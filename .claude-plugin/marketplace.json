@@ -1,0 +1,14 @@
+{
+  "name": "expert-partners",
+  "displayName": "Expert Partners AI Operating System",
+  "description": "Canonical skills for the Expert Partners AI Operating System",
+  "owner": "ExpertPartnersLLC",
+  "plugins": [
+    {
+      "name": "operating-doctrine",
+      "version": "2.0.0",
+      "description": "The non-negotiable operating standard. Loads at every session.",
+      "skills": ["operating-doctrine"]
+    }
+  ]
+}
