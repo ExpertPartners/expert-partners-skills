@@ -29,7 +29,7 @@ This skill loads the three canonical brand context documents:
 ## Authoritative source
 
 - Drive (live editing surface): per Allison's GitHub-everywhere principle, brand context lives in both Drive and GitHub. Drive is the editing canonical.
-- GitHub canonical (this folder): `ExpertPartnersLLC/skills/plugins/brand-voice/skills/brand-voice/`
+- GitHub canonical (this folder): `ExpertPartners/skills/plugins/brand-voice/skills/brand-voice/`
 - Auto-syncs to Aura local at `~/Claude/projects/Aura/skills/`
 - Should also reach Ember (M4 Mini) once cross-machine sync is wired.
 

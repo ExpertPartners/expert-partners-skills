@@ -2,7 +2,7 @@
   "name": "expert-partners",
   "displayName": "Expert Partners AI Operating System",
   "description": "Canonical skills for the Expert Partners AI Operating System",
-  "owner": "ExpertPartnersLLC",
+  "owner": "ExpertPartners",
   "plugins": [
     {
       "name": "operating-doctrine",
