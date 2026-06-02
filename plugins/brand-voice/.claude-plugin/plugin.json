@@ -1,6 +1,5 @@
 {
   "name": "brand-voice",
   "version": "0.1.0",
-  "description": "Canonical brand context for Expert Partners (EPIC), Free Agent Movement, and Moxie. Loaded into agent sessions to ground voice, tone, audience, and visual identity decisions.",
-  "skills": ["brand-voice"]
+  "description": "Canonical brand context for Expert Partners (EPIC), Free Agent Movement, and Moxie. Loaded into agent sessions to ground voice, tone, audience, and visual identity decisions."
 }
