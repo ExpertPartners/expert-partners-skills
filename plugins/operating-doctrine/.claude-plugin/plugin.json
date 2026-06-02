@@ -2,5 +2,5 @@
   "name": "operating-doctrine",
   "version": "2.0.0",
   "description": "The non-negotiable operating standard for the Expert Partners AI Operating System.",
-  "author": "Allison Gaddy"
+  "author": { "name": "Allison Gaddy" }
 }
