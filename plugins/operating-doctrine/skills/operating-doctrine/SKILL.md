@@ -226,7 +226,7 @@ If a pattern slips repeatedly, the doctrine has a gap, and the doctrine itself g
 
 ## Where This Doctrine Lives
 
-- Canonical: `ExpertPartners/skills/operating-doctrine/SKILL.md` (this file)
+- Canonical: `ExpertPartners/expert-partners-skills/operating-doctrine/SKILL.md` (this file)
 - Aura system prompt: highest-priority insert at the top, loaded at every session
 - Every Cowork project instructions: loaded at every session
 - Claude Code user CLAUDE.md: loaded at every session
