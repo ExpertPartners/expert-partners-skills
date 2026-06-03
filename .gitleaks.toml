@@ -1,0 +1,24 @@
+# Expert Partners gitleaks config (L6 Gatekeeper, F3).
+# Verified against gitleaks v8.30.1 config format, 2026-06-02.
+# Used identically by the local pre-commit hook and by CI (same ruleset, server-side enforced).
+
+title = "Expert Partners gitleaks config"
+
+# Inherit gitleaks' full default rule set, then layer repo-specific allowlisting on top.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Known-safe paths and documented false positives across the estate."
+# Binary/image assets are not source for secrets; skip to avoid noisy false positives on
+# screenshot PNGs and other media committed for documentation.
+paths = [
+  '''.*\.png$''',
+  '''.*\.jpe?g$''',
+  '''.*\.gif$''',
+  '''.*\.ico$''',
+  '''.*\.pdf$''',
+  '''.*\.woff2?$''',
+  # The verified-docs cache quotes OAuth SCOPE strings and example client-id shapes for
+  # documentation; these are not live secrets. Add narrower entries here only with a reason.
+]

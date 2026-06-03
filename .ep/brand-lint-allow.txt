@@ -1,0 +1,13 @@
+# brand-lint allowlist -- one Python regex per line. Any match is exempt from a finding.
+#
+# Use sparingly and only for genuine exceptions:
+#   - direct quotes that must preserve someone else's spelling
+#   - third-party proper nouns that legitimately collide with a brand term
+#   - forensic log/commit excerpts where the original text matters
+#
+# Prefer an inline `brand-lint: ignore` on the specific line over a broad allowlist entry,
+# so the exemption is visible at the point of use rather than hidden in this file.
+#
+# Examples (commented out -- uncomment and adapt only with a real reason):
+# ^Quoted third-party name$     # a proper noun that legitimately collides with a brand term
+# \bTICKER\b.*NASDAQ            # a stock ticker in a financial context

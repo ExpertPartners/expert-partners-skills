@@ -1,0 +1,16 @@
+{
+  "$comment": "Data-classification frontmatter schema for the Expert Partners estate. PROVISIONAL pending L1's data-classification ADR (Track E1). The four canonical classes are fixed by the lane partition (lane-L1-foundation.md line 34); L1 ratifies them in an ADR and L6 consumes this file. When L1 lands, this file is the single drop-in point -- the validator code does not change.",
+  "status": "provisional-pending-L1-ADR-E1",
+  "version": "0.1.0",
+  "frontmatter_key": "classification",
+  "allowed_values": ["public", "internal", "confidential", "restricted"],
+  "_required_in_paths_comment": "Glob patterns (relative to repo root) where a classification tag is MANDATORY. Empty today so existing untagged docs do not break commits. L5 populates this per brand repo as content is born tagged; until then, any file that DECLARES a classification is still value-checked everywhere.",
+  "required_in_paths": [],
+  "_exempt_paths_comment": "Never require (or value-check) classification on these even if they match required_in_paths.",
+  "exempt_paths": [
+    "README.md",
+    "**/README.md",
+    "LICENSE",
+    ".github/**"
+  ]
+}
