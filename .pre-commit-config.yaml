@@ -1,0 +1,40 @@
+# Expert Partners pre-commit framework -- deployed from L6 Gatekeeper (aura).
+# Same ruleset as .github/workflows/ci.yml (server-side). Install once per clone:
+#   pre-commit install
+# Run against everything: pre-commit run --all-files
+
+minimum_pre_commit_version: "3.5.0"
+default_install_hook_types: [pre-commit]
+
+repos:
+  # Secret scanning -- gitleaks CLI, no license required
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+
+  # Baseline hygiene
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ["--maxkb=4096"]
+
+  # Brand + classification gates -- repo-local via .ep/
+  - repo: local
+    hooks:
+      - id: brand-lint
+        name: Expert Partners brand-naming linter (eXp, Allison, Melony, em dashes)
+        entry: python3 .ep/brand-lint.py
+        language: system
+        files: \.(md|markdown|mdx|txt|rst)$
+      - id: frontmatter-lint
+        name: data-classification frontmatter validation
+        entry: python3 .ep/frontmatter-lint.py --schema .ep/classification-schema.json
+        language: system
+        files: \.(md|markdown|mdx)$
