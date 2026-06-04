@@ -1,16 +1,23 @@
 {
-  "$comment": "Data-classification frontmatter schema for the Expert Partners estate. PROVISIONAL pending L1's data-classification ADR (Track E1). The four canonical classes are fixed by the lane partition (lane-L1-foundation.md line 34); L1 ratifies them in an ADR and L6 consumes this file. When L1 lands, this file is the single drop-in point -- the validator code does not change.",
-  "status": "provisional-pending-L1-ADR-E1",
-  "version": "0.1.0",
+  "$comment": "Data-classification frontmatter schema for the Expert Partners estate. RATIFIED by ADR 0025 (decisions/0025-data-classification.md, 2026-06-02). Single drop-in point: the validator code (frontmatter-lint.py) does not change when this file changes.",
+  "status": "ratified",
+  "ratified_by": "ADR-0025",
+  "ratified_date": "2026-06-02",
+  "version": "1.0.0",
   "frontmatter_key": "classification",
   "allowed_values": ["public", "internal", "confidential", "restricted"],
-  "_required_in_paths_comment": "Glob patterns (relative to repo root) where a classification tag is MANDATORY. Empty today so existing untagged docs do not break commits. L5 populates this per brand repo as content is born tagged; until then, any file that DECLARES a classification is still value-checked everywhere.",
+  "_allowed_values_ref": "decisions/0025-data-classification.md -- Table: The four classes",
+  "_required_in_paths_comment": "Glob patterns (relative to repo root) where a classification tag is MANDATORY and absence is a commit error (fail-closed per ADR-0025). Empty on the aura repo today; L5 populates per brand repo as content is born tagged. Once populated, untagged files in these paths are rejected at pre-commit and CI.",
   "required_in_paths": [],
-  "_exempt_paths_comment": "Never require (or value-check) classification on these even if they match required_in_paths.",
+  "_exempt_paths_comment": "Paths where classification is never required (and value-checking is skipped). Machine-generated files, root READMEs, and CI config are out of scope per ADR-0025.",
   "exempt_paths": [
     "README.md",
     "**/README.md",
     "LICENSE",
-    ".github/**"
+    ".github/**",
+    ".ep/**",
+    ".claude/**",
+    "*.lock",
+    "*.json.raw"
   ]
 }
