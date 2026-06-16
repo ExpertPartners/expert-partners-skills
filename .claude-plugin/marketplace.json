@@ -15,6 +15,12 @@
       "name": "brand-voice",
       "source": "./plugins/brand-voice",
       "description": "Canonical brand context for Expert Partners, Free Agent Movement, and Moxie Signature Group"
+    },
+    {
+      "name": "content-engines",
+      "source": "./plugins/content-engines",
+      "version": "0.1.0",
+      "description": "Allison Gaddy content and marketing engines (master-marketer-free-agent-builder, rare-content-engine)."
     }
   ]
 }
