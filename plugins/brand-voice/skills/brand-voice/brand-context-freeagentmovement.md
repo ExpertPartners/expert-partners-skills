@@ -39,11 +39,14 @@ The vision is a movement of self-aware, system-driven, growth-focused agents who
 - Self-Love in Leadership: you cannot pour from an empty cup, identity comes before strategy
 - Open Playbook Leadership: we share what works, no gatekeeping, no posturing
 
-## Visual and Brand Anchors
+## Visual and Brand Anchors (Visual Identity System v3.1)
 
-- Movement-driven visual identity (energy, momentum, community)
-- Inclusive, diverse representation in imagery
-- Modern, accessible, never elitist
+- Editorial neutral, black-dominant. Palette is Black (#000000), White (#FFFFFF), and a single subtle Warm Bone (#F7F4EF). NO color accent: the prior Brand Blue (#2757CF) is retired for FAM. Emphasis comes from contrast and typography, never a colored highlight.
+- Typography: PT Serif headlines, Neue Swiss subheads / body / labels, IBM Plex Mono for numbers and technical detail. Overpass and Poppins are retired.
+- FAM is its own system, not an inherit of Expert Partners. It is built to layer over each member's personal brand, never replace it, which is why it carries no accent.
+- Warmth comes only from rich, editorial photography. The interface stays crisp black, white, and bone.
+- Inclusive, diverse representation in imagery. Modern, accessible, never elitist. Movement-coded, not person-coded.
+- Never reintroduce blue, brown, sepia, or warm-neutral UI tones; never add a color accent to the FAM mark; never substitute the licensed fonts.
 
 ## Hashtags and Social Conventions
 
