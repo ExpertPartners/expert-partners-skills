@@ -1,0 +1,46 @@
+---
+name: "document-formatting-standard"
+description: "Allison's default formatting for every document Claude creates (docx, PDF, or any styled deliverable): Poppins throughout, 1.5 line spacing, size-and-color headers with Brand Blue H2s, no bold or italics, no em dashes. Apply whenever creating or restyling a document unless a brand skill's typography explicitly governs that deliverable."
+---
+
+# Document Formatting Standard
+
+Ruled by Allison Gaddy, July 27, 2026, after the Wave 1 message review doc. This is the default look for every document Claude produces in Cowork or Claude Code: Word docs, PDFs, review docs, reports, SOPs rendered as deliverables, anything styled. It applies unless a brand skill's visual identity explicitly governs the deliverable (a Moxie listing piece, a FAM lead magnet, an EP-branded sales page keep their brand typography; internal and working documents use this standard).
+
+## The standard
+
+Typeface: Poppins for everything. Title, headers, body, labels. No font mixing in working documents.
+
+Line spacing: 1.5 throughout (in docx-js: spacing line 360).
+
+Hierarchy by size and color, never by bold or italics:
+
+- Title: Poppins 22pt, black #000000 (docx-js size 44)
+- H1 section headers: Poppins 17pt, black #000000 (size 34)
+- H2 subheaders: Poppins 13pt, Brand Blue #2757CF (size 26)
+- Body: Poppins 11pt, black #000000 (size 22)
+- Labels and meta text: Poppins 9pt, gray #555555 (size 18)
+
+Spacing rhythm (docx-js values): H1 before 320 after 160; H2 before 280 after 120; body after 160; labels after 60. Title after 80 with a gray subtitle line after 280.
+
+Quoted or message-style content: indent left 360 DXA, body size, so it reads as a block without borders or boxes.
+
+Page: US Letter (12240 x 15840 DXA), 1 inch margins all around.
+
+## Hard rules (inherit Allison's voice rules)
+
+- Never bold, never italics. Hierarchy comes from size and color only.
+- Never an em dash, anywhere, including headers.
+- Never horizontal rules, dividers, or decorative lines.
+- No emoji in documents.
+- Subtitle and provenance lines (date, audience, draft status) in gray meta style under the title.
+
+## Implementation notes
+
+In docx-js, set the default document style to Poppins size 22 and build helpers: title, h1, h2, body, label, and an indented msg block, using the values above. Verify output by converting to PDF and rendering a page image before delivering. In HTML or PDF pipelines, mirror the same values: Poppins via font stack 'Poppins, sans-serif', line-height 1.5, H2 color #2757CF.
+
+Poppins must be installed on the machine that opens the docx for it to render; it is part of the Expert Partners brand stack and present on Allison's machines. Name it explicitly in every run so it renders correctly there, whatever the fallback elsewhere.
+
+## Where this standard lives
+
+This file, in expert-partners-skills (plugins/operating-doctrine/skills/document-formatting-standard/), is the canonical copy. Cowork loads its saved operative copy of the same skill; Claude Code applies the same standard via the user CLAUDE.md pointer. If the standard changes, Allison rules it, and every copy updates together.
