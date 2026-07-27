@@ -1,4 +1,4 @@
-# Brand Context — Expert Partners (EPIC)
+# Brand Context -- Expert Partners (EPIC)
 
 ## Brand Identity
 
@@ -21,7 +21,7 @@ We build the next generation of real estate leaders by giving operators the syst
 
 ## Brand Voice and Tone
 
-- "We" not "I" — company / team voice, never first-person solo
+- "We" not "I" -- company / team voice, never first-person solo
 - Authoritative, operator-grounded, no theory
 - Forward-thinking, infrastructure-minded
 - Direct, unfiltered, but professional
@@ -62,7 +62,7 @@ We build the next generation of real estate leaders by giving operators the syst
 - eXp: lowercase "e," uppercase "XP" when referenced
 - "We" voice for all brand statements (never "I")
 - eXcelerate: not "accelerate" when referencing the brand-related term
-- Melony: not Melanie
+- Melony: not Melanie <!-- brand-lint: ignore -->
 - No em dashes. Use commas, semicolons, colons, parentheses, or double hyphens.
 
 ## Things We Never Say
@@ -79,7 +79,7 @@ We build the next generation of real estate leaders by giving operators the syst
 - CRM and marketing automation: GoHighLevel (PartnerSync)
 - Workflow automation: Make.com
 - AI infrastructure: Atlas (Don's Chief of Staff agent), Cortex (Content Ops), shared org-level AI preferences
-- System of record: Obsidian
+- System of record: GitHub canonical (doctrine, decisions, technical reference); Notion is the human-readable record layer (updated 2026-07-27; Obsidian removed from core architecture)
 - System of engagement: Notion
 - Web analytics: Google Tag Manager and Ahrefs (cleaned and current)
 - Custom builds: Lovable for the EPIC Inner Circle Resources hub

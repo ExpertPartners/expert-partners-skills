@@ -1,4 +1,4 @@
-# Brand Context — Free Agent Movement
+# Brand Context -- Free Agent Movement
 
 ## Brand Identity
 
@@ -56,9 +56,9 @@ The vision is a movement of self-aware, system-driven, growth-focused agents who
 
 ## Spelling and Style Rules
 
-- eXp: lowercase "e," uppercase "XP" (never "EXP" or "exp")
+- eXp: lowercase "e," uppercase "XP" (never "EXP" or "exp") <!-- brand-lint: ignore -->
 - Don: D-O-N (never Donald or Donny in copy)
-- Melony: not Melanie
+- Melony: not Melanie <!-- brand-lint: ignore -->
 - eXcelerate: not "accelerate" when referencing the brand-related term
 - Allison Gaddy: spelled correctly, no nicknames in formal copy
 - No em dashes anywhere in copy. Use commas, semicolons, colons, parentheses, or double hyphens.
@@ -79,7 +79,7 @@ The vision is a movement of self-aware, system-driven, growth-focused agents who
 - Marketing automation: GoHighLevel (PartnerSync system)
 - Workflow automation: Make.com (RevShare, Monthly Detail Reports)
 - AI infrastructure: Ember (Allison's Chief of Staff agent), Cortex (Content Operations)
-- System of record: Obsidian (memory layer for AI agents)
+- System of record: GitHub canonical (doctrine, decisions, technical reference); Notion is the human-readable record layer (updated 2026-07-27; Obsidian removed from core architecture)
 - System of engagement: Notion
 - EOS: priorities tracked in 90.io as Rocks, To-Dos, and Issues
 - Web analytics: Google Tag Manager and Ahrefs (cleaned and current)

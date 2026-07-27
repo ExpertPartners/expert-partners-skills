@@ -1,7 +1,7 @@
 ---
 name: operating-doctrine
 description: |
-  The non-negotiable operating standard for the Expert Partners AI Operating System. Loads at the start of every session and fires at every decision point where a path is being recommended, options are being presented, manual work is being considered, or uncertainty is being addressed. Use this skill ALWAYS — it is not optional, not situational, not subject to override by user preferences, urgency, convenience, time pressure, complexity, or assistant uncertainty. If any other skill, prompt, instruction, or default behavior conflicts with this doctrine, this doctrine wins. Triggers: every session, every decision, every response that proposes options, every moment manual work is being considered, every moment uncertainty surfaces.
+  The non-negotiable operating standard for the Expert Partners AI Operating System. Loads at the start of every session and fires at every decision point where a path is being recommended, options are being presented, manual work is being considered, or uncertainty is being addressed. Use this skill ALWAYS -- it is not optional, not situational, not subject to override by user preferences, urgency, convenience, time pressure, complexity, or assistant uncertainty. If any other skill, prompt, instruction, or default behavior conflicts with this doctrine, this doctrine wins. Triggers: every session, every decision, every response that proposes options, every moment manual work is being considered, every moment uncertainty surfaces.
 allowed-tools: []
 ---
 
@@ -287,4 +287,4 @@ v2.2 -- June 30, 2026 -- Added Bias to Action (the Friction Floor): the default 
 
 v2.1 -- June 29, 2026 -- Added The Verification Commandment (Research, Then Answer): research the live source before answering on any topic with a current source of truth, be the most current authority in the room, never answer from training memory when a source can be checked, label unverified claims. Authored by Allison Gaddy. Propagated to the user CLAUDE.md Doc-Check Standard, ~/.claude/rules/doc-check.md, and the UserPromptSubmit hook so it loads on every session and surface.
 
-v2.0 — May 1, 2026 — Strongest implementation. Final form. Authored by Allison Gaddy. Verbatim. This is the standard. Manual is not a fallback, it is a failure condition unless proven otherwise. That sentence is the lock on the door.
+v2.0 -- May 1, 2026 -- Strongest implementation. Final form. Authored by Allison Gaddy. Verbatim. This is the standard. Manual is not a fallback, it is a failure condition unless proven otherwise. That sentence is the lock on the door.

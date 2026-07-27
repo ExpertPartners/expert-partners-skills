@@ -73,7 +73,7 @@ Run these in order. One step at a time, confirming as you go.
 
 ### Step 1: Confirm the funnel and location
 
-Ask which funnel you are documenting and which location it lives in (EPIC New or Expert Partners New). Confirm back what you heard before doing anything.
+Ask which funnel you are documenting and which location it lives in (EPIC or Expert Partners). Confirm back what you heard before doing anything.
 
 ### Step 2: Check Notion first for duplicates
 
@@ -119,20 +119,20 @@ Then give the exact block to paste. Then the instruction to come back. Make it i
 
 Use this in Step 4. Fill in the location and funnel name before handing it over.
 
-"Read the live GHL funnel for [funnel name] in the [EPIC New / Expert Partners New] location. Pull the full object model: pages and steps with slugs and the public entry link, embedded forms and surveys, workflows and triggers, tags, pipeline and stage, trigger links, custom fields and custom values, calendars, products and order forms, and every email, SMS, and snippet with its trigger and sequence order. Also pull the post-load layer: domain, phone, Stripe, integrations. Write the result to a single structured file and print DONE with the file path."
+"Read the live GHL funnel for [funnel name] in the [EPIC / Expert Partners] location. Pull the full object model: pages and steps with slugs and the public entry link, embedded forms and surveys, workflows and triggers, tags, pipeline and stage, trigger links, custom fields and custom values, calendars, products and order forms, and every email, SMS, and snippet with its trigger and sequence order. Also pull the post-load layer: domain, phone, Stripe, integrations. Write the result to a single structured file and print DONE with the file path."
 
 ### Bridge block: behavioral test-audit
 
 Use this in Step 8. Fill in the location, funnel name, and public entry link.
 
-"Run a behavioral test-audit on the live GHL funnel for [funnel name] in the [EPIC New / Expert Partners New] location at [public entry link]. Submit a contained test identity: a non-deliverable example.com email, marked do-not-disturb, clearly tagged as a test. Then read the resulting contact and opportunity and confirm four things: the form fired, the expected tags applied, the expected workflow enrolled, and the opportunity landed in the right pipeline and stage. Print the contact ID, today's date, and a clear PASS or FAIL for each of the four checks, then print DONE."
+"Run a behavioral test-audit on the live GHL funnel for [funnel name] in the [EPIC / Expert Partners] location at [public entry link]. Submit a contained test identity: a non-deliverable example.com email, marked do-not-disturb, clearly tagged as a test. Then read the resulting contact and opportunity and confirm four things: the form fired, the expected tags applied, the expected workflow enrolled, and the opportunity landed in the right pipeline and stage. Print the contact ID, today's date, and a clear PASS or FAIL for each of the four checks, then print DONE."
 
 ## Field map for the Funnels database
 
 When you write the record, these are the fields and what goes in each:
 
 - Funnel Name: the funnel's name (title)
-- Location: EPIC New or Expert Partners New
+- Location: EPIC or Expert Partners
 - Status: Active, Migrating, Cutover Ready, Live, or Archived
 - Public Entry Link: the live entry URL
 - Funnel ID and Slug: the GHL funnel ID and slug

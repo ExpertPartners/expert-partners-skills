@@ -1,10 +1,12 @@
 ---
 name: funnel-build
 description: >-
-  Build a brand new funnel in a clean location (EPIC New or Expert Partners
-  New), then document it so it is born documented. Use this whenever someone
-  wants to build a new funnel, create a funnel, stand up a funnel, launch a new
-  funnel, or spin up a funnel from scratch in one of the clean locations. Use
+  Build a brand new funnel in the funnel's brand location (per the five-location
+  registry: EPIC, Expert Partners, AG Personal Brand, Moxie Signature Group, or
+  Free Agent Nation Circle Community), then document it so it is born
+  documented. Use this whenever someone wants to build a new funnel, create a
+  funnel, stand up a funnel, launch a new funnel, or spin up a funnel from
+  scratch. Use
   it even if they do not say "build," as long as the intent is a new funnel
   that does not exist yet. This skill is permanent. It ends by calling the
   Funnel Documentation skill, so every new funnel lands fully documented from
@@ -13,7 +15,7 @@ description: >-
 
 # Funnel Build
 
-This walks the build of a new funnel in a clean location, EPIC New or Expert Partners New, and then runs Funnel Documentation so the funnel is born documented. No new funnel exists undocumented. That is the whole point.
+This walks the build of a new funnel in the funnel's brand location and then runs Funnel Documentation so the funnel is born documented. Locations come from the canonical registry (partnersync/reference/ghl-location-registry.md, updated 2026-07-27); never work from remembered location names. No new funnel exists undocumented. That is the whole point.
 
 ## Who you are talking to
 
@@ -41,7 +43,7 @@ A funnel is never just its pages. Plan and build against the full model from the
 
 ## Where things live
 
-- Build location: EPIC New or Expert Partners New.
+- Build location: the brand location per the canonical registry.
 - System of record: Notion, the Funnels and Funnel Messages databases. Nothing is done until it lives in Notion.
 - Airtable is the migration tracker only and is not used for new builds.
 
@@ -59,7 +61,7 @@ One step at a time, confirming as you go.
 
 ### Step 1: Confirm the funnel and location
 
-Ask what the funnel is for, what it should accomplish, and which location it belongs in (EPIC New or Expert Partners New). Confirm back before doing anything.
+Ask what the funnel is for, what it should accomplish, and which brand location it belongs in (per the canonical registry). Confirm back before doing anything.
 
 ### Step 2: Check for duplicates
 
@@ -101,4 +103,4 @@ Then the exact block to paste. Then the instruction to come back. Make it imposs
 
 Use this in Step 7. Fill in the location, funnel name, and public entry link.
 
-"Run a behavioral test-audit on the live GHL funnel for [funnel name] in the [EPIC New / Expert Partners New] location at [public entry link]. Submit a contained test identity: a non-deliverable example.com email, marked do-not-disturb, clearly tagged as a test. Then read the resulting contact and opportunity and confirm four things: the form fired, the expected tags applied, the expected workflow enrolled, and the opportunity landed in the right pipeline and stage. Print the contact ID, today's date, and a clear PASS or FAIL for each of the four checks, then print DONE."
+"Run a behavioral test-audit on the live GHL funnel for [funnel name] in the [EPIC / Expert Partners] location at [public entry link]. Submit a contained test identity: a non-deliverable example.com email, marked do-not-disturb, clearly tagged as a test. Then read the resulting contact and opportunity and confirm four things: the form fired, the expected tags applied, the expected workflow enrolled, and the opportunity landed in the right pipeline and stage. Print the contact ID, today's date, and a clear PASS or FAIL for each of the four checks, then print DONE."

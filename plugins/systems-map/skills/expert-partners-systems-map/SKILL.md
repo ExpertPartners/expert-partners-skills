@@ -7,24 +7,42 @@ allowed-tools: []
 
 # Expert Partners Systems Map and Access Map
 
-This is the bible of where things live and what Claude can reach. The full version is in GitHub canonical, in the expert-partners doctrine area. This skill is the operative version that loads everywhere so nobody has to repeat it.
+This is the bible of where things live and what Claude can reach. The full version is in GitHub canonical, in the expert-partners doctrine area. This skill is the operative version that loads everywhere so nobody has to repeat it. When this skill and the full bible ever diverge, the bible wins and this skill is re-synced from it.
 
 ## The one rule
 
 Each system has exactly one job. Discrepancies happen when a system is asked to carry something that belongs somewhere else. When in doubt, match the thing to the one job below, not to whatever is closest at hand.
 
-## What each system does
+## The entity and the platform
+
+Expert Partners LLC is the legal and operating entity. Don Hobbs operates under Expert Partners LLC; his IP (Gateway to Mastery, Think Big Live Big, 2020 Vision, events, coaching clients, and related training assets) lives under Expert Partners LLC. He is not a separate brand stack or a separate business container.
+
+PartnerSync is the white-labeled GoHighLevel platform layer, the agency container (company `FOz8PSvqj7aYASb3wDzm`, "Expert Partners LLC dba Partner Sync"). It is plumbing, not a legal entity and not a brand. It holds five brand locations: EPIC, Expert Partners, AG Personal Brand, Moxie Signature Group, and Free Agent Nation Circle Community. The canonical registry with IDs, states, purposes, and the implementation priority order is `partnersync/reference/ghl-location-registry.md`; a mirror lives in the expert-partners repo at `reference/ghl-location-registry.md`. The location a contact lives in IS the brand statement; the peer brand-tag vocabulary is retired as contact-routing architecture (ruled 2026-07-27; full rule in `partnersync/doctrine/cross-location-identity-rules.md`).
+
+## Storage map: what each system does, one job each
 
 | System | Its one job | What goes here | What never goes here |
 | --- | --- | --- | --- |
-| Memory (Claude) | Cross-session recall, auto-loads each session | Short structured facts a future session must know, plus pointers to canonical docs | Human-facing content, secrets, anything long |
-| Notion | Single source of truth for funnel records and human logging | Funnel records (Funnels and Funnel Messages), status, human-readable logs | Technical doctrine, reference docs, secrets |
-| GitHub canonical | Single source of truth for doctrine and technical reference | Doctrine, decisions (ADRs), references, project knowledge. Commit AND push | Funnel records, secrets or tokens |
+| Notion | Single source of truth for funnel records and human logging. A funnel is not done until it lives here. | Funnel records (Funnels and Funnel Messages), status, human-readable logs, regenerated-from-canon human views | Doctrine, technical reference, secrets. Nothing authored in Notion competes with git canon |
+| GitHub canonical (`expert-partners`, `ghl-automation`, `expert-partners-skills`, `partnersync`) | Single source of truth for doctrine, decisions, and technical reference | Doctrine, decisions (ADRs), references, project knowledge, every n8n workflow's design doc. Commit AND push | Funnel records, secrets or tokens |
+| Memory (Claude) | Claude cross-session recall, auto-loads each session | Short structured facts a future session must know, plus pointers to canonical docs | Human-facing content, secrets, anything long |
+| 1Password | Secrets and tokens vault | Tokens, API keys, PITs, client secrets, passwords | Anything that belongs in GitHub or Notion. Secrets never go in GitHub or Notion |
 | AWS | Compute and hosting, not a document store | Backend services, runtime token storage, scripts | Documentation, anything you go to read |
-| 1Password | Secrets vault | Tokens, API keys, PITs, client secrets | Anything that belongs in GitHub or Notion |
-| Airtable | Migration tracker only (retires after the migrations) | Migration status during the move | Permanent records, doctrine |
-| Claude Code (M4) | Implementation engine for repo and GHL live work | Git commits and pushes, GHL API reads and writes via the app token, scripts. Tokens live here | The source of truth itself, open-ended brainstorming |
-| Cowork | Orchestration and reasoning brain | Planning, Notion / Airtable / Drive via connectors, data-layer writes, handing Code exact bridge blocks, verification | Direct GHL token work (that runs in Code) |
+| n8n | Execution layer only: runs workflows, stores nothing canonical | Workflow runtime for automation logic that GHL's API cannot build (see the platform-selection rule below) | Design docs, doctrine, records. Every workflow's design doc lives in GitHub |
+| Google Workspace | Delivery and collaboration only, never canonical | Documents delivered to humans, collaboration surfaces, transcripts and formal docs for reference | Canonical doctrine, decisions, records of truth |
+| Airtable | Migration tracker only, temporary (retires after the migrations) | Migration status during the move | Permanent records, doctrine |
+| Claude Code (M4) | Implementation engine: git push and live GHL reads and writes | Git commits and pushes, GHL API reads and writes via the Marketplace app token, scripts. Tokens live here | The source of truth itself, open-ended brainstorming |
+| Cowork | Orchestration, connector work, and verification | Planning, Notion / Airtable / Drive via connectors, data-layer writes, verification, handing Code exact bridge blocks | Direct GHL token work (that runs in Code) |
+
+Not in the stack, stated so nobody re-litigates it:
+
+- Obsidian is not part of the core architecture (ruled 2026-07-27). The one exception is EmberVault, Ember's internal knowledge vault on the M2: Ember-internal knowledge only, read-only to everyone else, never canonical, and nothing else stores anything there.
+- Manychat is not live and not in the stack. It gets a doctrine line if and when Allison implements it.
+- Make is frozen for new builds and migrating to n8n (ADR: `partnersync/decisions/0011-make-to-n8n-migration.md`). Existing scenarios run until rebuilt on touch.
+
+## AI brains
+
+The brains, their seats, machines, one jobs, SOULs, and liveness rules live in Bible Chapter 4 (`canonical-bible-chapter-4-brains-and-sync-topology.md`, expert-partners doctrine area). This map does not restate the roster. One production brain (Ember, M2), one strategic brain (Aura, M4 / Cowork); everything else is planned and dark by design. Liveness is proven by process evidence, never by a fresh commit.
 
 ## What Claude can already reach (the access map)
 
@@ -36,8 +54,10 @@ Claude already holds broad access across this stack. Do not claim access is miss
 | Credentials and secrets | 1Password, the primary store, multiple vaults | Search 1Password across all vaults |
 | GoHighLevel | Marketplace app token, lives in Claude Code (M4) | Read or write via the app token in Code |
 | Google file creation and admin | SA plus DWD path: service-account.json impersonating allison@. Never the read-only Google MCP connectors | Test SA plus DWD before any Google admin call |
-| Connectors (read and act) | Airtable, Canva, ClickUp, Cloudflare, Coupler, Fireflies, Gamma, Gmail, GoDaddy, Google Calendar, Google Drive, Granola, Make, Mercury, Miro, Notion, Slack | Call the connector tool directly |
+| Connectors (read and act) | Airtable, Canva, ClickUp, Cloudflare, Coupler, Fireflies, Gamma, Gmail, GoDaddy, Google Calendar, Google Drive, Granola, Make, Mercury, Miro, n8n, Notion, Slack | Call the connector tool directly |
 | Compute and backend | AWS | Reach the service directly |
+
+Warning line, ordered by Chapter 3: the Windsor GHL connector points at a foreign GHL company (`wVd3gUNItq6OXcVVS9xL`, not the PartnerSync agency) and must never be treated as a PartnerSync source.
 
 ## Verify-first protocol (inherits operating-doctrine)
 
@@ -52,25 +72,42 @@ If it succeeds, execute and report. If it genuinely fails after all four, name t
 
 ## Commit versus push
 
-Commit means saved locally on the machine. Push means it is in the shared canonical record every conversation reads. Always push doctrine and reference. A commit nobody pushed is invisible to the rest of the system.
+Commit means saved locally on the machine. Push means it is in the shared canonical record that every conversation reads. Always push doctrine and reference. A commit nobody pushed is invisible to the rest of the system.
+
+## Universal rules versus project rules
+
+Universal rules belong in org-level Claude instructions, where they apply everywhere across every project and session. Project-specific rules belong in that one project's instructions only. Do not paste universal rules into each project; that creates drift the moment one copy changes. One universal rule, one canonical home.
+
+## GHL: app-token-first, and the capability boundary
+
+GHL writes are app-token-first. Use the GoHighLevel Marketplace app token that lives in Claude Code (M4) as the primary path for reads and writes, before reaching for any other credential or a manual UI action.
+
+The GHL capability boundary holds: the data layer is writable through the API (contacts, tags, custom fields, opportunities, and similar records), while the builder layer is blocked to automation (funnels, workflows, and other canvas-built objects are UI-only and the builder canvas is CSP-blocked). Match the work to the writable layer; route builder-layer changes to the eyes-on path. Production-contact deletion still requires a fresh explicit confirmation.
+
+## The automation platform-selection rule (ruled 2026-07-27)
+
+Per automation, the implementer (Claude Code / Cowork) makes the platform call against current developer docs, with a hard bias for Claude-buildable. Allison never hand-builds workflows: where GHL API limits would force manual builder work, the logic goes to n8n. GHL keeps native sends on the location's number and sending reputation. Full doctrine: `ghl-automation/doctrine/automation-platform-selection.md`.
 
 ## Quick decision guide
 
-- A funnel record or a human log? Notion.
+- A funnel record or a human log? Notion. A funnel is not done until it lives there.
 - Doctrine, a decision, or technical reference? GitHub canonical, commit and push.
 - A fact a future session must recall? Memory.
-- A secret or token? 1Password.
+- A secret or token? 1Password. Never GitHub or Notion.
 - Running code or a backend service? AWS.
+- Automation logic GHL's API cannot build? n8n executes it; the design doc lives in GitHub.
+- A document for a human to receive or collaborate on? Google Workspace. Never canonical.
 - A rule that should apply everywhere? Org-level instructions.
-- A rule for just one project? That project's instructions.
-- Live GHL reads or writes? Claude Code, with the Marketplace app token. Cowork orchestrates and verifies.
+- A rule for just one project? That project's instructions only.
+- Live GHL reads or writes? Claude Code, with the Marketplace app token, app-token-first. Cowork orchestrates and verifies.
+- Which brand owns this contact? The location it lives in. Brand labels are for assets that genuinely need one, never a routing layer.
 
 ## Where this skill lives
 
 - Full bible: GitHub canonical, expert-partners doctrine area. Authoritative, version-controlled.
-- This skill: provisioned org-wide in Organization settings, Skills. Loads in chat, Cowork, and Code beta.
+- This skill: provisioned org-wide in Organization settings, Skills. Loads in chat, Cowork, and Code.
 - Memory: a one-line mirror that points here.
 
 ## Version
 
-v1.0. Derived verbatim from the Expert Partners Systems Map bible dated 2026-06-19. Authored by Allison Gaddy.
+v2.0. Derived verbatim from the Expert Partners Systems Map bible dated 2026-07-27 (bible v2.0, per Allison's canon-pass rulings). Authored by Allison Gaddy.

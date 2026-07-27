@@ -1,8 +1,8 @@
 ---
 name: funnel-migration
 description: >-
-  Move a funnel out of the old PartnerSync location and into EPIC New or
-  Expert Partners New, verify every object-model element transferred, certify
+  Move a funnel out of the old PartnerSync location and into EPIC or
+  Expert Partners, verify every object-model element transferred, certify
   the cutover with a live behavioral test, then document it. Use this whenever
   someone wants to migrate a funnel, move a funnel to the new location, port a
   funnel out of the legacy Expert Partners GHL, cut over a funnel, or rebuild
@@ -15,7 +15,9 @@ description: >-
 
 # Funnel Migration
 
-This is the per-funnel walk for moving one funnel from the old PartnerSync location (legacy Expert Partners GHL) into a clean location, EPIC New or Expert Partners New. It verifies every object-model element, certifies the cutover with a live test, then hands off to Funnel Documentation so the funnel is born documented in the same pass. This skill is temporary. It retires after both migrations are complete.
+STATUS (2026-07-27): STALE, retirement pending. The migration this skill served is over: EPIC went clean-in-place on its live location (partnersync ADR 0006) and the "EPIC New" build location became AG Personal Brand. Do not run this skill against the current estate without first reading the canonical registry (partnersync/reference/ghl-location-registry.md) and confirming with Allison that a genuine funnel move is in play.
+
+This is the per-funnel walk for moving one funnel from the old PartnerSync location (legacy Expert Partners GHL) into a clean location, EPIC or Expert Partners. It verifies every object-model element, certifies the cutover with a live test, then hands off to Funnel Documentation so the funnel is born documented in the same pass. This skill is temporary. It retires after both migrations are complete.
 
 ## Who you are talking to
 
@@ -44,7 +46,7 @@ Every element below must make it across, or be explicitly marked not applicable.
 ## Where things live
 
 - Source: the old PartnerSync location, legacy Expert Partners GHL.
-- Destination: EPIC New or Expert Partners New.
+- Destination: EPIC or Expert Partners.
 - Migration tracker: Airtable, the migration spine only. It retires when the work is done.
 - System of record: Notion, the Funnels and Funnel Messages databases. Nothing is done until it lives in Notion.
 - Source audit docs: Google Drive (GHL Old Expert Partners Migration Audit) and the EPIC Funnels inventory.
@@ -63,7 +65,7 @@ One step at a time, confirming as you go.
 
 ### Step 1: Confirm the funnel and the destination
 
-Ask which funnel is migrating and whether it belongs in EPIC New or Expert Partners New. Confirm back before doing anything.
+Ask which funnel is migrating and whether it belongs in EPIC or Expert Partners. Confirm back before doing anything.
 
 ### Step 2: Check the destination for duplicates
 
@@ -115,7 +117,7 @@ Use this in Step 3. Fill in the funnel name.
 
 Use this in Step 8. Fill in the destination location, funnel name, and the new public entry link.
 
-"Run a behavioral test-audit on the live GHL funnel for [funnel name] in the [EPIC New / Expert Partners New] location at [new public entry link]. Submit a contained test identity: a non-deliverable example.com email, marked do-not-disturb, clearly tagged as a test. Then read the resulting contact and opportunity and confirm four things: the form fired, the expected tags applied, the expected workflow enrolled, and the opportunity landed in the right pipeline and stage. Print the contact ID, today's date, and a clear PASS or FAIL for each of the four checks, then print DONE."
+"Run a behavioral test-audit on the live GHL funnel for [funnel name] in the [EPIC / Expert Partners] location at [new public entry link]. Submit a contained test identity: a non-deliverable example.com email, marked do-not-disturb, clearly tagged as a test. Then read the resulting contact and opportunity and confirm four things: the form fired, the expected tags applied, the expected workflow enrolled, and the opportunity landed in the right pipeline and stage. Print the contact ID, today's date, and a clear PASS or FAIL for each of the four checks, then print DONE."
 
 ## When this skill retires
 
