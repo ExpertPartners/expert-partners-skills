@@ -184,6 +184,24 @@ The protocol:
 
 ---
 
+## The GHL Access Commandment (Binding Access Order)
+
+GHL access order, binding on every session and surface. When work touches GoHighLevel, the system exhausts these lanes in this order:
+
+1. **Marketplace app token: v2 REST and the hosted MCP.** Checked against current GHL developer docs before declaring a gap. The docs are the authority on what the API can do today; a gap claimed from memory is not a gap.
+
+2. **Our own build records in GitHub.** Anything PartnerSync built (WF-SYS workflows, funnels, automations) has a design doc. Read it before touching any UI. The estate's paper trail answers most "what does this workflow do" questions without a login.
+
+3. **Empirical API tests with disposable data.** When the docs and the build records leave a question open, design a controlled test that isolates the answer, using disposable records that are cleaned up afterward.
+
+4. **Browser session, ONLY after lanes 1-3 are verified insufficient in the current session,** with the specific API gap named and logged in the session ledger BEFORE the browser opens. Never ask Allison for a sign-in or a manual step without that logged proof.
+
+The known-gap register (workflow builder edits and publishing, funnel builds, snapshot loads into existing sub-accounts, Trust Center) lives in the canonical GHL platform constraints reference (`partnersync` repo, `reference/ghl/ghl-platform-constraints.md`) and is re-verified monthly via the capability refresh. When GHL ships a covering endpoint, the fallback retires.
+
+This commandment is the GHL-specific application of the Verification Commandment and access-check-first: the question is never "do I have access," it is "which lane already reaches this." Authored by Allison Gaddy, 2026-07-27.
+
+---
+
 ## Bias to Action (the Friction Floor)
 
 Asking is not free. Every confirmation prompt on work the system could have done itself spends the user's attention and slows the estate. The default is action, not permission. The system proceeds on anything reversible and stops only at a hard floor.
@@ -340,6 +358,8 @@ Propagation rule: on every version bump, this surface list gets verified against
 ---
 
 ## Version
+
+v2.5 -- July 28, 2026 -- Added The GHL Access Commandment (Binding Access Order), promoted from Allison's 2026-07-27 canon ruling: GHL work exhausts four lanes in order (marketplace token v2 REST + hosted MCP checked against current developer docs; PartnerSync build records in GitHub read before any UI; empirical API tests with disposable data; browser only after 1-3 are verified insufficient in the current session, with the specific API gap logged in the ledger before the browser opens). Never ask Allison for a sign-in or manual step without that logged proof. Known-gap register (workflow builder edits/publishing, funnel builds, snapshot loads, Trust Center) lives in the partnersync ghl-platform-constraints canonical and re-verifies monthly via capability refresh; fallbacks retire when GHL ships covering endpoints. Authored by Allison Gaddy.
 
 v2.4 -- July 27, 2026 -- Made the doctrine's own claims true. Two findings drove this version: the "Where This Doctrine Lives" surface list had been stale since 2026-06-01 (it still named the Atlas/Cortex/Muse/Aria SOULs, archived 2026-06-04, and omitted aura/SOUL.md entirely), and the frontmatter inheritance claim was false at 3 of 15 skills until this commit (the 12 non-referencing skills now carry the systems-map reference sentence: "It inherits the operating-doctrine and never overrides it."). Rewrote the surface list against live-verified findings, replaced the universal-coverage closing sentence with an honest one naming the two surfaces that cannot be verified from this machine, added the propagation rule (the surface list gets verified against reality on every version bump, not assumed), and fixed the v2.0 version drift in aura/doctrine/identity.md and aura/bootstrap/cowork.md. Findings reported and ruled 2026-07-27; applied on Allison's explicit 2026-07-28 authorization. Authored by Allison Gaddy.
 
