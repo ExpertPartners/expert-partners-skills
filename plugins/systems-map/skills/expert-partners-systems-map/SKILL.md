@@ -54,6 +54,7 @@ Claude already holds broad access across this stack. Do not claim access is miss
 | Credentials and secrets | 1Password, the primary store, multiple vaults | Search 1Password across all vaults |
 | GoHighLevel | Marketplace app token, lives in Claude Code (M4) | Read or write via the app token in Code |
 | Google file creation and admin | SA plus DWD path: service-account.json impersonating allison@. Never the read-only Google MCP connectors | Test SA plus DWD before any Google admin call |
+| Web data (scraping, crawling, page monitoring) | Firecrawl, two lanes: Cowork / Claude app via the account-wide OAuth connector (`https://mcp.firecrawl.dev/v2/mcp-oauth`); Claude Code via the unattended lane (`https://mcp.firecrawl.dev/v2/mcp`) with a Bearer key read from `op://Automation/FIRECRAWL-API-KEY`, never plaintext | Call the Firecrawl MCP tools directly |
 | Connectors (read and act) | Airtable, Canva, ClickUp, Cloudflare, Coupler, Fireflies, Gamma, Gmail, GoDaddy, Google Calendar, Google Drive, Granola, Make, Mercury, Miro, n8n, Notion, Slack | Call the connector tool directly |
 | Compute and backend | AWS | Reach the service directly |
 
@@ -88,6 +89,15 @@ The GHL capability boundary holds: the data layer is writable through the API (c
 
 Per automation, the implementer (Claude Code / Cowork) makes the platform call against current developer docs, with a hard bias for Claude-buildable. Allison never hand-builds workflows: where GHL API limits would force manual builder work, the logic goes to n8n. GHL keeps native sends on the location's number and sending reputation. Full doctrine: `ghl-automation/doctrine/automation-platform-selection.md`.
 
+## Web data acquisition: Firecrawl-first (ruled 2026-07-27)
+
+Firecrawl is the primary tool for all scraping, crawling, and JS-heavy page monitoring, including the war room page monitors and the monthly capability refresh. Native web search / fetch is the fallback; browser automation is the last resort. Firecrawl is live and paid: team "Expert Partners" (renamed from Team Ember Team), Hobby plan, 5,000 credits per month, Smart Upgrade ON.
+
+Two lanes, matched to the surface:
+
+1. **Cowork / Claude app:** the account-wide custom connector at `https://mcp.firecrawl.dev/v2/mcp-oauth`, OAuth individual sign-in.
+2. **Claude Code (unattended):** `https://mcp.firecrawl.dev/v2/mcp` with an `Authorization: Bearer` key read from `op://Automation/FIRECRAWL-API-KEY`. The key is never written in plaintext anywhere: not in configs, not on command lines, not in chat.
+
 ## Quick decision guide
 
 - A funnel record or a human log? Notion. A funnel is not done until it lives there.
@@ -100,6 +110,7 @@ Per automation, the implementer (Claude Code / Cowork) makes the platform call a
 - A rule that should apply everywhere? Org-level instructions.
 - A rule for just one project? That project's instructions only.
 - Live GHL reads or writes? Claude Code, with the Marketplace app token, app-token-first. Cowork orchestrates and verifies.
+- Scraping, crawling, or watching a JS-heavy page? Firecrawl first, on the lane that matches the surface. Native web search / fetch is fallback; browser automation is last resort.
 - Which brand owns this contact? The location it lives in. Brand labels are for assets that genuinely need one, never a routing layer.
 
 ## Where this skill lives
@@ -110,4 +121,4 @@ Per automation, the implementer (Claude Code / Cowork) makes the platform call a
 
 ## Version
 
-v2.0. Derived verbatim from the Expert Partners Systems Map bible dated 2026-07-27 (bible v2.0, per Allison's canon-pass rulings). Authored by Allison Gaddy.
+v2.1. Derived verbatim from the Expert Partners Systems Map bible dated 2026-07-27 (bible v2.1, adding the Firecrawl web-data-acquisition doctrine). Authored by Allison Gaddy.
