@@ -1,6 +1,6 @@
 ---
 name: pin
-description: Place-keeping baton marker between CoWork and Claude Code, plus the carry-back choreography (pin fires only after Allison confirms she pasted into Cowork). Use when Allison types /pin or says "pin", confirms a paste ("pasted", "done"), says "pasting back to CoWork" or "back to code", or when composing any carry-back report bound for Cowork. A pin is a bookmark, never a task.
+description: Place-keeping baton marker between CoWork and Claude Code, plus the carry-back choreography (pin fires only after Allison confirms she pasted into Cowork). Use when Allison types /pin or says "pin", confirms a paste ("pasted", "done"), says "pasting back to CoWork" or "back to code", or when composing any carry-back report bound for Cowork. A pin is a bookmark, never a task. It inherits the operating-doctrine and never overrides it.
 ---
 
 # Pin -- v2 (2026-07-28)

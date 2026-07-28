@@ -1,6 +1,6 @@
 ---
 name: brand-voice
-description: Canonical brand context for the three primary brands operated by Allison Gaddy and Don Hobbs — Expert Partners (EPIC), Free Agent Movement, and Moxie Signature Group. Use this skill when writing, editing, or reviewing any brand-facing content to ground voice, tone, audience, differentiator, and visual identity decisions in the canonical positioning.
+description: Canonical brand context for the three primary brands operated by Allison Gaddy and Don Hobbs — Expert Partners (EPIC), Free Agent Movement, and Moxie Signature Group. Use this skill when writing, editing, or reviewing any brand-facing content to ground voice, tone, audience, differentiator, and visual identity decisions in the canonical positioning. It inherits the operating-doctrine and never overrides it.
 ---
 
 # Brand Voice — canonical brand context

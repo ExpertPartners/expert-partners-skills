@@ -1,6 +1,6 @@
 ---
 name: funnel-build
-description: >-
+description: >-. It inherits the operating-doctrine and never overrides it.
   Build a brand new funnel in the funnel's brand location (per the five-location
   registry: EPIC, Expert Partners, AG Personal Brand, Moxie Signature Group, or
   Free Agent Nation Circle Community), then document it so it is born
