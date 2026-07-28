@@ -1,6 +1,6 @@
 ---
 name: pin
-description: Carry-back envelope and place-keeping baton between CoWork and Claude Code. Fires when composing ANY report bound for Cowork, when a block arrives opening with COWORK HOME:/SESSION: (envelope check before executing), when Allison types /pin or says "pin", or when she confirms a paste ("pasted", "done"). Pin fires only after her paste confirmation. A pin is a bookmark, never a task. It inherits the operating-doctrine and never overrides it.
+description: "Carry-back envelope and place-keeping baton between CoWork and Claude Code. Fires when composing ANY report bound for Cowork, when a block arrives opening with COWORK HOME / SESSION header lines (envelope check before executing), when Allison types /pin or says \"pin\", or when she confirms a paste (\"pasted\", \"done\"). Pin fires only after her paste confirmation. A pin is a bookmark, never a task. It inherits the operating-doctrine and never overrides it."
 ---
 
 # Pin -- v3 (2026-07-28)
