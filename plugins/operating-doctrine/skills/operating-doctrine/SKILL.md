@@ -325,19 +325,23 @@ If a pattern slips repeatedly, the doctrine has a gap, and the doctrine itself g
 
 ## Where This Doctrine Lives
 
-- Canonical: `ExpertPartners/expert-partners-skills/operating-doctrine/SKILL.md` (this file)
-- Aura system prompt: highest-priority insert at the top, loaded at every session
-- Every Cowork project instructions: loaded at every session
-- Claude Code user CLAUDE.md: loaded at every session
-- Every other skill in the repo: YAML frontmatter references this doctrine
-- Ember/Atlas/Cortex/Muse/Aria SOUL.md: all five agents inherit identically
-- Claude.ai Aura project knowledge: uploaded as project knowledge file (active for all conversations in this project)
+- Canonical: `ExpertPartners/expert-partners-skills/operating-doctrine/SKILL.md` (this file). Live, version-controlled.
+- Aura system prompt: maintained as `aura/bootstrap/cowork.md` (reading copy: `aura/doctrine/identity.md`), pasted into the Cowork project Instructions panel. Live in the aura repo.
+- Cowork project instructions: claude.ai-side panels. Not verifiable from this machine; a propagation target confirmed by Allison at re-upload, never an assumed state.
+- Claude Code user CLAUDE.md: `~/.claude/CLAUDE.md`, mirrored to `ExpertPartners/allison-claude-doctrine`. Live.
+- Every other skill in the repo: YAML frontmatter references this doctrine.
+- SOUL.md: `ember-workspace/SOUL.md` (Ember, the production brain) and `aura/SOUL.md` (Aura, the strategic brain). Both live. Atlas, Cortex, Muse, and Aria were removed from this list: archived 2026-06-04, dark by design.
+- Claude.ai Aura project knowledge: uploaded project knowledge file. Not verifiable from this machine; a propagation target confirmed by Allison at re-upload, never an assumed state.
 
-The doctrine is not stored in one place. It is propagated to every surface where Claude operates within Expert Partners. There is no surface where Claude operates without it.
+The doctrine is not stored in one place. It is propagated to every surface listed here. Five of these surfaces are verified live; two (Cowork project instructions and the claude.ai Aura project knowledge) cannot be verified from this machine and are named as unverifiable rather than claimed as covered.
+
+Propagation rule: on every version bump, this surface list gets verified against reality (files read, processes checked, claims tested) before the new version ships. A checklist that names dead surfaces reports success it did not achieve.
 
 ---
 
 ## Version
+
+v2.4 -- July 27, 2026 -- Made the doctrine's own claims true. Two findings drove this version: the "Where This Doctrine Lives" surface list had been stale since 2026-06-01 (it still named the Atlas/Cortex/Muse/Aria SOULs, archived 2026-06-04, and omitted aura/SOUL.md entirely), and the frontmatter inheritance claim was false at 3 of 15 skills until this commit (the 12 non-referencing skills now carry the systems-map reference sentence: "It inherits the operating-doctrine and never overrides it."). Rewrote the surface list against live-verified findings, replaced the universal-coverage closing sentence with an honest one naming the two surfaces that cannot be verified from this machine, added the propagation rule (the surface list gets verified against reality on every version bump, not assumed), and fixed the v2.0 version drift in aura/doctrine/identity.md and aura/bootstrap/cowork.md. Findings reported and ruled 2026-07-27; applied on Allison's explicit 2026-07-28 authorization. Authored by Allison Gaddy.
 
 v2.3 -- July 27, 2026 -- Added The State Check and Why This Costs More Than Time. Closes the prescription-direction verification gap: prior versions guarded only against wrongly declaring something impossible, and were silent on prescribing work already done. Triggered by a live failure where an install was prescribed for a system already running with three active monitors. Authored by Allison Gaddy. Propagated to the canonical skill, the plugin mirror, the local marketplace clone, the user CLAUDE.md, and GitHub canonical; claude.ai-side surfaces (org skill, Cowork project instructions, Aura project knowledge) require admin-UI re-upload.
 
