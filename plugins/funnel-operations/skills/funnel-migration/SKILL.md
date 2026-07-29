@@ -1,6 +1,6 @@
 ---
 name: funnel-migration
-description: >-. It inherits the operating-doctrine and never overrides it.
+description: >-
   Move a funnel out of the old PartnerSync location and into EPIC or
   Expert Partners, verify every object-model element transferred, certify
   the cutover with a live behavioral test, then document it. Use this whenever
@@ -11,6 +11,7 @@ description: >-. It inherits the operating-doctrine and never overrides it.
   skill is temporary and retires once the Expert Partners migration is done.
   It ends by calling the Funnel Documentation skill, so the funnel lands fully
   documented. Built for a non-technical teammate; hand-hold one step at a time.
+  It inherits the operating-doctrine and never overrides it.
 ---
 
 # Funnel Migration

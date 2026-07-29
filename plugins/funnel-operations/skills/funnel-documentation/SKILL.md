@@ -1,6 +1,6 @@
 ---
 name: funnel-documentation
-description: >-. It inherits the operating-doctrine and never overrides it.
+description: >-
   Read a funnel's verified data and write one complete record into the Notion
   Funnels and Funnel Messages databases for Expert Partners and EPIC. This is
   the core funnel skill. Use it whenever someone wants to document a funnel,
@@ -12,6 +12,7 @@ description: >-. It inherits the operating-doctrine and never overrides it.
   end by calling this skill, so trigger it as the final step of any migration
   or new build. Built for a non-technical teammate; hand-hold one step at a
   time.
+  It inherits the operating-doctrine and never overrides it.
 ---
 
 # Funnel Documentation

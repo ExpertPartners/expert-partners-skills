@@ -1,6 +1,6 @@
 ---
 name: funnel-build
-description: >-. It inherits the operating-doctrine and never overrides it.
+description: >-
   Build a brand new funnel in the funnel's brand location (per the five-location
   registry: EPIC, Expert Partners, AG Personal Brand, Moxie Signature Group, or
   Free Agent Nation Circle Community), then document it so it is born
@@ -11,6 +11,7 @@ description: >-. It inherits the operating-doctrine and never overrides it.
   that does not exist yet. This skill is permanent. It ends by calling the
   Funnel Documentation skill, so every new funnel lands fully documented from
   day one. Built for a non-technical teammate; hand-hold one step at a time.
+  It inherits the operating-doctrine and never overrides it.
 ---
 
 # Funnel Build
