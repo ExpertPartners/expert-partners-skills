@@ -1,9 +1,11 @@
 ---
 name: moxie-signature-group-brand
-description: Apply Moxie Signature Group brand standards for North Dallas luxury real estate content. Use whenever Allison Gaddy is creating Moxie listings, marketing, social posts, presentations, websites, buyer or seller guides, email campaigns, or agent recruitment for the Moxie team. Target market is Elevated Accessible Premium, $700K to $1.2M in Frisco and Prosper. Locks brand tokens (Playfair Display headlines, Montserrat body, geometric endless knot icon as primary mark, NOT keys), enforces inclusive luxury voice (premium service without pretense), follows TREC-required eXp Realty co-branding rules, excludes eXp Luxury references, and bans real estate cliches. Apply this skill any time the work is for Moxie, even if the user does not explicitly say so. It inherits the operating-doctrine and never overrides it.
+description: BENCHED 2026-07-30 (aura ADR 0045, Allison's ruling) -- the Moxie Signature Group brand is tabled and its repo archived; do NOT apply this skill to new work, and route consumer-facing real estate content to the AG Luxury brand instead. Retained only for revival (unarchive + new ADR). Original scope, apply Moxie Signature Group brand standards for North Dallas luxury real estate content. Use whenever Allison Gaddy is creating Moxie listings, marketing, social posts, presentations, websites, buyer or seller guides, email campaigns, or agent recruitment for the Moxie team. Target market is Elevated Accessible Premium, $700K to $1.2M in Frisco and Prosper. Locks brand tokens (Playfair Display headlines, Montserrat body, geometric endless knot icon as primary mark, NOT keys), enforces inclusive luxury voice (premium service without pretense), follows TREC-required eXp Realty co-branding rules, excludes eXp Luxury references, and bans real estate cliches. Apply this skill any time the work is for Moxie, even if the user does not explicitly say so. It inherits the operating-doctrine and never overrides it.
 ---
 
 # Moxie Signature Group Brand System
+
+> **BENCHED 2026-07-30.** Allison tabled the Moxie Signature Group brand (aura ADR 0045). The `moxie` repo is archived read-only. The consumer-facing real estate lane is now **AG Luxury** (`ag-luxury`). This skill is retained for revival only; do not apply it to new work.
 
 This skill applies Moxie Signature Group brand standards. Moxie is Allison Gaddy's North Dallas real estate team operating under eXp Realty.
 
