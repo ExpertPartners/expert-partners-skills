@@ -1,5 +1,5 @@
 {
   "name": "content-engines",
-  "version": "0.2.0",
-  "description": "Allison Gaddy content and marketing engines: master-marketer-free-agent-builder (strategy, funnels, offers) and rare-content-engine (RARE-framework scroll-stopping content). Voice and brand tokens defer to the brand-voice plugin."
+  "version": "0.3.0",
+  "description": "Allison Gaddy content and marketing engines: master-marketer-free-agent-builder (strategy, funnels, offers), rare-content-engine (RARE-framework scroll-stopping content), and video-transcript-relay (video-to-transcript relay through Claude Code and Google Drive). Voice and brand tokens defer to the brand-voice plugin."
 }
