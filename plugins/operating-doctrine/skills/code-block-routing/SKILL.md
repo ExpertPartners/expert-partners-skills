@@ -1,6 +1,6 @@
 ---
 name: "code-block-routing"
-description: "Fires every time a Claude Code paste block, intake block, or implementation brief is handed to Allison, in every project and every session: routing line naming the SURFACE and the exact session (PASTE INTO: Claude Code, existing session \"Name\"), session name as the first line inside the block so the session self-identifies, a waiting-on statement with every hand-off, the lane ledger row written at dispatch and updated at carry-back (aura docs/estate/lanes.md), the pin fired only AFTER Allison confirms the paste, one paste block per response, nothing fenced that is not for a terminal or Code, versions read from canonical only."
+description: "Fires every time a Claude Code paste block, intake block, or implementation brief is handed to Allison, in every project and every session: routing line naming the SURFACE and the exact session (PASTE INTO: Claude Code, existing session \"Name\"), session name as the first line inside the block so the session self-identifies, a waiting-on statement with every hand-off, the lane ledger row written at dispatch and updated at carry-back (aura docs/estate/lanes.md), the pin fired only AFTER Allison confirms the paste, one paste block per response, nothing fenced that is not for a terminal or Code, versions read from canonical only. Cowork lane identity is the kickoff header line, never the window title; Code sessions keep exact-name parity via the in-session /rename request."
 ---
 
 # Code Block Routing
@@ -42,6 +42,15 @@ Consequences:
 - When a window title is known to differ, tell Allison the exact name to rename the window to, once, and keep using the authoritative name regardless.
 - Never advise archiving or closing a session based on its window title alone. Confirm what work that session still holds first.
 
+## Lane Identity By Surface: Kickoff Header Is Canonical In Cowork
+
+Ruled by Allison 2026-08-03. Cowork and Claude.ai chat titles are auto-generated from conversation content and cannot be set by any session, tool, or API; live-verified 2026-08-03 when the auto-namer paraphrased a first message that opened with the exact intended lane name. Manually renaming Cowork chats to match a convention is retired as of this ruling. Manual renaming was a failure condition; the identity rule moves instead.
+
+The rule by surface:
+
+- Cowork and Claude.ai chat lanes. Canonical identity is the kickoff header line, the first line of the lane's first message, format "Lane name - YYYY-MM-DD kickoff." Every kickoff block this skill governs already ships that line first, and the block-writer controls it fully at dispatch. The lane ledger records the lane name from the kickoff header. The displayed chat title is cosmetic; it may be logged parenthetically when someone needs to find the window, but it is never flagged for rename and never treated as identity. Cowork lanes never get PARITY MISMATCH flags.
+- Claude Code sessions. Exact-name parity stays enforced, unchanged, because this surface supports it: the session name rides as the first line inside every paste block, and the session requests /rename from Allison only when its displayed name differs (live-verified 2026-07-28, only Allison can type /rename into a Code session). A PARITY MISMATCH flag on a Code lane resolves by that in-session request the next time the session is used, never by Allison hunting windows to rename them cold.
+
 ## Session Name Goes First Inside The Block
 
 Added 2026-07-28 at Allison's instruction. The first line INSIDE every paste block is the session name, a colon, and a naming instruction, so the pasted prompt identifies its own lane in the transcript and the session ends up named correctly with the least Allison effort.
@@ -75,7 +84,7 @@ Added 2026-08-03. The estate-wide lane ledger lives at `docs/estate/lanes.md` in
 
 The habit, every hand-off:
 
-1. At dispatch, when a paste block is handed to Allison, the issuing Cowork chat's block-writer appends or updates the lane's row in the ledger: canonical session name, window title as shown in the Code sessions list (flag PARITY MISMATCH with the rename when they differ), Cowork home (Claude project / conversation), machine, status, waiting-on, last-updated date. The waiting-on statement this skill already requires with every hand-off is the same text that goes in the row -- write it once, use it in both places.
+1. At dispatch, when a paste block is handed to Allison, the issuing Cowork chat's block-writer appends or updates the lane's row in the ledger: canonical session name, window title as shown in the Code sessions list (flag PARITY MISMATCH with the rename when they differ; Code sessions only, per the lane identity ruling of 2026-08-03), Cowork home (Claude project / conversation, identified by its kickoff header line, not its displayed title), machine, status, waiting-on, last-updated date. The waiting-on statement this skill already requires with every hand-off is the same text that goes in the row -- write it once, use it in both places.
 2. At carry-back receipt, the row updates to the new status (running / waiting-on-Allison / waiting-on-carry-back / complete-safe-to-archive / owned-elsewhere).
 3. Append and update rows, never delete. Completed lanes move to the ledger's Completed section rather than vanishing, so the archive decision stays visible.
 4. Rule 5 applies: rows are only as certain as their evidence. A lane whose home nobody has named stays needs-Allison; never invent a home for it.
@@ -126,4 +135,3 @@ Known session names (update this list via skill overwrite as new ones appear):
 Archived lanes, do not route to these:
 
 - "Credential Rotation" and its Cowork conversation: archived by Allison 2026-07-28 after she completed all rotations herself. Its output files survive on disk at ~/Claude/projects/PartnerSync Operations Engineer/2026-07-28-github-repo-audit-secret-scan.md and 2026-07-28-session-summary-github-audit-and-credential-consolidation.md. Credential reconciliation ownership moved to "Ember audit."
-
