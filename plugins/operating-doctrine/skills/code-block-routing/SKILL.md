@@ -1,6 +1,6 @@
 ---
 name: "code-block-routing"
-description: "Fires every time a Claude Code paste block, intake block, or implementation brief is handed to Allison, in every project and every session: routing line naming the SURFACE and the exact session (PASTE INTO: Claude Code, existing session \"Name\"), session name as the first line inside the block so the session self-identifies, a waiting-on statement with every hand-off, the pin fired only AFTER Allison confirms the paste, one paste block per response, nothing fenced that is not for a terminal or Code, versions read from canonical only."
+description: "Fires every time a Claude Code paste block, intake block, or implementation brief is handed to Allison, in every project and every session: routing line naming the SURFACE and the exact session (PASTE INTO: Claude Code, existing session \"Name\"), session name as the first line inside the block so the session self-identifies, a waiting-on statement with every hand-off, the lane ledger row written at dispatch and updated at carry-back (aura docs/estate/lanes.md), the pin fired only AFTER Allison confirms the paste, one paste block per response, nothing fenced that is not for a terminal or Code, versions read from canonical only."
 ---
 
 # Code Block Routing
@@ -68,6 +68,19 @@ Precedence notes so the rules do not fight each other:
 
 - The pin marker is a bookmark, not a paste block. It does NOT count against the one-block-per-response rule, and it is exempt from the nothing-fenced-but-Code rule. It is the only other thing that may ever be fenced.
 - The pin skill's rule that the marker is the entire response applies only when Allison manually invokes /pin. Confirmation-triggered pins may ride in a response that also continues other work.
+
+## The Lane Ledger: Row At Dispatch, Update At Carry-Back
+
+Added 2026-08-03. The estate-wide lane ledger lives at `docs/estate/lanes.md` in the aura repo. It is the single file that answers "what Claude Code sessions exist, what does each belong to, and what is each waiting on" from any surface; any project reads it through its aura connection.
+
+The habit, every hand-off:
+
+1. At dispatch, when a paste block is handed to Allison, the issuing Cowork chat's block-writer appends or updates the lane's row in the ledger: canonical session name, window title as shown in the Code sessions list (flag PARITY MISMATCH with the rename when they differ), Cowork home (Claude project / conversation), machine, status, waiting-on, last-updated date. The waiting-on statement this skill already requires with every hand-off is the same text that goes in the row -- write it once, use it in both places.
+2. At carry-back receipt, the row updates to the new status (running / waiting-on-Allison / waiting-on-carry-back / complete-safe-to-archive / owned-elsewhere).
+3. Append and update rows, never delete. Completed lanes move to the ledger's Completed section rather than vanishing, so the archive decision stays visible.
+4. Rule 5 applies: rows are only as certain as their evidence. A lane whose home nobody has named stays needs-Allison; never invent a home for it.
+
+A Code session that completes its carry-back updates its own row to complete-safe-to-archive in the same push when it already has aura write access; otherwise the Cowork home updates it on receipt (root CLAUDE.md delivery protocol).
 
 ## One Block Per Response
 
