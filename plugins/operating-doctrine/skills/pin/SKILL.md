@@ -3,9 +3,9 @@ name: pin
 description: "Carry-back envelope and place-keeping baton between Allison's Claude project conversations (Claude app, CoWork) and Claude Code. Fires at first contact in a new Code session (ask for the Claude project and conversation before running a briefing that does not name them), when composing ANY report bound back to a Claude project, when a block arrives opening with CLAUDE HOME or COWORK HOME / SESSION header lines (envelope check before executing), when Allison types /pin or says \"pin\", or when she confirms a paste (\"pasted\", \"done\"). Pin fires only after her paste confirmation. A pin is a bookmark, never a task. It inherits the operating-doctrine and never overrides it."
 ---
 
-# Pin -- v4 (2026-08-03)
+# Pin -- v4.1 (2026-08-03)
 
-A pin is a bookmark, not a task. It marks the exact spot where work handed off between Claude Code and the Claude project conversation that drives it. v4 (ruled by Allison 2026-08-03) makes the protocol surface-neutral: the home is a Claude PROJECT plus CONVERSATION, never assumed to be CoWork. v4 also adds the first-contact question and the "come back here" pin close.
+A pin is a bookmark, not a task. It marks the exact spot where work handed off between Claude Code and the Claude project conversation that drives it. v4 (ruled by Allison 2026-08-03) makes the protocol surface-neutral: the home is a Claude PROJECT plus CONVERSATION, never assumed to be CoWork. v4 also adds the first-contact question and the "come back here" pin close. v4.1 (ruled by Allison 2026-08-03, same day) rewrites the carry-back SESSION STATUS line: it names the paste-back PROJECT and CONVERSATION explicitly, the ARCHIVE verdict is part of the line, and a session that is NOT clean to archive must give the instructions at that point instead of the ARCHIVE sentence.
 
 Pins persist to `~/.claude/baton.md`. Every surface reads the same baton file, so one pin trail spans all of them.
 
@@ -27,13 +27,23 @@ CLAUDE HOME: {Claude project name} / {conversation name}
 
 {the report}
 
-SESSION STATUS: {Waiting on you | Still working | Ready to carry back, safe to archive}
+SESSION STATUS: Ready to paste back to PROJECT: {Claude project name} in CONVERSATION NAME: {conversation name}. This session is ready to ARCHIVE.
 Let me know once you've pasted this back into {Claude project} / {conversation}, and I'll pin.
 ```
 
 Never write "into Cowork" in the closing line. Always name the actual Claude project and conversation; if the session somehow reached a carry-back without knowing them, ask (section 0) before sending the report.
 
-The SESSION STATUS line stays a verified claim per behavior defaults: run `git status` on every touched repo before claiming ready / safe to archive.
+### The ARCHIVE verdict is verified, or it is replaced with instructions (v4.1)
+
+"This session is ready to ARCHIVE" is a verified claim, never a sign-off phrase. Before writing it, run `git status` on every repo the session touched and confirm all three: nothing uncommitted, nothing unpushed, no open follow-ups parked in this session.
+
+If ANY check fails -- or the report is not a final carry-back (work still running, or something is waiting on Allison) -- do NOT write the ARCHIVE sentence. Keep the paste-back half of the line and replace the ARCHIVE half with the instructions at that point, in the same position:
+
+```
+SESSION STATUS: Ready to paste back to PROJECT: {Claude project name} in CONVERSATION NAME: {conversation name}. Do NOT archive this session yet -- {exactly what blocks it: the uncommitted files, the unpushed commits, or the open item} -- {the exact next instruction: the one action Allison takes, or what this session does next}. Keep this session open.
+```
+
+The instructions are specific, never generic: name the files, the repo, the commit, or the awaited item, and name the single next action. The lane ledger row (aura `docs/estate/lanes.md`) mirrors the same verdict: a row moves to complete-safe-to-archive only when the ARCHIVE sentence shipped.
 
 ## 2. Pin timing and the come-back close (v4)
 
