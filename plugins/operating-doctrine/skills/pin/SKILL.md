@@ -3,9 +3,9 @@ name: pin
 description: "Carry-back envelope and place-keeping baton between Allison's Claude project conversations (Claude app, CoWork) and Claude Code. Fires at first contact in a new Code session (ask for the Claude project and conversation before running a briefing that does not name them), when composing ANY report bound back to a Claude project, when a block arrives opening with CLAUDE HOME or COWORK HOME / SESSION header lines (envelope check before executing), when Allison types /pin or says \"pin\", or when she confirms a paste (\"pasted\", \"done\"). Pin fires only after her paste confirmation. A pin is a bookmark, never a task. It inherits the operating-doctrine and never overrides it."
 ---
 
-# Pin -- v4.1 (2026-08-03)
+# Pin -- v4.2 (2026-08-03)
 
-A pin is a bookmark, not a task. It marks the exact spot where work handed off between Claude Code and the Claude project conversation that drives it. v4 (ruled by Allison 2026-08-03) makes the protocol surface-neutral: the home is a Claude PROJECT plus CONVERSATION, never assumed to be CoWork. v4 also adds the first-contact question and the "come back here" pin close. v4.1 (ruled by Allison 2026-08-03, same day) rewrites the carry-back SESSION STATUS line: it names the paste-back PROJECT and CONVERSATION explicitly, the ARCHIVE verdict is part of the line, and a session that is NOT clean to archive must give the instructions at that point instead of the ARCHIVE sentence.
+A pin is a bookmark, not a task. It marks the exact spot where work handed off between Claude Code and the Claude project conversation that drives it. v4 (ruled by Allison 2026-08-03) makes the protocol surface-neutral: the home is a Claude PROJECT plus CONVERSATION, never assumed to be CoWork. v4 also adds the first-contact question and the "come back here" pin close. v4.1 (ruled by Allison 2026-08-03, same day) rewrites the carry-back SESSION STATUS line: it names the paste-back PROJECT and CONVERSATION explicitly, the ARCHIVE verdict is part of the line, and a session that is NOT clean to archive must give the instructions at that point instead of the ARCHIVE sentence. v4.2 (ruled by Allison 2026-08-03, same day) DELETES the closing line ("Let me know once you've pasted this back into ..., and I'll pin."): the carry-back ends at the SESSION STATUS line and never solicits a paste confirmation.
 
 Pins persist to `~/.claude/baton.md`. Every surface reads the same baton file, so one pin trail spans all of them.
 
@@ -28,10 +28,9 @@ CLAUDE HOME: {Claude project name} / {conversation name}
 {the report}
 
 SESSION STATUS: Ready to paste back to PROJECT: {Claude project name} in CONVERSATION NAME: {conversation name}. This session is ready to ARCHIVE.
-Let me know once you've pasted this back into {Claude project} / {conversation}, and I'll pin.
 ```
 
-Never write "into Cowork" in the closing line. Always name the actual Claude project and conversation; if the session somehow reached a carry-back without knowing them, ask (section 0) before sending the report.
+The SESSION STATUS line is the last line of the carry-back. There is no closing "Let me know once you've pasted... and I'll pin" line (deleted in v4.2); the carry-back never solicits a paste confirmation. Never write "into Cowork" anywhere in the carry-back. Always name the actual Claude project and conversation; if the session somehow reached a carry-back without knowing them, ask (section 0) before sending the report.
 
 ### The ARCHIVE verdict is verified, or it is replaced with instructions (v4.1)
 
@@ -47,7 +46,7 @@ The instructions are specific, never generic: name the files, the repo, the comm
 
 ## 2. Pin timing and the come-back close (v4)
 
-Pin ONLY after Allison confirms the paste ("pasted", "done", or similar). Exception: she types "pin" unprompted (bare or with a note), pin immediately. If she supplies her own text, it becomes the in-flight content preserved exactly as typed; still write the awaited part.
+Pin ONLY after Allison confirms the paste ("pasted", "done", or similar). Exception: she types "pin" unprompted (bare or with a note), pin immediately. The confirmation is always hers to volunteer: since v4.2 the carry-back never asks for it, so if she says nothing, no pin fires and that is correct. If she supplies her own text, it becomes the in-flight content preserved exactly as typed; still write the awaited part.
 
 The pin response is the bar plus exactly one orientation line pointing her back:
 

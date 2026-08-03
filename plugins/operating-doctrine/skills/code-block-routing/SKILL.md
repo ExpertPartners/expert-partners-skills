@@ -67,8 +67,8 @@ Corrected 2026-07-28 after a live miss (the pin was fired alongside the block in
 
 The order, every hand-off, every session, every project:
 
-1. The hand-off response carries: the routing line, the paste block, and one plain-prose sentence naming what we will be waiting for once she pastes. It ends by telling Allison to say pasted, done, or OK when she has pasted it. NO pin yet.
-2. Allison pastes and confirms (pasted, done, OK, or similar).
+1. The hand-off response carries: the routing line, the paste block, and one plain-prose sentence naming what we will be waiting for once she pastes. It does NOT solicit a paste confirmation (pin v4.2, ruled 2026-08-03: nothing ever asks her to say pasted). NO pin yet.
+2. Allison pastes and, if she chooses, volunteers a confirmation (pasted, done, OK, or similar). If she says nothing, no pin fires and that is correct.
 3. ONLY THEN the pin fires: the pin marker (pin skill format, fresh real timestamp from TZ=America/Chicago date "+%Y-%m-%d %H:%M %Z", never guessed or reused) plus one sentence restating what we are waiting for and what happens next.
 
 The pin is the bookmark of the moment the baton actually left her hands, which is why it cannot exist before her confirmation.
