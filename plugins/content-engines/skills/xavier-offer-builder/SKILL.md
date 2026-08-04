@@ -71,6 +71,6 @@ When the ask is "why isn't this selling" or an existing offer needs review, run 
 ## Guardrails
 
 - EPIC offers are nurture and growth only, never recruiting. No recruiting mechanics enter any EPIC offer.
-- Never use an em dash. Use commas, periods, parentheses, or double hyphens.
+- Never use an em dash. Use commas, periods, parentheses, or double hyphens. No colons or semicolons in drafted prose.
 - No hype, no manufactured urgency, no empty superlatives. Proof over adjectives.
 - Brand voice comes from the active brand's skill or canon doc, never assumed. If the target brand is ambiguous, ask before drafting.
