@@ -1,6 +1,14 @@
 ---
 name: "document-formatting-standard"
 description: "Allison's default formatting and delivery standard (v2) for every document Claude creates: Poppins throughout, 1.5 line spacing, size-and-color headers with Brand Blue H2s, no bold or italics, no em dashes, no colons or semicolons in drafted prose, YYYY-MM-DD date-prefixed filenames, and delivery as a styled Google Doc into the Aura Docs Drive folder with only a two-line summary in chat. Apply whenever creating, restyling, or delivering a document unless a brand skill's typography explicitly governs that deliverable."
+# --- skill-map metadata (additive, all optional) ---
+tier: plugin
+status: live
+inherits: operating-doctrine
+defers-to:
+  - deliverable-link
+brand-scope: null
+subtitle: "Poppins everywhere, hierarchy by size and color"
 ---
 
 # Document Formatting Standard (v2)

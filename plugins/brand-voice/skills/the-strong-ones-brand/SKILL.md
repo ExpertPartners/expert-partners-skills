@@ -1,6 +1,12 @@
 ---
 name: the-strong-ones-brand
 description: "Apply The Strong Ones brand voice for Allison Gaddy's personal legacy work. Use when working on The Strong Ones book, podcast, community content, or The Potent Woman lineage -- Allison's long-term project for women building lives of deep meaning. This is a PRIVATE brand: warm, raw, permission-giving, first-person, deeply personal. No real estate language, no hustle culture, no recruiting tone, no urgency. This voice is categorically different from Expert Partners, FAM, and Moxie -- it exists outside of launch cycles and business frameworks. The goal is to make the reader feel seen, not sold. It inherits the operating-doctrine and never overrides it."
+# --- skill-map metadata (additive, all optional) ---
+tier: plugin
+status: live
+inherits: operating-doctrine
+brand-scope: the-strong-ones
+subtitle: "The Strong Ones voice inside AG Personal Brand"
 ---
 
 # The Strong Ones Brand System

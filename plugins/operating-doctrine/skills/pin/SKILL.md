@@ -1,6 +1,15 @@
 ---
 name: pin
 description: "Carry-back envelope and place-keeping baton between Allison's Claude project conversations (Claude app, CoWork) and Claude Code. Fires at first contact in a new Code session (ask for the Claude project and conversation before running a briefing that does not name them), when composing ANY report bound back to a Claude project, when a block arrives opening with CLAUDE HOME or COWORK HOME / SESSION header lines (envelope check before executing), when Allison types /pin or says \"pin\", or when she confirms a paste (\"pasted\", \"done\"). Pin fires only after her paste confirmation. A pin is a bookmark, never a task. It inherits the operating-doctrine and never overrides it."
+# --- skill-map metadata (additive, all optional) ---
+tier: plugin
+zone: routing
+status: live
+inherits: operating-doctrine
+defers-to:
+  - code-block-routing
+brand-scope: null
+subtitle: "carry-back envelope and place-keeping baton"
 ---
 
 # Pin -- v4.2 (2026-08-03)

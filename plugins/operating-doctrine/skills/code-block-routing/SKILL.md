@@ -1,6 +1,15 @@
 ---
 name: "code-block-routing"
 description: "Fires every time a Claude Code paste block, intake block, or implementation brief is handed to Allison, in every project and every session: routing line naming the SURFACE and the exact session (PASTE INTO: Claude Code, existing session \"Name\"), session name as the first line inside the block so the session self-identifies, a waiting-on statement with every hand-off, the lane ledger row written at dispatch and updated at carry-back (aura docs/estate/lanes.md), the pin fired only AFTER Allison confirms the paste, one paste block per response, nothing fenced that is not for a terminal or Code, versions read from canonical only. Cowork lane identity is the kickoff header line, never the window title; Code sessions keep exact-name parity via the in-session /rename request."
+# --- skill-map metadata (additive, all optional) ---
+tier: plugin
+zone: routing
+status: live
+inherits: operating-doctrine
+defers-to:
+  - pin
+brand-scope: null
+subtitle: "paste block routing and the lane ledger"
 ---
 
 # Code Block Routing

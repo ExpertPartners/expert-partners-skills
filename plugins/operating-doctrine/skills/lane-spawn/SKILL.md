@@ -1,6 +1,16 @@
 ---
 name: lane-spawn
 description: "Detour hand-off protocol for Allison's Claude project conversations. Fires the moment a side task, new topic, audit, investigation, or question surfaces mid-lane that is not the current lane's job: Allison says 'new conversation for this', 'put this somewhere else', 'go audit X', or Claude itself notices work that belongs in its own lane. Instead of absorbing the detour or deferring it with 'we'll come back to this', ship a SPAWN PAIR: a lane kickoff block for a new Claude conversation, plus (when a worker is needed) a Claude Code block homed to the NEW lane, then state what the origin lane awaits and resume the origin thread in the same message. It inherits the operating-doctrine and never overrides it."
+# --- skill-map metadata (additive, all optional) ---
+tier: plugin
+zone: routing
+status: live
+inherits: operating-doctrine
+defers-to:
+  - code-block-routing
+  - pin
+brand-scope: null
+subtitle: "spawning new lanes with named homes"
 ---
 
 # Lane Spawn -- v1.1 (2026-08-03)

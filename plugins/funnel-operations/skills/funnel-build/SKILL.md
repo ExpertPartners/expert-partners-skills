@@ -12,6 +12,15 @@ description: >-
   Funnel Documentation skill, so every new funnel lands fully documented from
   day one. Built for a non-technical teammate; hand-hold one step at a time.
   It inherits the operating-doctrine and never overrides it.
+# --- skill-map metadata (additive, all optional) ---
+tier: plugin
+zone: hands
+status: live
+inherits: operating-doctrine
+calls:
+  - funnel-documentation
+brand-scope: null
+subtitle: "build a funnel that does not exist yet"
 ---
 
 # Funnel Build

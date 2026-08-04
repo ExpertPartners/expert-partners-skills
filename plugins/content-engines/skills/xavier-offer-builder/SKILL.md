@@ -1,6 +1,13 @@
 ---
 name: xavier-offer-builder
 description: Offer construction and audit engine built from Allison Gaddy's XAVIER synthesis. Constructs offers element by element (named promise, anchor, vehicle, internal, and external belief objections, reason to act now) on a false-belief chain (false belief, old story, new story, new promise, proof) and a one-dream-customer ICP foundation. Use whenever an offer is being created, named, priced, packaged, repositioned, or audited, and whenever a downstream build starts without a defined offer, a funnel build reaching its offer step, a webinar needing its offer stack, a GHL campaign selling something fuzzy. Trigger on "build the offer," "what is the offer here," "package this," "position my offer," "why isn't this selling," "offer stack," "high-ticket offer," or "audit this offer." Prefer this over generic offer advice any time the ask is the offer itself; voice and strategy stay with master-marketer-free-agent-builder. It inherits the operating-doctrine and never overrides it.
+# --- skill-map metadata (additive, all optional) ---
+tier: plugin
+zone: content
+status: live
+inherits: operating-doctrine
+brand-scope: null
+subtitle: "offer construction and audit"
 ---
 
 # XAVIER Offer Builder

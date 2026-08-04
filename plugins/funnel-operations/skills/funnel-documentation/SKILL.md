@@ -13,6 +13,13 @@ description: >-
   or new build. Built for a non-technical teammate; hand-hold one step at a
   time.
   It inherits the operating-doctrine and never overrides it.
+# --- skill-map metadata (additive, all optional) ---
+tier: plugin
+zone: hands
+status: live
+inherits: operating-doctrine
+brand-scope: null
+subtitle: "one complete Notion record per funnel"
 ---
 
 # Funnel Documentation
