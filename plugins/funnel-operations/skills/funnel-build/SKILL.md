@@ -18,7 +18,7 @@ zone: hands
 status: live
 inherits: operating-doctrine
 calls:
-  - funnel-documentation
+  - funnel-documentation-DOES-NOT-EXIST
 brand-scope: null
 subtitle: "build a funnel that does not exist yet"
 ---
