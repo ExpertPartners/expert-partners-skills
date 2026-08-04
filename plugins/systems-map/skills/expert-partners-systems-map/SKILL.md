@@ -7,24 +7,30 @@ allowed-tools: []
 
 # Expert Partners Systems Map and Access Map
 
-This is the bible of where things live and what Claude can reach. The full version is in GitHub canonical, in the expert-partners doctrine area. This skill is the operative version that loads everywhere so nobody has to repeat it. When this skill and the full bible ever diverge, the bible wins and this skill is re-synced from it.
+This is the bible of where things live and what Claude can reach. The full version is in GitHub canonical, in the expert-partners doctrine area (`doctrine/expert-partners-systems-map.md`). This skill is the operative version that loads everywhere so nobody has to repeat it. When this skill and the full bible ever diverge, the bible wins and this skill is re-synced from it.
 
 ## The one rule
 
 Each system has exactly one job. Discrepancies happen when a system is asked to carry something that belongs somewhere else. When in doubt, match the thing to the one job below, not to whatever is closest at hand.
 
+## First read for every cold session
+
+The estate manifest is the brain's table of contents: `aura/docs/estate/estate-manifest.md`. It indexes every canonical source with a last-verified date and evidence. A cold session reads it first, then the lane ledger (`aura/docs/estate/lanes.md`) for what is in flight and what each lane awaits. Pointers, never copies; the manifest carries its own maintenance rules.
+
 ## The entity and the platform
 
 Expert Partners LLC is the legal and operating entity. Don Hobbs operates under Expert Partners LLC; his IP (Gateway to Mastery, Think Big Live Big, 2020 Vision, events, coaching clients, and related training assets) lives under Expert Partners LLC. He is not a separate brand stack or a separate business container.
 
-PartnerSync is the white-labeled GoHighLevel platform layer, the agency container (company `FOz8PSvqj7aYASb3wDzm`, "Expert Partners LLC dba Partner Sync"). It is plumbing, not a legal entity and not a brand. It holds four permanent brand locations per Allison's 2026-07-28 canon ruling: EPIC, Expert Partners, AG Personal Brand, and AG Luxury (the location formerly recorded as Moxie Signature Group; Moxie remains a benched brand name, never a location name). Free Agent Nation Circle Community exists in the estate but is not one of the four permanent brand locations; its standing is an open question for Allison. The canonical registry with IDs, states, purposes, and the implementation priority order is `partnersync/reference/ghl-location-registry.md`; a mirror lives in the expert-partners repo at `reference/ghl-location-registry.md`. The location a contact lives in IS the brand statement; the peer brand-tag vocabulary is retired as contact-routing architecture (ruled 2026-07-27; full rule in `partnersync/doctrine/cross-location-identity-rules.md`).
+The brand registry is canonical in aura ADR 0045 (ruled 2026-07-30): six active brands (Expert Partners, EPIC, Don Hobbs Personal Brand, AG Personal Brand, AG Luxury, Free Agent Movement), with Moxie Signature Group benched. No new Moxie work; consumer real estate routes to AG Luxury.
+
+PartnerSync is the white-labeled GoHighLevel platform layer, the agency container (company `FOz8PSvqj7aYASb3wDzm`, "Expert Partners LLC dba Partner Sync"). It is plumbing, not a legal entity and not a brand. It holds five brand locations: EPIC, Expert Partners, AG Personal Brand, Moxie Signature Group (location exists physically; the brand is benched per aura ADR 0045, route no new work there), and Free Agent Nation Circle Community. The canonical registry with IDs, states, purposes, and the implementation priority order is `partnersync/reference/ghl-location-registry.md`; a mirror lives in the expert-partners repo at `reference/ghl-location-registry.md`. The location a contact lives in IS the brand statement; the peer brand-tag vocabulary is retired as contact-routing architecture (ruled 2026-07-27; full rule in `partnersync/doctrine/cross-location-identity-rules.md`).
 
 ## Storage map: what each system does, one job each
 
 | System | Its one job | What goes here | What never goes here |
 | --- | --- | --- | --- |
 | Notion | Single source of truth for funnel records and human logging. A funnel is not done until it lives here. | Funnel records (Funnels and Funnel Messages), status, human-readable logs, regenerated-from-canon human views | Doctrine, technical reference, secrets. Nothing authored in Notion competes with git canon |
-| GitHub canonical (`expert-partners`, `ghl-automation`, `expert-partners-skills`, `partnersync`) | Single source of truth for doctrine, decisions, and technical reference | Doctrine, decisions (ADRs), references, project knowledge, every n8n workflow's design doc. Commit AND push | Funnel records, secrets or tokens |
+| GitHub canonical (`aura`, `expert-partners`, `ghl-automation`, `expert-partners-skills`, `partnersync`) | Single source of truth for doctrine, decisions, and technical reference. `aura` is the seat of the operating system; its `decisions/` directory is canonical for ADRs and rulings (queue clean 0001 through 0047, renumber evidence in `aura/decisions/README.md`). Per-repo decisions directories that predate this remain as historical records. | Doctrine, decisions (ADRs), references, project knowledge, every n8n workflow's design doc. Commit AND push | Funnel records, secrets or tokens |
 | Memory (Claude) | Claude cross-session recall, auto-loads each session | Short structured facts a future session must know, plus pointers to canonical docs | Human-facing content, secrets, anything long |
 | 1Password | Secrets and tokens vault | Tokens, API keys, PITs, client secrets, passwords | Anything that belongs in GitHub or Notion. Secrets never go in GitHub or Notion |
 | AWS | Compute and hosting, not a document store | Backend services, runtime token storage, scripts | Documentation, anything you go to read |
@@ -42,7 +48,11 @@ Not in the stack, stated so nobody re-litigates it:
 
 ## AI brains
 
-The brains, their seats, machines, one jobs, SOULs, and liveness rules live in Bible Chapter 4 (`canonical-bible-chapter-4-brains-and-sync-topology.md`, expert-partners doctrine area). This map does not restate the roster. One production brain (Ember, M2), one strategic brain (Aura, M4 / Cowork); everything else is planned and dark by design. Liveness is proven by process evidence, never by a fresh commit.
+The brains, their seats, machines, one jobs, SOULs, and liveness rules live in Bible Chapter 4 (`canonical-bible-chapter-4-brains-and-sync-topology.md`, expert-partners doctrine area). This map does not restate the roster. One strategic brain (Aura, M4 / Cowork) is active. Ember (M2) was frozen and quieted 2026-08-03 (workspaces archived, gateway disabled, writer crons off); all agentic rebuilds, including the Ember rebuild and the OpenClaw-to-SDK migration, are paused until Aura's brain (the estate manifest plus the Estate Brain MCP) is in place and locked down (ruled 2026-08-03). Everything else is planned and dark by design. Liveness is proven by process evidence, never by a fresh commit.
+
+## The Estate Brain MCP: in build, not live
+
+The Estate Brain MCP (target endpoint mcp.expertpartners.com) does NOT exist yet. Never claim it is live; any memory or document recording it as deployed with tools is a phantom of the spec (Allison's correction, 2026-08-03). Until its acceptance passes with live proof, every surface reads canon through the GitHub connector against ExpertPartners repos, or the local clone in Code. The build runs in the Estate Brain MCP Build lane (Code session of the same name, home Aura: Strategic Advisor / Estate Brain MCP Build); status lives in the lane ledger.
 
 ## What Claude can already reach (the access map)
 
@@ -57,6 +67,7 @@ Claude already holds broad access across this stack. Do not claim access is miss
 | Web data (scraping, crawling, page monitoring) | Firecrawl, two lanes: Cowork / Claude app via the account-wide OAuth connector (`https://mcp.firecrawl.dev/v2/mcp-oauth`); Claude Code via the unattended lane (`https://mcp.firecrawl.dev/v2/mcp`) with a Bearer key read from `op://Automation/FIRECRAWL-API-KEY`, never plaintext | Call the Firecrawl MCP tools directly |
 | Connectors (read and act) | Airtable, Canva, ClickUp, Cloudflare, Coupler, Fireflies, Gamma, Gmail, GoDaddy, Google Calendar, Google Drive, Granola, Make, Mercury, Miro, n8n, Notion, Slack | Call the connector tool directly |
 | Compute and backend | AWS | Reach the service directly |
+| Estate canon (until the Estate Brain MCP ships) | GitHub connector against ExpertPartners repos (chat and Cowork); local clone (Code). First read: the estate manifest | Fetch `aura/docs/estate/estate-manifest.md` directly |
 
 Warning line, ordered by Chapter 3: the Windsor GHL connector points at a foreign GHL company (`wVd3gUNItq6OXcVVS9xL`, not the PartnerSync agency) and must never be treated as a PartnerSync source.
 
@@ -100,8 +111,9 @@ Two lanes, matched to the surface:
 
 ## Quick decision guide
 
+- A cold session orienting? The estate manifest first, `aura/docs/estate/estate-manifest.md`, then the lane ledger.
 - A funnel record or a human log? Notion. A funnel is not done until it lives there.
-- Doctrine, a decision, or technical reference? GitHub canonical, commit and push.
+- Doctrine, a decision, or technical reference? GitHub canonical, commit and push. New ADRs and rulings land in `aura/decisions/`.
 - A fact a future session must recall? Memory.
 - A secret or token? 1Password. Never GitHub or Notion.
 - Running code or a backend service? AWS.
@@ -112,6 +124,7 @@ Two lanes, matched to the surface:
 - Live GHL reads or writes? Claude Code, with the Marketplace app token, app-token-first. Cowork orchestrates and verifies.
 - Scraping, crawling, or watching a JS-heavy page? Firecrawl first, on the lane that matches the surface. Native web search / fetch is fallback; browser automation is last resort.
 - Which brand owns this contact? The location it lives in. Brand labels are for assets that genuinely need one, never a routing layer.
+- Consumer real estate work? AG Luxury, never Moxie (benched, aura ADR 0045).
 
 ## Where this skill lives
 
@@ -121,6 +134,4 @@ Two lanes, matched to the surface:
 
 ## Version
 
-v2.2. Corrects the location roster to the four permanent brand locations per the 2026-07-28 canon ruling (registry rewrite, `partnersync/reference/ghl-location-registry.md`): AG Luxury is the canonical name of the location formerly recorded as Moxie Signature Group, and Free Agent Nation Circle Community moved out of the permanent roster pending Allison's standing ruling. Drift caught and corrected 2026-08-03 in Aura: Strategic Advisor / Repo Walk, written by Aura via the GitHub connector.
-
-v2.1. Derived verbatim from the Expert Partners Systems Map bible dated 2026-07-27 (bible v2.1, adding the Firecrawl web-data-acquisition doctrine). Authored by Allison Gaddy.
+v2.2. Derived verbatim from the Expert Partners Systems Map bible v2.2 dated 2026-08-03 (expert-partners commit 756363c). Changes from skill v2.0: catches up the missed v2.1 Firecrawl doctrine, then adds the v2.2 rulings (aura canonical with decisions/ as the ADR seat, estate manifest first-read, Estate Brain MCP in build and not live, brand registry per aura ADR 0045 with Moxie benched, Ember freeze and agentic rebuild pause). Authored by Allison Gaddy.
