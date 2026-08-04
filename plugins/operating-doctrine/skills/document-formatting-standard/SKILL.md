@@ -1,11 +1,11 @@
 ---
 name: "document-formatting-standard"
-description: "Allison's default formatting and delivery standard (v2) for every document Claude creates: Poppins throughout, 1.5 line spacing, size-and-color headers with Brand Blue H2s, no bold or italics, no em dashes, no colons or semicolons in drafted prose, YYYY-MM-DD date-prefixed filenames, and delivery as a styled Google Doc via SA+DWD with only a two-line summary in chat. Apply whenever creating, restyling, or delivering a document unless a brand skill's typography explicitly governs that deliverable."
+description: "Allison's default formatting and delivery standard (v2) for every document Claude creates: Poppins throughout, 1.5 line spacing, size-and-color headers with Brand Blue H2s, no bold or italics, no em dashes, no colons or semicolons in drafted prose, YYYY-MM-DD date-prefixed filenames, and delivery as a styled Google Doc into the Aura Docs Drive folder with only a two-line summary in chat. Apply whenever creating, restyling, or delivering a document unless a brand skill's typography explicitly governs that deliverable."
 ---
 
 # Document Formatting Standard (v2)
 
-Ruled by Allison Gaddy, July 27, 2026, after the Wave 1 message review doc. Upgraded to v2 the same day with the punctuation rule and the delivery rule. This is the default look and delivery path for every document Claude produces in Cowork or Claude Code: Word docs, PDFs, Google Docs, review docs, reports, SOPs rendered as deliverables, anything styled. It applies unless a brand skill's visual identity explicitly governs the deliverable (a Moxie listing piece, a FAM lead magnet, an EP-branded sales page keep their brand typography; internal and working documents use this standard).
+Ruled by Allison Gaddy, July 27, 2026, after the Wave 1 message review doc. Upgraded to v2 the same day with the punctuation rule and the delivery rule. Destination rule added August 4, 2026. This is the default look and delivery path for every document Claude produces in Cowork or Claude Code: Word docs, PDFs, Google Docs, review docs, reports, SOPs rendered as deliverables, anything styled. It applies unless a brand skill's visual identity explicitly governs the deliverable (a Moxie listing piece, a FAM lead magnet, an EP-branded sales page keep their brand typography; internal and working documents use this standard).
 
 ## The standard
 
@@ -37,14 +37,15 @@ This applies to every document, email draft, message draft, and deliverable writ
 
 Exempt: code blocks, technical references (file paths, URLs, config values, API syntax, timestamps), and data tables. The rule governs prose, not notation.
 
-## Delivery rule (v2, ruled by Allison 2026-07-27)
+## Delivery rule (v2, ruled by Allison 2026-07-27; destination ruled 2026-08-04)
 
 Anything drafted for Allison to read, send, or keep lands as a styled Google Doc:
 
-- Created via the SA+DWD path impersonating allison@expertpartners.com (never the read-only Google connectors), so ownership is native.
-- Real Poppins and 1.5 line spacing applied through the Google Docs API (batchUpdate text and paragraph styles), not left as defaults.
+- Created via the SA+DWD path impersonating allison@expertpartners.com where that path is reachable, otherwise via a write-capable Drive connector, so ownership is native. Never the read-only Google connectors.
+- Saved into the Aura Docs folder in Drive, folder ID 1awtAUORC9PAspfIoIoM5YlkwfDOvG-rx, set as the parent on every document create. Every deliverable lands in this one folder unless Allison names a different destination for a specific document.
+- Real Poppins and 1.5 line spacing applied through the Google Docs API (batchUpdate text and paragraph styles) or HTML-conversion equivalent, not left as defaults.
 - Filename date-prefixed per the filename rule above.
-- Link handed to Allison in chat as a markdown hyperlink, never a raw URL.
+- Link handed to Allison in chat as a markdown hyperlink whose link text is the document's exact name, never a raw URL (see the deliverable-link skill).
 - Chat carries only a two-line summary of the document. The document is the deliverable; chat is the pointer.
 
 Stays in chat: Claude Code paste blocks (commands, prompts, snippets bound for another surface) and quick factual answers. Those are not documents and do not get wrapped in one.
