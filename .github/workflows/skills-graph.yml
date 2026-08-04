@@ -56,12 +56,12 @@ jobs:
         if: github.ref == 'refs/heads/main'
         working-directory: eps
         run: |
-          if git diff --quiet -- tools/skill-map/skills-graph.json; then
+          git add tools/skill-map/skills-graph.json
+          if git diff --cached --quiet -- tools/skill-map/skills-graph.json; then
             echo "skills-graph.json unchanged; nothing to commit."
             exit 0
           fi
           git config user.name "skills-graph-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add tools/skill-map/skills-graph.json
           git commit -m "skills-graph: regenerate from SKILL.md sources"
           git push
