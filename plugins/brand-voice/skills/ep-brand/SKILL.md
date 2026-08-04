@@ -47,7 +47,7 @@ Expert Partners is the parent real estate coaching, training, marketing, and eve
 - Expert Partners = parent organization (never "EP" as shorthand in external copy)
 - EPIC = Expert Partners Inner Circle (program, not the company)
 - eXp: lowercase e, uppercase XP
-- Don Hobbs (D-O-N), Allison Gaddy (two Ls), Melony (never Melanie)
+- Don Hobbs (D-O-N), Allison Gaddy (two Ls)
 - No em dashes anywhere
 
 ## What Expert Partners never sounds like

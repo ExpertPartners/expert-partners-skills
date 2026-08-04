@@ -74,7 +74,7 @@ Language bank, reuse until strangers repeat them: The producer came home. Receip
 ## Formatting locks (inherited, never deviate)
 
 - No em dashes anywhere. Use commas, periods, parentheses, or double hyphens.
-- No colons or semicolons in drafted prose.
+- Colons and semicolons allowed in drafted prose, sparingly, never overused (ruled 2026-08-04). Commas, periods, parentheses, and double hyphens stay preferred.
 - No bold or italics in copy (legal and MLS requirements are the only exception).
 
 ## Self-check before delivering anything

@@ -58,7 +58,6 @@ The vision is a movement of self-aware, system-driven, growth-focused agents who
 
 - eXp: lowercase "e," uppercase "XP" (never "EXP" or "exp") <!-- brand-lint: ignore -->
 - Don: D-O-N (never Donald or Donny in copy)
-- Melony: not Melanie <!-- brand-lint: ignore -->
 - eXcelerate: not "accelerate" when referencing the brand-related term
 - Allison Gaddy: spelled correctly, no nicknames in formal copy
 - No em dashes anywhere in copy. Use commas, semicolons, colons, parentheses, or double hyphens.

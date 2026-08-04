@@ -1,6 +1,6 @@
 ---
 name: "document-formatting-standard"
-description: "Allison's default formatting and delivery standard (v2) for every document Claude creates: Poppins throughout, 1.5 line spacing, size-and-color headers with Brand Blue H2s, no bold or italics, no em dashes, no colons or semicolons in drafted prose, YYYY-MM-DD date-prefixed filenames, and delivery as a styled Google Doc into the Aura Docs Drive folder with only a two-line summary in chat. Apply whenever creating, restyling, or delivering a document unless a brand skill's typography explicitly governs that deliverable."
+description: "Allison's default formatting and delivery standard (v3) for every document Claude creates: Poppins throughout, 1.5 line spacing, size-and-color headers with Brand Blue H2s, no bold or italics, no em dashes, colons and semicolons only sparingly, YYYY-MM-DD date-prefixed filenames, and delivery as a styled Google Doc into the Aura Docs Drive folder with only a two-line summary in chat. Apply whenever creating, restyling, or delivering a document unless a brand skill's typography explicitly governs that deliverable."
 # --- skill-map metadata (additive, all optional) ---
 tier: plugin
 status: live
@@ -37,9 +37,9 @@ Page: US Letter (12240 x 15840 DXA), 1 inch margins all around.
 
 Filenames: date-prefixed, `YYYY-MM-DD <Title>`, using the date the document is created.
 
-## Punctuation rule (v2, ruled by Allison 2026-07-27)
+## Punctuation rule (v3, ruled by Allison 2026-08-04)
 
-No colons or semicolons anywhere in drafted prose. Periods and commas only.
+Colons and semicolons are allowed in drafted prose, sparingly, never overused. Periods and commas stay preferred. Em dashes remain banned.
 
 This applies to every document, email draft, message draft, and deliverable written for Allison or her team. It covers body text, headers, subtitles, and captions inside the deliverable.
 
@@ -62,7 +62,7 @@ Stays in chat: Claude Code paste blocks (commands, prompts, snippets bound for a
 
 - Never bold, never italics. Hierarchy comes from size and color only.
 - Never an em dash, anywhere, including headers.
-- No colons or semicolons in drafted prose (see punctuation rule above).
+- Colons and semicolons sparingly, never overused (see punctuation rule above).
 - Never horizontal rules, dividers, or decorative lines.
 - No emoji in documents.
 - Subtitle and provenance lines (date, audience, draft status) in gray meta style under the title.

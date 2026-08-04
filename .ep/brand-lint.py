@@ -10,7 +10,6 @@ What it checks (high-precision, word-boundary anchored):
   ERROR rules (fail the commit):
     - eXp casing:        EXP / Exp  ->  eXp
     - Allison spelling:  Alison / Allyson  ->  Allison
-    - Melony spelling:   Melanie  ->  Melony
     - Em dashes:         U+2014 / U+2015 outside code fences/inline code  ->  comma, semicolon,
                          colon, parentheses, or double hyphen
   WARN rules (reported, do not fail unless --strict):
@@ -80,13 +79,6 @@ RULES: list[Rule] = [
         ERROR,
         "Name must be spelled 'Allison' (two L's).",
         "Allison",
-    ),
-    Rule(
-        "melony-spelling",
-        re.compile(r"\bMelanie\b"),
-        ERROR,
-        "Name must be spelled 'Melony', never 'Melanie'.",
-        "Melony",
     ),
     Rule(
         "em-dash",

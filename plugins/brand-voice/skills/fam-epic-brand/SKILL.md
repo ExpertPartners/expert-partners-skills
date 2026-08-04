@@ -17,7 +17,7 @@ When this skill triggers, you are operating as a brand-keeper for two interconne
 - **Expert Partners (EPIC)**: Real estate coaching, training, and events company co-founded by Allison Gaddy and Don Hobbs.
 - **Free Agent Movement (FAM)**: The umbrella content and coaching brand. Includes Free Agent Nation, Free Agent Formula.
 
-These brands share **voice, spelling, structure, and positioning** — treat those as one system. But as of Visual Identity System v3.1 (2026-06-13) they have **separate visual systems**: EPIC/Expert Partners keeps Black + Brand Blue (#2757CF) accent with Overpass/Poppins; FAM is accent-less (Black/White/Warm Bone, Neue Swiss, IBM Plex Mono) so it can layer over each member's personal brand. Always pick the visual system that matches the brand of the asset. See `references/tokens.md`.
+These brands share **voice, spelling, structure, and positioning** -- treat those as one system. But as of Visual Identity System v3.1 (2026-06-13) they have **separate visual systems**: EPIC/Expert Partners keeps Black + Brand Blue (#2757CF) accent with Overpass/Poppins; FAM is accent-less (Black/White/Warm Bone, Neue Swiss, IBM Plex Mono) so it can layer over each member's personal brand. Always pick the visual system that matches the brand of the asset. See `references/tokens.md`.
 
 ## Quick reference
 
@@ -31,11 +31,10 @@ Read both reference files before generating any non-trivial deliverable. For sho
 
 ### Spelling and naming (never deviate)
 
-- eXp (lowercase "e," uppercase "XP"). Never "EXP" or "Exp".
+- eXp (lowercase "e," uppercase "XP"). Never "EXP" or "Exp". <!-- brand-lint: ignore -->
 - eXcelerate (never "accelerate").
 - Don (D-O-N). Never "Dawn".
-- Allison Gaddy. Never "Alison" or "Allyson".
-- Melony. Never "Melanie".
+- Allison Gaddy. Never "Alison" or "Allyson". <!-- brand-lint: ignore -->
 - Expert Partners or EPIC (both acceptable).
 - Free Agent Movement, Free Agent Nation, Free Agent Formula (capitalize when referring to the brand).
 - YouTube handle: @TheAllisonGaddy.
@@ -86,7 +85,7 @@ Pick the system that matches the brand of the asset. Do not mix them.
 - Black (#000000) dominant; Brand Blue (#2757CF) accent only.
 - PT Serif headlines, Overpass subheads, Poppins Light/Medium body.
 
-**Free Agent Movement (FAM)** — Visual Identity System v3.1:
+**Free Agent Movement (FAM)** -- Visual Identity System v3.1:
 - Black (#000000), White (#FFFFFF), Warm Bone (#F7F4EF). NO color accent; the Brand Blue accent is retired for FAM. Emphasis comes from contrast and typography. Warmth comes only from photography.
 - PT Serif headlines, Neue Swiss subheads/body/labels, IBM Plex Mono for technical detail. Never reintroduce Overpass, Poppins, blue, brown, or sepia to FAM.
 
@@ -127,7 +126,7 @@ Flag gaps rather than guessing.
 3. Banned phrases? Replace with substance.
 4. Voice memo energy or polished essay? If polished, rewrite.
 5. Truth hook open and CTA close? If missing, add.
-6. eXp / Don / Melony / Allison spelled correctly? Verify.
+6. eXp / Don / Allison spelled correctly? Verify.
 7. Page breaks or dividers? Remove.
 
 If any of these fail, fix it before delivering. Do not ask permission to self-correct.

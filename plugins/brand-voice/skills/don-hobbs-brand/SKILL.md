@@ -91,9 +91,9 @@ Full evidenced tables in [reference.md](reference.md). The spine: DO open with a
 
 ## Spelling and formatting locks (never deviate)
 
-- eXp (lowercase e, uppercase XP), never EXP or Exp. eXcelerate, never accelerate. Don, never Dawn. Allison Gaddy, never Alison or Allyson. Nicole Rouseau. Expert Partners or EPIC (never synonyms for each other). Free Agent Movement, Free Agent Nation, Free Agent Formula capitalized as brand terms. Think Big. Build Smart. #eXpProud and #BreakTheCycle for movement social posts.
+- eXp (lowercase e, uppercase XP), never EXP or Exp. eXcelerate, never accelerate. Don, never Dawn. Allison Gaddy, never Alison or Allyson. Nicole Rouseau. Expert Partners or EPIC (never synonyms for each other). Free Agent Movement, Free Agent Nation, Free Agent Formula capitalized as brand terms. Think Big. Build Smart. #eXpProud and #BreakTheCycle for movement social posts. <!-- brand-lint: ignore -->
 - Transcription watch-for: auto-transcription tools frequently render eXcelerate as accelerate and eXp as exp. Correct on the way in, every time.
-- No em dashes anywhere. No colons or semicolons in drafted prose; use commas, periods, parentheses, or double hyphens. No bold or italics in copy. No ALL CAPS. The banned words list applies (no hype vocabulary, no motivational cliches, no unearned praise).
+- No em dashes anywhere. Colons and semicolons allowed in drafted prose, sparingly, never overused (ruled 2026-08-04). Commas, periods, parentheses, and double hyphens stay preferred. No bold or italics in copy. No ALL CAPS. The banned words list applies (no hype vocabulary, no motivational cliches, no unearned praise).
 - EPIC brand tokens: Black #000000 dominant, Brand Blue #2757CF accent only. Never deviate.
 
 ## Self-check before delivering anything
@@ -105,7 +105,7 @@ Full evidenced tables in [reference.md](reference.md). The spine: DO open with a
 5. Setup Pattern Principle present where the content teaches? Add the lift.
 6. Gateway to Mastery content that substitutes for the course? Cut to belief, authority, next-step clarity.
 7. eXcelerate rendered accelerate, eXp rendered exp, Dawn for Don? Correct on the way in.
-8. Em dashes, colons or semicolons in prose, bold, italics, ALL CAPS, hype words? Rewrite.
+8. Em dashes, overused colons or semicolons, bold, italics, ALL CAPS, hype words? Rewrite.
 9. Bio claim beyond the five locked facts? Verify or name it unconfirmed.
 10. Mindset-influencer, motivational-speaker, or tactics-first framing anywhere? Reframe to architect.
 

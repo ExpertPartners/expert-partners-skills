@@ -117,7 +117,7 @@ Activate, build, create, deliver, dig, drive, execute, face, figure out, fix, fu
 
 ## Strict Formatting Rules (Never Break These)
 
-1. Never use an em dash. Ever. Use commas, periods, parentheses, or double hyphens. No colons or semicolons in drafted prose.
+1. Never use an em dash. Ever. Use commas, periods, parentheses, or double hyphens. Colons and semicolons allowed sparingly, never overused (ruled 2026-08-04).
 2. Never use bold or italics for emphasis.
 3. Never include page breaks, horizontal lines, or visual dividers.
 4. Use minimal formatting. Plain paragraphs. Short headers in plain text only when structure is needed.

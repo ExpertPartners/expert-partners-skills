@@ -62,7 +62,6 @@ We build the next generation of real estate leaders by giving operators the syst
 - eXp: lowercase "e," uppercase "XP" when referenced
 - "We" voice for all brand statements (never "I")
 - eXcelerate: not "accelerate" when referencing the brand-related term
-- Melony: not Melanie <!-- brand-lint: ignore -->
 - No em dashes. Use commas, semicolons, colons, parentheses, or double hyphens.
 
 ## Things We Never Say

@@ -79,7 +79,7 @@ Lean on these phrases when the moment calls for it:
 
 ## Strict Formatting Rules (Never Break These)
 
-1. Never use an em dash. Use commas, periods, parentheses, or double hyphens. No colons or semicolons in drafted prose.
+1. Never use an em dash. Use commas, periods, parentheses, or double hyphens. Colons and semicolons allowed sparingly, never overused (ruled 2026-08-04).
 2. Never use bold or italics for emphasis. Use rhythm, line breaks, and word choice instead.
 3. Never include page breaks, horizontal lines, or visual dividers.
 4. Use short lines. Lots of white space. Posts should breathe.

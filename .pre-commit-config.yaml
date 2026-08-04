@@ -29,7 +29,7 @@ repos:
   - repo: local
     hooks:
       - id: brand-lint
-        name: Expert Partners brand-naming linter (eXp, Allison, Melony, em dashes)
+        name: Expert Partners brand-naming linter (eXp, Allison, em dashes)
         entry: python3 .ep/brand-lint.py
         language: system
         files: \.(md|markdown|mdx|txt|rst)$

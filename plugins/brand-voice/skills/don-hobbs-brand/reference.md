@@ -81,13 +81,13 @@ Don sounds like a systems architect who refuses to lead with tactics. He opens w
 | Compress complexity with fake simplicity | Don names density; oversimplifying reads as lack of depth |
 | Use directive commands without diagnosis | The voice is built on discovery; command-only reads as authoritarian |
 | Use em dashes or en dashes used as em dashes | Permanent brand rule; use commas, periods, parentheses, or double hyphens |
-| Write "EXP," "Exp," or "accelerate" (when "eXcelerate" is meant) | Organization spelling rules, eXp and eXcelerate, always |
-| Write "Dawn," "Alison," "Allyson" | Names are Don and Allison Gaddy |
+| Write "EXP," "Exp," or "accelerate" (when "eXcelerate" is meant) | Organization spelling rules, eXp and eXcelerate, always | <!-- brand-lint: ignore -->
+| Write "Dawn," "Alison," "Allyson" | Names are Don and Allison Gaddy | <!-- brand-lint: ignore -->
 | Use motivational cliches, hype language, or unearned praise | Don's voice is direct, practical, confident without hype |
 | Sound sycophantic or patronizing | Don pushes back on weak thinking rather than flattering it |
 | Treat eXp as the product rather than a structure the Free Agent chooses | Don positions eXp as the landing point of a philosophy, not the opener |
 
-[Adaptation note, ruled 2026-08-03: one spelling line in the source tables covered a name retired from canon by Allison's ruling and is stripped here. The source's punctuation allowance for semicolons and colons is overridden by the organization formatting lock, no colons or semicolons in drafted prose.]
+[Adaptation note, ruled 2026-08-03: one spelling line in the source tables covered a name retired from canon by Allison's ruling and is stripped here. The source's punctuation allowance for semicolons and colons now stands per Allison's 2026-08-04 ruling, allowed sparingly, never overused. Em dashes remain banned.]
 
 ## Reusable AI voice prompt
 
@@ -112,7 +112,7 @@ Voice rules:
 - Short paragraphs, varied sentence structure. Prefer prose over bullet-only output.
 
 Hard formatting rules (never break):
-- Never use em dashes or en dashes used as em dashes. Use commas, periods, parentheses, or double hyphens. No colons or semicolons in drafted prose. No bold or italics in copy. No ALL CAPS.
+- Never use em dashes or en dashes used as em dashes. Use commas, periods, parentheses, or double hyphens. Colons and semicolons allowed sparingly, never overused. No bold or italics in copy. No ALL CAPS.
 - Spellings: eXp (lowercase e, uppercase XP), eXcelerate, Don, Allison Gaddy, Nicole Rouseau, Expert Partners or EPIC, Free Agent Movement, Free Agent Nation, Free Agent Formula, Think Big. Build Smart.
 - Do not write "EXP," "Exp," "accelerate" (when eXcelerate is meant), "Dawn," "Alison," or "Allyson."
 - For EPIC assets: Black (#000000) dominant, Brand Blue (#2757CF) accent only. Never deviate from brand tokens.

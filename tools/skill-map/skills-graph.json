@@ -1,0 +1,959 @@
+{
+  "schema": "skill-map/v1",
+  "generatedFrom": {
+    "eps": "7f710cd1b9fac55ec7f7adf3831ae242d13ed675",
+    "aura": "1ad3429f18ff4b84cb7f8b0e05dbaa32cbe7eab0"
+  },
+  "zones": [
+    "surfaces",
+    "brain",
+    "hands",
+    "routing",
+    "finance",
+    "content",
+    "cataloging"
+  ],
+  "nodes": [
+    {
+      "id": "ag-luxury-brand",
+      "source": "eps:plugins/brand-voice/skills/ag-luxury-brand/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": "ag-luxury",
+      "subtitle": "luxury real estate voice under Allison’s name"
+    },
+    {
+      "id": "ag-personal-brand",
+      "source": "eps:plugins/brand-voice/skills/ag-personal-brand/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": "ag-personal-brand",
+      "subtitle": "Allison’s first person voice"
+    },
+    {
+      "id": "brand-voice",
+      "source": "eps:plugins/brand-voice/skills/brand-voice/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "canonical brand context for the primary brands"
+    },
+    {
+      "id": "can-i-close",
+      "source": "aura:.claude/skills/can-i-close/SKILL.md",
+      "repo": "aura",
+      "tier": "user",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "session-audit"
+      ],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "plain language safe-to-close check"
+    },
+    {
+      "id": "code-block-routing",
+      "source": "eps:plugins/operating-doctrine/skills/code-block-routing/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [
+        "pin"
+      ],
+      "brandScope": null,
+      "subtitle": "paste block routing and the lane ledger"
+    },
+    {
+      "id": "deliverable-link",
+      "source": "eps:plugins/operating-doctrine/skills/deliverable-link/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "deliverables land as named markdown links"
+    },
+    {
+      "id": "dm-to-dollars",
+      "source": "eps:plugins/content-engines/skills/dm-to-dollars/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "DM to Dollars content engine"
+    },
+    {
+      "id": "document-formatting-standard",
+      "source": "eps:plugins/operating-doctrine/skills/document-formatting-standard/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [
+        "deliverable-link"
+      ],
+      "brandScope": null,
+      "subtitle": "Poppins everywhere, hierarchy by size and color"
+    },
+    {
+      "id": "don-hobbs-brand",
+      "source": "eps:plugins/brand-voice/skills/don-hobbs-brand/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": "don-hobbs",
+      "subtitle": "Don’s personal brand voice"
+    },
+    {
+      "id": "ember-reactivate",
+      "source": "aura:.claude/skills/ember-reactivate/SKILL.md",
+      "repo": "aura",
+      "tier": "user",
+      "zone": null,
+      "status": "designed",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": null
+    },
+    {
+      "id": "ep-brand",
+      "source": "eps:plugins/brand-voice/skills/ep-brand/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": "expert-partners",
+      "subtitle": "Expert Partners parent voice"
+    },
+    {
+      "id": "expert-partners-systems-map",
+      "source": "eps:plugins/systems-map/skills/expert-partners-systems-map/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "where every system lives and what Claude can reach"
+    },
+    {
+      "id": "fam-epic-brand",
+      "source": "eps:plugins/brand-voice/skills/fam-epic-brand/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "FAM and EPIC voice"
+    },
+    {
+      "id": "funnel-build",
+      "source": "eps:plugins/funnel-operations/skills/funnel-build/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "funnel-documentation"
+      ],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "build a funnel that does not exist yet"
+    },
+    {
+      "id": "funnel-documentation",
+      "source": "eps:plugins/funnel-operations/skills/funnel-documentation/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "one complete Notion record per funnel"
+    },
+    {
+      "id": "funnel-migration",
+      "source": "eps:plugins/funnel-operations/skills/funnel-migration/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "funnel-documentation"
+      ],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "per-funnel walk from old location to clean location"
+    },
+    {
+      "id": "handoff",
+      "source": "aura:tools/continuity-skills/handoff/SKILL.md",
+      "repo": "aura",
+      "tier": "user",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "hand work to another session"
+    },
+    {
+      "id": "kindergartner-mode",
+      "source": "eps:plugins/operating-doctrine/skills/kindergartner-mode/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "plain language walkthroughs"
+    },
+    {
+      "id": "lane-spawn",
+      "source": "eps:plugins/operating-doctrine/skills/lane-spawn/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [
+        "code-block-routing",
+        "pin"
+      ],
+      "brandScope": null,
+      "subtitle": "spawning new lanes with named homes"
+    },
+    {
+      "id": "master-marketer-free-agent-builder",
+      "source": "eps:plugins/content-engines/skills/master-marketer-free-agent-builder/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [
+        "xavier-offer-builder"
+      ],
+      "brandScope": null,
+      "subtitle": "marketing strategy in Allison’s voice"
+    },
+    {
+      "id": "moxie-signature-group-brand",
+      "source": "eps:plugins/brand-voice/skills/moxie-signature-group-brand/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": null,
+      "status": "benched",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": "moxie",
+      "subtitle": "benched, consumer real estate routes to AG Luxury"
+    },
+    {
+      "id": "name-session",
+      "source": "aura:.claude/skills/name-session/SKILL.md",
+      "repo": "aura",
+      "tier": "user",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "propose an accurate session name"
+    },
+    {
+      "id": "operating-doctrine",
+      "source": "eps:plugins/operating-doctrine/skills/operating-doctrine/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": null,
+      "status": "live",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "the standard every skill inherits"
+    },
+    {
+      "id": "park",
+      "source": "aura:tools/continuity-skills/park/SKILL.md",
+      "repo": "aura",
+      "tier": "user",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "park work for a later resume"
+    },
+    {
+      "id": "pin",
+      "source": "eps:plugins/operating-doctrine/skills/pin/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [
+        "code-block-routing"
+      ],
+      "brandScope": null,
+      "subtitle": "carry-back envelope and place-keeping baton"
+    },
+    {
+      "id": "project-architect",
+      "source": "aura:.claude/skills/project-architect/SKILL.md",
+      "repo": "aura",
+      "tier": "user",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "project-builder"
+      ],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "where a piece of work should live"
+    },
+    {
+      "id": "project-builder",
+      "source": "aura:.claude/skills/project-builder/SKILL.md",
+      "repo": "aura",
+      "tier": "user",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "day one birth checklist and health audit"
+    },
+    {
+      "id": "rare-content-engine",
+      "source": "eps:plugins/content-engines/skills/rare-content-engine/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "RARE content engine"
+    },
+    {
+      "id": "resume-work",
+      "source": "aura:tools/continuity-skills/resume-work/SKILL.md",
+      "repo": "aura",
+      "tier": "user",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "resume parked or handed-off work"
+    },
+    {
+      "id": "session-audit",
+      "source": "aura:.claude/skills/session-audit/SKILL.md",
+      "repo": "aura",
+      "tier": "user",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "structured session audit for consolidation"
+    },
+    {
+      "id": "session-closeout",
+      "source": "aura:.claude/skills/session-closeout/SKILL.md",
+      "repo": "aura",
+      "tier": "user",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "session-audit"
+      ],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "handoff note to main, clean worktree"
+    },
+    {
+      "id": "social-brand-brief",
+      "source": "aura:project-knowledge/operations/blotato-social-automation/skills-staging/social-brand-brief/SKILL.md",
+      "repo": "aura",
+      "tier": "user",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "per-account voice contract"
+    },
+    {
+      "id": "social-content-coach",
+      "source": "aura:project-knowledge/operations/blotato-social-automation/skills-staging/social-content-coach/SKILL.md",
+      "repo": "aura",
+      "tier": "user",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "social-brand-brief",
+        "social-post-writer",
+        "social-post-grader",
+        "social-post-scheduler"
+      ],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "orchestrator for the Blotato pack"
+    },
+    {
+      "id": "social-post-grader",
+      "source": "aura:project-knowledge/operations/blotato-social-automation/skills-staging/social-post-grader/SKILL.md",
+      "repo": "aura",
+      "tier": "user",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "social-post-writer"
+      ],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "virality rubric, nothing ships below eight of ten"
+    },
+    {
+      "id": "social-post-scheduler",
+      "source": "aura:project-knowledge/operations/blotato-social-automation/skills-staging/social-post-scheduler/SKILL.md",
+      "repo": "aura",
+      "tier": "user",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "the only skill that publishes through Blotato"
+    },
+    {
+      "id": "social-post-writer",
+      "source": "aura:project-knowledge/operations/blotato-social-automation/skills-staging/social-post-writer/SKILL.md",
+      "repo": "aura",
+      "tier": "user",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "social-post-grader"
+      ],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "drafts hooks first, then body"
+    },
+    {
+      "id": "ss",
+      "source": "aura:_tools/personal-skills/ss/SKILL.md",
+      "repo": "aura",
+      "tier": "user",
+      "zone": null,
+      "status": "designed",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "screenshot shorthand"
+    },
+    {
+      "id": "the-strong-ones-brand",
+      "source": "eps:plugins/brand-voice/skills/the-strong-ones-brand/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": "the-strong-ones",
+      "subtitle": "The Strong Ones voice inside AG Personal Brand"
+    },
+    {
+      "id": "xavier-offer-builder",
+      "source": "eps:plugins/content-engines/skills/xavier-offer-builder/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": "offer construction and audit"
+    }
+  ],
+  "edges": [
+    {
+      "from": "ag-luxury-brand",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "ag-personal-brand",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "brand-voice",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "can-i-close",
+      "to": "session-audit",
+      "type": "calls"
+    },
+    {
+      "from": "can-i-close",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "code-block-routing",
+      "to": "pin",
+      "type": "defers-to"
+    },
+    {
+      "from": "code-block-routing",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "deliverable-link",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "dm-to-dollars",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "document-formatting-standard",
+      "to": "deliverable-link",
+      "type": "defers-to"
+    },
+    {
+      "from": "document-formatting-standard",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "don-hobbs-brand",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "ember-reactivate",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "ep-brand",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "expert-partners-systems-map",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "fam-epic-brand",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "funnel-build",
+      "to": "funnel-documentation",
+      "type": "calls"
+    },
+    {
+      "from": "funnel-build",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "funnel-documentation",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "funnel-migration",
+      "to": "funnel-documentation",
+      "type": "calls"
+    },
+    {
+      "from": "funnel-migration",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "handoff",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "kindergartner-mode",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "lane-spawn",
+      "to": "code-block-routing",
+      "type": "defers-to"
+    },
+    {
+      "from": "lane-spawn",
+      "to": "pin",
+      "type": "defers-to"
+    },
+    {
+      "from": "lane-spawn",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "master-marketer-free-agent-builder",
+      "to": "xavier-offer-builder",
+      "type": "defers-to"
+    },
+    {
+      "from": "master-marketer-free-agent-builder",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "moxie-signature-group-brand",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "name-session",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "park",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "pin",
+      "to": "code-block-routing",
+      "type": "defers-to"
+    },
+    {
+      "from": "pin",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "project-architect",
+      "to": "project-builder",
+      "type": "calls"
+    },
+    {
+      "from": "project-architect",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "project-builder",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "rare-content-engine",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "resume-work",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "session-audit",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "session-closeout",
+      "to": "session-audit",
+      "type": "calls"
+    },
+    {
+      "from": "session-closeout",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "social-brand-brief",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "social-content-coach",
+      "to": "social-brand-brief",
+      "type": "calls"
+    },
+    {
+      "from": "social-content-coach",
+      "to": "social-post-grader",
+      "type": "calls"
+    },
+    {
+      "from": "social-content-coach",
+      "to": "social-post-scheduler",
+      "type": "calls"
+    },
+    {
+      "from": "social-content-coach",
+      "to": "social-post-writer",
+      "type": "calls"
+    },
+    {
+      "from": "social-content-coach",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "social-post-grader",
+      "to": "social-post-writer",
+      "type": "calls"
+    },
+    {
+      "from": "social-post-grader",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "social-post-scheduler",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "social-post-writer",
+      "to": "social-post-grader",
+      "type": "calls"
+    },
+    {
+      "from": "social-post-writer",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "ss",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "the-strong-ones-brand",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "xavier-offer-builder",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    }
+  ],
+  "flags": {
+    "unzoned": [
+      "ag-luxury-brand",
+      "ag-personal-brand",
+      "brand-voice",
+      "can-i-close",
+      "deliverable-link",
+      "document-formatting-standard",
+      "don-hobbs-brand",
+      "ember-reactivate",
+      "ep-brand",
+      "expert-partners-systems-map",
+      "fam-epic-brand",
+      "handoff",
+      "kindergartner-mode",
+      "moxie-signature-group-brand",
+      "name-session",
+      "operating-doctrine",
+      "park",
+      "project-architect",
+      "project-builder",
+      "resume-work",
+      "session-audit",
+      "session-closeout",
+      "ss",
+      "the-strong-ones-brand"
+    ],
+    "declaredDuplicates": [
+      "eps:operating-doctrine/SKILL.md"
+    ]
+  },
+  "excluded": [
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/can-i-close/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/ember-reactivate/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/name-session/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/session-audit/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/session-closeout/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/_tools/personal-skills/ss/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-brand-brief/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-content-coach/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-grader/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-scheduler/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-writer/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/tools/continuity-skills/handoff/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/tools/continuity-skills/park/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/tools/continuity-skills/resume-work/SKILL.md",
+    "aura:docs/estate/extracts/mission-control/SKILL.md",
+    "aura:skills/operating-doctrine/SKILL.md",
+    "aura:skills/plugins/brand-voice/skills/brand-voice/SKILL.md",
+    "aura:skills/plugins/operating-doctrine/skills/operating-doctrine/SKILL.md"
+  ]
+}
