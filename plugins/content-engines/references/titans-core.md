@@ -1,6 +1,6 @@
 # Titans core, how this skill family thinks
 
-Shared reference for the Titans skill family. Lives inside xavier-offer-builder while it is the only shipped family member; hoists to a plugin-level shared location when the second member (dm-to-dollars) is built. Source: Allison Gaddy's synthesis and worked applications only. The original course library stays private in the archived claude-cowork repo and is never quoted here.
+Shared reference for the Titans skill family, hoisted to the plugin-level shared location (plugins/content-engines/references/titans-core.md) when the second family member shipped, per the roster plan. Source: Allison Gaddy's synthesis and worked applications only. The original course library stays private in the archived claude-cowork repo and is never quoted here.
 
 Roster and governance: aura project-knowledge/marketing-canon/titans-family-scoping-plan-2026-08-04.md, governed by the marketing canon directive (aura intake/2026-08-03-marketing-canon-directive.md). These skills are active builders, never a passive library.
 
@@ -19,7 +19,7 @@ Roster and governance: aura project-knowledge/marketing-canon/titans-family-scop
 
 ## The family
 
-- xavier-offer-builder (shipped). Offer construction and audit, six elements on a false-belief chain.
-- dm-to-dollars (approved, unbuilt, gate two). Profile audits, lead-flow math, social-conversation-to-sale.
+- xavier-offer-builder (shipped, gate one). Offer construction and audit, six elements on a false-belief chain.
+- dm-to-dollars (shipped, gate two). Profile audits, daily lead-flow math, conversation-to-offer bridging.
 - Content Machine (verdict deferred). Extend-candidate for rare-content-engine; decided at its own turn.
 - Secret MLM Hacks, library-only by decision. Anything it lends must pass the no-recruiting rule first. EPIC is nurture and growth only, never recruiting.

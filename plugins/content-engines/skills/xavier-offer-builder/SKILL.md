@@ -7,7 +7,7 @@ description: Offer construction and audit engine built from Allison Gaddy's XAVI
 
 This skill builds and audits offers. The offer is the first domino, a funnel is an offer with doors, copy is an offer with words, a campaign is an offer with a delivery truck. If the offer thinking is strong, everything downstream inherits it. Nothing downstream gets built on an undefined offer.
 
-Provenance and boundary. This skill operationalizes Allison Gaddy's own synthesis and worked applications of the XAVIER offer formula (her filled worksheets, her Gateway to Mastery offer buildout, the Expert Partners ICP layer). The original course material stays a private reference library and is never quoted, pasted, or republished here or in any asset this skill produces. Read references/titans-core.md before working; it is how this family of skills thinks.
+Provenance and boundary. This skill operationalizes Allison Gaddy's own synthesis and worked applications of the XAVIER offer formula (her filled worksheets, her Gateway to Mastery offer buildout, the Expert Partners ICP layer). The original course material stays a private reference library and is never quoted, pasted, or republished here or in any asset this skill produces. Read the plugin's shared reference at plugins/content-engines/references/titans-core.md before working; it is how this family of skills thinks.
 
 ## Step zero, one dream customer
 

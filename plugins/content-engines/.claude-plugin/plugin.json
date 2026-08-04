@@ -1,5 +1,5 @@
 {
   "name": "content-engines",
-  "version": "0.3.0",
-  "description": "Allison Gaddy content and marketing engines: master-marketer-free-agent-builder (strategy, funnels, offers voice layer), rare-content-engine (RARE-framework scroll-stopping content), and xavier-offer-builder (offer construction and audit from the Titans family, marketing canon directive). Voice and brand tokens defer to the brand-voice plugin."
+  "version": "0.4.0",
+  "description": "Allison Gaddy content and marketing engines: master-marketer-free-agent-builder (strategy and voice layer), rare-content-engine (RARE-framework scroll-stopping content), and the Titans family (xavier-offer-builder for offer construction and audit, dm-to-dollars for profile audits, lead-flow math, and conversation-to-offer bridging; shared core at references/titans-core.md). Voice and brand tokens defer to the brand-voice plugin."
 }
