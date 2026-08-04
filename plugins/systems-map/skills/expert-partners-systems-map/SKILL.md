@@ -17,7 +17,7 @@ Each system has exactly one job. Discrepancies happen when a system is asked to 
 
 Expert Partners LLC is the legal and operating entity. Don Hobbs operates under Expert Partners LLC; his IP (Gateway to Mastery, Think Big Live Big, 2020 Vision, events, coaching clients, and related training assets) lives under Expert Partners LLC. He is not a separate brand stack or a separate business container.
 
-PartnerSync is the white-labeled GoHighLevel platform layer, the agency container (company `FOz8PSvqj7aYASb3wDzm`, "Expert Partners LLC dba Partner Sync"). It is plumbing, not a legal entity and not a brand. It holds five brand locations: EPIC, Expert Partners, AG Personal Brand, Moxie Signature Group, and Free Agent Nation Circle Community. The canonical registry with IDs, states, purposes, and the implementation priority order is `partnersync/reference/ghl-location-registry.md`; a mirror lives in the expert-partners repo at `reference/ghl-location-registry.md`. The location a contact lives in IS the brand statement; the peer brand-tag vocabulary is retired as contact-routing architecture (ruled 2026-07-27; full rule in `partnersync/doctrine/cross-location-identity-rules.md`).
+PartnerSync is the white-labeled GoHighLevel platform layer, the agency container (company `FOz8PSvqj7aYASb3wDzm`, "Expert Partners LLC dba Partner Sync"). It is plumbing, not a legal entity and not a brand. It holds four permanent brand locations per Allison's 2026-07-28 canon ruling: EPIC, Expert Partners, AG Personal Brand, and AG Luxury (the location formerly recorded as Moxie Signature Group; Moxie remains a benched brand name, never a location name). Free Agent Nation Circle Community exists in the estate but is not one of the four permanent brand locations; its standing is an open question for Allison. The canonical registry with IDs, states, purposes, and the implementation priority order is `partnersync/reference/ghl-location-registry.md`; a mirror lives in the expert-partners repo at `reference/ghl-location-registry.md`. The location a contact lives in IS the brand statement; the peer brand-tag vocabulary is retired as contact-routing architecture (ruled 2026-07-27; full rule in `partnersync/doctrine/cross-location-identity-rules.md`).
 
 ## Storage map: what each system does, one job each
 
@@ -120,5 +120,7 @@ Two lanes, matched to the surface:
 - Memory: a one-line mirror that points here.
 
 ## Version
+
+v2.2. Corrects the location roster to the four permanent brand locations per the 2026-07-28 canon ruling (registry rewrite, `partnersync/reference/ghl-location-registry.md`): AG Luxury is the canonical name of the location formerly recorded as Moxie Signature Group, and Free Agent Nation Circle Community moved out of the permanent roster pending Allison's standing ruling. Drift caught and corrected 2026-08-03 in Aura: Strategic Advisor / Repo Walk, written by Aura via the GitHub connector.
 
 v2.1. Derived verbatim from the Expert Partners Systems Map bible dated 2026-07-27 (bible v2.1, adding the Firecrawl web-data-acquisition doctrine). Authored by Allison Gaddy.

@@ -1,6 +1,6 @@
 {
   "name": "systems-map",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The canonical map of where every Expert Partners system lives, each system's one job, and the access Claude already holds across the stack. Loads at session start; inherits the operating-doctrine and never overrides it.",
   "author": { "name": "Allison Gaddy" }
 }
