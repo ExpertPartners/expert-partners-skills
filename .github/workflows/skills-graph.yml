@@ -1,0 +1,67 @@
+# Skill Map Stage 1 pipeline (aura intake/2026-08-04-skill-map-architecture-report.md).
+# Regenerates tools/skill-map/skills-graph.json whenever a SKILL.md changes, in this repo
+# (push) or in aura (repository_dispatch fired by aura's skills-graph-trigger workflow).
+# The extractor exits non-zero on any dangling inherits / calls / defers-to id, duplicate
+# skill id, name/folder mismatch, or frontmatter parse error, which fails this workflow.
+# Branch pushes get validation only; the regenerated graph is committed back on main.
+name: skills-graph
+
+on:
+  push:
+    paths:
+      - "**/SKILL.md"
+      - "tools/skill-map/**"
+  repository_dispatch:
+    types: [skill-md-changed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: skills-graph-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  regenerate:
+    name: validate + regenerate skills-graph.json
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout expert-partners-skills
+        uses: actions/checkout@v6
+        with:
+          path: eps
+
+      - name: Checkout aura (canonical co-source of SKILL.md files)
+        uses: actions/checkout@v6
+        with:
+          repository: ExpertPartners/aura
+          token: ${{ secrets.SKILLS_GRAPH_TOKEN }}
+          path: aura
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pipeline dependencies
+        working-directory: eps/tools/skill-map
+        run: npm ci
+
+      - name: Extract and validate (fails on any dangling reference)
+        working-directory: eps/tools/skill-map
+        run: node extract-skills-graph.mjs --eps "$GITHUB_WORKSPACE/eps" --aura "$GITHUB_WORKSPACE/aura" --out "$GITHUB_WORKSPACE/eps/tools/skill-map/skills-graph.json"
+
+      - name: Commit regenerated graph (main only)
+        if: github.ref == 'refs/heads/main'
+        working-directory: eps
+        run: |
+          if git diff --quiet -- tools/skill-map/skills-graph.json; then
+            echo "skills-graph.json unchanged; nothing to commit."
+            exit 0
+          fi
+          git config user.name "skills-graph-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add tools/skill-map/skills-graph.json
+          git commit -m "skills-graph: regenerate from SKILL.md sources"
+          git push
