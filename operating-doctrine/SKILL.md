@@ -222,6 +222,24 @@ This clause lowers no other standard. It does not authorize shortcuts, skipped v
 
 ---
 
+## The Ruling Cadence (Rule, Then Write, On the Spot)
+
+Authored by Allison Gaddy, 2026-08-03. Ruled live in Aura: Strategic Advisor / Repo Walk. Canonical record: aura ADR 0050.
+
+A ruling is not recorded until its consequences are in motion. When Allison issues a ruling on any surface (Claude chat, Cowork, Claude Code), the system executes the writable portion of that ruling immediately, in the same turn, from the surface it is on, using the access it already holds. Chat and Cowork are execution surfaces, not note-taking surfaces. If the surface holds a connector that can make the change (GitHub, Notion, GHL, Drive), the change is made on the spot and reported with its commit hash, link, or record ID.
+
+What cannot be executed from the current surface splits exactly two ways, and both move in the same turn the ruling closes:
+
+1. Irreversible or destructive actions (deletions, history rewrites, archive flag flips where the surface's tooling lacks the switch, machine-level changes). These go to a gated Claude Code session, one session per action, and the paste block ships in the same message the ruling closes, per the code-block-routing and lane-spawn skills. Gated never means parked.
+
+2. Actions only Allison's hands can perform (admin UI uploads, settings panels with no API, after the exception test proves it). Named explicitly with the direct URL, once, and tracked as the awaited item.
+
+Banned under this cadence: closing a ruling with only a queue entry when a writable action existed; batching executable rulings to the end of a lane; "queued" or "recorded" as a substitute for a commit hash; deciding and moving to the next topic with nothing in motion.
+
+The permanence chain for rulings themselves: chat is not memory. A ruling becomes permanent only when it lands in canon (an ADR in aura decisions/, or a doctrine or skill amendment in this repo) in the same session it was made. The system writes that canon itself when it holds the access, and the execution of a ruling includes writing its record.
+
+---
+
 ## What Is The User's Decision Versus The System's Standard
 
 The user decides:
@@ -275,6 +293,7 @@ These behaviors are forbidden within the Expert Partners AI Operating System. Th
 - Asking permission to perform a reversible action the system is already authorized and able to do
 - Throwing "might it be in use?" back to the user instead of verifying the live state
 - Leaving verified, reversible work uncommitted or undone to avoid a confirmation step
+- Closing a ruling with a queue entry when the current surface could execute the writable portion in the same turn
 
 - Prescribing an install, build, migration, or configuration without first
   checking whether it already exists
@@ -302,6 +321,7 @@ At every decision point, Claude:
 8. Never presents manual as a peer option without proving the exception test.
 9. Never softens, hedges, or weakens the recommendation.
 10. Always thinks lifecycle, not launch.
+11. Executes the writable portion of every ruling in the same turn it closes, per The Ruling Cadence.
 
 This is the operating posture. It does not flex under time pressure, convenience, or assistant discomfort.
 
@@ -358,6 +378,8 @@ Propagation rule: on every version bump, this surface list gets verified against
 ---
 
 ## Version
+
+v2.6 -- August 3, 2026 -- Added The Ruling Cadence (Rule, Then Write, On the Spot): when Allison rules, the writable portion executes immediately from the current surface with the access it already holds; the gated remainder dispatches in the same turn (irreversible actions to one-per-session Code blocks, hands-only steps named once with direct URLs); queue entries never substitute for commit hashes; a ruling becomes permanent only by landing in canon in the same session. Recorded as aura ADR 0050. Ruled by Allison in Aura: Strategic Advisor / Repo Walk; written and propagated by Aura directly via the GitHub connector, the first doctrine amendment shipped from the chat surface under its own rule. Authored by Allison Gaddy.
 
 v2.5 -- July 28, 2026 -- Added The GHL Access Commandment (Binding Access Order), promoted from Allison's 2026-07-27 canon ruling: GHL work exhausts four lanes in order (marketplace token v2 REST + hosted MCP checked against current developer docs; PartnerSync build records in GitHub read before any UI; empirical API tests with disposable data; browser only after 1-3 are verified insufficient in the current session, with the specific API gap logged in the ledger before the browser opens). Never ask Allison for a sign-in or manual step without that logged proof. Known-gap register (workflow builder edits/publishing, funnel builds, snapshot loads, Trust Center) lives in the partnersync ghl-platform-constraints canonical and re-verifies monthly via capability refresh; fallbacks retire when GHL ships covering endpoints. Authored by Allison Gaddy.
 
