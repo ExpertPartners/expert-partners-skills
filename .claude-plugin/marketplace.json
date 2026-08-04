@@ -20,8 +20,8 @@
     {
       "name": "content-engines",
       "source": "./plugins/content-engines",
-      "version": "0.2.0",
-      "description": "Allison Gaddy content and marketing engines (master-marketer-free-agent-builder, rare-content-engine)."
+      "version": "0.3.0",
+      "description": "Allison Gaddy content and marketing engines (master-marketer-free-agent-builder, rare-content-engine, xavier-offer-builder)."
     },
     {
       "name": "funnel-operations",
