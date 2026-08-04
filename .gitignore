@@ -11,3 +11,5 @@
 # Skills-local secrets
 *.local.env
 *.secret
+__pycache__/
+*.pyc
