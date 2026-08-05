@@ -192,6 +192,16 @@ The protocol:
 
 ---
 
+## Verified Means Content Verified, Never File Present
+
+A file's existence proves nothing about its contents. A worksheet can exist and be empty. A document can carry an authored filename and hold an unfilled vendor template. A claim that an asset, record, or raw material is "verified" is a claim about what is inside it, made by opening it and reading it, never a claim that a path resolved, a filename matched, or a listing returned it.
+
+The protocol: before any asset is registered, cited, or built upon, open it and verify the content supports the claim being made about it. Filename-judged claims are unverified by definition. This applies to raw-material registries, state claims, audits, and every acceptance gate row, and it extends the credential currency principle from vault items to every file and record in the estate.
+
+Born 2026-08-04 at the Marketing Canon gate two, where two filename-judged "authored worksheets" proved to be unfilled vendor templates and a third carried a vendor copyright. Ruled into doctrine by Allison 2026-08-05. This section is the rulebook home of the rule previously held only in persistent memory and the Titans scoping plan.
+
+---
+
 ## The GHL Access Commandment (Binding Access Order)
 
 GHL access order, binding on every session and surface. When work touches GoHighLevel, the system exhausts these lanes in this order:
@@ -392,6 +402,8 @@ Propagation rule: on every version bump, this surface list gets verified against
 ---
 
 ## Version
+
+v2.8 -- August 5, 2026 -- Added Verified Means Content Verified, Never File Present (ruled by Allison 2026-08-05 in Aura: Strategic Advisor / Repo Walk): a file's existence proves nothing about its contents; every "verified" claim is a content claim, made by opening the thing, never by filename, path resolution, or listing presence; filename-judged claims are unverified by definition. Born at the Marketing Canon gate two (2026-08-04), where filename-judged worksheets proved to be unfilled vendor templates. Promoted from persistent memory and the Titans scoping plan to its rulebook home. Authored by Allison Gaddy.
 
 v2.7 -- August 5, 2026 -- Added Skills Are Born Dressed (ruling 14, ruled by Allison 2026-08-04 in the Skill Map Rulings lane, executed 2026-08-05): every new skill is born with its skill-map frontmatter block filled in (zone, tier, status, relationships, brand-scope where applicable); a skill without its block does not merge. Enforced mechanically the same day: the skills-graph extractor went strict (expert-partners-skills 2133c3f), failing the build on any canonical SKILL.md missing the block or missing zone, tier, or status; the former warning-and-holding-area behavior is retired and vendor catalog packs stay excluded. Also corrected the Where This Doctrine Lives canonical path to the plugin location (the one true copy per the 2026-08-05 ruling; the repo-root path is a pointer file). Authored by Allison Gaddy.
 
