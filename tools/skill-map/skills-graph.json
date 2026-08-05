@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "89631305a8b65bb2ee57a8e5555621ac6299ec58",
+    "eps": "83ce66cb85c1b71034bb9607a405a7945a28ced9",
     "aura": "7dca19ac2eb758b9099f903434afc564978cf51b"
   },
   "zones": [
@@ -14,6 +14,36 @@
     "cataloging"
   ],
   "nodes": [
+    {
+      "id": "acn-currency-check",
+      "source": "eps:plugins/acn-advisor/skills/acn-currency-check/SKILL.md",
+      "repo": "eps",
+      "tier": "user",
+      "zone": null,
+      "status": "designed",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": null
+    },
+    {
+      "id": "acn-email-watch",
+      "source": "eps:plugins/acn-advisor/skills/acn-email-watch/SKILL.md",
+      "repo": "eps",
+      "tier": "user",
+      "zone": null,
+      "status": "designed",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": null
+    },
     {
       "id": "ag-luxury-brand",
       "source": "eps:plugins/brand-voice/skills/ag-luxury-brand/SKILL.md",
@@ -645,6 +675,16 @@
   ],
   "edges": [
     {
+      "from": "acn-currency-check",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "acn-email-watch",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
       "from": "ag-luxury-brand",
       "to": "operating-doctrine",
       "type": "inherits"
@@ -927,6 +967,8 @@
   ],
   "flags": {
     "unzoned": [
+      "acn-currency-check",
+      "acn-email-watch",
       "ag-luxury-brand",
       "ag-personal-brand",
       "brand-voice",
