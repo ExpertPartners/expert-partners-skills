@@ -36,8 +36,8 @@ mutation($projectId: ID!, $title: String!, $body: String!) {
 ```
 Title: `Wrap: [lane] [YYYY-MM-DD]`. Body: one line pointing at the two intake paths and the ledger commit. Pointers only, no pasted state.
 
-From Claude Code: `gh api graphql` with the authenticated gh session. Auth needs project scope (classic PAT or app token; fine-grained PAT support for org ProjectsV2 writes is unverified as of 2026-08-04). Tokens live in 1Password only.
+From Claude Code: `gh api graphql` with the authenticated gh session. Auth needs project scope (classic PAT or app token; fine-grained PAT support for org ProjectsV2 writes is unverified as of 2026-08-04). Tokens live in 1Password only. Proven live 2026-08-05 by the Canon Doc Sync and Wrap Marks Backfill lanes (AllisonGaddy keyring identity with project scope, query-back verification per item).
 
 Known constraint (reported 2026, community-sourced, verify before relying): `updateProjectV2ItemFieldValue` single-select changes can update the data store without updating the board-view grouping index, so a card may not visibly move columns. That is why the wrap mark is a NEW dated draft item, never a status move.
 
-If the current surface has no GraphQL path or no credential: say plainly the mark did not land and why, and put it first in the next dispatch to a session that can land it. Never silently skip. Durable fix ORDERED (shared-canonical-file-writes directive, Rule 3): the Estate Brain ledger-row tool and the wrap-mark tool ship together in one dispatched Code build at the Phase B cutover decision; missing that dispatch at cutover is a directive violation.
+If the current surface has no GraphQL path or no credential: say plainly the mark did not land and why, and ship the mark's dispatch block to a capable session in the same wrap turn (closeout completeness rule, SKILL.md v1.2). Never silently skip. Durable fix ORDERED (shared-canonical-file-writes directive, Rule 3): the Estate Brain ledger-row tool and the wrap-mark tool ship together in one dispatched Code build at the Phase B cutover decision; missing that dispatch at cutover is a directive violation.
