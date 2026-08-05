@@ -14,8 +14,8 @@
     {
       "name": "brand-voice",
       "source": "./plugins/brand-voice",
-      "description": "Canonical brand context for Expert Partners, Free Agent Movement, and Moxie Signature Group",
-      "version": "0.2.0"
+      "description": "Canonical brand context for the aura ADR 0045 brand registry (Expert Partners, EPIC, AG Personal Brand, AG Luxury, FAM, Don Hobbs; Moxie benched)",
+      "version": "0.3.0"
     },
     {
       "name": "content-engines",
