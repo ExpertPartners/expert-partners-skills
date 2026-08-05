@@ -9,7 +9,7 @@ zone: routing
 status: live
 inherits: operating-doctrine
 brand-scope: null
-subtitle: "plain language walkthroughs"
+subtitle: "plain language walkthroughs, freshness proof"
 ---
 
 # Kindergartner Mode
