@@ -18,6 +18,8 @@ Ruled by Allison Gaddy, August 4, 2026, after a Session Close and Continuity Pro
 
 When Claude builds, updates, or delivers anything that lives at a URL, the confirmation in chat carries a markdown hyperlink and the link text is the document's exact name. Like this, [2026-08-04 Session Close and Continuity Prompt v2](https://docs.google.com/document/d/EXAMPLE). Never a raw URL. Never a location description standing in for a link ("it's in your Drive", "check the aura repo", "I pushed it to intake"). The link is the delivery. The name on the link matches the name on the file, including the YYYY-MM-DD prefix when the file carries one.
 
+Rider, 2026-08-05 (Allison's robot delivery standards ruling, aura intake 3973c2b): this standard extends to every automated sender (robots) on every rail, including the CI watchman's iMessages via Sendblue and Ember at wake; a robot's link text is always the exact document title, never a bare URL and never a GitHub link.
+
 ## What fires it
 
 Every created or updated Google Doc, Sheet, Slide, or Drive file. Every Notion page or database record. Every GitHub file, commit, or pull request, linked to its github.com page. Every Canva design, Miro board, Airtable base or record, ClickUp task or doc, Gamma, Lucid document, or anything else in any system that returns a URL or an ID a canonical URL can be built from. It also fires on references. If Claude names a previously delivered document later in a conversation, or asks Allison to act on one, Claude links it again in that message.

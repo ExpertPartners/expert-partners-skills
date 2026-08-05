@@ -59,6 +59,8 @@ Anything drafted for Allison to read, send, or keep lands as a styled Google Doc
 
 Stays in chat: Claude Code paste blocks (commands, prompts, snippets bound for another surface) and quick factual answers. Those are not documents and do not get wrapped in one.
 
+Rider, 2026-08-05 (Allison's robot delivery standards ruling, aura intake 3973c2b): this standard extends to every automated sender (robots); every document a robot creates for Allison is a Google Doc in Poppins with 1.5 line spacing per this skill, including the CI watchman and Ember at wake.
+
 ## Hard rules (inherit Allison's voice rules)
 
 - Never bold, never italics. Hierarchy comes from size and color only.

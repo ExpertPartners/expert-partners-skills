@@ -57,6 +57,8 @@ Not in the stack, stated so nobody re-litigates it:
 
 The brains, their seats, machines, one jobs, SOULs, and liveness rules live in Bible Chapter 4 (`canonical-bible-chapter-4-brains-and-sync-topology.md`, expert-partners doctrine area). This map does not restate the roster. One strategic brain (Aura, M4 / Cowork) is active. Ember (M2) was frozen and quieted 2026-08-03 (workspaces archived, gateway disabled, writer crons off); all agentic rebuilds, including the Ember rebuild and the OpenClaw-to-SDK migration, are paused until Aura's brain (the estate manifest plus the Estate Brain MCP) is in place and locked down (ruled 2026-08-03). Everything else is planned and dark by design. Liveness is proven by process evidence, never by a fresh commit.
 
+Ember has her own shared Google Drive, and it is her filing home at wake, she files her documents there when she wakes; the CI watchman is not Ember and keeps filing to the Aura Docs folder per document-formatting-standard (ruled 2026-08-05, robot delivery standards ruling, aura intake 3973c2b).
+
 ## The Estate Brain MCP: in build, not live
 
 The Estate Brain MCP (target endpoint mcp.expertpartners.com) does NOT exist yet. Never claim it is live; any memory or document recording it as deployed with tools is a phantom of the spec (Allison's correction, 2026-08-03). Until its acceptance passes with live proof, every surface reads canon through the GitHub connector against ExpertPartners repos, or the local clone in Code. The build runs in the Estate Brain MCP Build lane (Code session of the same name, home Aura: Strategic Advisor / Estate Brain MCP Build); status lives in the lane ledger.
