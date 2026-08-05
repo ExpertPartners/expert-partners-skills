@@ -5,6 +5,7 @@ description: |
 allowed-tools: []
 # --- skill-map metadata (additive, all optional) ---
 tier: plugin
+zone: brain
 status: live
 inherits: operating-doctrine
 brand-scope: null

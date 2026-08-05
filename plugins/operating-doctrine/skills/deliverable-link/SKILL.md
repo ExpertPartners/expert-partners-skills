@@ -3,6 +3,7 @@ name: "deliverable-link"
 description: "Every deliverable Claude creates or updates for Allison lands with a markdown hyperlink whose link text is the exact document name. Fires on every create, update, or delivery of any document, file, design, page, board, base, record, or repo artifact in any system (Google Drive, Notion, GitHub, Canva, Miro, Airtable, ClickUp, Gamma, Lucid, or anywhere else that returns a URL), and on every later reference to a deliverable's location. Telling Allison where something is without handing her the clickable link is the failure condition this skill exists to remove. It inherits the operating-doctrine and never overrides it."
 # --- skill-map metadata (additive, all optional) ---
 tier: plugin
+zone: routing
 status: live
 inherits: operating-doctrine
 brand-scope: null

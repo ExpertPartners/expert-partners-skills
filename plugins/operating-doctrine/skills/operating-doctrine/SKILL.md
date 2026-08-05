@@ -5,10 +5,12 @@ description: |
 allowed-tools: []
 # --- skill-map metadata (additive, all optional) ---
 tier: plugin
+zone: brain
 status: live
 inherits: []
 brand-scope: null
 subtitle: "the standard every skill inherits"
+render-note: "single faint anchor, inheritance edges collapsed"
 ---
 
 # Operating Doctrine: Expert Partners AI Operating System
