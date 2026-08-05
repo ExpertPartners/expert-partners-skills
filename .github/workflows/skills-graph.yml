@@ -8,6 +8,11 @@ name: skills-graph
 
 on:
   push:
+    # All branches, tags excluded: a defined branches filter drops tag refs
+    # (docs.github.com workflow-syntax, verified 2026-08-05). Evidence tags
+    # point at intentionally broken proof commits and must never fire this.
+    # '**' (not [main]) because branch pushes keep validation by design.
+    branches: ["**"]
     paths:
       - "**/SKILL.md"
       - "tools/skill-map/**"
