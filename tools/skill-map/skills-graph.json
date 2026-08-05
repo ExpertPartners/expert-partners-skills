@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "f4f5ecda79249f74d1898f8946ffb181b07e905f",
-    "aura": "720cf4d048c0367b7769d38d2f12ae7fdc69e097"
+    "eps": "af0db668926f190f40b248146c7b329b04f4d926",
+    "aura": "5c38b53c6daa97286d47931a720e7daf91be6945"
   },
   "zones": [
     "surfaces",
@@ -45,32 +45,32 @@
       "id": "acn-currency-check",
       "source": "eps:plugins/acn-advisor/skills/acn-currency-check/SKILL.md",
       "repo": "eps",
-      "tier": "user",
-      "zone": null,
-      "status": "designed",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "live",
       "inherits": [
         "operating-doctrine"
       ],
       "calls": [],
       "defersTo": [],
       "brandScope": [],
-      "subtitle": null,
+      "subtitle": "monthly ACN staying-current check",
       "renderNote": null
     },
     {
       "id": "acn-email-watch",
       "source": "eps:plugins/acn-advisor/skills/acn-email-watch/SKILL.md",
       "repo": "eps",
-      "tier": "user",
-      "zone": null,
-      "status": "designed",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "live",
       "inherits": [
         "operating-doctrine"
       ],
       "calls": [],
       "defersTo": [],
       "brandScope": [],
-      "subtitle": null,
+      "subtitle": "ACN inbox sweep, deadlines first",
       "renderNote": null
     },
     {
@@ -379,7 +379,7 @@
       "source": "eps:skills/intake/SKILL.md",
       "repo": "eps",
       "tier": "user",
-      "zone": null,
+      "zone": "routing",
       "status": "live",
       "inherits": [
         "operating-doctrine"
@@ -482,7 +482,7 @@
       "source": "eps:skills/new-project/SKILL.md",
       "repo": "eps",
       "tier": "user",
-      "zone": null,
+      "zone": "routing",
       "status": "live",
       "inherits": [
         "operating-doctrine"
@@ -647,7 +647,7 @@
       "source": "eps:skills/session-home/SKILL.md",
       "repo": "eps",
       "tier": "user",
-      "zone": null,
+      "zone": "routing",
       "status": "live",
       "inherits": [
         "operating-doctrine"
@@ -660,18 +660,18 @@
     },
     {
       "id": "session-wrap",
-      "source": "aura:.claude/skills/session-wrap/SKILL.md",
-      "repo": "aura",
-      "tier": "user",
-      "zone": null,
-      "status": "designed",
+      "source": "eps:skills/session-wrap/SKILL.md",
+      "repo": "eps",
+      "tier": "organization",
+      "zone": "routing",
+      "status": "live",
       "inherits": [
         "operating-doctrine"
       ],
       "calls": [],
       "defersTo": [],
       "brandScope": [],
-      "subtitle": null,
+      "subtitle": "the one canonical session close-out",
       "renderNote": null
     },
     {
@@ -802,7 +802,7 @@
       "source": "eps:skills/verify-docs/SKILL.md",
       "repo": "eps",
       "tier": "user",
-      "zone": null,
+      "zone": "routing",
       "status": "live",
       "inherits": [
         "operating-doctrine"
@@ -1183,16 +1183,8 @@
     }
   ],
   "flags": {
-    "unzoned": [
-      "acn-currency-check",
-      "acn-email-watch",
-      "intake",
-      "new-project",
-      "session-home",
-      "session-wrap",
-      "verify-docs"
-    ],
     "declaredDuplicates": [
+      "aura:.claude/skills/session-wrap/SKILL.md",
       "eps:operating-doctrine/SKILL.md"
     ]
   },
