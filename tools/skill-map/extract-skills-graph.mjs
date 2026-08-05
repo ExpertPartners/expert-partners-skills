@@ -21,11 +21,24 @@ import { z } from 'zod';
 
 // ---------- configuration ----------
 
-const ZONES = ['surfaces', 'brain', 'hands', 'routing', 'finance', 'content', 'cataloging'];
-const TIERS = ['user', 'organization', 'plugin'];
+const ZONES = ['surfaces', 'brain', 'hands', 'routing', 'finance', 'content', 'cataloging', 'brands'];
+const TIERS = ['user', 'organization', 'plugin', 'project'];
 const STATUSES = ['live', 'designed', 'benched', 'retired', 'sleeping'];
-// Brand id vocabulary, assumed pending Allison's ruling (flags file item 8).
-const BRANDS = ['expert-partners', 'epic', 'fam', 'ag-personal-brand', 'ag-luxury', 'don-hobbs', 'the-strong-ones', 'moxie'];
+// Brand id vocabulary, RULED by Allison 2026-08-05 (Skill Map Rulings lane, flags item 8).
+// Each id may carry a parent brand id (null = top-level). Registry source: aura ADR 0045.
+// A ninth id for Allison's AI education lane (You've Got a Friend) mints only on the day
+// its voice card is born, not before (ruled 2026-08-05).
+const BRAND_IDS = {
+  'expert-partners': { parent: null },
+  'epic': { parent: null },
+  'fam': { parent: null },
+  'ag-personal-brand': { parent: null },
+  'ag-luxury': { parent: null },
+  'don-hobbs': { parent: 'expert-partners' },
+  'the-strong-ones': { parent: 'ag-personal-brand' },
+  'moxie': { parent: null },
+};
+const BRANDS = Object.keys(BRAND_IDS);
 const INHERIT_ROOT = 'operating-doctrine';
 
 // Paths that hold SKILL.md files but are NOT canonical skill sources
@@ -49,6 +62,11 @@ const DECLARED_DUPLICATES = [
 
 const idList = z.union([z.string(), z.array(z.string())]).transform(v => (Array.isArray(v) ? v : [v]));
 
+// brand-scope is list-valued (ruled 2026-08-05, flags item 6): a single id or a list,
+// normalized to a list; null/omitted normalizes to [].
+const brandList = z.union([z.enum(BRANDS), z.array(z.enum(BRANDS))]).nullish()
+  .transform(v => (v == null ? [] : Array.isArray(v) ? v : [v]));
+
 const SkillMeta = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
@@ -58,8 +76,9 @@ const SkillMeta = z.object({
   inherits: idList.default([INHERIT_ROOT]),
   calls: z.array(z.string()).default([]),
   'defers-to': z.array(z.string()).default([]),
-  'brand-scope': z.enum(BRANDS).nullish().default(null),
+  'brand-scope': brandList.default([]),
   subtitle: z.string().nullish().default(null),
+  'render-note': z.string().nullish().default(null),
 }).passthrough(); // existing operational fields (allowed-tools, argument-hint, ...) pass through untouched
 
 // ---------- cli / repo discovery ----------
@@ -150,8 +169,9 @@ for (const [repoKey, root] of Object.entries(REPOS)) {
       inherits: meta.inherits,
       calls: meta.calls,
       defersTo: meta['defers-to'],
-      brandScope: meta['brand-scope'] ?? null,
+      brandScope: meta['brand-scope'],
       subtitle: meta.subtitle ?? null,
+      renderNote: meta['render-note'] ?? null,
     });
   }
 }
@@ -199,6 +219,7 @@ const graph = {
   schema: 'skill-map/v1',
   generatedFrom: Object.fromEntries(Object.entries(REPOS).map(([k, r]) => [k, headSha(r)])),
   zones: ZONES,
+  brands: BRAND_IDS,
   nodes: [...nodes.values()].sort((a, b) => a.id.localeCompare(b.id)),
   edges: edges.sort((a, b) => (a.from + a.type + a.to).localeCompare(b.from + b.type + b.to)),
   flags: {
