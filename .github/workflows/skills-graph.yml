@@ -18,9 +18,13 @@ on:
 permissions:
   contents: write
 
+# A superseded run is pure waste -- the newer push's run rebuilds the full
+# graph anyway -- so cancel it instead of letting it lose the push race and
+# page red. Same guard as aura generate-index (aura c6999c5); cancelled runs
+# are excluded by the CI watcher.
 concurrency:
   group: skills-graph-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   regenerate:
@@ -64,4 +68,20 @@ jobs:
           git config user.name "skills-graph-bot"
           git config user.email "actions@users.noreply.github.com"
           git commit -m "skills-graph: regenerate from SKILL.md sources"
+          # Push race guard (same shape as aura c6999c5): if main moved while
+          # this run was in flight, rebase onto the new tip, regenerate against
+          # the new tree, and retry, instead of failing red on a
+          # non-fast-forward reject.
+          for attempt in 1 2 3; do
+            if git push; then
+              exit 0
+            fi
+            echo "Push rejected, main moved. Rebase and regenerate, attempt ${attempt}."
+            git pull --rebase origin main
+            (cd tools/skill-map && node extract-skills-graph.mjs --eps "$GITHUB_WORKSPACE/eps" --aura "$GITHUB_WORKSPACE/aura" --out "$GITHUB_WORKSPACE/eps/tools/skill-map/skills-graph.json")
+            git add tools/skill-map/skills-graph.json
+            if ! git diff --cached --quiet; then
+              git commit --amend --no-edit
+            fi
+          done
           git push
