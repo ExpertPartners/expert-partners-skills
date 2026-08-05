@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "70a27b3240220c3e119cc11847f28d053a78a776",
-    "aura": "4b0bf5bd86363184055eae6c4e034f83f69d691a"
+    "eps": "028b29dd8286db2ece4c98ffbd81156cb88b400d",
+    "aura": "5de5cee858b10374b0c8b4b371cc66bd0392e4e9"
   },
   "zones": [
     "surfaces",
@@ -499,6 +499,21 @@
       "subtitle": "handoff note to main, clean worktree"
     },
     {
+      "id": "session-wrap",
+      "source": "aura:.claude/skills/session-wrap/SKILL.md",
+      "repo": "aura",
+      "tier": "user",
+      "zone": null,
+      "status": "designed",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": null,
+      "subtitle": null
+    },
+    {
       "id": "social-brand-brief",
       "source": "aura:project-knowledge/operations/blotato-social-automation/skills-staging/social-brand-brief/SKILL.md",
       "repo": "aura",
@@ -835,6 +850,11 @@
       "type": "inherits"
     },
     {
+      "from": "session-wrap",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
       "from": "social-brand-brief",
       "to": "operating-doctrine",
       "type": "inherits"
@@ -929,6 +949,7 @@
       "resume-work",
       "session-audit",
       "session-closeout",
+      "session-wrap",
       "ss",
       "the-strong-ones-brand"
     ],
