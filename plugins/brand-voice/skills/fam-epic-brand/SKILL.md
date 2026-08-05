@@ -6,7 +6,7 @@ tier: plugin
 zone: brands
 status: live
 inherits: operating-doctrine
-brand-scope: null
+brand-scope: [fam, epic]
 subtitle: "FAM and EPIC voice"
 ---
 
