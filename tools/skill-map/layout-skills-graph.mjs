@@ -30,7 +30,7 @@ import ELK from 'elkjs/lib/elk.bundled.js';
 const TITLE_CHAR_W = 7.4;   // ~13px system sans, weight 500
 const SUB_CHAR_W = 6.0;     // ~11.5px system sans, weight 400
 const NODE_W_MIN = 132;
-const NODE_W_MAX = 252;
+const NODE_W_MAX = 300;
 const NODE_PAD_X = 22;
 const ANNOT_H = 15;         // status annotation strip above the node rect
 const SUB_WRAP_AT = 32;     // wrap subtitle lines longer than this many chars

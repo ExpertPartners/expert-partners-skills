@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "f84dbe50985e70f87b3955ddfed36a2a20d544b3",
-    "aura": "3204cdc6da4c8c787e19785940dbf4365efc0861"
+    "eps": "0dda43bfe0cc7feeeb4dd4417264488e46db5c26",
+    "aura": "5eced58669f4311acc9466e20c33a1e10d4add51"
   },
   "zones": [
     "surfaces",
@@ -698,7 +698,7 @@
       "layout": {
         "x": 479,
         "y": 1405,
-        "width": 252,
+        "width": 296,
         "height": 77,
         "rectHeight": 62,
         "annotationHeight": 15,
@@ -1347,7 +1347,7 @@
       "subtitle": "offer construction and audit",
       "renderNote": null,
       "layout": {
-        "x": 777,
+        "x": 821,
         "y": 1412,
         "width": 212,
         "height": 63,
@@ -1796,11 +1796,11 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 731,
+          "x": 775,
           "y": 1443.5
         },
         {
-          "x": 777,
+          "x": 821,
           "y": 1443.5
         }
       ]
@@ -2149,6 +2149,23 @@
     ]
   },
   "excluded": [
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/can-i-close/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/ember-reactivate/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/name-session/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/project-architect/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/project-builder/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/session-audit/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/session-closeout/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/_tools/personal-skills/ss/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/docs/estate/extracts/mission-control/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-brand-brief/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-content-coach/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-grader/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-scheduler/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-writer/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/tools/continuity-skills/handoff/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/tools/continuity-skills/park/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/tools/continuity-skills/resume-work/SKILL.md",
     "aura:docs/estate/extracts/mission-control/SKILL.md"
   ],
   "layout": {
@@ -2268,7 +2285,7 @@
         "caption": "strategy, offers, content, conversations",
         "x": 8,
         "y": 1357,
-        "width": 1003,
+        "width": 1047,
         "height": 435,
         "rooms": []
       },
