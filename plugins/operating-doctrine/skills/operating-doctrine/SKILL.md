@@ -248,6 +248,12 @@ The permanence chain for rulings themselves: chat is not memory. A ruling become
 
 ---
 
+## Skills Are Born Dressed
+
+Ruled by Allison 2026-08-04 (Skill Map Rulings lane, ruling 14). Every new skill is born with its skill-map frontmatter block filled in (zone, tier, status, relationships, brand-scope where applicable); a skill without its block does not merge. The skills-graph build enforces this strictly: a SKILL.md in any canonical repo missing the block, or missing zone, tier, or status, fails the build (vendor catalog packs stay excluded).
+
+---
+
 ## What Is The User's Decision Versus The System's Standard
 
 The user decides:
@@ -371,7 +377,7 @@ If a pattern slips repeatedly, the doctrine has a gap, and the doctrine itself g
 
 ## Where This Doctrine Lives
 
-- Canonical: `ExpertPartners/expert-partners-skills/operating-doctrine/SKILL.md` (this file). Live, version-controlled.
+- Canonical: `ExpertPartners/expert-partners-skills/plugins/operating-doctrine/skills/operating-doctrine/SKILL.md` (this file, the one true copy per the 2026-08-05 ruling; the old repo-root path is a pointer file). Live, version-controlled.
 - Aura system prompt: maintained as `aura/bootstrap/cowork.md` (reading copy: `aura/doctrine/identity.md`), pasted into the Cowork project Instructions panel. Live in the aura repo.
 - Cowork project instructions: claude.ai-side panels. Not verifiable from this machine; a propagation target confirmed by Allison at re-upload, never an assumed state.
 - Claude Code user CLAUDE.md: `~/.claude/CLAUDE.md`, mirrored to `ExpertPartners/allison-claude-doctrine`. Live.
@@ -386,6 +392,8 @@ Propagation rule: on every version bump, this surface list gets verified against
 ---
 
 ## Version
+
+v2.7 -- August 5, 2026 -- Added Skills Are Born Dressed (ruling 14, ruled by Allison 2026-08-04 in the Skill Map Rulings lane, executed 2026-08-05): every new skill is born with its skill-map frontmatter block filled in (zone, tier, status, relationships, brand-scope where applicable); a skill without its block does not merge. Enforced mechanically the same day: the skills-graph extractor went strict (expert-partners-skills 2133c3f), failing the build on any canonical SKILL.md missing the block or missing zone, tier, or status; the former warning-and-holding-area behavior is retired and vendor catalog packs stay excluded. Also corrected the Where This Doctrine Lives canonical path to the plugin location (the one true copy per the 2026-08-05 ruling; the repo-root path is a pointer file). Authored by Allison Gaddy.
 
 v2.6 -- August 3, 2026 -- Added The Ruling Cadence (Rule, Then Write, On the Spot): when Allison rules, the writable portion executes immediately from the current surface with the access it already holds; the gated remainder dispatches in the same turn (irreversible actions to one-per-session Code blocks, hands-only steps named once with direct URLs); queue entries never substitute for commit hashes; a ruling becomes permanent only by landing in canon in the same session. Recorded as aura ADR 0050. Ruled by Allison in Aura: Strategic Advisor / Repo Walk; written and propagated by Aura directly via the GitHub connector, the first doctrine amendment shipped from the chat surface under its own rule. Authored by Allison Gaddy.
 
