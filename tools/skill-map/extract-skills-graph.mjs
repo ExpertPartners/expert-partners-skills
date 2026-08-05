@@ -23,6 +23,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import matter from 'gray-matter';
 import { z } from 'zod';
+import { layoutGraph } from './layout-skills-graph.mjs';
 
 // ---------- configuration ----------
 
@@ -249,7 +250,13 @@ const graph = {
   excluded: skippedPaths.sort(),
 };
 
+// Stage 2: bake build-time ELK layout (layered, INCLUDE_CHILDREN) into the same
+// regeneration step, so the committed JSON always carries coordinates and the
+// dashboard renderer never runs a layout engine. ELK stays a CI-only dependency.
+await layoutGraph(graph);
+
 fs.mkdirSync(path.dirname(outFile), { recursive: true });
 fs.writeFileSync(outFile, JSON.stringify(graph, null, 2) + '\n');
 console.log(`skills-graph.json written: ${graph.nodes.length} nodes, ${graph.edges.length} edges (strict mode: zone/tier/status verified on all), ${duplicateRecords.length} declared duplicate(s), ${skippedPaths.length} excluded path(s).`);
+console.log(`layout baked: ${graph.layout.width}x${graph.layout.height}, ${graph.layout.zones.length} zones, ${graph.layout.zones.reduce((a, z) => a + z.rooms.length, 0)} brand rooms (elkjs build-time only).`);
 console.log(`output: ${outFile}`);

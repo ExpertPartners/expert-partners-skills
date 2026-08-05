@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "581328bb9a17a816c4f4b4a109ee73ab7fbfd4cc",
-    "aura": "7adf5d5d75f5d2caa1243c92dc9cea07b5b145f6"
+    "eps": "3a5a8f6e0439a36370d366a2bc677ad0fdab27a4",
+    "aura": "14b597fff0060b2678cb69711ecbde8df0cfb642"
   },
   "zones": [
     "surfaces",
@@ -55,7 +55,19 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "monthly ACN staying-current check",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 292,
+        "y": 1870,
+        "width": 206,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "monthly ACN staying-current",
+          "check"
+        ]
+      }
     },
     {
       "id": "acn-email-watch",
@@ -71,7 +83,18 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "ACN inbox sweep, deadlines first",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 30,
+        "y": 1870,
+        "width": 236,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "ACN inbox sweep, deadlines first"
+        ]
+      }
     },
     {
       "id": "ag-luxury-brand",
@@ -89,7 +112,19 @@
         "ag-luxury"
       ],
       "subtitle": "luxury real estate voice under Allison’s name",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 309,
+        "y": 928,
+        "width": 224,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "luxury real estate voice under",
+          "Allison’s name"
+        ]
+      }
     },
     {
       "id": "ag-personal-brand",
@@ -107,7 +142,18 @@
         "ag-personal-brand"
       ],
       "subtitle": "Allison’s first person voice",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 314,
+        "y": 1079,
+        "width": 212,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "Allison’s first person voice"
+        ]
+      }
     },
     {
       "id": "brand-voice",
@@ -131,7 +177,19 @@
       ],
       "brandScope": [],
       "subtitle": "canonical brand context, registry per ADR 0045",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 30,
+        "y": 391.9,
+        "width": 188,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "canonical brand context,",
+          "registry per ADR 0045"
+        ]
+      }
     },
     {
       "id": "can-i-close",
@@ -149,7 +207,19 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "plain language safe-to-close check",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 544,
+        "y": 2659.8,
+        "width": 212,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "plain language safe-to-close",
+          "check"
+        ]
+      }
     },
     {
       "id": "code-block-routing",
@@ -167,7 +237,19 @@
       ],
       "brandScope": [],
       "subtitle": "paste block routing and the lane ledger",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 818,
+        "y": 2443,
+        "width": 236,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "paste block routing and the lane",
+          "ledger"
+        ]
+      }
     },
     {
       "id": "deliverable-link",
@@ -183,7 +265,19 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "deliverables land as named markdown links",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 328,
+        "y": 2443,
+        "width": 200,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "deliverables land as named",
+          "markdown links"
+        ]
+      }
     },
     {
       "id": "dm-to-dollars",
@@ -199,7 +293,18 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "DM to Dollars content engine",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 241,
+        "y": 1405,
+        "width": 212,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "DM to Dollars content engine"
+        ]
+      }
     },
     {
       "id": "document-formatting-standard",
@@ -217,7 +322,19 @@
       ],
       "brandScope": [],
       "subtitle": "Poppins everywhere, hierarchy by size and color",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 30,
+        "y": 2443,
+        "width": 252,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "Poppins everywhere, hierarchy by",
+          "size and color"
+        ]
+      }
     },
     {
       "id": "don-hobbs-brand",
@@ -235,7 +352,18 @@
         "don-hobbs"
       ],
       "subtitle": "Don’s personal brand voice",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 330,
+        "y": 487,
+        "width": 200,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "Don’s personal brand voice"
+        ]
+      }
     },
     {
       "id": "ember-reactivate",
@@ -251,7 +379,16 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": null,
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 30,
+        "y": 2251,
+        "width": 163,
+        "height": 49,
+        "rectHeight": 34,
+        "annotationHeight": 15,
+        "subtitleLines": []
+      }
     },
     {
       "id": "ep-brand",
@@ -269,7 +406,18 @@
         "expert-partners"
       ],
       "subtitle": "Expert Partners parent voice",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 314,
+        "y": 370,
+        "width": 212,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "Expert Partners parent voice"
+        ]
+      }
     },
     {
       "id": "expert-partners-systems-map",
@@ -285,7 +433,19 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "where every system lives and what Claude can reach",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 30,
+        "y": 159,
+        "width": 244,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "where every system lives and",
+          "what Claude can reach"
+        ]
+      }
     },
     {
       "id": "fam-epic-brand",
@@ -304,7 +464,18 @@
         "epic"
       ],
       "subtitle": "FAM and EPIC voice",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 309,
+        "y": 640,
+        "width": 152,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "FAM and EPIC voice"
+        ]
+      }
     },
     {
       "id": "funnel-build",
@@ -322,7 +493,19 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "build a funnel that does not exist yet",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 30,
+        "y": 2074,
+        "width": 212,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "build a funnel that does not",
+          "exist yet"
+        ]
+      }
     },
     {
       "id": "funnel-documentation",
@@ -338,7 +521,19 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "one complete Notion record per funnel",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 288,
+        "y": 1985.8,
+        "width": 224,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "one complete Notion record per",
+          "funnel"
+        ]
+      }
     },
     {
       "id": "funnel-migration",
@@ -356,7 +551,19 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "per-funnel walk from old location to clean location",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 42,
+        "y": 1973,
+        "width": 200,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "per-funnel walk from old",
+          "location to clean location"
+        ]
+      }
     },
     {
       "id": "handoff",
@@ -372,7 +579,18 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "hand work to another session",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 641,
+        "y": 2251,
+        "width": 212,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "hand work to another session"
+        ]
+      }
     },
     {
       "id": "intake",
@@ -388,7 +606,19 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "file content into a repo intake inbox",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 774,
+        "y": 2340,
+        "width": 230,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "file content into a repo intake",
+          "inbox"
+        ]
+      }
     },
     {
       "id": "kindergartner-mode",
@@ -404,7 +634,18 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "plain language walkthroughs",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 409,
+        "y": 2251,
+        "width": 206,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "plain language walkthroughs"
+        ]
+      }
     },
     {
       "id": "lane-spawn",
@@ -423,7 +664,19 @@
       ],
       "brandScope": [],
       "subtitle": "spawning new lanes with named homes",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 554,
+        "y": 2455.8,
+        "width": 218,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "spawning new lanes with named",
+          "homes"
+        ]
+      }
     },
     {
       "id": "master-marketer-free-agent-builder",
@@ -441,7 +694,19 @@
       ],
       "brandScope": [],
       "subtitle": "marketing strategy in Allison’s voice",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 479,
+        "y": 1405,
+        "width": 252,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "marketing strategy in Allison’s",
+          "voice"
+        ]
+      }
     },
     {
       "id": "moxie-signature-group-brand",
@@ -459,7 +724,19 @@
         "moxie"
       ],
       "subtitle": "benched, consumer real estate routes to AG Luxury",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 309,
+        "y": 777,
+        "width": 244,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "benched, consumer real estate",
+          "routes to AG Luxury"
+        ]
+      }
     },
     {
       "id": "name-session",
@@ -475,7 +752,18 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "propose an accurate session name",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 30,
+        "y": 2340,
+        "width": 236,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "propose an accurate session name"
+        ]
+      }
     },
     {
       "id": "new-project",
@@ -491,7 +779,19 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "bootstrap a new Expert Partners project",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 288,
+        "y": 2558.8,
+        "width": 230,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "bootstrap a new Expert Partners",
+          "project"
+        ]
+      }
     },
     {
       "id": "operating-doctrine",
@@ -505,7 +805,19 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "the standard every skill inherits",
-      "renderNote": "single faint anchor, inheritance edges collapsed"
+      "renderNote": "single faint anchor, inheritance edges collapsed",
+      "layout": {
+        "x": 30,
+        "y": 56,
+        "width": 188,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "the standard every skill",
+          "inherits"
+        ]
+      }
     },
     {
       "id": "park",
@@ -521,7 +833,18 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "park work for a later resume",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 879,
+        "y": 2251,
+        "width": 212,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "park work for a later resume"
+        ]
+      }
     },
     {
       "id": "pin",
@@ -539,7 +862,19 @@
       ],
       "brandScope": [],
       "subtitle": "carry-back envelope and place-keeping baton",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 1100,
+        "y": 2455.8,
+        "width": 182,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "carry-back envelope and",
+          "place-keeping baton"
+        ]
+      }
     },
     {
       "id": "project-architect",
@@ -558,7 +893,19 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "where a piece of work should live",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 30,
+        "y": 2571.7,
+        "width": 212,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "where a piece of work should",
+          "live"
+        ]
+      }
     },
     {
       "id": "project-builder",
@@ -574,7 +921,16 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": null,
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 288,
+        "y": 2659.8,
+        "width": 155,
+        "height": 49,
+        "rectHeight": 34,
+        "annotationHeight": 15,
+        "subtitleLines": []
+      }
     },
     {
       "id": "rare-content-engine",
@@ -590,7 +946,18 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "RARE content engine",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 30,
+        "y": 1405,
+        "width": 185,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "RARE content engine"
+        ]
+      }
     },
     {
       "id": "resume-work",
@@ -606,7 +973,18 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "resume parked or handed-off work",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 292,
+        "y": 2340,
+        "width": 236,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "resume parked or handed-off work"
+        ]
+      }
     },
     {
       "id": "session-audit",
@@ -622,7 +1000,19 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "structured session audit for consolidation",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 802,
+        "y": 2571.7,
+        "width": 212,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "structured session audit for",
+          "consolidation"
+        ]
+      }
     },
     {
       "id": "session-closeout",
@@ -640,7 +1030,19 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "handoff note to main, clean worktree",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 550,
+        "y": 2558.8,
+        "width": 206,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "handoff note to main, clean",
+          "worktree"
+        ]
+      }
     },
     {
       "id": "session-home",
@@ -656,7 +1058,19 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "route work to the right project home",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 1030,
+        "y": 2340,
+        "width": 230,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "route work to the right project",
+          "home"
+        ]
+      }
     },
     {
       "id": "session-wrap",
@@ -672,7 +1086,19 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "the one canonical session close-out",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 554,
+        "y": 2340,
+        "width": 194,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "the one canonical session",
+          "close-out"
+        ]
+      }
     },
     {
       "id": "social-brand-brief",
@@ -688,7 +1114,18 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "per-account voice contract",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 288,
+        "y": 1609,
+        "width": 200,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "per-account voice contract"
+        ]
+      }
     },
     {
       "id": "social-content-coach",
@@ -709,7 +1146,19 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "orchestrator for the Blotato pack",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 30,
+        "y": 1531.1,
+        "width": 212,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "orchestrator for the Blotato",
+          "pack"
+        ]
+      }
     },
     {
       "id": "social-post-grader",
@@ -727,7 +1176,19 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "virality rubric, nothing ships below eight of ten",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 288,
+        "y": 1508,
+        "width": 224,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "virality rubric, nothing ships",
+          "below eight of ten"
+        ]
+      }
     },
     {
       "id": "social-post-scheduler",
@@ -743,7 +1204,19 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "the only skill that publishes through Blotato",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 288,
+        "y": 1693,
+        "width": 218,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "the only skill that publishes",
+          "through Blotato"
+        ]
+      }
     },
     {
       "id": "social-post-writer",
@@ -761,7 +1234,18 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "drafts hooks first, then body",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 558,
+        "y": 1517.9,
+        "width": 218,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "drafts hooks first, then body"
+        ]
+      }
     },
     {
       "id": "ss",
@@ -777,7 +1261,18 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "screenshot shorthand",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 219,
+        "y": 2251,
+        "width": 164,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "screenshot shorthand"
+        ]
+      }
     },
     {
       "id": "the-strong-ones-brand",
@@ -795,7 +1290,19 @@
         "the-strong-ones"
       ],
       "subtitle": "The Strong Ones voice inside AG Personal Brand",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 330,
+        "y": 1196,
+        "width": 230,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "The Strong Ones voice inside AG",
+          "Personal Brand"
+        ]
+      }
     },
     {
       "id": "verify-docs",
@@ -811,7 +1318,18 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "live-doc check before building",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 1117,
+        "y": 2251,
+        "width": 224,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "live-doc check before building"
+        ]
+      }
     },
     {
       "id": "xavier-offer-builder",
@@ -827,359 +1345,801 @@
       "defersTo": [],
       "brandScope": [],
       "subtitle": "offer construction and audit",
-      "renderNote": null
+      "renderNote": null,
+      "layout": {
+        "x": 777,
+        "y": 1412,
+        "width": 212,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "offer construction and audit"
+        ]
+      }
     }
   ],
   "edges": [
     {
       "from": "acn-currency-check",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "acn-email-watch",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "ag-luxury-brand",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "ag-personal-brand",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "brand-voice",
       "to": "ag-luxury-brand",
-      "type": "defers-to"
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 218,
+          "y": 440
+        },
+        {
+          "x": 248,
+          "y": 440
+        },
+        {
+          "x": 248,
+          "y": 966.5
+        },
+        {
+          "x": 309,
+          "y": 966.5
+        }
+      ]
     },
     {
       "from": "brand-voice",
       "to": "ag-personal-brand",
-      "type": "defers-to"
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 218,
+          "y": 449.6
+        },
+        {
+          "x": 238,
+          "y": 449.6
+        },
+        {
+          "x": 238,
+          "y": 1110.5
+        },
+        {
+          "x": 314,
+          "y": 1110.5
+        }
+      ]
     },
     {
       "from": "brand-voice",
       "to": "don-hobbs-brand",
-      "type": "defers-to"
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 218,
+          "y": 411.1
+        },
+        {
+          "x": 278,
+          "y": 411.1
+        },
+        {
+          "x": 278,
+          "y": 518.5
+        },
+        {
+          "x": 330,
+          "y": 518.5
+        }
+      ]
     },
     {
       "from": "brand-voice",
       "to": "ep-brand",
-      "type": "defers-to"
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 218,
+          "y": 401.5
+        },
+        {
+          "x": 314,
+          "y": 401.5
+        }
+      ]
     },
     {
       "from": "brand-voice",
       "to": "fam-epic-brand",
-      "type": "defers-to"
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 218,
+          "y": 420.8
+        },
+        {
+          "x": 268,
+          "y": 420.8
+        },
+        {
+          "x": 268,
+          "y": 671.5
+        },
+        {
+          "x": 309,
+          "y": 671.5
+        }
+      ]
     },
     {
       "from": "brand-voice",
       "to": "moxie-signature-group-brand",
-      "type": "defers-to"
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 218,
+          "y": 430.4
+        },
+        {
+          "x": 258,
+          "y": 430.4
+        },
+        {
+          "x": 258,
+          "y": 815.5
+        },
+        {
+          "x": 309,
+          "y": 815.5
+        }
+      ]
     },
     {
       "from": "brand-voice",
       "to": "the-strong-ones-brand",
-      "type": "defers-to"
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 218,
+          "y": 459.3
+        },
+        {
+          "x": 228,
+          "y": 459.3
+        },
+        {
+          "x": 228,
+          "y": 1234.5
+        },
+        {
+          "x": 330,
+          "y": 1234.5
+        }
+      ]
     },
     {
       "from": "brand-voice",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "can-i-close",
       "to": "session-audit",
-      "type": "calls"
+      "type": "calls",
+      "points": [
+        {
+          "x": 756,
+          "y": 2698.3
+        },
+        {
+          "x": 766,
+          "y": 2698.3
+        },
+        {
+          "x": 766,
+          "y": 2623
+        },
+        {
+          "x": 802,
+          "y": 2623
+        }
+      ]
     },
     {
       "from": "can-i-close",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "code-block-routing",
       "to": "pin",
-      "type": "defers-to"
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 1054,
+          "y": 2468.7
+        },
+        {
+          "x": 1064,
+          "y": 2468.7
+        },
+        {
+          "x": 1064,
+          "y": 2475.1
+        },
+        {
+          "x": 1100,
+          "y": 2475.1
+        }
+      ]
     },
     {
       "from": "code-block-routing",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "deliverable-link",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "dm-to-dollars",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "document-formatting-standard",
       "to": "deliverable-link",
-      "type": "defers-to"
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 282,
+          "y": 2481.5
+        },
+        {
+          "x": 328,
+          "y": 2481.5
+        }
+      ]
     },
     {
       "from": "document-formatting-standard",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "don-hobbs-brand",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "ember-reactivate",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "ep-brand",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "expert-partners-systems-map",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "fam-epic-brand",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "funnel-build",
       "to": "funnel-documentation",
-      "type": "calls"
+      "type": "calls",
+      "points": [
+        {
+          "x": 242,
+          "y": 2112.5
+        },
+        {
+          "x": 252,
+          "y": 2112.5
+        },
+        {
+          "x": 252,
+          "y": 2037.2
+        },
+        {
+          "x": 288,
+          "y": 2037.2
+        }
+      ]
     },
     {
       "from": "funnel-build",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "funnel-documentation",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "funnel-migration",
       "to": "funnel-documentation",
-      "type": "calls"
+      "type": "calls",
+      "points": [
+        {
+          "x": 242,
+          "y": 2011.5
+        },
+        {
+          "x": 288,
+          "y": 2011.5
+        }
+      ]
     },
     {
       "from": "funnel-migration",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "handoff",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "intake",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "kindergartner-mode",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "lane-spawn",
       "to": "code-block-routing",
-      "type": "defers-to"
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 772,
+          "y": 2481.5
+        },
+        {
+          "x": 818,
+          "y": 2481.5
+        }
+      ]
     },
     {
       "from": "lane-spawn",
       "to": "pin",
-      "type": "defers-to"
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 772,
+          "y": 2507.2
+        },
+        {
+          "x": 782,
+          "y": 2507.2
+        },
+        {
+          "x": 782,
+          "y": 2530
+        },
+        {
+          "x": 1064,
+          "y": 2530
+        },
+        {
+          "x": 1064,
+          "y": 2513.6
+        },
+        {
+          "x": 1100,
+          "y": 2513.6
+        }
+      ]
     },
     {
       "from": "lane-spawn",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "master-marketer-free-agent-builder",
       "to": "xavier-offer-builder",
-      "type": "defers-to"
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 731,
+          "y": 1443.5
+        },
+        {
+          "x": 777,
+          "y": 1443.5
+        }
+      ]
     },
     {
       "from": "master-marketer-free-agent-builder",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "moxie-signature-group-brand",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "name-session",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "new-project",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "park",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "pin",
       "to": "code-block-routing",
-      "type": "defers-to"
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 1100,
+          "y": 2494.3
+        },
+        {
+          "x": 1054,
+          "y": 2494.3
+        }
+      ]
     },
     {
       "from": "pin",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "project-architect",
       "to": "new-project",
-      "type": "calls"
+      "type": "calls",
+      "points": [
+        {
+          "x": 242,
+          "y": 2597.3
+        },
+        {
+          "x": 288,
+          "y": 2597.3
+        }
+      ]
     },
     {
       "from": "project-architect",
       "to": "project-builder",
-      "type": "calls"
+      "type": "calls",
+      "points": [
+        {
+          "x": 242,
+          "y": 2623
+        },
+        {
+          "x": 252,
+          "y": 2623
+        },
+        {
+          "x": 252,
+          "y": 2684.3
+        },
+        {
+          "x": 288,
+          "y": 2684.3
+        }
+      ]
     },
     {
       "from": "project-architect",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "project-builder",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "rare-content-engine",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "resume-work",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "session-audit",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "session-closeout",
       "to": "session-audit",
-      "type": "calls"
+      "type": "calls",
+      "points": [
+        {
+          "x": 756,
+          "y": 2597.3
+        },
+        {
+          "x": 802,
+          "y": 2597.3
+        }
+      ]
     },
     {
       "from": "session-closeout",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "session-home",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "session-wrap",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "social-brand-brief",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "social-content-coach",
       "to": "social-brand-brief",
-      "type": "calls"
+      "type": "calls",
+      "points": [
+        {
+          "x": 242,
+          "y": 1561.9
+        },
+        {
+          "x": 272,
+          "y": 1561.9
+        },
+        {
+          "x": 272,
+          "y": 1640.5
+        },
+        {
+          "x": 288,
+          "y": 1640.5
+        }
+      ]
     },
     {
       "from": "social-content-coach",
       "to": "social-post-grader",
-      "type": "calls"
+      "type": "calls",
+      "points": [
+        {
+          "x": 242,
+          "y": 1546.5
+        },
+        {
+          "x": 288,
+          "y": 1546.5
+        }
+      ]
     },
     {
       "from": "social-content-coach",
       "to": "social-post-scheduler",
-      "type": "calls"
+      "type": "calls",
+      "points": [
+        {
+          "x": 242,
+          "y": 1592.7
+        },
+        {
+          "x": 252,
+          "y": 1592.7
+        },
+        {
+          "x": 252,
+          "y": 1731.5
+        },
+        {
+          "x": 288,
+          "y": 1731.5
+        }
+      ]
     },
     {
       "from": "social-content-coach",
       "to": "social-post-writer",
-      "type": "calls"
+      "type": "calls",
+      "points": [
+        {
+          "x": 242,
+          "y": 1577.3
+        },
+        {
+          "x": 262,
+          "y": 1577.3
+        },
+        {
+          "x": 262,
+          "y": 1682
+        },
+        {
+          "x": 522,
+          "y": 1682
+        },
+        {
+          "x": 522,
+          "y": 1565.2
+        },
+        {
+          "x": 558,
+          "y": 1565.2
+        }
+      ]
     },
     {
       "from": "social-content-coach",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "social-post-grader",
       "to": "social-post-writer",
-      "type": "calls"
+      "type": "calls",
+      "points": [
+        {
+          "x": 512,
+          "y": 1559.3
+        },
+        {
+          "x": 522,
+          "y": 1559.3
+        },
+        {
+          "x": 522,
+          "y": 1549.4
+        },
+        {
+          "x": 558,
+          "y": 1549.4
+        }
+      ]
     },
     {
       "from": "social-post-grader",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "social-post-scheduler",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "social-post-writer",
       "to": "social-post-grader",
-      "type": "calls"
+      "type": "calls",
+      "points": [
+        {
+          "x": 558,
+          "y": 1533.7
+        },
+        {
+          "x": 512,
+          "y": 1533.7
+        }
+      ]
     },
     {
       "from": "social-post-writer",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "ss",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "the-strong-ones-brand",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "verify-docs",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     },
     {
       "from": "xavier-offer-builder",
       "to": "operating-doctrine",
-      "type": "inherits"
+      "type": "inherits",
+      "points": null
     }
   ],
   "flags": {
@@ -1189,6 +2149,166 @@
     ]
   },
   "excluded": [
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/can-i-close/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/ember-reactivate/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/name-session/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/project-architect/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/project-builder/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/session-audit/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/session-closeout/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/_tools/personal-skills/ss/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/docs/estate/extracts/mission-control/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-brand-brief/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-content-coach/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-grader/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-scheduler/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-writer/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/tools/continuity-skills/handoff/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/tools/continuity-skills/park/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/tools/continuity-skills/resume-work/SKILL.md",
     "aura:docs/estate/extracts/mission-control/SKILL.md"
-  ]
+  ],
+  "layout": {
+    "engine": "elkjs layered, zones as compound containers (INCLUDE_CHILDREN over brand rooms), build-time only",
+    "width": 1371,
+    "height": 2767,
+    "zones": [
+      {
+        "id": "brain",
+        "label": "The brain",
+        "caption": "the law and the map of the house",
+        "x": 8,
+        "y": 8,
+        "width": 288,
+        "height": 250,
+        "rooms": []
+      },
+      {
+        "id": "brands",
+        "label": "The voices",
+        "caption": "one room per brand, registry per ADR 0045",
+        "x": 8,
+        "y": 288,
+        "width": 606,
+        "height": 1039,
+        "rooms": [
+          {
+            "key": "ag-luxury",
+            "brands": [
+              "ag-luxury"
+            ],
+            "label": "AG Luxury",
+            "parent": null,
+            "x": 293,
+            "y": 894,
+            "width": 256,
+            "height": 127
+          },
+          {
+            "key": "ag-personal-brand",
+            "brands": [
+              "ag-personal-brand"
+            ],
+            "label": "AG Personal Brand",
+            "parent": null,
+            "x": 293,
+            "y": 1045,
+            "width": 299,
+            "height": 260
+          },
+          {
+            "key": "the-strong-ones",
+            "brands": [
+              "the-strong-ones"
+            ],
+            "label": "The Strong Ones",
+            "parent": "ag-personal-brand",
+            "x": 314,
+            "y": 1162,
+            "width": 262,
+            "height": 127
+          },
+          {
+            "key": "expert-partners",
+            "brands": [
+              "expert-partners"
+            ],
+            "label": "Expert Partners",
+            "parent": null,
+            "x": 293,
+            "y": 336,
+            "width": 269,
+            "height": 246
+          },
+          {
+            "key": "don-hobbs",
+            "brands": [
+              "don-hobbs"
+            ],
+            "label": "Don Hobbs",
+            "parent": "expert-partners",
+            "x": 314,
+            "y": 453,
+            "width": 232,
+            "height": 113
+          },
+          {
+            "key": "fam+epic",
+            "brands": [
+              "fam",
+              "epic"
+            ],
+            "label": "FAM and EPIC",
+            "parent": null,
+            "x": 293,
+            "y": 606,
+            "width": 184,
+            "height": 113
+          },
+          {
+            "key": "moxie",
+            "brands": [
+              "moxie"
+            ],
+            "label": "Moxie",
+            "parent": null,
+            "x": 293,
+            "y": 743,
+            "width": 276,
+            "height": 127
+          }
+        ]
+      },
+      {
+        "id": "content",
+        "label": "The marketing engines",
+        "caption": "strategy, offers, content, conversations",
+        "x": 8,
+        "y": 1357,
+        "width": 1003,
+        "height": 435,
+        "rooms": []
+      },
+      {
+        "id": "hands",
+        "label": "The hands",
+        "caption": "funnel work and account operations",
+        "x": 8,
+        "y": 1822,
+        "width": 526,
+        "height": 351,
+        "rooms": []
+      },
+      {
+        "id": "routing",
+        "label": "Session machinery",
+        "caption": "routing, ledgers, session lifecycle",
+        "x": 8,
+        "y": 2203,
+        "width": 1355,
+        "height": 555.8,
+        "rooms": []
+      }
+    ]
+  }
 }
