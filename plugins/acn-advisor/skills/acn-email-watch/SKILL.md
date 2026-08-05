@@ -2,6 +2,12 @@
 name: acn-email-watch
 description: |
   ACN inbox sweep for Allison's ACN Advisor lane. Fires at the start of every ACN Advisor session before any other work, and any time Allison asks what came in, what is new from ACN, whether ACN sent anything, whether there is a deadline, or asks for an email check in an ACN context. Searches Gmail for ACN, Impact Health Sharing, DingoBlu, Flash Mobile, XOOM Energy, IDSeal, and Truvvi activity and reports deadlines first, then action items, then FYI. Use it even when Allison does not say the word email, as long as the ask is about incoming ACN activity or staying on top of the ACN accounts. It inherits the operating-doctrine and the ACN Advisor guardrails and never overrides them.
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
+# Zoned hands 2026-08-05 (Skill Map Rulings lane, add-on brief note 3).
+tier: plugin
+zone: hands
+status: live
+subtitle: "ACN inbox sweep, deadlines first"
 ---
 
 # ACN Email Watch

@@ -3,9 +3,11 @@ name: verify-docs
 description: Verify the current state of any third-party software, SDK, API, library, or platform before building or recommending integrations. Spawns a research subagent that pulls the latest official docs via Context7 MCP, falls back to WebFetch + WebSearch, and writes a verified-knowledge entry to the project's verified_docs.md cache. Use whenever a new tool/software/integration enters the working context (HeyGen, GoHighLevel, Make.com, Notion, Cloudflare, Higgsfield, eXp APIs, Fireflies, Gamma, Stripe, OpenAI/Anthropic SDKs, etc.) or before recommending any code or config that depends on third-party docs. Skip if the target already has a fresh entry (<30 days, no major version change implied) in verified_docs.md. Also use when the user says "latest," "current," "new version," or names a specific version ("v3," "the new API").
 metadata:
   version: 1.0.0
-# --- skill-map metadata (additive, all optional) ---
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Adopted into canonical 2026-08-05 (Skill Map Rulings lane, flags item 9);
 # the machine copy at ~/.claude/skills is a deployed copy.
+tier: user
+zone: routing
 status: live
 subtitle: "live-doc check before building"
 ---

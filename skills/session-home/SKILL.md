@@ -11,9 +11,11 @@ description: |
   the current working directory.
 argument-hint: "[topic or description of the work]"
 allowed-tools: Bash, Read
-# --- skill-map metadata (additive, all optional) ---
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Adopted into canonical 2026-08-05 (Skill Map Rulings lane, flags item 9);
 # the machine copy at ~/.claude/skills is a deployed copy.
+tier: user
+zone: routing
 status: live
 subtitle: "route work to the right project home"
 ---

@@ -8,9 +8,11 @@ description: >
   this into <repo>". Implements the ADR 0027 session-intake convention (the
   Claude Code half; the brain write tool save_to_session_intake is the claude.ai
   half, and both MUST produce identical file shape).
-# --- skill-map metadata (additive, all optional) ---
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Adopted into canonical 2026-08-05 (Skill Map Rulings lane, flags item 9);
 # the machine copy at ~/.claude/skills is a deployed copy.
+tier: user
+zone: routing
 status: live
 subtitle: "file content into a repo intake inbox"
 ---

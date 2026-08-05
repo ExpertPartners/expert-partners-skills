@@ -2,6 +2,12 @@
 name: acn-currency-check
 description: |
   The staying-current skill for Allison's ACN Advisor lane, built on the capability-refresh pattern. Fires monthly and whenever Allison asks if we are current, whether anything changed at ACN, whether the research brief is stale, or whether a rule, fee, threshold, promotion, or DingoBlu status has moved. Checks the two Firecrawl monitors for new hits, re-verifies the Business Support Fee, the current Compensation Plan version and Customer Qualified threshold, the Fast Start and Customer Bonus promotion for the current month, and DingoBlu's public status against live sources, then reports what changed since the 2026-08-05 ACN Master Research Brief and flags what needs a Back Office pull to confirm. Use it even when Allison does not name the skill, as long as the ask is about whether ACN knowledge is up to date. It inherits the operating-doctrine and the ACN Advisor guardrails and never overrides them.
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
+# Zoned hands 2026-08-05 (Skill Map Rulings lane, add-on brief note 3).
+tier: plugin
+zone: hands
+status: live
+subtitle: "monthly ACN staying-current check"
 ---
 
 # ACN Currency Check
