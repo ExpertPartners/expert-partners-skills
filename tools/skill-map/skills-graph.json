@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "83ce66cb85c1b71034bb9607a405a7945a28ced9",
-    "aura": "7dca19ac2eb758b9099f903434afc564978cf51b"
+    "eps": "e8985c2bf174606529f433ae8040b71acd90b7f9",
+    "aura": "20f2d0dbde4642994deb66007d4465d9e240fd9f"
   },
   "zones": [
     "surfaces",
@@ -11,8 +11,35 @@
     "routing",
     "finance",
     "content",
-    "cataloging"
+    "cataloging",
+    "brands"
   ],
+  "brands": {
+    "expert-partners": {
+      "parent": null
+    },
+    "epic": {
+      "parent": null
+    },
+    "fam": {
+      "parent": null
+    },
+    "ag-personal-brand": {
+      "parent": null
+    },
+    "ag-luxury": {
+      "parent": null
+    },
+    "don-hobbs": {
+      "parent": "expert-partners"
+    },
+    "the-strong-ones": {
+      "parent": "ag-personal-brand"
+    },
+    "moxie": {
+      "parent": null
+    }
+  },
   "nodes": [
     {
       "id": "acn-currency-check",
@@ -26,8 +53,9 @@
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": null
+      "brandScope": [],
+      "subtitle": null,
+      "renderNote": null
     },
     {
       "id": "acn-email-watch",
@@ -41,53 +69,69 @@
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": null
+      "brandScope": [],
+      "subtitle": null,
+      "renderNote": null
     },
     {
       "id": "ag-luxury-brand",
       "source": "eps:plugins/brand-voice/skills/ag-luxury-brand/SKILL.md",
       "repo": "eps",
       "tier": "plugin",
-      "zone": null,
+      "zone": "brands",
       "status": "live",
       "inherits": [
         "operating-doctrine"
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": "ag-luxury",
-      "subtitle": "luxury real estate voice under Allison’s name"
+      "brandScope": [
+        "ag-luxury"
+      ],
+      "subtitle": "luxury real estate voice under Allison’s name",
+      "renderNote": null
     },
     {
       "id": "ag-personal-brand",
       "source": "eps:plugins/brand-voice/skills/ag-personal-brand/SKILL.md",
       "repo": "eps",
       "tier": "plugin",
-      "zone": null,
+      "zone": "brands",
       "status": "live",
       "inherits": [
         "operating-doctrine"
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": "ag-personal-brand",
-      "subtitle": "Allison’s first person voice"
+      "brandScope": [
+        "ag-personal-brand"
+      ],
+      "subtitle": "Allison’s first person voice",
+      "renderNote": null
     },
     {
       "id": "brand-voice",
       "source": "eps:plugins/brand-voice/skills/brand-voice/SKILL.md",
       "repo": "eps",
       "tier": "plugin",
-      "zone": null,
+      "zone": "brands",
       "status": "live",
       "inherits": [
         "operating-doctrine"
       ],
       "calls": [],
-      "defersTo": [],
-      "brandScope": null,
-      "subtitle": "canonical brand context for the primary brands"
+      "defersTo": [
+        "ep-brand",
+        "fam-epic-brand",
+        "ag-personal-brand",
+        "ag-luxury-brand",
+        "don-hobbs-brand",
+        "the-strong-ones-brand",
+        "moxie-signature-group-brand"
+      ],
+      "brandScope": [],
+      "subtitle": "canonical brand context, registry per ADR 0045",
+      "renderNote": null
     },
     {
       "id": "can-i-close",
@@ -103,8 +147,9 @@
         "session-audit"
       ],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "plain language safe-to-close check"
+      "brandScope": [],
+      "subtitle": "plain language safe-to-close check",
+      "renderNote": null
     },
     {
       "id": "code-block-routing",
@@ -120,23 +165,25 @@
       "defersTo": [
         "pin"
       ],
-      "brandScope": null,
-      "subtitle": "paste block routing and the lane ledger"
+      "brandScope": [],
+      "subtitle": "paste block routing and the lane ledger",
+      "renderNote": null
     },
     {
       "id": "deliverable-link",
       "source": "eps:plugins/operating-doctrine/skills/deliverable-link/SKILL.md",
       "repo": "eps",
       "tier": "plugin",
-      "zone": null,
+      "zone": "routing",
       "status": "live",
       "inherits": [
         "operating-doctrine"
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "deliverables land as named markdown links"
+      "brandScope": [],
+      "subtitle": "deliverables land as named markdown links",
+      "renderNote": null
     },
     {
       "id": "dm-to-dollars",
@@ -150,15 +197,16 @@
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "DM to Dollars content engine"
+      "brandScope": [],
+      "subtitle": "DM to Dollars content engine",
+      "renderNote": null
     },
     {
       "id": "document-formatting-standard",
       "source": "eps:plugins/operating-doctrine/skills/document-formatting-standard/SKILL.md",
       "repo": "eps",
       "tier": "plugin",
-      "zone": null,
+      "zone": "routing",
       "status": "live",
       "inherits": [
         "operating-doctrine"
@@ -167,23 +215,27 @@
       "defersTo": [
         "deliverable-link"
       ],
-      "brandScope": null,
-      "subtitle": "Poppins everywhere, hierarchy by size and color"
+      "brandScope": [],
+      "subtitle": "Poppins everywhere, hierarchy by size and color",
+      "renderNote": null
     },
     {
       "id": "don-hobbs-brand",
       "source": "eps:plugins/brand-voice/skills/don-hobbs-brand/SKILL.md",
       "repo": "eps",
       "tier": "plugin",
-      "zone": null,
+      "zone": "brands",
       "status": "live",
       "inherits": [
         "operating-doctrine"
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": "don-hobbs",
-      "subtitle": "Don’s personal brand voice"
+      "brandScope": [
+        "don-hobbs"
+      ],
+      "subtitle": "Don’s personal brand voice",
+      "renderNote": null
     },
     {
       "id": "ember-reactivate",
@@ -197,53 +249,62 @@
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": null
+      "brandScope": [],
+      "subtitle": null,
+      "renderNote": null
     },
     {
       "id": "ep-brand",
       "source": "eps:plugins/brand-voice/skills/ep-brand/SKILL.md",
       "repo": "eps",
       "tier": "plugin",
-      "zone": null,
+      "zone": "brands",
       "status": "live",
       "inherits": [
         "operating-doctrine"
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": "expert-partners",
-      "subtitle": "Expert Partners parent voice"
+      "brandScope": [
+        "expert-partners"
+      ],
+      "subtitle": "Expert Partners parent voice",
+      "renderNote": null
     },
     {
       "id": "expert-partners-systems-map",
       "source": "eps:plugins/systems-map/skills/expert-partners-systems-map/SKILL.md",
       "repo": "eps",
       "tier": "plugin",
-      "zone": null,
+      "zone": "brain",
       "status": "live",
       "inherits": [
         "operating-doctrine"
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "where every system lives and what Claude can reach"
+      "brandScope": [],
+      "subtitle": "where every system lives and what Claude can reach",
+      "renderNote": null
     },
     {
       "id": "fam-epic-brand",
       "source": "eps:plugins/brand-voice/skills/fam-epic-brand/SKILL.md",
       "repo": "eps",
       "tier": "plugin",
-      "zone": null,
+      "zone": "brands",
       "status": "live",
       "inherits": [
         "operating-doctrine"
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "FAM and EPIC voice"
+      "brandScope": [
+        "fam",
+        "epic"
+      ],
+      "subtitle": "FAM and EPIC voice",
+      "renderNote": null
     },
     {
       "id": "funnel-build",
@@ -259,8 +320,9 @@
         "funnel-documentation"
       ],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "build a funnel that does not exist yet"
+      "brandScope": [],
+      "subtitle": "build a funnel that does not exist yet",
+      "renderNote": null
     },
     {
       "id": "funnel-documentation",
@@ -274,8 +336,9 @@
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "one complete Notion record per funnel"
+      "brandScope": [],
+      "subtitle": "one complete Notion record per funnel",
+      "renderNote": null
     },
     {
       "id": "funnel-migration",
@@ -291,8 +354,9 @@
         "funnel-documentation"
       ],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "per-funnel walk from old location to clean location"
+      "brandScope": [],
+      "subtitle": "per-funnel walk from old location to clean location",
+      "renderNote": null
     },
     {
       "id": "handoff",
@@ -306,14 +370,15 @@
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "hand work to another session"
+      "brandScope": [],
+      "subtitle": "hand work to another session",
+      "renderNote": null
     },
     {
-      "id": "kindergartner-mode",
-      "source": "eps:plugins/operating-doctrine/skills/kindergartner-mode/SKILL.md",
+      "id": "intake",
+      "source": "eps:skills/intake/SKILL.md",
       "repo": "eps",
-      "tier": "plugin",
+      "tier": "user",
       "zone": null,
       "status": "live",
       "inherits": [
@@ -321,8 +386,25 @@
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "plain language walkthroughs"
+      "brandScope": [],
+      "subtitle": "file content into a repo intake inbox",
+      "renderNote": null
+    },
+    {
+      "id": "kindergartner-mode",
+      "source": "eps:plugins/operating-doctrine/skills/kindergartner-mode/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "plain language walkthroughs",
+      "renderNote": null
     },
     {
       "id": "lane-spawn",
@@ -339,8 +421,9 @@
         "code-block-routing",
         "pin"
       ],
-      "brandScope": null,
-      "subtitle": "spawning new lanes with named homes"
+      "brandScope": [],
+      "subtitle": "spawning new lanes with named homes",
+      "renderNote": null
     },
     {
       "id": "master-marketer-free-agent-builder",
@@ -356,23 +439,27 @@
       "defersTo": [
         "xavier-offer-builder"
       ],
-      "brandScope": null,
-      "subtitle": "marketing strategy in Allison’s voice"
+      "brandScope": [],
+      "subtitle": "marketing strategy in Allison’s voice",
+      "renderNote": null
     },
     {
       "id": "moxie-signature-group-brand",
       "source": "eps:plugins/brand-voice/skills/moxie-signature-group-brand/SKILL.md",
       "repo": "eps",
       "tier": "plugin",
-      "zone": null,
+      "zone": "brands",
       "status": "benched",
       "inherits": [
         "operating-doctrine"
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": "moxie",
-      "subtitle": "benched, consumer real estate routes to AG Luxury"
+      "brandScope": [
+        "moxie"
+      ],
+      "subtitle": "benched, consumer real estate routes to AG Luxury",
+      "renderNote": null
     },
     {
       "id": "name-session",
@@ -386,21 +473,39 @@
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "propose an accurate session name"
+      "brandScope": [],
+      "subtitle": "propose an accurate session name",
+      "renderNote": null
+    },
+    {
+      "id": "new-project",
+      "source": "eps:skills/new-project/SKILL.md",
+      "repo": "eps",
+      "tier": "user",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "bootstrap a new Expert Partners project",
+      "renderNote": null
     },
     {
       "id": "operating-doctrine",
       "source": "eps:plugins/operating-doctrine/skills/operating-doctrine/SKILL.md",
       "repo": "eps",
       "tier": "plugin",
-      "zone": null,
+      "zone": "brain",
       "status": "live",
       "inherits": [],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "the standard every skill inherits"
+      "brandScope": [],
+      "subtitle": "the standard every skill inherits",
+      "renderNote": "single faint anchor, inheritance edges collapsed"
     },
     {
       "id": "park",
@@ -414,8 +519,9 @@
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "park work for a later resume"
+      "brandScope": [],
+      "subtitle": "park work for a later resume",
+      "renderNote": null
     },
     {
       "id": "pin",
@@ -431,8 +537,9 @@
       "defersTo": [
         "code-block-routing"
       ],
-      "brandScope": null,
-      "subtitle": "carry-back envelope and place-keeping baton"
+      "brandScope": [],
+      "subtitle": "carry-back envelope and place-keeping baton",
+      "renderNote": null
     },
     {
       "id": "project-architect",
@@ -448,8 +555,9 @@
         "project-builder"
       ],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "where a piece of work should live"
+      "brandScope": [],
+      "subtitle": "where a piece of work should live",
+      "renderNote": null
     },
     {
       "id": "project-builder",
@@ -463,8 +571,9 @@
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": null
+      "brandScope": [],
+      "subtitle": null,
+      "renderNote": null
     },
     {
       "id": "rare-content-engine",
@@ -478,8 +587,9 @@
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "RARE content engine"
+      "brandScope": [],
+      "subtitle": "RARE content engine",
+      "renderNote": null
     },
     {
       "id": "resume-work",
@@ -493,8 +603,9 @@
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "resume parked or handed-off work"
+      "brandScope": [],
+      "subtitle": "resume parked or handed-off work",
+      "renderNote": null
     },
     {
       "id": "session-audit",
@@ -508,8 +619,9 @@
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "structured session audit for consolidation"
+      "brandScope": [],
+      "subtitle": "structured session audit for consolidation",
+      "renderNote": null
     },
     {
       "id": "session-closeout",
@@ -525,8 +637,25 @@
         "session-audit"
       ],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "handoff note to main, clean worktree"
+      "brandScope": [],
+      "subtitle": "handoff note to main, clean worktree",
+      "renderNote": null
+    },
+    {
+      "id": "session-home",
+      "source": "eps:skills/session-home/SKILL.md",
+      "repo": "eps",
+      "tier": "user",
+      "zone": null,
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "route work to the right project home",
+      "renderNote": null
     },
     {
       "id": "session-wrap",
@@ -540,8 +669,9 @@
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": null
+      "brandScope": [],
+      "subtitle": null,
+      "renderNote": null
     },
     {
       "id": "social-brand-brief",
@@ -555,8 +685,9 @@
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "per-account voice contract"
+      "brandScope": [],
+      "subtitle": "per-account voice contract",
+      "renderNote": null
     },
     {
       "id": "social-content-coach",
@@ -575,8 +706,9 @@
         "social-post-scheduler"
       ],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "orchestrator for the Blotato pack"
+      "brandScope": [],
+      "subtitle": "orchestrator for the Blotato pack",
+      "renderNote": null
     },
     {
       "id": "social-post-grader",
@@ -592,8 +724,9 @@
         "social-post-writer"
       ],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "virality rubric, nothing ships below eight of ten"
+      "brandScope": [],
+      "subtitle": "virality rubric, nothing ships below eight of ten",
+      "renderNote": null
     },
     {
       "id": "social-post-scheduler",
@@ -607,8 +740,9 @@
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "the only skill that publishes through Blotato"
+      "brandScope": [],
+      "subtitle": "the only skill that publishes through Blotato",
+      "renderNote": null
     },
     {
       "id": "social-post-writer",
@@ -624,8 +758,9 @@
         "social-post-grader"
       ],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "drafts hooks first, then body"
+      "brandScope": [],
+      "subtitle": "drafts hooks first, then body",
+      "renderNote": null
     },
     {
       "id": "ss",
@@ -639,14 +774,33 @@
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "screenshot shorthand"
+      "brandScope": [],
+      "subtitle": "screenshot shorthand",
+      "renderNote": null
     },
     {
       "id": "the-strong-ones-brand",
       "source": "eps:plugins/brand-voice/skills/the-strong-ones-brand/SKILL.md",
       "repo": "eps",
       "tier": "plugin",
+      "zone": "brands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [
+        "the-strong-ones"
+      ],
+      "subtitle": "The Strong Ones voice inside AG Personal Brand",
+      "renderNote": null
+    },
+    {
+      "id": "verify-docs",
+      "source": "eps:skills/verify-docs/SKILL.md",
+      "repo": "eps",
+      "tier": "user",
       "zone": null,
       "status": "live",
       "inherits": [
@@ -654,8 +808,9 @@
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": "the-strong-ones",
-      "subtitle": "The Strong Ones voice inside AG Personal Brand"
+      "brandScope": [],
+      "subtitle": "live-doc check before building",
+      "renderNote": null
     },
     {
       "id": "xavier-offer-builder",
@@ -669,8 +824,9 @@
       ],
       "calls": [],
       "defersTo": [],
-      "brandScope": null,
-      "subtitle": "offer construction and audit"
+      "brandScope": [],
+      "subtitle": "offer construction and audit",
+      "renderNote": null
     }
   ],
   "edges": [
@@ -693,6 +849,41 @@
       "from": "ag-personal-brand",
       "to": "operating-doctrine",
       "type": "inherits"
+    },
+    {
+      "from": "brand-voice",
+      "to": "ag-luxury-brand",
+      "type": "defers-to"
+    },
+    {
+      "from": "brand-voice",
+      "to": "ag-personal-brand",
+      "type": "defers-to"
+    },
+    {
+      "from": "brand-voice",
+      "to": "don-hobbs-brand",
+      "type": "defers-to"
+    },
+    {
+      "from": "brand-voice",
+      "to": "ep-brand",
+      "type": "defers-to"
+    },
+    {
+      "from": "brand-voice",
+      "to": "fam-epic-brand",
+      "type": "defers-to"
+    },
+    {
+      "from": "brand-voice",
+      "to": "moxie-signature-group-brand",
+      "type": "defers-to"
+    },
+    {
+      "from": "brand-voice",
+      "to": "the-strong-ones-brand",
+      "type": "defers-to"
     },
     {
       "from": "brand-voice",
@@ -795,6 +986,11 @@
       "type": "inherits"
     },
     {
+      "from": "intake",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
       "from": "kindergartner-mode",
       "to": "operating-doctrine",
       "type": "inherits"
@@ -831,6 +1027,11 @@
     },
     {
       "from": "name-session",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "new-project",
       "to": "operating-doctrine",
       "type": "inherits"
     },
@@ -886,6 +1087,11 @@
     },
     {
       "from": "session-closeout",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
+      "from": "session-home",
       "to": "operating-doctrine",
       "type": "inherits"
     },
@@ -960,6 +1166,11 @@
       "type": "inherits"
     },
     {
+      "from": "verify-docs",
+      "to": "operating-doctrine",
+      "type": "inherits"
+    },
+    {
       "from": "xavier-offer-builder",
       "to": "operating-doctrine",
       "type": "inherits"
@@ -969,31 +1180,22 @@
     "unzoned": [
       "acn-currency-check",
       "acn-email-watch",
-      "ag-luxury-brand",
-      "ag-personal-brand",
-      "brand-voice",
       "can-i-close",
-      "deliverable-link",
-      "document-formatting-standard",
-      "don-hobbs-brand",
       "ember-reactivate",
-      "ep-brand",
-      "expert-partners-systems-map",
-      "fam-epic-brand",
       "handoff",
-      "kindergartner-mode",
-      "moxie-signature-group-brand",
+      "intake",
       "name-session",
-      "operating-doctrine",
+      "new-project",
       "park",
       "project-architect",
       "project-builder",
       "resume-work",
       "session-audit",
       "session-closeout",
+      "session-home",
       "session-wrap",
       "ss",
-      "the-strong-ones-brand"
+      "verify-docs"
     ],
     "declaredDuplicates": [
       "eps:operating-doctrine/SKILL.md"
