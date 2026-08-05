@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "0dda43bfe0cc7feeeb4dd4417264488e46db5c26",
-    "aura": "5eced58669f4311acc9466e20c33a1e10d4add51"
+    "eps": "74ae2e5fa7113e2efb8c7a057e4e9b0a7611eaa5",
+    "aura": "2631f372bbe8cfd94653af592324931160c7d8ad"
   },
   "zones": [
     "surfaces",
@@ -2149,23 +2149,6 @@
     ]
   },
   "excluded": [
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/can-i-close/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/ember-reactivate/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/name-session/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/project-architect/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/project-builder/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/session-audit/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/session-closeout/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/_tools/personal-skills/ss/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/docs/estate/extracts/mission-control/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-brand-brief/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-content-coach/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-grader/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-scheduler/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-writer/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/tools/continuity-skills/handoff/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/tools/continuity-skills/park/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/tools/continuity-skills/resume-work/SKILL.md",
     "aura:docs/estate/extracts/mission-control/SKILL.md"
   ],
   "layout": {
