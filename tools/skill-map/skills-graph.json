@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "5bac349e5b0ba1919ebb7a426dae346120e93365",
-    "aura": "895dfe5a8fe43bd26b97c10979915596a860ceef"
+    "eps": "f4f5ecda79249f74d1898f8946ffb181b07e905f",
+    "aura": "720cf4d048c0367b7769d38d2f12ae7fdc69e097"
   },
   "zones": [
     "surfaces",
@@ -566,7 +566,7 @@
       "repo": "aura",
       "tier": "project",
       "zone": "routing",
-      "status": "designed",
+      "status": "live",
       "inherits": [
         "operating-doctrine"
       ],
@@ -678,7 +678,7 @@
       "id": "social-brand-brief",
       "source": "aura:project-knowledge/operations/blotato-social-automation/skills-staging/social-brand-brief/SKILL.md",
       "repo": "aura",
-      "tier": "user",
+      "tier": "project",
       "zone": "content",
       "status": "designed",
       "inherits": [
@@ -694,7 +694,7 @@
       "id": "social-content-coach",
       "source": "aura:project-knowledge/operations/blotato-social-automation/skills-staging/social-content-coach/SKILL.md",
       "repo": "aura",
-      "tier": "user",
+      "tier": "project",
       "zone": "content",
       "status": "designed",
       "inherits": [
@@ -715,7 +715,7 @@
       "id": "social-post-grader",
       "source": "aura:project-knowledge/operations/blotato-social-automation/skills-staging/social-post-grader/SKILL.md",
       "repo": "aura",
-      "tier": "user",
+      "tier": "project",
       "zone": "content",
       "status": "designed",
       "inherits": [
@@ -733,7 +733,7 @@
       "id": "social-post-scheduler",
       "source": "aura:project-knowledge/operations/blotato-social-automation/skills-staging/social-post-scheduler/SKILL.md",
       "repo": "aura",
-      "tier": "user",
+      "tier": "project",
       "zone": "content",
       "status": "designed",
       "inherits": [
@@ -749,7 +749,7 @@
       "id": "social-post-writer",
       "source": "aura:project-knowledge/operations/blotato-social-automation/skills-staging/social-post-writer/SKILL.md",
       "repo": "aura",
-      "tier": "user",
+      "tier": "project",
       "zone": "content",
       "status": "designed",
       "inherits": [
