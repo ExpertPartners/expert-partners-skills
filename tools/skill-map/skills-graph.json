@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "e8985c2bf174606529f433ae8040b71acd90b7f9",
-    "aura": "20f2d0dbde4642994deb66007d4465d9e240fd9f"
+    "eps": "5bac349e5b0ba1919ebb7a426dae346120e93365",
+    "aura": "895dfe5a8fe43bd26b97c10979915596a860ceef"
   },
   "zones": [
     "surfaces",
@@ -137,8 +137,8 @@
       "id": "can-i-close",
       "source": "aura:.claude/skills/can-i-close/SKILL.md",
       "repo": "aura",
-      "tier": "user",
-      "zone": null,
+      "tier": "project",
+      "zone": "routing",
       "status": "live",
       "inherits": [
         "operating-doctrine"
@@ -241,9 +241,9 @@
       "id": "ember-reactivate",
       "source": "aura:.claude/skills/ember-reactivate/SKILL.md",
       "repo": "aura",
-      "tier": "user",
-      "zone": null,
-      "status": "designed",
+      "tier": "project",
+      "zone": "routing",
+      "status": "retired",
       "inherits": [
         "operating-doctrine"
       ],
@@ -363,7 +363,7 @@
       "source": "aura:tools/continuity-skills/handoff/SKILL.md",
       "repo": "aura",
       "tier": "user",
-      "zone": null,
+      "zone": "routing",
       "status": "live",
       "inherits": [
         "operating-doctrine"
@@ -465,8 +465,8 @@
       "id": "name-session",
       "source": "aura:.claude/skills/name-session/SKILL.md",
       "repo": "aura",
-      "tier": "user",
-      "zone": null,
+      "tier": "project",
+      "zone": "routing",
       "status": "live",
       "inherits": [
         "operating-doctrine"
@@ -512,7 +512,7 @@
       "source": "aura:tools/continuity-skills/park/SKILL.md",
       "repo": "aura",
       "tier": "user",
-      "zone": null,
+      "zone": "routing",
       "status": "live",
       "inherits": [
         "operating-doctrine"
@@ -545,14 +545,15 @@
       "id": "project-architect",
       "source": "aura:.claude/skills/project-architect/SKILL.md",
       "repo": "aura",
-      "tier": "user",
-      "zone": null,
+      "tier": "project",
+      "zone": "routing",
       "status": "live",
       "inherits": [
         "operating-doctrine"
       ],
       "calls": [
-        "project-builder"
+        "project-builder",
+        "new-project"
       ],
       "defersTo": [],
       "brandScope": [],
@@ -563,8 +564,8 @@
       "id": "project-builder",
       "source": "aura:.claude/skills/project-builder/SKILL.md",
       "repo": "aura",
-      "tier": "user",
-      "zone": null,
+      "tier": "project",
+      "zone": "routing",
       "status": "designed",
       "inherits": [
         "operating-doctrine"
@@ -596,7 +597,7 @@
       "source": "aura:tools/continuity-skills/resume-work/SKILL.md",
       "repo": "aura",
       "tier": "user",
-      "zone": null,
+      "zone": "routing",
       "status": "live",
       "inherits": [
         "operating-doctrine"
@@ -611,8 +612,8 @@
       "id": "session-audit",
       "source": "aura:.claude/skills/session-audit/SKILL.md",
       "repo": "aura",
-      "tier": "user",
-      "zone": null,
+      "tier": "project",
+      "zone": "routing",
       "status": "live",
       "inherits": [
         "operating-doctrine"
@@ -627,8 +628,8 @@
       "id": "session-closeout",
       "source": "aura:.claude/skills/session-closeout/SKILL.md",
       "repo": "aura",
-      "tier": "user",
-      "zone": null,
+      "tier": "project",
+      "zone": "routing",
       "status": "live",
       "inherits": [
         "operating-doctrine"
@@ -767,7 +768,7 @@
       "source": "aura:_tools/personal-skills/ss/SKILL.md",
       "repo": "aura",
       "tier": "user",
-      "zone": null,
+      "zone": "routing",
       "status": "designed",
       "inherits": [
         "operating-doctrine"
@@ -1052,6 +1053,11 @@
     },
     {
       "from": "project-architect",
+      "to": "new-project",
+      "type": "calls"
+    },
+    {
+      "from": "project-architect",
       "to": "project-builder",
       "type": "calls"
     },
@@ -1180,21 +1186,10 @@
     "unzoned": [
       "acn-currency-check",
       "acn-email-watch",
-      "can-i-close",
-      "ember-reactivate",
-      "handoff",
       "intake",
-      "name-session",
       "new-project",
-      "park",
-      "project-architect",
-      "project-builder",
-      "resume-work",
-      "session-audit",
-      "session-closeout",
       "session-home",
       "session-wrap",
-      "ss",
       "verify-docs"
     ],
     "declaredDuplicates": [
