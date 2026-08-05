@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "809e70fe26d24fa407c29dd4adf71e1ebfdf9210",
-    "aura": "296e2cb5c5735f3bf3b75a4d6e5a19f7283861cf"
+    "eps": "2b7eb239d272d3b86390b3e3c8fc092ab84bf515",
+    "aura": "be264de6a45abdecf23a6a9c488f4c3f2ccf8204"
   },
   "zones": [
     "surfaces",
@@ -218,6 +218,34 @@
         "subtitleLines": [
           "plain language safe-to-close",
           "check"
+        ]
+      }
+    },
+    {
+      "id": "capability-currency",
+      "source": "eps:skills/capability-currency/SKILL.md",
+      "repo": "eps",
+      "tier": "organization",
+      "zone": "hands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "twice-monthly estate capability sweep",
+      "renderNote": null,
+      "layout": {
+        "x": 524,
+        "y": 1870,
+        "width": 230,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "twice-monthly estate capability",
+          "sweep"
         ]
       }
     },
@@ -1573,6 +1601,12 @@
       "points": null
     },
     {
+      "from": "capability-currency",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
       "from": "code-block-routing",
       "to": "pin",
       "type": "defers-to",
@@ -2278,7 +2312,7 @@
         "caption": "funnel work and account operations",
         "x": 8,
         "y": 1822,
-        "width": 526,
+        "width": 768,
         "height": 351,
         "rooms": []
       },
