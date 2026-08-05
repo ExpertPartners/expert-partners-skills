@@ -1,7 +1,7 @@
 ---
 name: don-hobbs-brand
 description: "Apply Don Hobbs's authentic voice to any content written as Don: coaching frameworks, keynote and training material, EPIC and Free Agent Movement leadership copy, social, email, scripts, and bios. Don is the Brand Authority and Business Ownership Architect for real estate agents (aura ADR 0043, a distinct personal brand under Expert Partners, future-splittable). Three evidenced modes, and every invocation MUST declare which one it is writing in: Strategist, Keynote and Trainer, or EPIC / Free Agent Movement Leader. Personal-brand lane is first person I only; we belongs exclusively to the Leader mode where Don speaks as an Expert Partners co-founder. Strategic Architect tone dominant, diagnostic questions before prescriptions, Setup Pattern Principle reframe, story before eXp structure and fees, no hype. Never reproduce Gateway to Mastery curriculum. Use for Don Hobbs content only, NOT for Allison, AG, FAM-as-Allison, or consumer real estate. It inherits the operating-doctrine and never overrides it."
-# --- skill-map metadata (additive, all optional) ---
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: brands
 status: live

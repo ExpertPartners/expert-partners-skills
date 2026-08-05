@@ -1,7 +1,7 @@
 ---
 name: ag-personal-brand
 description: "Apply Allison Gaddy's personal brand voice to all outputs. Use when creating content for Allison's YouTube channel (@TheAllisonGaddy), speaking engagements, keynotes, thought leadership pieces, personal essays, LinkedIn, personal social posts, or any content that represents Allison as an individual founder, educator, and public figure -- NOT as Expert Partners, FAM, or Moxie. This is Allison's personal authority platform voice: direct, earned, warm, first-person. Distinct from the \"we\" voice of EP/FAM brands. No hype, no hustle culture, no real estate jargon -- just Allison telling the truth about what she is building and what she has learned. It inherits the operating-doctrine and never overrides it."
-# --- skill-map metadata (additive, all optional) ---
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: brands
 status: live

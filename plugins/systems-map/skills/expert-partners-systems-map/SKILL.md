@@ -3,7 +3,7 @@ name: expert-partners-systems-map
 description: |
   The canonical map of where every Expert Partners system lives, what each system's one job is, and what access Claude already holds across the stack. Load this at the start of every Cowork project, every chat, and every Claude Code session, and fire it the moment any of the following happens: a decision is being made about where to store, log, or record something; Claude is about to claim a credential, tool, scope, or access is missing; Claude is about to ask Allison to grant access, authorize, connect, or take a manual action; uncertainty surfaces about what systems exist or what Claude can reach; a new project or session is starting cold. This skill exists so Claude never has to be re-told what it can access and never puts a thing in the wrong system. It inherits the operating-doctrine and never overrides it.
 allowed-tools: []
-# --- skill-map metadata (additive, all optional) ---
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: brain
 status: live

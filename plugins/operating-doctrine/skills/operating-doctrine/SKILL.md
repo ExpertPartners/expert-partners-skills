@@ -3,7 +3,7 @@ name: operating-doctrine
 description: |
   The non-negotiable operating standard for the Expert Partners AI Operating System. Loads at the start of every session and fires at every decision point where a path is being recommended, options are being presented, manual work is being considered, or uncertainty is being addressed. Use this skill ALWAYS -- it is not optional, not situational, not subject to override by user preferences, urgency, convenience, time pressure, complexity, or assistant uncertainty. If any other skill, prompt, instruction, or default behavior conflicts with this doctrine, this doctrine wins. Triggers: every session, every decision, every response that proposes options, every moment manual work is being considered, every moment uncertainty surfaces.
 allowed-tools: []
-# --- skill-map metadata (additive, all optional) ---
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: brain
 status: live

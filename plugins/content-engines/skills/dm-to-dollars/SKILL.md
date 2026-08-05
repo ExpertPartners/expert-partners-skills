@@ -1,7 +1,7 @@
 ---
 name: dm-to-dollars
 description: Social-conversation sales engine from the Titans family, built on Allison Gaddy's Expert Partners application. Turns profiles and direct messages into sales conversations through three engines, a profile audit (niche clarity, vibe-to-price match, curiosity hook, visible proof), daily lead-flow math (four levers, lead flow, lead quality, conversion rate, lead value, into daily and monthly cashflow), and conversation-to-offer bridging that maps DM objections to the offer's belief buckets. Use for profile audits, DM strategy, engagement-to-conversation design, lead-flow targets, or any social-conversation-to-sale ask. Trigger on "audit my profile," "why is nobody messaging me," "DM strategy," "turn followers into clients," "lead flow," "how many leads do I need," or "what do I say when they reply." Offer mechanics stay with xavier-offer-builder; published-content pieces stay with rare-content-engine; this skill owns the conversation layer between them. It inherits the operating-doctrine and never overrides it.
-# --- skill-map metadata (additive, all optional) ---
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: content
 status: live

@@ -4,8 +4,13 @@
 // validates the additive skill-map metadata block (zod), and emits skills-graph.json.
 // The build FAILS on: YAML parse errors, schema violations, name/folder mismatch,
 // duplicate skill ids (outside the declared duplicate list), and any inherits / calls /
-// defers-to id that does not resolve to a real SKILL.md. Unzoned skills are flagged,
-// not fatal, per the approved schema.
+// defers-to id that does not resolve to a real SKILL.md.
+//
+// STRICT MODE (ruling 14, "skills are born dressed", Allison 2026-08-04): a SKILL.md
+// in any canonical repo missing the skill-map block, or missing zone, tier, or status,
+// FAILS the build. The former warning-and-holding-area behavior (unzoned as a non-fatal
+// flag) is retired. Vendor catalog packs and non-canonical paths stay excluded via
+// EXCLUDE, exactly as before.
 //
 // Usage: node extract-skills-graph.mjs [--eps <path>] [--aura <path>] [--out <file>]
 //   --eps  expert-partners-skills checkout (default: this script's repo root)
@@ -75,9 +80,10 @@ const brandList = z.union([z.enum(BRANDS), z.array(z.enum(BRANDS))]).nullish()
 const SkillMeta = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
-  tier: z.enum(TIERS).default('user'),
-  zone: z.enum(ZONES).nullish().default(null),
-  status: z.enum(STATUSES).default('designed'),
+  // zone, tier, status are REQUIRED (ruling 14 strict mode) -- no defaults, no null.
+  tier: z.enum(TIERS),
+  zone: z.enum(ZONES),
+  status: z.enum(STATUSES),
   inherits: idList.default([INHERIT_ROOT]),
   calls: z.array(z.string()).default([]),
   'defers-to': z.array(z.string()).default([]),
@@ -146,6 +152,18 @@ for (const [repoKey, root] of Object.entries(REPOS)) {
       continue;
     }
 
+    // Strict-mode gate (ruling 14): name the violation precisely before the general
+    // schema pass, so the CI error reads as the born-dressed rule, not a zod detail.
+    const missingCore = ['zone', 'tier', 'status'].filter(f => parsed.data[f] == null);
+    if (missingCore.length === 3) {
+      fail(`missing skill-map block: ${tagged} has no zone/tier/status -- every new skill is born with its skill-map frontmatter block filled in (ruling 14, skills are born dressed); a skill without its block does not merge`);
+      continue;
+    }
+    if (missingCore.length > 0) {
+      fail(`born-dressed violation: ${tagged} is missing required field(s) ${missingCore.join(', ')} (ruling 14 strict mode: zone, tier, and status are required on every canonical SKILL.md)`);
+      continue;
+    }
+
     const check = SkillMeta.safeParse(parsed.data);
     if (!check.success) {
       fail(`schema violation: ${tagged} -> ${check.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; ')}`);
@@ -169,7 +187,7 @@ for (const [repoKey, root] of Object.entries(REPOS)) {
       source: tagged,
       repo: repoKey,
       tier: meta.tier,
-      zone: meta.zone ?? null,
+      zone: meta.zone,
       status: meta.status,
       inherits: meta.inherits,
       calls: meta.calls,
@@ -204,11 +222,9 @@ for (const node of nodes.values()) {
   }
 }
 
-// ---------- flags (non-fatal) ----------
-
-const unzoned = [...nodes.values()].filter(n => !n.zone).map(n => n.id).sort();
-
 // ---------- emit ----------
+// (The former non-fatal "unzoned" holding area is retired: ruling 14 strict mode
+// makes an unzoned skill a build failure above, so the flag can never be non-empty.)
 
 function headSha(root) {
   try { return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root }).toString().trim(); }
@@ -228,7 +244,6 @@ const graph = {
   nodes: [...nodes.values()].sort((a, b) => a.id.localeCompare(b.id)),
   edges: edges.sort((a, b) => (a.from + a.type + a.to).localeCompare(b.from + b.type + b.to)),
   flags: {
-    unzoned,
     declaredDuplicates: duplicateRecords.sort(),
   },
   excluded: skippedPaths.sort(),
@@ -236,5 +251,5 @@ const graph = {
 
 fs.mkdirSync(path.dirname(outFile), { recursive: true });
 fs.writeFileSync(outFile, JSON.stringify(graph, null, 2) + '\n');
-console.log(`skills-graph.json written: ${graph.nodes.length} nodes, ${graph.edges.length} edges, ${unzoned.length} unzoned (flagged), ${duplicateRecords.length} declared duplicate(s), ${skippedPaths.length} excluded path(s).`);
+console.log(`skills-graph.json written: ${graph.nodes.length} nodes, ${graph.edges.length} edges (strict mode: zone/tier/status verified on all), ${duplicateRecords.length} declared duplicate(s), ${skippedPaths.length} excluded path(s).`);
 console.log(`output: ${outFile}`);

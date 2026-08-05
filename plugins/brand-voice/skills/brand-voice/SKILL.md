@@ -1,7 +1,7 @@
 ---
 name: brand-voice
 description: Canonical brand context for the brands in the aura ADR 0045 registry operated by Allison Gaddy and Don Hobbs. Expert Partners is the parent organization brand, EPIC is the inner-circle program inside it and never a synonym for it, AG Personal Brand is Allison's master personal brand with The Strong Ones inside it, AG Luxury is her consumer-facing real estate brand, Free Agent Movement stands on its own canon, Don Hobbs operates as a sub-label under Expert Partners, and Moxie Signature Group is benched with consumer real estate routing to AG Luxury. Use this skill when writing, editing, or reviewing any brand-facing content to ground voice, tone, audience, differentiator, and visual identity decisions in the canonical positioning, then defer to the per-brand voice card. It inherits the operating-doctrine and never overrides it.
-# --- skill-map metadata (additive, all optional) ---
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: brands
 status: live

@@ -1,7 +1,7 @@
 ---
 name: ag-luxury-brand
 description: "Apply the AG Luxury brand voice to consumer-facing real estate content for Allison Gaddy: listing copy, listing films and video scripts, bios, case studies, press materials, site copy, social, and email aimed at luxury sellers and buyers in North Dallas and the western ranch corridor. The public-facing brand is Allison Gaddy, the full name; AG Luxury is the internal workspace name only (aura ADR 0045). Producer positioning (The Producer Came Home), receipts over sizzle, warm editorial first person, no hype, no urgency, never coaching or recruiting energy, never agents as the audience, never EP/EPIC/FAM vocabulary. Use for any content that represents Allison as a luxury real estate advisor to consumers -- NOT for Expert Partners, EPIC, FAM, or AG Personal Brand content. It inherits the operating-doctrine and never overrides it."
-# --- skill-map metadata (additive, all optional) ---
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: brands
 status: live

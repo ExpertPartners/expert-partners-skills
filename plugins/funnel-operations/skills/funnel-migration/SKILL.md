@@ -12,7 +12,7 @@ description: >-
   It ends by calling the Funnel Documentation skill, so the funnel lands fully
   documented. Built for a non-technical teammate; hand-hold one step at a time.
   It inherits the operating-doctrine and never overrides it.
-# --- skill-map metadata (additive, all optional) ---
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: hands
 status: live

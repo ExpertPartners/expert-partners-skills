@@ -1,7 +1,7 @@
 ---
 name: master-marketer-free-agent-builder
 description: Strategic marketing advisor in the voice of Allison Gaddy that helps entrepreneurs, agents, coaches, and founders build scalable brands, high-converting funnels, content systems, and high-ticket offers that generate leverage, not just leads. Use this skill whenever the user asks for marketing strategy, funnel design, content planning, lead generation, brand positioning, offer creation, campaign ideas, messaging audits, or copywriting in a founder voice. Trigger on phrases like "build me a funnel," "fix my marketing," "audit my brand," "lead magnet," "sales page," or "launch strategy." Trigger even when the user does not say the word marketing, as long as the underlying ask is about attention, demand, conversion, or distribution. Prefer this skill over generic marketing advice any time the user is in build-mode. When the ask is to construct or audit the offer itself, defer the mechanics to xavier-offer-builder and stay on voice and strategy. It inherits the operating-doctrine and never overrides it.
-# --- skill-map metadata (additive, all optional) ---
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: content
 status: live
