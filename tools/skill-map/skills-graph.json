@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "01006723b72c83c8fe15fda610ba785362cbbb55",
-    "aura": "2631f372bbe8cfd94653af592324931160c7d8ad"
+    "eps": "b4e31862d6bc6d2b2cbcc01be40f99eeff984139",
+    "aura": "94bd8fe72b48d01e5fc9cfeffce844cceee1eb04"
   },
   "zones": [
     "surfaces",
@@ -581,7 +581,7 @@
       "subtitle": "hand work to another session",
       "renderNote": null,
       "layout": {
-        "x": 409,
+        "x": 641,
         "y": 2251,
         "width": 212,
         "height": 63,
@@ -608,7 +608,7 @@
       "subtitle": "file content into a repo intake inbox",
       "renderNote": null,
       "layout": {
-        "x": 750,
+        "x": 774,
         "y": 2340,
         "width": 230,
         "height": 77,
@@ -633,18 +633,17 @@
       "calls": [],
       "defersTo": [],
       "brandScope": [],
-      "subtitle": "plain language walkthroughs, freshness proof",
+      "subtitle": "plain language walkthroughs",
       "renderNote": null,
       "layout": {
-        "x": 512,
-        "y": 2340,
-        "width": 212,
-        "height": 77,
-        "rectHeight": 62,
+        "x": 409,
+        "y": 2251,
+        "width": 206,
+        "height": 63,
+        "rectHeight": 48,
         "annotationHeight": 15,
         "subtitleLines": [
-          "plain language walkthroughs,",
-          "freshness proof"
+          "plain language walkthroughs"
         ]
       }
     },
@@ -755,8 +754,8 @@
       "subtitle": "propose an accurate session name",
       "renderNote": null,
       "layout": {
-        "x": 1135,
-        "y": 2251,
+        "x": 30,
+        "y": 2340,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -836,7 +835,7 @@
       "subtitle": "park work for a later resume",
       "renderNote": null,
       "layout": {
-        "x": 647,
+        "x": 879,
         "y": 2251,
         "width": 212,
         "height": 63,
@@ -976,7 +975,7 @@
       "subtitle": "resume parked or handed-off work",
       "renderNote": null,
       "layout": {
-        "x": 30,
+        "x": 292,
         "y": 2340,
         "width": 236,
         "height": 63,
@@ -1061,7 +1060,7 @@
       "subtitle": "route work to the right project home",
       "renderNote": null,
       "layout": {
-        "x": 1006,
+        "x": 1030,
         "y": 2340,
         "width": 230,
         "height": 77,
@@ -1089,7 +1088,7 @@
       "subtitle": "the one canonical session close-out",
       "renderNote": null,
       "layout": {
-        "x": 292,
+        "x": 554,
         "y": 2340,
         "width": 194,
         "height": 77,
@@ -1321,7 +1320,7 @@
       "subtitle": "live-doc check before building",
       "renderNote": null,
       "layout": {
-        "x": 885,
+        "x": 1117,
         "y": 2251,
         "width": 224,
         "height": 63,
@@ -2154,7 +2153,7 @@
   ],
   "layout": {
     "engine": "elkjs layered, zones as compound containers (INCLUDE_CHILDREN over brand rooms), build-time only",
-    "width": 1401,
+    "width": 1371,
     "height": 2767,
     "zones": [
       {
@@ -2289,7 +2288,7 @@
         "caption": "routing, ledgers, session lifecycle",
         "x": 8,
         "y": 2203,
-        "width": 1385,
+        "width": 1355,
         "height": 555.8,
         "rooms": []
       }
