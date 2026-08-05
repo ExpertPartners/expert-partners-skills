@@ -58,6 +58,9 @@ const EXCLUDE = [
 // copy is now a pointer file naming the plugin path, kept here so the walk skips it.
 const DECLARED_DUPLICATES = [
   { id: 'operating-doctrine', keep: 'eps:plugins/operating-doctrine/skills/operating-doctrine/SKILL.md', duplicate: 'eps:operating-doctrine/SKILL.md' },
+  // session-wrap adopted into canonical 2026-08-05 (add-on brief note 4); the aura
+  // .claude/skills copy stays loadable as the deployed copy for Aura Code sessions.
+  { id: 'session-wrap', keep: 'eps:skills/session-wrap/SKILL.md', duplicate: 'aura:.claude/skills/session-wrap/SKILL.md' },
 ];
 
 // ---------- schema ----------
