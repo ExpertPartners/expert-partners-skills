@@ -52,8 +52,10 @@ const EXCLUDE = [
   /^aura:docs\/estate\/extracts\//,  // reference extracts of external systems
 ];
 
-// Declared duplicates: same content maintained at two paths on purpose.
+// Declared duplicates / pointers: paths that intentionally shadow a canonical copy.
 // The mapped node comes from `keep`; the other path is recorded, not mapped.
+// Ruled 2026-08-05 (flags item 3): the plugin path is canonical; the repo-root
+// copy is now a pointer file naming the plugin path, kept here so the walk skips it.
 const DECLARED_DUPLICATES = [
   { id: 'operating-doctrine', keep: 'eps:plugins/operating-doctrine/skills/operating-doctrine/SKILL.md', duplicate: 'eps:operating-doctrine/SKILL.md' },
 ];
