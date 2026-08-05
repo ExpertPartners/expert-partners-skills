@@ -100,6 +100,8 @@ The habit, every hand-off:
 
 A Code session that completes its carry-back updates its own row to complete-safe-to-archive in the same push when it already has aura write access; otherwise the Cowork home updates it on receipt (root CLAUDE.md delivery protocol).
 
+Write mechanics for the ledger file itself, added 2026-08-05 per Allison's ruling of 2026-08-04 after the second ledger regression (a stale-base full-file write erased three rows of newer state before the owning lanes healed it): every write to `docs/estate/lanes.md` obeys the shared-canonical-file-writes directive, canonical at aura `docs/directives/shared-canonical-file-writes.md`. In one breath, fresh read immediately before the write, blob-SHA compare-and-swap on any contents-API write, post-write diff check that no other lane's rows changed, git-based writers (Claude Code) preferred for this hot file, and a chat-surface writer that bounces twice on the SHA guard stops racing and routes the row verbatim through an intake handoff note for the next git-based writer to fold in. The directive also carries Allison's ordered build of the Estate Brain ledger-row tool, which retires whole-file writes once it ships.
+
 ## One Block Per Response
 
 Added 2026-07-27 at Allison's instruction: "I can't have you giving me two at a time."
