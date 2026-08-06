@@ -34,12 +34,27 @@ Rules for the routing line:
 
 1. Always present. No paste block ships without it.
 2. One line, first thing above the block, easy to spot.
-3. Session names stay short, plain, and human: two to four words. The assistant picks the name; Allison names the session exactly as given.
+3. Session names stay short, plain, and human: two to four words, prefixed with the lane tag per the Lane Tag Session Naming section below (tag, space-hyphen-space, job name). The assistant picks the name; Allison names the session exactly as given.
 4. Route to an EXISTING session when the work continues a thread that session already holds context for (a pending brief, a prior fix, a repo it already has open). Name the session exactly as Allison named it.
 5. Route to a NEW session when the work is a fresh workstream, a different repo, or would pollute an existing session's context.
 6. Track known session names as they are created or mentioned, and reuse them consistently so both sides always know where a thread lives. Never invent a session name and register it as if it exists. If Allison reveals the real name, adopt her exact spelling immediately and correct the registry.
 7. When it is unknown whether a coinciding session exists, say so on the routing line and default to a new session with a name: PASTE INTO: Claude Code, new session, name it "X" (or your existing session for this work if one is open).
 8. Never route two concurrent sessions at the same shared state (the same repo, the same credential, the same config file). One lane per workstream. If a second session is already open on that state, say so and route everything to one of them.
+
+## Lane Tag Session Naming
+
+Ruled by Allison 2026-08-04 ("yes adopt lane tag rule"); ruling of record at aura intake/2026-08-05-ruling-lane-tag-session-naming-rule.md.
+
+Every Claude Code session name starts with a short READABLE lane tag, a word or word pair (roughly 3 to 10 characters), then a space-hyphen-space, then the session's job name. Readable words, never bare initialisms. The point is that the Code sessions list identifies each session's lane on sight, with no ledger lookup.
+
+Examples: RepoDebt - Export A1 A2 workflows. CIWatch - CI Watcher Build. Funnels - EPIC funnel audit. Canon - Phase 1 skeleton. Memory - FalkorDB keeper.
+
+Mechanics:
+
+1. Each chat lane picks its tag at kickoff, and its ledger rows in aura docs/estate/lanes.md record the tag alongside the canonical session name.
+2. Every new dispatch block names the session with the tag. The dispatching lane owns tag consistency.
+3. Existing sessions are NOT cold-renamed. A session gains its tag the next time it is touched, via the in-session /rename request, the same mechanism as the PARITY MISMATCH resolution rule. Never send Allison window hunting.
+4. The canonical session name in the ledger includes the tag once adopted, so ledger and window match.
 
 ## Window Titles Drift; Session Names Do Not
 
