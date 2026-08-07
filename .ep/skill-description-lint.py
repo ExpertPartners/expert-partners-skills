@@ -76,6 +76,27 @@ except ImportError:  # pragma: no cover - depends on environment
 # 1024; we do not, so a description can never sit one keystroke from rejection.
 CAP_INCLUSIVE = 1024
 
+# ---------------------------------------------------------------------------
+# RULING, Allison, 2026-08-07: the truncation check STAYS. Do not strip it.
+#
+# The truncation check (authored_length, plus Row.truncated and its ERROR branch in main)
+# was added in the same pass that built this gate, after the fallback-vs-PyYAML selftest
+# surfaced ep-brand delivering 371 of its 859 authored characters. It was flagged at the
+# time as an addition beyond the ruled cap gate, and Allison was offered the chance to
+# strip it back. She endorsed it instead.
+#
+# Her reasoning, recorded here so a later reader does not remove this as scope creep:
+#   - A gate that certifies ep-brand healthy at 371 characters with 653 headroom is a gate
+#     that lies. Reporting a truncated description as having room to spare is worse than
+#     not checking at all, because it converts a defect into a clean bill of health.
+#   - Silent truncation is strictly worse than over-cap. An over-cap description fails
+#     loudly at upload time and someone fixes it. A truncated one never fails anywhere:
+#     the file says one thing, the uploader and Claude read another, and no error is ever
+#     raised on any surface.
+#
+# Both checks are therefore ERRORs of equal standing. Neither is decoration.
+# ---------------------------------------------------------------------------
+
 IGNORE_FILE_TOKEN = "skill-description-lint: ignore-file"
 SKILL_FILENAME = "SKILL.md"
 
