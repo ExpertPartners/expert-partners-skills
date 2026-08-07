@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "c759d885296f1f395972df426c162107b7f6ff59",
+    "eps": "d18935913465952c7df5b541b87cca0a022e1e60",
     "aura": "e0358b9993a55b79cdafc6e8b5a6d881c64e731a"
   },
   "zones": [
@@ -2234,41 +2234,6 @@
     ]
   },
   "excluded": [
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/can-i-close/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/ember-reactivate/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/name-session/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/project-architect/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/project-builder/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/session-audit/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/session-closeout/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/_tools/personal-skills/ss/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/docs/estate/extracts/mission-control/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-brand-brief/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-content-coach/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-grader/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-scheduler/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-writer/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/tools/continuity-skills/handoff/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/tools/continuity-skills/park/SKILL.md",
-    "aura:.claude/worktrees/affectionate-swirles-884bd1/tools/continuity-skills/resume-work/SKILL.md",
-    "aura:.claude/worktrees/canon-rebuild-phase1/.claude/skills/can-i-close/SKILL.md",
-    "aura:.claude/worktrees/canon-rebuild-phase1/.claude/skills/ember-reactivate/SKILL.md",
-    "aura:.claude/worktrees/canon-rebuild-phase1/.claude/skills/name-session/SKILL.md",
-    "aura:.claude/worktrees/canon-rebuild-phase1/.claude/skills/project-architect/SKILL.md",
-    "aura:.claude/worktrees/canon-rebuild-phase1/.claude/skills/project-builder/SKILL.md",
-    "aura:.claude/worktrees/canon-rebuild-phase1/.claude/skills/session-audit/SKILL.md",
-    "aura:.claude/worktrees/canon-rebuild-phase1/.claude/skills/session-closeout/SKILL.md",
-    "aura:.claude/worktrees/canon-rebuild-phase1/.claude/skills/session-wrap/SKILL.md",
-    "aura:.claude/worktrees/canon-rebuild-phase1/_tools/personal-skills/ss/SKILL.md",
-    "aura:.claude/worktrees/canon-rebuild-phase1/docs/estate/extracts/mission-control/SKILL.md",
-    "aura:.claude/worktrees/canon-rebuild-phase1/project-knowledge/operations/blotato-social-automation/skills-staging/social-brand-brief/SKILL.md",
-    "aura:.claude/worktrees/canon-rebuild-phase1/project-knowledge/operations/blotato-social-automation/skills-staging/social-content-coach/SKILL.md",
-    "aura:.claude/worktrees/canon-rebuild-phase1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-grader/SKILL.md",
-    "aura:.claude/worktrees/canon-rebuild-phase1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-scheduler/SKILL.md",
-    "aura:.claude/worktrees/canon-rebuild-phase1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-writer/SKILL.md",
-    "aura:.claude/worktrees/canon-rebuild-phase1/tools/continuity-skills/handoff/SKILL.md",
-    "aura:.claude/worktrees/canon-rebuild-phase1/tools/continuity-skills/park/SKILL.md",
-    "aura:.claude/worktrees/canon-rebuild-phase1/tools/continuity-skills/resume-work/SKILL.md",
     "aura:docs/estate/extracts/mission-control/SKILL.md"
   ],
   "layout": {
