@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "c0cba937eeccc176df9a921ad0a74a756c9fe2af",
-    "aura": "bc8fac65b7c20d9e7249f4df49d99aa78eeaa6fc"
+    "eps": "c759d885296f1f395972df426c162107b7f6ff59",
+    "aura": "e0358b9993a55b79cdafc6e8b5a6d881c64e731a"
   },
   "zones": [
     "surfaces",
@@ -210,7 +210,7 @@
       "renderNote": null,
       "layout": {
         "x": 544,
-        "y": 2659.8,
+        "y": 2544,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -267,8 +267,8 @@
       "subtitle": "paste block routing and the lane ledger",
       "renderNote": null,
       "layout": {
-        "x": 818,
-        "y": 2443,
+        "x": 294,
+        "y": 2659.8,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -276,6 +276,36 @@
         "subtitleLines": [
           "paste block routing and the lane",
           "ledger"
+        ]
+      }
+    },
+    {
+      "id": "cowork-direct-execution",
+      "source": "eps:plugins/operating-doctrine/skills/cowork-direct-execution/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [
+        "code-block-routing"
+      ],
+      "brandScope": [],
+      "subtitle": "direct execution on surfaces that hold the access",
+      "renderNote": null,
+      "layout": {
+        "x": 33,
+        "y": 2647,
+        "width": 215,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "direct execution on surfaces",
+          "that hold the access"
         ]
       }
     },
@@ -295,8 +325,8 @@
       "subtitle": "deliverables land as named markdown links",
       "renderNote": null,
       "layout": {
-        "x": 328,
-        "y": 2443,
+        "x": 1322,
+        "y": 2340,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -352,8 +382,8 @@
       "subtitle": "Poppins everywhere, hierarchy by size and color",
       "renderNote": null,
       "layout": {
-        "x": 30,
-        "y": 2443,
+        "x": 1024,
+        "y": 2340,
         "width": 252,
         "height": 77,
         "rectHeight": 62,
@@ -636,7 +666,7 @@
       "subtitle": "file content into a repo intake inbox",
       "renderNote": null,
       "layout": {
-        "x": 774,
+        "x": 512,
         "y": 2340,
         "width": 230,
         "height": 77,
@@ -694,8 +724,8 @@
       "subtitle": "spawning new lanes with named homes",
       "renderNote": null,
       "layout": {
-        "x": 554,
-        "y": 2455.8,
+        "x": 30,
+        "y": 2748,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -782,8 +812,8 @@
       "subtitle": "propose an accurate session name",
       "renderNote": null,
       "layout": {
-        "x": 30,
-        "y": 2340,
+        "x": 1367,
+        "y": 2251,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -810,7 +840,7 @@
       "renderNote": null,
       "layout": {
         "x": 288,
-        "y": 2558.8,
+        "y": 2516,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -892,8 +922,8 @@
       "subtitle": "carry-back envelope and place-keeping baton",
       "renderNote": null,
       "layout": {
-        "x": 1100,
-        "y": 2455.8,
+        "x": 576,
+        "y": 2666.3,
         "width": 182,
         "height": 77,
         "rectHeight": 62,
@@ -924,7 +954,7 @@
       "renderNote": null,
       "layout": {
         "x": 30,
-        "y": 2571.7,
+        "y": 2503.2,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -952,7 +982,7 @@
       "renderNote": null,
       "layout": {
         "x": 288,
-        "y": 2659.8,
+        "y": 2443,
         "width": 155,
         "height": 49,
         "rectHeight": 34,
@@ -1003,7 +1033,7 @@
       "subtitle": "resume parked or handed-off work",
       "renderNote": null,
       "layout": {
-        "x": 292,
+        "x": 30,
         "y": 2340,
         "width": 236,
         "height": 63,
@@ -1031,7 +1061,7 @@
       "renderNote": null,
       "layout": {
         "x": 802,
-        "y": 2571.7,
+        "y": 2455.8,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1061,7 +1091,7 @@
       "renderNote": null,
       "layout": {
         "x": 550,
-        "y": 2558.8,
+        "y": 2443,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -1088,7 +1118,7 @@
       "subtitle": "route work to the right project home",
       "renderNote": null,
       "layout": {
-        "x": 1030,
+        "x": 768,
         "y": 2340,
         "width": 230,
         "height": 77,
@@ -1116,7 +1146,7 @@
       "subtitle": "the one canonical session close-out",
       "renderNote": null,
       "layout": {
-        "x": 554,
+        "x": 292,
         "y": 2340,
         "width": 194,
         "height": 77,
@@ -1578,19 +1608,19 @@
       "points": [
         {
           "x": 756,
-          "y": 2698.3
+          "y": 2582.5
         },
         {
           "x": 766,
-          "y": 2698.3
+          "y": 2582.5
         },
         {
           "x": 766,
-          "y": 2623
+          "y": 2507.2
         },
         {
           "x": 802,
-          "y": 2623
+          "y": 2507.2
         }
       ]
     },
@@ -1612,25 +1642,38 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 1054,
-          "y": 2468.7
+          "x": 530,
+          "y": 2685.5
         },
         {
-          "x": 1064,
-          "y": 2468.7
-        },
-        {
-          "x": 1064,
-          "y": 2475.1
-        },
-        {
-          "x": 1100,
-          "y": 2475.1
+          "x": 576,
+          "y": 2685.5
         }
       ]
     },
     {
       "from": "code-block-routing",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "cowork-direct-execution",
+      "to": "code-block-routing",
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 248,
+          "y": 2685.5
+        },
+        {
+          "x": 294,
+          "y": 2685.5
+        }
+      ]
+    },
+    {
+      "from": "cowork-direct-execution",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -1653,12 +1696,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 282,
-          "y": 2481.5
+          "x": 1276,
+          "y": 2378.5
         },
         {
-          "x": 328,
-          "y": 2481.5
+          "x": 1322,
+          "y": 2378.5
         }
       ]
     },
@@ -1778,12 +1821,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 772,
-          "y": 2481.5
+          "x": 248,
+          "y": 2773.7
         },
         {
-          "x": 818,
-          "y": 2481.5
+          "x": 258,
+          "y": 2773.7
+        },
+        {
+          "x": 258,
+          "y": 2711.2
+        },
+        {
+          "x": 294,
+          "y": 2711.2
         }
       ]
     },
@@ -1793,28 +1844,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 772,
-          "y": 2507.2
+          "x": 248,
+          "y": 2799.3
         },
         {
-          "x": 782,
-          "y": 2507.2
+          "x": 540,
+          "y": 2799.3
         },
         {
-          "x": 782,
-          "y": 2530
+          "x": 540,
+          "y": 2724
         },
         {
-          "x": 1064,
-          "y": 2530
-        },
-        {
-          "x": 1064,
-          "y": 2513.6
-        },
-        {
-          "x": 1100,
-          "y": 2513.6
+          "x": 576,
+          "y": 2724
         }
       ]
     },
@@ -1875,12 +1918,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 1100,
-          "y": 2494.3
+          "x": 576,
+          "y": 2704.8
         },
         {
-          "x": 1054,
-          "y": 2494.3
+          "x": 540,
+          "y": 2704.8
+        },
+        {
+          "x": 540,
+          "y": 2711.2
+        },
+        {
+          "x": 530,
+          "y": 2711.2
         }
       ]
     },
@@ -1897,11 +1948,11 @@
       "points": [
         {
           "x": 242,
-          "y": 2597.3
+          "y": 2554.5
         },
         {
           "x": 288,
-          "y": 2597.3
+          "y": 2554.5
         }
       ]
     },
@@ -1912,19 +1963,19 @@
       "points": [
         {
           "x": 242,
-          "y": 2623
+          "y": 2528.8
         },
         {
           "x": 252,
-          "y": 2623
+          "y": 2528.8
         },
         {
           "x": 252,
-          "y": 2684.3
+          "y": 2467.5
         },
         {
           "x": 288,
-          "y": 2684.3
+          "y": 2467.5
         }
       ]
     },
@@ -1965,11 +2016,11 @@
       "points": [
         {
           "x": 756,
-          "y": 2597.3
+          "y": 2481.5
         },
         {
           "x": 802,
-          "y": 2597.3
+          "y": 2481.5
         }
       ]
     },
@@ -2183,12 +2234,47 @@
     ]
   },
   "excluded": [
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/can-i-close/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/ember-reactivate/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/name-session/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/project-architect/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/project-builder/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/session-audit/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/.claude/skills/session-closeout/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/_tools/personal-skills/ss/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/docs/estate/extracts/mission-control/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-brand-brief/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-content-coach/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-grader/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-scheduler/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-writer/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/tools/continuity-skills/handoff/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/tools/continuity-skills/park/SKILL.md",
+    "aura:.claude/worktrees/affectionate-swirles-884bd1/tools/continuity-skills/resume-work/SKILL.md",
+    "aura:.claude/worktrees/canon-rebuild-phase1/.claude/skills/can-i-close/SKILL.md",
+    "aura:.claude/worktrees/canon-rebuild-phase1/.claude/skills/ember-reactivate/SKILL.md",
+    "aura:.claude/worktrees/canon-rebuild-phase1/.claude/skills/name-session/SKILL.md",
+    "aura:.claude/worktrees/canon-rebuild-phase1/.claude/skills/project-architect/SKILL.md",
+    "aura:.claude/worktrees/canon-rebuild-phase1/.claude/skills/project-builder/SKILL.md",
+    "aura:.claude/worktrees/canon-rebuild-phase1/.claude/skills/session-audit/SKILL.md",
+    "aura:.claude/worktrees/canon-rebuild-phase1/.claude/skills/session-closeout/SKILL.md",
+    "aura:.claude/worktrees/canon-rebuild-phase1/.claude/skills/session-wrap/SKILL.md",
+    "aura:.claude/worktrees/canon-rebuild-phase1/_tools/personal-skills/ss/SKILL.md",
+    "aura:.claude/worktrees/canon-rebuild-phase1/docs/estate/extracts/mission-control/SKILL.md",
+    "aura:.claude/worktrees/canon-rebuild-phase1/project-knowledge/operations/blotato-social-automation/skills-staging/social-brand-brief/SKILL.md",
+    "aura:.claude/worktrees/canon-rebuild-phase1/project-knowledge/operations/blotato-social-automation/skills-staging/social-content-coach/SKILL.md",
+    "aura:.claude/worktrees/canon-rebuild-phase1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-grader/SKILL.md",
+    "aura:.claude/worktrees/canon-rebuild-phase1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-scheduler/SKILL.md",
+    "aura:.claude/worktrees/canon-rebuild-phase1/project-knowledge/operations/blotato-social-automation/skills-staging/social-post-writer/SKILL.md",
+    "aura:.claude/worktrees/canon-rebuild-phase1/tools/continuity-skills/handoff/SKILL.md",
+    "aura:.claude/worktrees/canon-rebuild-phase1/tools/continuity-skills/park/SKILL.md",
+    "aura:.claude/worktrees/canon-rebuild-phase1/tools/continuity-skills/resume-work/SKILL.md",
     "aura:docs/estate/extracts/mission-control/SKILL.md"
   ],
   "layout": {
     "engine": "elkjs layered, zones as compound containers (INCLUDE_CHILDREN over brand rooms), build-time only",
-    "width": 1371,
-    "height": 2767,
+    "width": 1633,
+    "height": 2855,
     "zones": [
       {
         "id": "brain",
@@ -2322,8 +2408,8 @@
         "caption": "routing, ledgers, session lifecycle",
         "x": 8,
         "y": 2203,
-        "width": 1355,
-        "height": 555.8,
+        "width": 1617,
+        "height": 644,
         "rooms": []
       }
     ]
