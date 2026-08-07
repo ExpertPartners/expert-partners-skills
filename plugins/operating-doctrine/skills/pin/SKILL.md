@@ -12,9 +12,9 @@ brand-scope: null
 subtitle: "carry-back envelope and place-keeping baton"
 ---
 
-# Pin -- v4.4 (2026-08-07)
+# Pin -- v4.5 (2026-08-07)
 
-A pin is a bookmark, not a task. It marks the exact spot where work handed off between Claude Code and the Claude project conversation that drives it. v4 (ruled by Allison 2026-08-03) makes the protocol surface-neutral: the home is a Claude PROJECT plus CONVERSATION, never assumed to be CoWork. v4 also adds the first-contact question and the "come back here" pin close. v4.1 (ruled by Allison 2026-08-03, same day) rewrites the carry-back SESSION STATUS line: it names the paste-back PROJECT and CONVERSATION explicitly, the ARCHIVE verdict is part of the line, and a session that is NOT clean to archive must give the instructions at that point instead of the ARCHIVE sentence. v4.2 (ruled by Allison 2026-08-03, same day) DELETES the closing line ("Let me know once you've pasted this back into ..., and I'll pin."): the carry-back ends at the SESSION STATUS line and never solicits a paste confirmation. v4.3 (ruled by Allison 2026-08-07) rewrites naming authority (section 5): sessions are named AT LAUNCH via `claude -n`, the name format is `<Project short name> - <Conversation name> - <Job name>`, and every session self-verifies its own name off disk at first contact. `/rename` is demoted to the exception repair. v4.3 also (same ruling, addendum) strips the ARCHIVE verdict out of the carry-back entirely: a session never declares itself ready to archive, the SESSION STATUS line ends at "carry-back delivered, awaiting verification at home," and archive authority moves to the home conversation. This supersedes the v4.1 ARCHIVE-verdict rule above. v4.4 (ruled by Allison 2026-08-07, same lane) adds the surface vocabulary lock: `SESSION` labels a Claude Code session and only ever that, a block bound for a chat conversation heads its envelope `CONVERSATION`, and `/rename` is a Code-only repair that is never handed out for a chat. See section 4 and section 5.
+A pin is a bookmark, not a task. It marks the exact spot where work handed off between Claude Code and the Claude project conversation that drives it. v4 (ruled by Allison 2026-08-03) makes the protocol surface-neutral: the home is a Claude PROJECT plus CONVERSATION, never assumed to be CoWork. v4 also adds the first-contact question and the "come back here" pin close. v4.1 (ruled by Allison 2026-08-03, same day) rewrites the carry-back SESSION STATUS line: it names the paste-back PROJECT and CONVERSATION explicitly, the ARCHIVE verdict is part of the line, and a session that is NOT clean to archive must give the instructions at that point instead of the ARCHIVE sentence. v4.2 (ruled by Allison 2026-08-03, same day) DELETES the closing line ("Let me know once you've pasted this back into ..., and I'll pin."): the carry-back ends at the SESSION STATUS line and never solicits a paste confirmation. v4.3 (ruled by Allison 2026-08-07) rewrites naming authority (section 5): sessions are named AT LAUNCH via `claude -n`, the name format is `<Project short name> - <Conversation name> - <Job name>`, and every session self-verifies its own name off disk at first contact. `/rename` is demoted to the exception repair. v4.3 also (same ruling, addendum) strips the ARCHIVE verdict out of the carry-back entirely: a session never declares itself ready to archive, the SESSION STATUS line ends at "carry-back delivered, awaiting verification at home," and archive authority moves to the home conversation. This supersedes the v4.1 ARCHIVE-verdict rule above. v4.4 (ruled by Allison 2026-08-07, same lane) adds the surface vocabulary lock: `SESSION` labels a Claude Code session and only ever that, a block bound for a chat conversation heads its envelope `CONVERSATION`, and `/rename` is a Code-only repair that is never handed out for a chat. See section 4 and section 5. v4.5 (re-ruled by Allison 2026-08-07 evening, in the Estate Brain Door Phase B Code session) brings the ARCHIVE verdict BACK and retires "carry-back delivered, awaiting verification at home" permanently: the session determines its own disposition and tells Allison plainly, SAFE TO ARCHIVE with evidence or NOT safe with the one move that closes it, because sessions that cannot say whether they are done pile up. This supersedes the v4.3 no-verdict addendum. See section 1.
 
 Pins persist to `~/.claude/baton.md`. Every surface reads the same baton file, so one pin trail spans all of them.
 
@@ -36,22 +36,27 @@ CLAUDE HOME: {Claude project name} / {conversation name}
 
 {the report}
 
-SESSION STATUS: carry-back delivered, awaiting verification at home.
+SESSION STATUS: {the verdict line, section below}
 ```
 
 The SESSION STATUS line is the last line of the carry-back. There is no closing "Let me know once you've pasted... and I'll pin" line (deleted in v4.2); the carry-back never solicits a paste confirmation. Never write "into Cowork" anywhere in the carry-back. Always name the actual Claude project and conversation; if the session somehow reached a carry-back without knowing them, ask (section 0) before sending the report.
 
-### A session never declares itself ready to archive (v4.3, ruled 2026-08-07)
+### The session gives the archive verdict (v4.5, re-ruled by Allison 2026-08-07 evening)
 
-This REPLACES the v4.1 ARCHIVE-verdict rule. The old template ended with "This session is ready to ARCHIVE" (or a Do-NOT-archive variant), which made the session the judge of its own disposition. That is self-attestation from the narrowest view in the system: a session sees its own repos and its own turn, and cannot see what the home conversation is holding, what it dispatched elsewhere, or what it still means to ask this lane for.
+This SUPERSEDES the v4.3 no-verdict addendum and retires `SESSION STATUS: carry-back delivered, awaiting verification at home.` permanently; that line is never written again. Allison's reason, recorded: the session must tell her whether it is okay to archive, determine whether something is open, and say whether a closeout or a wrap is needed, because sessions that cannot say whether they are done pile up, and too many open sessions is the real failure.
 
-The carry-back now ends at exactly `SESSION STATUS: carry-back delivered, awaiting verification at home.` and nothing stronger. No archive verdict of any kind, in either direction.
+A carry-back ends with exactly one of the four SESSION STATUS lines from `behavior-defaults.md`:
 
-What the session still owes, unchanged: everything the old ARCHIVE sentence was gating on still gets DONE and REPORTED, it just is not converted into a verdict. Run `git status` on every repo touched, commit and push, and state plainly in the report what is committed, what is pushed, what is still open, and what is waiting on Allison. The home conversation needs those facts to make the call; it just makes the call itself.
+- `SESSION STATUS: Waiting on you -- [exact action].`
+- `SESSION STATUS: Still working -- [what remains]. Keep this session open.`
+- `SESSION STATUS: SAFE TO ARCHIVE -- [evidence in one line].`
+- `SESSION STATUS: NOT safe to archive -- [what is open]; run [/session-wrap | /session-closeout | the named action].`
 
-Archive authority belongs to the home conversation alone. After verifying the carry-back live, it issues `archive {session name}` or `hold {session name} open for {named next block}`, and the archive call and the ledger row flip to `archived` are one motion. Full rule, including the default-to-archive posture and the no-dispatch-against-an-archived-row constraint: the code-block-routing skill, "Archive Authority Belongs To The Home Conversation."
+SAFE TO ARCHIVE is a verified claim, never a phrase. It is issued only after all three verify live in the same turn: `git status` clean and pushed on every repo the session touched; the session record, wrap, or closeout note written and pushed when doctrine requires one; and every open wait re-lodged in the lane ledger's waiting-on column with its named condition and stale date, so nothing dies with the archive. The evidence goes in the line itself.
 
-Sessions born before this rule follow it from their next carry-back.
+NOT safe means the session diagnoses AND prescribes: it names exactly what is open and the single move that closes it, /session-wrap when chat-only decisions or flags are unrecorded, /session-closeout when shipped work has no handoff note on main, or the named open action otherwise. Never leave Allison to work out which.
+
+What stays with the home conversation: the actual archive click, and the ledger flip. Home flips the lane's row to `archived` in aura `docs/estate/lanes.md` as one motion with the archive, and no dispatch block is ever written against a row reading `archived`. Sessions are cheap and deterministically named, so spawn freely. Sessions born before v4.5 follow it from their next response.
 
 ## 2. Pin timing and the come-back close (v4)
 
@@ -167,7 +172,7 @@ Never send her window hunting, and never cold-rename a fleet of existing session
 
 One home per session for life: the home is the Claude project plus conversation named in the briefing block (CLAUDE HOME line) or by Allison at first contact. Echo both header lines (SESSION and CLAUDE HOME) on every carry-back. If Allison herself corrects or supplies the home mid-lane, adopt her correction verbatim from that point on; nobody else may change it.
 
-When the lane ends, the session does NOT pronounce on archiving (v4.3, ruled 2026-08-07, superseding the old instruction to say "safe to archive this session"). It ends at `SESSION STATUS: carry-back delivered, awaiting verification at home.` and the home conversation makes the call.
+When the lane ends, the session pronounces on archiving with evidence (v4.5, re-ruled 2026-08-07 evening): it ends at the verdict SESSION STATUS line per section 1, SAFE TO ARCHIVE with the evidence named, or NOT safe with the one closing move named.
 
 ## Rules
 

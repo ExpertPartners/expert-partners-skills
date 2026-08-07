@@ -177,36 +177,23 @@ Precedence notes so the rules do not fight each other:
 - The pin marker is a bookmark, not a paste block. It does NOT count against the one-block-per-response rule, and it is exempt from the nothing-fenced-but-Code rule. It is the only other thing that may ever be fenced.
 - The pin skill's rule that the marker is the entire response applies only when Allison manually invokes /pin. Confirmation-triggered pins may ride in a response that also continues other work.
 
-## Archive Authority Belongs To The Home Conversation
+## The Session Gives The Archive Verdict
 
-Ruled by Allison 2026-08-07, same lane as the naming ruling.
+Re-ruled by Allison 2026-08-07 evening in the Estate Brain Door Phase B Code session, superseding the same-date "Archive Authority Belongs To The Home Conversation" ruling. Her reason, recorded: the session must tell her whether it is okay to archive, determine whether something is open, and say whether a closeout or a wrap is needed, because sessions that cannot say whether they are done pile up, and too many open sessions is the real failure.
 
-A Claude Code session NEVER declares itself ready to archive. That is self-attestation from the narrowest view in the system: the session can see its own repos and its own turn, and it cannot see what the home conversation is holding, what it dispatched elsewhere, or what it still intends to ask this lane for.
+**`SESSION STATUS: carry-back delivered, awaiting verification at home.` is RETIRED and never written again.** Every carry-back ends with one of the four verdict lines from `behavior-defaults.md`: Waiting on you, Still working, SAFE TO ARCHIVE with evidence, or NOT safe to archive with the one closing move named.
 
-**Carry-backs end at exactly this line and nothing stronger:**
+**SAFE TO ARCHIVE is a verified claim, never a phrase.** Issued only after all three verify live in the same turn: `git status` clean and pushed on every repo the session touched; the session record, wrap, or closeout note written and pushed when doctrine requires one; and every open wait re-lodged in the lane ledger's waiting-on column with its named condition and stale date, so nothing dies with the archive. The evidence rides in the line itself.
 
-```
-SESSION STATUS: carry-back delivered, awaiting verification at home.
-```
+**NOT safe means the session diagnoses AND prescribes.** It names exactly what is open and the single move that closes it: /session-wrap when chat-only decisions or flags are unrecorded, /session-closeout when shipped work has no handoff note on main, or the named open action otherwise. Never leave Allison to work out which close a session needs.
 
-No "safe to archive," no "ready to ARCHIVE," no "nothing open," no archive verdict of any kind. The session reports what it did and stops there.
+**What stays with the home conversation:** the archive click itself, and the ledger flip. Home may still verify a verdict's claims against commits, and a hold still names its next block ("hold it open just in case" is not a call; it is a lane leaking). When home archives, it flips that lane's row to `archived` in aura `docs/estate/lanes.md` BEFORE dispatching anything further, and no dispatch block is ever written against a session whose row reads `archived`; that lane is gone, spawn a new one.
 
-**The home conversation holds archive authority alone.** After it verifies the carry-back live (claims are checked against commits, not taken on the session's word), it issues exactly one of two calls:
+**Default is archive.** Sessions are cheap and deterministically named, so spawn freely rather than hoarding a session because it might be useful later. A correctly named session is trivially reproducible; a stale open lane is not free, and the verdict rule exists precisely so stale open lanes stop accumulating.
 
-```
-archive <session name>
-hold <session name> open for <named next block>
-```
+Sessions born before this re-ruling follow it from their next response. No cold sweep, no retroactive rewriting of past carry-backs.
 
-A hold must name the next block. "Hold it open just in case" is not a call; it is a lane leaking.
-
-**Default is archive.** Sessions are cheap and deterministically named, so spawn freely rather than hoarding a session because it might be useful later. A correctly named session is trivially reproducible; a stale open lane is not free.
-
-**The archive call and the ledger are one motion.** When home says archive, home flips that lane's row to `archived` in aura `docs/estate/lanes.md` BEFORE dispatching anything further. Not after the next block, not in a later cleanup pass. And no dispatch block is ever written against a session whose row reads `archived`; that lane is gone, spawn a new one.
-
-Sessions born before this rule follow it from their next carry-back. No cold sweep, no retroactive rewriting of past carry-backs.
-
-Precedence: where this and any older SESSION STATUS wording disagree (the pin skill's carry-back template, the user-global close-of-turn rule, `behavior-defaults.md`), this ruling wins and the older wording is corrected to match. All three were corrected in the same pass on 2026-08-07.
+Precedence: where this and any older SESSION STATUS wording disagree (the pin skill's carry-back template, the user-global close-of-turn rule, `behavior-defaults.md`), this re-ruling wins and the older wording is corrected to match. All three were corrected in the same pass on 2026-08-07 evening (pin v4.5, behavior-defaults, user-global CLAUDE.md, doctrine repo cf5d97e).
 
 ## The Lane Ledger: Row At Dispatch, Update At Carry-Back
 
