@@ -37,7 +37,7 @@ PartnerSync is the white-labeled GoHighLevel platform layer, the agency containe
 | System | Its one job | What goes here | What never goes here |
 | --- | --- | --- | --- |
 | Notion | Single source of truth for funnel records and human logging. A funnel is not done until it lives here. | Funnel records (Funnels and Funnel Messages), status, human-readable logs, regenerated-from-canon human views | Doctrine, technical reference, secrets. Nothing authored in Notion competes with git canon |
-| GitHub canonical (`aura`, `expert-partners`, `ghl-automation`, `expert-partners-skills`, `partnersync`) | Single source of truth for doctrine, decisions, and technical reference. `aura` is the seat of the operating system; its `decisions/` directory is canonical for ADRs and rulings (queue clean 0001 through 0047, renumber evidence in `aura/decisions/README.md`). Per-repo decisions directories that predate this remain as historical records. | Doctrine, decisions (ADRs), references, project knowledge, every n8n workflow's design doc. Commit AND push | Funnel records, secrets or tokens |
+| GitHub canonical (`aura`, `expert-partners`, `ghl-automation`, `expert-partners-skills`, `partnersync`) | Single source of truth for doctrine, decisions, and technical reference. `aura` is the seat of the operating system; its `decisions/` directory is canonical for ADRs and rulings (queue clean 0001 through 0055, verified by live enumeration 2026-08-06; renumber evidence in `aura/decisions/README.md`). Per-repo decisions directories that predate this remain as historical records. | Doctrine, decisions (ADRs), references, project knowledge, every n8n workflow's design doc. Commit AND push | Funnel records, secrets or tokens |
 | Memory (Claude) | Claude cross-session recall, auto-loads each session | Short structured facts a future session must know, plus pointers to canonical docs | Human-facing content, secrets, anything long |
 | 1Password | Secrets and tokens vault | Tokens, API keys, PITs, client secrets, passwords | Anything that belongs in GitHub or Notion. Secrets never go in GitHub or Notion |
 | AWS | Compute and hosting, not a document store | Backend services, runtime token storage, scripts | Documentation, anything you go to read |
@@ -55,13 +55,13 @@ Not in the stack, stated so nobody re-litigates it:
 
 ## AI brains
 
-The brains, their seats, machines, one jobs, SOULs, and liveness rules live in Bible Chapter 4 (`canonical-bible-chapter-4-brains-and-sync-topology.md`, expert-partners doctrine area). This map does not restate the roster. One strategic brain (Aura, M4 / Cowork) is active. Ember (M2) was frozen and quieted 2026-08-03 (workspaces archived, gateway disabled, writer crons off); all agentic rebuilds, including the Ember rebuild and the OpenClaw-to-SDK migration, are paused until Aura's brain (the estate manifest plus the Estate Brain MCP) is in place and locked down (ruled 2026-08-03). Everything else is planned and dark by design. Liveness is proven by process evidence, never by a fresh commit.
+The brains, their seats, machines, one jobs, SOULs, and liveness rules live in Bible Chapter 4 (`canonical-bible-chapter-4-brains-and-sync-topology.md`, expert-partners doctrine area). This map does not restate the roster. One strategic brain (Aura, M4 / Cowork) is active. Ember (M2) was frozen and quieted 2026-08-03 (workspaces archived, gateway disabled, writer crons off). The 2026-08-03 pause condition on agentic rebuilds (Aura's brain in place and locked down) was MET when the Estate Brain went live and proven on every surface (2026-08-04, re-proven 2026-08-07); Ember's wake now proceeds under the one-move wake ruling (`aura/intake/2026-08-05-ruling-ember-one-move-wake-sequencing.md`) in its own lane per the ledger. Everything else is planned and dark by design. Liveness is proven by process evidence, never by a fresh commit.
 
 Ember has her own shared Google Drive, and it is her filing home at wake, she files her documents there when she wakes; the CI watchman is not Ember and keeps filing to the Aura Docs folder per document-formatting-standard (ruled 2026-08-05, robot delivery standards ruling, aura intake 3973c2b). Amended 2026-08-06 per the Ember Voice and Your Move Queue ruling (aura intake/2026-08-06-ruling-ember-voice-and-your-move-queue.md, ee86601). Every robot message to Allison speaks as Ember in first person (R2). Drive docs are for genuine reading material only, the your-move instruction lives on the board rendered at hq.allisongaddy.com, and robot texts link hq.allisongaddy.com only (R3, rail spec aura docs/estate/your-move-queue.md).
 
-## The Estate Brain MCP: in build, not live
+## The Estate Brain MCP: live and connected on every surface
 
-The Estate Brain MCP (target endpoint mcp.expertpartners.com) does NOT exist yet. Never claim it is live; any memory or document recording it as deployed with tools is a phantom of the spec (Allison's correction, 2026-08-03). Until its acceptance passes with live proof, every surface reads canon through the GitHub connector against ExpertPartners repos, or the local clone in Code. The build runs in the Estate Brain MCP Build lane (Code session of the same name, home Aura: Strategic Advisor / Estate Brain MCP Build); status lives in the lane ledger.
+The Estate Brain MCP at mcp.expertpartners.com/mcp is LIVE. Six tools (fetch, search, get_brand_context, list_repos, list_topics, save_to_session_intake), Streamable HTTP, Cognito auth with individual sign-in. Proven from Claude Code 2026-08-03 (`aura/docs/estate/estate-brain-live-evidence-2026-08-03.md`), live from claude.ai chat and Cowork via the custom connector since 2026-08-04, re-proven from the chat surface 2026-08-07 (`aura/intake/2026-08-07-estate-brain-chat-surface-proof-2026-08-04.md`). Estate canon loads through this connector first; the GitHub connector and local clones remain the fallback road. Known drift flags stay with the Estate Brain lane in the ledger (get_brand_context lacks ag-luxury and don-hobbs, still exposes benched moxie). The prior version of this section ("does NOT exist yet," v2.2) was itself a phantom in the opposite direction, a locked front door recorded as an empty lot; retirement evidence lives in the estate manifest's Retired section.
 
 ## What Claude can already reach (the access map)
 
@@ -76,7 +76,7 @@ Claude already holds broad access across this stack. Do not claim access is miss
 | Web data (scraping, crawling, page monitoring) | Firecrawl, two lanes: Cowork / Claude app via the account-wide OAuth connector (`https://mcp.firecrawl.dev/v2/mcp-oauth`); Claude Code via the unattended lane (`https://mcp.firecrawl.dev/v2/mcp`) with a Bearer key read from `op://Automation/FIRECRAWL-API-KEY`, never plaintext | Call the Firecrawl MCP tools directly |
 | Connectors (read and act) | Airtable, Canva, ClickUp, Cloudflare, Coupler, Fireflies, Gamma, Gmail, GoDaddy, Google Calendar, Google Drive, Granola, Make, Mercury, Miro, n8n, Notion, Slack | Call the connector tool directly |
 | Compute and backend | AWS | Reach the service directly |
-| Estate canon (until the Estate Brain MCP ships) | GitHub connector against ExpertPartners repos (chat and Cowork); local clone (Code). First read: the estate manifest | Fetch `aura/docs/estate/estate-manifest.md` directly |
+| Estate canon | Estate Brain MCP connector, first road on every surface (chat, Cowork, Code). GitHub connector against ExpertPartners repos and local clones are the fallback road. First read: the estate manifest | Call the Estate Brain tools directly (list_repos, then fetch the manifest) |
 
 Warning line, ordered by Chapter 3: the Windsor GHL connector points at a foreign GHL company (`wVd3gUNItq6OXcVVS9xL`, not the PartnerSync agency) and must never be treated as a PartnerSync source.
 
@@ -128,7 +128,7 @@ Two lanes, matched to the surface:
 
 ## Quick decision guide
 
-- A cold session orienting? The estate manifest first, `aura/docs/estate/estate-manifest.md`, then the lane ledger.
+- A cold session orienting? The estate manifest first, `aura/docs/estate/estate-manifest.md`, then the lane ledger. Both load through the Estate Brain connector, first road.
 - A funnel record or a human log? Notion. A funnel is not done until it lives there.
 - Doctrine, a decision, or technical reference? GitHub canonical, commit and push. New ADRs and rulings land in `aura/decisions/`.
 - A fact a future session must recall? Memory.
@@ -151,4 +151,4 @@ Two lanes, matched to the surface:
 
 ## Version
 
-v2.2. Derived verbatim from the Expert Partners Systems Map bible v2.2 dated 2026-08-03 (expert-partners commit 756363c). Changes from skill v2.0: catches up the missed v2.1 Firecrawl doctrine, then adds the v2.2 rulings (aura canonical with decisions/ as the ADR seat, estate manifest first-read, Estate Brain MCP in build and not live, brand registry per aura ADR 0045 with Moxie benched, Ember freeze and agentic rebuild pause). Authored by Allison Gaddy.
+v2.4. Derived verbatim from the Expert Partners Systems Map bible v2.4 dated 2026-08-07 (expert-partners commit 8c9c74e). Changes from skill v2.2 (plus its two skill-side ruled additions, now absorbed into the bible per the reverse-drift repair): Estate Brain MCP section rewritten to live-and-connected with proof citations, estate canon access-map row now Estate-Brain-first, ADR queue span corrected to 0001 through 0055, AI brains records the rebuild-pause condition as MET with Ember's wake under the one-move wake ruling, Google Workspace access doctrine section carried with its version log. Skill-map frontmatter metadata preserved per ruling 14. Authored by Allison Gaddy.
