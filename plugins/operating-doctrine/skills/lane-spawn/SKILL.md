@@ -13,13 +13,15 @@ brand-scope: null
 subtitle: "spawning new lanes with named homes"
 ---
 
-# Lane Spawn -- v1.2 (2026-08-07)
+# Lane Spawn -- v1.3 (2026-08-07)
 
 Ruled by Allison 2026-08-03 (Aura: Strategic Advisor / Repo Walk). The problem this kills: a detour surfaces mid-lane, gets half-absorbed into the wrong conversation, derails the thread, and its state lives nowhere. The fix: every detour gets its own lane at the moment it appears, the origin lane names what it is waiting on, and the origin thread continues without a beat.
 
 v1.1 (ruled by Allison 2026-08-03, same day, after a live misroute): every paste bound for ANY surface carries the full envelope, and a block that lands on an unexpected surface adopts itself and continues instead of interrogating Allison. See "Every paste carries the envelope" and "Landing on the wrong surface" below.
 
 v1.2 (ruled by Allison 2026-08-07, same lane as the naming and archive rulings): the chat side of naming. A chat kickoff block now opens with the conversation name as its literal first line, plain and alone, because the app auto-titles a conversation from its first message and nothing can set that title programmatically. The block also heads its envelope with CONVERSATION, never SESSION. See "The conversation name is the first line" and "Vocabulary lock" below. The live failure that forced it: a spawn block buried the conversation name mid-block and led with mission text, so the app titled the chat off the mission and the lane was born with two names.
+
+v1.3 (ruled by Allison 2026-08-07 afternoon, the worktree dispatch ruling; ruling of record aura intake/2026-08-07-ruling-dispatch-blocks-must-name-worktrees.md): the Code half of a spawn pair carries a `WORKTREE` line naming the isolated worktree the worker session creates and works in, per code-block-routing's Worktree Isolation. A block that spawns a Code session without one is malformed and bounces home.
 
 A detour is any work item that surfaces inside a lane but is not that lane's job per its kickoff. Quick verification reads (a file check, a live probe) are not detours; do those inline. Anything with its own state, its own carry-backs, or its own rulings is a detour and spawns.
 
@@ -52,7 +54,7 @@ WHAT THIS LANE IS: ...
 
 The name appears twice on purpose. Line one is for the auto-titler, which reads the message and cannot be told anything. The CONVERSATION line is for the receiving Claude, which needs the project as well as the name.
 
-PASTE 2 -- CODE BLOCK (only when a worker session is needed). Per the code-block-routing skill, with one requirement specific to spawning: its `CLAUDE HOME` names the NEW lane, never the origin lane. The carry-back must land where the work will be ruled. The Code half keeps `SESSION`, keeps its `claude -n` launch line, and keeps its first-contact self-verify instruction; none of the v1.2 chat rules touch it.
+PASTE 2 -- CODE BLOCK (only when a worker session is needed). Per the code-block-routing skill, with one requirement specific to spawning: its `CLAUDE HOME` names the NEW lane, never the origin lane. The carry-back must land where the work will be ruled. The Code half keeps `SESSION`, keeps its `claude -n` launch line, keeps its first-contact self-verify instruction, and carries its `WORKTREE` line naming the isolated worktree the worker creates from a freshly fetched remote ref and confirms by absolute path at first contact (v1.3, per code-block-routing's Worktree Isolation); none of the v1.2 chat rules touch it.
 
 RESUME LINE (always, same message, after the blocks). One line stating what the origin lane awaits from the new lane (or 'nothing, fully detached'), then the origin lane's next step, immediately. The origin lane never closes its turn on the detour.
 
@@ -114,3 +116,4 @@ If a Code block already shipped before the new lane existed (the detour escalate
 - Findings that change origin-lane decisions travel back as a short paste Allison carries, never assumed to be known cross-lane.
 - Every paste carries the envelope (v1.1). A receiving session adopts a fully-named block on any surface and continues (v1.1).
 - A chat kickoff opens with the bare conversation name; a chat block heads its envelope CONVERSATION, never SESSION; a chat never gets a rename instruction (v1.2).
+- The Code half of a spawn pair carries its WORKTREE line; a spawning Code block without one is malformed and bounces home (v1.3).

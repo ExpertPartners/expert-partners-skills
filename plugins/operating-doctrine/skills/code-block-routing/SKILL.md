@@ -1,6 +1,6 @@
 ---
 name: "code-block-routing"
-description: "Fires on every Claude Code paste block, intake block, or implementation brief for Allison. Requires a routing line naming surface and exact session, the session name first inside the block, a waiting-on statement per hand-off, a lane ledger row at dispatch and carry-back, one block per response, nothing fenced but terminal or Code, versions from canonical only, the pin only AFTER Allison confirms the paste. Cowork and chat lane identity is the kickoff header line, not the title, so a chat kickoff leads with the conversation name plain and alone, envelope CONVERSATION never SESSION. Code sessions are named at launch via claude -n as Project short name - Conversation name - Job name, self-verified off disk at first contact. /rename is a Code-only exception repair, never handed to a chat. A session NEVER declares itself ready to archive. Carry-backs end at awaiting verification at home. Archive authority is the home conversation's, which flips the aura lanes.md row to archived in one motion."
+description: "Fires on every Claude Code paste block, intake block, or implementation brief for Allison. Requires a routing line naming surface and exact session, the session name first inside the block, a WORKTREE line naming the isolated worktree on every block that spawns a Code session (a spawning block without one is malformed and bounces home), a waiting-on statement per hand-off, a lane ledger row at dispatch and carry-back, one block per response, nothing fenced but terminal or Code, versions from canonical only, the pin only AFTER Allison confirms the paste. Cowork and chat lane identity is the kickoff header line, not the title, so a chat kickoff leads with the conversation name plain and alone, envelope CONVERSATION never SESSION. Code sessions are named at launch via claude -n as Project short name - Conversation name - Job name, self-verified off disk at first contact; the session creates its named worktree from a freshly fetched remote ref and confirms the absolute path in the same first contact. /rename is a Code-only exception repair, never handed to a chat. Every carry-back ends with the archive verdict per the 2026-08-07 evening re-ruling: SAFE TO ARCHIVE with evidence or NOT safe with the one closing move named; awaiting-verification-at-home is retired. The archive click and the ledger flip to archived stay with the home conversation."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -57,19 +57,23 @@ Two hard riders. Every dispatched build cuts its worktree from a freshly fetched
 
 This rule is Rule 8 of the routing line extended from shared state to shared PURPOSE. Rule 8 stops two sessions from touching one file. This stops two sessions from building one tool.
 
-## Worktree Isolation: Name Separate Trees Or Serialize
+## Worktree Isolation: Every Spawning Dispatch Names Its Worktree
 
-Ruled by Allison 2026-08-07; decision 9d of the Estate Brain Door Phase B record. On 2026-08-04 two sessions sharing one working tree reset each other's uncommitted edits mid-job. Uncommitted work has no undo, so this is data loss, not inconvenience.
+First ruled by Allison 2026-08-07 as decision 9d of the Estate Brain Door Phase B record, after the 2026-08-04 incident where two sessions sharing one working tree reset each other's uncommitted edits mid-job. Uncommitted work has no undo, so this is data loss, not inconvenience.
 
-Every dispatch that could run concurrently with another session on the same repo names its worktree explicitly, or the dispatch serializes the two lanes and says which goes first. There is no third option, and "they probably will not overlap" is not a plan.
+HARDENED by Allison's ruling of 2026-08-07 afternoon (ruling of record: aura intake/2026-08-07-ruling-dispatch-blocks-must-name-worktrees.md). The rule existed but was not enforced at the dispatch chokepoint, and the Phase B session alone logged three collisions: a ledger edit that landed under a sibling's commit, a multi-branch git pull failure, and the Door Tools Build lane losing a full build to a sibling executing the same order. The requirement now lives where the violation is visible at paste time instead of discoverable at collision time.
+
+**Every dispatch block that spawns a Claude Code session carries a `WORKTREE` line naming the isolated worktree the session works in.** Unconditional. Concurrency risk is assumed at dispatch, never assessed away with "they probably will not overlap."
 
 Mechanics:
 
-1. The dispatch block names the worktree path and the branch, both, inside the block. The session creates its own tree from a freshly fetched remote ref (same rider as dispatch dedupe) and works only there.
-2. A session NEVER writes in a repo's main working tree when another lane may hold uncommitted state in it. Check before writing: `git worktree list`, then `git status` in the main tree. Uncommitted changes belonging to someone else mean isolate, always.
-3. Serializing is a legitimate answer when the work genuinely cannot split. The dispatch names the order and the second lane's row records that it waits on the first.
-4. The worktree is named in the lane's ledger row at dispatch, so the next dispatcher can see which trees are occupied.
-5. This rule binds the dispatcher AND the dispatched session. A session that receives a dispatch without a named worktree, and finds a concurrency risk when it looks, isolates itself and says so in its carry-back.
+1. The `WORKTREE` line rides inside the block with the envelope, naming the tree and the branch (one name serves both when they match). The session's FIRST ACT is creating that worktree from a freshly fetched remote ref (`git worktree add ../worktrees/<name> -b <name>`, same fresh-ref rider as dispatch dedupe) and confirming the ABSOLUTE path in its first report. No work happens in the shared main tree.
+2. **A dispatch block that spawns a Code session and arrives WITHOUT a `WORKTREE` line is malformed and bounces home, same as a block missing its routing line.** The receiving session does not execute it; it replies naming what is missing so the dispatcher reships the block whole.
+3. A session NEVER writes in a repo's main working tree when another lane may hold uncommitted state in it. Check before writing: `git worktree list`, then `git status` in the main tree. Uncommitted changes belonging to someone else mean isolate, always.
+4. Serializing is a legitimate answer when the work genuinely cannot split, and it is stated, never assumed: the dispatch replaces the `WORKTREE` line with an explicit serialization statement naming the order, and the second lane's row records that it waits on the first. Silence is never serialization.
+5. The worktree is named in the lane's ledger row at dispatch, so the next dispatcher can see which trees are occupied.
+6. This rule binds the dispatcher AND the dispatched session. The dispatcher ships the line; the session enforces it by bouncing a spawning block that lacks one, and confirms its tree's absolute path before touching anything else.
+7. Continuation blocks routed to an EXISTING session inherit that session's established worktree and need not restate it. A pre-rule session with no isolated tree that receives new work isolates itself at that point and says so in its carry-back.
 
 ## Session Naming: Three Segments, Set At Launch
 
@@ -136,6 +140,8 @@ SESSION: Aura - Code Rule Fix - Rule Rewrite -- self-verify this name against yo
 
 Substitute the actual session name for each block. The routing line above the fence still ships too. Outside the fence Allison reads where to paste; inside the fence the session learns what it is called and proves it.
 
+**For a NEW session the envelope also carries the `WORKTREE` line** (Worktree Isolation above): the isolated tree the session creates from a freshly fetched remote ref and works in, confirmed by absolute path in its first report. A spawning block without one is malformed and bounces home.
+
 Why the self-verify line still ships even though the launch line exists: the harness auto-titles sessions from their first message, so a session launched WITHOUT `-n` (an existing session receiving a dispatch, or a launch line Allison did not use) will carry a generated name. The in-block line is what catches that case. Only Allison can type `/rename` into a Code session, verified 2026-07-28 and reconfirmed against Anthropic's tracker 2026-08-07 (#33165, #83543, #84041, #84587 all open).
 
 ## Chat Blocks Lead With The Conversation Name
@@ -201,7 +207,7 @@ Added 2026-08-03. The estate-wide lane ledger lives at `docs/estate/lanes.md` in
 
 The habit, every hand-off:
 
-1. At dispatch, when a paste block is handed to Allison, the issuing Cowork chat's block-writer appends or updates the lane's row in the ledger: canonical session name (three segments per the naming rule, and the same string the dispatch's `claude -n` launch line carries), window title as shown in the Code sessions list (flag PARITY MISMATCH with the rename when they differ; Code sessions only, per the lane identity ruling of 2026-08-03; a lane launched with `-n` should read parity-clean on the session's own first-contact self-verify), Cowork home (Claude project / conversation, identified by its kickoff header line, not its displayed title), machine, status, waiting-on, last-updated date. The waiting-on statement this skill already requires with every hand-off is the same text that goes in the row -- write it once, use it in both places.
+1. At dispatch, when a paste block is handed to Allison, the issuing Cowork chat's block-writer appends or updates the lane's row in the ledger: canonical session name (three segments per the naming rule, and the same string the dispatch's `claude -n` launch line carries), window title as shown in the Code sessions list (flag PARITY MISMATCH with the rename when they differ; Code sessions only, per the lane identity ruling of 2026-08-03; a lane launched with `-n` should read parity-clean on the session's own first-contact self-verify), Cowork home (Claude project / conversation, identified by its kickoff header line, not its displayed title), machine, the worktree named in the dispatch (per Worktree Isolation above, so the next dispatcher can see which trees are occupied), status, waiting-on, last-updated date. The waiting-on statement this skill already requires with every hand-off is the same text that goes in the row -- write it once, use it in both places.
 2. At carry-back receipt, the row updates to the new status (running / waiting-on-Allison / waiting-on-carry-back / archived / owned-elsewhere). `complete-safe-to-archive` is retired as of 2026-08-07; only the home conversation writes `archived`, as one motion with its archive call.
 3. Append and update rows, never delete. Completed lanes move to the ledger's Completed section rather than vanishing, so the archive decision stays visible.
 4. Rule 5 applies: rows are only as certain as their evidence. A lane whose home nobody has named stays needs-Allison; never invent a home for it.
