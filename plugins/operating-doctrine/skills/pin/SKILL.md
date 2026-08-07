@@ -12,9 +12,9 @@ brand-scope: null
 subtitle: "carry-back envelope and place-keeping baton"
 ---
 
-# Pin -- v4.2 (2026-08-03)
+# Pin -- v4.3 (2026-08-07)
 
-A pin is a bookmark, not a task. It marks the exact spot where work handed off between Claude Code and the Claude project conversation that drives it. v4 (ruled by Allison 2026-08-03) makes the protocol surface-neutral: the home is a Claude PROJECT plus CONVERSATION, never assumed to be CoWork. v4 also adds the first-contact question and the "come back here" pin close. v4.1 (ruled by Allison 2026-08-03, same day) rewrites the carry-back SESSION STATUS line: it names the paste-back PROJECT and CONVERSATION explicitly, the ARCHIVE verdict is part of the line, and a session that is NOT clean to archive must give the instructions at that point instead of the ARCHIVE sentence. v4.2 (ruled by Allison 2026-08-03, same day) DELETES the closing line ("Let me know once you've pasted this back into ..., and I'll pin."): the carry-back ends at the SESSION STATUS line and never solicits a paste confirmation.
+A pin is a bookmark, not a task. It marks the exact spot where work handed off between Claude Code and the Claude project conversation that drives it. v4 (ruled by Allison 2026-08-03) makes the protocol surface-neutral: the home is a Claude PROJECT plus CONVERSATION, never assumed to be CoWork. v4 also adds the first-contact question and the "come back here" pin close. v4.1 (ruled by Allison 2026-08-03, same day) rewrites the carry-back SESSION STATUS line: it names the paste-back PROJECT and CONVERSATION explicitly, the ARCHIVE verdict is part of the line, and a session that is NOT clean to archive must give the instructions at that point instead of the ARCHIVE sentence. v4.2 (ruled by Allison 2026-08-03, same day) DELETES the closing line ("Let me know once you've pasted this back into ..., and I'll pin."): the carry-back ends at the SESSION STATUS line and never solicits a paste confirmation. v4.3 (ruled by Allison 2026-08-07) rewrites naming authority (section 5): sessions are named AT LAUNCH via `claude -n`, the name format is `<Project short name> - <Conversation name> - <Job name>`, and every session self-verifies its own name off disk at first contact. `/rename` is demoted to the exception repair.
 
 Pins persist to `~/.claude/baton.md`. Every surface reads the same baton file, so one pin trail spans all of them.
 
@@ -76,11 +76,82 @@ Doctrine note (added 2026-08-03): the pin confirms the paste; it is not the lane
 
 ## 4. Envelope check (inbound)
 
-Inbound blocks open with `CLAUDE HOME:` (or legacy `COWORK HOME:`) and `SESSION:`. Before executing anything in the block, check the SESSION line against your own authoritative name. If it names a different session: STOP, do not execute any of it, reply exactly "This block is addressed to {named session}; I am {own name}." (Incident this rule prevents: 2026-07-28, a Canon Doc Sync block was executed by the ORPHAN RECRUITING PIPELINE session.)
+Inbound blocks open with `CLAUDE HOME:` (or legacy `COWORK HOME:`) and `SESSION:`. Before executing anything in the block, check the SESSION line against your own authoritative name, read off disk per the self-verification recipe in section 5. If it names a different session: STOP, do not execute any of it, reply exactly "This block is addressed to {named session}; I am {own name}." (Incident this rule prevents: 2026-07-28, a Canon Doc Sync block was executed by the ORPHAN RECRUITING PIPELINE session.)
 
-## 5. Naming authority
+Judgment the check requires (v4.3): a name mismatch is not automatically a misaddressed block. A session launched without `-n`, or one the harness auto-titled, will read a name that differs from a briefing genuinely meant for it. Distinguish the two: a block addressed to a DIFFERENT lane's work stops cold; a block that is plainly this lane's own continuation, arriving at a session that was never named to convention, proceeds and hands Allison the `/rename` repair alongside the work. When it is genuinely ambiguous, ask before executing.
 
-The SESSION line in the block that spawns or briefs a session IS its name, adopted verbatim for life. Never improvise, abbreviate, or restyle it. Claude Code cannot read or set its own window title (verified 2026-07-28: session-management tooling excludes the current session), so: on first contact, and any time the window title is known to differ from the authoritative name, tell Allison the exact name to rename the window to, once -- and echo the authoritative name in every carry-back regardless of what the window says. (Other sessions CAN be renamed from here via the session-management rename tool; only a session's own title is out of reach.)
+## 5. Naming authority (v4.3, ruled by Allison 2026-08-07)
+
+The SESSION line in the block that spawns or briefs a session IS its name, adopted verbatim for life. Never improvise, abbreviate, or restyle it. Everything below is how that name gets onto the session and how the session proves it carries the right one.
+
+### The name format
+
+`<Project short name> - <Conversation name> - <Job name>`, the three segments joined by space-hyphen-space.
+
+Project short names lock per project as they arise. `Aura` is the short name for the Claude project "Aura: Strategic Advisor". Once a project's short name is used in a dispatch, that is its short name; never restyle it later.
+
+Example: `Aura - Code Rule Fix - Rule Rewrite`.
+
+This EXTENDS the lane tag session naming rule of 2026-08-04 (code-block-routing), it does not replace it. That rule required a readable lane tag plus a job name. The job name is unchanged and simply moves to third position; the project short name and conversation name together now carry the lane-identification job the bare tag used to carry alone, and they carry it with the home encoded in the name.
+
+### Named at launch, never after
+
+Every dispatch block that spawns a NEW session ships the exact launch line with the name baked in:
+
+```
+claude -n "Aura - Code Rule Fix - Rule Rewrite"
+```
+
+`-n, --name` is a real Claude Code flag. Live-verified 2026-08-07 on Claude Code 2.1.223: "Set a display name for this session (shown in the prompt box, /resume picker, and terminal title)." Proven end to end the same day, a headless run with `-n` wrote the exact string to the session's `custom-title` record on disk.
+
+Naming at launch is the whole point. A session that is born correctly named never needs a repair, and Allison never touches a window title.
+
+### First-contact self-verification
+
+A session reads its OWN name off disk and compares it to the SESSION line in its briefing. No human is in that loop. The name lives in the session transcript:
+
+```
+~/.claude/projects/<url-encoded-cwd>/<session-id>.jsonl
+```
+
+The encoded cwd is the absolute working directory with every `/` replaced by `-` (the leading `-` is kept). The name is the `customTitle` field of the record whose `type` is `custom-title`; take the LAST such record, because the harness rewrites it when it auto-titles.
+
+```bash
+python3 -c "
+import json,sys
+p=sys.argv[1]; t=None
+for line in open(p):
+    try: o=json.loads(line)
+    except: continue
+    if o.get('type')=='custom-title': t=o['customTitle']
+print(t)
+" ~/.claude/projects/<encoded-cwd>/<session-id>.jsonl
+```
+
+Verified live 2026-08-07 on Claude Code 2.1.223. This supersedes the read half of the old claim that a session cannot read its own title; a session can, and must, and reports the result in its first response.
+
+Report the comparison plainly at first contact: the name read off disk, the name in the briefing, and match or mismatch.
+
+### A session still cannot rename itself
+
+The set half of the old claim stands. Renaming is manual-only: only Allison can type `/rename` into a session's input box. Verified on Anthropic's public tracker 2026-08-07, all open: #33165 (programmatic session rename API), #83543 (rename not accessible to the agent during workflow), #84041 (`set_session_title` refuses the current session from within), #84587 (agent cannot rename at the user's request). The session-management rename tool renames OTHER sessions only, by explicit schema constraint.
+
+State this plainly in canon rather than implying a session is being lazy when it hands the rename back.
+
+### /rename is the exception repair, not the routine
+
+`/rename` survives for exactly two cases:
+
+1. Self-verification found a mismatch (the session was launched without `-n`, or with the wrong string, or the harness auto-titled over it).
+2. The session was born before this rule and has never been named to convention.
+
+In both cases, hand Allison the exact line, once, and keep using the authoritative name from the briefing regardless of what the window shows:
+
+```
+/rename Aura - Code Rule Fix - Rule Rewrite
+```
+
+Never send her window hunting, and never cold-rename a fleet of existing sessions. A pre-rule session gains its name the next time it is touched.
 
 ## 6. Home fidelity
 

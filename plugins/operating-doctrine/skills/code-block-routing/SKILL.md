@@ -1,6 +1,6 @@
 ---
 name: "code-block-routing"
-description: "Fires every time a Claude Code paste block, intake block, or implementation brief is handed to Allison, in every project and every session: routing line naming the SURFACE and the exact session (PASTE INTO: Claude Code, existing session \"Name\"), session name as the first line inside the block so the session self-identifies, a waiting-on statement with every hand-off, the lane ledger row written at dispatch and updated at carry-back (aura docs/estate/lanes.md), the pin fired only AFTER Allison confirms the paste, one paste block per response, nothing fenced that is not for a terminal or Code, versions read from canonical only. Cowork lane identity is the kickoff header line, never the window title; Code sessions keep exact-name parity via the in-session /rename request."
+description: "Fires every time a Claude Code paste block, intake block, or implementation brief is handed to Allison, in every project and every session: routing line naming the SURFACE and the exact session (PASTE INTO: Claude Code, existing session \"Name\"), session name as the first line inside the block so the session self-identifies, a waiting-on statement with every hand-off, the lane ledger row written at dispatch and updated at carry-back (aura docs/estate/lanes.md), the pin fired only AFTER Allison confirms the paste, one paste block per response, nothing fenced that is not for a terminal or Code, versions read from canonical only. Cowork lane identity is the kickoff header line, never the window title; Code sessions are named AT LAUNCH via the dispatch block's claude -n launch line, format Project short name - Conversation name - Job name, and self-verify their own name off disk at first contact, with /rename handed to Allison only as the exception repair on a mismatch."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -71,29 +71,42 @@ Mechanics:
 4. The worktree is named in the lane's ledger row at dispatch, so the next dispatcher can see which trees are occupied.
 5. This rule binds the dispatcher AND the dispatched session. A session that receives a dispatch without a named worktree, and finds a concurrency risk when it looks, isolates itself and says so in its carry-back.
 
-## Lane Tag Session Naming
+## Session Naming: Three Segments, Set At Launch
 
-Ruled by Allison 2026-08-04 ("yes adopt lane tag rule"); ruling of record at aura intake/2026-08-05-ruling-lane-tag-session-naming-rule.md.
+Ruled by Allison 2026-08-04 ("yes adopt lane tag rule"), ruling of record at aura intake/2026-08-05-ruling-lane-tag-session-naming-rule.md. EXTENDED by Allison's ruling of 2026-08-07: the job-shaped name is extended, not replaced, and the job name is now the third segment.
 
-Every Claude Code session name starts with a short READABLE lane tag, a word or word pair (roughly 3 to 10 characters), then a space-hyphen-space, then the session's job name. Readable words, never bare initialisms. The point is that the Code sessions list identifies each session's lane on sight, with no ledger lookup.
+Every Claude Code session name is three segments joined by space-hyphen-space:
 
-Examples: RepoDebt - Export A1 A2 workflows. CIWatch - CI Watcher Build. Funnels - EPIC funnel audit. Canon - Phase 1 skeleton. Memory - FalkorDB keeper.
+```
+<Project short name> - <Conversation name> - <Job name>
+```
+
+Project short names lock per project as they arise. `Aura` is the short name for the Claude project "Aura: Strategic Advisor". Readable words throughout, never bare initialisms. The point is unchanged from the 2026-08-04 ruling and now stronger: the Code sessions list identifies each session's lane AND its home on sight, with no ledger lookup.
+
+Examples: `Aura - Code Rule Fix - Rule Rewrite`. `Aura - Repo Walk - Engine Build`. `EPIC - Funnel Audit - Nurture flow reconcile`.
 
 Mechanics:
 
-1. Each chat lane picks its tag at kickoff, and its ledger rows in aura docs/estate/lanes.md record the tag alongside the canonical session name.
-2. Every new dispatch block names the session with the tag. The dispatching lane owns tag consistency.
-3. Existing sessions are NOT cold-renamed. A session gains its tag the next time it is touched, via the in-session /rename request, the same mechanism as the PARITY MISMATCH resolution rule. Never send Allison window hunting.
-4. The canonical session name in the ledger includes the tag once adopted, so ledger and window match.
+1. The name is set AT LAUNCH, never after. Every dispatch block for a new session ships the exact launch line with `-n "<full name>"` baked in. `-n, --name` is a real Claude Code flag, live-verified 2026-08-07 on 2.1.223, and it writes the exact string to the session's `custom-title` record on disk.
+2. The dispatching lane owns name consistency, and its ledger row in aura docs/estate/lanes.md records the same canonical name.
+3. Sessions self-verify at first contact by reading their own `custom-title` off disk and comparing it to the SESSION line in the briefing (recipe in the pin skill, section 5). The session reports the comparison in its first response. No human is in that loop.
+4. Existing sessions are NOT cold-renamed. A pre-rule session gains its name the next time it is touched, via the `/rename` exception repair below. Never send Allison window hunting.
+5. `/rename` is the exception repair only, fired when self-verification finds a mismatch or the session predates this rule. It is manual by necessity: a session cannot rename itself. Verified on Anthropic's public tracker 2026-08-07, all open: #33165, #83543, #84041, #84587. Hand Allison the exact `/rename` line once, then keep using the authoritative name regardless of what the window shows.
 
 ## Window Titles Drift; Session Names Do Not
 
-Added 2026-07-28 after a live incident. A Claude Code window displayed the title "Atlas bot token cleanup" while the session inside it was authoritatively "ember-audit," which it confirmed by its own envelope check. Claude Code cannot read or set its own window title, so the displayed label can drift while the session name stays fixed. Allison nearly archived an active worker because of it.
+Added 2026-07-28 after a live incident, and this is still why the parity rule exists. A Claude Code window displayed the title "Atlas bot token cleanup" while the session inside it was authoritatively "ember-audit," which it confirmed by its own envelope check. Allison nearly archived an active worker because of it. Drift is real, it is dangerous, and the cost is a live lane killed by mistake.
+
+Amended 2026-08-07. The 2026-07-28 entry explained the drift by saying Claude Code cannot read or set its own window title. The READ half of that is superseded: a session CAN read its own name, off its own transcript's `custom-title` record (live-verified 2026-08-07 on Claude Code 2.1.223; recipe in the pin skill, section 5). The SET half stands, renaming is manual-only.
+
+What that changes: drift is now DETECTABLE by the session itself, at first contact, with no human in the loop. The old rule waited for someone to notice a mismatch. The new rule catches it in the session's first response.
 
 Consequences:
 
 - The authoritative name is the one in the SESSION line of the block that briefed the session, never the window title.
-- When a window title is known to differ, tell Allison the exact name to rename the window to, once, and keep using the authoritative name regardless.
+- Every session self-verifies its own name at first contact and reports the comparison. A mismatch is surfaced immediately, not discovered later.
+- When self-verification finds a mismatch, hand Allison the exact `/rename` line once, and keep using the authoritative name regardless of what the window shows.
+- Naming at launch (`claude -n "<full name>"`) is the actual fix. Self-verification is the safety net under it, not the primary mechanism. A dispatch that ships the launch line correctly produces a session that never drifts in the first place.
 - Never advise archiving or closing a session based on its window title alone. Confirm what work that session still holds first.
 
 ## Lane Identity By Surface: Kickoff Header Is Canonical In Cowork
@@ -103,17 +116,25 @@ Ruled by Allison 2026-08-03. Cowork and Claude.ai chat titles are auto-generated
 The rule by surface:
 
 - Cowork and Claude.ai chat lanes. Canonical identity is the kickoff header line, the first line of the lane's first message, format "Lane name - YYYY-MM-DD kickoff." Every kickoff block this skill governs already ships that line first, and the block-writer controls it fully at dispatch. The lane ledger records the lane name from the kickoff header. The displayed chat title is cosmetic; it may be logged parenthetically when someone needs to find the window, but it is never flagged for rename and never treated as identity. Cowork lanes never get PARITY MISMATCH flags.
-- Claude Code sessions. Exact-name parity stays enforced, unchanged, because this surface supports it: the session name rides as the first line inside every paste block, and the session requests /rename from Allison only when its displayed name differs (live-verified 2026-07-28, only Allison can type /rename into a Code session). A PARITY MISMATCH flag on a Code lane resolves by that in-session request the next time the session is used, never by Allison hunting windows to rename them cold.
+- Claude Code sessions. Exact-name parity stays enforced, because this surface supports it, and as of the 2026-08-07 ruling it is enforced at LAUNCH rather than by repair. A dispatch spawning a new session ships the `claude -n "<full name>"` launch line, so the session is born correctly named. The session then self-verifies its own name off disk at first contact and reports the comparison. A PARITY MISMATCH flag on a Code lane means self-verification failed or the lane predates the rule; it resolves by the in-session `/rename` request the next time the session is used (live-verified 2026-07-28 and reconfirmed 2026-08-07, only Allison can type `/rename` into a Code session), never by Allison hunting windows to rename them cold.
 
 ## Session Name Goes First Inside The Block
 
-Added 2026-07-28 at Allison's instruction. The first line INSIDE every paste block is the session name, a colon, and a naming instruction, so the pasted prompt identifies its own lane in the transcript and the session ends up named correctly with the least Allison effort.
+Added 2026-07-28 at Allison's instruction, rewritten 2026-08-07 under the launch-line ruling. The first line INSIDE every paste block is still the session name, so the pasted prompt identifies its own lane in the transcript. What changed is how the session ends up correctly named: the launch line does it, and the in-block line verifies it.
 
-Live-verified 2026-07-28: Claude Code cannot rename its own session; only Allison can, by typing /rename <name> into that session's input box. So the first line instructs Code to handle naming the lightest correct way. Exact format for the first line inside the fence:
+**For a NEW session, the dispatch ships the launch line above the fence.** Allison runs it, and the session is born named:
 
-Canon Doc Sync: this is the session name. If this session is not already named "Canon Doc Sync", make your very first output a request that Allison paste /rename Canon Doc Sync into this session's input box, then execute the brief below.
+```
+claude -n "Aura - Code Rule Fix - Rule Rewrite"
+```
 
-(Substitute the actual session name for each block. The routing line above the fence still ships too. Outside the fence Allison reads where to paste; inside the fence the session learns what it is called.)
+**Inside the fence, the first line is the SESSION header plus the self-verify instruction.** Exact format:
+
+SESSION: Aura - Code Rule Fix - Rule Rewrite -- self-verify this name against your own custom-title record before executing (pin skill section 5). If it does not match, hand Allison the exact /rename line in your first output, then execute the brief below.
+
+Substitute the actual session name for each block. The routing line above the fence still ships too. Outside the fence Allison reads where to paste; inside the fence the session learns what it is called and proves it.
+
+Why the self-verify line still ships even though the launch line exists: the harness auto-titles sessions from their first message, so a session launched WITHOUT `-n` (an existing session receiving a dispatch, or a launch line Allison did not use) will carry a generated name. The in-block line is what catches that case. Only Allison can type `/rename` into a Code session, verified 2026-07-28 and reconfirmed against Anthropic's tracker 2026-08-07 (#33165, #83543, #84041, #84587 all open).
 
 ## The Hand-Off Choreography: Pin Fires AFTER the Paste Confirmation
 
@@ -138,7 +159,7 @@ Added 2026-08-03. The estate-wide lane ledger lives at `docs/estate/lanes.md` in
 
 The habit, every hand-off:
 
-1. At dispatch, when a paste block is handed to Allison, the issuing Cowork chat's block-writer appends or updates the lane's row in the ledger: canonical session name, window title as shown in the Code sessions list (flag PARITY MISMATCH with the rename when they differ; Code sessions only, per the lane identity ruling of 2026-08-03), Cowork home (Claude project / conversation, identified by its kickoff header line, not its displayed title), machine, status, waiting-on, last-updated date. The waiting-on statement this skill already requires with every hand-off is the same text that goes in the row -- write it once, use it in both places.
+1. At dispatch, when a paste block is handed to Allison, the issuing Cowork chat's block-writer appends or updates the lane's row in the ledger: canonical session name (three segments per the naming rule, and the same string the dispatch's `claude -n` launch line carries), window title as shown in the Code sessions list (flag PARITY MISMATCH with the rename when they differ; Code sessions only, per the lane identity ruling of 2026-08-03; a lane launched with `-n` should read parity-clean on the session's own first-contact self-verify), Cowork home (Claude project / conversation, identified by its kickoff header line, not its displayed title), machine, status, waiting-on, last-updated date. The waiting-on statement this skill already requires with every hand-off is the same text that goes in the row -- write it once, use it in both places.
 2. At carry-back receipt, the row updates to the new status (running / waiting-on-Allison / waiting-on-carry-back / complete-safe-to-archive / owned-elsewhere).
 3. Append and update rows, never delete. Completed lanes move to the ledger's Completed section rather than vanishing, so the archive decision stays visible.
 4. Rule 5 applies: rows are only as certain as their evidence. A lane whose home nobody has named stays needs-Allison; never invent a home for it.
