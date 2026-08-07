@@ -3,6 +3,7 @@
 ## Brand Identity
 
 - Brand Name: Free Agent Movement (program and framework: Free Agent Formula)
+- Tagline: "Break The Cycle. Build The Movement." with the philosophy sub-line "Freedom through leverage" (ruled 2026-08-06)
 - Founder: Allison Gaddy
 - Co-Leadership: Don Hobbs (broader Expert Partners / EPIC ecosystem)
 - Category: Real Estate Agent Recruiting and Movement-Based Coaching
@@ -50,7 +51,7 @@ The vision is a movement of self-aware, system-driven, growth-focused agents who
 
 ## Hashtags and Social Conventions
 
-- Always include #eXpProud and #BreakTheCycle on Free Agent Movement social posts
+- Free Agent Movement social posts carry #BreakTheCycle and #FreeAgentMovement. #eXpProud never appears on FAM content (EPIC-only flag, ruled 2026-08-06; FAM is a movement for the whole real estate industry, not any one brokerage)
 - Tone of social: Think Big, identity first, system smart
 - YouTube channel handle: @TheAllisonGaddy
 
@@ -90,5 +91,5 @@ The vision is a movement of self-aware, system-driven, growth-focused agents who
 - Ownership over optics
 - No savior energy: reflect truth and empower agency, never rescue
 - Pro-growth, not pro-sponsor
-- Freedom through leverage
-- Think Big, Build Smart
+- Freedom through leverage (FAM's philosophy sub-line)
+- Break The Cycle. Build The Movement. (FAM's tagline, ruled 2026-08-06; Think Big. Build Smart. belongs to Expert Partners, never FAM)

@@ -26,6 +26,8 @@ This returns the live `doctrine/mission.md`, `doctrine/voice.md`, `brand/identit
 
 Expert Partners is the parent real estate coaching, training, marketing, and events company. Co-founded by Allison Gaddy and Don Hobbs. Operator-led, not guru-led. We build the next generation of real estate leaders by giving operators the systems, mindset, and community required to scale beyond personal production.
 
+Tagline: "Think Big. Build Smart." (the tagline flip, ruled 2026-08-05, superseding the same-day initial assignment). The think-big-build-smart line family belongs to Don Hobbs; the Expert Partners tagline deliberately echoes it. EPIC's tagline under the same flip is "Empowering Dreams, Elevating Success."
+
 **Critical distinction:** Expert Partners = the company. EPIC = the inner-circle program for eXp agents inside Expert Partners. Do not conflate.
 
 ## Voice (non-negotiables)

@@ -113,7 +113,7 @@ Voice rules:
 
 Hard formatting rules (never break):
 - Never use em dashes or en dashes used as em dashes. Use commas, periods, parentheses, or double hyphens. Colons and semicolons allowed sparingly, never overused. No bold or italics in copy. No ALL CAPS.
-- Spellings: eXp (lowercase e, uppercase XP), eXcelerate, Don, Allison Gaddy, Nicole Rouseau, Expert Partners or EPIC, Free Agent Movement, Free Agent Nation, Free Agent Formula, Think Big. Build Smart.
+- Spellings: eXp (lowercase e, uppercase XP), eXcelerate, Don, Allison Gaddy, Nicole Rouseau, Expert Partners or EPIC, Free Agent Movement, Free Agent Nation, Free Agent Formula, Think Big. Build Smart. (Expert Partners' tagline), Think Bigger. Build Smarter. Get Greater RESULTS. (Don's personal line, approved 2026-08-05), Think Big Live Big (Don's course, name never changes).
 - Do not write "EXP," "Exp," "accelerate" (when eXcelerate is meant), "Dawn," "Alison," or "Allyson."
 - For EPIC assets: Black (#000000) dominant, Brand Blue (#2757CF) accent only. Never deviate from brand tokens.
 

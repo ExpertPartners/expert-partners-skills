@@ -32,7 +32,7 @@ Don's personal-brand lane is first person I only. "We" belongs to the Leader mod
 |---|---|
 | Strategist | Diagnostic questions, full framework walkthrough, numbers, archetypes, 90 / 180 / 365 day phasing, permission-granting live narration |
 | Keynote and Trainer | Teaching energy, analogies and stories, fast framework build, recurring rituals, light directive punchlines, alignment checks ("you guys buying it?") |
-| EPIC / FAM Leader | "We" not "I," movement language (Free Agent, Think Big Build Smart), leverage through AI and systems, pro-growth framing, celebrating team self-sufficiency |
+| EPIC / FAM Leader | "We" not "I," movement language (Free Agent, Break The Cycle), leverage through AI and systems, pro-growth framing, celebrating team self-sufficiency |
 
 ## The four tone pillars (evidenced weighting, in this order)
 
@@ -75,6 +75,7 @@ Archetypes Don speaks to, led by the Momentum Creator (the producer moving from 
 - Belief order, always: authority before leads, ownership before hustle, brand before transactions, identity before systems.
 - The promise: Don helps agents stop chasing deals and start attracting, become the obvious choice in their market, and build a marketing-based business they own rather than a stressful job.
 - Method name: The Brand Authority Reset.
+- Personal line (approved by Allison 2026-08-05): Think Bigger. Build Smarter. Get Greater RESULTS. The signature belief sits beside it: the purpose of the business is to serve the life of the owner, so you can live freer. The think-big-build-smart line family BELONGS TO DON; his signature is the escalation, and the Expert Partners tagline Think Big. Build Smart. deliberately echoes it. Program names are untouched by the tagline flip: Don's course keeps its name Think Big Live Big everywhere it is offered (ruled 2026-08-06).
 - He is NOT a mindset influencer and NOT a tactics-first trainer. Those framings diminish the positioning. The motivational-speaker label is NOT banned for Don (ruled 2026-08-05, Jim Rohn heritage and the coaching-the-coaches overlap, superseding the earlier ban line); architect stays the lead framing. He is a strategic mentor who builds belief, identity, and clarity so people can receive and implement systems.
 - CTA style is invitation-based, warm, open-door. Never pressure-based.
 
@@ -92,7 +93,7 @@ Full evidenced tables in [reference.md](reference.md). The spine: DO open with a
 
 ## Spelling and formatting locks (never deviate)
 
-- eXp (lowercase e, uppercase XP), never EXP or Exp. eXcelerate, never accelerate. Don, never Dawn. Allison Gaddy, never Alison or Allyson. Nicole Rouseau. Expert Partners or EPIC (never synonyms for each other). Free Agent Movement, Free Agent Nation, Free Agent Formula capitalized as brand terms. Think Big. Build Smart. #eXpProud and #BreakTheCycle for movement social posts. <!-- brand-lint: ignore -->
+- eXp (lowercase e, uppercase XP), never EXP or Exp. eXcelerate, never accelerate. Don, never Dawn. Allison Gaddy, never Alison or Allyson. Nicole Rouseau. Expert Partners or EPIC (never synonyms for each other). Free Agent Movement, Free Agent Nation, Free Agent Formula capitalized as brand terms. Think Big. Build Smart. (Expert Partners); Think Bigger. Build Smarter. Get Greater RESULTS. (Don's personal line); Break The Cycle. Build The Movement. (FAM). #BreakTheCycle and #FreeAgentMovement for movement social posts; #eXpProud on EPIC content only (ruled 2026-08-06). <!-- brand-lint: ignore -->
 - Transcription watch-for: auto-transcription tools frequently render eXcelerate as accelerate and eXp as exp. Correct on the way in, every time.
 - No em dashes anywhere. Colons and semicolons allowed in drafted prose, sparingly, never overused (ruled 2026-08-04). Commas, periods, parentheses, and double hyphens stay preferred. No bold or italics in copy. No ALL CAPS. The banned words list applies (no hype vocabulary, no motivational cliches, no unearned praise).
 - EPIC brand tokens: Black #000000 dominant, Brand Blue #2757CF accent only. Never deviate.

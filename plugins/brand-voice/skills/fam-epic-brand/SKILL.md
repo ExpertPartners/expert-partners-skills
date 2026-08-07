@@ -70,9 +70,9 @@ Never rescue or fix. Reflect truth and empower agency.
 - Hands-on C-level leadership, open playbooks, collaboration over competition, innovation over inertia.
 - Self-love as the foundation of inclusive leadership.
 - Pro-growth, not pro-sponsor.
-- Freedom through leverage.
-- "Think Big. Build Smart."
-- Social posts for the movement include #eXpProud and #BreakTheCycle.
+- Taglines are brand-scoped (ruled 2026-08-05 and 2026-08-06). FAM's tagline: "Break The Cycle. Build The Movement." with the philosophy sub-line "Freedom through leverage." "Think Big. Build Smart." is Expert Partners' company tagline and never appears as a FAM line.
+- Social posts: #eXpProud lives on EPIC content ONLY, never on anything FAM (ruled 2026-08-06). FAM's tags stay #BreakTheCycle and #FreeAgentMovement.
+- FAM holds NO courses (course ownership law, ruled 2026-08-06). All classroom and program content belongs to Expert Partners; EPIC receives the courses as free membership goodies; course and resource listings never appear in FAM materials. Program names never change: Think Big Live Big stays Think Big Live Big.
 
 ### Banned phrases (never use)
 
