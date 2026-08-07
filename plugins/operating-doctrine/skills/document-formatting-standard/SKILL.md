@@ -59,7 +59,7 @@ Anything drafted for Allison to read, send, or keep lands as a styled Google Doc
 
 Stays in chat: Claude Code paste blocks (commands, prompts, snippets bound for another surface) and quick factual answers. Those are not documents and do not get wrapped in one.
 
-Rider, 2026-08-05 (Allison's robot delivery standards ruling, aura intake 3973c2b): this standard extends to every automated sender (robots); every document a robot creates for Allison is a Google Doc in Poppins with 1.5 line spacing per this skill, including the CI watchman and Ember at wake.
+Rider, 2026-08-05 (Allison's robot delivery standards ruling, aura intake 3973c2b): this standard extends to every automated sender (robots); every document a robot creates for Allison is a Google Doc in Poppins with 1.5 line spacing per this skill, including the CI watchman and Ember at wake. Amended 2026-08-06 per the Ember Voice and Your Move Queue ruling (aura intake/2026-08-06-ruling-ember-voice-and-your-move-queue.md, ee86601). Poppins 1.5 Google Docs are for genuine reading material only. The your-move instruction itself lives on the board rendered at hq.allisongaddy.com, never a per-task doc, robot texts link hq.allisongaddy.com only, and every robot message to Allison speaks as Ember in first person (rail spec, aura docs/estate/your-move-queue.md).
 
 ## Hard rules (inherit Allison's voice rules)
 

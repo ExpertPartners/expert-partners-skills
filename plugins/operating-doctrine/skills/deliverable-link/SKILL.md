@@ -18,7 +18,7 @@ Ruled by Allison Gaddy, August 4, 2026, after a Session Close and Continuity Pro
 
 When Claude builds, updates, or delivers anything that lives at a URL, the confirmation in chat carries a markdown hyperlink and the link text is the document's exact name. Like this, [2026-08-04 Session Close and Continuity Prompt v2](https://docs.google.com/document/d/EXAMPLE). Never a raw URL. Never a location description standing in for a link ("it's in your Drive", "check the aura repo", "I pushed it to intake"). The link is the delivery. The name on the link matches the name on the file, including the YYYY-MM-DD prefix when the file carries one.
 
-Rider, 2026-08-05 (Allison's robot delivery standards ruling, aura intake 3973c2b): this standard extends to every automated sender (robots) on every rail, including the CI watchman's iMessages via Sendblue and Ember at wake; a robot's link text is always the exact document title, never a bare URL and never a GitHub link.
+Rider, 2026-08-05 (Allison's robot delivery standards ruling, aura intake 3973c2b): this standard extends to every automated sender (robots) on every rail, including the CI watchman's iMessages via Sendblue and Ember at wake; a robot's link text is always the exact document title, never a bare URL and never a GitHub link. Amended 2026-08-06 per the Ember Voice and Your Move Queue ruling (aura intake/2026-08-06-ruling-ember-voice-and-your-move-queue.md, ee86601). R2, every robot message to Allison speaks as Ember in first person. R3, robot texts link hq.allisongaddy.com only, and the your-move instruction itself lives on the board rendered at hq.allisongaddy.com rather than a per-task doc (rail spec, aura docs/estate/your-move-queue.md).
 
 ## What fires it
 
