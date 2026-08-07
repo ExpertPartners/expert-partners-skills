@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "4db83a38d27d56f8209105455a576e3ea47f8f38",
-    "aura": "9b8bad8bcdf4613ceb73c224a3d2336c0f7ab161"
+    "eps": "fa317c7aa3182339b135a452723d7e4cf4825fe7",
+    "aura": "8a4ef375b1f6c124e7f5e0e4927857bc1d18dba1"
   },
   "zones": [
     "surfaces",
@@ -57,7 +57,7 @@
       "subtitle": "monthly ACN staying-current check",
       "renderNote": null,
       "layout": {
-        "x": 292,
+        "x": 518,
         "y": 1870,
         "width": 206,
         "height": 77,
@@ -237,8 +237,8 @@
       "subtitle": "twice-monthly estate capability sweep",
       "renderNote": null,
       "layout": {
-        "x": 524,
-        "y": 1870,
+        "x": 30,
+        "y": 1973,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -553,7 +553,7 @@
       "subtitle": "build a funnel that does not exist yet",
       "renderNote": null,
       "layout": {
-        "x": 30,
+        "x": 286,
         "y": 2074,
         "width": 212,
         "height": 77,
@@ -581,7 +581,7 @@
       "subtitle": "one complete Notion record per funnel",
       "renderNote": null,
       "layout": {
-        "x": 288,
+        "x": 544,
         "y": 1985.8,
         "width": 224,
         "height": 77,
@@ -611,7 +611,7 @@
       "subtitle": "per-funnel walk from old location to clean location",
       "renderNote": null,
       "layout": {
-        "x": 42,
+        "x": 298,
         "y": 1973,
         "width": 200,
         "height": 77,
@@ -1014,6 +1014,34 @@
         "annotationHeight": 15,
         "subtitleLines": [
           "RARE content engine"
+        ]
+      }
+    },
+    {
+      "id": "repo-standards",
+      "source": "eps:skills/repo-standards/SKILL.md",
+      "repo": "eps",
+      "tier": "organization",
+      "zone": "hands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "born-to-standard repos and ten-point audits",
+      "renderNote": null,
+      "layout": {
+        "x": 292,
+        "y": 1870,
+        "width": 200,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "born-to-standard repos and",
+          "ten-point audits"
         ]
       }
     },
@@ -1747,19 +1775,19 @@
       "type": "calls",
       "points": [
         {
-          "x": 242,
+          "x": 498,
           "y": 2112.5
         },
         {
-          "x": 252,
+          "x": 508,
           "y": 2112.5
         },
         {
-          "x": 252,
+          "x": 508,
           "y": 2037.2
         },
         {
-          "x": 288,
+          "x": 544,
           "y": 2037.2
         }
       ]
@@ -1782,11 +1810,11 @@
       "type": "calls",
       "points": [
         {
-          "x": 242,
+          "x": 498,
           "y": 2011.5
         },
         {
-          "x": 288,
+          "x": 544,
           "y": 2011.5
         }
       ]
@@ -1993,6 +2021,12 @@
     },
     {
       "from": "rare-content-engine",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "repo-standards",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -2229,6 +2263,7 @@
   ],
   "flags": {
     "declaredDuplicates": [
+      "aura:.claude/skills/repo-standards/SKILL.md",
       "aura:.claude/skills/session-wrap/SKILL.md",
       "eps:operating-doctrine/SKILL.md"
     ]
@@ -2363,7 +2398,7 @@
         "caption": "funnel work and account operations",
         "x": 8,
         "y": 1822,
-        "width": 768,
+        "width": 782,
         "height": 351,
         "rooms": []
       },
