@@ -258,6 +258,16 @@ The permanence chain for rulings themselves: chat is not memory. A ruling become
 
 ---
 
+## The No Later Commandment (Nothing Rides Untracked)
+
+Ruled by Allison 2026-08-06 at commandment tier; ruling of record at aura intake/2026-08-07-ruling-no-later-commandment-and-repo-walk-dispatch.md.
+
+Part one. There is no later. When a session finds work its surface cannot finish itself, the hand-off block ships in the same conversation, in the same turn, before the session moves on. Deferring routed work to a next session is a failure condition.
+
+Part two. Nothing rides untracked. The moment work is routed anywhere, it gets a board card with a due date, and the janitor alerts daily until the card closes. Routed with no card and no watcher does not count as routed. Enforcement machinery is the Follow-Through Engine.
+
+---
+
 ## Skills Are Born Dressed
 
 Ruled by Allison 2026-08-04 (Skill Map Rulings lane, ruling 14). Every new skill is born with its skill-map frontmatter block filled in (zone, tier, status, relationships, brand-scope where applicable); a skill without its block does not merge. The skills-graph build enforces this strictly: a SKILL.md in any canonical repo missing the block, or missing zone, tier, or status, fails the build (vendor catalog packs stay excluded).
@@ -402,6 +412,8 @@ Propagation rule: on every version bump, this surface list gets verified against
 ---
 
 ## Version
+
+v2.9 -- August 6, 2026 -- Added The No Later Commandment (Nothing Rides Untracked), ruled by Allison 2026-08-06 at commandment tier in Aura: Strategic Advisor / Repo Walk; ruling of record at aura intake/2026-08-07-ruling-no-later-commandment-and-repo-walk-dispatch.md. Part one, there is no later: routed work's hand-off block ships in the same conversation, in the same turn, before the session moves on; deferring routed work to a next session is a failure condition. Part two, nothing rides untracked: the moment work is routed anywhere it gets a board card with a due date and the janitor alerts daily until the card closes; routed with no card and no watcher does not count as routed. Enforcement machinery is the Follow-Through Engine. Inked by the RepoWalk - No Later Inking Code session. Authored by Allison Gaddy.
 
 v2.8 -- August 5, 2026 -- Added Verified Means Content Verified, Never File Present (ruled by Allison 2026-08-05 in Aura: Strategic Advisor / Repo Walk): a file's existence proves nothing about its contents; every "verified" claim is a content claim, made by opening the thing, never by filename, path resolution, or listing presence; filename-judged claims are unverified by definition. Born at the Marketing Canon gate two (2026-08-04), where filename-judged worksheets proved to be unfilled vendor templates. Promoted from persistent memory and the Titans scoping plan to its rulebook home. Authored by Allison Gaddy.
 
