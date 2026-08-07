@@ -8,14 +8,14 @@
     {
       "name": "operating-doctrine",
       "source": "./plugins/operating-doctrine",
-      "version": "2.27.0",
+      "version": "2.29.0",
       "description": "The non-negotiable operating standard. Loads at every session."
     },
     {
       "name": "brand-voice",
       "source": "./plugins/brand-voice",
       "description": "Canonical brand context for the aura ADR 0045 brand registry (Expert Partners, EPIC, AG Personal Brand, AG Luxury, FAM, Don Hobbs; Moxie benched)",
-      "version": "0.3.0"
+      "version": "0.4.0"
     },
     {
       "name": "content-engines",
