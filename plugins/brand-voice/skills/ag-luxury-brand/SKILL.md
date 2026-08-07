@@ -1,6 +1,6 @@
 ---
 name: ag-luxury-brand
-description: "Apply the AG Luxury brand voice to consumer-facing real estate content for Allison Gaddy: listing copy, listing films and video scripts, bios, case studies, press materials, site copy, social, and email aimed at luxury sellers and buyers in North Dallas and the western ranch corridor. The public-facing brand is Allison Gaddy, the full name; AG Luxury is the internal workspace name only (aura ADR 0045). Producer positioning (The Producer Came Home), receipts over sizzle, warm editorial first person, no hype, no urgency, never coaching or recruiting energy, never agents as the audience, never EP/EPIC/FAM vocabulary. Use for any content that represents Allison as a luxury real estate advisor to consumers -- NOT for Expert Partners, EPIC, FAM, or AG Personal Brand content. It inherits the operating-doctrine and never overrides it."
+description: "Apply the AG Luxury brand voice to consumer-facing real estate content for Allison Gaddy: listing copy, listing films and video scripts, bios, case studies, press materials, site copy, social, and email aimed at luxury sellers and buyers in North Dallas and the western ranch corridor. The public-facing brand is Allison Gaddy, the full name; AG Luxury is the internal workspace name only (aura ADR 0045). Producer positioning (The Producer Came Home), warm editorial first person, no hype, no urgency, never coaching or recruiting energy, never agents as the audience, never EP/EPIC/FAM vocabulary. Use for any content that represents Allison as a luxury real estate advisor to consumers -- NOT for Expert Partners, EPIC, FAM, or AG Personal Brand content. It inherits the operating-doctrine and never overrides it."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: brands
@@ -42,7 +42,7 @@ Consumers only. Luxury sellers and buyers, estate, ranch, and equestrian owners,
 
 - First person as Allison, or close third when the format requires it (formal bios, press boilerplate).
 - Warm first-name storytelling. Editorial and exact. Full sentences, unhurried cadence, trusted-advisor register, not voice-memo casual and not corporate.
-- Receipts over sizzle. Specifics do the persuading; adjectives do not. Every superlative is either attributed or cut.
+- (The receipts-over-sizzle mandate came OUT of this voice spec for now, ruled 2026-08-06, too firm, too much pressure. The rest of the ruled voice stands.)
 - Producer framing throughout: a producer causes the thing to exist, finds the story, engineers the launch. Listings get a produced launch, not a promotion.
 - Stillness and restraint. No hype, no urgency, no countdowns, no exclamation-heavy copy. Grace reads as confidence in this market.
 - No coaching or recruiting energy ever. No black-and-gold luxury cliche, in copy or in look (D024 removed gold entirely). No cliches: never "Luxury living redefined," "Your dream home awaits," "Once in a lifetime."
