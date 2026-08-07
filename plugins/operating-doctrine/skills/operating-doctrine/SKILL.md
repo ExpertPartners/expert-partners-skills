@@ -260,11 +260,11 @@ The permanence chain for rulings themselves: chat is not memory. A ruling become
 
 ## The No Later Commandment (Nothing Rides Untracked)
 
-Ruled by Allison 2026-08-06 at commandment tier; ruling of record at aura intake/2026-08-07-ruling-no-later-commandment-and-repo-walk-dispatch.md.
+Ruled by Allison 2026-08-06 at commandment tier; ruling of record at aura intake/2026-08-07-ruling-no-later-commandment-and-repo-walk-dispatch.md. Part Two amended by Allison 2026-08-06 after research review; amendment record at aura intake/2026-08-07-ruling-part-two-amendment-register-and-digest.md.
 
 Part one. There is no later. When a session finds work its surface cannot finish itself, the hand-off block ships in the same conversation, in the same turn, before the session moves on. Deferring routed work to a next session is a failure condition.
 
-Part two. Nothing rides untracked. The moment work is routed anywhere, it gets a board card with a due date, and the janitor alerts daily until the card closes. Routed with no card and no watcher does not count as routed. Enforcement machinery is the Follow-Through Engine.
+Part two. Nothing rides untracked. Genuinely blocked work means blocked on a third party, on elapsed time, on Allison's hands, or on a running process, nothing else. Everything else executes now. Every wait lives as a row in the lane ledger (aura docs/estate/lanes.md), the estate's waiting register, and every row carries three things, what it waits on, what moves next, and the date it goes stale. No reason, no wait. The watcher is one robot pass inside the existing morning digest. It reads the register and the intake inbox and reports only items past their stale date. Nothing stale means silence, and silence is the healthy state. The board holds missions only, work Allison chose. Blocked residue never lands on the board and no card is minted for routed work. Enforcement machinery is the Follow-Through Engine (aura#90), whose job is sweeping the register, never minting cards.
 
 ---
 
@@ -412,6 +412,8 @@ Propagation rule: on every version bump, this surface list gets verified against
 ---
 
 ## Version
+
+v2.10 -- August 6, 2026 -- Part Two of The No Later Commandment rewritten from the board-card-and-daily-janitor design to the register-and-digest design per Allison's same-day ruling after research review (waiting-for work needs its own container, boards rot holding routed residue, daily nagging trains alert deafness so the watcher reports exceptions only). The waiting register is the lane ledger plus the intake inbox, the watcher is an exceptions-only pass in the existing morning digest, the board holds missions only, and the Follow-Through Engine (aura#90, charter v2) sweeps the register and never mints cards. Amendment record at aura intake/2026-08-07-ruling-part-two-amendment-register-and-digest.md. Inked by the RepoWalk - Part Two Amendment Code session. Authored by Allison Gaddy.
 
 v2.9 -- August 6, 2026 -- Added The No Later Commandment (Nothing Rides Untracked), ruled by Allison 2026-08-06 at commandment tier in Aura: Strategic Advisor / Repo Walk; ruling of record at aura intake/2026-08-07-ruling-no-later-commandment-and-repo-walk-dispatch.md. Part one, there is no later: routed work's hand-off block ships in the same conversation, in the same turn, before the session moves on; deferring routed work to a next session is a failure condition. Part two, nothing rides untracked: the moment work is routed anywhere it gets a board card with a due date and the janitor alerts daily until the card closes; routed with no card and no watcher does not count as routed. Enforcement machinery is the Follow-Through Engine. Inked by the RepoWalk - No Later Inking Code session. Authored by Allison Gaddy.
 
