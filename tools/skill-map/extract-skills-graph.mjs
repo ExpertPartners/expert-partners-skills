@@ -67,6 +67,9 @@ const DECLARED_DUPLICATES = [
   // session-wrap adopted into canonical 2026-08-05 (add-on brief note 4); the aura
   // .claude/skills copy stays loadable as the deployed copy for Aura Code sessions.
   { id: 'session-wrap', keep: 'eps:skills/session-wrap/SKILL.md', duplicate: 'aura:.claude/skills/session-wrap/SKILL.md' },
+  // repo-standards born canonical here 2026-08-07 (ADR 0056 piece two); the aura
+  // .claude/skills copy is the deployed copy, produced by tools/skill-deploy.
+  { id: 'repo-standards', keep: 'eps:skills/repo-standards/SKILL.md', duplicate: 'aura:.claude/skills/repo-standards/SKILL.md' },
 ];
 
 // ---------- schema ----------
