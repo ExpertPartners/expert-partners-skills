@@ -1,6 +1,6 @@
 ---
 name: "document-formatting-standard"
-description: "Allison's default formatting and delivery standard (v3) for every document Claude creates: Poppins throughout, 1.5 line spacing, size-and-color headers with Brand Blue H2s, no bold or italics, no em dashes, colons and semicolons only sparingly, YYYY-MM-DD date-prefixed filenames, and delivery as a styled Google Doc into the Aura Docs Drive folder with only a two-line summary in chat. Apply whenever creating, restyling, or delivering a document unless a brand skill's typography explicitly governs that deliverable."
+description: "Allison's default formatting and delivery standard (v3) for every document Claude creates: Poppins throughout, 1.5 line spacing, size-and-color headers with Brand Blue H2s, no bold or italics, no em dashes, colons and semicolons only sparingly, plain title filenames with no date prefix, and delivery as a styled Google Doc into the Aura Docs Drive folder with only a two-line summary in chat. Apply whenever creating, restyling, or delivering a document unless a brand skill's typography explicitly governs that deliverable."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -36,7 +36,7 @@ Quoted or message-style content: indent left 360 DXA, body size, so it reads as 
 
 Page: US Letter (12240 x 15840 DXA), 1 inch margins all around.
 
-Filenames: date-prefixed, `YYYY-MM-DD <Title>`, using the date the document is created.
+Filenames: the document's title, no date prefix (ruled 2026-08-05, amending the earlier `YYYY-MM-DD <Title>` rule). The platform (Drive, GitHub) carries the dates; the names do not need them. Caveat from the same ruling: aura intake inbox filenames are stamped by the Estate Brain save tool itself (append-only convention), so intake files keep their stamps until that tool changes.
 
 ## Punctuation rule (v3, ruled by Allison 2026-08-04)
 
@@ -53,7 +53,7 @@ Anything drafted for Allison to read, send, or keep lands as a styled Google Doc
 - Created via the SA+DWD path impersonating allison@expertpartners.com where that path is reachable, otherwise via a write-capable Drive connector, so ownership is native. Never the read-only Google connectors.
 - Saved into the Aura Docs folder in Drive, folder ID 1awtAUORC9PAspfIoIoM5YlkwfDOvG-rx, set as the parent on every document create. Every deliverable lands in this one folder unless Allison names a different destination for a specific document.
 - Real Poppins and 1.5 line spacing applied through the Google Docs API (batchUpdate text and paragraph styles) or HTML-conversion equivalent, not left as defaults.
-- Filename date-prefixed per the filename rule above.
+- Filename is the document's title with no date prefix, per the filename rule above.
 - Link handed to Allison in chat as a markdown hyperlink whose link text is the document's exact name, never a raw URL (see the deliverable-link skill).
 - Chat carries only a two-line summary of the document. The document is the deliverable; chat is the pointer.
 
