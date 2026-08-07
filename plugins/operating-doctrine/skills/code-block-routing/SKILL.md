@@ -1,6 +1,6 @@
 ---
 name: "code-block-routing"
-description: "Fires every time a Claude Code paste block, intake block, or implementation brief is handed to Allison, in every project and every session: routing line naming the SURFACE and the exact session (PASTE INTO: Claude Code, existing session \"Name\"), session name as the first line inside the block so the session self-identifies, a waiting-on statement with every hand-off, the lane ledger row written at dispatch and updated at carry-back (aura docs/estate/lanes.md), the pin fired only AFTER Allison confirms the paste, one paste block per response, nothing fenced that is not for a terminal or Code, versions read from canonical only. Cowork lane identity is the kickoff header line, never the window title; Code sessions are named AT LAUNCH via the dispatch block's claude -n launch line, format Project short name - Conversation name - Job name, and self-verify their own name off disk at first contact, with /rename handed to Allison only as the exception repair on a mismatch."
+description: "Fires every time a Claude Code paste block, intake block, or implementation brief is handed to Allison, in every project and every session: routing line naming the SURFACE and the exact session, session name first inside the block, a waiting-on statement with every hand-off, the lane ledger row written at dispatch and updated at carry-back, the pin fired only AFTER Allison confirms the paste, one paste block per response, nothing fenced but terminal or Code, versions read from canonical only. Cowork lane identity is the kickoff header line, never the window title. Code sessions are named AT LAUNCH via the dispatch's claude -n line, format Project short name - Conversation name - Job name, and self-verify their name off disk at first contact; /rename is the exception repair only. A session NEVER declares itself ready to archive: carry-backs end at awaiting verification at home, and archive authority belongs to the home conversation, which flips the aura lanes.md row to archived as one motion with the call."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -153,6 +153,37 @@ Precedence notes so the rules do not fight each other:
 - The pin marker is a bookmark, not a paste block. It does NOT count against the one-block-per-response rule, and it is exempt from the nothing-fenced-but-Code rule. It is the only other thing that may ever be fenced.
 - The pin skill's rule that the marker is the entire response applies only when Allison manually invokes /pin. Confirmation-triggered pins may ride in a response that also continues other work.
 
+## Archive Authority Belongs To The Home Conversation
+
+Ruled by Allison 2026-08-07, same lane as the naming ruling.
+
+A Claude Code session NEVER declares itself ready to archive. That is self-attestation from the narrowest view in the system: the session can see its own repos and its own turn, and it cannot see what the home conversation is holding, what it dispatched elsewhere, or what it still intends to ask this lane for.
+
+**Carry-backs end at exactly this line and nothing stronger:**
+
+```
+SESSION STATUS: carry-back delivered, awaiting verification at home.
+```
+
+No "safe to archive," no "ready to ARCHIVE," no "nothing open," no archive verdict of any kind. The session reports what it did and stops there.
+
+**The home conversation holds archive authority alone.** After it verifies the carry-back live (claims are checked against commits, not taken on the session's word), it issues exactly one of two calls:
+
+```
+archive <session name>
+hold <session name> open for <named next block>
+```
+
+A hold must name the next block. "Hold it open just in case" is not a call; it is a lane leaking.
+
+**Default is archive.** Sessions are cheap and deterministically named, so spawn freely rather than hoarding a session because it might be useful later. A correctly named session is trivially reproducible; a stale open lane is not free.
+
+**The archive call and the ledger are one motion.** When home says archive, home flips that lane's row to `archived` in aura `docs/estate/lanes.md` BEFORE dispatching anything further. Not after the next block, not in a later cleanup pass. And no dispatch block is ever written against a session whose row reads `archived`; that lane is gone, spawn a new one.
+
+Sessions born before this rule follow it from their next carry-back. No cold sweep, no retroactive rewriting of past carry-backs.
+
+Precedence: where this and any older SESSION STATUS wording disagree (the pin skill's carry-back template, the user-global close-of-turn rule, `behavior-defaults.md`), this ruling wins and the older wording is corrected to match. All three were corrected in the same pass on 2026-08-07.
+
 ## The Lane Ledger: Row At Dispatch, Update At Carry-Back
 
 Added 2026-08-03. The estate-wide lane ledger lives at `docs/estate/lanes.md` in the aura repo. It is the single file that answers "what Claude Code sessions exist, what does each belong to, and what is each waiting on" from any surface; any project reads it through its aura connection.
@@ -160,11 +191,11 @@ Added 2026-08-03. The estate-wide lane ledger lives at `docs/estate/lanes.md` in
 The habit, every hand-off:
 
 1. At dispatch, when a paste block is handed to Allison, the issuing Cowork chat's block-writer appends or updates the lane's row in the ledger: canonical session name (three segments per the naming rule, and the same string the dispatch's `claude -n` launch line carries), window title as shown in the Code sessions list (flag PARITY MISMATCH with the rename when they differ; Code sessions only, per the lane identity ruling of 2026-08-03; a lane launched with `-n` should read parity-clean on the session's own first-contact self-verify), Cowork home (Claude project / conversation, identified by its kickoff header line, not its displayed title), machine, status, waiting-on, last-updated date. The waiting-on statement this skill already requires with every hand-off is the same text that goes in the row -- write it once, use it in both places.
-2. At carry-back receipt, the row updates to the new status (running / waiting-on-Allison / waiting-on-carry-back / complete-safe-to-archive / owned-elsewhere).
+2. At carry-back receipt, the row updates to the new status (running / waiting-on-Allison / waiting-on-carry-back / archived / owned-elsewhere). `complete-safe-to-archive` is retired as of 2026-08-07; only the home conversation writes `archived`, as one motion with its archive call.
 3. Append and update rows, never delete. Completed lanes move to the ledger's Completed section rather than vanishing, so the archive decision stays visible.
 4. Rule 5 applies: rows are only as certain as their evidence. A lane whose home nobody has named stays needs-Allison; never invent a home for it.
 
-A Code session that completes its carry-back updates its own row to complete-safe-to-archive in the same push when it already has aura write access; otherwise the Cowork home updates it on receipt (root CLAUDE.md delivery protocol).
+A Code session that completes its carry-back updates its own row to `waiting-on-carry-back`, with the full report, in the same push when it already has aura write access; otherwise the home updates it on receipt (root CLAUDE.md delivery protocol). It never writes `archived` into its own row: that is the home conversation's call and the home conversation's write.
 
 Write mechanics for the ledger file itself, added 2026-08-05 per Allison's ruling of 2026-08-04 after the second ledger regression (a stale-base full-file write erased three rows of newer state before the owning lanes healed it): every write to `docs/estate/lanes.md` obeys the shared-canonical-file-writes directive, canonical at aura `docs/directives/shared-canonical-file-writes.md`. In one breath, fresh read immediately before the write, blob-SHA compare-and-swap on any contents-API write, post-write diff check that no other lane's rows changed, git-based writers (Claude Code) preferred for this hot file, and a chat-surface writer that bounces twice on the SHA guard stops racing and routes the row verbatim through an intake handoff note for the next git-based writer to fold in. The directive also carries Allison's ordered build of the Estate Brain ledger-row tool, which retires whole-file writes once it ships.
 

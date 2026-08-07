@@ -14,7 +14,7 @@ subtitle: "carry-back envelope and place-keeping baton"
 
 # Pin -- v4.3 (2026-08-07)
 
-A pin is a bookmark, not a task. It marks the exact spot where work handed off between Claude Code and the Claude project conversation that drives it. v4 (ruled by Allison 2026-08-03) makes the protocol surface-neutral: the home is a Claude PROJECT plus CONVERSATION, never assumed to be CoWork. v4 also adds the first-contact question and the "come back here" pin close. v4.1 (ruled by Allison 2026-08-03, same day) rewrites the carry-back SESSION STATUS line: it names the paste-back PROJECT and CONVERSATION explicitly, the ARCHIVE verdict is part of the line, and a session that is NOT clean to archive must give the instructions at that point instead of the ARCHIVE sentence. v4.2 (ruled by Allison 2026-08-03, same day) DELETES the closing line ("Let me know once you've pasted this back into ..., and I'll pin."): the carry-back ends at the SESSION STATUS line and never solicits a paste confirmation. v4.3 (ruled by Allison 2026-08-07) rewrites naming authority (section 5): sessions are named AT LAUNCH via `claude -n`, the name format is `<Project short name> - <Conversation name> - <Job name>`, and every session self-verifies its own name off disk at first contact. `/rename` is demoted to the exception repair.
+A pin is a bookmark, not a task. It marks the exact spot where work handed off between Claude Code and the Claude project conversation that drives it. v4 (ruled by Allison 2026-08-03) makes the protocol surface-neutral: the home is a Claude PROJECT plus CONVERSATION, never assumed to be CoWork. v4 also adds the first-contact question and the "come back here" pin close. v4.1 (ruled by Allison 2026-08-03, same day) rewrites the carry-back SESSION STATUS line: it names the paste-back PROJECT and CONVERSATION explicitly, the ARCHIVE verdict is part of the line, and a session that is NOT clean to archive must give the instructions at that point instead of the ARCHIVE sentence. v4.2 (ruled by Allison 2026-08-03, same day) DELETES the closing line ("Let me know once you've pasted this back into ..., and I'll pin."): the carry-back ends at the SESSION STATUS line and never solicits a paste confirmation. v4.3 (ruled by Allison 2026-08-07) rewrites naming authority (section 5): sessions are named AT LAUNCH via `claude -n`, the name format is `<Project short name> - <Conversation name> - <Job name>`, and every session self-verifies its own name off disk at first contact. `/rename` is demoted to the exception repair. v4.3 also (same ruling, addendum) strips the ARCHIVE verdict out of the carry-back entirely: a session never declares itself ready to archive, the SESSION STATUS line ends at "carry-back delivered, awaiting verification at home," and archive authority moves to the home conversation. This supersedes the v4.1 ARCHIVE-verdict rule above.
 
 Pins persist to `~/.claude/baton.md`. Every surface reads the same baton file, so one pin trail spans all of them.
 
@@ -36,22 +36,22 @@ CLAUDE HOME: {Claude project name} / {conversation name}
 
 {the report}
 
-SESSION STATUS: Ready to paste back to PROJECT: {Claude project name} in CONVERSATION NAME: {conversation name}. This session is ready to ARCHIVE.
+SESSION STATUS: carry-back delivered, awaiting verification at home.
 ```
 
 The SESSION STATUS line is the last line of the carry-back. There is no closing "Let me know once you've pasted... and I'll pin" line (deleted in v4.2); the carry-back never solicits a paste confirmation. Never write "into Cowork" anywhere in the carry-back. Always name the actual Claude project and conversation; if the session somehow reached a carry-back without knowing them, ask (section 0) before sending the report.
 
-### The ARCHIVE verdict is verified, or it is replaced with instructions (v4.1)
+### A session never declares itself ready to archive (v4.3, ruled 2026-08-07)
 
-"This session is ready to ARCHIVE" is a verified claim, never a sign-off phrase. Before writing it, run `git status` on every repo the session touched and confirm all three: nothing uncommitted, nothing unpushed, no open follow-ups parked in this session.
+This REPLACES the v4.1 ARCHIVE-verdict rule. The old template ended with "This session is ready to ARCHIVE" (or a Do-NOT-archive variant), which made the session the judge of its own disposition. That is self-attestation from the narrowest view in the system: a session sees its own repos and its own turn, and cannot see what the home conversation is holding, what it dispatched elsewhere, or what it still means to ask this lane for.
 
-If ANY check fails -- or the report is not a final carry-back (work still running, or something is waiting on Allison) -- do NOT write the ARCHIVE sentence. Keep the paste-back half of the line and replace the ARCHIVE half with the instructions at that point, in the same position:
+The carry-back now ends at exactly `SESSION STATUS: carry-back delivered, awaiting verification at home.` and nothing stronger. No archive verdict of any kind, in either direction.
 
-```
-SESSION STATUS: Ready to paste back to PROJECT: {Claude project name} in CONVERSATION NAME: {conversation name}. Do NOT archive this session yet -- {exactly what blocks it: the uncommitted files, the unpushed commits, or the open item} -- {the exact next instruction: the one action Allison takes, or what this session does next}. Keep this session open.
-```
+What the session still owes, unchanged: everything the old ARCHIVE sentence was gating on still gets DONE and REPORTED, it just is not converted into a verdict. Run `git status` on every repo touched, commit and push, and state plainly in the report what is committed, what is pushed, what is still open, and what is waiting on Allison. The home conversation needs those facts to make the call; it just makes the call itself.
 
-The instructions are specific, never generic: name the files, the repo, the commit, or the awaited item, and name the single next action. The lane ledger row (aura `docs/estate/lanes.md`) mirrors the same verdict: a row moves to complete-safe-to-archive only when the ARCHIVE sentence shipped.
+Archive authority belongs to the home conversation alone. After verifying the carry-back live, it issues `archive {session name}` or `hold {session name} open for {named next block}`, and the archive call and the ledger row flip to `archived` are one motion. Full rule, including the default-to-archive posture and the no-dispatch-against-an-archived-row constraint: the code-block-routing skill, "Archive Authority Belongs To The Home Conversation."
+
+Sessions born before this rule follow it from their next carry-back.
 
 ## 2. Pin timing and the come-back close (v4)
 
@@ -155,7 +155,9 @@ Never send her window hunting, and never cold-rename a fleet of existing session
 
 ## 6. Home fidelity
 
-One home per session for life: the home is the Claude project plus conversation named in the briefing block (CLAUDE HOME line) or by Allison at first contact. Echo both header lines (SESSION and CLAUDE HOME) on every carry-back. If Allison herself corrects or supplies the home mid-lane, adopt her correction verbatim from that point on; nobody else may change it. When the lane ends, say exactly "safe to archive this session" so she never guesses.
+One home per session for life: the home is the Claude project plus conversation named in the briefing block (CLAUDE HOME line) or by Allison at first contact. Echo both header lines (SESSION and CLAUDE HOME) on every carry-back. If Allison herself corrects or supplies the home mid-lane, adopt her correction verbatim from that point on; nobody else may change it.
+
+When the lane ends, the session does NOT pronounce on archiving (v4.3, ruled 2026-08-07, superseding the old instruction to say "safe to archive this session"). It ends at `SESSION STATUS: carry-back delivered, awaiting verification at home.` and the home conversation makes the call.
 
 ## Rules
 
