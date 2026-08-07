@@ -38,3 +38,14 @@ repos:
         entry: python3 .ep/frontmatter-lint.py --schema .ep/classification-schema.json
         language: system
         files: \.(md|markdown|mdx)$
+
+      # Agent Skills description cap (F6). Ruled by Allison 2026-08-07: hard fail at 1024,
+      # no warn band. Sweeps every tracked SKILL.md and always prints the headroom table,
+      # so near-cap skills stay visible without being an alarm. pass_filenames is false
+      # because the sweep is repo-wide by design, not limited to the touched files.
+      - id: skill-description-lint
+        name: Agent Skills description cap (fails at or over 1024 characters)
+        entry: python3 .ep/skill-description-lint.py
+        language: system
+        files: (^|/)SKILL\.md$
+        pass_filenames: false

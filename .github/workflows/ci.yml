@@ -59,6 +59,17 @@ jobs:
             python3 .ep/frontmatter-lint.py --schema .ep/classification-schema.json "${FILES[@]}"
           fi
 
+      # F6 -- Agent Skills description cap. Runs on EVERY push, not only when a SKILL.md
+      # is in the diff: the gate is repo-wide, the headroom table is the point, and a
+      # cheap always-on sweep means a breach can never ride in behind an unrelated change.
+      # --selftest proves the no-PyYAML fallback still agrees with PyYAML character for
+      # character, so the pre-commit path (system python3, no pyyaml) stays trustworthy.
+      - name: Agent Skills description cap (F6)
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet pyyaml
+          python3 .ep/skill-description-lint.py --selftest
+
   gitleaks:
     name: gitleaks secret scan (full history)
     runs-on: ubuntu-latest
