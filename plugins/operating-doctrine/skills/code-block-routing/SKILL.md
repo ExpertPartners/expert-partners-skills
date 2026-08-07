@@ -1,6 +1,6 @@
 ---
 name: "code-block-routing"
-description: "Fires on every Claude Code paste block, intake block, or implementation brief for Allison. Requires a routing line naming surface and exact session, the session name first inside the block, a WORKTREE line naming the isolated worktree on every block spawning a Code session (a spawning block without one is malformed and bounces home), a waiting-on statement per hand-off, a lane ledger row at dispatch and carry-back, one block per response, nothing fenced but terminal or Code, versions from canonical only, the pin only AFTER Allison confirms the paste. Chat lane identity is the kickoff header line, so a chat kickoff leads with the conversation name plain and alone, envelope CONVERSATION never SESSION. Code sessions are named at launch via claude -n, self-verify off disk at first contact, and create their named worktree from a fresh remote ref, confirming the absolute path. /rename is a Code-only repair. Every carry-back ends with the archive verdict, SAFE TO ARCHIVE or NOT safe with the one closing move named."
+description: "Fires on every Claude Code paste block, intake block, or implementation brief for Allison. Requires a routing line naming surface and exact session, the session name first inside the block, a WORKTREE line naming the isolated worktree on every block spawning a Code session (without one the block bounces home), a waiting-on statement per hand-off, a lane ledger row at dispatch and carry-back, one block per response, nothing fenced but terminal or Code, versions from canonical only, the pin only AFTER Allison confirms the paste. Chat lane identity is the kickoff header line, so a chat kickoff leads with the conversation name plain and alone, envelope CONVERSATION never SESSION. Code sessions are named at launch via claude -n, self-verify off disk at first contact, and create their named worktree from a fresh remote ref. /rename is a Code-only repair. Every carry-back ends with the status line plus an earned verdict, RECOMMEND ARCHIVE only when the checklist verifies, else RECOMMEND HOLD OPEN naming the wait."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -200,6 +200,15 @@ Re-ruled by Allison 2026-08-07 evening in the Estate Brain Door Phase B Code ses
 Sessions born before this re-ruling follow it from their next response. No cold sweep, no retroactive rewriting of past carry-backs.
 
 Precedence: where this and any older SESSION STATUS wording disagree (the pin skill's carry-back template, the user-global close-of-turn rule, `behavior-defaults.md`), this re-ruling wins and the older wording is corrected to match. All three were corrected in the same pass on 2026-08-07 evening (pin v4.5, behavior-defaults, user-global CLAUDE.md, doctrine repo cf5d97e).
+
+### The Earned Verdict Line
+
+Amended by Allison 2026-08-07 (Aura / Code Rule Fix lane). This amends the archive-verdict re-ruling above; it does not replace it. **Every Code session carry-back ends with the standing SESSION STATUS line PLUS one earned verdict line, and the verdict line is the carry-back's last line.** Exactly two verdicts exist:
+
+- `VERDICT: RECOMMEND ARCHIVE -- all pushed, nothing pending on Allison's side.` Permitted ONLY when the session verifies its checklist live in the same turn: every commit pushed, the whole brief executed, nothing gated or held open, no deliverable still owed. A bare safe-to-archive with no checklist behind it stays banned.
+- `VERDICT: RECOMMEND HOLD OPEN, waiting on <the one named thing>.` The verdict every other state earns. One named thing, never a list; if several things are open, name the one that unblocks the rest.
+
+Archive authority stays with the home conversation and home's GitHub grading remains the backstop, but Allison may archive on the spot on a RECOMMEND ARCHIVE without waiting for home. The verdict line is earned, never decorative: RECOMMEND ARCHIVE with an unverified checklist is the same failure the SAFE TO ARCHIVE evidence rule exists to prevent, stated at the moment Allison actually makes the call.
 
 ## The Lane Ledger: Row At Dispatch, Update At Carry-Back
 
