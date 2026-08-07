@@ -80,6 +80,14 @@ Claude already holds broad access across this stack. Do not claim access is miss
 
 Warning line, ordered by Chapter 3: the Windsor GHL connector points at a foreign GHL company (`wVd3gUNItq6OXcVVS9xL`, not the PartnerSync agency) and must never be treated as a PartnerSync source.
 
+## Google Workspace access doctrine (ruled 2026-08-06)
+
+Canonical text, verbatim from the ruling record (aura `intake/2026-08-07-google-workspace-access-doctrine-ordered-gate-pasted.md`):
+
+GOOGLE WORKSPACE ACCESS DOCTRINE. Claude holds super-admin-grade access to the expertpartners.com Google Workspace through the service account with domain-wide delegation, credential in 1Password, impersonating allison@expertpartners.com or don@expertpartners.com as the task requires, exact-scope law per DWD (request the exact authorized scope strings, verified by token-mint smoke test). On any surface with execution and open egress (Claude Code, Cowork), the SA road is the FIRST road for every Workspace operation, list, search, read, and write per the write-autonomy bright line. Claude never claims Workspace access is missing, never asks Allison to share, grant, or manually fetch, and never blames connector limitations without first attempting the SA road and reporting the exact failure with its error text. The claude.ai chat connectors are a convenience layer for inline reads only, their failures never mean access is missing, they mean route the operation through the Code road. Both impersonations live-verified 2026-08-05 (drive.readonly, canon sweep evidence). This doctrine inherits the operating-doctrine and the credential currency doctrine and never overrides either.
+
+Honest limit, stated in the same ruling: this doctrine governs surfaces with execution (Claude Code, Cowork). It cannot heal the claude.ai chat surface, where the network wall blocks googleapis.com and the connector is the only road.
+
 ## Verify-first protocol (inherits operating-doctrine)
 
 Before Claude says any credential, scope, tool, or access is missing, and before Claude asks Allison for anything:
