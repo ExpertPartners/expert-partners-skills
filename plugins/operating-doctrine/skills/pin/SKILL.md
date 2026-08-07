@@ -1,6 +1,6 @@
 ---
 name: pin
-description: "Carry-back envelope and place-keeping baton between Allison's Claude project conversations (Claude app, CoWork) and Claude Code. Fires at first contact in a new Code session (ask for the Claude project and conversation before running a briefing that does not name them), when composing ANY report bound back to a Claude project, when a block arrives opening with CLAUDE HOME or COWORK HOME / SESSION header lines (envelope check before executing), when Allison types /pin or says \"pin\", or when she confirms a paste (\"pasted\", \"done\"). Pin fires only after her paste confirmation. A pin is a bookmark, never a task. It inherits the operating-doctrine and never overrides it."
+description: "Carry-back envelope and place-keeping baton between Allison's Claude project conversations (Claude app, CoWork) and Claude Code. Fires at first contact in a new Code session (ask for the Claude project and conversation before running a briefing that does not name them), when composing ANY report bound back to a Claude project, when a block arrives opening with CLAUDE HOME or COWORK HOME / SESSION header lines (envelope check before executing), when Allison types /pin or says \"pin\", or when she confirms a paste (\"pasted\", \"done\"). Pin fires only after her paste confirmation. SESSION labels a Claude Code session and only ever that; a block bound for a chat conversation heads its envelope CONVERSATION, and /rename is a Code-only repair that is never handed out for a chat. A pin is a bookmark, never a task. It inherits the operating-doctrine and never overrides it."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -12,9 +12,9 @@ brand-scope: null
 subtitle: "carry-back envelope and place-keeping baton"
 ---
 
-# Pin -- v4.3 (2026-08-07)
+# Pin -- v4.4 (2026-08-07)
 
-A pin is a bookmark, not a task. It marks the exact spot where work handed off between Claude Code and the Claude project conversation that drives it. v4 (ruled by Allison 2026-08-03) makes the protocol surface-neutral: the home is a Claude PROJECT plus CONVERSATION, never assumed to be CoWork. v4 also adds the first-contact question and the "come back here" pin close. v4.1 (ruled by Allison 2026-08-03, same day) rewrites the carry-back SESSION STATUS line: it names the paste-back PROJECT and CONVERSATION explicitly, the ARCHIVE verdict is part of the line, and a session that is NOT clean to archive must give the instructions at that point instead of the ARCHIVE sentence. v4.2 (ruled by Allison 2026-08-03, same day) DELETES the closing line ("Let me know once you've pasted this back into ..., and I'll pin."): the carry-back ends at the SESSION STATUS line and never solicits a paste confirmation. v4.3 (ruled by Allison 2026-08-07) rewrites naming authority (section 5): sessions are named AT LAUNCH via `claude -n`, the name format is `<Project short name> - <Conversation name> - <Job name>`, and every session self-verifies its own name off disk at first contact. `/rename` is demoted to the exception repair. v4.3 also (same ruling, addendum) strips the ARCHIVE verdict out of the carry-back entirely: a session never declares itself ready to archive, the SESSION STATUS line ends at "carry-back delivered, awaiting verification at home," and archive authority moves to the home conversation. This supersedes the v4.1 ARCHIVE-verdict rule above.
+A pin is a bookmark, not a task. It marks the exact spot where work handed off between Claude Code and the Claude project conversation that drives it. v4 (ruled by Allison 2026-08-03) makes the protocol surface-neutral: the home is a Claude PROJECT plus CONVERSATION, never assumed to be CoWork. v4 also adds the first-contact question and the "come back here" pin close. v4.1 (ruled by Allison 2026-08-03, same day) rewrites the carry-back SESSION STATUS line: it names the paste-back PROJECT and CONVERSATION explicitly, the ARCHIVE verdict is part of the line, and a session that is NOT clean to archive must give the instructions at that point instead of the ARCHIVE sentence. v4.2 (ruled by Allison 2026-08-03, same day) DELETES the closing line ("Let me know once you've pasted this back into ..., and I'll pin."): the carry-back ends at the SESSION STATUS line and never solicits a paste confirmation. v4.3 (ruled by Allison 2026-08-07) rewrites naming authority (section 5): sessions are named AT LAUNCH via `claude -n`, the name format is `<Project short name> - <Conversation name> - <Job name>`, and every session self-verifies its own name off disk at first contact. `/rename` is demoted to the exception repair. v4.3 also (same ruling, addendum) strips the ARCHIVE verdict out of the carry-back entirely: a session never declares itself ready to archive, the SESSION STATUS line ends at "carry-back delivered, awaiting verification at home," and archive authority moves to the home conversation. This supersedes the v4.1 ARCHIVE-verdict rule above. v4.4 (ruled by Allison 2026-08-07, same lane) adds the surface vocabulary lock: `SESSION` labels a Claude Code session and only ever that, a block bound for a chat conversation heads its envelope `CONVERSATION`, and `/rename` is a Code-only repair that is never handed out for a chat. See section 4 and section 5.
 
 Pins persist to `~/.claude/baton.md`. Every surface reads the same baton file, so one pin trail spans all of them.
 
@@ -77,6 +77,14 @@ Doctrine note (added 2026-08-03): the pin confirms the paste; it is not the lane
 ## 4. Envelope check (inbound)
 
 Inbound blocks open with `CLAUDE HOME:` (or legacy `COWORK HOME:`) and `SESSION:`. Before executing anything in the block, check the SESSION line against your own authoritative name, read off disk per the self-verification recipe in section 5. If it names a different session: STOP, do not execute any of it, reply exactly "This block is addressed to {named session}; I am {own name}." (Incident this rule prevents: 2026-07-28, a Canon Doc Sync block was executed by the ORPHAN RECRUITING PIPELINE session.)
+
+### SESSION means Claude Code, always (v4.4, ruled 2026-08-07)
+
+`SESSION` labels a Claude Code session and only ever that. A block bound for a chat conversation in the Claude app or Cowork heads its envelope `CONVERSATION:` instead, and it opens with the bare conversation name on the line above that (lane-spawn skill, "The conversation name is the first line"). A chat block carrying a `SESSION:` line is malformed.
+
+What that means for the inbound check here: a block arriving in Claude Code whose envelope reads `CONVERSATION:` is a chat kickoff that landed on the wrong surface. That is not a misaddressed block and it does not trigger the STOP above. Adopt it, say in one line which surface this actually is, and continue, per the lane-spawn skill's "Landing on the wrong surface." The STOP is for a block addressed to a DIFFERENT lane's work, never for a block that named the right lane and the wrong surface.
+
+`WORKER SESSION:` inside a chat kickoff and `CLAUDE HOME:` inside a Code block are pointers to the other surface, not envelope headers, and neither one violates the lock.
 
 Judgment the check requires (v4.3): a name mismatch is not automatically a misaddressed block. A session launched without `-n`, or one the harness auto-titled, will read a name that differs from a briefing genuinely meant for it. Distinguish the two: a block addressed to a DIFFERENT lane's work stops cold; a block that is plainly this lane's own continuation, arriving at a session that was never named to convention, proceeds and hands Allison the `/rename` repair alongside the work. When it is genuinely ambiguous, ask before executing.
 
@@ -152,6 +160,8 @@ In both cases, hand Allison the exact line, once, and keep using the authoritati
 ```
 
 Never send her window hunting, and never cold-rename a fleet of existing sessions. A pre-rule session gains its name the next time it is touched.
+
+`/rename` is a Claude Code repair and nothing else (v4.4). It is never handed out for a chat conversation, in any form: not the slash command, not "please retitle this," not a parenthetical suggestion. Chat titles are auto-generated and cosmetic, chat lane identity is the kickoff header line, and near-match chat titles are accepted and left alone. Manual chat renaming was retired as a failure condition by the 2026-08-03 identity ruling and stays retired.
 
 ## 6. Home fidelity
 

@@ -1,6 +1,6 @@
 ---
 name: "code-block-routing"
-description: "Fires every time a Claude Code paste block, intake block, or implementation brief is handed to Allison, in every project and every session: routing line naming the SURFACE and the exact session, session name first inside the block, a waiting-on statement with every hand-off, the lane ledger row written at dispatch and updated at carry-back, the pin fired only AFTER Allison confirms the paste, one paste block per response, nothing fenced but terminal or Code, versions read from canonical only. Cowork lane identity is the kickoff header line, never the window title. Code sessions are named AT LAUNCH via the dispatch's claude -n line, format Project short name - Conversation name - Job name, and self-verify their name off disk at first contact; /rename is the exception repair only. A session NEVER declares itself ready to archive: carry-backs end at awaiting verification at home, and archive authority belongs to the home conversation, which flips the aura lanes.md row to archived as one motion with the call."
+description: "Fires every time a Claude Code paste block, intake block, or implementation brief is handed to Allison, in every project and every session: routing line naming the SURFACE and the exact session, session name first inside the block, a waiting-on statement with every hand-off, the lane ledger row written at dispatch and updated at carry-back, the pin fired only AFTER Allison confirms the paste, one paste block per response, nothing fenced but terminal or Code, versions read from canonical only. Cowork and chat lane identity is the kickoff header line, never the displayed title; a chat kickoff opens with the conversation name plain and alone as its literal first line, heads its envelope CONVERSATION and never SESSION, and is never handed a rename instruction. Code sessions are named AT LAUNCH via the dispatch's claude -n line, format Project short name - Conversation name - Job name, and self-verify their name off disk at first contact; /rename is the exception repair only, and it is a Code-only repair. A session NEVER declares itself ready to archive: carry-backs end at awaiting verification at home, and archive authority belongs to the home conversation, which flips the aura lanes.md row to archived as one motion with the call."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -34,7 +34,7 @@ Rules for the routing line:
 
 1. Always present. No paste block ships without it.
 2. One line, first thing above the block, easy to spot.
-3. Session names stay short, plain, and human: two to four words, prefixed with the lane tag per the Lane Tag Session Naming section below (tag, space-hyphen-space, job name). The assistant picks the name; Allison names the session exactly as given.
+3. Session names follow the three-segment format in the Session Naming section below (`<Project short name> - <Conversation name> - <Job name>`), readable words throughout. The assistant picks the name and bakes it into the dispatch's `claude -n` launch line; Allison never types it.
 4. Route to an EXISTING session when the work continues a thread that session already holds context for (a pending brief, a prior fix, a repo it already has open). Name the session exactly as Allison named it.
 5. Route to a NEW session when the work is a fresh workstream, a different repo, or would pollute an existing session's context.
 6. Track known session names as they are created or mentioned, and reuse them consistently so both sides always know where a thread lives. Never invent a session name and register it as if it exists. If Allison reveals the real name, adopt her exact spelling immediately and correct the registry.
@@ -115,12 +115,14 @@ Ruled by Allison 2026-08-03. Cowork and Claude.ai chat titles are auto-generated
 
 The rule by surface:
 
-- Cowork and Claude.ai chat lanes. Canonical identity is the kickoff header line, the first line of the lane's first message, format "Lane name - YYYY-MM-DD kickoff." Every kickoff block this skill governs already ships that line first, and the block-writer controls it fully at dispatch. The lane ledger records the lane name from the kickoff header. The displayed chat title is cosmetic; it may be logged parenthetically when someone needs to find the window, but it is never flagged for rename and never treated as identity. Cowork lanes never get PARITY MISMATCH flags.
+- Cowork and Claude.ai chat lanes. Canonical identity is the kickoff header line, the first line of the lane's first message. As of Allison's ruling of 2026-08-07 that line is the conversation name, plain and alone, with no label in front of it, no date suffix, and no "kickoff" word (the old "Lane name - YYYY-MM-DD kickoff" format is retired; see Chat Blocks Lead With The Conversation Name below). The block-writer controls that line fully at dispatch, and the lane ledger records the lane name from it. The displayed chat title is cosmetic; it may be logged parenthetically when someone needs to find the window, but it is never flagged for rename and never treated as identity. Chat lanes never get PARITY MISMATCH flags, and Claude never hands Allison a rename instruction for a chat.
 - Claude Code sessions. Exact-name parity stays enforced, because this surface supports it, and as of the 2026-08-07 ruling it is enforced at LAUNCH rather than by repair. A dispatch spawning a new session ships the `claude -n "<full name>"` launch line, so the session is born correctly named. The session then self-verifies its own name off disk at first contact and reports the comparison. A PARITY MISMATCH flag on a Code lane means self-verification failed or the lane predates the rule; it resolves by the in-session `/rename` request the next time the session is used (live-verified 2026-07-28 and reconfirmed 2026-08-07, only Allison can type `/rename` into a Code session), never by Allison hunting windows to rename them cold.
 
 ## Session Name Goes First Inside The Block
 
-Added 2026-07-28 at Allison's instruction, rewritten 2026-08-07 under the launch-line ruling. The first line INSIDE every paste block is still the session name, so the pasted prompt identifies its own lane in the transcript. What changed is how the session ends up correctly named: the launch line does it, and the in-block line verifies it.
+Added 2026-07-28 at Allison's instruction, rewritten 2026-08-07 under the launch-line ruling. This section governs blocks bound for Claude Code. Blocks bound for a chat conversation lead with the conversation name instead and never carry a SESSION line at all; see Chat Blocks Lead With The Conversation Name below.
+
+The first line INSIDE every Claude Code paste block is still the session name, so the pasted prompt identifies its own lane in the transcript. What changed is how the session ends up correctly named: the launch line does it, and the in-block line verifies it.
 
 **For a NEW session, the dispatch ships the launch line above the fence.** Allison runs it, and the session is born named:
 
@@ -135,6 +137,28 @@ SESSION: Aura - Code Rule Fix - Rule Rewrite -- self-verify this name against yo
 Substitute the actual session name for each block. The routing line above the fence still ships too. Outside the fence Allison reads where to paste; inside the fence the session learns what it is called and proves it.
 
 Why the self-verify line still ships even though the launch line exists: the harness auto-titles sessions from their first message, so a session launched WITHOUT `-n` (an existing session receiving a dispatch, or a launch line Allison did not use) will carry a generated name. The in-block line is what catches that case. Only Allison can type `/rename` into a Code session, verified 2026-07-28 and reconfirmed against Anthropic's tracker 2026-08-07 (#33165, #83543, #84041, #84587 all open).
+
+## Chat Blocks Lead With The Conversation Name
+
+Ruled by Allison 2026-08-07, same lane as the naming and archive rulings. The section above governs blocks bound for Claude Code. This one governs blocks bound for a chat conversation in the Claude app or Cowork, and the two rules do not overlap at any point.
+
+The live failure that forced it: a lane-spawn block buried the conversation name mid-block and opened with mission text, so the app auto-titled the chat off the mission and the lane was born carrying two names, the one in the ledger and the one Allison could see in her sidebar.
+
+Chat conversation titles cannot be set programmatically. The app auto-titles from the first message and no session, tool, or API can override it (live-verified 2026-08-03, reconfirmed 2026-08-07). The only lever the block-writer has is what the first message says first.
+
+**The first line inside a chat block is the conversation name, plain and alone.** No label, no date suffix, no "kickoff" word, no envelope line above it, no mission text above it. The envelope follows on the next lines. Full block anatomy lives in the lane-spawn skill, "The spawn pair."
+
+**Vocabulary lock.** A chat block heads its envelope `CONVERSATION:`. A Code block heads its envelope `SESSION:`. A chat block carrying a `SESSION:` line is malformed and gets rewritten before it ships. `WORKER SESSION:` inside a chat kickoff is a pointer to the Code lane that will carry back, not the block's own header, and is correct. `CLAUDE HOME:` inside a Code block is the same kind of pointer, and is unchanged.
+
+**Near-match titles are accepted and left alone.** Chat lane identity is the kickoff header line, not the displayed title, so leading with the name is a courtesy to Allison's eyes and not a correctness requirement. A chat titled "Ember Rail Repair Plan" for a lane named "Ember Rail Repair" is fine.
+
+**No rename instruction ever reaches Allison for a chat.** Not `/rename`, not "please retitle this," not a parenthetical suggestion. Manual chat renaming was retired as a failure condition by the 2026-08-03 identity ruling and this rule does not revive it. `/rename` remains a Claude Code repair only. If Allison retitles a conversation herself, her name wins from that point on and the ledger follows her; she is simply never asked to.
+
+Routing line for a chat destination follows the same shape as the Code one, surface first:
+
+PASTE INTO: Claude app, new conversation named "Ember Rail Repair"
+
+PASTE INTO: Cowork, existing conversation "Ember Rail Repair"
 
 ## The Hand-Off Choreography: Pin Fires AFTER the Paste Confirmation
 
