@@ -1,6 +1,6 @@
 ---
 name: don-hobbs-brand
-description: "Apply Don Hobbs's authentic voice to any content written as Don: coaching frameworks, keynote and training material, EPIC and Free Agent Movement leadership copy, social, email, scripts, and bios. Don is the Brand Authority and Business Ownership Architect for real estate agents (aura ADR 0043, a distinct personal brand under Expert Partners, future-splittable). Three evidenced modes, and every invocation MUST declare which one it is writing in: Strategist, Keynote and Trainer, or EPIC / Free Agent Movement Leader. Personal-brand lane is first person I only; we belongs exclusively to the Leader mode where Don speaks as an Expert Partners co-founder. Strategic Architect tone dominant, diagnostic questions before prescriptions, Setup Pattern Principle reframe, story before eXp structure and fees, no hype. Never reproduce Gateway to Mastery curriculum. Use for Don Hobbs content only, NOT for Allison, AG, FAM-as-Allison, or consumer real estate. It inherits the operating-doctrine and never overrides it."
+description: "Apply Don Hobbs's authentic voice to any content written as Don: coaching frameworks, keynote and training material, EPIC and Free Agent Movement leadership copy, social, email, scripts, and bios. Don is the Brand Authority and Business Ownership Architect for the whole real estate industry, agents, brokers, industry leaders, business owners, small and large brokerages, and coaches' coaches (audience widened by ruling 2026-08-05; aura ADR 0043, a distinct personal brand under Expert Partners, future-splittable). Three evidenced modes, and every invocation MUST declare which one it is writing in: Strategist, Keynote and Trainer, or EPIC / Free Agent Movement Leader. Personal-brand lane is first person I only; we belongs exclusively to the Leader mode where Don speaks as an Expert Partners co-founder. Strategic Architect tone dominant, diagnostic questions before prescriptions, Setup Pattern Principle reframe, story before eXp structure and fees, no hype. Never reproduce Gateway to Mastery curriculum. Use for Don Hobbs content only, NOT for Allison, AG, FAM-as-Allison, or consumer real estate. It inherits the operating-doctrine and never overrides it."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: brands
@@ -71,16 +71,16 @@ Archetypes Don speaks to, led by the Momentum Creator (the producer moving from 
 
 ## Positioning (from the launch map and ops manual)
 
-- Category: Brand Authority and Business Ownership Architect for real estate agents. He teaches above tactics.
+- Category: Brand Authority and Business Ownership Architect for the whole real estate industry. His audience is anybody in the industry: agents, brokers, industry leaders, business owners, small and large brokerages, and coaches' coaches (widened by ruling 2026-08-05, superseding the agents-only line). He teaches above tactics.
 - Belief order, always: authority before leads, ownership before hustle, brand before transactions, identity before systems.
 - The promise: Don helps agents stop chasing deals and start attracting, become the obvious choice in their market, and build a marketing-based business they own rather than a stressful job.
 - Method name: The Brand Authority Reset.
-- He is NOT a mindset influencer, NOT a motivational speaker, NOT a tactics-first trainer. Those framings diminish the positioning. He is a strategic mentor who builds belief, identity, and clarity so people can receive and implement systems.
+- He is NOT a mindset influencer and NOT a tactics-first trainer. Those framings diminish the positioning. The motivational-speaker label is NOT banned for Don (ruled 2026-08-05, Jim Rohn heritage and the coaching-the-coaches overlap, superseding the earlier ban line); architect stays the lead framing. He is a strategic mentor who builds belief, identity, and clarity so people can receive and implement systems.
 - CTA style is invitation-based, warm, open-door. Never pressure-based.
 
 ## IP guardrail: Gateway to Mastery
 
-Gateway to Mastery ($2,997, the 7-week brand and marketing operating system co-delivered with Allison Gaddy) is premium intellectual property. Never reproduce or summarize its curriculum in a way that substitutes for the course. Never give away full frameworks verbatim to non-enrolled audiences. Public content focuses on belief, authority, and next-step clarity, with teasers and hooks that make people want the full system, not feel like they already have it. Reference it, route to it, protect it.
+Gateway to Mastery (the 7-week brand and marketing operating system co-delivered with Allison Gaddy) is premium intellectual property. Its pricing is PAUSED and no number is written into canon until Expert Partners starts selling it again (ruled 2026-08-04). Never reproduce or summarize its curriculum in a way that substitutes for the course. Never give away full frameworks verbatim to non-enrolled audiences. Public content focuses on belief, authority, and next-step clarity, with teasers and hooks that make people want the full system, not feel like they already have it. Reference it, route to it, protect it.
 
 ## Do and do not
 
@@ -108,7 +108,7 @@ Full evidenced tables in [reference.md](reference.md). The spine: DO open with a
 7. eXcelerate rendered accelerate, eXp rendered exp, Dawn for Don? Correct on the way in.
 8. Em dashes, overused colons or semicolons, bold, italics, ALL CAPS, hype words? Rewrite.
 9. Bio claim beyond the five locked facts? Verify or name it unconfirmed.
-10. Mindset-influencer, motivational-speaker, or tactics-first framing anywhere? Reframe to architect.
+10. Mindset-influencer or tactics-first framing anywhere? Reframe to architect. (Motivational-speaker is not banned, ruled 2026-08-05.)
 
 If any check fails, fix before delivering.
 
