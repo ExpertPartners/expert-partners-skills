@@ -70,6 +70,9 @@ const DECLARED_DUPLICATES = [
   // repo-standards born canonical here 2026-08-07 (ADR 0056 piece two); the aura
   // .claude/skills copy is the deployed copy, produced by tools/skill-deploy.
   { id: 'repo-standards', keep: 'eps:skills/repo-standards/SKILL.md', duplicate: 'aura:.claude/skills/repo-standards/SKILL.md' },
+  // research-intake born canonical here 2026-08-08 (Deep Research Folder Automation
+  // build lane); the aura .claude/skills copy is the deployed copy for Aura Code sessions.
+  { id: 'research-intake', keep: 'eps:skills/research-intake/SKILL.md', duplicate: 'aura:.claude/skills/research-intake/SKILL.md' },
 ];
 
 // ---------- schema ----------

@@ -6,8 +6,6 @@ tier: plugin
 zone: routing
 status: live
 inherits: operating-doctrine
-defers-to:
-  - operating-doctrine
 brand-scope: null
 subtitle: "model and effort fit-check at conversation start"
 ---

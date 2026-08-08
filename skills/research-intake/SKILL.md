@@ -15,7 +15,7 @@ description: >
   informs-lane-in-one-index design rather than the ADR's original per-paper
   docs/research/ file design.
 tier: user
-zone: knowledge
+zone: cataloging
 status: live
 subtitle: "file a research report into the aura research index"
 ---
