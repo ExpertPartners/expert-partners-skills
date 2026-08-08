@@ -98,7 +98,7 @@ jobs:
           python-version: "3.12"
 
       - name: Offline selftest (fixture proof, no PyYAML, system python3)
-        run: python3 .ep/ruling-provenance-lint.py --selftest
+        run: python3 .ep/ruling-provenance-lint.py --selftest --aura-path "$GITHUB_WORKSPACE/aura-ref"
 
       - name: Live diff check (BASE_SHA..HEAD_SHA)
         env:

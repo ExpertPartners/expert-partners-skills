@@ -79,9 +79,13 @@ Usage:
       Check the diff between two commits (CI wiring, mirrors ci.yml's
       existing changed-files pattern).
 
-  python3 .ep/ruling-provenance-lint.py --selftest
+  python3 .ep/ruling-provenance-lint.py --selftest [--aura-path DIR]
       Prove all three checks against deliberate failing and passing
-      fixtures, offline (no network, no git diff -- pure fixture data).
+      fixtures (pure fixture data, no git diff). Cross-repo resolution in
+      the fixtures still needs an answer for "does this path exist on aura
+      main": pass --aura-path to answer it from an already-checked-out
+      tree (CI wiring, fully offline), otherwise it falls to gh api, which
+      needs an authenticated `gh` in the environment running the selftest.
 
   --aura-path DIR   pre-resolved aura checkout for cross-repo citations
   --repo NAME       override current-repo name (default: read from `git
@@ -426,15 +430,16 @@ FIXTURE_BAD_FAKE_PATH_TEXT = (
 )
 
 
-def selftest() -> int:
+def selftest(aura_path: str | None = None) -> int:
     ok = True
     repo_root = Path.cwd()
 
-    print("ruling-provenance-lint: --selftest (offline, fixture data)\n")
+    resolution_note = f"local checkout {aura_path}" if aura_path else "live network (gh api) to aura"
+    print(f"ruling-provenance-lint: --selftest (fixture data; cross-repo resolution via {resolution_note})\n")
 
     # Check 1a: good text resolves cleanly against real aura main.
-    f = check1("fixture.md", FIXTURE_GOOD_CITED_TEXT, repo_root, "expert-partners-skills", None)
-    label = "check1/good-citation (expect 0 findings, live network to aura)"
+    f = check1("fixture.md", FIXTURE_GOOD_CITED_TEXT, repo_root, "expert-partners-skills", aura_path)
+    label = f"check1/good-citation (expect 0 findings, {resolution_note})"
     if f:
         print(f"  FAIL {label}: {[fi.message for fi in f]}")
         ok = False
@@ -442,7 +447,7 @@ def selftest() -> int:
         print(f"  PASS {label}")
 
     # Check 1b: trigger with no citation anywhere nearby -> must fail.
-    f = check1("fixture.md", FIXTURE_BAD_UNBACKED_TEXT, repo_root, "expert-partners-skills", None)
+    f = check1("fixture.md", FIXTURE_BAD_UNBACKED_TEXT, repo_root, "expert-partners-skills", aura_path)
     label = "check1/unbacked-trigger (expect >=1 finding)"
     if f:
         print(f"  PASS {label}: {f[0].message}")
@@ -451,7 +456,7 @@ def selftest() -> int:
         ok = False
 
     # Check 1c: citation present but path does not exist -> must fail.
-    f = check1("fixture.md", FIXTURE_BAD_FAKE_PATH_TEXT, repo_root, "expert-partners-skills", None)
+    f = check1("fixture.md", FIXTURE_BAD_FAKE_PATH_TEXT, repo_root, "expert-partners-skills", aura_path)
     label = "check1/nonexistent-path (expect >=1 finding)"
     if f:
         print(f"  PASS {label}: {f[0].message}")
@@ -577,7 +582,7 @@ def main(argv: list[str]) -> int:
     args = parser.parse_args(argv)
 
     if args.selftest:
-        return selftest()
+        return selftest(args.aura_path)
     if args.pre_commit:
         return run_live("pre-commit", None, None, args.aura_path, args.repo)
     if args.ci:
