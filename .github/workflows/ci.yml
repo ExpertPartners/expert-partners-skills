@@ -3,7 +3,10 @@ name: ci-gates
 # Expert Partners CI quality gates -- deployed from L6 Gatekeeper (aura).
 # Mirrors .pre-commit-config.yaml: same ruleset, server-side enforced.
 # Gates the diff (changed files); gitleaks scans full history.
-# Tools live in .ep/ -- self-contained, no cross-repo dependency.
+# Tools live in .ep/ -- self-contained, with one named exception: the ruling
+# provenance gate resolves aura-repo citations via a read-only checkout using
+# the existing SKILLS_GRAPH_TOKEN secret (same credential the skills-graph
+# job already uses for the same purpose).
 
 on:
   pull_request:
@@ -69,6 +72,47 @@ jobs:
           set -euo pipefail
           python3 -m pip install --quiet pyyaml
           python3 .ep/skill-description-lint.py --selftest
+
+  ruling-provenance:
+    name: ruling provenance gate (citations, supersession, disclosure)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout expert-partners-skills
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      # Read-only cross-repo checkout for resolving aura-repo ruling citations.
+      # Reuses the SKILLS_GRAPH_TOKEN secret already granted for this exact
+      # purpose by the skills-graph workflow; this is a second READ of an
+      # already-existing credential, not a new grant.
+      - name: Checkout aura (for cross-repo ruling citation resolution)
+        uses: actions/checkout@v6
+        with:
+          repository: ExpertPartners/aura
+          token: ${{ secrets.SKILLS_GRAPH_TOKEN }}
+          path: aura-ref
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Offline selftest (fixture proof, no PyYAML, system python3)
+        run: python3 .ep/ruling-provenance-lint.py --selftest
+
+      - name: Live diff check (BASE_SHA..HEAD_SHA)
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [ -z "${BASE_SHA:-}" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            # First push on a branch with no prior SHA to diff against: diff
+            # against this repo's empty tree so the gate still runs on the
+            # full file set rather than silently no-op'ing.
+            BASE_SHA=$(git hash-object -t tree /dev/null)
+          fi
+          python3 .ep/ruling-provenance-lint.py --ci "$BASE_SHA" "$HEAD_SHA" --aura-path "$GITHUB_WORKSPACE/aura-ref"
 
   gitleaks:
     name: gitleaks secret scan (full history)
