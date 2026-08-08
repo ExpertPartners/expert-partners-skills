@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "26babe260767764b6bf6bf0072de604e7b1c7328",
-    "aura": "5d967074e04004e670197201c7733584d3c0c027"
+    "eps": "59a07d00fa93f4c7d19a6525abbb341d12280c1c",
+    "aura": "c09368b26c0c91e0db50b3855908272f055ecd08"
   },
   "zones": [
     "surfaces",
@@ -209,7 +209,7 @@
       "subtitle": "plain language safe-to-close check",
       "renderNote": null,
       "layout": {
-        "x": 544,
+        "x": 1068,
         "y": 2544,
         "width": 212,
         "height": 77,
@@ -218,6 +218,34 @@
         "subtitleLines": [
           "plain language safe-to-close",
           "check"
+        ]
+      }
+    },
+    {
+      "id": "canon-sync-protocol",
+      "source": "eps:skills/canon-sync-protocol/SKILL.md",
+      "repo": "eps",
+      "tier": "organization",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "canon and rule changes reach every surface, automatically",
+      "renderNote": null,
+      "layout": {
+        "x": 512,
+        "y": 2340,
+        "width": 212,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "canon and rule changes reach",
+          "every surface, automatically"
         ]
       }
     },
@@ -325,8 +353,8 @@
       "subtitle": "deliverables land as named markdown links",
       "renderNote": null,
       "layout": {
-        "x": 1322,
-        "y": 2340,
+        "x": 328,
+        "y": 2443,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -382,8 +410,8 @@
       "subtitle": "Poppins everywhere, hierarchy by size and color",
       "renderNote": null,
       "layout": {
-        "x": 1024,
-        "y": 2340,
+        "x": 30,
+        "y": 2443,
         "width": 252,
         "height": 77,
         "rectHeight": 62,
@@ -666,7 +694,7 @@
       "subtitle": "file content into a repo intake inbox",
       "renderNote": null,
       "layout": {
-        "x": 512,
+        "x": 750,
         "y": 2340,
         "width": 230,
         "height": 77,
@@ -839,7 +867,7 @@
       "subtitle": "bootstrap a new Expert Partners project",
       "renderNote": null,
       "layout": {
-        "x": 288,
+        "x": 812,
         "y": 2516,
         "width": 230,
         "height": 77,
@@ -953,7 +981,7 @@
       "subtitle": "where a piece of work should live",
       "renderNote": null,
       "layout": {
-        "x": 30,
+        "x": 554,
         "y": 2503.2,
         "width": 212,
         "height": 77,
@@ -981,7 +1009,7 @@
       "subtitle": null,
       "renderNote": null,
       "layout": {
-        "x": 288,
+        "x": 812,
         "y": 2443,
         "width": 155,
         "height": 49,
@@ -1088,7 +1116,7 @@
       "subtitle": "structured session audit for consolidation",
       "renderNote": null,
       "layout": {
-        "x": 802,
+        "x": 1326,
         "y": 2455.8,
         "width": 212,
         "height": 77,
@@ -1118,7 +1146,7 @@
       "subtitle": "handoff note to main, clean worktree",
       "renderNote": null,
       "layout": {
-        "x": 550,
+        "x": 1074,
         "y": 2443,
         "width": 206,
         "height": 77,
@@ -1146,7 +1174,7 @@
       "subtitle": "route work to the right project home",
       "renderNote": null,
       "layout": {
-        "x": 768,
+        "x": 1006,
         "y": 2340,
         "width": 230,
         "height": 77,
@@ -1635,25 +1663,31 @@
       "type": "calls",
       "points": [
         {
-          "x": 756,
+          "x": 1280,
           "y": 2582.5
         },
         {
-          "x": 766,
+          "x": 1290,
           "y": 2582.5
         },
         {
-          "x": 766,
+          "x": 1290,
           "y": 2507.2
         },
         {
-          "x": 802,
+          "x": 1326,
           "y": 2507.2
         }
       ]
     },
     {
       "from": "can-i-close",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "canon-sync-protocol",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -1724,12 +1758,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 1276,
-          "y": 2378.5
+          "x": 282,
+          "y": 2481.5
         },
         {
-          "x": 1322,
-          "y": 2378.5
+          "x": 328,
+          "y": 2481.5
         }
       ]
     },
@@ -1975,11 +2009,11 @@
       "type": "calls",
       "points": [
         {
-          "x": 242,
+          "x": 766,
           "y": 2554.5
         },
         {
-          "x": 288,
+          "x": 812,
           "y": 2554.5
         }
       ]
@@ -1990,19 +2024,19 @@
       "type": "calls",
       "points": [
         {
-          "x": 242,
+          "x": 766,
           "y": 2528.8
         },
         {
-          "x": 252,
+          "x": 776,
           "y": 2528.8
         },
         {
-          "x": 252,
+          "x": 776,
           "y": 2467.5
         },
         {
-          "x": 288,
+          "x": 812,
           "y": 2467.5
         }
       ]
@@ -2049,11 +2083,11 @@
       "type": "calls",
       "points": [
         {
-          "x": 756,
+          "x": 1280,
           "y": 2481.5
         },
         {
-          "x": 802,
+          "x": 1326,
           "y": 2481.5
         }
       ]
