@@ -259,6 +259,23 @@ Added 2026-07-27 after a live failure: a doctrine version bump was specified as 
 
 Never state or prescribe a version number from a plugin cache, a loaded skill copy, or any mirror. Those lag canonical. Read canonical in the repo, or have Claude Code read it and report back. If only a mirror was read, say which copy was read and that it may lag.
 
+## Both Shelves: One Pass Delivers Both Zips
+
+Ruled by Allison 2026-08-07. Several skills ride two mount surfaces at once, a standalone claude.ai skill copy and a copy inside the operating-doctrine plugin bundle. pin, code-block-routing, and lane-spawn all sit on both shelves today. The Deployed Copy Content Check of 2026-08-07 verified the two surfaces byte-identical, and that check is the reason the gap was visible: nothing in canon forced a future pass to ship both, so one single-shelf delivery would have opened silent drift between two copies Allison believes are the same rule.
+
+**Any pass that touches a skill carried by the operating-doctrine plugin builds and delivers BOTH upload-ready zips in that same pass.** The standalone skill zip and the freshly bumped plugin bundle zip, together, so Allison's one upload trip covers both shelves. A pass that ships one zip and mentions the other is not finished; it is a drift event with a note attached.
+
+Mechanics:
+
+1. Both zips land in `~/Desktop/Claude Skill Zips` (Rule 0 of `rules/file-delivery.md`, the standing skill-zip refinement). Superseded versions and build intermediates go to `~/Claude/estate-backups/skill-zips` and never crowd the staging folder.
+2. Both zips are blob-verified against `origin/main` before they ship. Every SKILL.md inside a zip hashes with `git hash-object` to the same blob SHA that `git rev-parse origin/main:<path>` reports. A zip built from a working tree that never landed on the remote is a zip of something that does not exist yet, and it does not ship.
+3. The plugin bundle carries a FRESH version bump in `plugins/operating-doctrine/.claude-plugin/plugin.json`, read from canonical per Reading Versions From The Right Place above, never from a cache mirror. The zip filename carries that version so two bundles can never be confused on the Desktop.
+4. The carry-back NAMES BOTH zips, each by exact filename with its verified blob or archive SHA, plus the commit that put the content on `origin/main`. Naming one and implying the other is the failure this rule exists to remove.
+5. The rule keys on the plugin's carrying, not on how the pass started. A pass that set out to touch only the standalone copy still owes the plugin zip, because the plugin copy is the one that governs (skill-map standing flag, plugin copy wins).
+6. Skills with no standalone claude.ai copy owe only the plugin zip, and the carry-back says so plainly rather than going quiet on a missing second file.
+
+Precedence: this section is the delivery half of Reading Versions From The Right Place. That rule stops a wrong version from being SPOKEN; this one stops a right version from being shipped to only one shelf.
+
 ## Links Are Evidence: Never Construct A URL
 
 Added 2026-08-04 after a live recurrence (Marketing Canon lane: a Code session emitted constructed claude.ai links in its carry-backs, was corrected at gate one, saved the rule to its own session memory, and still emitted constructed links at closeout; session memory is a notebook, this skill is the rulebook, so the rule lives here).
