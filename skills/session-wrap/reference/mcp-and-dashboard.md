@@ -20,6 +20,28 @@ Collision guard, mandatory (incident 2026-08-04, first live wrap): the ledger is
 
 Directive binding, added 2026-08-05 (Allison's ruling of 2026-08-04 after the second regression incident): the shared-canonical-file-writes directive (aura `docs/directives/shared-canonical-file-writes.md`) governs every ledger write and wins if this section ever lags it. Three additions beyond the guard above. Any contents-API write MUST pass the current blob SHA (compare-and-swap) so a stale write bounces instead of landing. After two SHA-guard bounces in one wrap, the writer stops racing and routes the row verbatim through an intake handoff note for the next git-based writer to fold in, and a routed row plus a plain statement is a correct wrap. Corrective commits restore only from a FRESH read taken at repair time, never from a copy held earlier in the session, because the held copy may be missing newer healing by the owning lanes (this exact near-miss happened 2026-08-04 and only the SHA guard stopped it).
 
+### Reaching the door from a Code session (connection, not auth model)
+
+Diagnosed 2026-08-07 (Fix estate-brain-door MCP auth error lane) after `update_lane_row` failed four times live from this repo's Plugin GitHub Sync Setup lane with `Incompatible auth server: does not support dynamic client registration` (task_87b02a77). The door's auth model never changed and was never down: `mcp.expertpartners.com/mcp` answered `initialize` with 200 on the first live retest. The failure was a missing project-scoped MCP registration for `estate-brain` in this repo, so the session fell back to Claude Code's default OAuth-discovery flow, which cannot work against the door's Cognito app client (`ukph8epl3baqjajcift1mhhej`, a `USER_PASSWORD_AUTH` client with no Dynamic Client Registration support) -- exactly the documented trigger for that error at code.claude.com/docs/en/mcp ("Use pre-configured OAuth credentials").
+
+The door has never used interactive OAuth for Code sessions and does not need to: it authenticates Code callers via a `headersHelper` (`~/.claude/estate-brain-auth.py`) that runs Cognito `USER_PASSWORD_AUTH` directly and hands back a Bearer token, bypassing OAuth discovery entirely. (Separately, claude.ai's chat connector uses a *different* Cognito app client with pre-configured Client ID/Secret under Advanced settings, per ADR 0051 -- that path is for chat surfaces only and is not relevant to Code sessions.)
+
+Fix shipped as a project-scoped `.mcp.json` at this repo's root (`32417d0`):
+
+```json
+{
+  "mcpServers": {
+    "estate-brain": {
+      "type": "http",
+      "url": "https://mcp.expertpartners.com/mcp",
+      "headersHelper": "python3 $HOME/.claude/estate-brain-auth.py"
+    }
+  }
+}
+```
+
+Any repo whose Code sessions need door tools (`update_lane_row`, `save_to_session_intake`, `get_manifest`, etc.) should carry this same block rather than relying on the door being added ad hoc via `claude mcp add <url>` with no headers -- a bare add defaults to the OAuth flow and reproduces this exact failure. If a session ever sees "Incompatible auth server: does not support dynamic client registration" against this door, the fix is this file, not a credential rotation.
+
 ## Dashboard wrap mark (hq.allisongaddy.com)
 
 RETIRED 2026-08-06. Ruled by Allison in the Memory Drawer Cleanup lane, ruling of record at aura `intake/2026-08-07-ruling-wrap-marks-retired-from-session-wrap-protocol.md`, forced by the Board Walk clearing of 2026-08-07 (aura d183965, twelve marks removed, bodies preserved at `intake/2026-08-07-wrap-marks-cleared-from-board.md`). The wrap mark is out of the session-wrap protocol entirely as of SKILL.md v1.4; a wrap no longer marks the board. Everything below is kept as the mechanical record of how the mark worked, per append-and-update-never-silently-delete. Do not execute it as part of a wrap. Disposition of door tool nine `wrap_mark` is tracked separately and is not settled by this note.
