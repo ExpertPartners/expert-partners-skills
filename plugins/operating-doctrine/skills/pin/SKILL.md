@@ -44,6 +44,9 @@ The VERDICT line is the last line of the carry-back, directly after the SESSION 
 
 ### The session gives the archive verdict (v4.5, re-ruled by Allison 2026-08-07 evening)
 
+<!-- RULED-BY: aura/intake/2026-08-07-ruling-archive-verdict-returns-to-code-sessions.md date:2026-08-07 -->
+<!-- Restores and generalizes a rule Allison first ruled 2026-08-03 for this skill (pin v4.1), struck without disclosure 2026-08-07 morning, and re-ruled the same afternoon: aura/intake/2026-08-03-ruling-pin-v41-carry-back-names-verified-archive-verdict.md date:2026-08-03 status:superseded-and-restored -->
+
 This SUPERSEDES the v4.3 no-verdict addendum and retires `SESSION STATUS: carry-back delivered, awaiting verification at home.` permanently; that line is never written again. Allison's reason, recorded: the session must tell her whether it is okay to archive, determine whether something is open, and say whether a closeout or a wrap is needed, because sessions that cannot say whether they are done pile up, and too many open sessions is the real failure.
 
 A carry-back ends with exactly one of the four SESSION STATUS lines from `behavior-defaults.md`:
@@ -60,6 +63,8 @@ NOT safe means the session diagnoses AND prescribes: it names exactly what is op
 What stays with the home conversation: the actual archive click, and the ledger flip. Home flips the lane's row to `archived` in aura `docs/estate/lanes.md` as one motion with the archive, and no dispatch block is ever written against a row reading `archived`. Sessions are cheap and deterministically named, so spawn freely. Sessions born before v4.5 follow it from their next response.
 
 ### The earned verdict line (v4.7, ruled by Allison 2026-08-07, Aura / Code Rule Fix lane)
+
+<!-- RULED-BY: aura/intake/2026-08-07-ruling-earned-verdict-line-on-carry-backs.md date:2026-08-07 -->
 
 Amends v4.5; does not replace it. The standing SESSION STATUS line stays, and every carry-back adds exactly one earned VERDICT line after it, the carry-back's true last line:
 
