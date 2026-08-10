@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "59a07d00fa93f4c7d19a6525abbb341d12280c1c",
-    "aura": "c09368b26c0c91e0db50b3855908272f055ecd08"
+    "eps": "83fd715fb92bf1e38318c45d4a482fc7ae3e6ac7",
+    "aura": "c975a75ac543302f5978be42d19a4d6527a01b85"
   },
   "zones": [
     "surfaces",
@@ -694,7 +694,7 @@
       "subtitle": "file content into a repo intake inbox",
       "renderNote": null,
       "layout": {
-        "x": 750,
+        "x": 994,
         "y": 2340,
         "width": 230,
         "height": 77,
@@ -1074,6 +1074,34 @@
       }
     },
     {
+      "id": "research-intake",
+      "source": "eps:skills/research-intake/SKILL.md",
+      "repo": "eps",
+      "tier": "user",
+      "zone": "cataloging",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "file a research report into the aura research index",
+      "renderNote": null,
+      "layout": {
+        "x": 30,
+        "y": 2925,
+        "width": 230,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "file a research report into the",
+          "aura research index"
+        ]
+      }
+    },
+    {
       "id": "resume-work",
       "source": "aura:tools/continuity-skills/resume-work/SKILL.md",
       "repo": "aura",
@@ -1174,7 +1202,7 @@
       "subtitle": "route work to the right project home",
       "renderNote": null,
       "layout": {
-        "x": 1006,
+        "x": 1250,
         "y": 2340,
         "width": 230,
         "height": 77,
@@ -1183,6 +1211,34 @@
         "subtitleLines": [
           "route work to the right project",
           "home"
+        ]
+      }
+    },
+    {
+      "id": "session-model-advisor",
+      "source": "eps:plugins/operating-doctrine/skills/session-model-advisor/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "model and effort fit-check at conversation start",
+      "renderNote": null,
+      "layout": {
+        "x": 750,
+        "y": 2340,
+        "width": 218,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "model and effort fit-check at",
+          "conversation start"
         ]
       }
     },
@@ -2066,6 +2122,12 @@
       "points": null
     },
     {
+      "from": "research-intake",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
       "from": "resume-work",
       "to": "operating-doctrine",
       "type": "inherits",
@@ -2100,6 +2162,12 @@
     },
     {
       "from": "session-home",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "session-model-advisor",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -2298,6 +2366,7 @@
   "flags": {
     "declaredDuplicates": [
       "aura:.claude/skills/repo-standards/SKILL.md",
+      "aura:.claude/skills/research-intake/SKILL.md",
       "aura:.claude/skills/session-wrap/SKILL.md",
       "eps:operating-doctrine/SKILL.md"
     ]
@@ -2308,7 +2377,7 @@
   "layout": {
     "engine": "elkjs layered, zones as compound containers (INCLUDE_CHILDREN over brand rooms), build-time only",
     "width": 1633,
-    "height": 2855,
+    "height": 3032,
     "zones": [
       {
         "id": "brain",
@@ -2444,6 +2513,16 @@
         "y": 2203,
         "width": 1617,
         "height": 644,
+        "rooms": []
+      },
+      {
+        "id": "cataloging",
+        "label": "The librarians",
+        "caption": "catalogs and registries",
+        "x": 8,
+        "y": 2877,
+        "width": 274,
+        "height": 147,
         "rooms": []
       }
     ]
