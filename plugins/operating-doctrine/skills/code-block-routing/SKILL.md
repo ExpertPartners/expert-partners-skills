@@ -75,6 +75,22 @@ Mechanics:
 6. This rule binds the dispatcher AND the dispatched session. The dispatcher ships the line; the session enforces it by bouncing a spawning block that lacks one, and confirms its tree's absolute path before touching anything else.
 7. Continuation blocks routed to an EXISTING session inherit that session's established worktree and need not restate it. A pre-rule session with no isolated tree that receives new work isolates itself at that point and says so in its carry-back.
 
+## The Model And Effort Line: Every Spawning Dispatch Names What To Click
+
+Ruled by Allison 2026-08-10, same enforcement shape as Worktree Isolation above: a rule that exists but is not enforced at the dispatch chokepoint is a rule nobody can rely on.
+
+**Every dispatch block that spawns a NEW Claude Code session carries a `MODEL AND EFFORT` line, naming exactly what to select in the Claude Code model and effort picker before the block below it is pasted.** Unconditional. **A dispatch block that spawns a Code session and arrives WITHOUT a `MODEL AND EFFORT` line is malformed and bounces home, same as a block missing its `WORKTREE` line.** The receiving session does not execute it; it replies naming what is missing so the dispatcher reships the block whole.
+
+The line's content is not this skill's to derive. It comes from the session-model-advisor skill's existing Step 3 (fetch ADR 0057 live) and Step 4 (classify the task), run against the JOB THIS DISPATCH HANDS OFF rather than against the session drafting the dispatch. **This skill carries no copy of that logic and no copy of ADR 0057's decision matrix.** If either turns up duplicated here, that is a doctrine violation, delete it and re-point to session-model-advisor.
+
+Format, riding with the other envelope lines, above the fence:
+
+RUN THIS SESSION AT: <model>, effort <level>
+
+Name the level in ADR 0057's own vocabulary (`low`, `medium`, `high`, `xhigh`, `max`), verified fresh against current Claude Code documentation every time the line is written, never carried over from an earlier verification the same day. Which levels exist, and what each one means, is exactly the kind of vendor fact the doc-check standard exists to keep from going stale in a skill file.
+
+**When a level has grown a same-looking UI sibling, name both and say which one to actually click.** Worked example, verified live 2026-08-10 against code.claude.com/docs/en/model-config: Claude Code's `/effort` picker grew an entry named `ultracode` sitting at the strong end of the slider next to `max`. `ultracode` is not a separate or higher effort level. It is `xhigh` plus Claude given standing permission to orchestrate dynamic multi-agent workflows for substantive tasks, a Claude Code SETTING scoped to the current session, not a model effort level (the persisted `effortLevel` key in settings.json does not even accept it). A dispatch that means `xhigh` writes `xhigh`. A dispatch that means the orchestration behavior writes `ultracode` by name, and the line never lets the two get read as interchangeable just because they sit next to each other on the same picker.
+
 ## Session Naming: Three Segments, Set At Launch
 
 Ruled by Allison 2026-08-04 ("yes adopt lane tag rule"), ruling of record at aura intake/2026-08-05-ruling-lane-tag-session-naming-rule.md. EXTENDED by Allison's ruling of 2026-08-07: the job-shaped name is extended, not replaced, and the job name is now the third segment.
