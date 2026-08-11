@@ -160,6 +160,16 @@ Substitute the actual session name for each block. The routing line above the fe
 
 Why the self-verify line still ships even though the launch line exists: the harness auto-titles sessions from their first message, so a session launched WITHOUT `-n` (an existing session receiving a dispatch, or a launch line Allison did not use) will carry a generated name. The in-block line is what catches that case. Only Allison can type `/rename` into a Code session, verified 2026-07-28 and reconfirmed against Anthropic's tracker 2026-08-07 (#33165, #83543, #84041, #84587 all open).
 
+## The Naming Line Is Hard-Enforced, Same As Worktree And Model And Effort
+
+<!-- RULED-BY: aura/intake/2026-08-11-ruling-naming-line-hard-enforcement.md date:2026-08-10 -->
+
+Ruled by Allison 2026-08-10, ruling of record, aura intake/2026-08-11-ruling-naming-line-hard-enforcement.md. Same enforcement shape as Worktree Isolation and The Model And Effort Line above: a rule that exists but is not enforced at the dispatch chokepoint is a rule nobody can rely on. The `claude -n` launch line and the self-verify it feeds existed already; nothing stopped a spawning block from shipping without one and reaching the receiving session unchallenged.
+
+**A spawning block with no `claude -n` launch line, or one whose self-verify at first contact finds no matching custom-title record at all, is malformed and bounces home, same as a block missing its `WORKTREE` or `MODEL AND EFFORT` line. The receiving session does not execute the brief, it reports what is missing so the dispatcher reships the block whole.**
+
+Scoped to spawning (new-session) dispatch blocks only. This does not change continuation-block behavior: a block routed to an EXISTING session never carries a `claude -n` line by design, and a drifted window title there stays informational, exactly as today, self-verify, flag, hand Allison the `/rename` line, then proceed. The two cases are never conflated: a missing launch line on a spawning block is a malformed dispatch that bounces home unexecuted; a drifted title on a continuation block is a self-verify finding that gets flagged and worked through, not a reason to refuse the brief.
+
 ## Chat Blocks Lead With The Conversation Name
 
 Ruled by Allison 2026-08-07, same lane as the naming and archive rulings. The section above governs blocks bound for Claude Code. This one governs blocks bound for a chat conversation in the Claude app or Cowork, and the two rules do not overlap at any point.
