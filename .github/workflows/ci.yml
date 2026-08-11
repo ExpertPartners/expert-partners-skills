@@ -38,10 +38,17 @@ jobs:
           set -euo pipefail
           GLOBS=( '*.md' '*.markdown' '*.mdx' '*.txt' '*.rst' )
           if [ -z "${BASE_SHA:-}" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
-            git ls-files -- "${GLOBS[@]}" > changed_files.txt
-          else
-            git diff --name-only --diff-filter=ACMR "$BASE_SHA" "$HEAD_SHA" -- "${GLOBS[@]}" > changed_files.txt
+            # No prior SHA to diff against (workflow_dispatch, or the first
+            # push of a branch). This gate is diff-scoped (header comment:
+            # "Gates the diff"); sweeping every tracked file here lints files
+            # the commit never touched and can never pass while brand docs
+            # deliberately quote counter-examples (e.g. the misspellings the
+            # ag-personal-brand skill exists to forbid). Gate the tip commit
+            # instead; only a parentless first commit falls back to the empty
+            # tree.
+            BASE_SHA=$(git rev-parse --verify --quiet "${HEAD_SHA}^" || git hash-object -t tree /dev/null)
           fi
+          git diff --name-only --diff-filter=ACMR "$BASE_SHA" "$HEAD_SHA" -- "${GLOBS[@]}" > changed_files.txt
           echo "count=$(grep -c . changed_files.txt || true)" >> "$GITHUB_OUTPUT"
           echo "Changed text files:"; cat changed_files.txt
 
@@ -107,10 +114,16 @@ jobs:
         run: |
           set -euo pipefail
           if [ -z "${BASE_SHA:-}" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
-            # First push on a branch with no prior SHA to diff against: diff
-            # against this repo's empty tree so the gate still runs on the
-            # full file set rather than silently no-op'ing.
-            BASE_SHA=$(git hash-object -t tree /dev/null)
+            # No prior SHA to diff against (workflow_dispatch, or the first
+            # push of a branch). The gate is diff-scoped by its own design
+            # (.ep/ruling-provenance-lint.py: "This gate does not
+            # retroactively validate existing rules... only DIFFS are
+            # checked"), so the old empty-tree fallback here was wrong for
+            # workflow_dispatch: it swept the entire repo and failed on
+            # pre-gate rule text the tip commit never touched. Gate the tip
+            # commit instead; only a parentless first commit falls back to
+            # the empty tree, so the gate still never silently no-ops.
+            BASE_SHA=$(git rev-parse --verify --quiet "${HEAD_SHA}^" || git hash-object -t tree /dev/null)
           fi
           python3 .ep/ruling-provenance-lint.py --ci "$BASE_SHA" "$HEAD_SHA" --aura-path "$GITHUB_WORKSPACE/aura-ref"
 

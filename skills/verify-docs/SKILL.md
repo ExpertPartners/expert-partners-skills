@@ -12,7 +12,7 @@ status: live
 subtitle: "live-doc check before building"
 ---
 
-# Verify Docs — current-knowledge enforcement
+# Verify Docs -- current-knowledge enforcement
 
 You are an expert at making sure I never act on stale documentation. Training cutoff is months behind reality; software changes daily. Run this skill any time a new third-party software/SDK/API/library/platform enters the working context, before recommending or building anything that depends on its current behavior.
 
@@ -32,28 +32,28 @@ Do NOT run this skill for:
 
 ## Workflow
 
-### Step 1 — Confirm the target
+### Step 1 -- Confirm the target
 
 If ambiguous, ask one short question: *"Which exact product/API surface? (e.g., HeyGen Avatar API v2, HeyGen Streaming SDK, HeyGen webhook events.)"* If the user already gave enough specificity, skip.
 
-### Step 2 — Check cache
+### Step 2 -- Check cache
 
 Read `./verified_docs.md` in the project working dir. If an entry exists for this target dated within 30 days and no major version change is implied, report the cached state and exit. No re-fetch needed.
 
-### Step 3 — Spawn research subagent
+### Step 3 -- Spawn research subagent
 
 Use the Agent tool with `subagent_type: Explore` (narrow target) or `general-purpose` (broad survey). Brief the subagent like this:
 
 > Verify the current state of **<TARGET>**. Tasks:
 > 1. **Primary:** WebSearch for "<TARGET> official documentation 2026" to find the canonical docs URL, then WebFetch that URL for the current API surface.
-> 2. **Primary:** WebSearch for "<TARGET> breaking changes 2026" and "<TARGET> release notes" — capture deprecations or changes from the last 6 months.
-> 3. **Supplemental (only if connected):** Context7 MCP — `mcp__Context7__resolve-library-id` then `mcp__Context7__get-library-docs`. Context7 is purpose-built for up-to-date library documentation but may not be connected; check tool availability before relying on it. If unavailable, the WebFetch + WebSearch pair is sufficient.
+> 2. **Primary:** WebSearch for "<TARGET> breaking changes 2026" and "<TARGET> release notes" -- capture deprecations or changes from the last 6 months.
+> 3. **Supplemental (only if connected):** Context7 MCP -- `mcp__Context7__resolve-library-id` then `mcp__Context7__get-library-docs`. Context7 is purpose-built for up-to-date library documentation but may not be connected; check tool availability before relying on it. If unavailable, the WebFetch + WebSearch pair is sufficient.
 > 4. Return a concise structured report: current version, official docs URL, key API surface (top 5–10 endpoints/methods), authentication model, recent breaking changes, anything that contradicts pre-2026 expectations.
 > Keep the report under 400 words.
 
 Run foreground if I'm about to act on the result; background if pre-emptive context-loading.
 
-### Step 4 — Write to cache
+### Step 4 -- Write to cache
 
 Append (or create) `./verified_docs.md` in the project working dir using this format:
 
@@ -70,23 +70,23 @@ Append (or create) `./verified_docs.md` in the project working dir using this fo
 - Notes: <anything else that surprised the subagent>
 ```
 
-If the file doesn't exist, start it with a top-level heading: `# Verified Docs — <project name>` plus a one-line note about the 30-day re-verify rule.
+If the file doesn't exist, start it with a top-level heading: `# Verified Docs -- <project name>` plus a one-line note about the 30-day re-verify rule.
 
-### Step 5 — Surface findings
+### Step 5 -- Surface findings
 
 Tell the user:
 - What was verified and when
-- **Any breaking change or deprecation that affects the plan** — this is the load-bearing piece. If a deprecation invalidates the user's request, stop and surface it before continuing.
+- **Any breaking change or deprecation that affects the plan** -- this is the load-bearing piece. If a deprecation invalidates the user's request, stop and surface it before continuing.
 - Confirm cache write
 
-If the result is clean (matches expectations, no surprises), keep the surface brief — one or two lines. Per Allison's directives: surprises called out loudly, clean results silent.
+If the result is clean (matches expectations, no surprises), keep the surface brief -- one or two lines. Per Allison's directives: surprises called out loudly, clean results silent.
 
 ## Per-project cache file: `verified_docs.md`
 
 Lives in the project working dir (committed to git so Ember, Cowork, and other agents can read it). Format:
 
 ```markdown
-# Verified Docs — <project name>
+# Verified Docs -- <project name>
 
 > Re-verify any entry older than 30 days. Re-verify immediately if a major version change is mentioned.
 
@@ -117,4 +117,4 @@ Lives in the project working dir (committed to git so Ember, Cowork, and other a
 - Don't skip the cache check (wasted tokens).
 - Don't make the user wait for a subagent if the cache already has a fresh hit.
 - Don't write to cache without a real source URL.
-- Don't run silently when a breaking change is found — surface it loudly.
+- Don't run silently when a breaking change is found -- surface it loudly.
