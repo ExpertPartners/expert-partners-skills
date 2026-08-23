@@ -1,0 +1,4 @@
+[SYNTHETIC FIXTURE -- same content as marketing-pdf-synthetic.txt]
+[This variant is used to test the CORE-designated path: Allison's message
+ accompanying this source was "this is foundational, make sure the Estate
+ knows this."]
