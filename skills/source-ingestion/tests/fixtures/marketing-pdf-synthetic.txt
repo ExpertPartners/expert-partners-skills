@@ -1,0 +1,17 @@
+[SYNTHETIC FIXTURE -- not a real book, for skill testing only]
+
+Title: The Offer Ladder (synthetic)
+Author: Fictional Author A
+Format: PDF, 40 pages (synthetic stand-in, no real file)
+
+Chapter 1: Why most offers underprice themselves
+A fictional marketing framework describing a five-rung "offer ladder"
+concept: Free Sample, Entry Offer, Core Offer, Premium Offer, Legacy Offer.
+Page 4: "An offer ladder fails when rung two costs more trust than rung one
+earned."
+
+Chapter 2: The Trust Deposit
+Introduces the term "Trust Deposit" (synthetic terminology): any small
+proof-of-value action that costs the buyer nothing but proves the seller's
+competence. Page 11 gives a fictional example: a synthetic case study of
+"Acme Coaching" giving away a diagnostic call before ever pitching.
