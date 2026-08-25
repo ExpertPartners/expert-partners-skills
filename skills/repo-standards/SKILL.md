@@ -9,7 +9,7 @@ status: live
 subtitle: "born-to-standard repos and ten-point audits"
 ---
 
-# Repo Standards -- v1.0 (2026-08-07)
+# Repo Standards -- v1.1 (2026-08-25)
 
 Every repo in the ExpertPartners organization meets the ruled baseline. This skill is the judgment layer of ADR 0056, the piece that checks what org-level rulesets cannot, and it runs in exactly two situations, a repo being born and a repo being audited.
 
@@ -29,6 +29,7 @@ Fires when a new ExpertPartners repo is being created, including via the new-pro
 4. **.gitattributes and CODEOWNERS scaffold.** Generated paths marked linguist-generated, CODEOWNERS protecting generated artifacts and decision records, both committed even if short.
 5. **Org ruleset inheritance confirmed.** New repos inherit the estate default-branch and tag rulesets automatically. Confirm live (GET the repo's rules for its default branch) and record the check in the birth report. Never assume inheritance, prove it once.
 6. **Intake inbox, when the repo will receive session records.** Create intake/ with the ADR 0027 convention README and note the distillation cadence owner.
+7. **Committed permission baseline** (ADR 0056 point 1, Amendment 1). Write `.claude/settings.json` carrying a `permissions` block before the repo takes its first agent session. Confirm `.gitignore` does not swallow it, since a blanket `.claude/*` ignore makes the file untracked and therefore invisible to the cloud sessions it exists to configure. The mechanics are in the permission-baseline section below.
 
 Report the birth with each item named and its evidence, then hand the repo back.
 
@@ -40,11 +41,31 @@ Run order:
 
 1. Fetch ADR 0056 fresh, then inventory the repo live (tree, workflows, rulesets in effect, .gitattributes, CODEOWNERS, index file, intake state, largest files, frontmatter sampling). Every grade below cites evidence read this session, never memory.
 2. Grade each of the ten points PASS or FAIL, one line of evidence per point. A point that does not apply (no CI exists, no intake inbox, no deployed copies) grades N/A with the reason, and N/A is declared, never silently skipped.
+
+   Point 1 carries a sub-check that is easy to miss and has already been missed once. Read the repo's committed `.claude/settings.json` and confirm it holds a `permissions` block, not hooks alone. A repo whose committed file carries only a SessionStart hook FAILS point 1, however good the operator's own machine configuration is, because a cloud session never reads the operator's machine. Confirm the file is actually tracked by git, not shadowed by a `.claude/*` ignore rule.
 3. **Fix reversible gaps in the same pass.** Missing AGENTS.md, missing index, missing .gitattributes or CODEOWNERS, missing frontmatter on recent files, header banners on generated files, all get fixed and committed in the pass that found them, on a branch merged sequentially. Backup-then-proceed applies, never rewrite history to fix a finding.
 4. **Flag what is gated.** Anything destructive (deleting or rewriting existing content, force operations), anything that spends money, anything that changes who or what holds access (ruleset edits, bypass actors, token scopes), and any judgment call that needs business truth goes back to Allison as a named line item with a recommendation. The audit never executes these, even when the fix is obvious.
 5. **File the audit record.** A dated record lands in the audited repo's intake/ (or aura intake/ when the repo has none), named `YYYY-MM-DD-repo-standards-audit-<repo>.md`, carrying the per-point table, fixes applied with commit hashes, and open flags. Template at `references/audit-record-template.md`.
 
 The walk of the existing estate runs this path one repo per pass, aura first, per the ADR's sequencing (enforcement layer lands before the walk starts). The lane ledger breakup is a known open finding on aura, marked in aura's audit record and never blocking it, per the ADR carve-out.
+
+## The permission baseline
+
+What goes in a repo's committed `.claude/settings.json`. The standard itself lives in ADR 0056 point 1; this section is the mechanics of satisfying it, and the ADR wins on any disagreement.
+
+- **`defaultMode`, `acceptEdits` at most.** Never `bypassPermissions`, never `dontAsk`, never `auto` in a repo-committed file. ADR 0058 governs, and `auto` is an operator's own user-level choice that does not belong in shared project settings.
+- **`allow`, this repo's real toolchain only.** Read the repo's `.pre-commit-config.yaml`, its CI workflow, and its actual script directories, then allow-list what those genuinely invoke. Generic npm or TypeScript rules in a repo with no `package.json` are noise, and they grade as a fail rather than a pass.
+- **`ask`, the consequential tier.** Pushing, pulling, rebasing, hard resets, branch deletes, stash drops and clears, plus every action-capable MCP tool the repo's work reaches.
+- **`deny`, the destructive tier.** Secret and key paths, the recursive-force delete family, force push, force branch delete, remote branch deletion, package publish commands, raw network fetch commands, privilege escalation.
+
+Four traps, each one already paid for:
+
+1. **A `Read` deny rule does not constrain Bash.** A deny on a secrets path does nothing about a Bash command that prints the same file. Any content-reading command added to `allow` reopens every path the deny rules were meant to close.
+2. **Bash rules match literal command prefixes, never intent.** A pull carrying a rebase flag satisfies a broad pull allow rule and never reaches the rebase ask rule. A blanket stash rule covers the two stash subcommands that destroy work. Enumerate safe subcommands instead of globbing a family.
+3. **An `allow` rule cannot glob a server segment, while `ask` and `deny` rules can glob the whole tool name.** Verified live against code.claude.com/docs/en/permissions on 2026-08-25. A guardrail written as a tool-name glob holds in any surface under any server name, while an allow rule must name one literal configured server. Write guardrails as globs and frictionless allows per verified identifier.
+4. **Never guess an MCP server name, and never read one off a permission dialog.** The same server carries different identifiers on different surfaces, and Anthropic's own docs warn that the label shown for a tool in the transcript and permission dialog can differ from its canonical name, which rules match instead. Read the identifier live in the surface the rule has to work in, then write the rule.
+
+Some prompts are unsuppressible by design and are never treated as gaps. A connector tool an organization has set to ask, and an MCP tool whose server marks it with the Anthropic requires-user-interaction meta flag, both prompt on every call in every permission mode, offer no remember-my-choice option, ignore matching allow rules, and still prompt when a PreToolUse hook returns allow. Recognize the signature, record it, and do not build a workaround.
 
 ## Deployed copies and this skill's own hygiene
 
