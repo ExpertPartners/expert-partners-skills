@@ -1,13 +1,13 @@
 ---
 name: new-project
 description: >
-  Bootstrap a new Expert Partners project: creates a private GitHub repo under
-  ExpertPartners/<slug>, creates ~/Claude/projects/<Home>/, writes CLAUDE.md from
-  the canonical template, creates intake/ (ADR 0027 convention), pushes the initial
-  commit, registers the repo for S1 CANONICAL_REPOS sync, and updates the /intake
-  skill's project table so the brain can index it immediately.
-  Use when Allison says "/new-project <Name>", "new project: <Name>", "bootstrap a
-  new project called <Name>", or the session-wrap new-project variant fires.
+  Bootstrap a new Expert Partners project: creates a private GitHub repo under the
+  ExpertPartners org, creates its home folder under ~/Claude/projects, writes CLAUDE.md from the
+  canonical template, creates intake/ (ADR 0027 convention), pushes the initial commit,
+  registers the repo for S1 CANONICAL_REPOS sync, and updates the /intake skill's project table
+  so the brain can index it immediately. Use when Allison says /new-project followed by a name,
+  "new project: NAME", "bootstrap a new project called NAME", or the session-wrap new-project
+  variant fires.
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Adopted into canonical 2026-08-05 (Skill Map Rulings lane, flags item 9);
 # the machine copy at ~/.claude/skills is a deployed copy.

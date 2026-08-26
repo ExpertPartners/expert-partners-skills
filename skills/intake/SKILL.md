@@ -1,13 +1,12 @@
 ---
 name: intake
 description: >
-  File a session summary or any captured content into a canonical brand/project
-  repo's intake/ inbox, then commit and push so the estate-brain indexes it.
-  Use when the user pastes a claude.ai session summary with "/intake <project>",
-  or says "intake this to <project>", "save this session to <project>", "file
-  this into <repo>". Implements the ADR 0027 session-intake convention (the
-  Claude Code half; the brain write tool save_to_session_intake is the claude.ai
-  half, and both MUST produce identical file shape).
+  File a session summary or any captured content into a canonical brand/project repo's intake/
+  inbox, then commit and push so the estate-brain indexes it. Use when the user pastes a
+  claude.ai session summary with /intake followed by a project name, or says "intake this to
+  PROJECT", "save this session to PROJECT", "file this into REPO". Implements the ADR 0027
+  session-intake convention (the Claude Code half; the brain write tool save_to_session_intake
+  is the claude.ai half, and both MUST produce identical file shape).
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Adopted into canonical 2026-08-05 (Skill Map Rulings lane, flags item 9);
 # the machine copy at ~/.claude/skills is a deployed copy.
