@@ -13,7 +13,7 @@ brand-scope: null
 subtitle: "Claude Code takes care of Claude Code"
 ---
 
-# Session Steward -- v1.0 (2026-08-26)
+# Session Steward -- v1.1 (2026-08-26)
 
 Ruled by Allison 2026-08-26, decision of record aura decisions/0074-naming-and-session-steward.md. The problem this kills: Allison hunting through Ungrouped for mystery Code sessions, remembering which worker belongs to which table, manually correcting Claude Code titles, and being handed /rename lines for work the product can now do itself. Claude Code takes care of Claude Code.
 
@@ -48,6 +48,8 @@ Honest classifications, from evidence:
 - Orphan. Real work, no recoverable owning table from any evidence. Report it as an orphan with what the transcript shows it did; never invent a home (ledger Rule 5).
 - Mixed-purpose. The transcript shows genuinely different jobs sharing one session. Say mixed, plainly. Do not force a clean genealogy that never existed, and do not split history retroactively.
 - Side-fix. Work discovered inside another mission. Distinguish the discovered-from context from the operational home; a worker can have one discovery source and a different operational branch or home, and a shared repo, branch family, issue, PR, or topic is NEVER by itself proof of shared table ownership.
+
+Room segment authority (v1.1, 2026-08-26, decision 0077). The specific behavior this governs: owning-table recovery and every home value the Steward writes or repairs (a ledger home cell, a recovered CLAUDE HOME). The room segment of such a value comes from the lane's dispatched CLAUDE HOME line, itself composed from the room's Project Instructions ROOM identity literal, echoed verbatim. Ledger rows, canon prose, intake records, and memory are never exact-string sources for a room name; where only such prose evidence exists, the Steward copies it verbatim as evidence and marks it non-authoritative for the exact string, and it never normalizes historical rows to match.
 
 ## 4. One table, one active worker (enforcement)
 

@@ -13,7 +13,7 @@ brand-scope: null
 subtitle: "spawning new lanes with named homes"
 ---
 
-# Lane Spawn -- v1.4 (2026-08-26)
+# Lane Spawn -- v1.5 (2026-08-26)
 
 Ruled by Allison 2026-08-03 (Aura: Strategic Advisor / Repo Walk). The problem this kills: a detour surfaces mid-lane, gets half-absorbed into the wrong conversation, derails the thread, and its state lives nowhere. The fix: every detour gets its own lane at the moment it appears, the origin lane names what it is waiting on, and the origin thread continues without a beat.
 
@@ -24,6 +24,8 @@ v1.2 (ruled by Allison 2026-08-07, same lane as the naming and archive rulings):
 v1.3 (ruled by Allison 2026-08-07 afternoon, the worktree dispatch ruling; ruling of record aura intake/2026-08-07-ruling-dispatch-blocks-must-name-worktrees.md): the Code half of a spawn pair carries a `WORKTREE` line naming the isolated worktree the worker session creates and works in, per code-block-routing's Worktree Isolation. A block that spawns a Code session without one is malformed and bounces home.
 
 v1.4 (ruled by Allison 2026-08-26, decision of record aura decisions/0074-naming-and-session-steward.md): Table Birth. A spawned conversation is a TABLE, the durable continuity anchor for its work, and it is named exactly once at birth. The kickoff block still leads with the bare name for the auto-titler, and the receiving surface now also DECLARES that name on its first substantive turn as `TABLE NAME: <exact name>`, so the declared name and the visible title are compared once, at birth, and Allison performs at most one manual title rename if they differ. The Code half changes too: the worker is named `<Table Name> - <Specific Job>` and titles ITSELF through the native session-management tool, so no launch line and no rename hand step ride along. One table, one active Code worker. See "Table Birth" and "The worker half" below.
+
+v1.5 (ruled by Allison 2026-08-26, decision of record aura decisions/0077-room-identity-literal.md): ROOM joins Table Birth. The birth declaration is two lines, `ROOM: <exact room identity>` above `TABLE NAME: <exact permanent table name>`. The exact ROOM string comes solely from that room's own Project Instructions ROOM identity literal, never reconstructed from canon prose, ledger rows, intake records, conversation memory, or this skill (skills carry the value, they never own one). The `CONVERSATION:` envelope line's project segment is composed from that same literal. Platform honesty also lands: a chat surface cannot read its own visible title, so the birth declaration states the intended name, says plainly that visible-title parity cannot be verified from that surface, and asks Allison for the one birth-time glance and rename if the visible title differs, never claiming a title was inspected, matched, or fixed when the surface cannot know that. The live failures that forced it, 2026-08-26: a fresh Aura table declared ROOM as Aura Strategic Advisor, dropping the colon from the Project's actual visible name, because canon prose itself carries the colon-less spelling; the same day NORTH's ChatGPT Project auto-titled a table "Recommend Twilio next move" over the declared name "Twilio Account Cleanup" with no birth-time detection.
 
 A detour is any work item that surfaces inside a lane but is not that lane's job per its kickoff. Quick verification reads (a file check, a live probe) are not detours; do those inline. Anything with its own state, its own carry-backs, or its own rulings is a detour and spawns.
 
@@ -73,8 +75,8 @@ The failure this replaces, 2026-08-07: a spawn block buried the conversation nam
 **Table Birth (v1.4, decision 0074) replaces near-match acceptance for tables.** A spawned conversation is a table, and a table is named exactly once, at birth. Mechanics:
 
 1. The kickoff block leads with the bare name (above), so the auto-titler lands on it or close.
-2. On its first substantive turn, the receiving surface DECLARES the name plainly: `TABLE NAME: <exact table name>`.
-3. If the visible conversation title is not exactly that name, Allison performs the ONE manual table-title rename. At birth only.
+2. On its first substantive turn, the receiving surface DECLARES identity in two lines (v1.5, decision 0077): `ROOM: <exact room identity>` then `TABLE NAME: <exact table name>`. The ROOM string comes solely from the room's own Project Instructions ROOM identity literal.
+3. The surface cannot read its own visible title, so it states the intended TABLE NAME, says plainly that visible-title parity cannot be verified from that surface, and asks Allison for the ONE manual table-title rename if the visible title differs. At birth only, and never claiming a title was inspected, matched, or fixed when the surface cannot know that (v1.5, decision 0077).
 4. After that the table name is stable for life, and no implementation dispatch leaves an unnamed or unconfirmed table.
 
 What did NOT come back: routine or repeated chat rename requests stay banned, `/rename` is still never handed out for a chat in any form, and chat lanes still never get PARITY MISMATCH flags. Table Birth is a single naming act at the moment a table is created, not a maintenance loop, and it is the only point at which a table title correction is ever raised. If Allison renames a conversation herself at any time, her name wins from that point on and the ledger follows her.
@@ -128,5 +130,5 @@ If a Code block already shipped before the new lane existed (the detour escalate
 - Every paste carries the envelope (v1.1). A receiving session adopts a fully-named block on any surface and continues (v1.1).
 - A chat kickoff opens with the bare conversation name; a chat block heads its envelope CONVERSATION, never SESSION; a chat never gets a routine rename instruction (v1.2).
 - The Code half of a spawn pair carries its WORKTREE line; a spawning Code block without one is malformed and bounces home (v1.3).
-- A table is named exactly once, at birth: declared as TABLE NAME on the first substantive turn, with at most one manual title rename by Allison if the visible title is not exact (v1.4).
+- A table is named exactly once, at birth: declared as ROOM plus TABLE NAME on the first substantive turn (v1.5, decision 0077), with at most one manual title rename by Allison if the visible title is not exact (v1.4). The ROOM string comes solely from the room's own Project Instructions literal, and no surface claims title parity it cannot read (v1.5).
 - A table runs many sequential workers and never two concurrent independent ones; the worker names itself `<Table Name> - <Specific Job>` through the native tool (v1.4).
