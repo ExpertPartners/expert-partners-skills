@@ -185,6 +185,36 @@ if errs:
 PY
 }
 
+# spec_clean_frontmatter <SKILL.md path> -- rewrite frontmatter to the six keys
+# the claude.ai upload / Skills API path allows, dropping every Claude Code and
+# estate-local extension. Used ONLY when building an upload zip. Canonical
+# source and Claude Code deployed copies keep their skill-map keys, because
+# Claude Code accepts every field; it is the upload path that does not.
+# code.claude.com/docs/en/skills, "Using skill frontmatter outside Claude Code"
+# (verified live 2026-08-26): "If you include any field the spec doesn't allow,
+# packaging or upload fails with a hard error instead of ignoring the field",
+# error text "Unexpected key(s) in SKILL.md frontmatter: ... Allowed properties
+# are: allowed-tools, compatibility, description, license, metadata, name".
+spec_clean_frontmatter() {
+  python3 - "$1" <<'PY'
+import sys, yaml
+SPEC = ["name", "description", "license", "compatibility", "metadata", "allowed-tools"]
+path = sys.argv[1]
+text = open(path).read()
+end = text.index("\n---", 3)
+fm = yaml.safe_load(text[3:end])
+body = text[end:]
+kept = {k: fm[k] for k in SPEC if k in fm}
+dropped = sorted(set(fm) - set(SPEC))
+rendered = yaml.dump(kept, sort_keys=False, default_flow_style=False,
+                     width=10**6, allow_unicode=True).rstrip("\n")
+open(path, "w").write("---\n" + rendered + body)
+if dropped:
+    print("  spec-clean: dropped non-spec frontmatter keys from the upload copy: "
+          + ", ".join(dropped), file=sys.stderr)
+PY
+}
+
 # zip_preflight <zip path> <expected skill name> -- assert the two structural
 # rules the upload UI enforces (proven by live rejection 2026-08-07):
 # exactly one top-level folder, exactly one SKILL.md.
@@ -192,10 +222,25 @@ zip_preflight() {
   python3 - "$1" "$2" <<'PY'
 import sys, zipfile
 zp, expected = sys.argv[1], sys.argv[2]
-names = [n for n in zipfile.ZipFile(zp).namelist() if not n.startswith("__MACOSX")]
+zf = zipfile.ZipFile(zp)
+names = [n for n in zf.namelist() if not n.startswith("__MACOSX")]
 tops = {n.split("/")[0] for n in names if n.strip()}
 skills = [n for n in names if n.endswith("SKILL.md")]
 errs = []
+
+# Prove the packaged artifact itself carries only the six allowed frontmatter
+# keys, so a spec-clean claim is verified on the thing Allison uploads rather
+# than assumed from the source.
+SPEC = {"name", "description", "license", "compatibility", "metadata", "allowed-tools"}
+if len(skills) == 1:
+    import yaml
+    t = zf.read(skills[0]).decode()
+    if t.startswith("---"):
+        fm = yaml.safe_load(t[3:t.index("\n---", 3)])
+        extra = sorted(set(fm) - SPEC)
+        if extra:
+            errs.append("packaged SKILL.md still carries non-spec frontmatter keys, which "
+                        "the upload rejects as a hard error: " + ", ".join(extra))
 if len(tops) != 1:
     errs.append(f"zip must contain exactly one top-level folder, found {len(tops)}: {sorted(tops)}")
 elif tops != {expected}:
@@ -328,6 +373,10 @@ fi
 if [ -n "$ZIP_PATH" ]; then
   STAGE=$(mktemp -d)
   rsync -a "$SRC/" "$STAGE/$SKILL_NAME/"
+  # The upload path allows only the six spec keys and hard-errors on any other,
+  # so the zip copy is stripped to them. Canonical source is untouched.
+  spec_clean_frontmatter "$STAGE/$SKILL_NAME/SKILL.md"
+  upload_preflight "$STAGE/$SKILL_NAME/SKILL.md"
   manifest "$STAGE/$SKILL_NAME"
   mkdir -p "$(dirname "$ZIP_PATH")"
   rm -f "$ZIP_PATH"
