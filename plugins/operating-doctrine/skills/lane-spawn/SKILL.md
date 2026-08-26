@@ -1,6 +1,6 @@
 ---
 name: lane-spawn
-description: "Detour hand-off protocol for Allison's Claude project conversations. Fires the moment a side task, new topic, audit, investigation, or question surfaces mid-lane that is not the current lane's job: Allison says 'new conversation for this', 'put this somewhere else', 'go audit X', or Claude itself notices work that belongs in its own lane. Instead of absorbing the detour or deferring it with 'we'll come back to this', ship a SPAWN PAIR: a lane kickoff block for a new Claude conversation, plus (when a worker is needed) a Claude Code block homed to the NEW lane, then state what the origin lane awaits and resume the origin thread in the same message. A chat kickoff block opens with the conversation name as its literal first line, plain and alone, so the app's auto-titler lands close; chat blocks head their envelope with CONVERSATION and never SESSION, and a chat is never handed a rename instruction. It inherits the operating-doctrine and never overrides it."
+description: "Detour hand-off protocol for Allison's Claude project conversations. Fires the moment a side task, new topic, audit, investigation, or question surfaces mid-lane that is not the current lane's job: Allison says 'new conversation for this', 'put this somewhere else', 'go audit X', or Claude itself notices work that belongs in its own lane. Instead of absorbing the detour or deferring it with 'we'll come back to this', ship a SPAWN PAIR: a lane kickoff block for a new Claude conversation, plus (when a worker is needed) a Claude Code block homed to the NEW lane, then state what the origin lane awaits and resume the origin thread in the same message. A chat kickoff block opens with the conversation name as its literal first line, plain and alone, so the app's auto-titler lands close; chat blocks head their envelope with CONVERSATION and never SESSION. A spawned conversation is a table named exactly once at Table Birth (TABLE NAME declared on the first substantive turn, at most one manual title rename by Allison at birth, decision 0074), and a chat is never handed a routine rename instruction. It inherits the operating-doctrine and never overrides it."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -13,7 +13,7 @@ brand-scope: null
 subtitle: "spawning new lanes with named homes"
 ---
 
-# Lane Spawn -- v1.3 (2026-08-07)
+# Lane Spawn -- v1.4 (2026-08-26)
 
 Ruled by Allison 2026-08-03 (Aura: Strategic Advisor / Repo Walk). The problem this kills: a detour surfaces mid-lane, gets half-absorbed into the wrong conversation, derails the thread, and its state lives nowhere. The fix: every detour gets its own lane at the moment it appears, the origin lane names what it is waiting on, and the origin thread continues without a beat.
 
@@ -22,6 +22,8 @@ v1.1 (ruled by Allison 2026-08-03, same day, after a live misroute): every paste
 v1.2 (ruled by Allison 2026-08-07, same lane as the naming and archive rulings): the chat side of naming. A chat kickoff block now opens with the conversation name as its literal first line, plain and alone, because the app auto-titles a conversation from its first message and nothing can set that title programmatically. The block also heads its envelope with CONVERSATION, never SESSION. See "The conversation name is the first line" and "Vocabulary lock" below. The live failure that forced it: a spawn block buried the conversation name mid-block and led with mission text, so the app titled the chat off the mission and the lane was born with two names.
 
 v1.3 (ruled by Allison 2026-08-07 afternoon, the worktree dispatch ruling; ruling of record aura intake/2026-08-07-ruling-dispatch-blocks-must-name-worktrees.md): the Code half of a spawn pair carries a `WORKTREE` line naming the isolated worktree the worker session creates and works in, per code-block-routing's Worktree Isolation. A block that spawns a Code session without one is malformed and bounces home.
+
+v1.4 (ruled by Allison 2026-08-26, decision of record aura decisions/0074-naming-and-session-steward.md): Table Birth. A spawned conversation is a TABLE, the durable continuity anchor for its work, and it is named exactly once at birth. The kickoff block still leads with the bare name for the auto-titler, and the receiving surface now also DECLARES that name on its first substantive turn as `TABLE NAME: <exact name>`, so the declared name and the visible title are compared once, at birth, and Allison performs at most one manual title rename if they differ. The Code half changes too: the worker is named `<Table Name> - <Specific Job>` and titles ITSELF through the native session-management tool, so no launch line and no rename hand step ride along. One table, one active Code worker. See "Table Birth" and "The worker half" below.
 
 A detour is any work item that surfaces inside a lane but is not that lane's job per its kickoff. Quick verification reads (a file check, a live probe) are not detours; do those inline. Anything with its own state, its own carry-backs, or its own rulings is a detour and spawns.
 
@@ -47,14 +49,14 @@ Ember Rail Repair
 
 CONVERSATION: Aura: Strategic Advisor / Ember Rail Repair
 SURFACE: chat conversation (Claude app)
-WORKER SESSION: Aura - Ember Rail Repair - Rail Diagnostic
+WORKER SESSION: Ember Rail Repair - Rail Diagnostic
 
 WHAT THIS LANE IS: ...
 ```
 
 The name appears twice on purpose. Line one is for the auto-titler, which reads the message and cannot be told anything. The CONVERSATION line is for the receiving Claude, which needs the project as well as the name.
 
-PASTE 2 -- CODE BLOCK (only when a worker session is needed). Per the code-block-routing skill, with one requirement specific to spawning: its `CLAUDE HOME` names the NEW lane, never the origin lane. The carry-back must land where the work will be ruled. The Code half keeps `SESSION`, keeps its `claude -n` launch line, keeps its first-contact self-verify instruction, and carries its `WORKTREE` line naming the isolated worktree the worker creates from a freshly fetched remote ref and confirms by absolute path at first contact (v1.3, per code-block-routing's Worktree Isolation); none of the v1.2 chat rules touch it.
+PASTE 2 -- CODE BLOCK (only when a worker session is needed). Per the code-block-routing skill, with one requirement specific to spawning: its `CLAUDE HOME` names the NEW lane, never the origin lane. The carry-back must land where the work will be ruled. The Code half keeps `SESSION NAME`, keeps its first-contact self-title-and-verify instruction, and carries its `WORKTREE` line naming the isolated worktree the worker creates from a freshly fetched remote ref and confirms by absolute path at first contact (v1.3, per code-block-routing's Worktree Isolation); none of the chat rules touch it. Under v1.4 the worker name is `<Table Name> - <Specific Job>` and the worker titles itself on Desktop, so no `claude -n` launch line rides unless the target is a CLI-only launch.
 
 RESUME LINE (always, same message, after the blocks). One line stating what the origin lane awaits from the new lane (or 'nothing, fully detached'), then the origin lane's next step, immediately. The origin lane never closes its turn on the detour.
 
@@ -66,9 +68,18 @@ So: **the conversation name is the literal first line of the kickoff block, plai
 
 The failure this replaces, 2026-08-07: a spawn block buried the conversation name several lines down and opened with mission text instead. The app titled the chat off the mission, and the lane had two names from birth, the one the ledger recorded and the one Allison could see.
 
-**Near-match titles are accepted, and always were.** Chat lane identity is the kickoff header line, per the standing 2026-08-03 ruling; the displayed title is cosmetic and is never authoritative. Leading with the name is a courtesy to Allison's eyes in the sidebar, not a correctness requirement. A title that reads "Ember Rail Repair Plan" when the lane is "Ember Rail Repair" is fine and is left alone.
+**Chat lane identity is the kickoff header line**, per the standing 2026-08-03 ruling; the displayed title is not the mechanism, because it cannot be set programmatically. Leading with the name is what gives the auto-titler the right material.
 
-**Claude never hands Allison a rename instruction for a chat. Ever.** Not a `/rename`, not a "please retitle this conversation," not a parenthetical suggestion. Manual chat renaming was retired as a failure condition in the 2026-08-03 ruling and this rule does not revive it. Chat lanes never get PARITY MISMATCH flags. If Allison renames a conversation herself, her name wins from that point on and the ledger follows her, same as any correction she makes to a home; she is simply never asked to.
+**Table Birth (v1.4, decision 0074) replaces near-match acceptance for tables.** A spawned conversation is a table, and a table is named exactly once, at birth. Mechanics:
+
+1. The kickoff block leads with the bare name (above), so the auto-titler lands on it or close.
+2. On its first substantive turn, the receiving surface DECLARES the name plainly: `TABLE NAME: <exact table name>`.
+3. If the visible conversation title is not exactly that name, Allison performs the ONE manual table-title rename. At birth only.
+4. After that the table name is stable for life, and no implementation dispatch leaves an unnamed or unconfirmed table.
+
+What did NOT come back: routine or repeated chat rename requests stay banned, `/rename` is still never handed out for a chat in any form, and chat lanes still never get PARITY MISMATCH flags. Table Birth is a single naming act at the moment a table is created, not a maintenance loop, and it is the only point at which a table title correction is ever raised. If Allison renames a conversation herself at any time, her name wins from that point on and the ledger follows her.
+
+**The worker half (v1.4).** A table may have many sequential Code workers over its life and never two concurrent independent ones. If the detour genuinely needs its own concurrent implementation, it needs its own table first, which is exactly what a spawn pair produces. Worker naming and self-titling live in code-block-routing, Session Naming; classification, drift repair, and the one-table-one-active-worker check live in the session-steward skill.
 
 ## Vocabulary lock: CONVERSATION for chats, SESSION for Code (v1.2)
 
@@ -99,9 +110,9 @@ When Claude discovers a lane is living on a different surface than planned, it s
 
 Claude proposes the conversation name: short, the topic, and readable in a sidebar (e.g. `Ember Audit`, `EPIC Funnel Audit`). Keep it to the words that identify the lane; date suffixes and the word "kickoff" no longer ride on the name itself under v1.2, because the name is now the line the auto-titler reads. When a lane is genuinely date-bound, the date goes in the block body, not in the name.
 
-The name in the kickoff block IS the lane's name for life, and it is what the lane ledger records. The displayed chat title is cosmetic and may be logged parenthetically when someone needs to find the window, never treated as identity. If Allison renames the conversation herself, her name wins from that point on; Claude never asks her to.
+The name in the kickoff block IS the table's name for life, it is what the receiving surface declares as `TABLE NAME` on its first substantive turn (v1.4), and it is what the lane ledger records. Under Table Birth the visible title is compared to it once, at birth, and Allison performs at most one manual rename if they differ; after that the title is never revisited. If Allison renames the conversation herself at any point, her name wins from that point on.
 
-Code session names are a different rule with a different format (`<Project short name> - <Conversation name> - <Job name>`, set at launch via `claude -n`). See the pin skill, section 5. Do not apply the Code format to a chat conversation name.
+Worker (Code session) names are a different rule with a different format, `<Table Name> - <Specific Job>`, self-titled at birth through the native session-management tool (decision 0074). See the pin skill, section 5, and code-block-routing, Session Naming. Do not apply the worker format to a table name, and do not put a room prefix on either by default.
 
 ## Ordering when Allison asks mid-detour
 
@@ -115,5 +126,7 @@ If a Code block already shipped before the new lane existed (the detour escalate
 - The origin lane records the spawn as a waiting-on item; the pin skill handles the paste confirmations on each surface as usual.
 - Findings that change origin-lane decisions travel back as a short paste Allison carries, never assumed to be known cross-lane.
 - Every paste carries the envelope (v1.1). A receiving session adopts a fully-named block on any surface and continues (v1.1).
-- A chat kickoff opens with the bare conversation name; a chat block heads its envelope CONVERSATION, never SESSION; a chat never gets a rename instruction (v1.2).
+- A chat kickoff opens with the bare conversation name; a chat block heads its envelope CONVERSATION, never SESSION; a chat never gets a routine rename instruction (v1.2).
 - The Code half of a spawn pair carries its WORKTREE line; a spawning Code block without one is malformed and bounces home (v1.3).
+- A table is named exactly once, at birth: declared as TABLE NAME on the first substantive turn, with at most one manual title rename by Allison if the visible title is not exact (v1.4).
+- A table runs many sequential workers and never two concurrent independent ones; the worker names itself `<Table Name> - <Specific Job>` through the native tool (v1.4).
