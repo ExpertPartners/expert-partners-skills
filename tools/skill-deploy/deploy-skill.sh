@@ -68,13 +68,21 @@ manifest() { # write checksums.sha256 over a dir (excluding the manifest itself)
     | xargs -0 shasum -a 256 > checksums.sha256 )
 }
 
-# upload_preflight <SKILL.md path> -- enforce the constraints claude.ai's Skills
-# upload UI actually rejects on, BEFORE anything is deployed or zipped.
+# upload_preflight <SKILL.md path> -- enforce the constraints the claude.ai
+# Skills upload actually rejects on, BEFORE anything is deployed or zipped.
 # Added 2026-08-26 after a live upload rejected code-block-routing and lane-spawn
 # with "field 'description' in SKILL.md must be at most 1024 characters" and
 # "SKILL.md description cannot contain XML tags". Local plugin validation and
 # blob verification both passed, so neither caught it; a package is not
 # upload-ready until it satisfies the uploader's own frontmatter rules.
+#
+# The rule set is the UNION of the two official validators, because they
+# disagree and either may be what the upload path runs:
+#   skills-ref        github.com/agentskills/agentskills  (spec reference lib)
+#   quick_validate.py github.com/anthropics/skills        (run by package_skill.py)
+# Verified live 2026-08-26 against agentskills.io/specification,
+# platform.claude.com/docs/en/build-with-claude/skills-guide and
+# code.claude.com/docs/en/skills. Where docs conflict, the live rejection wins.
 upload_preflight() {
   python3 - "$1" <<'PY'
 import os, re, sys, unicodedata
@@ -83,100 +91,160 @@ try:
 except ImportError:
     sys.exit("FATAL: upload_preflight needs PyYAML (pip3 install pyyaml)")
 
-# Constraint set is the UNION of the two official validators, because they
-# disagree and the upload path can enforce either:
-#   skills-ref        github.com/agentskills/agentskills  (spec reference lib)
-#   quick_validate.py github.com/anthropics/skills        (run by package_skill.py)
-# Verified live 2026-08-26 against agentskills.io/specification,
-# platform.claude.com/docs/en/api/skills-guide, and both validator sources.
-# GROUND TRUTH outranks docs where they conflict: the 2026-08-26 upload
-# rejection is authoritative, and Claude Code's own looser frontmatter rules
-# are deliberately NOT the baseline (it makes every field optional and accepts
-# ~20 extra keys, so validating against it would let a real rejection through).
 SPEC_KEYS = {"name", "description", "license", "compatibility", "metadata", "allowed-tools"}
-RESERVED_IN_NAME = ("anthropic", "claude")
-
 path = sys.argv[1]
-text = open(path).read()
-if not text.startswith("---"):
-    sys.exit(f"FATAL: {path} has no YAML frontmatter")
-try:
-    end = text.index("\n---", 3)
-except ValueError:
-    sys.exit(f"FATAL: {path} frontmatter is not terminated")
-try:
-    fm = yaml.safe_load(text[3:end])
-except yaml.YAMLError as e:
-    sys.exit(f"FATAL: {path} frontmatter is not valid YAML: {e}")
-if not isinstance(fm, dict):
-    sys.exit(f"FATAL: {path} frontmatter is not a mapping")
-
+raw = open(path, "rb").read()
 errs, warns = [], []
+
+# --- file-level encoding gates -------------------------------------------
+# Anthropic's shipped validator matches ^---\n(.*?)\n--- against the raw file,
+# so a BOM or CRLF breaks frontmatter parsing with "Invalid frontmatter format".
+if raw.startswith(b"\xef\xbb\xbf"):
+    errs.append("file begins with a UTF-8 BOM; the validator gates on the literal '---' at byte 0")
+if b"\r\n" in raw:
+    errs.append("file uses CRLF line endings; the validator's frontmatter regex requires LF")
+if os.path.basename(path) != "SKILL.md":
+    errs.append(f"skill file must be named exactly 'SKILL.md', found {os.path.basename(path)!r}")
+try:
+    text = raw.decode("utf-8")
+except UnicodeDecodeError as e:
+    print(f"FATAL: {path} is not valid UTF-8: {e}", file=sys.stderr)
+    sys.exit(1)
+
+m = re.match(r"^---\n(.*?)\n---", text, re.DOTALL)
+if not m:
+    errs.append("no parsable YAML frontmatter block delimited by '---' lines at the very start")
+    block = ""
+else:
+    block = m.group(1)
+
+fm = None
+if block:
+    try:
+        fm = yaml.safe_load(block)
+    except yaml.YAMLError as e:
+        errs.append(f"frontmatter is not valid YAML: {e}")
+    if fm is not None and not isinstance(fm, dict):
+        errs.append("frontmatter must be a YAML mapping")
+        fm = None
+    # PyYAML silently keeps the last of duplicated keys; server behavior is
+    # unknown, so a duplicate is treated as an authoring error.
+    seen, dupes = set(), set()
+    for line in block.split("\n"):
+        km = re.match(r"^([A-Za-z0-9_.-]+):", line)
+        if km:
+            k = km.group(1)
+            (dupes.add if k in seen else seen.add)(k)
+    if dupes:
+        errs.append("duplicate top-level frontmatter keys: " + ", ".join(sorted(dupes)))
 
 def angle_check(field, value):
     # The uploader's error is "cannot contain XML tags" and Anthropic does not
-    # publish the matching rule. Independent reimplementations range from
-    # </?[a-zA-Z][^>]*> to a blanket ban on any < or >. A confirmed live
-    # rejection fired on a single angle-bracketed token buried mid-sentence
-    # inside backticks, so formatting is no exemption. We enforce the strictest
-    # reading (no angle bracket at all), which provably cannot be laxer than
-    # the server, and which the whole shelf satisfies as of 2026-08-26.
+    # publish the matching rule. Its own quick_validate.py rejects ANY '<' or
+    # '>' anywhere, which is stricter than its prose and stricter than every
+    # third-party tag-shaped regex. We enforce that strictest reading, so this
+    # check can never let a real rejection through. Checked against the PARSED
+    # scalar: backticks and quoting grant no exemption.
     if re.search(r"[<>]", value):
         bits = sorted(set(re.findall(r"\S*[<>]\S*", value)))[:6]
-        errs.append(
-            f"{field} contains angle brackets, which the uploader rejects as XML tags: "
-            + ", ".join(bits)
-            + " -- write the placeholder in prose (for example TABLE NAME) instead")
+        errs.append(f"{field} contains angle brackets, which the uploader rejects as XML tags: "
+                    + ", ".join(bits)
+                    + " -- write the placeholder in prose (for example TABLE NAME) instead")
 
-name = fm.get("name")
-if name is None or not str(name).strip():
-    errs.append("frontmatter 'name' is missing or empty")
-else:
-    n = str(name).strip()
-    angle_check("name", n)
-    if len(n) > 64:
-        errs.append(f"name is {len(n)} characters, the limit is 64")
-    if not re.fullmatch(r"[a-z0-9-]+", n):
-        errs.append(f"name {n!r} must match ^[a-z0-9-]+$ (lowercase ASCII letters, digits, hyphens)")
-    if n.startswith("-") or n.endswith("-"):
-        errs.append(f"name {n!r} must not start or end with a hyphen")
-    if "--" in n:
-        errs.append(f"name {n!r} must not contain consecutive hyphens")
-    parent = os.path.basename(os.path.dirname(os.path.abspath(path)))
-    if unicodedata.normalize("NFKC", n) != unicodedata.normalize("NFKC", parent):
-        errs.append(f"name {n!r} must equal its parent directory name {parent!r}")
-    for w in RESERVED_IN_NAME:
-        if w in n.lower():
-            warns.append(f"name contains the reserved word {w!r}; the Skills API documents "
-                         f"this as disallowed and may reject it server-side")
+if isinstance(fm, dict):
+    name = fm.get("name")
+    if name is None or (isinstance(name, str) and not name.strip()):
+        errs.append("frontmatter 'name' is missing or empty")
+    elif not isinstance(name, str):
+        errs.append(f"'name' must be a string; YAML coerced it to {type(name).__name__} "
+                    f"({name!r}) -- quote it")
+    else:
+        n = name.strip()
+        angle_check("name", n)
+        if not 1 <= len(n) <= 64:
+            errs.append(f"name is {len(n)} characters, must be 1 to 64")
+        if not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", n):
+            errs.append(f"name {n!r} must match ^[a-z0-9]+(-[a-z0-9]+)*$ (lowercase ASCII, "
+                        f"digits, single internal hyphens)")
+        parent = os.path.basename(os.path.dirname(os.path.abspath(path)))
+        if unicodedata.normalize("NFKC", n) != unicodedata.normalize("NFKC", parent):
+            errs.append(f"name {n!r} must equal its parent directory name {parent!r} "
+                        f"(NFKC-normalized)")
+        for w in ("anthropic", "claude"):
+            if w in n.lower():
+                warns.append(f"name contains the reserved word {w!r}; the Skills API documents "
+                             f"this as disallowed. Substring semantics are unspecified and "
+                             f"Claude Code itself ships a 'claude-api' skill, so this is a "
+                             f"warning rather than a failure")
 
-desc = fm.get("description")
-if desc is None or not str(desc).strip():
-    errs.append("frontmatter 'description' is missing or empty")
-else:
-    d = str(desc).strip()
-    if len(d) > 1024:
-        errs.append(f"description is {len(d)} characters, the uploader's limit is 1024 "
-                    f"(over by {len(d) - 1024})")
-    angle_check("description", d)
+    desc = fm.get("description")
+    if desc is None or (isinstance(desc, str) and not desc.strip()):
+        errs.append("frontmatter 'description' is missing or empty")
+    elif not isinstance(desc, str):
+        errs.append(f"'description' must be a string; YAML coerced it to {type(desc).__name__} "
+                    f"({desc!r}) -- quote it")
+    else:
+        d = desc.strip()
+        # Count in codepoints AND UTF-16 units: a non-BMP character counts 1 in
+        # Python and 2 in JavaScript, and the server's counting unit is unknown.
+        u16 = len(d.encode("utf-16-le")) // 2
+        if len(d) > 1024 or u16 > 1024:
+            errs.append(f"description is {len(d)} codepoints / {u16} UTF-16 units, the "
+                        f"uploader's limit is 1024 (over by {max(len(d), u16) - 1024})")
+        elif len(d) > 200:
+            warns.append(f"description is {len(d)} characters. The live uploader enforced 1024 "
+                         f"on 2026-08-26, but claude.com/docs/skills/how-to still states a "
+                         f"200-character claude.ai limit; the 201-1024 band is untested")
+        angle_check("description", d)
 
-compat = fm.get("compatibility")
-if compat is not None and len(str(compat)) > 500:
-    errs.append(f"compatibility is {len(str(compat))} characters, the limit is 500")
+    compat = fm.get("compatibility")
+    if compat is not None:
+        if not isinstance(compat, str):
+            errs.append("'compatibility' must be a string")
+        elif not 1 <= len(compat) <= 500:
+            errs.append(f"compatibility is {len(compat)} characters, must be 1 to 500")
 
-# The spec and both reference validators treat a key outside SPEC_KEYS as a hard
-# error. The live claude.ai upload does NOT: on 2026-08-26 a skill carrying this
-# estate's skill-map keys (tier, zone, status, subtitle, ...) uploaded
-# successfully, and all 38 skills here carry them. Live behavior wins, so this
-# is a warning that would tell us early if the upload path ever tightened.
-extra = sorted(set(fm) - SPEC_KEYS)
-if extra:
-    warns.append("frontmatter keys outside the published spec set: " + ", ".join(extra)
-                 + " (accepted by the live upload as of 2026-08-26; a hard error to the "
-                   "spec's own reference validators)")
+    md = fm.get("metadata")
+    if md is not None:
+        if not isinstance(md, dict):
+            errs.append("'metadata' must be a mapping")
+        else:
+            bad = [f"{k}={md[k]!r}" for k in md
+                   if not isinstance(k, str) or not isinstance(md[k], str)]
+            if bad:
+                errs.append("'metadata' must map strings to strings; quote these: "
+                            + ", ".join(bad[:6]))
+
+    at = fm.get("allowed-tools")
+    if at is not None:
+        # The spec wants a single space-separated string; Claude Code also
+        # accepts a YAML list and comma-separated values. Canonical files may
+        # use either, because the packager normalizes to the spec shape when it
+        # stages the upload copy, so this is a warning rather than a failure.
+        if not isinstance(at, str):
+            warns.append(f"'allowed-tools' is a {type(at).__name__}; the spec wants a "
+                         f"space-separated string (normalized in the upload zip)")
+        elif "," in at:
+            warns.append("'allowed-tools' is comma-separated; the spec wants space-separated "
+                         "(normalized in the upload zip)")
+
+    lic = fm.get("license")
+    if lic is not None and not isinstance(lic, str):
+        errs.append("'license' must be a string")
+
+    # The spec and both reference validators treat a key outside SPEC_KEYS as a
+    # hard error, and code.claude.com/docs/en/skills names claude.ai uploads
+    # explicitly. Canonical sources here intentionally carry skill-map keys
+    # because Claude Code accepts every field, so this is a warning at source;
+    # the upload zip is rewritten to the six keys and zip_preflight PROVES it.
+    extra = sorted(set(fm) - SPEC_KEYS)
+    if extra:
+        warns.append("frontmatter keys outside the spec's six: " + ", ".join(extra)
+                     + " (fine for Claude Code; stripped from the upload zip, where any "
+                       "extra key is a hard error)")
 
 for w in warns:
-    print(f"warn: {os.path.basename(os.path.dirname(path))}: {w}", file=sys.stderr)
+    print(f"warn: {os.path.basename(os.path.dirname(os.path.abspath(path)))}: {w}", file=sys.stderr)
 if errs:
     print(f"FATAL: {path} is not claude.ai-upload-ready:", file=sys.stderr)
     for e in errs:
@@ -192,9 +260,7 @@ PY
 # Claude Code accepts every field; it is the upload path that does not.
 # code.claude.com/docs/en/skills, "Using skill frontmatter outside Claude Code"
 # (verified live 2026-08-26): "If you include any field the spec doesn't allow,
-# packaging or upload fails with a hard error instead of ignoring the field",
-# error text "Unexpected key(s) in SKILL.md frontmatter: ... Allowed properties
-# are: allowed-tools, compatibility, description, license, metadata, name".
+# packaging or upload fails with a hard error instead of ignoring the field".
 spec_clean_frontmatter() {
   python3 - "$1" <<'PY'
 import sys, yaml
@@ -206,47 +272,123 @@ fm = yaml.safe_load(text[3:end])
 body = text[end:]
 kept = {k: fm[k] for k in SPEC if k in fm}
 dropped = sorted(set(fm) - set(SPEC))
+notes = []
+at = kept.get("allowed-tools")
+if at is not None:
+    if isinstance(at, (list, tuple)):
+        joined = " ".join(str(x).strip() for x in at if str(x).strip())
+        notes.append("normalized allowed-tools from a list to a space-separated string")
+    elif isinstance(at, str):
+        joined = " ".join(x.strip() for x in at.replace(",", " ").split() if x.strip())
+        if joined != at:
+            notes.append("normalized allowed-tools to a space-separated string")
+    else:
+        joined = str(at).strip()
+    # An empty allowed-tools (a bare [] in the source, meaning "no restriction
+    # declared") must be DROPPED, not emitted as an empty string: the key is
+    # optional, and an empty value could read as "no tools permitted".
+    if joined:
+        kept["allowed-tools"] = joined
+    else:
+        del kept["allowed-tools"]
+        notes.append("dropped an empty allowed-tools from the upload copy (optional key)")
 rendered = yaml.dump(kept, sort_keys=False, default_flow_style=False,
                      width=10**6, allow_unicode=True).rstrip("\n")
 open(path, "w").write("---\n" + rendered + body)
 if dropped:
     print("  spec-clean: dropped non-spec frontmatter keys from the upload copy: "
           + ", ".join(dropped), file=sys.stderr)
+for note in notes:
+    print("  spec-clean: " + note, file=sys.stderr)
 PY
 }
 
-# zip_preflight <zip path> <expected skill name> -- assert the two structural
-# rules the upload UI enforces (proven by live rejection 2026-08-07):
-# exactly one top-level folder, exactly one SKILL.md.
+# zip_preflight <zip path> <expected skill name> -- assert every structural rule
+# the upload UI enforces, on the artifact Allison actually uploads. The
+# one-top-level-folder rule is ground truth from a live rejection 2026-08-07.
 zip_preflight() {
   python3 - "$1" "$2" <<'PY'
-import sys, zipfile
-zp, expected = sys.argv[1], sys.argv[2]
-zf = zipfile.ZipFile(zp)
-names = [n for n in zf.namelist() if not n.startswith("__MACOSX")]
-tops = {n.split("/")[0] for n in names if n.strip()}
-skills = [n for n in names if n.endswith("SKILL.md")]
-errs = []
-
-# Prove the packaged artifact itself carries only the six allowed frontmatter
-# keys, so a spec-clean claim is verified on the thing Allison uploads rather
-# than assumed from the source.
-SPEC = {"name", "description", "license", "compatibility", "metadata", "allowed-tools"}
-if len(skills) == 1:
+import os, posixpath, sys, unicodedata, zipfile
+try:
     import yaml
-    t = zf.read(skills[0]).decode()
-    if t.startswith("---"):
-        fm = yaml.safe_load(t[3:t.index("\n---", 3)])
-        extra = sorted(set(fm) - SPEC)
-        if extra:
-            errs.append("packaged SKILL.md still carries non-spec frontmatter keys, which "
-                        "the upload rejects as a hard error: " + ", ".join(extra))
+except ImportError:
+    sys.exit("FATAL: zip_preflight needs PyYAML")
+
+SPEC = {"name", "description", "license", "compatibility", "metadata", "allowed-tools"}
+zp, expected = sys.argv[1], sys.argv[2]
+errs, warns = [], []
+
+try:
+    zf = zipfile.ZipFile(zp)
+except zipfile.BadZipFile as e:
+    sys.exit(f"FATAL: {zp} is not a readable zip: {e}")
+
+infos = zf.infolist()
+names = [i.filename for i in infos]
+if not names:
+    errs.append("archive is empty")
+
+# Path hygiene. A Finder- or ditto-built archive carries a sibling __MACOSX/
+# directory, which is a SECOND top-level entry and trips the one-folder rule.
+# This is the most likely real-world cause of the 2026-08-07 rejection on a
+# Mac, so it is detected rather than filtered out.
+junk = sorted({n for n in names
+               if n.split("/")[0] == "__MACOSX" or posixpath.basename(n.rstrip("/")).startswith("._")
+               or posixpath.basename(n.rstrip("/")) == ".DS_Store"})
+if junk:
+    errs.append("archive contains macOS metadata entries (build with python zipfile or "
+                "'zip -r -X', never Finder Compress): " + ", ".join(junk[:6]))
+for i in infos:
+    n = i.filename
+    if n.startswith("/") or ".." in n.split("/") or "\\" in n:
+        errs.append(f"unsafe entry path: {n!r}")
+    if (i.external_attr >> 16) & 0o170000 == 0o120000:
+        errs.append(f"archive contains a symlink: {n!r}")
+
+tops = sorted({n.split("/")[0] for n in names if n.strip()})
 if len(tops) != 1:
-    errs.append(f"zip must contain exactly one top-level folder, found {len(tops)}: {sorted(tops)}")
-elif tops != {expected}:
-    errs.append(f"top-level folder is {sorted(tops)[0]!r}, expected {expected!r}")
-if len(skills) != 1:
-    errs.append(f"zip must contain exactly one SKILL.md, found {len(skills)}: {skills}")
+    errs.append(f"archive must contain exactly one top-level folder and nothing else at its "
+                f"root; found {len(tops)}: {tops[:6]}")
+elif unicodedata.normalize("NFKC", tops[0]) != unicodedata.normalize("NFKC", expected):
+    errs.append(f"top-level folder is {tops[0]!r}, expected {expected!r}")
+
+root_skill = [n for n in names if n.count("/") == 1 and posixpath.basename(n) == "SKILL.md"]
+deeper = [n for n in names if n.count("/") > 1 and posixpath.basename(n) == "SKILL.md"]
+if len(root_skill) != 1:
+    errs.append(f"archive must contain exactly one SKILL.md at the top folder's root; "
+                f"found {len(root_skill)}: {root_skill[:4]}")
+if deeper:
+    warns.append("additional SKILL.md files nested deeper: " + ", ".join(deeper[:4]))
+
+# Documented Skills API ceiling, borrowed: no claude.ai UI number is published.
+total = sum(i.file_size for i in infos)
+if total > 30 * 1024 * 1024:
+    errs.append(f"uncompressed contents total {total/1048576:.1f} MB, over the documented "
+                f"30 MB Skills API ceiling (no claude.ai UI figure is published)")
+
+# Prove the packaged frontmatter is spec-clean on the artifact itself, rather
+# than trusting the source it was built from.
+if len(root_skill) == 1:
+    t = zf.read(root_skill[0]).decode("utf-8", "replace")
+    if t.startswith("---"):
+        try:
+            fm = yaml.safe_load(t[3:t.index("\n---", 3)])
+            extra = sorted(set(fm) - SPEC)
+            if extra:
+                errs.append("packaged SKILL.md still carries non-spec frontmatter keys, which "
+                            "the upload rejects as a hard error: " + ", ".join(extra))
+            pat = fm.get("allowed-tools")
+            if pat is not None and (not isinstance(pat, str) or "," in pat):
+                errs.append(f"packaged 'allowed-tools' is not a space-separated string: {pat!r}")
+            if unicodedata.normalize("NFKC", str(fm.get("name", ""))) != \
+               unicodedata.normalize("NFKC", tops[0] if tops else ""):
+                errs.append(f"packaged name {fm.get('name')!r} does not match the top-level "
+                            f"folder {tops[0] if tops else None!r}")
+        except Exception as e:
+            errs.append(f"packaged SKILL.md frontmatter unreadable: {e}")
+
+for w in warns:
+    print(f"warn: {os.path.basename(zp)}: {w}", file=sys.stderr)
 if errs:
     print(f"FATAL: {zp} would be rejected by the claude.ai Skills upload:", file=sys.stderr)
     for e in errs:
@@ -372,7 +514,14 @@ fi
 
 if [ -n "$ZIP_PATH" ]; then
   STAGE=$(mktemp -d)
-  rsync -a "$SRC/" "$STAGE/$SKILL_NAME/"
+  # Exclusions mirror Anthropic's own package_skill.py, and keep macOS junk out
+  # of the archive: a __MACOSX/ sibling is a second top-level entry and trips
+  # the one-folder rule the uploader enforces.
+  rsync -a \
+    --exclude '.DS_Store' --exclude '._*' \
+    --exclude '__pycache__/' --exclude '*.pyc' \
+    --exclude 'node_modules/' --exclude '/evals/' \
+    "$SRC/" "$STAGE/$SKILL_NAME/"
   # The upload path allows only the six spec keys and hard-errors on any other,
   # so the zip copy is stripped to them. Canonical source is untouched.
   spec_clean_frontmatter "$STAGE/$SKILL_NAME/SKILL.md"
@@ -380,7 +529,7 @@ if [ -n "$ZIP_PATH" ]; then
   manifest "$STAGE/$SKILL_NAME"
   mkdir -p "$(dirname "$ZIP_PATH")"
   rm -f "$ZIP_PATH"
-  ( cd "$STAGE" && zip -qr "$ZIP_PATH" "$SKILL_NAME" )
+  ( cd "$STAGE" && zip -qrX "$ZIP_PATH" "$SKILL_NAME" )
   rm -rf "$STAGE"
   # The zip is the thing Allison actually uploads, so assert its structure too.
   zip_preflight "$ZIP_PATH" "$SKILL_NAME"
