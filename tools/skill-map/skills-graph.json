@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "e468d1fa3a690c23724b767d3a3f9ea91f2d0fc9",
-    "aura": "d4684d35af628eacdf857d8721a1a99c24b201c9"
+    "eps": "eb433c14f025df0720dd7caaafc0d058ee394e0e",
+    "aura": "f5fe4fd177cf47b9d41f1c7000f0e9fb3264b4e6"
   },
   "zones": [
     "surfaces",
@@ -209,7 +209,7 @@
       "subtitle": "plain language safe-to-close check",
       "renderNote": null,
       "layout": {
-        "x": 1068,
+        "x": 544,
         "y": 2544,
         "width": 212,
         "height": 77,
@@ -237,7 +237,7 @@
       "subtitle": "canon and rule changes reach every surface, automatically",
       "renderNote": null,
       "layout": {
-        "x": 512,
+        "x": 250,
         "y": 2340,
         "width": 212,
         "height": 77,
@@ -295,8 +295,8 @@
       "subtitle": "paste block routing and the lane ledger",
       "renderNote": null,
       "layout": {
-        "x": 294,
-        "y": 2659.8,
+        "x": 1322,
+        "y": 2544,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -325,8 +325,8 @@
       "subtitle": "direct execution on surfaces that hold the access",
       "renderNote": null,
       "layout": {
-        "x": 33,
-        "y": 2647,
+        "x": 1061,
+        "y": 2544,
         "width": 215,
         "height": 77,
         "rectHeight": 62,
@@ -353,8 +353,8 @@
       "subtitle": "deliverables land as named markdown links",
       "renderNote": null,
       "layout": {
-        "x": 328,
-        "y": 2443,
+        "x": 1542,
+        "y": 2340,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -410,8 +410,8 @@
       "subtitle": "Poppins everywhere, hierarchy by size and color",
       "renderNote": null,
       "layout": {
-        "x": 30,
-        "y": 2443,
+        "x": 1244,
+        "y": 2340,
         "width": 252,
         "height": 77,
         "rectHeight": 62,
@@ -694,7 +694,7 @@
       "subtitle": "file content into a repo intake inbox",
       "renderNote": null,
       "layout": {
-        "x": 994,
+        "x": 732,
         "y": 2340,
         "width": 230,
         "height": 77,
@@ -752,8 +752,8 @@
       "subtitle": "spawning new lanes with named homes",
       "renderNote": null,
       "layout": {
-        "x": 30,
-        "y": 2748,
+        "x": 1058,
+        "y": 2645,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -867,8 +867,8 @@
       "subtitle": "bootstrap a new Expert Partners project",
       "renderNote": null,
       "layout": {
-        "x": 812,
-        "y": 2516,
+        "x": 288,
+        "y": 2443,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -950,8 +950,8 @@
       "subtitle": "carry-back envelope and place-keeping baton",
       "renderNote": null,
       "layout": {
-        "x": 576,
-        "y": 2666.3,
+        "x": 1604,
+        "y": 2538.9,
         "width": 182,
         "height": 77,
         "rectHeight": 62,
@@ -981,8 +981,8 @@
       "subtitle": "where a piece of work should live",
       "renderNote": null,
       "layout": {
-        "x": 554,
-        "y": 2503.2,
+        "x": 30,
+        "y": 2455.8,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1009,8 +1009,8 @@
       "subtitle": null,
       "renderNote": null,
       "layout": {
-        "x": 812,
-        "y": 2443,
+        "x": 288,
+        "y": 2544,
         "width": 155,
         "height": 49,
         "rectHeight": 34,
@@ -1090,7 +1090,7 @@
       "renderNote": null,
       "layout": {
         "x": 30,
-        "y": 2925,
+        "y": 2822,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -1117,8 +1117,8 @@
       "subtitle": "resume parked or handed-off work",
       "renderNote": null,
       "layout": {
-        "x": 30,
-        "y": 2340,
+        "x": 1605,
+        "y": 2251,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -1144,7 +1144,7 @@
       "subtitle": "structured session audit for consolidation",
       "renderNote": null,
       "layout": {
-        "x": 1326,
+        "x": 802,
         "y": 2455.8,
         "width": 212,
         "height": 77,
@@ -1174,7 +1174,7 @@
       "subtitle": "handoff note to main, clean worktree",
       "renderNote": null,
       "layout": {
-        "x": 1074,
+        "x": 550,
         "y": 2443,
         "width": 206,
         "height": 77,
@@ -1202,7 +1202,7 @@
       "subtitle": "route work to the right project home",
       "renderNote": null,
       "layout": {
-        "x": 1250,
+        "x": 988,
         "y": 2340,
         "width": 230,
         "height": 77,
@@ -1230,7 +1230,7 @@
       "subtitle": "model and effort fit-check at conversation start",
       "renderNote": null,
       "layout": {
-        "x": 750,
+        "x": 488,
         "y": 2340,
         "width": 218,
         "height": 77,
@@ -1239,6 +1239,37 @@
         "subtitleLines": [
           "model and effort fit-check at",
           "conversation start"
+        ]
+      }
+    },
+    {
+      "id": "session-steward",
+      "source": "eps:plugins/operating-doctrine/skills/session-steward/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [
+        "code-block-routing",
+        "pin"
+      ],
+      "brandScope": [],
+      "subtitle": "Claude Code takes care of Claude Code",
+      "renderNote": null,
+      "layout": {
+        "x": 1040,
+        "y": 2443,
+        "width": 236,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "Claude Code takes care of Claude",
+          "Code"
         ]
       }
     },
@@ -1258,7 +1289,7 @@
       "subtitle": "the one canonical session close-out",
       "renderNote": null,
       "layout": {
-        "x": 292,
+        "x": 30,
         "y": 2340,
         "width": 194,
         "height": 77,
@@ -1719,19 +1750,19 @@
       "type": "calls",
       "points": [
         {
-          "x": 1280,
+          "x": 756,
           "y": 2582.5
         },
         {
-          "x": 1290,
+          "x": 766,
           "y": 2582.5
         },
         {
-          "x": 1290,
+          "x": 766,
           "y": 2507.2
         },
         {
-          "x": 1326,
+          "x": 802,
           "y": 2507.2
         }
       ]
@@ -1760,12 +1791,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 530,
-          "y": 2685.5
+          "x": 1558,
+          "y": 2569.7
         },
         {
-          "x": 576,
-          "y": 2685.5
+          "x": 1604,
+          "y": 2569.7
         }
       ]
     },
@@ -1781,12 +1812,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 248,
-          "y": 2685.5
+          "x": 1276,
+          "y": 2582.5
         },
         {
-          "x": 294,
-          "y": 2685.5
+          "x": 1322,
+          "y": 2582.5
         }
       ]
     },
@@ -1814,12 +1845,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 282,
-          "y": 2481.5
+          "x": 1496,
+          "y": 2378.5
         },
         {
-          "x": 328,
-          "y": 2481.5
+          "x": 1542,
+          "y": 2378.5
         }
       ]
     },
@@ -1939,20 +1970,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 248,
-          "y": 2773.7
+          "x": 1276,
+          "y": 2670.7
         },
         {
-          "x": 258,
-          "y": 2773.7
+          "x": 1286,
+          "y": 2670.7
         },
         {
-          "x": 258,
-          "y": 2711.2
+          "x": 1286,
+          "y": 2601.8
         },
         {
-          "x": 294,
-          "y": 2711.2
+          "x": 1322,
+          "y": 2601.8
         }
       ]
     },
@@ -1962,20 +1993,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 248,
-          "y": 2799.3
+          "x": 1276,
+          "y": 2696.3
         },
         {
-          "x": 540,
-          "y": 2799.3
+          "x": 1568,
+          "y": 2696.3
         },
         {
-          "x": 540,
-          "y": 2724
+          "x": 1568,
+          "y": 2600.5
         },
         {
-          "x": 576,
-          "y": 2724
+          "x": 1604,
+          "y": 2600.5
         }
       ]
     },
@@ -2036,20 +2067,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 576,
-          "y": 2704.8
+          "x": 1604,
+          "y": 2585.1
         },
         {
-          "x": 540,
-          "y": 2704.8
+          "x": 1568,
+          "y": 2585.1
         },
         {
-          "x": 540,
-          "y": 2711.2
+          "x": 1568,
+          "y": 2595.3
         },
         {
-          "x": 530,
-          "y": 2711.2
+          "x": 1558,
+          "y": 2595.3
         }
       ]
     },
@@ -2065,12 +2096,12 @@
       "type": "calls",
       "points": [
         {
-          "x": 766,
-          "y": 2554.5
+          "x": 242,
+          "y": 2481.5
         },
         {
-          "x": 812,
-          "y": 2554.5
+          "x": 288,
+          "y": 2481.5
         }
       ]
     },
@@ -2080,20 +2111,20 @@
       "type": "calls",
       "points": [
         {
-          "x": 766,
-          "y": 2528.8
+          "x": 242,
+          "y": 2507.2
         },
         {
-          "x": 776,
-          "y": 2528.8
+          "x": 252,
+          "y": 2507.2
         },
         {
-          "x": 776,
-          "y": 2467.5
+          "x": 252,
+          "y": 2568.5
         },
         {
-          "x": 812,
-          "y": 2467.5
+          "x": 288,
+          "y": 2568.5
         }
       ]
     },
@@ -2145,11 +2176,11 @@
       "type": "calls",
       "points": [
         {
-          "x": 1280,
+          "x": 756,
           "y": 2481.5
         },
         {
-          "x": 1326,
+          "x": 802,
           "y": 2481.5
         }
       ]
@@ -2168,6 +2199,58 @@
     },
     {
       "from": "session-model-advisor",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "session-steward",
+      "to": "code-block-routing",
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 1276,
+          "y": 2494.3
+        },
+        {
+          "x": 1286,
+          "y": 2494.3
+        },
+        {
+          "x": 1286,
+          "y": 2563.3
+        },
+        {
+          "x": 1322,
+          "y": 2563.3
+        }
+      ]
+    },
+    {
+      "from": "session-steward",
+      "to": "pin",
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 1276,
+          "y": 2468.7
+        },
+        {
+          "x": 1568,
+          "y": 2468.7
+        },
+        {
+          "x": 1568,
+          "y": 2554.3
+        },
+        {
+          "x": 1604,
+          "y": 2554.3
+        }
+      ]
+    },
+    {
+      "from": "session-steward",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -2376,8 +2459,8 @@
   ],
   "layout": {
     "engine": "elkjs layered, zones as compound containers (INCLUDE_CHILDREN over brand rooms), build-time only",
-    "width": 1609,
-    "height": 3032,
+    "width": 1871,
+    "height": 2929,
     "zones": [
       {
         "id": "brain",
@@ -2511,8 +2594,8 @@
         "caption": "routing, ledgers, session lifecycle",
         "x": 8,
         "y": 2203,
-        "width": 1593,
-        "height": 644,
+        "width": 1855,
+        "height": 541,
         "rooms": []
       },
       {
@@ -2520,7 +2603,7 @@
         "label": "The librarians",
         "caption": "catalogs and registries",
         "x": 8,
-        "y": 2877,
+        "y": 2774,
         "width": 274,
         "height": 147,
         "rooms": []
