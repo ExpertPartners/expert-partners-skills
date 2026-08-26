@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "ad56cdb84a57e823d9e872e0698f6c0eab6ab498",
-    "aura": "05852ada6dc25c8f5dafbc0f52da23df46b65c43"
+    "eps": "e468d1fa3a690c23724b767d3a3f9ea91f2d0fc9",
+    "aura": "d4684d35af628eacdf857d8721a1a99c24b201c9"
   },
   "zones": [
     "surfaces",
@@ -837,17 +837,17 @@
       "calls": [],
       "defersTo": [],
       "brandScope": [],
-      "subtitle": "propose an accurate session name",
+      "subtitle": "set an accurate session name",
       "renderNote": null,
       "layout": {
-        "x": 1367,
+        "x": 879,
         "y": 2251,
-        "width": 236,
+        "width": 212,
         "height": 63,
         "rectHeight": 48,
         "annotationHeight": 15,
         "subtitleLines": [
-          "propose an accurate session name"
+          "set an accurate session name"
         ]
       }
     },
@@ -921,7 +921,7 @@
       "subtitle": "park work for a later resume",
       "renderNote": null,
       "layout": {
-        "x": 879,
+        "x": 1117,
         "y": 2251,
         "width": 212,
         "height": 63,
@@ -1490,7 +1490,7 @@
       "subtitle": "live-doc check before building",
       "renderNote": null,
       "layout": {
-        "x": 1117,
+        "x": 1355,
         "y": 2251,
         "width": 224,
         "height": 63,
@@ -2376,7 +2376,7 @@
   ],
   "layout": {
     "engine": "elkjs layered, zones as compound containers (INCLUDE_CHILDREN over brand rooms), build-time only",
-    "width": 1633,
+    "width": 1609,
     "height": 3032,
     "zones": [
       {
@@ -2511,7 +2511,7 @@
         "caption": "routing, ledgers, session lifecycle",
         "x": 8,
         "y": 2203,
-        "width": 1617,
+        "width": 1593,
         "height": 644,
         "rooms": []
       },
