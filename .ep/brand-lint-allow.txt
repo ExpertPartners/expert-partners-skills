@@ -1,4 +1,13 @@
-# brand-lint allowlist -- one Python regex per line. Any match is exempt from a finding.
+# brand-lint allowlist -- one Python regex per line.
+#
+# Matching semantics (revised 2026-08-26): each pattern is tested with re.search against
+# the FULL RAW TEXT of every line the linter examines. If any pattern matches a line,
+# every finding on that line is skipped, the same granularity as the inline ignore token.
+# Patterns are never tested against only the flagged word, so context entries (a term
+# plus required surrounding text on the same line) work.
+#
+# This file must live next to brand-lint.py, which loads it from its own directory
+# (tools/ in aura, .ep/ in deployed repos).
 #
 # Use sparingly and only for genuine exceptions:
 #   - direct quotes that must preserve someone else's spelling
@@ -9,5 +18,5 @@
 # so the exemption is visible at the point of use rather than hidden in this file.
 #
 # Examples (commented out -- uncomment and adapt only with a real reason):
-# ^Quoted third-party name$     # a proper noun that legitimately collides with a brand term
-# \bTICKER\b.*NASDAQ            # a stock ticker in a financial context
+# ^Quoted third-party name$     # a line consisting exactly of this colliding proper noun
+# \bTICKER\b.*NASDAQ            # a ticker line in a financial context
