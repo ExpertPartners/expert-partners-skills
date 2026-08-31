@@ -1,6 +1,6 @@
 ---
 name: capability-currency
-description: "Twice-monthly staying-current sweep for the Expert Partners AI Operating System, built on capability-refresh, extending never replacing it. Fires the 1st and 15th, 7 AM CDT, from launchd job com.expertpartners.capability-currency on the M4, and whenever Allison asks whether estate capability knowledge is current, whether anything moved at Anthropic, in the MCP spec, the pinned Python SDK lines, the AWS serverless stack under the Estate Brain door and memory spine, or in estate-relevant AI developments. Sweeps five heads against live sources, Firecrawl primary, overwrites aura reference/capability-watch.md, appends a dated entry with a source URL per claim to reference/capability-refresh-changelog.md, files the run record to aura intake via the Estate Brain door, and emits each needed change as a flag becoming a Founder Active Work card with a proposed due date. Use it even unnamed, whenever the ask is whether the AI operating layer's knowledge is stale. Inherits the operating-doctrine."
+description: "Twice-monthly staying-current sweep for the Expert Partners AI Operating System, built on capability-refresh, extending never replacing it. Fires the 1st and 15th, 7 AM CDT, from launchd job com.expertpartners.capability-currency on the M4, and whenever Allison asks whether estate capability knowledge is current, whether anything moved at Anthropic, in the MCP spec, the pinned Python SDK lines, the AWS serverless stack under the Estate Brain door and memory spine, or in estate-relevant AI developments. Sweeps five heads against live sources, Firecrawl primary, overwrites aura reference/capability-watch.md, appends a dated entry with a source URL per claim to reference/capability-refresh-changelog.md, files the run record to aura intake via the Estate Brain door, and classifies findings first, preserving unactivated ones with RETURN WHEN issues, carding only what Allison activates. Use it even unnamed, whenever the ask is whether the AI operating layer's knowledge is stale. Inherits the operating-doctrine."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Born dressed 2026-08-05 (Capability Currency Build lane, per the locked
 # Capability Currency plan). Zone hands per the acn-currency-check precedent.
@@ -10,7 +10,9 @@ status: live
 subtitle: "twice-monthly estate capability sweep"
 ---
 
-# Capability Currency
+# Capability Currency -- v1.1 (2026-08-30)
+
+v1.1 amendment 2026-08-30 (ruled by Allison; ruling of record: aura decisions/0083-sequencing-without-maximalism-amendment-to-decision-0075.md; advisory of record aura intake/2026-08-30-sequencing-without-maximalism-corrected-final-advisory-super.md): activation behavior only. Findings are classified first, and the prior rule that every needed change is emitted as a flag becoming a Founder Active Work card with a proposed due date is superseded by output 4 below. All research machinery, cadence, sources, capability-watch, changelog, run record, duplicate check, and healthcheck behavior stay exactly as they were.
 
 Keep the estate's capability knowledge honest. The AI operating layer moves faster than a monthly cadence catches, deprecation clocks start ticking the day a vendor posts them, and the 2026-08-03 Capability Check proved the cost of finding a two-day-old retirement notice two days before it fires. This skill runs the sweep twice a month so no clock gets found late.
 
@@ -52,7 +54,7 @@ Sweep every head every run. For each head, compare live state against the baseli
 
 3. File the run record to aura intake through the Estate Brain door (the save_to_session_intake tool), so the run is indexed and readable from every surface.
 
-4. Emit every needed change as a flag. A flag becomes a card on Founder Active Work with a proposed due date under propose-with-override (ruled 2026-08-05), Allison can move or strike the date, the proposal never waits on her. Card carries the finding, its source URL, why it matters to the estate, the proposed due date with one line of reasoning, Business Area Infrastructure unless the finding is brand-scoped, Status Backlog. Search the board for an existing card first, never mint a duplicate, feed an existing card with a comment instead.
+4. Classify every finding first, before any activation output fires, under the operating-doctrine's Decide Now disposition seam. Contained cleanup within existing authority may happen in lane as part of the run. A blocking finding surfaces immediately. A meaningful non-blocking finding is preserved in its owning repo, detailed context in the smallest appropriate existing artifact, and, when guaranteed mechanical resurfacing is required, one open GitHub issue in the owning repo carrying RETURN WHEN and the condition as the wake token, pointing at the owning artifact rather than duplicating it. A Founder Active Work card is created only when Allison deliberately activates the finding as an initiative through the intake ritual. The existing duplicate check is preserved and applies to wake-token issues exactly as it applied to cards, search the owning repo's open issues first, never mint a duplicate, feed the existing issue instead. (This supersedes the 2026-08-05 propose-with-override flag-to-card rule for sweep findings, per Allison's 2026-08-30 correction of record.)
 
 5. Reference-file writes land under ADR 0047 standing write authority and commit to aura main with a Push-Policy trailer. Anything touching doctrine is a proposed diff for Allison, never auto-applied.
 
@@ -73,7 +75,7 @@ The launchd job com.expertpartners.capability-currency fires the runner script (
 - A monitor hit or a headline is a lead, never a conclusion. Fetch the underlying live source before reporting a change as real.
 - Every claim carries a source URL, unverifiable claims are labeled unverified or left out.
 - No self-attestation. The session that runs the sweep never certifies its own build, and the builder never grades the first run.
-- No duplicate cards, no duplicate healthchecks checks, no duplicate reference files. Check first.
+- No duplicate cards, no duplicate wake-token issues, no duplicate healthchecks checks, no duplicate reference files. Check first.
 - Doctrine changes are proposed diffs for Allison. Reference files are the only standing-authority writes.
 
 ## Formatting

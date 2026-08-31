@@ -238,6 +238,17 @@ Amended by Allison 2026-08-07 (Aura / Code Rule Fix lane). This amends the archi
 
 Archive authority stays with the home conversation and home's GitHub grading remains the backstop, but Allison may archive on the spot on a RECOMMEND ARCHIVE without waiting for home. The verdict line is earned, never decorative: RECOMMEND ARCHIVE with an unverified checklist is the same failure the SAFE TO ARCHIVE evidence rule exists to prevent, stated at the moment Allison actually makes the call.
 
+### BUILD BLOCKERS and OUTCOME BLOCKERS: Two Lines, Never One
+
+Amended 2026-08-30, ruled by Allison; ruling of record: aura decisions/0083-sequencing-without-maximalism-amendment-to-decision-0075.md (an explicit amendment to decision 0075); advisory of record aura intake/2026-08-30-sequencing-without-maximalism-corrected-final-advisory-super.md.
+
+Every carry-back reports BUILD BLOCKERS and OUTCOME BLOCKERS as two separate lines, riding immediately before the SESSION STATUS line. No surface ever reports a single BLOCKING line, and every disposition or completion list that would have carried one carries the BUILD and OUTCOME pair instead. "None" is a valid value and is stated explicitly, never implied by omission.
+
+- BUILD BLOCKERS prevent the implementation from being built. They are owned by the active worker.
+- OUTCOME BLOCKERS prevent Allison's stated result from functioning end to end, or prevent required acceptance proof, blocking mission completion even when the build is finished. Safe, bounded, reversible, clearly-owned fixes required for the current outcome are handled in place; fixes that materially change architecture, authority, security, cost, or system-of-record ownership go to Allison before implementation.
+
+The worker's verdict speaks only to its own surface-specific job, never to the home table's objective. A worker closes when its job is finished and successor work is durably handed off; whether the home table's mission is achieved is judged only by the home table's own closeout (the session-wrap close-or-continue verdict), never imported from a worker's verdict. A worker carry-back that pronounces on the home objective is malformed on that line, exactly as a table verdict spoken in worker vocabulary is void under decision 0075.
+
 ## The Lane Ledger: Row At Dispatch, Update At Carry-Back
 
 Added 2026-08-03. The estate-wide lane ledger lives at `docs/estate/lanes.md` in the aura repo. It is the single file that answers "what Claude Code sessions exist, what does each belong to, and what is each waiting on" from any surface; any project reads it through its aura connection.
