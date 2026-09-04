@@ -44,10 +44,17 @@ Verified live 2026-09-03 against help.openai.com and developers.openai.com.
 1. In the ChatGPT sidebar, select **Plugins**.
 2. In the Plugin Directory, select the **Skills** tab.
 3. Select **Create**, then **Upload from your computer**.
-4. Upload `expert-partners-estate-chatgpt-plugin-v1.0.0.zip` from the Desktop.
+4. Upload the current `expert-partners-estate-chatgpt-plugin-vX.Y.Z.zip` from
+   the Desktop. The build writes exactly one version there and the previous one
+   is deleted, so the file present IS the one to upload. Never hardcode a
+   version in this instruction; it goes stale on the next rebuild.
 5. Wait for the upload scan. Most skills are available immediately. A skill may
    be marked **Needs Review**, and one that appears risky may be marked
    **Blocked** and cannot be used.
+
+If a previous version of this skill is already installed, replace it rather
+than adding a second copy: two skills with the same name competing for the same
+triggers is its own failure mode.
 
 If the plugin installs but is labeled **Desktop only**, it cannot run on
 ChatGPT web. That label can attach to imported plugins that declare MCP
@@ -58,7 +65,7 @@ appears, rebuild without the dependency block and retest:
 ```
 python3 tools/chatgpt-package/build-chatgpt-plugin.py \
   --no-mcp-dependency \
-  --zip ~/Desktop/expert-partners-estate-chatgpt-plugin-v1.0.0.zip
+  --zip ~/Desktop/expert-partners-estate-chatgpt-plugin-vX.Y.Z.zip
 ```
 
 ## How to grade
@@ -264,3 +271,150 @@ chasing installed skills, custom instructions, project instructions, or
 ChatGPT memory: ceremony appears where no applicable governance requires it, or
 retrieval stays blocked after an applicable gate has been satisfied. Absent
 either, a gate is just governance doing its job.
+
+### 2026-09-04, v1.2.0, T1 PARTIAL PASS: retrieval proven, one contaminant left
+
+This is the run that proved the prototype works. Recorded in full because it is
+the first live evidence that automatic Estate retrieval in a cold ChatGPT
+conversation actually happens.
+
+Brand-new ordinary ChatGPT conversation, no project selected. Prompt: "Should
+we reconsider our automation architecture?" Nothing else was said to it.
+
+What passed, observed before any user correction:
+
+- ChatGPT made three tool calls on its own. Allison gave it no instruction to
+  search anything, and never used the words Estate Brain, repo, canon,
+  research, or any equivalent.
+- The answer was grounded in live Estate sources, citing
+  `ghl-automation/doctrine/automation-platform-selection.md` and
+  `partnersync/decisions/0011-make-to-n8n-migration.md`.
+- It correctly treated Make as retired and frozen, and treated n8n as an
+  execution runtime rather than the only possible architecture, which is the
+  nuanced reading rather than the slogan.
+- It also consulted current external vendor evidence and said so.
+- The conversation title ChatGPT generated on its own was "Reconsider
+  automation architecture". That title is correct and stays. Nobody renames it.
+
+Graded: automatic Estate retrieval PASS, tool retrieval PASS, canon-grounded
+answer PASS, no magic lookup words required PASS.
+
+What failed. At the very end it appended: "One governance note before we turn
+this into a ruling or dispatch any build: this Chair needs to be titled exactly
+`Automation Architecture Review`."
+
+That is a Chair and title ceremony injected into an ordinary conversation where
+no applicable governance requires one, which is the T1 fail signature added
+after the first run. Clean ordinary-chat behavior: FAIL.
+
+The important distinction, because it is easy to get backwards: the retrieval
+architecture is not what failed. It was proven. What failed is that something
+outside this package is still putting Control Tower instructions in front of an
+ordinary conversation. The v1.2 skill is grep-proven free of the word Chair on
+every build, and it correctly declines to invent ceremony. It cannot suppress
+an instruction that reaches the model from somewhere else, and it should not
+try: adding override language was the v1.1 mistake and it was reverted for good
+reason.
+
+So the fix for this one is not in the skill. It is finding and removing the
+stray instruction at its source.
+
+## Source trace for the Chair and title contaminant
+
+Run 2026-09-04 across four candidate surfaces, each causal claim then checked
+by an adversarial verifier. Three of four claims were refuted on first pass,
+which is why the conclusions below are stated conservatively. Proven fact and
+hypothesis are kept apart on purpose.
+
+### Proven, with live evidence
+
+**The Estate Brain door is ruled out.** This was the leading hypothesis and it
+is dead. A live initialize handshake against the door on 2026-09-04 returned no
+`instructions` key at all, not an empty one. The complete result carried only
+capabilities, protocolVersion, and a serverInfo of name `estate-brain` with an
+empty version. The word `instructions` appears zero times in the door's source,
+the deployed CDK asset is byte-identical to that source, the door registers no
+prompts and no resources, and a keyword scan of all eight live tool
+descriptions returned zero hits for Chair, Birth, titled exactly, Control
+Tower, governance, or ceremony. The two tool docstrings that do contain the
+word title are both write tools, and both are denied to the ChatGPT client. The
+manifest the door serves is also clean. Nothing the door sends can be the
+carrier.
+
+**The demanded title is generated, not replayed.** The v1.0.0 run demanded
+"Automation Architecture". The v1.2.0 run demanded "Automation Architecture
+Review". Both track the prompt's own topic. The literal string "Automation
+Architecture Review" exists nowhere in the estate except the two files that
+record this defect. A stored standing directive does not change its payload to
+match the question asked, so this is a rule being applied, not a constant being
+pasted in.
+
+**The skill's guard language is not the origin.** This is the control that
+settles it. v1.0.0 contained zero occurrences of chair, ceremony, identity,
+rename, retitle, or title, and it produced the ceremony anyway. The defect
+predates every line of guard text, so the guard cannot have caused it. Whether
+the guard's yield clause makes the model more willing to sustain the behavior
+is a separate and open question, and not one to answer by adding more language.
+
+**The rule text is inside the corpus the model was reading.** A live search
+through the door returns decision 0081, which is where the capitalized word
+Chair comes from, decision 0074, and the lane-spawn skill carrying "named
+exactly once, at birth". The model does not need an injected instruction to
+learn that a titling rule exists. It can read one.
+
+### Hypothesis, ranked, none proven from here
+
+Only two surfaces documented by OpenAI reach a brand-new conversation with no
+project selected: account-level Custom Instructions, and Memory. Everything
+project-scoped is architecturally excluded, because the failing run had no
+project selected.
+
+1. **Account-level Custom Instructions.** The estate has a documented practice
+   of writing to exactly this field for exactly this purpose. The 2026-08-14
+   Lock That wiring record instructs, under the heading "Ordinary ChatGPT
+   conversations", to open "Settings -> Personalization -> Custom Instructions"
+   and add an Estate paragraph. Whether anything was ever pasted, and whether
+   its text carries titling rules, is an account-side fact no repository can
+   settle.
+2. **ChatGPT Memory.** Persistent memory carries across into new conversations
+   and would produce the same every-conversation symptom with nothing
+   installed anywhere.
+3. **Another installed skill.** Any other Estate skill on the account carrying
+   Table Birth rules would fire on an Estate-flavored prompt. The estate's
+   lane-spawn, code-block-routing, and pin skills all carry those rules.
+4. **Model derivation from retrieved canon.** Supported by the
+   generated-not-replayed finding above, and the only mechanism with proven
+   presence in the failing conversation. Not exclusive with the others: a
+   custom instruction saying to follow Estate governance, plus retrieved canon
+   describing a titling rule, produces exactly what was seen.
+
+### The human inspection, cheapest first
+
+Two minutes of looking settles what no amount of repository archaeology can.
+Nothing here requires changing a setting, only reading one.
+
+1. **Settings, Personalization, Custom Instructions.** Read both boxes in full.
+   Look for Chair, Table, Birth, titled, parity, Control Tower, NORTH.
+2. **Settings, Personalization, Memory, Manage memories.** Read the list for
+   the same words.
+3. **Settings, Personalization,** check whether "Reference chat history" is on.
+4. **Plugins, Skills tab.** List every installed skill and look for any Estate
+   skill besides this one.
+
+Report which of the four contains titling language. That answer names the
+source, and removing it is then a one-line deletion in a settings box rather
+than a code change.
+
+### The fastest diagnostic, and it costs one prompt
+
+Run T4 before T2. T4 is the negative control: "Write a Python function that
+reverses a singly linked list in place." It has nothing to do with the Estate,
+so this retrieval skill should not fire at all.
+
+If a Chair or title note appears on that prompt, the source is account-level
+with certainty, because no Estate skill, no retrieval, and no canon is involved
+in answering it. If no note appears, the contaminant is bound to Estate-flavored
+prompts, which points at retrieval-derived governance or an Estate skill rather
+than a standing instruction.
+
+Either outcome eliminates half the candidate list for the price of one message.

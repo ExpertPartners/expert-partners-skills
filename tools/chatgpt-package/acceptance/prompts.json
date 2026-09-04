@@ -47,6 +47,15 @@
           "graded": "skill fired YES, retrieval NO, grounded in canon NO, overall FAIL",
           "root_cause": "Not the package. The canonical SKILL.md and the whole generated bundle were grep-proven free of chair, table, title, parity, rename, and control tower vocabulary. The naming gate was injected into that conversation from elsewhere in the ChatGPT account (an installed skill, project or custom instructions, or ChatGPT persistent memory), all of which are outside this worker's visibility.",
           "fix": "v1.1.0 added a guard, but it overreached by claiming retrieval outranks any naming act. Corrected in v1.2.0 to the narrower and correct principle: the skill never CREATES, INFERS, or DEMANDS identity ceremony of its own, and a vendor-generated visible title is never identity, but where higher-priority governance genuinely applies and explicitly requires an identity act, the skill YIELDS rather than overriding. Per aura decision 0082's bridge clause (read live 2026-09-04), the pre-cutover wiring including automatic birth declarations still binds until Allison's coordinated cutover under decision 0080 Section 24, so an override claim would have been wrong."
+        },
+        {
+          "date": "2026-09-04",
+          "version": "1.2.0",
+          "what_happened": "Brand-new ordinary ChatGPT conversation, no project selected. ChatGPT made three tool calls unprompted and grounded its answer in live Estate sources, citing ghl-automation/doctrine/automation-platform-selection.md and partnersync/decisions/0011-make-to-n8n-migration.md, treating Make as retired and frozen and n8n as an execution runtime rather than the only option. It also consulted current external vendor evidence. Then it appended: 'One governance note before we turn this into a ruling or dispatch any build: this Chair needs to be titled exactly `Automation Architecture Review`.'",
+          "graded": "automatic Estate retrieval PASS, tool retrieval PASS, canon-grounded answer PASS, no magic lookup words PASS, clean ordinary-chat behavior FAIL",
+          "root_cause": "Not the skill, and not the retrieval architecture, which this run proved works. The v1.2 skill is grep-proven free of the word Chair on every build and correctly declines to invent ceremony. A stray Control Tower instruction is still reaching ordinary conversations from a surface outside this package.",
+          "fix": "None in this package. Adding override language was the v1.1 mistake and was reverted. The fix is to find and remove the stray instruction at its source; see the source-trace section of fresh-chat-acceptance.md.",
+          "conversation_title": "ChatGPT generated 'Reconsider automation architecture' on its own. That title is correct and stays. Nobody renames it."
         }
       ],
       "environment_dependent": true,
