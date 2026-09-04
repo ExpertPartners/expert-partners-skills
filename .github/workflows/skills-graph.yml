@@ -17,6 +17,12 @@ on:
       - "**/SKILL.md"
       - "tools/skill-map/**"
       - "tools/skill-deploy/**"
+      # A canonical skill's non-SKILL.md files (references/, templates/, scripts/)
+      # are part of its deployed copies, so changing one makes aura's mounts stale
+      # even though no SKILL.md moved. Watch them too, so the redeploy notice below
+      # fires in the repo that owns the canonical.
+      - "skills/**"
+      - "plugins/*/skills/**"
   repository_dispatch:
     types: [skill-md-changed]
   workflow_dispatch:
@@ -73,6 +79,24 @@ jobs:
       - name: Extract and validate (fails on any dangling reference)
         working-directory: eps/tools/skill-map
         run: node extract-skills-graph.mjs --eps "$GITHUB_WORKSPACE/eps" --aura "$GITHUB_WORKSPACE/aura" --out "$GITHUB_WORKSPACE/eps/tools/skill-map/skills-graph.json"
+
+      # Forward signal, never a block. This repo owns canonicals that aura deploys
+      # as copies, so a change here can leave aura's mounts stale -- and aura's own
+      # deployed-copy-drift job would then go red for a change it did not make, with
+      # the fix living in this repo. Say so here instead, on the run that caused it.
+      # Non-blocking on purpose: making it a gate would deadlock the two repos
+      # against each other on every canonical bump.
+      - name: Notice whether aura's mounts still match this repo's canonicals
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          python3 -m pip install --quiet pyyaml
+          fail=0
+          eps/tools/skill-deploy/deploy-skill.sh --verify-copies aura/.claude/skills || fail=1
+          eps/tools/skill-deploy/deploy-skill.sh --mirror-mount aura/.claude/skills --to aura/.agents/skills --verify || fail=1
+          if [ "$fail" -ne 0 ]; then
+            echo "::warning title=aura skill mounts are stale::A canonical in this repo moved, so aura's deployed copies no longer match it. Redeploy in aura and land both changes together: tools/skill-deploy/deploy-skill.sh --mirror-mount .claude/skills --to .agents/skills (plus --to .claude/skills for the copies this repo owns). Until then aura's deployed-copy-drift job will be red."
+          fi
 
       - name: Commit regenerated graph (main only)
         if: github.ref == 'refs/heads/main'

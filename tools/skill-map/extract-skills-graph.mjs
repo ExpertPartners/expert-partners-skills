@@ -19,9 +19,13 @@
 // extractor classifies a SKILL.md as a deployed copy when it sits under a deployed-mount
 // root (Codex discovers repo skills only under .agents/skills, so everything there is a
 // copy by construction) or when it carries that header anywhere. A deployed copy is
-// never mapped as a node; it must carry the header, and the header must name the very
-// canonical SKILL.md that owns its id, else the build fails. Byte drift between a copy
-// and its canonical is the deploy pipeline's --verify gate, not this extractor's job.
+// never mapped as a node; it must carry the header, the header must name the very
+// canonical SKILL.md that owns its id, and stripping the header must yield the
+// canonical file byte for byte. That last check is what makes the header a proof
+// rather than a claim: without it a genuinely different skill wearing a canonical's
+// name plus three pasted header lines would pass as a legitimate mirror. The deploy
+// pipeline's --verify covers a copy's non-SKILL.md files and its manifest; this
+// covers the identity file wherever it lives.
 //
 // Usage: node extract-skills-graph.mjs [--eps <path>] [--aura <path>] [--out <file>]
 //   --eps  expert-partners-skills checkout (default: this script's repo root)
@@ -74,16 +78,20 @@ const EXCLUDE = [
 // Ruled 2026-08-05 (flags item 3): the plugin path is canonical; the repo-root
 // copy is now a pointer file naming the plugin path, kept here so the walk skips it.
 const DECLARED_DUPLICATES = [
+  // The ONLY legitimate entry: a pointer file with no frontmatter at all, which
+  // cannot carry a DEPLOYED COPY header and so cannot be classified by pass 3.
+  // Ruled 2026-08-05 (flags item 3): the plugin path is canonical; the repo-root
+  // copy is a pointer file naming it, kept here so the walk skips it.
   { id: 'operating-doctrine', keep: 'eps:plugins/operating-doctrine/skills/operating-doctrine/SKILL.md', duplicate: 'eps:operating-doctrine/SKILL.md' },
-  // session-wrap adopted into canonical 2026-08-05 (add-on brief note 4); the aura
-  // .claude/skills copy stays loadable as the deployed copy for Aura Code sessions.
-  { id: 'session-wrap', keep: 'eps:skills/session-wrap/SKILL.md', duplicate: 'aura:.claude/skills/session-wrap/SKILL.md' },
-  // repo-standards born canonical here 2026-08-07 (ADR 0056 piece two); the aura
-  // .claude/skills copy is the deployed copy, produced by tools/skill-deploy.
-  { id: 'repo-standards', keep: 'eps:skills/repo-standards/SKILL.md', duplicate: 'aura:.claude/skills/repo-standards/SKILL.md' },
-  // research-intake born canonical here 2026-08-08 (Deep Research Folder Automation
-  // build lane); the aura .claude/skills copy is the deployed copy for Aura Code sessions.
-  { id: 'research-intake', keep: 'eps:skills/research-intake/SKILL.md', duplicate: 'aura:.claude/skills/research-intake/SKILL.md' },
+  // The aura .claude/skills copies of session-wrap, repo-standards and
+  // research-intake USED to be listed here (2026-08-05, 08-07, 08-08). They are
+  // not any more: a hand-maintained exemption list skipped them before any
+  // classification ran, so those three paths were exempt from the header
+  // requirement, the canonical-exists check, and the id-ownership check, which
+  // is exactly the corruption class of aura issue #212 (research-intake was in
+  // fact a hand-made copy with no manifest, found 2026-09-04). They are now
+  // ordinary deployed copies: pipeline-produced, header-verified, byte-checked
+  // against canonical in pass 3, and reported under flags.deployedMounts.
 ];
 
 // Deployed-mount roots: every SKILL.md under one of these is a deployed copy by
@@ -99,6 +107,9 @@ const DEPLOYED_MOUNT_ROOTS = [
 // (render()) as YAML comment lines inside the frontmatter. Two lines: the date and
 // producer, then "<repo> <path>. Deployed at <stamp>." Keep in step with the script.
 const DEPLOYED_HEADER = /^# DEPLOYED COPY \((\d{4}-\d{2}-\d{2}), skill-deploy pipeline\): the canonical home is\s*\n# (\S+) (\S+?SKILL\.md)\. Deployed at (.+?)\.\s*$/m;
+// The same three lines as a removable block, for the byte-fidelity check below:
+// stripping it from a deployed copy must yield the canonical file byte for byte.
+const DEPLOYED_HEADER_BLOCK = /^# DEPLOYED COPY \(\d{4}-\d{2}-\d{2}, skill-deploy pipeline\): the canonical home is\n# \S+ \S+?SKILL\.md\. Deployed at .+?\.\n# Edit the canonical copy first, then redeploy via tools\/skill-deploy\.\n/m;
 // Header repo names -> walk keys. A header naming a repo this walk does not cover
 // cannot be verified and fails the build.
 const REPO_NAME_TO_KEY = { 'expert-partners-skills': 'eps', 'aura': 'aura' };
@@ -171,7 +182,7 @@ const skippedPaths = [];        // excluded files, recorded for the report
 // order, so a deployed copy that sorts before its canonical (.agents before .claude)
 // is handled the same as one that sorts after it.
 const canonicalFiles = [];  // { repoKey, tagged, abs, raw }
-const deployedFiles = [];   // { repoKey, tagged, abs, raw, header, underMount }
+const deployedFiles = [];   // { repoKey, tagged, abs, raw, header, mountRoot }
 
 function readDeployedHeader(raw) {
   // Only the frontmatter block may carry the header; a stray match in the body is
@@ -199,9 +210,11 @@ for (const [repoKey, root] of Object.entries(REPOS)) {
 
     const raw = fs.readFileSync(abs, 'utf8');
     const header = readDeployedHeader(raw);
-    const underMount = DEPLOYED_MOUNT_ROOTS.some(rx => rx.test(tagged));
-    if (underMount || header) {
-      deployedFiles.push({ repoKey, tagged, abs, raw, header, underMount });
+    // Capture the matched mount root itself, so adding a root to
+    // DEPLOYED_MOUNT_ROOTS needs no second edit and can never emit a wrong value.
+    const mountRoot = DEPLOYED_MOUNT_ROOTS.map(rx => tagged.match(rx)?.[0]).find(Boolean) ?? null;
+    if (mountRoot || header) {
+      deployedFiles.push({ repoKey, tagged, abs, raw, header, mountRoot });
     } else {
       canonicalFiles.push({ repoKey, tagged, abs, raw });
     }
@@ -268,7 +281,7 @@ for (const { repoKey, tagged, abs, raw } of canonicalFiles) {
 // Pass 3: validate deployed copies against the canonical map. A copy is legitimate
 // only when it is pipeline-produced (header present) and its header names the exact
 // canonical SKILL.md that owns its id. Anything else is corruption, named precisely.
-for (const { tagged, abs, raw, header, underMount } of deployedFiles) {
+for (const { tagged, abs, raw, header, mountRoot } of deployedFiles) {
   const folder = path.basename(path.dirname(abs));
   if (!header) {
     fail(`deployed copy without a DEPLOYED COPY header: ${tagged} sits under a deployed mount root but was not produced by tools/skill-deploy/deploy-skill.sh (ADR 0056 point 8) -- redeploy it through the pipeline (--mirror-mount) instead of copying files by hand`);
@@ -293,6 +306,13 @@ for (const { tagged, abs, raw, header, underMount } of deployedFiles) {
   }
   const canonicalTagged = `${repoKey}:${header.canonicalPath}`;
   const canonicalAbs = path.join(REPOS[repoKey], ...header.canonicalPath.split('/'));
+  if (canonicalTagged === tagged) {
+    // The canonical file itself carries a header naming its own path: a mirror was
+    // pasted back over canonical. Say that, because "orphan copy" would send the
+    // operator to delete mirrors when the canonical is what needs restoring.
+    fail(`canonical overwritten by a deployed copy: ${tagged} carries a DEPLOYED COPY header naming itself -- restore the canonical from git history, then redeploy its mirrors through tools/skill-deploy`);
+    continue;
+  }
   if (!fs.existsSync(canonicalAbs)) {
     fail(`deployed copy names a canonical home that does not exist: ${tagged} -> ${canonicalTagged} (a hand-transformed path, or canonical moved without a redeploy)`);
     continue;
@@ -306,14 +326,42 @@ for (const { tagged, abs, raw, header, underMount } of deployedFiles) {
     fail(`deployed copy points at the wrong canonical home: ${tagged} names ${canonicalTagged}, but "${folder}" is canonical at ${node.source}`);
     continue;
   }
+  // Byte fidelity. A header is a claim, not a proof: without this check a
+  // genuinely different skill wearing a canonical's name plus three pasted
+  // header lines would pass as a legitimate mirror and be verified by nothing
+  // (the deploy pipeline's --verify only walks the mounts it is pointed at).
+  // The pipeline writes exactly three header lines into the frontmatter, so
+  // removing them must yield the canonical bytes.
+  const stripped = raw.replace(DEPLOYED_HEADER_BLOCK, '');
+  if (stripped === raw) {
+    fail(`deployed copy carries a malformed DEPLOYED COPY header block: ${tagged} -- redeploy it through tools/skill-deploy instead of editing the header by hand`);
+    continue;
+  }
+  if (stripped !== fs.readFileSync(canonicalAbs, 'utf8')) {
+    fail(`deployed copy is not a faithful render of its canonical: ${tagged} differs from ${canonicalTagged} beyond the DEPLOYED COPY header -- it was hand-edited or built by something other than tools/skill-deploy; redeploy it (deploy-skill.sh --mirror-mount / --to ... --repair-drift)`);
+    continue;
+  }
   deployedMounts.push({
     path: tagged,
     id: folder,
     canonical: canonicalTagged,
     deployedAt: header.date,
     stamp: header.stamp,
-    mount: underMount ? tagged.replace(/^([a-z-]+:\.agents\/skills\/).*$/, '$1') : null,
+    mount: mountRoot,
   });
+}
+
+// Declared duplicates are a hand-maintained exemption, so verify the hand: each
+// entry's `keep` path must be the canonical this build actually mapped for that
+// id. Without this the list can silently outlive the layout it describes.
+for (const d of DECLARED_DUPLICATES) {
+  if (!duplicateRecords.includes(d.duplicate)) continue;
+  const node = nodes.get(d.id);
+  if (!node) {
+    fail(`declared duplicate "${d.id}": ${d.duplicate} was skipped as a pointer, but no canonical SKILL.md maps that id`);
+  } else if (node.source !== d.keep) {
+    fail(`declared duplicate "${d.id}": the list keeps ${d.keep}, but the mapped canonical is ${node.source} -- update DECLARED_DUPLICATES`);
+  }
 }
 
 // ---------- reference resolution (the drift gate) ----------

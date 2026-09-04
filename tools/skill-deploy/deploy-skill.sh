@@ -13,6 +13,7 @@
 #   deploy-skill.sh <skill-name> [--from <canonical-dir>] --to <deploy-dir> --verify
 #   deploy-skill.sh <plugin-name> --bundle --zip <zip-path>
 #   deploy-skill.sh --mirror-mount <canonical-mount-dir> --to <deploy-dir> [--verify] [--repair-drift]
+#   deploy-skill.sh --verify-copies <mount-dir>
 #   deploy-skill.sh --check-all
 #
 #   --check-all    repo-wide claude.ai upload-readiness sweep over every
@@ -66,6 +67,15 @@
 #                  overwrite it silently. Pass this flag to acknowledge the
 #                  drift (it is printed) and replace the copy with pipeline
 #                  output. Valid only with --to, never with --verify.
+#   --verify-copies <mount-dir>
+#                  write nothing. In a mount that MIXES canonical skills and
+#                  deployed copies (aura .claude/skills: seven aura-native
+#                  canonicals beside three copies of this repo's skills), verify
+#                  every skill directory that carries a DEPLOYED COPY header
+#                  against the canonical home in this repo, exactly as --verify
+#                  does, and leave the header-less canonicals alone. Exits
+#                  non-zero on drift, a lying manifest, or a header naming a
+#                  canonical this repo does not hold.
 #
 # Idempotency: a redeploy that would change nothing but the header date leaves
 # the deployed copy byte-for-byte untouched (the original deploy date stands),
@@ -80,14 +90,15 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 
 NAME="" CHECK_ALL=0 DEPLOY_DIR="" ZIP_PATH="" BUNDLE=0
-FROM_DIR="" MIRROR_MOUNT="" VERIFY=0 REPAIR_DRIFT=0
-USAGE="usage: deploy-skill.sh <skill-name|plugin-name> [--from dir] [--to dir] [--zip path] [--bundle] [--verify] | deploy-skill.sh --mirror-mount <dir> --to <dir> [--verify] [--repair-drift] | deploy-skill.sh --check-all"
+FROM_DIR="" MIRROR_MOUNT="" VERIFY=0 REPAIR_DRIFT=0 VERIFY_COPIES=""
+USAGE="usage: deploy-skill.sh <skill-name|plugin-name> [--from dir] [--to dir] [--zip path] [--bundle] [--verify] | deploy-skill.sh --mirror-mount <dir> --to <dir> [--verify] [--repair-drift] | deploy-skill.sh --verify-copies <dir> | deploy-skill.sh --check-all"
 while [ $# -gt 0 ]; do
   case "$1" in
     --to)            DEPLOY_DIR="${2:?--to needs a directory}"; shift 2 ;;
     --zip)           ZIP_PATH="${2:?--zip needs a path}";  shift 2 ;;
     --from)          FROM_DIR="${2:?--from needs a directory}"; shift 2 ;;
     --mirror-mount)  MIRROR_MOUNT="${2:?--mirror-mount needs a directory}"; shift 2 ;;
+    --verify-copies) VERIFY_COPIES="${2:?--verify-copies needs a directory}"; shift 2 ;;
     --bundle)        BUNDLE=1; shift ;;
     --check-all)     CHECK_ALL=1; shift ;;
     --verify)        VERIFY=1; shift ;;
@@ -97,8 +108,14 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-if [ "$CHECK_ALL" -eq 0 ] && [ -z "$MIRROR_MOUNT" ] && [ -z "$NAME" ]; then
+if [ "$CHECK_ALL" -eq 0 ] && [ -z "$MIRROR_MOUNT" ] && [ -z "$VERIFY_COPIES" ] && [ -z "$NAME" ]; then
   echo "FATAL: $USAGE" >&2; exit 1
+fi
+if [ -n "$VERIFY_COPIES" ]; then
+  if [ -n "$NAME" ] || [ -n "$DEPLOY_DIR" ] || [ -n "$ZIP_PATH" ] || [ -n "$FROM_DIR" ] || [ -n "$MIRROR_MOUNT" ] || [ "$BUNDLE" -eq 1 ] || [ "$REPAIR_DRIFT" -eq 1 ]; then
+    echo "FATAL: --verify-copies <dir> stands alone (it is read-only and names its own mount)" >&2; exit 1
+  fi
+  VERIFY=1
 fi
 if [ -n "$MIRROR_MOUNT" ]; then
   [ -z "$NAME" ]     || { echo "FATAL: --mirror-mount takes no positional skill name (it deploys every skill in the mount)" >&2; exit 1; }
@@ -107,7 +124,7 @@ if [ -n "$MIRROR_MOUNT" ]; then
   [ "$BUNDLE" -eq 0 ] || { echo "FATAL: --mirror-mount excludes --bundle" >&2; exit 1; }
   [ -n "$DEPLOY_DIR" ] || { echo "FATAL: --mirror-mount requires --to <deploy-dir>" >&2; exit 1; }
 fi
-if [ "$VERIFY" -eq 1 ]; then
+if [ "$VERIFY" -eq 1 ] && [ -z "$VERIFY_COPIES" ]; then
   [ -n "$DEPLOY_DIR" ] || { echo "FATAL: --verify checks a deployed copy, so it requires --to <deploy-dir>" >&2; exit 1; }
   [ -z "$ZIP_PATH" ] || { echo "FATAL: --verify writes nothing; drop --zip" >&2; exit 1; }
   [ "$BUNDLE" -eq 0 ] || { echo "FATAL: --verify excludes --bundle" >&2; exit 1; }
@@ -134,7 +151,11 @@ plugin_version() { # plugin_version <plugin-name> -- reads plugins/<name>/.claud
 }
 
 manifest() { # write checksums.sha256 over a dir (excluding the manifest itself)
-  ( cd "$1" && find . -type f ! -name checksums.sha256 -print0 | sort -z \
+  # LC_ALL=C pins the sort: `sort` honors LC_COLLATE, so an en_US.UTF-8 caller
+  # would otherwise order "./reference/x" before "./SKILL.md" and write a
+  # manifest whose line order differs from the committed one for no content
+  # reason (found 2026-09-04, aura issue #212 review).
+  ( cd "$1" && find . -type f ! -name checksums.sha256 -print0 | LC_ALL=C sort -z \
     | xargs -0 shasum -a 256 > checksums.sha256 )
 }
 
@@ -476,7 +497,14 @@ PY
 # a second canonical skill identity. Change the format in both places or not at all.
 # ---------------------------------------------------------------------------
 
-has_deployed_header() { grep -q '^# DEPLOYED COPY (' "$1"; }
+# frontmatter_of <SKILL.md> -- print the frontmatter lines only (nothing from the
+# body), so a body that documents the header format is never mistaken for one.
+frontmatter_of() {
+  awk 'NR==1 { if ($0 != "---") exit 1; next } /^---[[:space:]]*$/ { exit } { print }' "$1"
+}
+has_deployed_header() { frontmatter_of "$1" | grep -q '^# DEPLOYED COPY ('; }
+# header_names_canonical <SKILL.md> <label> -- the header names exactly this home
+header_names_canonical() { frontmatter_of "$1" | grep -qF -- "# $2. Deployed at "; }
 
 # canonical_label_external <dir> -> "<repo> <repo-relative-path>/SKILL.md"
 # The repo name comes from the origin remote (aura, not the local folder name
@@ -493,12 +521,80 @@ canonical_label_external() {
   echo "$repo $prefix/SKILL.md"
 }
 
+# list_source_files <dir> -- NUL-separated, bytewise-sorted, <dir>-relative list of
+# the files a deployed copy carries: what git tracks or would track (tracked plus
+# untracked-but-not-ignored, i.e. what `git add -A` would take), minus the manifest
+# and the junk set the --zip path already excludes (.DS_Store, ._*, __pycache__,
+# *.pyc). A directory outside git (never a canonical home) falls back to a walk
+# with the same exclusions. Bytewise order is locale-independent on purpose:
+# stamps and manifests must not change with LC_COLLATE.
+list_source_files() {
+  python3 - "$1" <<'PY'
+import os, subprocess, sys
+root = sys.argv[1]
+JUNK_NAMES = {"checksums.sha256", ".DS_Store"}
+def junk(rel):
+    parts = rel.split("/")
+    base = parts[-1]
+    return (base in JUNK_NAMES or base.startswith("._") or base.endswith(".pyc")
+            or "__pycache__" in parts[:-1])
+files = None
+try:
+    out = subprocess.run(["git", "-C", root, "ls-files", "-z", "--cached", "--others", "--exclude-standard", "--", "."],
+                         capture_output=True, check=True).stdout
+    files = [f.decode("utf-8", "surrogateescape") for f in out.split(b"\0") if f]
+    # a path git still indexes but the working tree no longer has is not deployable
+    files = [f for f in files if os.path.isfile(os.path.join(root, f))]
+except (subprocess.CalledProcessError, FileNotFoundError):
+    files = []
+    for dp, dn, fn in os.walk(root):
+        dn[:] = [d for d in dn if d not in (".git",)]
+        for f in fn:
+            files.append(os.path.relpath(os.path.join(dp, f), root))
+files = sorted({f for f in files if not junk(f)}, key=lambda s: s.encode("utf-8", "surrogateescape"))
+sys.stdout.buffer.write(b"".join(f.encode("utf-8", "surrogateescape") + b"\0" for f in files))
+PY
+}
+
 # tree_stamp <dir> -- deterministic 12-hex content stamp over a canonical skill
-# directory (manifest excluded). The version stamp for a canonical skill that
+# directory's deployable files. The version stamp for a canonical skill that
 # carries no vX.Y line: it changes exactly when canonical content changes.
+# The hashed text is exactly what `shasum -a 256` prints for those files, in
+# bytewise path order, with the "./<path>" names `find .` yields: so the stamp
+# equals the one an LC_ALL=C `find | sort | xargs shasum | shasum` run produced,
+# and every stamp committed before 2026-09-04 stays valid. Computed in python
+# rather than a shell pipeline because BSD sed has no -z and a broken pipe here
+# would silently hash the empty string instead of failing.
 tree_stamp() {
-  ( cd "$1" && find . -type f ! -name checksums.sha256 -print0 | sort -z \
-    | xargs -0 shasum -a 256 | shasum -a 256 | cut -c1-12 )
+  python3 - "$1" <<'PYSTAMP'
+import hashlib, os, subprocess, sys
+root = sys.argv[1]
+JUNK_NAMES = {"checksums.sha256", ".DS_Store"}
+def junk(rel):
+    parts = rel.split("/"); base = parts[-1]
+    return (base in JUNK_NAMES or base.startswith("._") or base.endswith(".pyc")
+            or "__pycache__" in parts[:-1])
+try:
+    out = subprocess.run(["git", "-C", root, "ls-files", "-z", "--cached", "--others", "--exclude-standard", "--", "."],
+                         capture_output=True, check=True).stdout
+    files = [f.decode("utf-8", "surrogateescape") for f in out.split(b"\0") if f]
+    files = [f for f in files if os.path.isfile(os.path.join(root, f))]
+except (subprocess.CalledProcessError, FileNotFoundError):
+    files = []
+    for dp, dn, fn in os.walk(root):
+        dn[:] = [d for d in dn if d != ".git"]
+        for f in fn:
+            files.append(os.path.relpath(os.path.join(dp, f), root))
+files = sorted({f for f in files if not junk(f)},
+               key=lambda s: ("./" + s).encode("utf-8", "surrogateescape"))
+if not files:
+    sys.exit(f"FATAL: {root} carries no deployable files to stamp")
+lines = b"".join(
+    hashlib.sha256(open(os.path.join(root, rel), "rb").read()).hexdigest().encode()
+    + b"  ./" + rel.encode("utf-8", "surrogateescape") + b"\n"
+    for rel in files)
+print(hashlib.sha256(lines).hexdigest()[:12])
+PYSTAMP
 }
 
 eps_canonical_exists() { # eps_canonical_exists <name>
@@ -577,8 +673,8 @@ resolve_source() {
 # mount_preflight <SKILL.md> -- the portable Agent Skills frontmatter contract
 # every deployed copy must satisfy regardless of surface (agentskills.io
 # /specification and learn.chatgpt.com/docs/build-skills, verified 2026-09-04):
-# parsable frontmatter, name 1-64 lowercase-hyphen equal to the parent folder,
-# description 1-1024 and non-empty. Codex tolerates extra keys and YAML
+# parsable, non-empty frontmatter, name 1-64 lowercase-hyphen equal to the parent
+# folder, description 1-1024 and non-empty. Codex tolerates extra keys and YAML
 # comments (openai/codex codex-rs/skills/src/parser.rs, read 2026-09-04), so
 # skill-map keys and the DEPLOYED COPY header pass through untouched.
 mount_preflight() {
@@ -600,6 +696,8 @@ else:
         fm = yaml.safe_load(m.group(1))
     except yaml.YAMLError as e:
         errs.append(f"frontmatter is not valid YAML: {e}")
+    if fm is None and not errs:
+        errs.append("frontmatter block is empty (or comments only); name and description are required")
 if fm is not None and not isinstance(fm, dict):
     errs.append("frontmatter must be a YAML mapping"); fm = None
 if isinstance(fm, dict):
@@ -626,12 +724,40 @@ PY
 }
 
 # render <stage-dir> -- produce the deployed copy of the resolved source into an
-# empty scratch dir: canonical files, the DEPLOYED COPY header injected into the
-# frontmatter after the canonical keys, and a fresh manifest.
+# empty scratch dir: the canonical's deployable files (list_source_files), the
+# DEPLOYED COPY header injected into the frontmatter after the canonical keys,
+# and a fresh manifest. Every step fails loudly; a partial render is never
+# reported as a copy.
 render() {
   local stage="$1"
-  rsync -a --delete --exclude checksums.sha256 "$SRC/" "$stage/"
-  python3 - "$stage/SKILL.md" "$CANONICAL" "$VERSION" "$TODAY" <<'PY'
+  python3 - "$SRC" "$stage" <<'PY' || return 1
+import os, shutil, subprocess, sys
+src, stage = sys.argv[1], sys.argv[2]
+JUNK_NAMES = {"checksums.sha256", ".DS_Store"}
+def junk(rel):
+    parts = rel.split("/"); base = parts[-1]
+    return (base in JUNK_NAMES or base.startswith("._") or base.endswith(".pyc")
+            or "__pycache__" in parts[:-1])
+try:
+    out = subprocess.run(["git", "-C", src, "ls-files", "-z", "--cached", "--others", "--exclude-standard", "--", "."],
+                         capture_output=True, check=True).stdout
+    files = [f.decode("utf-8", "surrogateescape") for f in out.split(b"\0") if f]
+    files = [f for f in files if os.path.isfile(os.path.join(src, f))]
+except (subprocess.CalledProcessError, FileNotFoundError):
+    files = []
+    for dp, dn, fn in os.walk(src):
+        dn[:] = [d for d in dn if d != ".git"]
+        for f in fn:
+            files.append(os.path.relpath(os.path.join(dp, f), src))
+files = sorted({f for f in files if not junk(f)})
+if "SKILL.md" not in files:
+    sys.exit(f"FATAL: {src} has no deployable SKILL.md")
+for rel in files:
+    dst = os.path.join(stage, rel)
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+    shutil.copy2(os.path.join(src, rel), dst)
+PY
+  python3 - "$stage/SKILL.md" "$CANONICAL" "$VERSION" "$TODAY" <<'PY' || return 1
 import sys
 path, canonical, version, today = sys.argv[1:5]
 text = open(path, encoding="utf-8").read()
@@ -639,12 +765,17 @@ header = (f"# DEPLOYED COPY ({today}, skill-deploy pipeline): the canonical home
           f"# {canonical}. Deployed at {version}.\n"
           f"# Edit the canonical copy first, then redeploy via tools/skill-deploy.\n")
 lines = text.split("\n")
+if not lines or lines[0].strip() != "---":
+    sys.exit(f"FATAL: {path} does not start with a frontmatter block; cannot inject the DEPLOYED COPY header")
 # insert before the closing '---' of the frontmatter block
-end = next(i for i, l in enumerate(lines[1:], 1) if l.strip() == "---")
+try:
+    end = next(i for i, l in enumerate(lines[1:], 1) if l.strip() == "---")
+except StopIteration:
+    sys.exit(f"FATAL: {path} frontmatter block never closes")
 lines[end:end] = header.rstrip("\n").split("\n")
 open(path, "w", encoding="utf-8").write("\n".join(lines))
 PY
-  manifest "$stage"
+  manifest "$stage" || return 1
 }
 
 # compare_deployed <regenerated-dir> <deployed-dir> -- byte compare, manifest
@@ -721,14 +852,19 @@ PY
 # deploy_one <name> -- deploy the resolved source to $DEPLOY_DIR/<name>.
 # Unchanged (modulo header date) and manifest-clean: leave every byte alone.
 # Manifest failing or absent: refuse unless --repair-drift acknowledged it.
+# Any write failure is FATAL and never reported as a deploy.
 deploy_one() {
   local name="$1" dest="$DEPLOY_DIR/$1" stage_root stage
   # The render lands under <scratch>/<name>/ so the copy's parent folder is its
   # skill name, exactly as it will sit in the mount; the frontmatter contract
   # (name equals parent directory) is then checked on the real shape.
   stage_root="$(mktemp -d)"; stage="$stage_root/$name"; mkdir -p "$stage"
-  render "$stage"
+  render "$stage" || { echo "FATAL: could not render $name from $SRC" >&2; rm -rf "$stage_root"; return 1; }
   mount_preflight "$stage/SKILL.md" || { rm -rf "$stage_root"; return 1; }
+  if [ -e "$dest" ] && [ ! -d "$dest" ]; then
+    echo "FATAL: $dest exists and is not a directory; refusing to deploy over it" >&2
+    rm -rf "$stage_root"; return 1
+  fi
   if [ -d "$dest" ]; then
     if compare_deployed "$stage" "$dest" >/dev/null && manifest_check "$dest" >/dev/null; then
       echo "unchanged: $dest already matches $CANONICAL ($VERSION); not rewritten"
@@ -745,9 +881,15 @@ deploy_one() {
       fi
     fi
   fi
-  mkdir -p "$dest"
-  rsync -a --delete "$stage/" "$dest/"
+  if ! mkdir -p "$dest" || ! rsync -a --delete "$stage/" "$dest/"; then
+    echo "FATAL: could not write the deployed copy to $dest" >&2
+    rm -rf "$stage_root"; return 1
+  fi
   rm -rf "$stage_root"
+  if ! manifest_check "$dest" >/dev/null; then
+    echo "FATAL: $dest was written but does not verify against its own manifest; the destination is not a faithful filesystem" >&2
+    return 1
+  fi
   echo "deployed: $dest ($VERSION), manifest: $dest/checksums.sha256"
 }
 
@@ -759,7 +901,7 @@ verify_one() {
     echo "DRIFT $name: no deployed copy at $dest (canonical $CANONICAL, $VERSION)"; return 1
   fi
   stage_root="$(mktemp -d)"; stage="$stage_root/$name"; mkdir -p "$stage"
-  render "$stage"
+  render "$stage" || { echo "DRIFT $name: could not render canonical $CANONICAL for comparison"; rm -rf "$stage_root"; return 1; }
   if ! out="$(compare_deployed "$stage" "$dest")"; then
     echo "DRIFT $name: deployed copy differs from a fresh render of $CANONICAL ($VERSION)"
     printf '%s\n' "$out" | sed 's/^/  /'; rc=1
@@ -813,6 +955,34 @@ if [ "$BUNDLE" -eq 1 ]; then
   exit 0
 fi
 
+if [ -n "$VERIFY_COPIES" ]; then
+  [ -d "$VERIFY_COPIES" ] || { echo "FATAL: --verify-copies $VERIFY_COPIES is not a directory" >&2; exit 1; }
+  DEPLOY_DIR="$(cd "$VERIFY_COPIES" && pwd)"
+  FAILS=0 COUNT=0 SKIPPED=0
+  for d in "$DEPLOY_DIR"/*/; do
+    [ -d "$d" ] && [ -f "$d/SKILL.md" ] || continue
+    n="$(basename "$d")"
+    if ! has_deployed_header "$d/SKILL.md"; then SKIPPED=$((SKIPPED + 1)); continue; fi   # a canonical skill living in this mount
+    COUNT=$((COUNT + 1))
+    if ! resolve_source "$n" "" 2>/dev/null; then
+      echo "DRIFT $n: carries a DEPLOYED COPY header but this repo holds no canonical skill named $n"
+      FAILS=$((FAILS + 1)); continue
+    fi
+    if ! header_names_canonical "$d/SKILL.md" "$CANONICAL"; then
+      echo "DRIFT $n: DEPLOYED COPY header names a canonical home other than $CANONICAL"
+      frontmatter_of "$d/SKILL.md" | grep '^# ' | sed 's/^/  /'
+      FAILS=$((FAILS + 1)); continue
+    fi
+    verify_one "$n" || FAILS=$((FAILS + 1))
+  done
+  if [ "$FAILS" -gt 0 ]; then
+    echo "verify-copies: $FAILS problem(s) across $COUNT deployed cop(ies) in $DEPLOY_DIR ($SKIPPED canonical skill(s) left alone)" >&2
+    exit 1
+  fi
+  echo "verify-copies: all $COUNT deployed cop(ies) in $DEPLOY_DIR clean ($SKIPPED canonical skill(s) left alone)"
+  exit 0
+fi
+
 if [ -n "$MIRROR_MOUNT" ]; then
   [ -d "$MIRROR_MOUNT" ] || { echo "FATAL: --mirror-mount $MIRROR_MOUNT is not a directory" >&2; exit 1; }
   MOUNT_ABS="$(cd "$MIRROR_MOUNT" && pwd)"
@@ -831,7 +1001,16 @@ if [ -n "$MIRROR_MOUNT" ]; then
     COUNT=$((COUNT + 1)); NAMES="$NAMES $n "
     if eps_canonical_exists "$n"; then EXT=""; else EXT="$MOUNT_ABS/$n"; fi
     if ! resolve_source "$n" "$EXT"; then FAILS=$((FAILS + 1)); continue; fi
-    if [ "$SOURCE_KIND" != "external" ]; then upload_preflight "$SRC/SKILL.md" || { FAILS=$((FAILS + 1)); continue; }; fi
+    if [ -z "$EXT" ]; then
+      # The mount entry shares its name with a canonical skill of this repo, so it
+      # must BE a deployed copy of that canonical. Anything else is a second
+      # canonical wearing a taken name, and it would be silently shadowed here.
+      if ! header_names_canonical "$d/SKILL.md" "$CANONICAL"; then
+        echo "FATAL: mount entry $MOUNT_ABS/$n shares its name with the canonical skill at $CANONICAL but is not a pipeline-produced copy of it (no DEPLOYED COPY header naming that home). Two canonical homes for one skill id are never allowed: redeploy it from canonical (deploy-skill.sh $n --to $MOUNT_ABS --repair-drift) or give the mount skill its own name." >&2
+        FAILS=$((FAILS + 1)); continue
+      fi
+      upload_preflight "$SRC/SKILL.md" || { FAILS=$((FAILS + 1)); continue; }
+    fi
     if [ "$VERIFY" -eq 1 ]; then
       verify_one "$n" || FAILS=$((FAILS + 1))
     else
