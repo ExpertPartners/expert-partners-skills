@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "52d5ac1d62092e610f22196e2a07187095e6b42d",
-    "aura": "8490eafb1f1d8cb0a7907f496a1ce829a16f9239"
+    "eps": "52cdccc7759ae0535359b139e62c1714d971b2c7",
+    "aura": "baa2aaa77a672aeddea1b49c7afbdd278aaa42a9"
   },
   "zones": [
     "surfaces",
@@ -323,7 +323,7 @@
       "subtitle": "hold the connection before you hold the screenshot",
       "renderNote": null,
       "layout": {
-        "x": 1244,
+        "x": 1482,
         "y": 2354,
         "width": 274,
         "height": 77,
@@ -534,6 +534,34 @@
       }
     },
     {
+      "id": "estate-memory-router",
+      "source": "eps:skills/estate-memory-router/SKILL.md",
+      "repo": "eps",
+      "tier": "organization",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "one classifier, six existing destinations, no new store",
+      "renderNote": null,
+      "layout": {
+        "x": 488,
+        "y": 2354,
+        "width": 212,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "one classifier, six existing",
+          "destinations, no new store"
+        ]
+      }
+    },
+    {
       "id": "expert-partners-systems-map",
       "source": "eps:plugins/systems-map/skills/expert-partners-systems-map/SKILL.md",
       "repo": "eps",
@@ -722,7 +750,7 @@
       "subtitle": "file content into a repo intake inbox",
       "renderNote": null,
       "layout": {
-        "x": 732,
+        "x": 970,
         "y": 2354,
         "width": 230,
         "height": 77,
@@ -1074,6 +1102,34 @@
       }
     },
     {
+      "id": "remember-this",
+      "source": "eps:skills/remember-this/SKILL.md",
+      "repo": "eps",
+      "tier": "organization",
+      "zone": "brain",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "future obligations get a durable home and a wake condition",
+      "renderNote": null,
+      "layout": {
+        "x": 244,
+        "y": 56,
+        "width": 236,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "future obligations get a durable",
+          "home and a wake condition"
+        ]
+      }
+    },
+    {
       "id": "repo-standards",
       "source": "eps:skills/repo-standards/SKILL.md",
       "repo": "eps",
@@ -1231,7 +1287,7 @@
       "subtitle": "route work to the right project home",
       "renderNote": null,
       "layout": {
-        "x": 988,
+        "x": 1226,
         "y": 2354,
         "width": 230,
         "height": 77,
@@ -1259,7 +1315,7 @@
       "subtitle": "model and effort fit-check at conversation start",
       "renderNote": null,
       "layout": {
-        "x": 488,
+        "x": 726,
         "y": 2354,
         "width": 218,
         "height": 77,
@@ -1914,6 +1970,12 @@
       "points": null
     },
     {
+      "from": "estate-memory-router",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
       "from": "expert-partners-systems-map",
       "to": "operating-doctrine",
       "type": "inherits",
@@ -2177,6 +2239,12 @@
     },
     {
       "from": "rare-content-engine",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "remember-this",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -2503,6 +2571,14 @@
         "mount": "aura:.agents/skills/"
       },
       {
+        "path": "aura:.agents/skills/estate-memory-router/SKILL.md",
+        "id": "estate-memory-router",
+        "canonical": "eps:skills/estate-memory-router/SKILL.md",
+        "deployedAt": "2026-09-04",
+        "stamp": "v1.0",
+        "mount": "aura:.agents/skills/"
+      },
+      {
         "path": "aura:.agents/skills/name-session/SKILL.md",
         "id": "name-session",
         "canonical": "aura:.claude/skills/name-session/SKILL.md",
@@ -2524,6 +2600,14 @@
         "canonical": "aura:.claude/skills/project-builder/SKILL.md",
         "deployedAt": "2026-09-04",
         "stamp": "tree sha256 b3bd16602b95",
+        "mount": "aura:.agents/skills/"
+      },
+      {
+        "path": "aura:.agents/skills/remember-this/SKILL.md",
+        "id": "remember-this",
+        "canonical": "eps:skills/remember-this/SKILL.md",
+        "deployedAt": "2026-09-04",
+        "stamp": "v1.0",
         "mount": "aura:.agents/skills/"
       },
       {
@@ -2563,8 +2647,24 @@
         "id": "session-wrap",
         "canonical": "eps:skills/session-wrap/SKILL.md",
         "deployedAt": "2026-09-04",
-        "stamp": "v1.11",
+        "stamp": "v1.12",
         "mount": "aura:.agents/skills/"
+      },
+      {
+        "path": "aura:.claude/skills/estate-memory-router/SKILL.md",
+        "id": "estate-memory-router",
+        "canonical": "eps:skills/estate-memory-router/SKILL.md",
+        "deployedAt": "2026-09-04",
+        "stamp": "v1.0",
+        "mount": null
+      },
+      {
+        "path": "aura:.claude/skills/remember-this/SKILL.md",
+        "id": "remember-this",
+        "canonical": "eps:skills/remember-this/SKILL.md",
+        "deployedAt": "2026-09-04",
+        "stamp": "v1.0",
+        "mount": null
       },
       {
         "path": "aura:.claude/skills/repo-standards/SKILL.md",
@@ -2586,8 +2686,8 @@
         "path": "aura:.claude/skills/session-wrap/SKILL.md",
         "id": "session-wrap",
         "canonical": "eps:skills/session-wrap/SKILL.md",
-        "deployedAt": "2026-09-03",
-        "stamp": "v1.11",
+        "deployedAt": "2026-09-04",
+        "stamp": "v1.12",
         "mount": null
       }
     ]
@@ -2606,7 +2706,7 @@
         "caption": "the law and the map of the house",
         "x": 8,
         "y": 8,
-        "width": 288,
+        "width": 494,
         "height": 250,
         "rooms": []
       },
