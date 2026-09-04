@@ -1,0 +1,151 @@
+{
+  "$comment": "Fresh-chat acceptance set for the estate-knowledge-retrieval skill. Every prompt is run in a BRAND NEW ChatGPT conversation with no project context and no instruction to look anything up. Expected targets were verified live against the aura repo on 2026-09-03; line numbers are docs/research/INDEX.md at that date and may drift as the index grows, so match on the entry TITLE first and treat the line number as a hint.",
+  "magic_words_forbidden": [
+    "estate brain",
+    "repo",
+    "repository",
+    "canon",
+    "research folder",
+    "knowledge retrieval",
+    "look it up",
+    "search your",
+    "check the index",
+    "use the connector",
+    "use the tool"
+  ],
+  "tests": [
+    {
+      "id": "T1",
+      "name": "positive automatic retrieval",
+      "polarity": "positive",
+      "prompt": "Should we reconsider our automation architecture?",
+      "expect_retrieval": true,
+      "expected_targets": [
+        "expert-partners doctrine/automation-map.md",
+        "aura docs/estate/estate-manifest.md"
+      ],
+      "expected_content_signals": [
+        "Make.com is retiring",
+        "Migration gate",
+        "n8n"
+      ],
+      "pass_criteria": "The answer rests on retrieved Estate sources and reflects the standing position that Make.com is retiring completely and the migration gate has not passed. It must NOT deliver a generic essay on automation architecture.",
+      "fail_signatures": [
+        "generic automation-platform comparison with no Expert Partners specifics",
+        "recommends Make.com for new work",
+        "asks Allison which system she means before retrieving anything"
+      ]
+    },
+    {
+      "id": "T2",
+      "name": "prior research discovered without naming it",
+      "polarity": "positive",
+      "prompt": "How should I be choosing between the different Claude models for different kinds of work?",
+      "expect_retrieval": true,
+      "expected_targets": [
+        "aura decisions/0057-model-and-effort-operating-standard.md"
+      ],
+      "expected_content_signals": [
+        "0057",
+        "effort"
+      ],
+      "expected_research_entries": [
+        "Claude Model Lineup and the Effort Parameter, A Current-State Deep Research Report (August 2026)",
+        "Model Selection and the Effort Parameter Across Claude Chat, Claude Cowork, and Claude Code",
+        "Model, Effort, and Evaluation Hardening"
+      ],
+      "pass_criteria": "The answer surfaces the accepted model-and-effort standard as the governing position, and may cite the underlying research as supporting evidence. Discovering the corpus material without the corpus being named is the point of this test.",
+      "fail_signatures": [
+        "generic public advice about Claude model tiers with no Expert Partners standard cited",
+        "cites only research and never the accepted standard"
+      ]
+    },
+    {
+      "id": "T3",
+      "name": "authority collision, canon governs over research",
+      "polarity": "positive",
+      "prompt": "How should our brands be organized underneath PartnerSync?",
+      "expect_retrieval": true,
+      "expected_targets": [
+        "aura decisions/0043-brand-architecture-brand-vs-location-registry.md"
+      ],
+      "expected_content_signals": [
+        "0043",
+        "PartnerSync",
+        "infrastructure"
+      ],
+      "expected_research_entries": [
+        "AI-Ready Operating System for a Multi-Brand Digital Business"
+      ],
+      "pass_criteria": "The premise is corrected from accepted canon: PartnerSync is infrastructure, not the brand umbrella, per ADR 0043. If the superseded research that modeled PartnerSync as the umbrella is surfaced, it must be named as superseded evidence, not blended into the answer as though it still held.",
+      "fail_signatures": [
+        "accepts the premise and designs a brand hierarchy under PartnerSync",
+        "presents the research position and the canon position as equally live",
+        "silently drops the conflict instead of naming it"
+      ],
+      "notes": "This is the corpus's one fully closed research-versus-canon collision. INDEX.md's own epistemic header names ADR 0043 as the governing precedent, and the research entry carries Disposition superseded, Superseded by ADR 0043 explicitly."
+    },
+    {
+      "id": "T3b",
+      "name": "authority collision, open research against a standing rejection",
+      "polarity": "positive",
+      "prompt": "Would consolidating everything into one single project be simpler than the split we have now?",
+      "expect_retrieval": true,
+      "expected_targets": [
+        "aura decisions/0023-multi-repo-vs-monorepo.md"
+      ],
+      "expected_content_signals": [
+        "0023",
+        "multi-repo"
+      ],
+      "expected_research_entries": [
+        "One Canonical Layer for a Six-Brand AI Operating System",
+        "Estate Brain Canon Blueprint, Monorepo Architecture for Multi-Brand AI Operations"
+      ],
+      "pass_criteria": "ADR 0023 governs: the monorepo migration was formally rejected and the multi-repo SOP ratified. Research arguing the other way may be surfaced, but only as unruled evidence, explicitly flagged as awaiting ruling.",
+      "fail_signatures": [
+        "recommends consolidating to a monorepo",
+        "cites the research as though it were the estate's position"
+      ],
+      "notes": "Prompt deliberately avoids the word repository, which is a magic word under acceptance test 5. The question still lands on the monorepo-versus-multi-repo decision."
+    },
+    {
+      "id": "T4",
+      "name": "negative control, generic technical request",
+      "polarity": "negative",
+      "prompt": "Write a Python function that reverses a singly linked list in place.",
+      "expect_retrieval": false,
+      "pass_criteria": "Answers directly with code. No Estate retrieval fires and no Estate sources are cited.",
+      "fail_signatures": [
+        "calls any Estate tool",
+        "mentions Expert Partners, the manifest, or any canonical source",
+        "asks whether this relates to the Estate"
+      ]
+    },
+    {
+      "id": "T4b",
+      "name": "negative control, general knowledge",
+      "polarity": "negative",
+      "prompt": "What is the difference between TCP and UDP?",
+      "expect_retrieval": false,
+      "pass_criteria": "Answers as ordinary general knowledge. No Estate retrieval fires.",
+      "fail_signatures": [
+        "calls any Estate tool",
+        "cites Expert Partners sources"
+      ]
+    },
+    {
+      "id": "T6",
+      "name": "retrieval gap is named, never papered over",
+      "polarity": "degraded",
+      "prompt": "Should we reconsider our automation architecture?",
+      "precondition": "Run with the Estate Brain app disconnected or unavailable in this conversation.",
+      "expect_retrieval": false,
+      "pass_criteria": "The answer states plainly that Estate sources could not be reached, names what it would have retrieved, and labels any general reasoning it offers as unverified. It must NOT present a memory-based answer as though Estate state had been checked.",
+      "fail_signatures": [
+        "answers confidently about Expert Partners systems with no retrieval and no disclosure",
+        "invents a current position on Make.com or n8n"
+      ]
+    }
+  ]
+}
