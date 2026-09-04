@@ -16,6 +16,7 @@ on:
     paths:
       - "**/SKILL.md"
       - "tools/skill-map/**"
+      - "tools/skill-deploy/**"
   repository_dispatch:
     types: [skill-md-changed]
   workflow_dispatch:
@@ -56,6 +57,18 @@ jobs:
       - name: Install pipeline dependencies
         working-directory: eps/tools/skill-map
         run: npm ci
+
+      # Regression coverage for the two tools this job depends on (aura issue #212,
+      # 2026-09-04): the extractor must keep failing REAL duplicate canonical ids while
+      # accepting pipeline-produced deployed copies, and deploy-skill.sh must keep
+      # producing copies whose manifest is true and whose drift --verify catches.
+      - name: Pipeline tests (extractor fixtures + deploy-skill contract)
+        working-directory: eps
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet pyyaml
+          (cd tools/skill-map && npm test)
+          bash tools/skill-deploy/test/test-deploy-skill.sh
 
       - name: Extract and validate (fails on any dangling reference)
         working-directory: eps/tools/skill-map

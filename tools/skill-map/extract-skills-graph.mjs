@@ -12,6 +12,17 @@
 // flag) is retired. Vendor catalog packs and non-canonical paths stay excluded via
 // EXCLUDE, exactly as before.
 //
+// DEPLOYED COPIES (added 2026-09-04, aura issue #212): a skill deployed as a copy to a
+// second agent surface is the SAME skill, not a second identity. The pipeline in
+// tools/skill-deploy/deploy-skill.sh is the sole producer of such copies and stamps each
+// with a DEPLOYED COPY header naming its canonical home (ADR 0056 point 8). This
+// extractor classifies a SKILL.md as a deployed copy when it sits under a deployed-mount
+// root (Codex discovers repo skills only under .agents/skills, so everything there is a
+// copy by construction) or when it carries that header anywhere. A deployed copy is
+// never mapped as a node; it must carry the header, and the header must name the very
+// canonical SKILL.md that owns its id, else the build fails. Byte drift between a copy
+// and its canonical is the deploy pipeline's --verify gate, not this extractor's job.
+//
 // Usage: node extract-skills-graph.mjs [--eps <path>] [--aura <path>] [--out <file>]
 //   --eps  expert-partners-skills checkout (default: this script's repo root)
 //   --aura aura checkout (default: env AURA_PATH, else ../aura relative to the eps root)
@@ -75,6 +86,23 @@ const DECLARED_DUPLICATES = [
   { id: 'research-intake', keep: 'eps:skills/research-intake/SKILL.md', duplicate: 'aura:.claude/skills/research-intake/SKILL.md' },
 ];
 
+// Deployed-mount roots: every SKILL.md under one of these is a deployed copy by
+// construction, whatever its header says. .agents/skills is the Codex repo-scope
+// discovery path (learn.chatgpt.com/docs/build-skills, verified 2026-09-04); Codex
+// cannot be pointed at .claude/skills, so the estate mirrors its project mount there
+// through the deploy pipeline (aura .claude/skills -> aura .agents/skills).
+const DEPLOYED_MOUNT_ROOTS = [
+  /^[a-z-]+:\.agents\/skills\//,
+];
+
+// The DEPLOYED COPY header contract, written by tools/skill-deploy/deploy-skill.sh
+// (render()) as YAML comment lines inside the frontmatter. Two lines: the date and
+// producer, then "<repo> <path>. Deployed at <stamp>." Keep in step with the script.
+const DEPLOYED_HEADER = /^# DEPLOYED COPY \((\d{4}-\d{2}-\d{2}), skill-deploy pipeline\): the canonical home is\s*\n# (\S+) (\S+?SKILL\.md)\. Deployed at (.+?)\.\s*$/m;
+// Header repo names -> walk keys. A header naming a repo this walk does not cover
+// cannot be verified and fails the build.
+const REPO_NAME_TO_KEY = { 'expert-partners-skills': 'eps', 'aura': 'aura' };
+
 // ---------- schema ----------
 
 const idList = z.union([z.string(), z.array(z.string())]).transform(v => (Array.isArray(v) ? v : [v]));
@@ -136,9 +164,27 @@ function fail(msg) { console.error(`ERROR: ${msg}`); errors.push(msg); }
 
 const nodes = new Map();        // id -> node
 const duplicateRecords = [];    // declared duplicates encountered
+const deployedMounts = [];      // deployed copies encountered (recorded, never mapped)
 const skippedPaths = [];        // excluded files, recorded for the report
 
+// Pass 1: collect and classify every SKILL.md. Classification never depends on walk
+// order, so a deployed copy that sorts before its canonical (.agents before .claude)
+// is handled the same as one that sorts after it.
+const canonicalFiles = [];  // { repoKey, tagged, abs, raw }
+const deployedFiles = [];   // { repoKey, tagged, abs, raw, header, underMount }
+
+function readDeployedHeader(raw) {
+  // Only the frontmatter block may carry the header; a stray match in the body is
+  // prose about the header, not the header.
+  const fm = raw.match(/^---\n([\s\S]*?)\n---/);
+  if (!fm) return null;
+  const m = fm[1].match(DEPLOYED_HEADER);
+  if (!m) return null;
+  return { date: m[1], repoName: m[2], canonicalPath: m[3], stamp: m[4] };
+}
+
 for (const [repoKey, root] of Object.entries(REPOS)) {
+  if (!fs.existsSync(root)) continue;
   for (const abs of walk(root)) {
     const rel = path.relative(root, abs).split(path.sep).join('/');
     const tagged = `${repoKey}:${rel}`;
@@ -151,59 +197,123 @@ for (const [repoKey, root] of Object.entries(REPOS)) {
     const dup = DECLARED_DUPLICATES.find(d => d.duplicate === tagged);
     if (dup) { duplicateRecords.push(tagged); continue; }
 
-    let parsed;
-    try {
-      parsed = matter(fs.readFileSync(abs, 'utf8'));
-    } catch (e) {
-      fail(`frontmatter does not parse: ${tagged} -> ${e.message.split('\n')[0]}`);
-      continue;
+    const raw = fs.readFileSync(abs, 'utf8');
+    const header = readDeployedHeader(raw);
+    const underMount = DEPLOYED_MOUNT_ROOTS.some(rx => rx.test(tagged));
+    if (underMount || header) {
+      deployedFiles.push({ repoKey, tagged, abs, raw, header, underMount });
+    } else {
+      canonicalFiles.push({ repoKey, tagged, abs, raw });
     }
-
-    // Strict-mode gate (ruling 14): name the violation precisely before the general
-    // schema pass, so the CI error reads as the born-dressed rule, not a zod detail.
-    const missingCore = ['zone', 'tier', 'status'].filter(f => parsed.data[f] == null);
-    if (missingCore.length === 3) {
-      fail(`missing skill-map block: ${tagged} has no zone/tier/status -- every new skill is born with its skill-map frontmatter block filled in (ruling 14, skills are born dressed); a skill without its block does not merge`);
-      continue;
-    }
-    if (missingCore.length > 0) {
-      fail(`born-dressed violation: ${tagged} is missing required field(s) ${missingCore.join(', ')} (ruling 14 strict mode: zone, tier, and status are required on every canonical SKILL.md)`);
-      continue;
-    }
-
-    const check = SkillMeta.safeParse(parsed.data);
-    if (!check.success) {
-      fail(`schema violation: ${tagged} -> ${check.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; ')}`);
-      continue;
-    }
-    const meta = check.data;
-
-    const folder = path.basename(path.dirname(abs));
-    if (meta.name !== folder) {
-      fail(`name/folder mismatch: ${tagged} declares name "${meta.name}" but lives in folder "${folder}"`);
-      continue;
-    }
-
-    if (nodes.has(meta.name)) {
-      fail(`duplicate skill id "${meta.name}": ${tagged} collides with ${nodes.get(meta.name).source}`);
-      continue;
-    }
-
-    nodes.set(meta.name, {
-      id: meta.name,
-      source: tagged,
-      repo: repoKey,
-      tier: meta.tier,
-      zone: meta.zone,
-      status: meta.status,
-      inherits: meta.inherits,
-      calls: meta.calls,
-      defersTo: meta['defers-to'],
-      brandScope: meta['brand-scope'],
-      subtitle: meta.subtitle ?? null,
-      renderNote: meta['render-note'] ?? null,
-    });
   }
+}
+
+// Pass 2: map canonical skills. This is the identity pass; a duplicate here is a
+// REAL duplicate canonical id and fails the build exactly as before.
+for (const { repoKey, tagged, abs, raw } of canonicalFiles) {
+  let parsed;
+  try {
+    parsed = matter(raw);
+  } catch (e) {
+    fail(`frontmatter does not parse: ${tagged} -> ${e.message.split('\n')[0]}`);
+    continue;
+  }
+
+  // Strict-mode gate (ruling 14): name the violation precisely before the general
+  // schema pass, so the CI error reads as the born-dressed rule, not a zod detail.
+  const missingCore = ['zone', 'tier', 'status'].filter(f => parsed.data[f] == null);
+  if (missingCore.length === 3) {
+    fail(`missing skill-map block: ${tagged} has no zone/tier/status -- every new skill is born with its skill-map frontmatter block filled in (ruling 14, skills are born dressed); a skill without its block does not merge`);
+    continue;
+  }
+  if (missingCore.length > 0) {
+    fail(`born-dressed violation: ${tagged} is missing required field(s) ${missingCore.join(', ')} (ruling 14 strict mode: zone, tier, and status are required on every canonical SKILL.md)`);
+    continue;
+  }
+
+  const check = SkillMeta.safeParse(parsed.data);
+  if (!check.success) {
+    fail(`schema violation: ${tagged} -> ${check.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; ')}`);
+    continue;
+  }
+  const meta = check.data;
+
+  const folder = path.basename(path.dirname(abs));
+  if (meta.name !== folder) {
+    fail(`name/folder mismatch: ${tagged} declares name "${meta.name}" but lives in folder "${folder}"`);
+    continue;
+  }
+
+  if (nodes.has(meta.name)) {
+    fail(`duplicate skill id "${meta.name}": ${tagged} collides with ${nodes.get(meta.name).source}`);
+    continue;
+  }
+
+  nodes.set(meta.name, {
+    id: meta.name,
+    source: tagged,
+    repo: repoKey,
+    tier: meta.tier,
+    zone: meta.zone,
+    status: meta.status,
+    inherits: meta.inherits,
+    calls: meta.calls,
+    defersTo: meta['defers-to'],
+    brandScope: meta['brand-scope'],
+    subtitle: meta.subtitle ?? null,
+    renderNote: meta['render-note'] ?? null,
+  });
+}
+
+// Pass 3: validate deployed copies against the canonical map. A copy is legitimate
+// only when it is pipeline-produced (header present) and its header names the exact
+// canonical SKILL.md that owns its id. Anything else is corruption, named precisely.
+for (const { tagged, abs, raw, header, underMount } of deployedFiles) {
+  const folder = path.basename(path.dirname(abs));
+  if (!header) {
+    fail(`deployed copy without a DEPLOYED COPY header: ${tagged} sits under a deployed mount root but was not produced by tools/skill-deploy/deploy-skill.sh (ADR 0056 point 8) -- redeploy it through the pipeline (--mirror-mount) instead of copying files by hand`);
+    continue;
+  }
+  let parsed;
+  try {
+    parsed = matter(raw);
+  } catch (e) {
+    fail(`frontmatter does not parse: ${tagged} -> ${e.message.split('\n')[0]}`);
+    continue;
+  }
+  const declaredName = parsed.data?.name;
+  if (declaredName !== folder) {
+    fail(`name/folder mismatch: ${tagged} declares name "${declaredName}" but lives in folder "${folder}"`);
+    continue;
+  }
+  const repoKey = REPO_NAME_TO_KEY[header.repoName];
+  if (!repoKey) {
+    fail(`deployed copy names an unknown canonical repo: ${tagged} says its canonical home is "${header.repoName} ${header.canonicalPath}", and this walk covers only ${Object.keys(REPO_NAME_TO_KEY).join(', ')}`);
+    continue;
+  }
+  const canonicalTagged = `${repoKey}:${header.canonicalPath}`;
+  const canonicalAbs = path.join(REPOS[repoKey], ...header.canonicalPath.split('/'));
+  if (!fs.existsSync(canonicalAbs)) {
+    fail(`deployed copy names a canonical home that does not exist: ${tagged} -> ${canonicalTagged} (a hand-transformed path, or canonical moved without a redeploy)`);
+    continue;
+  }
+  const node = nodes.get(folder);
+  if (!node) {
+    fail(`orphan deployed copy: ${tagged} carries id "${folder}" but no canonical SKILL.md maps that id (canonical removed or renamed without removing the copy)`);
+    continue;
+  }
+  if (node.source !== canonicalTagged) {
+    fail(`deployed copy points at the wrong canonical home: ${tagged} names ${canonicalTagged}, but "${folder}" is canonical at ${node.source}`);
+    continue;
+  }
+  deployedMounts.push({
+    path: tagged,
+    id: folder,
+    canonical: canonicalTagged,
+    deployedAt: header.date,
+    stamp: header.stamp,
+    mount: underMount ? tagged.replace(/^([a-z-]+:\.agents\/skills\/).*$/, '$1') : null,
+  });
 }
 
 // ---------- reference resolution (the drift gate) ----------
@@ -252,6 +362,9 @@ const graph = {
   edges: edges.sort((a, b) => (a.from + a.type + a.to).localeCompare(b.from + b.type + b.to)),
   flags: {
     declaredDuplicates: duplicateRecords.sort(),
+    // Deployed copies verified against their canonical home this build. Each is the
+    // same skill as its `canonical`, mounted for a second agent surface; none is a node.
+    deployedMounts: deployedMounts.sort((a, b) => a.path.localeCompare(b.path)),
   },
   excluded: skippedPaths.sort(),
 };
@@ -263,6 +376,6 @@ await layoutGraph(graph);
 
 fs.mkdirSync(path.dirname(outFile), { recursive: true });
 fs.writeFileSync(outFile, JSON.stringify(graph, null, 2) + '\n');
-console.log(`skills-graph.json written: ${graph.nodes.length} nodes, ${graph.edges.length} edges (strict mode: zone/tier/status verified on all), ${duplicateRecords.length} declared duplicate(s), ${skippedPaths.length} excluded path(s).`);
+console.log(`skills-graph.json written: ${graph.nodes.length} nodes, ${graph.edges.length} edges (strict mode: zone/tier/status verified on all), ${duplicateRecords.length} declared duplicate(s), ${deployedMounts.length} deployed mount(s) verified against canonical, ${skippedPaths.length} excluded path(s).`);
 console.log(`layout baked: ${graph.layout.width}x${graph.layout.height}, ${graph.layout.zones.length} zones, ${graph.layout.zones.reduce((a, z) => a + z.rooms.length, 0)} brand rooms (elkjs build-time only).`);
 console.log(`output: ${outFile}`);
