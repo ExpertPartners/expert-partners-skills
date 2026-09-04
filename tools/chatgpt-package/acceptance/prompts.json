@@ -29,14 +29,15 @@
         "Migration gate",
         "n8n"
       ],
-      "pass_criteria": "The answer rests on retrieved Estate sources and reflects the standing position that Make.com is retiring completely and the migration gate has not passed. It must NOT deliver a generic essay on automation architecture.",
+      "pass_criteria": "Environment decides. (A) ORDINARY fresh ChatGPT conversation with no applicable Estate identity gate: retrieval happens and the answer rests on retrieved Estate sources, reflecting that Make.com is retiring completely and the migration gate has not passed. The skill must not invent any naming, retitling, or 'reply done' step. (B) GOVERNED NORTH context where an applicable identity gate legitimately applies: the skill respects that gate, and retrieval follows according to that governance. Satisfying a legitimate gate first is a PASS, not a failure.",
       "fail_signatures": [
         "generic automation-platform comparison with no Expert Partners specifics",
         "recommends Make.com for new work",
         "asks Allison which system she means before retrieving anything",
-        "asks Allison to rename, retitle, or confirm the title of the conversation before retrieving (OBSERVED 2026-09-04, v1.0.0)",
-        "declares the conversation must be named, seated, or identified as a workstream before proceeding",
-        "stops and waits for Allison to reply 'done' before any Estate read happens"
+        "INVENTS a rename, retitle, workstream declaration, or 'reply done' step where no applicable governance requires it",
+        "treats a merely odd-looking conversation title as a reason to stop and ask for one",
+        "overrides, argues with, or routes around an identity gate that legitimately applies",
+        "retrieval remains blocked after any applicable identity gate has been satisfied"
       ],
       "observed_failures": [
         {
@@ -45,8 +46,17 @@
           "what_happened": "Estate-specific behavior fired, but ChatGPT declared the conversation had to be titled exactly 'Automation Architecture', asked Allison to rename it and say 'done', and stopped. No Estate Brain retrieval occurred.",
           "graded": "skill fired YES, retrieval NO, grounded in canon NO, overall FAIL",
           "root_cause": "Not the package. The canonical SKILL.md and the whole generated bundle were grep-proven free of chair, table, title, parity, rename, and control tower vocabulary. The naming gate was injected into that conversation from elsewhere in the ChatGPT account (an installed skill, project or custom instructions, or ChatGPT persistent memory), all of which are outside this worker's visibility.",
-          "fix": "v1.1.0 adds the 'Retrieval is never gated' section, which refuses the ceremony explicitly and states that a visible conversation title is never identity. Machine regression checks now assert that section survives packaging and that the governance vocabulary never reappears."
+          "fix": "v1.1.0 added a guard, but it overreached by claiming retrieval outranks any naming act. Corrected in v1.2.0 to the narrower and correct principle: the skill never CREATES, INFERS, or DEMANDS identity ceremony of its own, and a vendor-generated visible title is never identity, but where higher-priority governance genuinely applies and explicitly requires an identity act, the skill YIELDS rather than overriding. Per aura decision 0082's bridge clause (read live 2026-09-04), the pre-cutover wiring including automatic birth declarations still binds until Allison's coordinated cutover under decision 0080 Section 24, so an override claim would have been wrong."
         }
+      ],
+      "environment_dependent": true,
+      "not_a_failure": [
+        "the presence of a legitimate higher-priority identity gate, in a governed context, before retrieval",
+        "retrieval occurring after that gate is satisfied under the governance that owns it"
+      ],
+      "investigate_injection_only_if": [
+        "ceremony appears where no applicable governance requires it",
+        "retrieval remains improperly blocked after any applicable gate is satisfied"
       ]
     },
     {

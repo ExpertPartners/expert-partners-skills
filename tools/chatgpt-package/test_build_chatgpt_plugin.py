@@ -113,19 +113,36 @@ def test_build_structure() -> None:
                 check(f"{skill}: packaged frontmatter is spec-clean", not extra, str(extra))
                 check(f"{skill}: packaged name matches its folder", fm.get("name") == skill)
                 check(f"{skill}: body survived packaging intact", len(body) > 500)
-                # REGRESSION, acceptance T1 failure of 2026-09-04. In a fresh
-                # ChatGPT conversation the model demanded the chat be retitled
-                # and confirmed before it would retrieve anything, so no Estate
-                # read happened at all. The canonical source never carried that
-                # vocabulary (grep-proven clean); the gate was injected from
-                # elsewhere in the account. The skill now refuses the ceremony
-                # explicitly, and that refusal must survive packaging.
+                # REGRESSION, acceptance T1 failure of 2026-09-04, and the
+                # governance correction that followed on the same day.
+                #
+                # T1 failed on v1.0.0: in a fresh ChatGPT conversation the model
+                # demanded the chat be retitled and confirmed before it would
+                # retrieve, so no Estate read happened. The canonical source was
+                # grep-proven clean of that vocabulary, so the skill now refuses
+                # to INVENT the ceremony itself.
+                #
+                # v1.1 then overcorrected, claiming retrieval outranks any
+                # naming act. That was wrong: per aura decision 0082's bridge
+                # clause, read live 2026-09-04, the pre-cutover wiring still
+                # binds ("automatic birth declarations and the one-active-worker
+                # practice included") until Allison's coordinated cutover under
+                # decision 0080 Section 24. v1.2 yields to applicable governance
+                # instead of overriding it. Both halves are asserted here, so
+                # neither the original failure nor the overcorrection can return.
                 body_l = body.lower()
-                for phrase in ("retrieval is never gated",
-                               "rename the conversation",
-                               "never identity"):
-                    check(f"{skill}: no-ceremony guard survives packaging ({phrase!r})",
+                for phrase in ("never invent identity ceremony",
+                               "does not create, infer, or demand",
+                               "yields to that",
+                               "never identity",
+                               "not a retrieval failure"):
+                    check(f"{skill}: no-invention guard survives packaging ({phrase!r})",
                           phrase in body_l)
+                for overreach in ("retrieval still runs first",
+                                  "retrieval is never gated",
+                                  "the answer still ships"):
+                    check(f"{skill}: guard does not reclaim override authority "
+                          f"({overreach!r})", overreach not in body_l)
                 for banned in ("chair", "table birth", "title parity"):
                     check(f"{skill}: packaged skill stays free of governance vocabulary "
                           f"({banned!r})", banned not in body_l)

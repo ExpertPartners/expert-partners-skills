@@ -218,3 +218,49 @@ deciding which skill to run.
 Regression: six machine checks now assert the guard language survives packaging
 and that chair, table birth, and title parity never reappear in a shipped
 skill.
+
+### 2026-09-04, governance correction to the v1.1 guard
+
+NORTH accepted the package-source diagnosis above but corrected the fix. The
+v1.1 guard claimed retrieval runs first even when something else asks for a
+naming act. That was an override claim and it was wrong.
+
+Estate governance still carries an active pre-cutover compatibility rule. Aura
+decision 0082's bridge clause, read live 2026-09-04, states that until the
+coordinated cutover ruled by Allison under decision 0080 Section 24, "the
+currently installed operational wiring continues to bind, automatic birth
+declarations and the one-active-worker practice included". Decision 0080 line
+19 says the same thing from the other side, that approving the architecture
+does not by itself execute cutover. So where NORTH identity governance applies,
+the Identity Gate legitimately runs before retrieval, and a portable retrieval
+skill has no standing to outrank it.
+
+v1.2.0 narrows the guard to what this skill actually owns. It never creates,
+infers, or demands Room, Table, or title ceremony of its own, and a
+vendor-generated visible title is never identity. But where higher-priority
+governance genuinely applies and explicitly requires an identity act, the skill
+yields rather than overriding, and the presence of a legitimate identity gate
+is not counted as a retrieval failure.
+
+Regression now runs in both directions: five checks assert the no-invention
+language survives packaging, and three assert the override phrasing never comes
+back.
+
+## T1 grading depends on the environment
+
+T1 has two correct outcomes, and which one applies depends on where it is run.
+
+**Ordinary fresh conversation, no applicable Estate identity gate.** Retrieval
+happens and the answer rests on retrieved sources. The skill invents no naming,
+retitling, or "reply done" step. Anything the skill makes up here is a FAIL.
+
+**Governed NORTH context where an identity gate legitimately applies.** The
+skill respects the gate, and retrieval follows according to that governance.
+Satisfying a legitimate gate first is a PASS, not a failure. Grading a
+legitimate gate as a failure was the mistake v1.1 was built on.
+
+**When to suspect account-level injection.** Only two conditions justify
+chasing installed skills, custom instructions, project instructions, or
+ChatGPT memory: ceremony appears where no applicable governance requires it, or
+retrieval stays blocked after an applicable gate has been satisfied. Absent
+either, a gate is just governance doing its job.
