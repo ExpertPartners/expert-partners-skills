@@ -138,6 +138,12 @@ const SkillMeta = z.object({
   'render-note': z.string().nullish().default(null),
 }).passthrough(); // existing operational fields (allowed-tools, argument-hint, ...) pass through untouched
 
+// Declared before repo discovery: the missing-checkout guard below calls fail(),
+// and a const declared later sits in its temporal dead zone, so that guard used to
+// die with a ReferenceError instead of printing the clear error it was written to give.
+const errors = [];
+function fail(msg) { console.error(`ERROR: ${msg}`); errors.push(msg); }
+
 // ---------- cli / repo discovery ----------
 
 const argv = process.argv.slice(2);
@@ -170,8 +176,6 @@ function* walk(dir) {
   }
 }
 
-const errors = [];
-function fail(msg) { console.error(`ERROR: ${msg}`); errors.push(msg); }
 
 const nodes = new Map();        // id -> node
 const duplicateRecords = [];    // declared duplicates encountered
