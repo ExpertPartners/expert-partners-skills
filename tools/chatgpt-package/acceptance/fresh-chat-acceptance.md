@@ -227,7 +227,7 @@ naming act. That was an override claim and it was wrong.
 
 Estate governance still carries an active pre-cutover compatibility rule. Aura
 decision 0082's bridge clause, read live 2026-09-04, states that until the
-coordinated cutover ruled by Allison under decision 0080 Section 24, "the
+coordinated cutover that decision 0080 Section 24 reserves to Allison, "the
 currently installed operational wiring continues to bind, automatic birth
 declarations and the one-active-worker practice included". Decision 0080 line
 19 says the same thing from the other side, that approving the architecture
