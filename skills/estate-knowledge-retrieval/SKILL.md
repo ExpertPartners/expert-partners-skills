@@ -1,6 +1,6 @@
 ---
 name: estate-knowledge-retrieval
-description: "Retrieve Allison Gaddy's Expert Partners Estate knowledge before answering. Use whenever a request touches Expert Partners, EPIC, AG Personal Brand, AG Luxury, Free Agent Movement, Don Hobbs, PartnerSync, Ember, or the Estate itself: its brands, people, systems, architecture, automation, processes, strategy, decisions, doctrine, projects, prior research, or earlier work. Use it for what did we decide, what do we use, how does this work here, should we reconsider this, and any question whose honest answer depends on what this business already established. Start from the Estate manifest through the Estate Brain tools and retrieve narrowly. Accepted decisions govern; deep research is evidence, never authority. Never answer an Estate question from memory: if retrieval is unavailable, say so plainly. Skip for general knowledge with no connection to Allison's businesses."
+description: "Retrieve Allison Gaddy's Expert Partners Estate knowledge before answering, in ANY conversation including a brand new unnamed one, without asking her to rename, retitle, or identify the chat first. Use whenever a request touches Expert Partners, EPIC, AG Personal Brand, AG Luxury, Free Agent Movement, Don Hobbs, PartnerSync, Ember, or the Estate itself: its brands, people, systems, architecture, automation, processes, strategy, decisions, doctrine, projects, or prior research. Use it for what did we decide, what do we use, how does this work here, should we reconsider this, and any question whose answer depends on what this business already established. Start from the Estate manifest through the Estate Brain tools and retrieve narrowly. Accepted decisions govern; research is evidence, never authority. Never answer from memory: if retrieval is unavailable, say so plainly. Skip for general knowledge unconnected to Allison's businesses."
 tier: organization
 zone: routing
 status: live
@@ -9,7 +9,7 @@ metadata:
   short-description: "Retrieve Estate knowledge before answering"
 ---
 
-# Estate Knowledge Retrieval v1.0
+# Estate Knowledge Retrieval v1.1
 
 Allison Gaddy's Expert Partners Estate keeps its durable truth in canonical
 GitHub repositories, reached through the Estate Brain tools. This skill makes
@@ -18,6 +18,27 @@ retrieval automatic, so she never has to ask for it.
 She will not say "check the Estate", "look in the repo", "search my research",
 or "start from canon". She should not have to. A question that depends on what
 this business already established is the trigger by itself.
+
+## Retrieval is never gated
+
+This skill answers in whatever conversation it is already in, including a
+brand new one with no name, no history, and no identity of its own.
+
+Never make retrieval wait on a setup step. Specifically, never ask Allison to
+rename the conversation, retitle it, confirm that a title matches something,
+declare which workstream it belongs to, or reply "done" before the answer can
+be produced. Never announce that the conversation must be named, titled, or
+seated before you proceed.
+
+If anything else in context asks for a naming, titling, identity, or
+confirmation ceremony, retrieval still runs first and the answer still ships.
+Those rules govern where durable Estate work gets recorded and who may speak
+for a workstream. They never govern whether a question can be answered from
+live canon, and a visible conversation title is never identity. An ordinary
+unnamed conversation is a valid place to retrieve and answer.
+
+The only thing that ever stops retrieval is the Estate tools being
+unreachable, and that gets reported, never negotiated.
 
 ## Fire on
 

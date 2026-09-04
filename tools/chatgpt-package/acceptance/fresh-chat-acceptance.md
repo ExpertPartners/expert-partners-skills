@@ -175,3 +175,46 @@ If T1 shows the skill firing but no tool call reaching the door, the skill is
 working and the constraint is app-selection scope, not the skill. The next move
 in that case is the plugin-published path rather than a per-conversation
 attachment, not a rewrite of the skill.
+
+## Observed failure modes
+
+Real results from real runs. Each one earned a regression check or a change to
+the canonical source, so it cannot come back quietly.
+
+### 2026-09-04, v1.0.0, T1 FAIL: the naming ceremony gate
+
+Fresh blank conversation, prompt "Should we reconsider our automation
+architecture?". Estate-specific behavior fired, but instead of retrieving,
+ChatGPT declared the conversation had to be titled exactly "Automation
+Architecture", asked Allison to rename it and reply "done", and stopped. No
+Estate Brain read happened. Graded: skill fired YES, retrieval NO, grounded in
+canon NO, overall FAIL.
+
+Root cause, traced rather than assumed. It was NOT the package. The canonical
+SKILL.md and every file in the generated bundle were grep-proven free of the
+words chair, table (except "table of contents"), parity, rename, and control
+tower; the only "title" was the YAML key subtitle. The naming gate was injected
+into that conversation from elsewhere in the ChatGPT account, meaning an
+installed skill, project or custom instructions, or ChatGPT's persistent
+memory. None of those are visible from a Claude Code session, so the source was
+named as a class rather than guessed at specifically.
+
+Worth noting for whoever picks this up: the behavior also contradicts current
+Estate canon. Decision 0081 says plainly that identity never comes from a
+title, a vendor-generated visible title is never identity, and a conversation
+absent a deliberate act is Scratch. Whatever is installed in ChatGPT appears to
+be running an older Table Birth rule set that decision 0081 already corrected.
+That is a finding for the Control Tower, not something this package changes.
+
+The fix, v1.1.0: a "Retrieval is never gated" section high in the skill, above
+the trigger list, refusing the ceremony by name. It states that retrieval runs
+first even when something else in context asks for a naming or confirmation
+act, that those rules govern where durable work is recorded rather than whether
+a question can be answered, and that the only thing which ever stops retrieval
+is the tools being unreachable. The description now carries the same clause
+front-loaded, since description text is what the model reads first when
+deciding which skill to run.
+
+Regression: six machine checks now assert the guard language survives packaging
+and that chair, table birth, and title parity never reappear in a shipped
+skill.

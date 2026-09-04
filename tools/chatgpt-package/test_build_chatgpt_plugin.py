@@ -113,6 +113,23 @@ def test_build_structure() -> None:
                 check(f"{skill}: packaged frontmatter is spec-clean", not extra, str(extra))
                 check(f"{skill}: packaged name matches its folder", fm.get("name") == skill)
                 check(f"{skill}: body survived packaging intact", len(body) > 500)
+                # REGRESSION, acceptance T1 failure of 2026-09-04. In a fresh
+                # ChatGPT conversation the model demanded the chat be retitled
+                # and confirmed before it would retrieve anything, so no Estate
+                # read happened at all. The canonical source never carried that
+                # vocabulary (grep-proven clean); the gate was injected from
+                # elsewhere in the account. The skill now refuses the ceremony
+                # explicitly, and that refusal must survive packaging.
+                body_l = body.lower()
+                for phrase in ("retrieval is never gated",
+                               "rename the conversation",
+                               "never identity"):
+                    check(f"{skill}: no-ceremony guard survives packaging ({phrase!r})",
+                          phrase in body_l)
+                for banned in ("chair", "table birth", "title parity"):
+                    check(f"{skill}: packaged skill stays free of governance vocabulary "
+                          f"({banned!r})", banned not in body_l)
+
                 skmd = [n for n in names
                         if n.lower().startswith(f"{plugin}/skills/{skill}/".lower())
                         and n.lower().endswith("/skill.md")]

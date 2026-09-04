@@ -33,7 +33,20 @@
       "fail_signatures": [
         "generic automation-platform comparison with no Expert Partners specifics",
         "recommends Make.com for new work",
-        "asks Allison which system she means before retrieving anything"
+        "asks Allison which system she means before retrieving anything",
+        "asks Allison to rename, retitle, or confirm the title of the conversation before retrieving (OBSERVED 2026-09-04, v1.0.0)",
+        "declares the conversation must be named, seated, or identified as a workstream before proceeding",
+        "stops and waits for Allison to reply 'done' before any Estate read happens"
+      ],
+      "observed_failures": [
+        {
+          "date": "2026-09-04",
+          "version": "1.0.0",
+          "what_happened": "Estate-specific behavior fired, but ChatGPT declared the conversation had to be titled exactly 'Automation Architecture', asked Allison to rename it and say 'done', and stopped. No Estate Brain retrieval occurred.",
+          "graded": "skill fired YES, retrieval NO, grounded in canon NO, overall FAIL",
+          "root_cause": "Not the package. The canonical SKILL.md and the whole generated bundle were grep-proven free of chair, table, title, parity, rename, and control tower vocabulary. The naming gate was injected into that conversation from elsewhere in the ChatGPT account (an installed skill, project or custom instructions, or ChatGPT persistent memory), all of which are outside this worker's visibility.",
+          "fix": "v1.1.0 adds the 'Retrieval is never gated' section, which refuses the ceremony explicitly and states that a visible conversation title is never identity. Machine regression checks now assert that section survives packaging and that the governance vocabulary never reappears."
+        }
       ]
     },
     {
