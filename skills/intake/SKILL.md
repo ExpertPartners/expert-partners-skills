@@ -24,15 +24,15 @@ Files captured content into `<repo>/intake/` per ADR 0027, commits, and pushes.
 
 | Project keyword | Local home | GitHub repo | Branch protected? |
 |---|---|---|---|
-| FAM / free agent | ~/Claude/projects/FAM | ExpertPartners/fam | yes (PR) |
+| FAM / free agent / Free Agent Nation | ~/Claude/projects/FAM | ExpertPartners/free-agent-nation (renamed from fam 2026-09-04) | yes (PR) |
 | Moxie (BENCHED 2026-07-30, ADR 0045: repo archived, do NOT intake; route consumer RE content to AG Luxury) | ~/Claude/projects/MoxieSignatureGroup | ExpertPartners/moxie (archived) | n/a |
 | AG Luxury / luxury | ~/Claude/projects/allisongaddy-com (clone of ag-luxury) | ExpertPartners/ag-luxury | yes (PR) |
 | Expert Partners / EP | ~/Claude/projects/ExpertPartners | ExpertPartners/expert-partners | yes (PR) |
 | EPIC | ~/Claude/projects/EPIC | ExpertPartners/epic | no (direct) |
 | AG / personal brand | ~/Claude/projects/AGPersonalBrand | ExpertPartners/ag-personal-brand | yes (PR) |
 | Azulio | ~/Claude/projects/AzulioPartnership | ExpertPartners/azulio | no (direct) |
-| The Strong Ones (body of work inside AG Personal Brand per ADR 0045; repo stays separate for privacy) | ~/Claude/projects/TheStrongOnes | ExpertPartners/the-strong-ones | no (direct) |
-| book | ~/Claude/projects/book | ExpertPartners/book | no (direct) |
+| The Strong Ones (independent body of work that feeds AG Personal Brand per aura ADR 0069; private repo) | ~/Claude/projects/TheStrongOnes | ExpertPartners/the-strong-ones | no (direct) |
+| book / You've Got a Friend | ~/Claude/projects/book | ExpertPartners/youve-got-a-friend-book (renamed from book 2026-09-04) | no (direct) |
 | HeyGen | ~/Claude/projects/HeyGen | ExpertPartners/heygen | no (direct) |
 | PartnerSync | ~/Claude/projects/PartnerSync | ExpertPartners/partnersync | no (direct) |
 | ghl / automation | ~/Claude/projects/ghl-automation | ExpertPartners/ghl-automation | no (direct) |

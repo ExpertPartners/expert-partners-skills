@@ -32,13 +32,13 @@ Read `~/Claude/projects/Aura/doctrine/session-routing.md` first. That file is th
 |---|---|---|
 | Cross-brand strategy, ADRs, Aura doctrine | `~/Claude/projects/Aura/` | `ExpertPartners/aura` |
 | AG personal brand, YouTube, speaking | `~/Claude/projects/AGPersonalBrand/` | `ExpertPartners/ag-personal-brand` |
-| Free Agent Movement, FAM keynotes, cohorts | `~/Claude/projects/FAM/` | `ExpertPartners/fam-doctrine` |
+| Free Agent Movement, Free Agent Nation, FAM keynotes, cohorts | `~/Claude/projects/FAM/` | `ExpertPartners/free-agent-nation` |
 | Expert Partners, EPIC, coaching programs | `~/Claude/projects/ExpertPartners/` | `ExpertPartners/expert-partners` |
 | Moxie Signature Group brand + marketing, North Dallas RE | `~/Claude/projects/MoxieSignatureGroup/` | `ExpertPartners/moxie` |
 | Moxie website build + engineering (Next.js, RETS, deploys, code) | `~/Claude/projects/Moxie Website Builder Partner/` | `ExpertPartners/moxie-signature-group-website` |
 | PartnerSync, GHL sync, Make.com S1-S10 | `~/Claude/projects/PartnerSync/` | `ExpertPartners/partnersync` |
 | GHL automation, workflows, pipelines | `~/Claude/projects/ghl-automation/` | `ExpertPartners/ghl-automation` |
-| Book "You've Got a Friend" manuscript | `~/Claude/projects/book/` | `ExpertPartners/book` |
+| Book "You've Got a Friend" manuscript | `~/Claude/projects/book/` | `ExpertPartners/youve-got-a-friend-book` |
 | HeyGen avatar video | `~/Claude/projects/HeyGen/` | `ExpertPartners/heygen` |
 | eXp Explained 2.0 | `~/Claude/projects/eXpExplained2/` | `ExpertPartners/exp-explained-2` |
 | Azulio Partnership | `~/Claude/projects/AzulioPartnership/` | `ExpertPartners/azulio-partnership` |
