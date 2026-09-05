@@ -64,6 +64,22 @@ their version-history paragraphs and are not deleted, per this estate's
 append-and-mark convention. Active rule text is rewritten to the decision 0088
 reading.
 
+## Addendum, same day, on NORTH's live review of PR 23
+
+A third thread was still active after the first commit and is superseded here.
+The 2026-08-07 chat-naming rule, carried into decision 0074's Table Birth, said
+that if Allison retitles a conversation herself her name wins from that point
+on and the ledger follows her. Under decision 0088 the TABLE NAME is the durable
+identity and the visible chair title is only a navigation mirror, so a manual
+visible-title rename alone, Allison's own included, never changes TABLE NAME,
+table identity, or ledger identity. A differing title is drift and is repaired
+back to the exact TABLE NAME. A genuinely different durable mission gets a
+different table by deliberate Birth, never by renaming a sidebar title.
+Corrected in lane-spawn (Table Birth paragraph and Naming section, plus a v1.8
+correction line) and code-block-routing (Chat Blocks Lead With The Conversation
+Name). Pin, session-steward, and session-wrap never carried the sentence.
+Ruling of record aura decisions/0088-chair-worker-boundary-and-title-parity.md.
+
 ## Why the birth-only limit was retired
 
 Live testing on 2026-09-04 in NORTH'S ESTATE CONTROL TOWER established that
