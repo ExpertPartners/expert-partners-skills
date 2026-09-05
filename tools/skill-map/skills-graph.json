@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "52cdccc7759ae0535359b139e62c1714d971b2c7",
-    "aura": "baa2aaa77a672aeddea1b49c7afbdd278aaa42a9"
+    "eps": "d818e0321dcfd40cc6da56a3e7e53a9dd07e49dd",
+    "aura": "a43fc0cfa405de3ee697332a649dd184a7f122dd"
   },
   "zones": [
     "surfaces",
@@ -2647,7 +2647,7 @@
         "id": "session-wrap",
         "canonical": "eps:skills/session-wrap/SKILL.md",
         "deployedAt": "2026-09-04",
-        "stamp": "v1.12",
+        "stamp": "v1.13",
         "mount": "aura:.agents/skills/"
       },
       {
@@ -2687,7 +2687,7 @@
         "id": "session-wrap",
         "canonical": "eps:skills/session-wrap/SKILL.md",
         "deployedAt": "2026-09-04",
-        "stamp": "v1.12",
+        "stamp": "v1.13",
         "mount": null
       }
     ]
