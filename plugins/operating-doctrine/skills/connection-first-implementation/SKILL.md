@@ -1,9 +1,12 @@
 ---
 name: "connection-first-implementation"
-description: "Fires whenever Allison asks to configure, audit, operate, build, troubleshoot, or change any external service and a connector, plugin, MCP server, API, SDK, or CLI could make direct implementation possible. Inspect the connections already held before concluding anything is missing, then reach for the strongest official connection immediately rather than deferring it. Prefer connected first-party tools, then official MCP servers and connectors, then existing Estate integrations, then the official API, SDK, or CLI, with browser and manual work last. Documentation access and execution access are different capabilities and are never reported as one. Reuse least-privilege credentials from approved secret storage, scope tools narrowly, never expose secret values to chat, repositories, configs, logs, or artifacts, and prove access with a harmless read before claiming it. Return to Allison's original objective the moment the connection is proven. It inherits the operating-doctrine and never overrides it."
+description: "Fires whenever Allison asks to configure, audit, operate, build, troubleshoot, or change any external service and a connector, plugin, MCP server, API, SDK, or CLI could make direct implementation possible. Inspect the connections already held before concluding anything is missing, then reach for the strongest official connection immediately. Prefer connected first-party tools, then official MCP servers and connectors, then existing Estate integrations, then the official API, SDK, or CLI, with browser and manual work last. Browser automation that genuinely survives that ladder runs on the existing saved Chrome environment of Embers-Mac-mini, never by default on AG-Mac-Mini-M4. Documentation access and execution access are never reported as one. Reuse least-privilege credentials from approved secret storage, never expose secret values, and prove access with a harmless read before claiming it. It inherits the operating-doctrine and never overrides it."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Born dressed 2026-08-26 (Estate Control Tower - Twilio Direct Access - Connection
 # First Setup lane). Twilio was the acceptance fixture that proved the ladder below.
+# Amended 2026-09-07 (Ember Browser Routing - Deploy Access Routing Rule lane): rung
+# five gains its execution home, Embers-Mac-mini, and the access-first road list.
+# Ruling of record: aura intake/2026-09-07-ruling-browser-last-ember-browser-execution-home.md
 tier: plugin
 zone: routing
 status: live
@@ -28,9 +31,30 @@ Walk it top down. Stop at the first rung that can actually do the job, and say w
 2. **Official MCP servers and connectors.** The vendor's own hosted or published server, installed through the officially supported method for this surface. First-party beats community every time, and a community server running alongside an official one is an injection surface, not a convenience.
 3. **Existing Estate integrations.** A component the Estate already owns that already holds this job. The systems map is the register of what exists. Reuse it rather than standing up a second one.
 4. **The official API, SDK, or CLI.** Stable, versioned, first-party, with credentials resolved at runtime. Often the safest rung even when a flashier option exists one rung up.
-5. **Browser or manual work.** Last, declared as an exception, with the reason no programmatic path exists and the failed attempt named.
+5. **Browser or manual work.** Last, declared as an exception, with the reason no programmatic path exists and the failed attempt named. Browser automation that reaches this rung runs on the Ember browser home (next section), never by default on Allison's M4.
 
 A rung is only "unavailable" after a real attempt produced a real error. Report the error, never the assumption.
+
+The roads that live on rungs one through four, wherever they apply: surface-native tools and connectors, Claude and ChatGPT plugins and connectors, Estate-owned and official MCP servers, existing organization integrations, official APIs, OAuth, service accounts and delegated identities, 1Password-held credentials, official CLIs and SDKs, approved SSH and remote-host roads, Firecrawl and the existing web-data roads, and native web search and fetch. "Try all methods" means discover and continue through the applicable roads until a safe, capable one succeeds. It never means repeating the same write through several channels after one has succeeded. Every stronger system-specific rule already in force outranks this general ladder where it applies: Estate Brain first for Estate canon, Google Workspace through the service account plus domain-wide delegation where currently ruled, GoHighLevel through the direct API and token roads, Firecrawl-first web-data acquisition. The register of what exists and what Claude already reaches is the systems map (the `expert-partners-systems-map` skill and its bible in the expert-partners repo); this skill inherits that inventory and never copies it, so a new connector or credential changes the map, not this file.
+
+## Rung five has a home: Embers-Mac-mini
+
+<!-- RULED-BY: aura/intake/2026-09-07-ruling-browser-last-ember-browser-execution-home.md date:2026-09-07 -->
+
+Ruled by Allison 2026-09-07 as a standing direction (ruling of record: aura intake/2026-09-07-ruling-browser-last-ember-browser-execution-home.md). The machine half of the same ruling lives in the aura host-machine directive (`docs/directives/host-machine.md`), which this section matches and does not restate beyond what a routing decision needs.
+
+Browser automation is the final fallback, never the default. It is used only when the task is genuinely UI-only, requires a browser extension, requires existing authenticated browser state, or every adequate direct programmatic road has been verified insufficient, with the failed attempts named.
+
+When browser automation is genuinely required, the standing execution home is Embers-Mac-mini (M2 Pro), running Google Chrome, in the existing persistent saved Chrome environment only, through the existing standing Claude-connected Chrome session or window when Claude browser control is required, with the existing 1Password integration and the approved authenticated sessions as the credential state.
+
+- Never default browser automation to AG-Mac-Mini-M4.
+- Never create or choose a fresh Chrome profile, a Guest profile, a temporary profile, an arbitrary Chrome window, or a new unauthenticated session merely because it is easier to discover.
+- Select the intended browser by persistent host and saved profile or session state, never by whichever Chrome window happens to be in the foreground.
+- Never steal Allison's focus, mouse, keyboard, or active browser state on the M4.
+- If Ember's browser path is unavailable, re-check the non-browser roads first, then diagnose the existing Ember Chrome and session path and report the exact blocker. Never fall back silently to browser automation on the M4.
+- Allison may explicitly override the browser host for a specific task. That override is task-scoped unless she explicitly changes the standing rule.
+
+The M4 keeps its other jobs. AG-Mac-Mini-M4 remains Allison's primary conductor workstation and continues to own the non-browser implementation roads already assigned to it, including code, APIs, CLI operations, and system-specific token work. The restriction is specifically against default interactive browser automation on Allison's M4. A step that is genuinely Allison's own hands (a sign-in only she can perform) is handed to her as a full clickable URL per code-block-routing; that is a declared manual exception, not browser automation, and this section does not move it.
 
 ## Documentation access is not execution access
 
