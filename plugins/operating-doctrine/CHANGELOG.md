@@ -18,6 +18,11 @@ in place. Pin section 5 also gains the decision 0082 amendment pointer on its
 one-table-one-active-worker sentence, which the sibling skills already
 carried. Disclosure filed at
 intake/2026-09-08-disclosure-worker-title-form-superseded-by-decision-0091.md.
+Same pass, implementation detail with no rule change: the search for the native
+session-management tool is made once per session and a successful
+set_session_title result is the birth verification (transcript reread reserved
+for tool errors and drift checks), in session-steward section 1, pin section 5,
+and code-block-routing's absent-tools paragraph.
 Inked by the Startup Efficiency - Routing Simplification Code session
 (table Startup Efficiency, room NORTH'S ESTATE CONTROL TOWER), a conformance
 pass only; no new rule, registry, or routing-state write.

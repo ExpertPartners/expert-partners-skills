@@ -159,7 +159,7 @@ Substitute the actual two-word worker title (decision 0091) for each block. The 
 
 **For a NEW session the envelope also carries the `WORKTREE` line** (Worktree Isolation above): the isolated tree the session creates from a freshly fetched remote ref and works in, confirmed by absolute path in its first report. A spawning block without one is malformed and bounces home.
 
-If the native session-management tools are unexpectedly absent at first contact, the worker reports that limitation plainly, continues under the authoritative SESSION NAME, and does not hand Allison a `/rename` line as the routine path (`/rename` survives only as the last-resort repair on surfaces without the tools).
+If the native session-management tools are unexpectedly absent at first contact, the worker reports that limitation plainly, continues under the authoritative SESSION NAME, and does not hand Allison a `/rename` line as the routine path (`/rename` survives only as the last-resort repair on surfaces without the tools). Absence is established by one tool search, never a retry loop (added 2026-09-08, Startup Efficiency audit; two workers that day spent three and four searches each on the same absent tool).
 
 ## The Naming Line Is Hard-Enforced, Same As Worktree And Model And Effort
 

@@ -146,7 +146,7 @@ On Claude Code Desktop, the worker's FIRST management action is titling itself:
 set_session_title(session_id="self", title="<Two Word Job>")
 ```
 
-Then an independent verification read (the tool's own confirmation plus a reread of the last `custom-title` record in its own transcript). Live-verified 2026-08-25 and again 2026-08-26: a session renamed itself with no Allison and no `/rename`, one Desktop session renamed another, and both changes persisted on independent reread.
+Then an independent verification read (the tool's own confirmation plus a reread of the last `custom-title` record in its own transcript). Amended 2026-09-08 (Startup Efficiency audit, implementation detail, no rule change): the tool's own success result is the birth verification, the transcript reread is for a tool error or a later drift check, and the search for the tool itself is made once, with absence reported plainly and the session continuing under the SESSION NAME line, never a retry loop. Live-verified 2026-08-25 and again 2026-08-26: a session renamed itself with no Allison and no `/rename`, one Desktop session renamed another, and both changes persisted on independent reread.
 
 For CLI-only launches the dispatch still ships `claude -n "<full name>"` (`-n, --name` live-verified 2026-08-07 on Claude Code 2.1.223, and a headless run wrote the exact string to the session's `custom-title` record). Either way the worker self-verifies at first contact.
 
