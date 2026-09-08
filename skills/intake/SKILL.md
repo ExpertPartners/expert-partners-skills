@@ -35,7 +35,7 @@ Files captured content into `<repo>/intake/` per ADR 0027, commits, and pushes.
 | book / You've Got a Friend | ~/Claude/projects/book | ExpertPartners/youve-got-a-friend-book (renamed from book 2026-09-04) | no (direct) |
 | HeyGen | ~/Claude/projects/HeyGen | ExpertPartners/heygen | no (direct) |
 | PartnerSync | ~/Claude/projects/PartnerSync | ExpertPartners/partnersync | no (direct) |
-| ghl / automation | ~/Claude/projects/ghl-automation | ExpertPartners/ghl-automation | no (direct) |
+| ghl / automation (ghl-automation split and retired 2026-09-08; GHL reference and doctrine intake goes to PartnerSync) | ~/Claude/projects/PartnerSync | ExpertPartners/partnersync | no (direct) |
 | Tonic / Tonic Build Studio | ~/Claude/projects/TonicBuildStudio | ExpertPartners/tonic-build-studio | no (direct) |
 | Aura | ~/Claude/projects/Aura | ExpertPartners/aura | no (direct) |
 | Founder Command Center / EOS | ~/Claude/projects/FounderCommandCenter | ExpertPartners/allison-founder-command-center | no (direct) |
