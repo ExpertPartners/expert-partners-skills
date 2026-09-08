@@ -37,7 +37,7 @@ Read `~/Claude/projects/Aura/doctrine/session-routing.md` first. That file is th
 | Moxie Signature Group brand + marketing, North Dallas RE | `~/Claude/projects/MoxieSignatureGroup/` | `ExpertPartners/moxie` |
 | Moxie website build + engineering (Next.js, RETS, deploys, code) | `~/Claude/projects/Moxie Website Builder Partner/` | `ExpertPartners/moxie-signature-group-website` |
 | PartnerSync, GHL sync, Make.com S1-S10 | `~/Claude/projects/PartnerSync/` | `ExpertPartners/partnersync` |
-| GHL automation, workflows, pipelines | `~/Claude/projects/ghl-automation/` | `ExpertPartners/ghl-automation` |
+| GHL automation, workflows, pipelines (ghl-automation retired 2026-09-08; reference in partnersync, executable source in partnersync-automation-backend) | `~/Claude/projects/PartnerSync/` (reference) or `~/Claude/projects/partnersync-automation-backend/` (executable) | `ExpertPartners/partnersync` / `ExpertPartners/partnersync-automation-backend` |
 | Book "You've Got a Friend" manuscript | `~/Claude/projects/book/` | `ExpertPartners/youve-got-a-friend-book` |
 | HeyGen avatar video | `~/Claude/projects/HeyGen/` | `ExpertPartners/heygen` |
 | eXp Explained 2.0 | `~/Claude/projects/eXpExplained2/` | `ExpertPartners/exp-explained-2` |
