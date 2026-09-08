@@ -1,5 +1,27 @@
 # operating-doctrine changelog
 
+## 2.48.0 -- 2026-09-08
+
+Two-word worker titles per decision 0091 (ruled by Allison 2026-09-07 via Lock
+that, ruling of record aura decisions/0091-allison-controlled-two-word-routing-names.md).
+`code-block-routing` (dated amendment, description frontmatter updated),
+`lane-spawn` v1.9, `session-steward` v1.5, and `pin` v4.10 retire the
+`<Table Name> - <Specific Job>` worker form and the room-token exception that
+rode on it. Every new WORKER visible title is exactly two clear words
+identifying the job, every new or Allison-renamed TABLE NAME is exactly two
+clear words, worker ownership and return identity ride in the lane ledger row
+and the CLAUDE HOME line rather than in the title, Allison may rename a Table
+by explicit direction with prior names kept as historical aliases, workers
+active before 2026-09-07 finish under their admitted titles, and legacy names
+are never mass-renamed by AI. Superseded lines are marked SUPERSEDED IN PART
+in place. Pin section 5 also gains the decision 0082 amendment pointer on its
+one-table-one-active-worker sentence, which the sibling skills already
+carried. Disclosure filed at
+intake/2026-09-08-disclosure-worker-title-form-superseded-by-decision-0091.md.
+Inked by the Startup Efficiency - Routing Simplification Code session
+(table Startup Efficiency, room NORTH'S ESTATE CONTROL TOWER), a conformance
+pass only; no new rule, registry, or routing-state write.
+
 ## 2.47.0 -- 2026-09-07
 
 `connection-first-implementation` amended: access first, browser last, and
