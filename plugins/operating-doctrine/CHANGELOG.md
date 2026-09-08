@@ -1,5 +1,39 @@
 # operating-doctrine changelog
 
+## 2.48.0 -- 2026-09-08
+
+Two-word worker titles per decision 0091 (ruled by Allison 2026-09-07 via Lock
+that, ruling of record aura decisions/0091-allison-controlled-two-word-routing-names.md).
+`code-block-routing` (dated amendment, description frontmatter updated),
+`lane-spawn` v1.9, `session-steward` v1.5, and `pin` v4.10 retire the
+`<Table Name> - <Specific Job>` worker form and the room-token exception that
+rode on it. Every new WORKER visible title is exactly two clear words
+identifying the job, every new or Allison-renamed TABLE NAME is exactly two
+clear words, worker ownership and return identity ride in the lane ledger row
+and the CLAUDE HOME line rather than in the title, Allison may rename a Table
+by explicit direction with prior names kept as historical aliases, workers
+active before 2026-09-07 finish under their admitted titles, and legacy names
+are never mass-renamed by AI. Superseded lines are marked SUPERSEDED IN PART
+in place. Pin section 5 also gains the decision 0082 amendment pointer on its
+one-table-one-active-worker sentence, which the sibling skills already
+carried. Disclosure filed at
+intake/2026-09-08-disclosure-worker-title-form-superseded-by-decision-0091.md.
+Same pass, implementation detail with no rule change: the search for the native
+session-management tool is made once per session and a successful
+set_session_title result is the birth verification (transcript reread reserved
+for tool errors and drift checks), in session-steward section 1, pin section 5,
+and code-block-routing's absent-tools paragraph.
+NORTH review correction, same day: the sweep reached every ACTIVE line. Table
+names are no longer described as permanent or set once (Allison may rename a
+Table by explicit direction, decision 0091), the code-block-routing heading
+reads Two-Word Job Title, the SESSION NAME template no longer commands an
+independent reread, and every routine reread in code-block-routing, pin, and
+session-steward is rewritten as the exception path. Version-history paragraphs
+keep their original wording, marked SUPERSEDED IN PART.
+Inked by the Startup Efficiency - Routing Simplification Code session
+(table Startup Efficiency, room NORTH'S ESTATE CONTROL TOWER), a conformance
+pass only; no new rule, registry, or routing-state write.
+
 ## 2.47.0 -- 2026-09-07
 
 `connection-first-implementation` amended: access first, browser last, and
