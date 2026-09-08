@@ -1,6 +1,6 @@
 ---
 name: pin
-description: "Carry-back envelope and place-keeping baton between Allison's Claude project conversations (Claude app, CoWork) and Claude Code. Fires at first contact in a new Code session, when composing ANY report bound back to a Claude project, when a block arrives opening with CLAUDE HOME or SESSION header lines (envelope check before executing), when Allison types /pin or says \"pin\", and when she confirms a paste (\"pasted\", \"done\"). Pin fires only after her paste confirmation. SESSION labels a Claude Code session and only ever that; a block bound for a chat conversation heads its envelope CONVERSATION. A Desktop worker titles ITSELF at birth through the native session-management tool and repairs its own drift, so /rename is retired from the routine path, and a table is named once at Table Birth instead. A pin is a bookmark, never a task. It inherits the operating-doctrine and never overrides it."
+description: "Carry-back envelope and place-keeping baton between Allison's Claude project conversations (Claude app, CoWork) and Claude Code. Fires at first contact in a new Code session, when composing ANY report bound back to a Claude project, when a block arrives opening with CLAUDE HOME or SESSION header lines (envelope check before executing), when Allison types /pin or says \"pin\", and when she confirms a paste (\"pasted\", \"done\"). Pin fires only after her paste confirmation. SESSION labels a Claude Code session and only ever that; a block bound for a chat conversation heads its envelope CONVERSATION. A Desktop worker titles ITSELF at birth through the native session-management tool and repairs its own drift, so /rename is retired from the routine path, and a table is named at Table Birth instead, renamed afterward only by Allison (decision 0091). A pin is a bookmark, never a task. It inherits the operating-doctrine and never overrides it."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -104,7 +104,7 @@ Doctrine note (added 2026-08-03): the pin confirms the paste; it is not the lane
 
 ## 4. Envelope check (inbound)
 
-Inbound blocks open with `CLAUDE HOME:` (or legacy `COWORK HOME:`) and `SESSION:`. Before executing anything in the block, check the SESSION line against your own authoritative name, read off disk per the self-verification recipe in section 5. If it names a different session: STOP, do not execute any of it, reply exactly "This block is addressed to {named session}; I am {own name}." (Incident this rule prevents: 2026-07-28, a Canon Doc Sync block was executed by the ORPHAN RECRUITING PIPELINE session.)
+Inbound blocks open with `CLAUDE HOME:` (or legacy `COWORK HOME:`) and `SESSION:`. Before executing anything in the block, check the SESSION line against your own authoritative name (the SESSION NAME you were dispatched under and titled yourself with; the disk recipe in section 5 is the exception path for a session with no such name). If it names a different session: STOP, do not execute any of it, reply exactly "This block is addressed to {named session}; I am {own name}." (Incident this rule prevents: 2026-07-28, a Canon Doc Sync block was executed by the ORPHAN RECRUITING PIPELINE session.)
 
 ### SESSION means Claude Code, always (v4.4, ruled 2026-08-07)
 
@@ -146,15 +146,15 @@ On Claude Code Desktop, the worker's FIRST management action is titling itself:
 set_session_title(session_id="self", title="<Two Word Job>")
 ```
 
-Then an independent verification read (the tool's own confirmation plus a reread of the last `custom-title` record in its own transcript). Amended 2026-09-08 (Startup Efficiency audit, implementation detail, no rule change): the tool's own success result is the birth verification, the transcript reread is for a tool error or a later drift check, and the search for the tool itself is made once, with absence reported plainly and the session continuing under the SESSION NAME line, never a retry loop. Live-verified 2026-08-25 and again 2026-08-26: a session renamed itself with no Allison and no `/rename`, one Desktop session renamed another, and both changes persisted on independent reread.
+Then nothing more when the call succeeds: the tool's own success result is the birth verification (implementation detail adopted 2026-09-08, Startup Efficiency audit, no rule change). The reread of the last `custom-title` record in its own transcript is exception-only, for a tool error, actually observed drift, or evidence needed to resolve a mismatch, and the search for the tool itself is made once, with absence reported plainly and the session continuing under the SESSION NAME line, never a retry loop. Live-verified 2026-08-25 and again 2026-08-26: a session renamed itself with no Allison and no `/rename`, one Desktop session renamed another, and both changes persisted on independent reread.
 
-For CLI-only launches the dispatch still ships `claude -n "<full name>"` (`-n, --name` live-verified 2026-08-07 on Claude Code 2.1.223, and a headless run wrote the exact string to the session's `custom-title` record). Either way the worker self-verifies at first contact.
+For CLI-only launches the dispatch still ships `claude -n "<full name>"` (`-n, --name` live-verified 2026-08-07 on Claude Code 2.1.223, and a headless run wrote the exact string to the session's `custom-title` record). A CLI-launched worker has no tool result to trust, so it reads its `custom-title` record once at first contact.
 
 Birth self-titling is the whole point. A session born correctly named never needs a repair, and Allison never touches a window title.
 
-### First-contact self-verification
+### First-contact self-verification (exception path)
 
-A session reads its OWN name off disk and compares it to the SESSION line in its briefing. No human is in that loop. The name lives in the session transcript:
+This recipe is for a session with no successful birth title call of its own: a CLI launch, a pre-rule session, a continuation into an unnamed session, a tool error, or actually observed drift (implementation detail adopted 2026-09-08, Startup Efficiency audit, no rule change). A Desktop worker whose `set_session_title` call succeeded is already verified by that result and skips this. When it applies, the session reads its OWN name off disk once and compares it to the SESSION line in its briefing. No human is in that loop. The name lives in the session transcript:
 
 ```
 ~/.claude/projects/<url-encoded-cwd>/<session-id>.jsonl
@@ -174,9 +174,9 @@ print(t)
 " ~/.claude/projects/<encoded-cwd>/<session-id>.jsonl
 ```
 
-Verified live 2026-08-07 on Claude Code 2.1.223. This supersedes the read half of the old claim that a session cannot read its own title; a session can, and must, and reports the result in its first response.
+Verified live 2026-08-07 on Claude Code 2.1.223. This supersedes the read half of the old claim that a session cannot read its own title; a session can, and on this exception path does, reporting the result in its first response.
 
-Report the comparison plainly at first contact: the name read off disk, the name in the briefing, and match or mismatch. On mismatch the session repairs itself in the same turn (v4.8) and reports the before and after; on a Desktop session the `get_session` metadata read is an equally valid independent check and does not replace this one.
+When this path ran, report the comparison plainly: the name read off disk, the name in the briefing, and match or mismatch. On mismatch the session repairs itself in the same turn (v4.8), trusts the repair's tool result, and reports the before and after; on a Desktop session the `get_session` metadata read is an equally valid check when evidence is needed.
 
 First contact has a second half when the briefing spawned the session (v4.6): create the worktree the briefing's `WORKTREE` line names, from a freshly fetched remote ref, before any other work, and confirm the ABSOLUTE path in the same first report. No work happens in the shared main tree. Mechanics and the malformed-block bounce live in code-block-routing, Worktree Isolation.
 

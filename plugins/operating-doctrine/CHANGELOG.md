@@ -23,6 +23,13 @@ session-management tool is made once per session and a successful
 set_session_title result is the birth verification (transcript reread reserved
 for tool errors and drift checks), in session-steward section 1, pin section 5,
 and code-block-routing's absent-tools paragraph.
+NORTH review correction, same day: the sweep reached every ACTIVE line. Table
+names are no longer described as permanent or set once (Allison may rename a
+Table by explicit direction, decision 0091), the code-block-routing heading
+reads Two-Word Job Title, the SESSION NAME template no longer commands an
+independent reread, and every routine reread in code-block-routing, pin, and
+session-steward is rewritten as the exception path. Version-history paragraphs
+keep their original wording, marked SUPERSEDED IN PART.
 Inked by the Startup Efficiency - Routing Simplification Code session
 (table Startup Efficiency, room NORTH'S ESTATE CONTROL TOWER), a conformance
 pass only; no new rule, registry, or routing-state write.
