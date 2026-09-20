@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "b5be4f6f97e344190d8671841e8659b238e612d2",
-    "aura": "ae64b1a881d542379d2dae44212cf2d397105273"
+    "eps": "62b3ad46b3ec198cca43ea4582fcc426cdd5d96f",
+    "aura": "ca0c8c497a1e19beffec22a06b73332e4a6f70bc"
   },
   "zones": [
     "surfaces",
@@ -57,8 +57,8 @@
       "subtitle": "monthly ACN staying-current check",
       "renderNote": null,
       "layout": {
-        "x": 292,
-        "y": 1870,
+        "x": 928,
+        "y": 1202.8,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -85,8 +85,8 @@
       "subtitle": "ACN inbox sweep, deadlines first",
       "renderNote": null,
       "layout": {
-        "x": 30,
-        "y": 1870,
+        "x": 913,
+        "y": 1303.8,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -114,8 +114,8 @@
       "subtitle": "luxury real estate voice under Allison’s name",
       "renderNote": null,
       "layout": {
-        "x": 309,
-        "y": 928,
+        "x": 422,
+        "y": 360,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -144,8 +144,8 @@
       "subtitle": "Allison’s first person voice",
       "renderNote": null,
       "layout": {
-        "x": 314,
-        "y": 1079,
+        "x": 427,
+        "y": 511,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -179,8 +179,8 @@
       "subtitle": "canonical brand context, registry per ADR 0045",
       "renderNote": null,
       "layout": {
-        "x": 30,
-        "y": 391.9,
+        "x": 143,
+        "y": 111.9,
         "width": 188,
         "height": 77,
         "rectHeight": 62,
@@ -209,8 +209,8 @@
       "subtitle": "plain language safe-to-close check",
       "renderNote": null,
       "layout": {
-        "x": 1068,
-        "y": 2558,
+        "x": 100,
+        "y": 3112,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -237,8 +237,8 @@
       "subtitle": "canon and rule changes reach every surface, automatically",
       "renderNote": null,
       "layout": {
-        "x": 250,
-        "y": 2354,
+        "x": 69,
+        "y": 2172,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -265,8 +265,8 @@
       "subtitle": "twice-monthly estate capability sweep",
       "renderNote": null,
       "layout": {
-        "x": 30,
-        "y": 1987,
+        "x": 916,
+        "y": 1592.8,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -295,8 +295,8 @@
       "subtitle": "paste block routing and the lane ledger",
       "renderNote": null,
       "layout": {
-        "x": 312,
-        "y": 2762,
+        "x": 577,
+        "y": 2546.8,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -323,8 +323,8 @@
       "subtitle": "hold the connection before you hold the screenshot",
       "renderNote": null,
       "layout": {
-        "x": 1482,
-        "y": 2354,
+        "x": 38,
+        "y": 3488,
         "width": 274,
         "height": 77,
         "rectHeight": 62,
@@ -353,8 +353,8 @@
       "subtitle": "direct execution on surfaces that hold the access",
       "renderNote": null,
       "layout": {
-        "x": 51,
-        "y": 2762,
+        "x": 332,
+        "y": 2458.7,
         "width": 215,
         "height": 77,
         "rectHeight": 62,
@@ -381,8 +381,8 @@
       "subtitle": "deliverables land as named markdown links",
       "renderNote": null,
       "layout": {
-        "x": 328,
-        "y": 2457,
+        "x": 332,
+        "y": 2722,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -409,8 +409,8 @@
       "subtitle": "DM to Dollars content engine",
       "renderNote": null,
       "layout": {
-        "x": 241,
-        "y": 1405,
+        "x": 72,
+        "y": 3752.7,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -438,8 +438,8 @@
       "subtitle": "Poppins everywhere, hierarchy by size and color",
       "renderNote": null,
       "layout": {
-        "x": 30,
-        "y": 2457,
+        "x": 60,
+        "y": 2722,
         "width": 252,
         "height": 77,
         "rectHeight": 62,
@@ -468,8 +468,8 @@
       "subtitle": "Don’s personal brand voice",
       "renderNote": null,
       "layout": {
-        "x": 330,
-        "y": 487,
+        "x": 443,
+        "y": 207,
         "width": 200,
         "height": 63,
         "rectHeight": 48,
@@ -495,8 +495,8 @@
       "subtitle": null,
       "renderNote": null,
       "layout": {
-        "x": 30,
-        "y": 2265,
+        "x": 93.5,
+        "y": 2461,
         "width": 163,
         "height": 49,
         "rectHeight": 34,
@@ -522,8 +522,8 @@
       "subtitle": "Expert Partners parent voice",
       "renderNote": null,
       "layout": {
-        "x": 314,
-        "y": 370,
+        "x": 427,
+        "y": 90,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -549,8 +549,8 @@
       "subtitle": "one classifier, six existing destinations, no new store",
       "renderNote": null,
       "layout": {
-        "x": 488,
-        "y": 2354,
+        "x": 69,
+        "y": 1681,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -577,8 +577,8 @@
       "subtitle": "where every system lives and what Claude can reach",
       "renderNote": null,
       "layout": {
-        "x": 30,
-        "y": 159,
+        "x": 302,
+        "y": 1226,
         "width": 244,
         "height": 77,
         "rectHeight": 62,
@@ -608,8 +608,8 @@
       "subtitle": "FAM and EPIC voice",
       "renderNote": null,
       "layout": {
-        "x": 309,
-        "y": 640,
+        "x": 422,
+        "y": 795,
         "width": 152,
         "height": 63,
         "rectHeight": 48,
@@ -637,8 +637,8 @@
       "subtitle": "build a funnel that does not exist yet",
       "renderNote": null,
       "layout": {
-        "x": 286,
-        "y": 2088,
+        "x": 937,
+        "y": 1491.8,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -665,8 +665,8 @@
       "subtitle": "one complete Notion record per funnel",
       "renderNote": null,
       "layout": {
-        "x": 544,
-        "y": 1999.8,
+        "x": 1169,
+        "y": 1403.7,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -695,8 +695,8 @@
       "subtitle": "per-funnel walk from old location to clean location",
       "renderNote": null,
       "layout": {
-        "x": 298,
-        "y": 1987,
+        "x": 949,
+        "y": 1390.8,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -723,8 +723,8 @@
       "subtitle": "hand work to another session",
       "renderNote": null,
       "layout": {
-        "x": 641,
-        "y": 2265,
+        "x": 69,
+        "y": 2924,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -750,8 +750,8 @@
       "subtitle": "file content into a repo intake inbox",
       "renderNote": null,
       "layout": {
-        "x": 970,
-        "y": 2354,
+        "x": 60,
+        "y": 2360,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -778,8 +778,8 @@
       "subtitle": "plain language walkthroughs",
       "renderNote": null,
       "layout": {
-        "x": 409,
-        "y": 2265,
+        "x": 72,
+        "y": 2635,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -808,8 +808,8 @@
       "subtitle": "spawning new lanes with named homes",
       "renderNote": null,
       "layout": {
-        "x": 48,
-        "y": 2863,
+        "x": 94,
+        "y": 2534,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -838,8 +838,8 @@
       "subtitle": "marketing strategy in Allison’s voice",
       "renderNote": null,
       "layout": {
-        "x": 479,
-        "y": 1405,
+        "x": 30,
+        "y": 4017,
         "width": 296,
         "height": 77,
         "rectHeight": 62,
@@ -868,8 +868,8 @@
       "subtitle": "benched, consumer real estate routes to AG Luxury",
       "renderNote": null,
       "layout": {
-        "x": 309,
-        "y": 777,
+        "x": 422,
+        "y": 932,
         "width": 244,
         "height": 77,
         "rectHeight": 62,
@@ -896,8 +896,8 @@
       "subtitle": "set an accurate session name",
       "renderNote": null,
       "layout": {
-        "x": 879,
-        "y": 2265,
+        "x": 69,
+        "y": 3589,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -917,20 +917,23 @@
       "inherits": [
         "operating-doctrine"
       ],
-      "calls": [],
+      "calls": [
+        "repo-standards"
+      ],
       "defersTo": [],
       "brandScope": [],
-      "subtitle": "bootstrap a new Expert Partners project",
+      "subtitle": "run the repo-standards gate, then bootstrap a justified project",
       "renderNote": null,
       "layout": {
-        "x": 812,
-        "y": 2457,
-        "width": 230,
-        "height": 77,
-        "rectHeight": 62,
+        "x": 333.5,
+        "y": 1693.8,
+        "width": 212,
+        "height": 91,
+        "rectHeight": 76,
         "annotationHeight": 15,
         "subtitleLines": [
-          "bootstrap a new Expert Partners",
+          "run the repo-standards gate,",
+          "then bootstrap a justified",
           "project"
         ]
       }
@@ -949,8 +952,8 @@
       "subtitle": "the standard every skill inherits",
       "renderNote": "single faint anchor, inheritance edges collapsed",
       "layout": {
-        "x": 30,
-        "y": 56,
+        "x": 330,
+        "y": 1327,
         "width": 188,
         "height": 77,
         "rectHeight": 62,
@@ -977,8 +980,8 @@
       "subtitle": "park work for a later resume",
       "renderNote": null,
       "layout": {
-        "x": 1117,
-        "y": 2265,
+        "x": 69,
+        "y": 1883,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -1006,8 +1009,8 @@
       "subtitle": "carry-back envelope and place-keeping baton",
       "renderNote": null,
       "layout": {
-        "x": 594,
-        "y": 2756.9,
+        "x": 348.5,
+        "y": 2559.7,
         "width": 182,
         "height": 77,
         "rectHeight": 62,
@@ -1037,8 +1040,8 @@
       "subtitle": "where a piece of work should live",
       "renderNote": null,
       "layout": {
-        "x": 554,
-        "y": 2469.8,
+        "x": 100,
+        "y": 1782,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1065,8 +1068,8 @@
       "subtitle": null,
       "renderNote": null,
       "layout": {
-        "x": 812,
-        "y": 2558,
+        "x": 332,
+        "y": 1808.8,
         "width": 155,
         "height": 49,
         "rectHeight": 34,
@@ -1090,8 +1093,8 @@
       "subtitle": "RARE content engine",
       "renderNote": null,
       "layout": {
-        "x": 30,
-        "y": 1405,
+        "x": 85.5,
+        "y": 4118,
         "width": 185,
         "height": 63,
         "rectHeight": 48,
@@ -1117,8 +1120,8 @@
       "subtitle": "future obligations get a durable home and a wake condition",
       "renderNote": null,
       "layout": {
-        "x": 244,
-        "y": 56,
+        "x": 306,
+        "y": 1125,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -1145,8 +1148,8 @@
       "subtitle": "born-to-standard repos, ten-point audits, and the readiness gate",
       "renderNote": null,
       "layout": {
-        "x": 524,
-        "y": 1870,
+        "x": 913,
+        "y": 1693.8,
         "width": 194,
         "height": 91,
         "rectHeight": 76,
@@ -1174,8 +1177,8 @@
       "subtitle": "file a research report into the aura research index",
       "renderNote": null,
       "layout": {
-        "x": 30,
-        "y": 3040,
+        "x": 309,
+        "y": 1504,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -1202,8 +1205,8 @@
       "subtitle": "resume parked or handed-off work",
       "renderNote": null,
       "layout": {
-        "x": 1605,
-        "y": 2265,
+        "x": 57,
+        "y": 3213,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -1229,8 +1232,8 @@
       "subtitle": "structured session audit for consolidation",
       "renderNote": null,
       "layout": {
-        "x": 1326,
-        "y": 2469.8,
+        "x": 332,
+        "y": 3374.2,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1259,8 +1262,8 @@
       "subtitle": "handoff note to main, clean worktree",
       "renderNote": null,
       "layout": {
-        "x": 1074,
-        "y": 2457,
+        "x": 106,
+        "y": 3387,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -1287,8 +1290,8 @@
       "subtitle": "route work to the right project home",
       "renderNote": null,
       "layout": {
-        "x": 1226,
-        "y": 2354,
+        "x": 60,
+        "y": 2071,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -1315,8 +1318,8 @@
       "subtitle": "model and effort fit-check at conversation start",
       "renderNote": null,
       "layout": {
-        "x": 726,
-        "y": 2354,
+        "x": 66,
+        "y": 2823,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -1346,8 +1349,8 @@
       "subtitle": "Claude Code takes care of Claude Code",
       "renderNote": null,
       "layout": {
-        "x": 30,
-        "y": 2661,
+        "x": 76,
+        "y": 3011,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -1374,8 +1377,8 @@
       "subtitle": "the one canonical session close-out",
       "renderNote": null,
       "layout": {
-        "x": 30,
-        "y": 2354,
+        "x": 78,
+        "y": 1970,
         "width": 194,
         "height": 77,
         "rectHeight": 62,
@@ -1402,8 +1405,8 @@
       "subtitle": "per-account voice contract",
       "renderNote": null,
       "layout": {
-        "x": 288,
-        "y": 1609,
+        "x": 356,
+        "y": 3752,
         "width": 200,
         "height": 63,
         "rectHeight": 48,
@@ -1434,8 +1437,8 @@
       "subtitle": "orchestrator for the Blotato pack",
       "renderNote": null,
       "layout": {
-        "x": 30,
-        "y": 1531.1,
+        "x": 114,
+        "y": 3839.7,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1464,8 +1467,8 @@
       "subtitle": "virality rubric, nothing ships below eight of ten",
       "renderNote": null,
       "layout": {
-        "x": 288,
-        "y": 1508,
+        "x": 594,
+        "y": 3842.5,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -1492,8 +1495,8 @@
       "subtitle": "the only skill that publishes through Blotato",
       "renderNote": null,
       "layout": {
-        "x": 288,
-        "y": 1693,
+        "x": 356,
+        "y": 3926,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -1522,8 +1525,8 @@
       "subtitle": "drafts hooks first, then body",
       "renderNote": null,
       "layout": {
-        "x": 558,
-        "y": 1517.9,
+        "x": 356,
+        "y": 3839,
         "width": 218,
         "height": 63,
         "rectHeight": 48,
@@ -1549,8 +1552,8 @@
       "subtitle": "screenshot shorthand",
       "renderNote": null,
       "layout": {
-        "x": 219,
-        "y": 2265,
+        "x": 93,
+        "y": 3300,
         "width": 164,
         "height": 63,
         "rectHeight": 48,
@@ -1578,8 +1581,8 @@
       "subtitle": "The Strong Ones voice inside AG Personal Brand",
       "renderNote": null,
       "layout": {
-        "x": 330,
-        "y": 1196,
+        "x": 443,
+        "y": 628,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -1606,8 +1609,8 @@
       "subtitle": "live-doc check before building",
       "renderNote": null,
       "layout": {
-        "x": 1355,
-        "y": 2265,
+        "x": 63,
+        "y": 2273,
         "width": 224,
         "height": 63,
         "rectHeight": 48,
@@ -1633,8 +1636,8 @@
       "subtitle": "offer construction and audit",
       "renderNote": null,
       "layout": {
-        "x": 821,
-        "y": 1412,
+        "x": 356,
+        "y": 4024,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -1676,20 +1679,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 218,
-          "y": 440
+          "x": 331,
+          "y": 140.8
         },
         {
-          "x": 248,
-          "y": 440
+          "x": 381,
+          "y": 140.8
         },
         {
-          "x": 248,
-          "y": 966.5
+          "x": 381,
+          "y": 398.5
         },
         {
-          "x": 309,
-          "y": 966.5
+          "x": 422,
+          "y": 398.5
         }
       ]
     },
@@ -1699,20 +1702,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 218,
-          "y": 449.6
+          "x": 331,
+          "y": 150.4
         },
         {
-          "x": 238,
-          "y": 449.6
+          "x": 371,
+          "y": 150.4
         },
         {
-          "x": 238,
-          "y": 1110.5
+          "x": 371,
+          "y": 542.5
         },
         {
-          "x": 314,
-          "y": 1110.5
+          "x": 427,
+          "y": 542.5
         }
       ]
     },
@@ -1722,20 +1725,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 218,
-          "y": 411.1
+          "x": 331,
+          "y": 131.1
         },
         {
-          "x": 278,
-          "y": 411.1
+          "x": 391,
+          "y": 131.1
         },
         {
-          "x": 278,
-          "y": 518.5
+          "x": 391,
+          "y": 238.5
         },
         {
-          "x": 330,
-          "y": 518.5
+          "x": 443,
+          "y": 238.5
         }
       ]
     },
@@ -1745,12 +1748,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 218,
-          "y": 401.5
+          "x": 331,
+          "y": 121.5
         },
         {
-          "x": 314,
-          "y": 401.5
+          "x": 427,
+          "y": 121.5
         }
       ]
     },
@@ -1760,20 +1763,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 218,
-          "y": 420.8
+          "x": 331,
+          "y": 169.6
         },
         {
-          "x": 268,
-          "y": 420.8
+          "x": 351,
+          "y": 169.6
         },
         {
-          "x": 268,
-          "y": 671.5
+          "x": 351,
+          "y": 826.5
         },
         {
-          "x": 309,
-          "y": 671.5
+          "x": 422,
+          "y": 826.5
         }
       ]
     },
@@ -1783,20 +1786,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 218,
-          "y": 430.4
+          "x": 331,
+          "y": 179.3
         },
         {
-          "x": 258,
-          "y": 430.4
+          "x": 341,
+          "y": 179.3
         },
         {
-          "x": 258,
-          "y": 815.5
+          "x": 341,
+          "y": 970.5
         },
         {
-          "x": 309,
-          "y": 815.5
+          "x": 422,
+          "y": 970.5
         }
       ]
     },
@@ -1806,20 +1809,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 218,
-          "y": 459.3
+          "x": 331,
+          "y": 160
         },
         {
-          "x": 228,
-          "y": 459.3
+          "x": 361,
+          "y": 160
         },
         {
-          "x": 228,
-          "y": 1234.5
+          "x": 361,
+          "y": 666.5
         },
         {
-          "x": 330,
-          "y": 1234.5
+          "x": 443,
+          "y": 666.5
         }
       ]
     },
@@ -1835,20 +1838,20 @@
       "type": "calls",
       "points": [
         {
-          "x": 1280,
-          "y": 2596.5
+          "x": 312,
+          "y": 3150.5
         },
         {
-          "x": 1290,
-          "y": 2596.5
+          "x": 322,
+          "y": 3150.5
         },
         {
-          "x": 1290,
-          "y": 2521.2
+          "x": 322,
+          "y": 3399.8
         },
         {
-          "x": 1326,
-          "y": 2521.2
+          "x": 332,
+          "y": 3399.8
         }
       ]
     },
@@ -1876,12 +1879,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 548,
-          "y": 2787.7
+          "x": 577,
+          "y": 2585.3
         },
         {
-          "x": 594,
-          "y": 2787.7
+          "x": 530.5,
+          "y": 2585.3
         }
       ]
     },
@@ -1903,12 +1906,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 266,
-          "y": 2800.5
+          "x": 547,
+          "y": 2497.2
         },
         {
-          "x": 312,
-          "y": 2800.5
+          "x": 557,
+          "y": 2497.2
+        },
+        {
+          "x": 557,
+          "y": 2572.5
+        },
+        {
+          "x": 577,
+          "y": 2572.5
         }
       ]
     },
@@ -1936,12 +1947,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 282,
-          "y": 2495.5
+          "x": 312,
+          "y": 2760.5
         },
         {
-          "x": 328,
-          "y": 2495.5
+          "x": 332,
+          "y": 2760.5
         }
       ]
     },
@@ -1993,20 +2004,20 @@
       "type": "calls",
       "points": [
         {
-          "x": 498,
-          "y": 2126.5
+          "x": 1149,
+          "y": 1530.3
         },
         {
-          "x": 508,
-          "y": 2126.5
+          "x": 1159,
+          "y": 1530.3
         },
         {
-          "x": 508,
-          "y": 2051.2
+          "x": 1159,
+          "y": 1455
         },
         {
-          "x": 544,
-          "y": 2051.2
+          "x": 1169,
+          "y": 1455
         }
       ]
     },
@@ -2028,12 +2039,12 @@
       "type": "calls",
       "points": [
         {
-          "x": 498,
-          "y": 2025.5
+          "x": 1149,
+          "y": 1429.3
         },
         {
-          "x": 544,
-          "y": 2025.5
+          "x": 1169,
+          "y": 1429.3
         }
       ]
     },
@@ -2067,20 +2078,28 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 266,
-          "y": 2888.7
-        },
-        {
-          "x": 276,
-          "y": 2888.7
-        },
-        {
-          "x": 276,
-          "y": 2819.8
-        },
-        {
           "x": 312,
-          "y": 2819.8
+          "y": 2559.7
+        },
+        {
+          "x": 322,
+          "y": 2559.7
+        },
+        {
+          "x": 322,
+          "y": 2447.7
+        },
+        {
+          "x": 567,
+          "y": 2447.7
+        },
+        {
+          "x": 567,
+          "y": 2559.7
+        },
+        {
+          "x": 577,
+          "y": 2559.7
         }
       ]
     },
@@ -2090,20 +2109,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 266,
-          "y": 2914.3
+          "x": 312,
+          "y": 2585.3
         },
         {
-          "x": 558,
-          "y": 2914.3
-        },
-        {
-          "x": 558,
-          "y": 2818.5
-        },
-        {
-          "x": 594,
-          "y": 2818.5
+          "x": 348.5,
+          "y": 2585.3
         }
       ]
     },
@@ -2119,12 +2130,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 775,
-          "y": 1443.5
+          "x": 326,
+          "y": 4055.5
         },
         {
-          "x": 821,
-          "y": 1443.5
+          "x": 356,
+          "y": 4055.5
         }
       ]
     },
@@ -2148,6 +2159,21 @@
     },
     {
       "from": "new-project",
+      "to": "repo-standards",
+      "type": "calls",
+      "points": [
+        {
+          "x": 545.5,
+          "y": 1739.3
+        },
+        {
+          "x": 913,
+          "y": 1739.3
+        }
+      ]
+    },
+    {
+      "from": "new-project",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -2164,20 +2190,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 594,
-          "y": 2803.1
+          "x": 530.5,
+          "y": 2611
         },
         {
-          "x": 558,
-          "y": 2803.1
+          "x": 557,
+          "y": 2611
         },
         {
-          "x": 558,
-          "y": 2813.3
+          "x": 557,
+          "y": 2598.2
         },
         {
-          "x": 548,
-          "y": 2813.3
+          "x": 577,
+          "y": 2598.2
         }
       ]
     },
@@ -2193,12 +2219,20 @@
       "type": "calls",
       "points": [
         {
-          "x": 766,
-          "y": 2495.5
+          "x": 312,
+          "y": 1807.7
         },
         {
-          "x": 812,
-          "y": 2495.5
+          "x": 322,
+          "y": 1807.7
+        },
+        {
+          "x": 322,
+          "y": 1739.3
+        },
+        {
+          "x": 333.5,
+          "y": 1739.3
         }
       ]
     },
@@ -2208,20 +2242,12 @@
       "type": "calls",
       "points": [
         {
-          "x": 766,
-          "y": 2521.2
+          "x": 312,
+          "y": 1833.3
         },
         {
-          "x": 776,
-          "y": 2521.2
-        },
-        {
-          "x": 776,
-          "y": 2582.5
-        },
-        {
-          "x": 812,
-          "y": 2582.5
+          "x": 332,
+          "y": 1833.3
         }
       ]
     },
@@ -2279,12 +2305,12 @@
       "type": "calls",
       "points": [
         {
-          "x": 1280,
-          "y": 2495.5
+          "x": 312,
+          "y": 3425.5
         },
         {
-          "x": 1326,
-          "y": 2495.5
+          "x": 332,
+          "y": 3425.5
         }
       ]
     },
@@ -2312,20 +2338,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 266,
-          "y": 2712.3
-        },
-        {
-          "x": 276,
-          "y": 2712.3
-        },
-        {
-          "x": 276,
-          "y": 2781.3
-        },
-        {
           "x": 312,
-          "y": 2781.3
+          "y": 3062.3
+        },
+        {
+          "x": 567,
+          "y": 3062.3
+        },
+        {
+          "x": 567,
+          "y": 2611
+        },
+        {
+          "x": 577,
+          "y": 2611
         }
       ]
     },
@@ -2335,20 +2361,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 266,
-          "y": 2686.7
+          "x": 312,
+          "y": 3036.7
         },
         {
-          "x": 558,
-          "y": 2686.7
+          "x": 322,
+          "y": 3036.7
         },
         {
-          "x": 558,
-          "y": 2772.3
+          "x": 322,
+          "y": 2611
         },
         {
-          "x": 594,
-          "y": 2772.3
+          "x": 348.5,
+          "y": 2611
         }
       ]
     },
@@ -2376,20 +2402,20 @@
       "type": "calls",
       "points": [
         {
-          "x": 242,
-          "y": 1561.9
+          "x": 326,
+          "y": 3855.1
         },
         {
-          "x": 272,
-          "y": 1561.9
+          "x": 336,
+          "y": 3855.1
         },
         {
-          "x": 272,
-          "y": 1640.5
+          "x": 336,
+          "y": 3783.5
         },
         {
-          "x": 288,
-          "y": 1640.5
+          "x": 356,
+          "y": 3783.5
         }
       ]
     },
@@ -2399,12 +2425,28 @@
       "type": "calls",
       "points": [
         {
-          "x": 242,
-          "y": 1546.5
+          "x": 326,
+          "y": 3901.3
         },
         {
-          "x": 288,
-          "y": 1546.5
+          "x": 336,
+          "y": 3901.3
+        },
+        {
+          "x": 336,
+          "y": 4013
+        },
+        {
+          "x": 584,
+          "y": 4013
+        },
+        {
+          "x": 584,
+          "y": 3900.3
+        },
+        {
+          "x": 594,
+          "y": 3900.3
         }
       ]
     },
@@ -2414,20 +2456,20 @@
       "type": "calls",
       "points": [
         {
-          "x": 242,
-          "y": 1592.7
+          "x": 326,
+          "y": 3885.9
         },
         {
-          "x": 252,
-          "y": 1592.7
+          "x": 346,
+          "y": 3885.9
         },
         {
-          "x": 252,
-          "y": 1731.5
+          "x": 346,
+          "y": 3964.5
         },
         {
-          "x": 288,
-          "y": 1731.5
+          "x": 356,
+          "y": 3964.5
         }
       ]
     },
@@ -2437,28 +2479,12 @@
       "type": "calls",
       "points": [
         {
-          "x": 242,
-          "y": 1577.3
+          "x": 326,
+          "y": 3870.5
         },
         {
-          "x": 262,
-          "y": 1577.3
-        },
-        {
-          "x": 262,
-          "y": 1682
-        },
-        {
-          "x": 522,
-          "y": 1682
-        },
-        {
-          "x": 522,
-          "y": 1565.2
-        },
-        {
-          "x": 558,
-          "y": 1565.2
+          "x": 356,
+          "y": 3870.5
         }
       ]
     },
@@ -2474,20 +2500,12 @@
       "type": "calls",
       "points": [
         {
-          "x": 512,
-          "y": 1559.3
+          "x": 594,
+          "y": 3881
         },
         {
-          "x": 522,
-          "y": 1559.3
-        },
-        {
-          "x": 522,
-          "y": 1549.4
-        },
-        {
-          "x": 558,
-          "y": 1549.4
+          "x": 574,
+          "y": 3881
         }
       ]
     },
@@ -2509,12 +2527,20 @@
       "type": "calls",
       "points": [
         {
-          "x": 558,
-          "y": 1533.7
+          "x": 574,
+          "y": 3860
         },
         {
-          "x": 512,
-          "y": 1533.7
+          "x": 584,
+          "y": 3860
+        },
+        {
+          "x": 584,
+          "y": 3861.8
+        },
+        {
+          "x": 594,
+          "y": 3861.8
         }
       ]
     },
@@ -2616,7 +2642,11 @@
         "canonical": "eps:skills/repo-standards/SKILL.md",
         "deployedAt": "2026-09-04",
         "stamp": "v1.1",
-        "mount": "aura:.agents/skills/"
+        "mount": "aura:.agents/skills/",
+        "status": "VERIFIED STALE",
+        "awaitingRedeploy": true,
+        "verifiedCanonicalCommit": "d5eb64d6b71f209e4a998466cb6790d76314cbbb",
+        "verifiedCanonicalBlob": "6d0557563490ceaea358729b2b0b8dfbd8cedf52"
       },
       {
         "path": "aura:.agents/skills/research-intake/SKILL.md",
@@ -2672,7 +2702,11 @@
         "canonical": "eps:skills/repo-standards/SKILL.md",
         "deployedAt": "2026-09-04",
         "stamp": "v1.1",
-        "mount": null
+        "mount": null,
+        "status": "VERIFIED STALE",
+        "awaitingRedeploy": true,
+        "verifiedCanonicalCommit": "d5eb64d6b71f209e4a998466cb6790d76314cbbb",
+        "verifiedCanonicalBlob": "6d0557563490ceaea358729b2b0b8dfbd8cedf52"
       },
       {
         "path": "aura:.claude/skills/research-intake/SKILL.md",
@@ -2696,26 +2730,26 @@
     "aura:docs/estate/extracts/mission-control/SKILL.md"
   ],
   "layout": {
-    "engine": "elkjs layered, zones as compound containers (INCLUDE_CHILDREN over brand rooms), build-time only",
-    "width": 1871,
-    "height": 3147,
+    "engine": "elkjs layered, single INCLUDE_CHILDREN hierarchy over zones and brand rooms, build-time only",
+    "width": 1423,
+    "height": 4211,
     "zones": [
       {
         "id": "brain",
         "label": "The brain",
         "caption": "the law and the map of the house",
-        "x": 8,
-        "y": 8,
-        "width": 494,
-        "height": 250,
+        "x": 280,
+        "y": 1077,
+        "width": 288,
+        "height": 349,
         "rooms": []
       },
       {
         "id": "brands",
         "label": "The voices",
         "caption": "one room per brand, registry per ADR 0045",
-        "x": 8,
-        "y": 288,
+        "x": 121,
+        "y": 8,
         "width": 606,
         "height": 1039,
         "rooms": [
@@ -2726,8 +2760,8 @@
             ],
             "label": "AG Luxury",
             "parent": null,
-            "x": 293,
-            "y": 894,
+            "x": 406,
+            "y": 326,
             "width": 256,
             "height": 127
           },
@@ -2738,8 +2772,8 @@
             ],
             "label": "AG Personal Brand",
             "parent": null,
-            "x": 293,
-            "y": 1045,
+            "x": 406,
+            "y": 477,
             "width": 299,
             "height": 260
           },
@@ -2750,8 +2784,8 @@
             ],
             "label": "The Strong Ones",
             "parent": "ag-personal-brand",
-            "x": 314,
-            "y": 1162,
+            "x": 427,
+            "y": 594,
             "width": 262,
             "height": 127
           },
@@ -2762,8 +2796,8 @@
             ],
             "label": "Expert Partners",
             "parent": null,
-            "x": 293,
-            "y": 336,
+            "x": 406,
+            "y": 56,
             "width": 269,
             "height": 246
           },
@@ -2774,8 +2808,8 @@
             ],
             "label": "Don Hobbs",
             "parent": "expert-partners",
-            "x": 314,
-            "y": 453,
+            "x": 427,
+            "y": 173,
             "width": 232,
             "height": 113
           },
@@ -2787,8 +2821,8 @@
             ],
             "label": "FAM and EPIC",
             "parent": null,
-            "x": 293,
-            "y": 606,
+            "x": 406,
+            "y": 761,
             "width": 184,
             "height": 113
           },
@@ -2799,8 +2833,8 @@
             ],
             "label": "Moxie",
             "parent": null,
-            "x": 293,
-            "y": 743,
+            "x": 406,
+            "y": 898,
             "width": 276,
             "height": 127
           }
@@ -2811,37 +2845,37 @@
         "label": "The marketing engines",
         "caption": "strategy, offers, content, conversations",
         "x": 8,
-        "y": 1357,
-        "width": 1047,
-        "height": 435,
+        "y": 3704,
+        "width": 832,
+        "height": 499,
         "rooms": []
       },
       {
         "id": "hands",
         "label": "The hands",
         "caption": "funnel work and account operations",
-        "x": 8,
-        "y": 1822,
-        "width": 782,
-        "height": 365,
+        "x": 891,
+        "y": 1154.8,
+        "width": 524,
+        "height": 652,
         "rooms": []
       },
       {
         "id": "routing",
         "label": "Session machinery",
         "caption": "routing, ledgers, session lifecycle",
-        "x": 8,
-        "y": 2217,
-        "width": 1855,
-        "height": 745,
+        "x": 16,
+        "y": 1633,
+        "width": 819,
+        "height": 2041,
         "rooms": []
       },
       {
         "id": "cataloging",
         "label": "The librarians",
         "caption": "catalogs and registries",
-        "x": 8,
-        "y": 2992,
+        "x": 287,
+        "y": 1456,
         "width": 274,
         "height": 147,
         "rooms": []
