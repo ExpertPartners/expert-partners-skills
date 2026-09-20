@@ -6,12 +6,10 @@
 // the committed coordinates and draws static SVG.
 //
 // Modeling, per the approved architecture and the 2026-08-05 rulings:
-// - Zones are compound containers. Each populated zone is laid out by ELK as
-//   the root compound of its own layered run (every drawn edge in the graph
-//   is intra-zone, verified at generation time below, so per-zone runs lose
-//   nothing), because ELK's component packing and per-zone direction are
-//   documented as unsupported inside a single INCLUDE_CHILDREN hierarchy.
-//   The zone boxes then stack vertically in canonical reading order.
+// - Zones stay compound containers in one INCLUDE_CHILDREN layered run, so
+//   calls and defers-to can cross zone boundaries without losing containment.
+//   ELK routes all drawn edges in the hierarchy; coordinates are translated
+//   from each returned edge container into the renderer's absolute space.
 // - The brands zone renders each brand as its own tinted sub-room, and that
 //   run uses elk.hierarchyHandling INCLUDE_CHILDREN for the nesting. Ruled
 //   parent links nest two rooms: don-hobbs inside expert-partners and
@@ -34,7 +32,6 @@ const NODE_W_MAX = 300;
 const NODE_PAD_X = 22;
 const ANNOT_H = 15;         // status annotation strip above the node rect
 const SUB_WRAP_AT = 32;     // wrap subtitle lines longer than this many chars
-const ZONE_GAP = 30;        // vertical gap between stacked zone boxes
 const CANVAS_PAD = 8;
 
 function wrapSubtitle(subtitle) {
@@ -74,7 +71,7 @@ const ZONE_LABELS = {
   finance: { label: 'The money', caption: 'cash, close, runway' },
   cataloging: { label: 'The librarians', caption: 'catalogs and registries' },
 };
-// Reading order for the vertical stack; only populated zones are laid out.
+// Stable input and output order; ELK positions only populated zone containers.
 const ZONE_ORDER = ['brain', 'brands', 'content', 'hands', 'routing', 'surfaces', 'finance', 'cataloging'];
 
 const BRAND_LABELS = {
@@ -104,15 +101,13 @@ export async function layoutGraph(graph) {
   }
   const zoneIds = ZONE_ORDER.filter(z => byZone.has(z));
 
-  // Per-zone runs are only sound while every drawn edge stays intra-zone.
-  // The day a cross-zone calls/defers-to edge is declared, fail loudly so the
-  // layout model is revisited instead of silently dropping the edge.
-  const routedEdges = graph.edges.map((e, i) => ({ ...e, _idx: i })).filter(e => e.type !== 'inherits');
-  for (const e of routedEdges) {
-    const zf = nodesById.get(e.from)?.zone;
-    const zt = nodesById.get(e.to)?.zone;
-    if (zf !== zt) throw new Error(`cross-zone ${e.type} edge ${e.from} -> ${e.to} (${zf} -> ${zt}): per-zone layout cannot route it; extend layout-skills-graph.mjs to a single hierarchical run first`);
+  // Validate every relationship even though inherits is deliberately collapsed.
+  for (const e of graph.edges) {
+    if (!nodesById.has(e.from) || !nodesById.has(e.to)) {
+      throw new Error(`dangling ${e.type} edge ${e.from} -> ${e.to}`);
+    }
   }
+  const routedEdges = graph.edges.map((e, i) => ({ ...e, _idx: i })).filter(e => e.type !== 'inherits');
 
   function elkNode(n) {
     const b = boxes.get(n.id);
@@ -156,74 +151,63 @@ export async function layoutGraph(graph) {
     return [...loose.map(n => elkNode(n)), ...topRooms.map(k => roomElk(k))];
   }
 
-  const elk = new ELK();
-  const absNodes = new Map();
-  const zonesOut = [];
-  const edgeRoutes = new Map();
-
-  let cursorY = CANVAS_PAD;
-  let canvasW = 0;
-
-  for (const zid of zoneIds) {
-    const zoneNodes = byZone.get(zid);
-    const zoneEdges = routedEdges.filter(e => nodesById.get(e.from).zone === zid);
-    const isBrands = zid === 'brands';
-    const root = {
+  const root = {
+    id: 'skill-map',
+    layoutOptions: {
+      'elk.algorithm': 'layered',
+      'elk.hierarchyHandling': 'INCLUDE_CHILDREN',
+      'elk.direction': 'RIGHT',
+      'elk.edgeRouting': 'ORTHOGONAL',
+      'elk.padding': `[top=${CANVAS_PAD},left=${CANVAS_PAD},bottom=${CANVAS_PAD},right=${CANVAS_PAD}]`,
+      'elk.spacing.nodeNode': '30',
+      'elk.layered.spacing.nodeNodeBetweenLayers': '46',
+      'elk.randomSeed': '1',
+    },
+    children: zoneIds.map(zid => ({
       id: `zone:${zid}`,
-      layoutOptions: {
-        'elk.algorithm': 'layered',
-        'elk.direction': 'RIGHT',
-        ...(isBrands ? { 'elk.hierarchyHandling': 'INCLUDE_CHILDREN' } : {}),
-        'elk.edgeRouting': 'ORTHOGONAL',
-        'elk.padding': ZONE_PAD,
-        'elk.spacing.nodeNode': '24',
-        'elk.layered.spacing.nodeNodeBetweenLayers': '46',
-        'elk.separateConnectedComponents': 'true',
-        'elk.spacing.componentComponent': '26',
-        'elk.aspectRatio': '2.4',
-      },
-      children: isBrands ? buildBrandChildren(zoneNodes) : zoneNodes.map(elkNode),
-      edges: zoneEdges.map(e => ({ id: `edge:${e._idx}`, sources: [e.from], targets: [e.to] })),
-    };
+      layoutOptions: { 'elk.padding': ZONE_PAD, 'elk.spacing.nodeNode': '24' },
+      children: zid === 'brands' ? buildBrandChildren(byZone.get(zid)) : byZone.get(zid).map(elkNode),
+    })),
+    edges: routedEdges.map(e => ({ id: `edge:${e._idx}`, sources: [e.from], targets: [e.to] })),
+  };
+  const laid = await new ELK().layout(root);
+  const absNodes = new Map();
+  const zonesById = new Map();
+  const edgeRoutes = new Map();
+  const containerOrigin = new Map();
 
-    const laid = await elk.layout(root);
-    const zx = CANVAS_PAD;
-    const zy = cursorY;
-    const zl = ZONE_LABELS[zid] ?? { label: zid, caption: '' };
-    const zone = { id: zid, label: zl.label, caption: zl.caption, x: zx, y: zy, width: laid.width, height: laid.height, rooms: [] };
-    zonesOut.push(zone);
+  // ELK node positions and edge sections are relative to their containing
+  // compound. Keep a single absolute origin table for zones, rooms and edges.
+  (function walk(el, ox, oy, zone) {
+    const x = ox + (el.x ?? 0);
+    const y = oy + (el.y ?? 0);
+    containerOrigin.set(el.id, { x, y });
+    if (el.id.startsWith('zone:')) {
+      const zid = el.id.slice(5);
+      const zl = ZONE_LABELS[zid] ?? { label: zid, caption: '' };
+      zone = { id: zid, ...zl, x, y, width: el.width, height: el.height, rooms: [] };
+      zonesById.set(zid, zone);
+    } else if (roomMeta.has(el.id)) {
+      const m = roomMeta.get(el.id);
+      zone.rooms.push({ key: m.key, brands: m.brands, label: m.label, parent: null, x, y, width: el.width, height: el.height });
+    } else if (nodesById.has(el.id)) {
+      absNodes.set(el.id, { x, y, width: el.width, height: el.height });
+    }
+    for (const c of el.children ?? []) walk(c, x, y, zone);
+  })(laid, 0, 0, null);
+  const zonesOut = zoneIds.map(zid => zonesById.get(zid));
 
-    // Absolute node and room coordinates (children are relative to their parent).
-    const containerOrigin = new Map();
-    (function walk(el, ox, oy) {
-      const isRoot = el === laid;
-      const x = isRoot ? zx : ox + (el.x ?? 0);
-      const y = isRoot ? zy : oy + (el.y ?? 0);
-      containerOrigin.set(el.id, { x, y });
-      if (roomMeta.has(el.id)) {
-        const m = roomMeta.get(el.id);
-        zone.rooms.push({ key: m.key, brands: m.brands, label: m.label, parent: null, x, y, width: el.width, height: el.height });
-      } else if (nodesById.has(el.id)) {
-        absNodes.set(el.id, { x, y, width: el.width, height: el.height });
-      }
-      for (const c of el.children ?? []) walk(c, x, y);
-    })(laid, 0, 0);
-
-    // Edge routes: ELK reports sections relative to the edge's container.
-    (function collect(el) {
-      for (const e of el.edges ?? []) {
-        const idx = Number(e.id.slice(5));
-        const origin = containerOrigin.get(e.container ?? el.id) ?? { x: zx, y: zy };
-        const pts = [];
-        for (const s of e.sections ?? []) pts.push(s.startPoint, ...(s.bendPoints ?? []), s.endPoint);
-        edgeRoutes.set(idx, pts.map(p => ({ x: Math.round((p.x + origin.x) * 10) / 10, y: Math.round((p.y + origin.y) * 10) / 10 })));
-      }
-      for (const c of el.children ?? []) collect(c);
-    })(laid);
-
-    cursorY += laid.height + ZONE_GAP;
-    canvasW = Math.max(canvasW, zx + laid.width);
-  }
+  (function collect(el) {
+    for (const e of el.edges ?? []) {
+      const idx = Number(e.id.slice(5));
+      const origin = containerOrigin.get(e.container ?? el.id);
+      if (!origin) throw new Error(`layout missing container for edge ${e.id}`);
+      const pts = [];
+      for (const s of e.sections ?? []) pts.push(s.startPoint, ...(s.bendPoints ?? []), s.endPoint);
+      edgeRoutes.set(idx, pts.map(p => ({ x: Math.round((p.x + origin.x) * 10) / 10, y: Math.round((p.y + origin.y) * 10) / 10 })));
+    }
+    for (const c of el.children ?? []) collect(c);
+  })(laid);
 
   // Room parent links, recorded flat with a parent key for the renderer.
   for (const zone of zonesOut) {
@@ -250,12 +234,16 @@ export async function layoutGraph(graph) {
   }
   graph.edges.forEach((e, i) => {
     if (e.type === 'inherits') { e.points = null; return; } // collapsed per render-note
-    e.points = edgeRoutes.get(i) ?? null;
+    const points = edgeRoutes.get(i);
+    if (!points || points.length < 2 || points.some(p => !Number.isFinite(p.x) || !Number.isFinite(p.y))) {
+      throw new Error(`layout missing routed points for ${e.type} edge ${e.from} -> ${e.to}`);
+    }
+    e.points = points;
   });
   graph.layout = {
-    engine: 'elkjs layered, zones as compound containers (INCLUDE_CHILDREN over brand rooms), build-time only',
-    width: Math.ceil(canvasW + CANVAS_PAD),
-    height: Math.ceil(cursorY - ZONE_GAP + CANVAS_PAD),
+    engine: 'elkjs layered, single INCLUDE_CHILDREN hierarchy over zones and brand rooms, build-time only',
+    width: Math.ceil(laid.width),
+    height: Math.ceil(laid.height),
     zones: zonesOut.map(z => ({
       ...z, x: round(z.x), y: round(z.y), width: round(z.width), height: round(z.height),
       rooms: z.rooms.map(r => ({ ...r, x: round(r.x), y: round(r.y), width: round(r.width), height: round(r.height) })),

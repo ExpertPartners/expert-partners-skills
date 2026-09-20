@@ -567,3 +567,32 @@ test('historical proof rejects symlinked deployed reference files', () => {
   fs.symlinkSync(saved, ref);
   assertFatal(repos, /non-regular deployed file/);
 });
+
+// The canonical relationship must survive extraction AND build-time layout.
+test('cross-zone calls and defers-to extract with visible routes and unchanged zones', () => {
+  const repos = makeRepos();
+  writeSkill(repos.eps, 'skills/new-project', {
+    name: 'new-project', fields: { zone: 'routing', calls: ['alpha'], 'defers-to': ['operating-doctrine'] },
+  });
+  const r = run(repos);
+  assert.equal(r.status, 0, r.stderr);
+  assert.equal(r.graph.nodes.find(n => n.id === 'new-project').zone, 'routing');
+  assert.equal(r.graph.nodes.find(n => n.id === 'alpha').zone, 'hands');
+  for (const [to, type] of [['alpha', 'calls'], ['operating-doctrine', 'defers-to']]) {
+    const e = r.graph.edges.find(e => e.from === 'new-project' && e.to === to && e.type === type);
+    assert.ok(e?.points?.length >= 2, `${type} must render in the static SVG`);
+    assert.ok(e.points.every(p => Number.isFinite(p.x) && Number.isFinite(p.y)));
+  }
+});
+
+test('cross-zone layout does not admit dangling defers-to or inherits references', () => {
+  for (const field of ['defers-to', 'inherits']) {
+    const repos = makeRepos();
+    writeSkill(repos.eps, 'skills/new-project', {
+      name: 'new-project', fields: { zone: 'routing', calls: ['alpha'], [field]: ['missing'] },
+    });
+    const r = run(repos);
+    assert.equal(r.status, 1);
+    assert.match(r.stderr, new RegExp(`dangling ${field} reference: new-project -> "missing"`));
+  }
+});
