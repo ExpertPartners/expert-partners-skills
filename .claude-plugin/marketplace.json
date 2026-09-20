@@ -32,7 +32,7 @@
     {
       "name": "systems-map",
       "source": "./plugins/systems-map",
-      "version": "0.5.1",
+      "version": "0.5.2",
       "description": "The canonical map of where every Expert Partners system lives. Loads at session start; inherits operating-doctrine."
     },
     {
