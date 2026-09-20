@@ -47,6 +47,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           path: eps
+          fetch-depth: 0 # committed history is required to prove VERIFIED STALE copies
 
       - name: Checkout aura (canonical co-source of SKILL.md files)
         uses: actions/checkout@v6
@@ -54,6 +55,7 @@ jobs:
           repository: ExpertPartners/aura
           token: ${{ secrets.SKILLS_GRAPH_TOKEN }}
           path: aura
+          fetch-depth: 0 # Aura-native canonicals need the same historical proof
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -95,7 +97,7 @@ jobs:
           eps/tools/skill-deploy/deploy-skill.sh --verify-copies aura/.claude/skills || fail=1
           eps/tools/skill-deploy/deploy-skill.sh --mirror-mount aura/.claude/skills --to aura/.agents/skills --verify || fail=1
           if [ "$fail" -ne 0 ]; then
-            echo "::warning title=aura skill mounts are stale::A canonical in this repo moved, so aura's deployed copies no longer match it. Redeploy in aura and land both changes together: tools/skill-deploy/deploy-skill.sh --mirror-mount .claude/skills --to .agents/skills (plus --to .claude/skills for the copies this repo owns). Until then aura's deployed-copy-drift job will be red."
+            echo "::warning title=aura skill mounts are stale::A canonical in this repo moved, so aura's deployed copies no longer match it. Canonical-first delivery is allowed only for VERIFIED STALE copies with committed-history proof. The later Aura redeploy step remains owed: tools/skill-deploy/deploy-skill.sh --mirror-mount .claude/skills --to .agents/skills (plus --to .claude/skills for the copies this repo owns). Until then aura's deployed-copy-drift job will be red."
           fi
 
       - name: Commit regenerated graph (main only)

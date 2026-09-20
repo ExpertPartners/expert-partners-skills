@@ -1,80 +1,114 @@
 ---
 name: new-project
 description: >
-  Bootstrap a new Expert Partners project: creates a private GitHub repo under the
-  ExpertPartners org, creates its home folder under ~/Claude/projects, writes CLAUDE.md from the
-  canonical template, creates intake/ (ADR 0027 convention), pushes the initial commit,
-  registers the repo for S1 CANONICAL_REPOS sync, and updates the /intake skill's project table
-  so the brain can index it immediately. Use when Allison says /new-project followed by a name,
-  "new project: NAME", "bootstrap a new project called NAME", or the session-wrap new-project
-  variant fires.
+  Run a new Expert Partners project through repo-standards before bootstrapping.
+  Uses live creation Stage A, creates nothing on USE EXISTING REPO, and proceeds
+  only on NEW REPO JUSTIFIED. After creation, runs Stage B and registers the
+  Estate Manifest Entity row before reporting birth complete. Use when Allison
+  says /new-project followed by a name, "new project: NAME", "bootstrap a new
+  project called NAME", or the session-wrap new-project variant fires.
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Adopted into canonical 2026-08-05 (Skill Map Rulings lane, flags item 9);
 # the machine copy at ~/.claude/skills is a deployed copy.
 tier: user
 zone: routing
 status: live
-subtitle: "bootstrap a new Expert Partners project"
+calls:
+  - repo-standards
+subtitle: "run the repo-standards gate, then bootstrap a justified project"
 ---
 
 # New-Project Skill
 
-Creates a complete, brain-connected project home from one command.
+Runs `repo-standards`, the one repository standard implementation. This skill
+supplies bootstrap mechanics; ADR 0056 and ADR 0078 remain the authorities.
+Load current canonical `expert-partners-skills skills/repo-standards/SKILL.md`
+for every run. If it cannot be reached live, create nothing and name the failed
+source. A local script or an older deployed skill never substitutes for the gate.
+
+<!-- RULED-BY: aura/decisions/0056-repo-baseline-standard.md date:2026-08-07 -->
+<!-- RULED-BY: aura/decisions/0078-claude-project-repository-setup.md date:2026-08-27 -->
+<!-- RULED-BY: aura/intake/2026-09-01-repo-final-reconciliation-execution-map.md date:2026-09-01 -->
 
 ## Steps
 
-1. **Parse input.** Extract the project home name (PascalCase, e.g., `FreeAgentNation`)
-   and optional type (`brand` or `standalone`, default `standalone`). If the name is
-   provided in a different case, normalize to PascalCase before passing to the script.
+1. **Parse input without creating anything.** Extract the proposed project home
+   name (PascalCase, e.g., `ExampleProject`) and optional script type (`brand` or
+   `standalone`, default `standalone`). Script type is a bootstrap option, not
+   the Manifest's entity type. Identify the durable job and Project context.
 
-2. **Run the bootstrap script.**
-   ```
+2. **Run repo-standards creation Stage A live.** Read its authorities and the
+   current Estate Manifest Entity index, then complete the ownership gate.
+   Proceed only on `NEW REPO JUSTIFIED`. On `USE EXISTING REPO`, stop, report
+   the owner and supporting Entity row, and create nothing: no repo, local home,
+   bootstrap commit, or pending registration. An archived owner is a revival
+   candidate, not permission to create a duplicate or unarchive it. If the gate
+   cannot return a verdict, stop before bootstrap and name the missing evidence.
+
+3. **Bootstrap only the justified repo.** Verify the proposed slug and local
+   home do not already exist, then inspect the current script and its side
+   effects before running:
+   ```bash
    bash ~/scripts/new-project.sh <ProjectHome> [type]
    ```
-   The script creates the GitHub repo, local home, CLAUDE.md, intake/.gitkeep, and
-   initial commit. It also appends to
-   `~/Claude/projects/Aura/project-knowledge/pending-canonical-repos.md`.
-   Capture the script output and surface it.
+   The script is scaffolding, not a readiness verdict. Capture its actual
+   output, new repo URL, local home, initial commit, and any pending-registration
+   file it changed. Its `DONE` message or template TODO never proves a complete
+   birth. If it partially fails, inspect what it created and resume that repo's
+   Stage B; do not blindly rerun creation. If the script is absent or unsuitable,
+   any replacement bootstrap still requires the same live Stage A verdict and
+   Stage B completion. Do not modify unrelated host scripts in this run.
 
-3. **Commit pending-canonical-repos.md to aura.** After the script exits successfully,
-   commit the pending-canonical-repos.md update to the aura repo:
-   ```bash
-   cd ~/Claude/projects/Aura
-   git add project-knowledge/pending-canonical-repos.md
-   git commit -m "chore(new-project): register <repo-slug> for S1 CANONICAL_REPOS sync
+4. **Run repo-standards Stage B on the new repo.** Bring the scaffold to the live
+   ADR 0056 baseline, replace placeholder identity with the verified job, record
+   the Project relationship under ADR 0078, and register the Manifest Entity row
+   through Stage B item 8. The birth report is the Stage B report. Until the row
+   is committed to aura main and independently read back, birth is incomplete.
 
-   Push-Policy: docs"
-   git push origin main
-   ```
-   Run the sibling-session visibility check before this commit.
+5. **Reconcile downstream routing and door registration.** The Manifest Entity
+   row is topology registration. Door serving scope is a separate consumer:
+   check the row's scan profile and declared consumers before requesting it.
+   For a repo intended for the Estate Brain door, verify the live door list and
+   the current canonical registration mechanism. If it is not served, file a
+   pending door-registration handoff with the owning door lane and report it as
+   pending, never live. A topology-only application does not automatically need
+   door indexing. Do not edit the door implementation or change access here.
 
-4. **Update the /intake skill's project table.** Open
-   `~/.claude/skills/intake/SKILL.md` and add a row to the project map table:
-   | <project keyword> | ~/Claude/projects/<Home> | ExpertPartners/<slug> | no (direct) |
-   Save the file. This keeps the intake skill current without a manual step.
+   The inspected legacy script appends to
+   `aura project-knowledge/pending-canonical-repos.md`. Inspect and preserve any
+   such side effect; reconcile it with the justified row and actual serving need
+   before committing it through the applicable reviewed path. That file is a
+   historical handoff queue, never proof of registration or an active automatic
+   sync. The old "S1 CANONICAL_REPOS sync" wording referred to the completed
+   Synapse worker lane, not a Make scenario. Evidence: aura
+   `project-knowledge/planning/synapse-sprint-control-tower.md` and
+   `project-knowledge/pending-canonical-repos.md`, read 2026-09-20. Never promise
+   that a retired worker or queue will index the repo automatically.
 
-5. **Check brain registration.** Confirm the new repo slug appears in either (a) `CANONICAL_REPOS` in `tools/mcp-brain-server/server/server.py` (already registered) or (b) `project-knowledge/pending-canonical-repos.md` awaiting a CDK deploy (queued). If it appears in neither, the project is invisible to Aura and Ember via the brain -- add it to pending-canonical-repos.md now before closing the session.
+   If intake routing needs a new home mapping, update its canonical skill source
+   (`expert-partners-skills skills/intake/SKILL.md`) from the Entity row and live
+   branch rules, then use the deployment pipeline under the current rollout
+   scope. Never hand-edit `~/.claude/skills/intake/SKILL.md` or hardcode a
+   protection verdict. Routing tables remain downstream consumers of topology.
 
-6. **Report back.**
-   - GitHub repo URL
-   - Local home path
-   - Pending-canonical-repos.md commit hash
-   - Reminder to fill in the "What this home is" TODO in CLAUDE.md
-   - Brain registration status (live in CANONICAL_REPOS, or pending CDK deploy)
+6. **Report the Stage B result with evidence.** Include the Stage A verdict,
+   repo URL, local home, baseline evidence, Project relationship, landed Entity
+   row commit and readback, and door status (live, pending, or not required).
+   Name remaining gaps explicitly. A pending queue entry, script success, or
+   repo URL without the Entity row cannot be reported as a completed birth.
 
 ## Rules
-- Never create a project home that already exists on disk; the script will abort.
+
+- Never creates a repo the gate did not justify. repo-standards is the one
+  standard; this skill is a runner of it, never a second one.
+- Never create a project home that already exists on disk.
 - ag-vault is never a valid project name here.
-- Do not edit server.py or the brain server directly -- hand off via pending-canonical-repos.md only (sync point 3).
 - Never use em dashes in any content this skill writes (org standard).
 - Run the sibling-session visibility check before any commit to shared repos.
 
 ## New-project variant (from claude.ai)
-If the user is in claude.ai and the session-wrap new-project prompt fires, the
-output is a /new-project block for Claude Code:
 
-```
-/new-project <ProjectHome> [type]
-```
-
-Claude Code runs this skill when that block is pasted into a session.
+If the session-wrap new-project prompt fires in claude.ai, the output is a
+`/new-project <ProjectHome> [type]` block for the implementation session. That
+session starts at step 1 and runs Stage A before any script; a handoff never
+counts as a prior gate verdict.

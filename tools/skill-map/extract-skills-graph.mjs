@@ -21,7 +21,10 @@
 // copy by construction) or when it carries that header anywhere. A deployed copy is
 // never mapped as a node; it must carry the header, the header must name the very
 // canonical SKILL.md that owns its id, and stripping the header must yield the
-// canonical file byte for byte. That last check is what makes the header a proof
+// current canonical file byte for byte, or prove the complete deployed tree is
+// an exact pipeline render of a prior committed canonical version. Verified prior
+// copies stay visible as VERIFIED STALE / awaiting redeploy; all unproven changes
+// remain fatal. That check is what makes the header a proof
 // rather than a claim: without it a genuinely different skill wearing a canonical's
 // name plus three pasted header lines would pass as a legitimate mirror. The deploy
 // pipeline's --verify covers a copy's non-SKILL.md files and its manifest; this
@@ -39,6 +42,7 @@ import { fileURLToPath } from 'node:url';
 import matter from 'gray-matter';
 import { z } from 'zod';
 import { layoutGraph } from './layout-skills-graph.mjs';
+import { proveHistoricalDeployment } from './historical-deployment.mjs';
 
 // ---------- configuration ----------
 
@@ -341,9 +345,18 @@ for (const { tagged, abs, raw, header, mountRoot } of deployedFiles) {
     fail(`deployed copy carries a malformed DEPLOYED COPY header block: ${tagged} -- redeploy it through tools/skill-deploy instead of editing the header by hand`);
     continue;
   }
+  let historical = null;
   if (stripped !== fs.readFileSync(canonicalAbs, 'utf8')) {
-    fail(`deployed copy is not a faithful render of its canonical: ${tagged} differs from ${canonicalTagged} beyond the DEPLOYED COPY header -- it was hand-edited or built by something other than tools/skill-deploy; redeploy it (deploy-skill.sh --mirror-mount / --to ... --repair-drift)`);
-    continue;
+    historical = proveHistoricalDeployment({
+      root: REPOS[repoKey], canonicalPath: header.canonicalPath,
+      canonicalLabel: `${header.repoName} ${header.canonicalPath}`,
+      deployedDir: path.dirname(abs), header, stripped,
+    });
+    if (historical.error) {
+      fail(`deployed copy is not a faithful render of its canonical: ${tagged} differs from ${canonicalTagged} beyond the DEPLOYED COPY header -- historical proof failed: ${historical.error}; redeploy through tools/skill-deploy`);
+      continue;
+    }
+    console.warn(`WARNING: VERIFIED STALE / awaiting redeploy: ${tagged} matches ${canonicalTagged} at committed version ${historical.commit} (blob ${historical.blob}); Aura's dedicated deployed-copy-drift gate still requires current canonical bytes.`);
   }
   deployedMounts.push({
     path: tagged,
@@ -352,6 +365,12 @@ for (const { tagged, abs, raw, header, mountRoot } of deployedFiles) {
     deployedAt: header.date,
     stamp: header.stamp,
     mount: mountRoot,
+    ...(historical ? {
+      status: 'VERIFIED STALE',
+      awaitingRedeploy: true,
+      verifiedCanonicalCommit: historical.commit,
+      verifiedCanonicalBlob: historical.blob,
+    } : {}),
   });
 }
 
@@ -414,7 +433,8 @@ const graph = {
   edges: edges.sort((a, b) => (a.from + a.type + a.to).localeCompare(b.from + b.type + b.to)),
   flags: {
     declaredDuplicates: duplicateRecords.sort(),
-    // Deployed copies verified against their canonical home this build. Each is the
+    // Deployed copies verified against current or proven prior canonical bytes.
+    // Prior versions carry status, commit/blob proof and an explicit redeploy debt. Each is the
     // same skill as its `canonical`, mounted for a second agent surface; none is a node.
     deployedMounts: deployedMounts.sort((a, b) => a.path.localeCompare(b.path)),
   },

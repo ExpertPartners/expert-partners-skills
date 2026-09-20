@@ -9,13 +9,18 @@ status: live
 subtitle: "born-to-standard repos, ten-point audits, and the readiness gate"
 ---
 
-# Repo Standards -- v1.1 (2026-09-04)
+# Repo Standards -- v1.2 (2026-09-20)
 
 Every repo in the ExpertPartners organization meets the ruled baseline. This skill is the judgment layer of ADR 0056, the piece that checks what org-level rulesets cannot.
 
 v1.1 adds the readiness gate. v1.0 ran in exactly two situations, a repo being born and a repo being audited, which meant readiness depended on Allison remembering to ask for an audit. It no longer does. A repo joining a Claude Project, a Project or repo relationship being materially reconfigured, and material work starting in a repo whose readiness nobody has established now all reach the same live evaluation, and repo creation now passes an ownership gate before it may proceed.
 
 <!-- RULED-BY: aura/decisions/0078-claude-project-repository-setup.md date:2026-08-27 -->
+
+<!-- RULED-BY: aura/intake/2026-09-01-repo-final-reconciliation-execution-map.md date:2026-09-01 -->
+
+v1.2 names the topology authority. The Estate Manifest Entity index (`aura docs/estate/estate-manifest.md`, section `Entity index`, introduced in v1.20) is the one machine-readable answer to which repositories exist, each repository's durable job, owner, and disposition. Read the current manifest live, never a frozen roster or a historical census. Stage A reads the index before proposing any repo, Stage B registers the new row as part of birth, and path three reads the repo's row as its ownership input. The weekly governance scan's topology contract uses the same index. A repo without a row is `UNREGISTERED` by design. Implementation provenance: `aura intake/2026-09-20-session-record-forever-controls-topology-authority.md`; P9 and P10 specification: `aura intake/2026-09-19-session-record-controls-review-lane-5-forever-controls-prefl.md`.
+
 
 ## The one source of truth
 
@@ -47,9 +52,9 @@ When trigger 5 is ambiguous, prefer one short readiness line over a full intervi
 
 No Estate repo is proposed or created until this gate returns. Run it live, never from memory of what repos exist.
 
-1. **Search live existing ownership first.** Enumerate the org (`gh api orgs/ExpertPartners/repos`, active and archived) and read the current topology through Estate Brain and canon. An archived repo that already owns the job is a revival candidate, not an absence.
+1. **Search live existing ownership first.** Read the Estate Manifest Entity index live before proposing any repository, then enumerate the whole org (`gh api --paginate orgs/ExpertPartners/repos`, active and archived) and reconcile the candidates against current canon. The Entity index is the one machine-readable topology authority. An archived row whose Job covers the durable job is a revival candidate, not an absence; name it in the existing-owner verdict without silently unarchiving it.
 2. **Prove no existing repo can cleanly own the durable job.** Name the candidates considered and why each fails. "Nothing came to mind" is not a proof.
-3. **Classify the entity or capability type.** Brand, operating function, product or body of work, source corpus, infrastructure, application, external record, scratch.
+3. **Classify the entity or capability type** using the current Entity index schema and its enum values, never a second local taxonomy.
 4. **Name the durable owner**, the domain or entity that owns the facts, not the person who asked.
 5. **Name the consumers**, who reads it and by what path (pointer, door, generated copy).
 6. **State why independent repository existence is warranted**, in terms of the durable job, not present convenience.
@@ -74,8 +79,9 @@ Work through the checklist in order and confirm each item before reporting the r
 5. **Org ruleset inheritance confirmed.** New repos inherit the estate default-branch and tag rulesets automatically. Confirm live (GET the repo's rules for its default branch) and record the check in the birth report. Never assume inheritance, prove it once.
 6. **Intake inbox, when the repo will receive session records.** Create intake/ with the ADR 0027 convention README and note the distillation cadence owner.
 7. **Project connection recorded** per ADR 0078, the owning Project named and the repo connected where that surface supports connections.
+8. **Manifest Entity row registered.** Add the repo's row to the Estate Manifest Entity index in the same pass, using its current schema (Repo, Job, Owner, Entity type, Room, Scan profile, Status, Disposition, Desc sha, Identity sha, Last verified, Evidence). Commit it to aura main through the applicable reviewed path with `Push-Policy: docs`, then independently fetch the landed row. Use `aura-governance-scan.py --stamp <repo>` after verifying that command exists in current canon. If scan integration has not landed, use the shipped `tools/governance/estate_entities.py` parser's `sha12` with the live description and pinned default-branch identity, exactly as the manifest specifies; never invent a command result. Validate the row with that shared parser. A proposed row, a pending door-registration entry, or a skill's project table is not registration.
 
-Report the birth with each item named and its evidence, then hand the repo back.
+Report the birth with each item named and its evidence, including the Entity row's path, landed commit, both stamps, and verification date. Birth cannot be reported complete without the registered row. If registration cannot land, name that exact remaining gap and keep the birth incomplete.
 
 ## Path two, repo audit (walk this repo)
 
@@ -99,12 +105,13 @@ Expected input: the repo, plus the owning Project, Table, or Room context when k
 
 Run order:
 
-1. **Resolve live ownership and topology** through GitHub (repo exists, visibility, archived flag, description, default branch) and Estate Brain plus canon (registry, manifest, the owning-repo rows). Never infer ownership from a repo name.
+1. **Resolve live ownership and topology** through GitHub (repo exists, visibility, archived flag, description, default branch) and the repo's Estate Manifest Entity index row (Job, entity type, owner, status, disposition). Never infer ownership from a repo name. No row means `UNREGISTERED` and `REMEDIATION REQUIRED`; the smallest safe remediation for that gap is the row itself, not a replacement repo or restructure. Use reachable owning canon to establish the proposed row's owner, or report ownership unproven rather than inventing it.
 2. **Read ADR 0056 fresh**, and ADR 0078 for the Project half.
 3. **Resolve the relevant Project ownership and setup evidence.** Claude Project membership and repository attachment are not enumerable by any tool the estate holds; room existence is Allison's projects page. So Project relationships are established from canonical committed records (aura `docs/estate/room-registry.md`, the lane ledger, the current topology map) and from live session or dispatch context. A Project relationship that no accessible live source supports is reported `UNPROVEN`, never invented and never assumed from a matching name.
 
 Then verify, each with its evidence:
 
+- **Manifest Entity row present and current.** The row exists and its description and identity stamps match the live surfaces. Read the current GitHub description and the first H1 in root `CLAUDE.md` at a pinned default-branch commit, following exactly one `@AGENTS.md` hop when that exact import appears among the first three nonempty lines. Use the manifest's `sha12` rule (collapse whitespace, trim, preserve case, first 12 lowercase SHA-256 hex characters). The scan's `DESCRIPTION DRIFT` and `IDENTITY DRIFT` findings are inputs here, checked against live evidence. A dash records an absent source, not a passing identity baseline; name missing descriptions or identity H1s as gaps. Do not refresh a stamp just to erase a mismatch: first reconcile the surface with the accepted job and owner. The Entity index is topology authority; `project-knowledge/estate-manifest.json` is observed-state machinery and the systems census is a separate inventory.
 - **One clear durable job.** The repo does one thing, and its own README, AGENTS.md, and GitHub description say the same thing. A description contradicting the repo's accepted canon is a gap, not a detail.
 - **Owning domain or entity named.**
 - **Correct canonical pointers**, out and in, and none pointing at a deleted or renamed repo.
@@ -134,11 +141,11 @@ An automatic readiness evaluation never silently repairs, renames, archives, con
 
 ## Topology drift, and who watches it
 
-Drift surfacing belongs to the EXISTING weekly Aura governance scan (`aura tools/governance/aura-governance-scan.py`, ADR 0033), never to a second watcher, daemon, registry, or dashboard. That scan carries the repo-topology diff: an active org repo absent from its coverage list is an `UNREGISTERED REPO` finding, and a covered repo that is gone or archived in the org is an `ORPHAN POINTER` finding. It stays read-and-flag-only, and it proposes while the owning session or Allison disposes. This skill reads those findings as an input and never builds a parallel mechanism to produce them.
+Drift surfacing belongs to the EXISTING weekly Aura governance scan (`aura tools/governance/aura-governance-scan.py`, ADR 0033), never to a second watcher, daemon, registry, or dashboard. Its ruled topology contract derives coverage from the Estate Manifest Entity index, never from a list of its own: an active org repo with no Entity row is an `UNREGISTERED REPO` finding; an active row for a repo that is gone or archived is an `ORPHAN POINTER`; an archived row for a live repo is a `STATUS MISMATCH`; a changed GitHub description or CLAUDE.md identity H1 produces `DESCRIPTION DRIFT` or `IDENTITY DRIFT`; a retired repo name produces `RETIRED NAME REFERENCE`; and the Estate Brain door's canonical list is cross-checked against knowledge-profile rows as `DOOR LIST MISMATCH`. Verify current scan implementation before claiming it emits these findings; a pending scan rollout does not suspend this skill's direct Entity-row and live-surface checks. The scan stays read-and-flag-only, proposes while the owning session or Allison disposes, and this skill reads its findings without building a parallel mechanism.
 
 ## Deployed copies and this skill's own hygiene
 
-This skill practices point 8 on itself. The canonical home is `expert-partners-skills skills/repo-standards/SKILL.md`. It is homed under `skills/` and carried by no plugin, so it owes exactly one shelf, the claude.ai organization Skills upload, plus the aura deployed copy. Deployed copies (aura `.claude/skills/repo-standards/`) carry the DEPLOYED COPY header naming the canonical home, a version stamp matching the canonical version line, and a SHA-256 checksum manifest committed alongside. The deploy pipeline (`tools/skill-deploy/deploy-skill.sh`) is the sole producer of deployed copies and upload zips. Hand-editing a deployed copy is a violation, fixes flow through canonical source and redeploy.
+This skill practices point 8 on itself. The canonical home is `expert-partners-skills skills/repo-standards/SKILL.md`. It is homed under `skills/` and carried by no plugin, so it owes exactly one shelf, the claude.ai organization Skills upload, plus the aura deployed copy and that copy's Codex mirror at `.agents/skills/repo-standards/`. Codex discovers the mirror under `.agents/skills`, not the `.claude/skills` mount. Deployed copies (aura `.claude/skills/repo-standards/` and `.agents/skills/repo-standards/`) carry the DEPLOYED COPY header naming the canonical home, a version stamp matching the canonical version line, and a SHA-256 checksum manifest committed alongside. The deploy pipeline (`tools/skill-deploy/deploy-skill.sh`) is the sole producer of deployed copies and upload zips. Use `--to aura/.claude/skills` for the deployed copy and `--mirror-mount aura/.claude/skills --to aura/.agents/skills` for its Codex mirror, then verify both through the pipeline. Hand-editing a deployed copy is a violation, fixes flow through canonical source and redeploy.
 
 ## Boundaries
 

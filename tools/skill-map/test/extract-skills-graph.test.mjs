@@ -21,6 +21,7 @@
 // Run: npm test  (from tools/skill-map, after npm ci)
 
 import { test } from 'node:test';
+import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -260,7 +261,7 @@ test('a mirror that drifted by one line in the body is caught', () => {
   assert.match(r.stderr, /is not a faithful render of its canonical/);
 });
 
-test('a stale mirror (canonical moved, no redeploy) is caught', () => {
+test('uncommitted stale bytes without historical proof remain fatal', () => {
   const repos = makeRepos();
   deployMirror(repos.files.beta, path.join(repos.aura, '.agents/skills/beta'),
     'aura .claude/skills/beta/SKILL.md', 'tree sha256 0123456789ab');
@@ -349,4 +350,249 @@ test('born-dressed strict mode still fails an unzoned canonical skill', () => {
   const r = run(repos);
   assert.equal(r.status, 1);
   assert.match(r.stderr, /born-dressed violation: aura:\.claude\/skills\/zeta\/SKILL\.md is missing required field\(s\) zone/);
+});
+
+// --- canonical-first delivery: proof is an exact historical pipeline render ---
+const DEPLOY_SCRIPT = path.join(here, '..', '..', 'skill-deploy', 'deploy-skill.sh');
+function gitRun(root, ...args) {
+  const r = spawnSync('git', ['-C', root, ...args], { encoding: 'utf8' });
+  assert.equal(r.status, 0, r.stderr);
+  return r.stdout.trim();
+}
+function commitFiles(root, message) {
+  gitRun(root, 'add', '.');
+  gitRun(root, 'commit', '-m', message);
+  return gitRun(root, 'rev-parse', 'HEAD');
+}
+function rewriteManifest(dir) {
+  const files = [];
+  function visit(at, prefix = '') {
+    for (const e of fs.readdirSync(at, { withFileTypes: true })) {
+      const rel = prefix + e.name;
+      if (e.isDirectory()) visit(path.join(at, e.name), `${rel}/`);
+      else if (rel !== 'checksums.sha256') files.push(rel);
+    }
+  }
+  visit(dir);
+  const digest = bytes => createHash('sha256').update(bytes).digest('hex');
+  const text = files.sort((a, b) => Buffer.compare(Buffer.from(a), Buffer.from(b)))
+    .map(rel => `${digest(fs.readFileSync(path.join(dir, rel)))}  ./${rel}\n`).join('');
+  fs.writeFileSync(path.join(dir, 'checksums.sha256'), text);
+}
+function committedDeployment({ native = false, plugin = false } = {}) {
+  const repos = makeRepos();
+  const root = native ? repos.aura : repos.eps;
+  const name = plugin ? 'gamma' : native ? 'beta' : 'alpha';
+  let source = repos.files[name];
+  if (plugin) {
+    source = writeSkill(repos.eps, 'plugins/example/skills/gamma', { name: 'gamma' });
+    fs.mkdirSync(path.join(repos.eps, 'plugins/example/.claude-plugin'), { recursive: true });
+    fs.writeFileSync(path.join(repos.eps, 'plugins/example/.claude-plugin/plugin.json'), '{"version":"1.2.3"}\n');
+  } else if (!native) {
+    fs.appendFileSync(source, '\n# Alpha -- v1.0\n');
+  }
+  const reference = path.join(path.dirname(source), 'references', 'contract.txt');
+  fs.mkdirSync(path.dirname(reference));
+  fs.writeFileSync(reference, 'Historical reference bytes.\n');
+  gitRun(root, 'init', '-b', 'main');
+  gitRun(root, 'config', 'user.name', 'Fixture');
+  gitRun(root, 'config', 'user.email', 'fixture@example.invalid');
+  const prior = commitFiles(root, 'canonical version one');
+  const canonicalPath = path.relative(root, source).split(path.sep).join('/');
+  const blob = gitRun(root, 'rev-parse', `${prior}:${canonicalPath}`);
+  const pipeline = path.join(repos.eps, 'tools/skill-deploy/deploy-skill.sh');
+  fs.mkdirSync(path.dirname(pipeline), { recursive: true });
+  fs.copyFileSync(DEPLOY_SCRIPT, pipeline);
+  const mount = path.join(repos.aura, '.agents/skills');
+  const args = [pipeline, name, ...(native ? ['--from', path.dirname(source)] : []), '--to', mount];
+  const rendered = spawnSync('bash', args, {
+    encoding: 'utf8', env: { ...process.env, SKILL_DEPLOY_TODAY: '2026-09-20' },
+  });
+  assert.equal(rendered.status, 0, rendered.stderr);
+  fs.appendFileSync(source, '\nA newly committed canonical instruction.\n');
+  commitFiles(root, 'canonical version two');
+  const dir = path.join(mount, name);
+  return { ...repos, root, source, prior, blob, canonicalPath, dir, file: path.join(dir, 'SKILL.md') };
+}
+function assertFatal(repos, pattern) {
+  const r = run(repos);
+  assert.equal(r.status, 1, r.stderr);
+  assert.match(r.stderr, pattern);
+  assert.equal(r.graph, null);
+  assert.doesNotMatch(r.stderr, /WARNING: VERIFIED STALE/);
+}
+
+test('exact prior committed pipeline deployment is VERIFIED STALE with proof and redeploy debt', () => {
+  const repos = committedDeployment();
+  const r = run(repos);
+  assert.equal(r.status, 0, r.stderr);
+  assert.match(r.stderr, /VERIFIED STALE \/ awaiting redeploy/);
+  const mount = r.graph.flags.deployedMounts.find(m => m.id === 'alpha');
+  assert.equal(mount.status, 'VERIFIED STALE');
+  assert.equal(mount.awaitingRedeploy, true);
+  assert.equal(mount.verifiedCanonicalCommit, repos.prior);
+  assert.equal(mount.verifiedCanonicalBlob, repos.blob);
+  assert.equal(r.graph.nodes.filter(n => n.id === 'alpha').length, 1);
+  // The canonical graph allowance does NOT change the dedicated deployment gate.
+  const verify = spawnSync('bash', [path.join(repos.eps, 'tools/skill-deploy/deploy-skill.sh'),
+    'alpha', '--to', path.dirname(repos.dir), '--verify'], { encoding: 'utf8' });
+  assert.notEqual(verify.status, 0);
+  assert.match(verify.stdout + verify.stderr, /DRIFT/);
+});
+
+test('Aura-native tree-stamped prior committed deployment is also provable', () => {
+  const repos = committedDeployment({ native: true });
+  const r = run(repos);
+  assert.equal(r.status, 0, r.stderr);
+  const mount = r.graph.flags.deployedMounts.find(m => m.id === 'beta');
+  assert.match(mount.stamp, /^tree sha256 [a-f0-9]{12}$/);
+  assert.equal(mount.verifiedCanonicalCommit, repos.prior);
+});
+
+test('plugin deployment proves historical plugin release as well as skill bytes', () => {
+  const repos = committedDeployment({ plugin: true });
+  const r = run(repos);
+  assert.equal(r.status, 0, r.stderr);
+  assert.equal(r.graph.flags.deployedMounts.find(m => m.id === 'gamma').stamp, '1.2.3');
+});
+
+test('a changed stale body is fatal even with a recomputed checksum manifest', () => {
+  const repos = committedDeployment();
+  fs.appendFileSync(repos.file, '\nHand-edited instructions.\n');
+  rewriteManifest(repos.dir);
+  assertFatal(repos, /no exact prior committed canonical render/);
+});
+
+test('a stale reference modification is fatal even with a recomputed manifest', () => {
+  const repos = committedDeployment();
+  fs.appendFileSync(path.join(repos.dir, 'references/contract.txt'), 'Hand edit.\n');
+  rewriteManifest(repos.dir);
+  assertFatal(repos, /no exact prior committed canonical render/);
+});
+
+test('an extra stale deployed file is fatal even with a recomputed manifest', () => {
+  const repos = committedDeployment();
+  fs.writeFileSync(path.join(repos.dir, 'extra.txt'), 'Uncommitted provenance.\n');
+  rewriteManifest(repos.dir);
+  assertFatal(repos, /no exact prior committed canonical render/);
+});
+
+test('an absent historical reference is fatal even with a recomputed manifest', () => {
+  const repos = committedDeployment();
+  fs.renameSync(path.join(repos.dir, 'references/contract.txt'), path.join(repos.base, 'saved-reference.txt'));
+  rewriteManifest(repos.dir);
+  assertFatal(repos, /no exact prior committed canonical render/);
+});
+
+test('stale copy without a checksum manifest is fatal', () => {
+  const repos = committedDeployment();
+  fs.renameSync(path.join(repos.dir, 'checksums.sha256'), path.join(repos.base, 'saved-checksums.sha256'));
+  assertFatal(repos, /missing or invalid deployment checksum manifest/);
+});
+
+test('a stale checksum mismatch is fatal', () => {
+  const repos = committedDeployment();
+  fs.appendFileSync(path.join(repos.dir, 'checksums.sha256'), '\n');
+  assertFatal(repos, /missing or invalid deployment checksum manifest/);
+});
+
+test('a false historical version stamp is fatal despite an exact old body', () => {
+  const repos = committedDeployment();
+  fs.writeFileSync(repos.file, fs.readFileSync(repos.file, 'utf8').replace('Deployed at v1.0.', 'Deployed at v9.9.'));
+  rewriteManifest(repos.dir);
+  assertFatal(repos, /no exact prior committed canonical render/);
+});
+
+test('a moved pipeline header is fatal despite an exact stripped historical body', () => {
+  const repos = committedDeployment();
+  let text = fs.readFileSync(repos.file, 'utf8');
+  const block = text.match(/^# DEPLOYED COPY \([\s\S]*?# Edit the canonical copy first, then redeploy via tools\/skill-deploy\.\n/m)[0];
+  text = text.replace(block, '').replace('name: alpha\n', `name: alpha\n${block}`);
+  fs.writeFileSync(repos.file, text);
+  rewriteManifest(repos.dir);
+  assertFatal(repos, /no exact prior committed canonical render/);
+});
+
+test('invalid or missing historical header remains fatal', () => {
+  for (const mode of ['invalid', 'missing']) {
+    const repos = committedDeployment();
+    let text = fs.readFileSync(repos.file, 'utf8');
+    text = mode === 'invalid' ? text.replace('skill-deploy pipeline', 'someone else')
+      : text.replace(/^# DEPLOYED COPY \([\s\S]*?# Edit the canonical copy first, then redeploy via tools\/skill-deploy\.\n/m, '');
+    fs.writeFileSync(repos.file, text);
+    rewriteManifest(repos.dir);
+    assertFatal(repos, /without a DEPLOYED COPY header/);
+  }
+});
+
+test('historical match cannot override wrong ownership or an orphaned canonical', () => {
+  const wrong = committedDeployment();
+  fs.writeFileSync(wrong.file, fs.readFileSync(wrong.file, 'utf8')
+    .replace('expert-partners-skills skills/alpha/SKILL.md', 'aura .claude/skills/beta/SKILL.md'));
+  rewriteManifest(wrong.dir);
+  assertFatal(wrong, /points at the wrong canonical home/);
+  const orphan = committedDeployment();
+  fs.renameSync(orphan.source, path.join(orphan.base, 'saved-SKILL.md'));
+  assertFatal(orphan, /canonical home that does not exist/);
+});
+
+test('an unreachable side-branch version is not prior canonical history', () => {
+  const repos = committedDeployment();
+  gitRun(repos.root, 'switch', '-c', 'unmerged');
+  fs.appendFileSync(repos.source, '\nOnly on an unrelated branch.\n');
+  commitFiles(repos.root, 'unmerged source');
+  const out = path.join(repos.base, 'branch-deployment');
+  const render = spawnSync('bash', [path.join(repos.eps, 'tools/skill-deploy/deploy-skill.sh'), 'alpha', '--to', out], { encoding: 'utf8' });
+  assert.equal(render.status, 0, render.stderr);
+  for (const rel of ['SKILL.md', 'checksums.sha256', 'references/contract.txt']) {
+    fs.copyFileSync(path.join(out, 'alpha', rel), path.join(repos.dir, rel));
+  }
+  gitRun(repos.root, 'switch', 'main');
+  assertFatal(repos, /no exact prior committed canonical render/);
+});
+
+test('shallow history without the matching canonical commit fails closed', () => {
+  const repos = committedDeployment();
+  const shallow = path.join(repos.base, 'shallow');
+  const clone = spawnSync('git', ['clone', '--depth=1', `file://${repos.root}`, shallow], { encoding: 'utf8' });
+  assert.equal(clone.status, 0, clone.stderr);
+  assertFatal({ ...repos, eps: shallow }, /fetch full history if shallow/);
+});
+
+test('historical proof rejects symlinked deployed reference files', () => {
+  const repos = committedDeployment();
+  const ref = path.join(repos.dir, 'references/contract.txt');
+  const saved = path.join(repos.base, 'original-reference.txt');
+  fs.renameSync(ref, saved);
+  fs.symlinkSync(saved, ref);
+  assertFatal(repos, /non-regular deployed file/);
+});
+
+// The canonical relationship must survive extraction AND build-time layout.
+test('cross-zone calls and defers-to extract with visible routes and unchanged zones', () => {
+  const repos = makeRepos();
+  writeSkill(repos.eps, 'skills/new-project', {
+    name: 'new-project', fields: { zone: 'routing', calls: ['alpha'], 'defers-to': ['operating-doctrine'] },
+  });
+  const r = run(repos);
+  assert.equal(r.status, 0, r.stderr);
+  assert.equal(r.graph.nodes.find(n => n.id === 'new-project').zone, 'routing');
+  assert.equal(r.graph.nodes.find(n => n.id === 'alpha').zone, 'hands');
+  for (const [to, type] of [['alpha', 'calls'], ['operating-doctrine', 'defers-to']]) {
+    const e = r.graph.edges.find(e => e.from === 'new-project' && e.to === to && e.type === type);
+    assert.ok(e?.points?.length >= 2, `${type} must render in the static SVG`);
+    assert.ok(e.points.every(p => Number.isFinite(p.x) && Number.isFinite(p.y)));
+  }
+});
+
+test('cross-zone layout does not admit dangling defers-to or inherits references', () => {
+  for (const field of ['defers-to', 'inherits']) {
+    const repos = makeRepos();
+    writeSkill(repos.eps, 'skills/new-project', {
+      name: 'new-project', fields: { zone: 'routing', calls: ['alpha'], [field]: ['missing'] },
+    });
+    const r = run(repos);
+    assert.equal(r.status, 1);
+    assert.match(r.stderr, new RegExp(`dangling ${field} reference: new-project -> "missing"`));
+  }
 });
