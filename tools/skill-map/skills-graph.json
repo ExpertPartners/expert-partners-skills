@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "f5440cf8a6293302d029fe1b9bbf37e2a961794e",
-    "aura": "5a96938c7cb8b77aace1e9d5d3fa7976be3230f6"
+    "eps": "d0dab127002fe7e782dd688e4a2144def284d46c",
+    "aura": "435f24c287a39aaf79251a2c2ca31ca5d9f59588"
   },
   "zones": [
     "surfaces",
@@ -58,7 +58,7 @@
       "renderNote": null,
       "layout": {
         "x": 928,
-        "y": 1202.8,
+        "y": 2125.3,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -86,7 +86,7 @@
       "renderNote": null,
       "layout": {
         "x": 913,
-        "y": 1303.8,
+        "y": 2226.3,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -210,7 +210,7 @@
       "renderNote": null,
       "layout": {
         "x": 100,
-        "y": 3112,
+        "y": 2245,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -238,7 +238,7 @@
       "renderNote": null,
       "layout": {
         "x": 69,
-        "y": 2172,
+        "y": 3112,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -266,7 +266,7 @@
       "renderNote": null,
       "layout": {
         "x": 916,
-        "y": 1592.8,
+        "y": 2515.3,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -296,7 +296,7 @@
       "renderNote": null,
       "layout": {
         "x": 577,
-        "y": 2546.8,
+        "y": 1931.5,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -324,7 +324,7 @@
       "renderNote": null,
       "layout": {
         "x": 38,
-        "y": 3488,
+        "y": 3300,
         "width": 274,
         "height": 77,
         "rectHeight": 62,
@@ -354,7 +354,7 @@
       "renderNote": null,
       "layout": {
         "x": 332,
-        "y": 2458.7,
+        "y": 1706.7,
         "width": 215,
         "height": 77,
         "rectHeight": 62,
@@ -382,7 +382,7 @@
       "renderNote": null,
       "layout": {
         "x": 332,
-        "y": 2722,
+        "y": 3401,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -439,7 +439,7 @@
       "renderNote": null,
       "layout": {
         "x": 60,
-        "y": 2722,
+        "y": 3401,
         "width": 252,
         "height": 77,
         "rectHeight": 62,
@@ -496,7 +496,7 @@
       "renderNote": null,
       "layout": {
         "x": 93.5,
-        "y": 2461,
+        "y": 2172,
         "width": 163,
         "height": 49,
         "rectHeight": 34,
@@ -550,7 +550,7 @@
       "renderNote": null,
       "layout": {
         "x": 69,
-        "y": 1681,
+        "y": 2910,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -638,7 +638,7 @@
       "renderNote": null,
       "layout": {
         "x": 937,
-        "y": 1491.8,
+        "y": 2414.3,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -666,7 +666,7 @@
       "renderNote": null,
       "layout": {
         "x": 1169,
-        "y": 1403.7,
+        "y": 2326.2,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -696,7 +696,7 @@
       "renderNote": null,
       "layout": {
         "x": 949,
-        "y": 1390.8,
+        "y": 2313.3,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -724,7 +724,7 @@
       "renderNote": null,
       "layout": {
         "x": 69,
-        "y": 2924,
+        "y": 3213,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -751,7 +751,7 @@
       "renderNote": null,
       "layout": {
         "x": 60,
-        "y": 2360,
+        "y": 2809,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -779,7 +779,7 @@
       "renderNote": null,
       "layout": {
         "x": 72,
-        "y": 2635,
+        "y": 3589,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -809,7 +809,7 @@
       "renderNote": null,
       "layout": {
         "x": 94,
-        "y": 2534,
+        "y": 1768,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -897,7 +897,7 @@
       "renderNote": null,
       "layout": {
         "x": 69,
-        "y": 3589,
+        "y": 3502,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -926,7 +926,7 @@
       "renderNote": null,
       "layout": {
         "x": 333.5,
-        "y": 1693.8,
+        "y": 2695.2,
         "width": 212,
         "height": 91,
         "rectHeight": 76,
@@ -981,7 +981,7 @@
       "renderNote": null,
       "layout": {
         "x": 69,
-        "y": 1883,
+        "y": 2534,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -1010,7 +1010,7 @@
       "renderNote": null,
       "layout": {
         "x": 348.5,
-        "y": 2559.7,
+        "y": 1944.3,
         "width": 182,
         "height": 77,
         "rectHeight": 62,
@@ -1041,7 +1041,7 @@
       "renderNote": null,
       "layout": {
         "x": 100,
-        "y": 1782,
+        "y": 2621,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1062,14 +1062,16 @@
       "inherits": [
         "operating-doctrine"
       ],
-      "calls": [],
+      "calls": [
+        "repo-standards"
+      ],
       "defersTo": [],
       "brandScope": [],
       "subtitle": null,
       "renderNote": null,
       "layout": {
-        "x": 332,
-        "y": 1808.8,
+        "x": 362,
+        "y": 2622.2,
         "width": 155,
         "height": 49,
         "rectHeight": 34,
@@ -1149,7 +1151,7 @@
       "renderNote": null,
       "layout": {
         "x": 913,
-        "y": 1693.8,
+        "y": 2616.3,
         "width": 194,
         "height": 91,
         "rectHeight": 76,
@@ -1206,7 +1208,7 @@
       "renderNote": null,
       "layout": {
         "x": 57,
-        "y": 3213,
+        "y": 2722,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -1233,7 +1235,7 @@
       "renderNote": null,
       "layout": {
         "x": 332,
-        "y": 3374.2,
+        "y": 2083.8,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1263,7 +1265,7 @@
       "renderNote": null,
       "layout": {
         "x": 106,
-        "y": 3387,
+        "y": 2071,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -1291,7 +1293,7 @@
       "renderNote": null,
       "layout": {
         "x": 60,
-        "y": 2071,
+        "y": 1869,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -1319,7 +1321,7 @@
       "renderNote": null,
       "layout": {
         "x": 66,
-        "y": 2823,
+        "y": 3011,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -1350,7 +1352,7 @@
       "renderNote": null,
       "layout": {
         "x": 76,
-        "y": 3011,
+        "y": 1970,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -1378,7 +1380,7 @@
       "renderNote": null,
       "layout": {
         "x": 78,
-        "y": 1970,
+        "y": 2346,
         "width": 194,
         "height": 77,
         "rectHeight": 62,
@@ -1553,7 +1555,7 @@
       "renderNote": null,
       "layout": {
         "x": 93,
-        "y": 3300,
+        "y": 1681,
         "width": 164,
         "height": 63,
         "rectHeight": 48,
@@ -1610,7 +1612,7 @@
       "renderNote": null,
       "layout": {
         "x": 63,
-        "y": 2273,
+        "y": 2447,
         "width": 224,
         "height": 63,
         "rectHeight": 48,
@@ -1839,19 +1841,19 @@
       "points": [
         {
           "x": 312,
-          "y": 3150.5
+          "y": 2283.5
         },
         {
           "x": 322,
-          "y": 3150.5
+          "y": 2283.5
         },
         {
           "x": 322,
-          "y": 3399.8
+          "y": 2135.2
         },
         {
           "x": 332,
-          "y": 3399.8
+          "y": 2135.2
         }
       ]
     },
@@ -1880,11 +1882,11 @@
       "points": [
         {
           "x": 577,
-          "y": 2585.3
+          "y": 1970
         },
         {
           "x": 530.5,
-          "y": 2585.3
+          "y": 1970
         }
       ]
     },
@@ -1907,19 +1909,19 @@
       "points": [
         {
           "x": 547,
-          "y": 2497.2
+          "y": 1745.2
         },
         {
-          "x": 557,
-          "y": 2497.2
+          "x": 567,
+          "y": 1745.2
         },
         {
-          "x": 557,
-          "y": 2572.5
+          "x": 567,
+          "y": 1944.3
         },
         {
           "x": 577,
-          "y": 2572.5
+          "y": 1944.3
         }
       ]
     },
@@ -1948,11 +1950,11 @@
       "points": [
         {
           "x": 312,
-          "y": 2760.5
+          "y": 3439.5
         },
         {
           "x": 332,
-          "y": 2760.5
+          "y": 3439.5
         }
       ]
     },
@@ -2005,19 +2007,19 @@
       "points": [
         {
           "x": 1149,
-          "y": 1530.3
+          "y": 2452.8
         },
         {
           "x": 1159,
-          "y": 1530.3
+          "y": 2452.8
         },
         {
           "x": 1159,
-          "y": 1455
+          "y": 2377.5
         },
         {
           "x": 1169,
-          "y": 1455
+          "y": 2377.5
         }
       ]
     },
@@ -2040,11 +2042,11 @@
       "points": [
         {
           "x": 1149,
-          "y": 1429.3
+          "y": 2351.8
         },
         {
           "x": 1169,
-          "y": 1429.3
+          "y": 2351.8
         }
       ]
     },
@@ -2079,27 +2081,19 @@
       "points": [
         {
           "x": 312,
-          "y": 2559.7
+          "y": 1793.7
         },
         {
-          "x": 322,
-          "y": 2559.7
+          "x": 557,
+          "y": 1793.7
         },
         {
-          "x": 322,
-          "y": 2447.7
-        },
-        {
-          "x": 567,
-          "y": 2447.7
-        },
-        {
-          "x": 567,
-          "y": 2559.7
+          "x": 557,
+          "y": 1957.2
         },
         {
           "x": 577,
-          "y": 2559.7
+          "y": 1957.2
         }
       ]
     },
@@ -2110,11 +2104,19 @@
       "points": [
         {
           "x": 312,
-          "y": 2585.3
+          "y": 1819.3
+        },
+        {
+          "x": 322,
+          "y": 1819.3
+        },
+        {
+          "x": 322,
+          "y": 1970
         },
         {
           "x": 348.5,
-          "y": 2585.3
+          "y": 1970
         }
       ]
     },
@@ -2164,11 +2166,19 @@
       "points": [
         {
           "x": 545.5,
-          "y": 1739.3
+          "y": 2740.7
+        },
+        {
+          "x": 850,
+          "y": 2740.7
+        },
+        {
+          "x": 850,
+          "y": 2677
         },
         {
           "x": 913,
-          "y": 1739.3
+          "y": 2677
         }
       ]
     },
@@ -2191,19 +2201,19 @@
       "points": [
         {
           "x": 530.5,
-          "y": 2611
+          "y": 1995.7
         },
         {
           "x": 557,
-          "y": 2611
+          "y": 1995.7
         },
         {
           "x": 557,
-          "y": 2598.2
+          "y": 1982.8
         },
         {
           "x": 577,
-          "y": 2598.2
+          "y": 1982.8
         }
       ]
     },
@@ -2220,19 +2230,19 @@
       "points": [
         {
           "x": 312,
-          "y": 1807.7
+          "y": 2672.3
         },
         {
           "x": 322,
-          "y": 1807.7
+          "y": 2672.3
         },
         {
           "x": 322,
-          "y": 1739.3
+          "y": 2740.7
         },
         {
           "x": 333.5,
-          "y": 1739.3
+          "y": 2740.7
         }
       ]
     },
@@ -2243,11 +2253,11 @@
       "points": [
         {
           "x": 312,
-          "y": 1833.3
+          "y": 2646.7
         },
         {
-          "x": 332,
-          "y": 1833.3
+          "x": 362,
+          "y": 2646.7
         }
       ]
     },
@@ -2256,6 +2266,21 @@
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
+    },
+    {
+      "from": "project-builder",
+      "to": "repo-standards",
+      "type": "calls",
+      "points": [
+        {
+          "x": 517,
+          "y": 2646.7
+        },
+        {
+          "x": 913,
+          "y": 2646.7
+        }
+      ]
     },
     {
       "from": "project-builder",
@@ -2306,11 +2331,11 @@
       "points": [
         {
           "x": 312,
-          "y": 3425.5
+          "y": 2109.5
         },
         {
           "x": 332,
-          "y": 3425.5
+          "y": 2109.5
         }
       ]
     },
@@ -2339,19 +2364,27 @@
       "points": [
         {
           "x": 312,
-          "y": 3062.3
+          "y": 2021.3
+        },
+        {
+          "x": 322,
+          "y": 2021.3
+        },
+        {
+          "x": 322,
+          "y": 2031.3
         },
         {
           "x": 567,
-          "y": 3062.3
+          "y": 2031.3
         },
         {
           "x": 567,
-          "y": 2611
+          "y": 1995.7
         },
         {
           "x": 577,
-          "y": 2611
+          "y": 1995.7
         }
       ]
     },
@@ -2362,19 +2395,11 @@
       "points": [
         {
           "x": 312,
-          "y": 3036.7
-        },
-        {
-          "x": 322,
-          "y": 3036.7
-        },
-        {
-          "x": 322,
-          "y": 2611
+          "y": 1995.7
         },
         {
           "x": 348.5,
-          "y": 2611
+          "y": 1995.7
         }
       ]
     },
@@ -2624,8 +2649,8 @@
         "path": "aura:.agents/skills/project-builder/SKILL.md",
         "id": "project-builder",
         "canonical": "aura:.claude/skills/project-builder/SKILL.md",
-        "deployedAt": "2026-09-04",
-        "stamp": "tree sha256 b3bd16602b95",
+        "deployedAt": "2026-09-20",
+        "stamp": "tree sha256 c77f121d82fa",
         "mount": "aura:.agents/skills/"
       },
       {
@@ -2847,7 +2872,7 @@
         "label": "The hands",
         "caption": "funnel work and account operations",
         "x": 891,
-        "y": 1154.8,
+        "y": 2077.3,
         "width": 524,
         "height": 652,
         "rooms": []
