@@ -1,15 +1,15 @@
 ---
 name: repo-standards
-description: "Brings every ExpertPartners repo to the ruled baseline and keeps it there. Fires on repo creation or proposal, explicit repo audit or hardening, a repo being connected to or materially reconfigured in a Claude Project, and material work starting in a repo whose readiness is not established for the current context. Never fires on a repo merely named in passing. Reads ADR 0056 (aura decisions/0056-repo-baseline-standard.md) and ADR 0078 as its source of truth and checks the ten points without restating them as its own canon. Creation runs a gate first, proving no existing repo can own the durable job, returning USE EXISTING REPO or NEW REPO JUSTIFIED with owner, boundaries, and consumers. Audit and readiness paths grade live and return READY with no structural change when compliant, else REMEDIATION REQUIRED carrying exact gaps, evidence, the correct owner, and the smallest safe scoped dispatch, never silent restructuring. It inherits the operating-doctrine and never overrides it."
+description: "Brings Estate repos to ADR 0056 and ADR 0078 readiness. Use for repo creation or proposals; explicit audits, hardening, organization, cleanup, curation, rationalizing knowledge, deciding what belongs, or preparing a repo for humans and AI; Project attachment or material reconfiguration; and material work without established readiness. Never fires on a casual repo mention. Creation proves ownership before proposing a new repo. Explicit audits assess content and fix authorized reversible gaps. Automatic readiness only evaluates and routes. Reads live canon and the Manifest Entity index, preserves source history and one-owner pointers, and stops on conflicts, unclear ownership or confidentiality, unavailable canon, or overlapping workers. Research cannot create new baseline rules. One lifecycle/audit skill, no repo-curator."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Born dressed 2026-08-07 (Repo Baseline Standard lane, ADR 0056 piece two).
 tier: organization
 zone: hands
 status: live
-subtitle: "born-to-standard repos, ten-point audits, and the readiness gate"
+subtitle: "repo birth, readiness, and evidence-led content audits"
 ---
 
-# Repo Standards -- v1.2 (2026-09-20)
+# Repo Standards -- v1.3 (2026-09-21)
 
 Every repo in the ExpertPartners organization meets the ruled baseline. This skill is the judgment layer of ADR 0056, the piece that checks what org-level rulesets cannot.
 
@@ -20,6 +20,9 @@ v1.1 adds the readiness gate. v1.0 ran in exactly two situations, a repo being b
 <!-- RULED-BY: aura/intake/2026-09-01-repo-final-reconciliation-execution-map.md date:2026-09-01 -->
 
 v1.2 names the topology authority. The Estate Manifest Entity index (`aura docs/estate/estate-manifest.md`, section `Entity index`, introduced in v1.20) is the one machine-readable answer to which repositories exist, each repository's durable job, owner, and disposition. Read the current manifest live, never a frozen roster or a historical census. Stage A reads the index before proposing any repo, Stage B registers the new row as part of birth, and path three reads the repo's row as its ownership input. The weekly governance scan's topology contract uses the same index. A repo without a row is `UNREGISTERED` by design. Implementation provenance: `aura intake/2026-09-20-session-record-forever-controls-topology-authority.md`; P9 and P10 specification: `aura intake/2026-09-19-session-record-controls-review-lane-5-forever-controls-prefl.md`.
+
+
+v1.3 extends only the explicit audit path with knowledge architecture assessment. Read [the content assessment](references/content-architecture.md) before changing governed content, and use the [audit record](references/audit-record-template.md) to preserve evidence and proposed dispositions. The ten baseline grades, creation gate, and automatic readiness authority stay unchanged. This is implementation of existing authority plus the bounded Phase Two brief, not adoption of the research's proposed schema or governance. Provenance and unresolved amendments are recorded in `intake/2026-09-21-repo-standards-phase-two-authority-review.md` and `intake/2026-09-21-repo-standards-phase-two-founder-decisions.md` in the canonical skills repo.
 
 
 ## The one source of truth
@@ -33,7 +36,7 @@ This skill never restates the ten points as its own canon. The ADR's text wins o
 Fires on:
 
 1. A new Estate repo being created or merely proposed. The gate runs before creation, not after.
-2. An explicit repo audit, walk, harden, grade, or bring-to-standard request.
+2. An explicit repo audit, walk, harden, grade, bring-to-standard, organize, clean, curate, make-canonical, rationalize-knowledge, determine-what-belongs, or prepare-for-humans-and-AI request.
 3. A repo being connected or assigned to a Claude Project.
 4. A Project or repo relationship being materially reconfigured, a repo swapped, an owning boundary moved, a second repo attached to a Project that already had one.
 5. Material work beginning in an important repo with no readiness determination for the current context. Material means committing, restructuring, moving canonical facts, or standing up new durable content, not reading.
@@ -85,15 +88,15 @@ Report the birth with each item named and its evidence, including the Entity row
 
 ## Path two, repo audit (walk this repo)
 
-Fires on any request to walk, harden, grade, or verify a named repo. One repo per pass, never batch grades across repos in one breath. This path keeps its v1.0 semantics unchanged: an explicit audit is licensed to fix reversible gaps in the pass that found them.
+Fires on explicit audit and organization requests (trigger 2). One repo per pass. An explicit audit remains licensed to fix reversible gaps in the pass that found them, within existing authority. Organization starts with evidence and the smallest useful batch, never a giant folder reorganization.
 
 Run order:
 
-1. Fetch ADR 0056 fresh, then inventory the repo live (tree, workflows, rulesets in effect, .gitattributes, CODEOWNERS, index file, intake state, largest files, frontmatter sampling). Every grade below cites evidence read this session, never memory.
+1. Fetch ADR 0056, ADR 0078, and the current Manifest Entity row fresh, then inventory the repo live (tree, workflows, rulesets in effect, .gitattributes, CODEOWNERS, index file, intake state, largest files, frontmatter sampling). Before content changes, complete the ownership, front-door, and content assessment in [references/content-architecture.md](references/content-architecture.md), including its stop checks and authority classification. Every grade below cites evidence read this session, never memory.
 2. Grade each of the ten points PASS or FAIL, one line of evidence per point. A point that does not apply (no CI exists, no intake inbox, no deployed copies) grades N/A with the reason, and N/A is declared, never silently skipped.
 3. **Fix reversible gaps in the same pass.** Missing AGENTS.md, missing index, missing .gitattributes or CODEOWNERS, missing frontmatter on recent files, header banners on generated files, all get fixed and committed in the pass that found them, on a branch merged sequentially. Backup-then-proceed applies, never rewrite history to fix a finding.
-4. **Flag what is gated.** Anything destructive (deleting or rewriting existing content, force operations), anything that spends money, anything that changes who or what holds access (ruleset edits, bypass actors, token scopes), and any judgment call that needs business truth goes back to Allison as a named line item with a recommendation. The audit never executes these, even when the fix is obvious.
-5. **File the audit record.** A dated record lands in the audited repo's intake/ (or aura intake/ when the repo has none), named `YYYY-MM-DD-repo-standards-audit-<repo>.md`, carrying the per-point table, fixes applied with commit hashes, and open flags. Template at `references/audit-record-template.md`.
+4. **Flag what is gated.** Anything destructive (deleting or rewriting existing content, force operations), anything that spends money, anything that changes who or what holds access (ruleset edits, bypass actors, token scopes), and any judgment call that needs business truth goes back to Allison as a named line item with a recommendation. The audit never executes these, even when the fix is obvious. Distinguish a verified typo or navigation correction already permitted by step 3 from a rewrite that changes governed meaning; Git reversibility alone does not authorize new business truth.
+5. **File the audit record.** A dated record lands in the audited repo's intake/ (or aura intake/ when the repo has none), named `YYYY-MM-DD-repo-standards-audit-<repo>.md`, carrying the per-point table, bounded content assessment, fixes applied with commit hashes, and open flags. Use [references/audit-record-template.md](references/audit-record-template.md). Report `READY` only when both the applicable baseline and usable front doors are evidenced; otherwise `REMEDIATION REQUIRED`. `ORGANIZE EXISTING REPO` is an action recommendation within that report, not a third readiness verdict or permission for gated changes.
 
 The walk of the existing estate runs this path one repo per pass, aura first, per the ADR's sequencing (enforcement layer lands before the walk starts). The lane ledger breakup is a known open finding on aura, marked in aura's audit record and never blocking it, per the ADR carve-out.
 
