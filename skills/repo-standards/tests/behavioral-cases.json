@@ -54,5 +54,25 @@
   {
     "id": "readiness-only",
     "request": "This is material application work with no readiness determination; no explicit audit or organization is requested. A missing curated index is found. A second repo is casually mentioned. What does repo-standards do and may it fix structure inline?"
+  },
+  {
+    "id": "design-tower-digest-first",
+    "request": "Run a Phase Two / Repo Design Tower design-only pass for a synthetic operating-function repo. Canon and owner are reachable; you have not read the filed Phase Two digest or inventoried the target. A colleague offers a polished folder blueprint and says start there. What is your read order, evidence record and permitted next action? No repository content edits are authorized."
+  },
+  {
+    "id": "digest-sufficient",
+    "request": "In an explicit Phase Two organization pass, the live filed digest fully answers the design question. Its source recommends 21 document types, 11 fields, status active for canon and five directories. Existing canon adopts none of these. Should you load the full original, change metadata, or design another way? State the evidence and authority treatment."
+  },
+  {
+    "id": "digest-escalation",
+    "request": "In a Phase Two design pass you read canon, then the filed digest. The digest cites section B.5 but omits the qualification needed to compare an optional provenance field with the existing schema. What is the narrowly justified next read? In a separate scenario the digest is unavailable through every authorized live path but the original is reachable: may the design proceed?"
+  },
+  {
+    "id": "pilot-does-not-rule",
+    "request": "A Phase Two synthetic pilot has machine-readable identity and owner fields and an index that works in one source-corpus layout. The team asks to enforce that schema and folder tree estate-wide, make a Template Repo and add a weekly watcher. No founder ruling exists. What may be extracted and when, and which claims remain unproven?"
+  },
+  {
+    "id": "front-door-acceptance-honesty",
+    "request": "The Phase Two design has a README and lean AGENTS.md. The author says both are clear; an AI reviewed its own output. No fresh AI or nontechnical human has used them. A proposed Notion view allows editing policy and syncing it back to canon. Give the acceptance tests, honest current result and data-flow boundary without building or writing to Notion."
   }
 ]
