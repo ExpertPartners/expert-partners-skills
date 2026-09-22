@@ -9,7 +9,7 @@ status: live
 subtitle: "repo birth, readiness, and evidence-led content audits"
 ---
 
-# Repo Standards -- v1.3 (2026-09-21)
+# Repo Standards -- v1.4 (2026-09-22)
 
 Every repo in the ExpertPartners organization meets the ruled baseline. This skill is the judgment layer of ADR 0056, the piece that checks what org-level rulesets cannot.
 
@@ -24,6 +24,8 @@ v1.2 names the topology authority. The Estate Manifest Entity index (`aura docs/
 
 v1.3 extends only the explicit audit path with knowledge architecture assessment. Read [the content assessment](references/content-architecture.md) before changing governed content, and use the [audit record](references/audit-record-template.md) to preserve evidence and proposed dispositions. The ten baseline grades, creation gate, and automatic readiness authority stay unchanged. This is implementation of existing authority plus the bounded Phase Two brief, not adoption of the research's proposed schema or governance. Provenance and unresolved amendments are recorded in `intake/2026-09-21-repo-standards-phase-two-authority-review.md` and `intake/2026-09-21-repo-standards-phase-two-founder-decisions.md` in the canonical skills repo.
 
+
+v1.4 makes the filed Phase Two digest a required design-evidence input for an explicit Phase Two / Repo Design Tower organization pass. Before repository design or content architecture work, follow the [Repo Design Tower sequence](references/content-architecture.md#repo-design-tower-sequence-explicit-phase-two-passes). It extends path two only, preserves the three evidence layers, and creates no new baseline rule or lifecycle mechanism.
 
 ## The one source of truth
 
@@ -91,6 +93,8 @@ Report the birth with each item named and its evidence, including the Entity row
 Fires on explicit audit and organization requests (trigger 2). One repo per pass. An explicit audit remains licensed to fix reversible gaps in the pass that found them, within existing authority. Organization starts with evidence and the smallest useful batch, never a giant folder reorganization.
 
 Run order:
+
+For an explicit Phase Two / Repo Design Tower pass, complete the linked sequence's input reads before designing. The dispatch bounds the work: a design-only or skill-amendment job does not authorize a target-repository content audit or edits outside its named paths. Do not report a full audit or readiness verdict for checks outside that scope.
 
 1. Fetch ADR 0056, ADR 0078, and the current Manifest Entity row fresh, then inventory the repo live (tree, workflows, rulesets in effect, .gitattributes, CODEOWNERS, index file, intake state, largest files, frontmatter sampling). Before content changes, complete the ownership, front-door, and content assessment in [references/content-architecture.md](references/content-architecture.md), including its stop checks and authority classification. Every grade below cites evidence read this session, never memory.
 2. Grade each of the ten points PASS or FAIL, one line of evidence per point. A point that does not apply (no CI exists, no intake inbox, no deployed copies) grades N/A with the reason, and N/A is declared, never silently skipped.

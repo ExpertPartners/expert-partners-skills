@@ -41,6 +41,16 @@ Scope: <authorized paths; excluded surfaces; baseline commit>.
 Canon reads: <ADR 0056, 0078, metadata/handling rules, Manifest and applicable
 owner decisions, each with revision or fetch time>.
 
+For an explicit Phase Two / Repo Design Tower pass, read the digest before
+design and keep the following three layers separate. A bounded design-only
+report may reuse this section without claiming an audit or baseline grades.
+
+| Evidence layer | Sources + revision / fetch time | Finding and permitted use |
+| --- | --- | --- |
+| Accepted Estate canon and decisions | | |
+| Phase Two research evidence | <filed digest; cited sections; original only if insufficient, with escalation question> | Evidence only |
+| Live target-repository evidence | <in-scope inventory, consumers; uninspected areas> | |
+
 | Boundary | Evidence / unresolved gap |
 | --- | --- |
 | Durable job and Entity row | |
@@ -92,7 +102,11 @@ automation, compatibility/migration impact, recommendation. Proposal only.>
 <Existing schema/lint commands, link and inbound-consumer coverage,
 move-only check where applicable, generator run twice with byte and file
 inventory comparison, retrieval questions with expected owning paths,
-actual results and limitations. No test can replace semantic verification.>
+actual results and limitations. For Phase Two, include fresh-AI and
+nontechnical-human prompts, routes, answers and failures. Label simulations
+and unrun tests honestly. Record pilot outcomes and class-specific exceptions
+before proposing any universal standard; pilot success is not adoption.
+No test can replace semantic verification.>
 
 ## Fixes applied this pass
 - <what, commit hash, branch, merged how>
