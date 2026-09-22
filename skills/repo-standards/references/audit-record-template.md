@@ -8,7 +8,9 @@ File as `intake/YYYY-MM-DD-repo-standards-audit-<repo>.md` in the audited repo
 classification: internal
 classification_owner: allison
 classification_date: YYYY-MM-DD
+date: YYYY-MM-DD
 source: repo-standards-skill
+topic: repo audit
 project: <repo>
 captured_at: <ISO 8601 UTC>
 ---
@@ -30,6 +32,67 @@ read live, never memory.
 | 8 | Deployed-copy drift control | | <version stamps, checksum manifests, producer> |
 | 9 | ADR integrity | | <MADR format, numbering gaps, CI validation> |
 | 10 | Retrieval readiness | | <curated index present and described> |
+
+## Content architecture assessment
+
+Verdict: READY / REMEDIATION REQUIRED (not a new ADR grade).
+Action recommendation: ORGANIZE EXISTING REPO / none.
+Scope: <authorized paths; excluded surfaces; baseline commit>.
+Canon reads: <ADR 0056, 0078, metadata/handling rules, Manifest and applicable
+owner decisions, each with revision or fetch time>.
+
+| Boundary | Evidence / unresolved gap |
+| --- | --- |
+| Durable job and Entity row | |
+| Owner and current Entity type | |
+| Owns | |
+| Consumes by pointer | |
+| Does not own | |
+| Systems of record outside GitHub | |
+| Human front door and correction route | |
+| AI front door | |
+| Curated index and producer | |
+| Intake / research / sources / generated / history handling | |
+| Open PRs / live workers and overlapping paths | |
+
+### Front-door and job-coverage gaps
+
+<Answer job, owner, trusted/current source, exclusions, correction route by
+following links. Record missing operating knowledge separately from filing.
+A technically compliant but unusable front door remains incomplete.>
+
+### Content inventory and dispositions
+
+One bounded row per assessed item; name coverage and omitted paths. Use the
+source's existing kind/status terms, not the research's proposed schema.
+
+| Path + revision | Kind / current authority + evidence | Owner / handling | Accuracy | Completeness | Usefulness | Freshness | Disposition + rule mapping | Executed / proposed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| <path> | <authority assessed independently> | | | | | | <ALREADY RULED / SAFE IMPLEMENTATION OF EXISTING RULE / PROPOSED BASELINE AMENDMENT REQUIRING ALLISON; source> | |
+
+### Conflicts and needs review
+
+<Claims and source pointers, current status and supersession evidence, owner,
+stop condition, exact resolving evidence. For sensitive material, path and
+handling flag only; do not copy private contents.>
+
+### Smallest reversible execution batch
+
+<Paths, existing authority, permitted actions, accepted destinations,
+source revision/hash, inbound consumers, pointer/alias requirements,
+separate move-only and semantic commits, rollback, and gated exclusions.>
+
+### Founder decisions required
+
+<Exact proposed rule, why current canon does not cover it, dependent
+automation, compatibility/migration impact, recommendation. Proposal only.>
+
+### Deterministic verification plan and results
+
+<Existing schema/lint commands, link and inbound-consumer coverage,
+move-only check where applicable, generator run twice with byte and file
+inventory comparison, retrieval questions with expected owning paths,
+actual results and limitations. No test can replace semantic verification.>
 
 ## Fixes applied this pass
 - <what, commit hash, branch, merged how>
