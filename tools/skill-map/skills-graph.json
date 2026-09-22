@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "d0dab127002fe7e782dd688e4a2144def284d46c",
-    "aura": "435f24c287a39aaf79251a2c2ca31ca5d9f59588"
+    "eps": "fa80f55c02433f45578ea68e96e2d481c5f4c36d",
+    "aura": "59ce41bd04a0c788a30475b574f7199d8d626f04"
   },
   "zones": [
     "surfaces",
@@ -58,7 +58,7 @@
       "renderNote": null,
       "layout": {
         "x": 928,
-        "y": 2125.3,
+        "y": 2130,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -86,7 +86,7 @@
       "renderNote": null,
       "layout": {
         "x": 913,
-        "y": 2226.3,
+        "y": 2231,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -266,7 +266,7 @@
       "renderNote": null,
       "layout": {
         "x": 916,
-        "y": 2515.3,
+        "y": 2520,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -638,7 +638,7 @@
       "renderNote": null,
       "layout": {
         "x": 937,
-        "y": 2414.3,
+        "y": 2419,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -666,7 +666,7 @@
       "renderNote": null,
       "layout": {
         "x": 1169,
-        "y": 2326.2,
+        "y": 2330.8,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -696,7 +696,7 @@
       "renderNote": null,
       "layout": {
         "x": 949,
-        "y": 2313.3,
+        "y": 2318,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -1147,19 +1147,18 @@
       "calls": [],
       "defersTo": [],
       "brandScope": [],
-      "subtitle": "born-to-standard repos, ten-point audits, and the readiness gate",
+      "subtitle": "repo birth, readiness, and evidence-led content audits",
       "renderNote": null,
       "layout": {
         "x": 913,
-        "y": 2616.3,
-        "width": 194,
-        "height": 91,
-        "rectHeight": 76,
+        "y": 2621,
+        "width": 206,
+        "height": 77,
+        "rectHeight": 62,
         "annotationHeight": 15,
         "subtitleLines": [
-          "born-to-standard repos,",
-          "ten-point audits, and the",
-          "readiness gate"
+          "repo birth, readiness, and",
+          "evidence-led content audits"
         ]
       }
     },
@@ -2007,19 +2006,19 @@
       "points": [
         {
           "x": 1149,
-          "y": 2452.8
+          "y": 2457.5
         },
         {
           "x": 1159,
-          "y": 2452.8
+          "y": 2457.5
         },
         {
           "x": 1159,
-          "y": 2377.5
+          "y": 2382.2
         },
         {
           "x": 1169,
-          "y": 2377.5
+          "y": 2382.2
         }
       ]
     },
@@ -2042,11 +2041,11 @@
       "points": [
         {
           "x": 1149,
-          "y": 2351.8
+          "y": 2356.5
         },
         {
           "x": 1169,
-          "y": 2351.8
+          "y": 2356.5
         }
       ]
     },
@@ -2174,11 +2173,11 @@
         },
         {
           "x": 850,
-          "y": 2677
+          "y": 2672.3
         },
         {
           "x": 913,
-          "y": 2677
+          "y": 2672.3
         }
       ]
     },
@@ -2667,7 +2666,11 @@
         "canonical": "eps:skills/repo-standards/SKILL.md",
         "deployedAt": "2026-09-20",
         "stamp": "v1.2",
-        "mount": "aura:.agents/skills/"
+        "mount": "aura:.agents/skills/",
+        "status": "VERIFIED STALE",
+        "awaitingRedeploy": true,
+        "verifiedCanonicalCommit": "62b3ad46b3ec198cca43ea4582fcc426cdd5d96f",
+        "verifiedCanonicalBlob": "dfc097db6cca7616643e9da93040977b43b55971"
       },
       {
         "path": "aura:.agents/skills/research-intake/SKILL.md",
@@ -2723,7 +2726,11 @@
         "canonical": "eps:skills/repo-standards/SKILL.md",
         "deployedAt": "2026-09-20",
         "stamp": "v1.2",
-        "mount": null
+        "mount": null,
+        "status": "VERIFIED STALE",
+        "awaitingRedeploy": true,
+        "verifiedCanonicalCommit": "62b3ad46b3ec198cca43ea4582fcc426cdd5d96f",
+        "verifiedCanonicalBlob": "dfc097db6cca7616643e9da93040977b43b55971"
       },
       {
         "path": "aura:.claude/skills/research-intake/SKILL.md",
@@ -2872,9 +2879,9 @@
         "label": "The hands",
         "caption": "funnel work and account operations",
         "x": 891,
-        "y": 2077.3,
+        "y": 2082,
         "width": 524,
-        "height": 652,
+        "height": 638,
         "rooms": []
       },
       {
