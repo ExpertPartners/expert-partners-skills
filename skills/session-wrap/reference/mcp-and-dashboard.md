@@ -6,7 +6,7 @@ Volatile mechanics live here, dated, verified at use time. Nothing in SKILL.md d
 
 Tool, fully qualified: `Estate Brain:save_to_session_intake`
 Args: `project` (canonical repo name, normally `aura`), `content` (the full markdown), `title` (slug source, e.g. `session-record-[lane]` / `continuity-[lane]`), `classification` (`internal` unless ruled otherwise, ADR 0025).
-Behavior: append-only, writes `<repo>/intake/YYYY-MM-DD-<slug>.md`, never overwrites (ADR 0027). Verify: the response must return the written path. Echo the exact path in the confirmation. No path returned means the write failed, use the fallback (downloadable .md plus a plain statement of the failure).
+Behavior: append-only, writes `<repo>/intake/YYYY-MM-DD-<slug>.md`, never overwrites (ADR 0027). The returned path is a write receipt, not proof of publication. Independently read the record from the authoritative published `main` branch and test retrieval through the continuation path. Echo the exact published path in the confirmation. If the write or publication fails, use the existing authorized Git path where available. Otherwise preserve the unpublished material in the owning repo's approved private recovery or staging location, identify the blocked action and owner, and leave the closeout obligation uncleared. Never create a routine Desktop or Downloads copy, including after successful publication. The governing owner rule is `~/.claude/rules/file-delivery.md` in allison-claude-doctrine.
 
 ## Lane ledger
 

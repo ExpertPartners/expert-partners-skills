@@ -1,7 +1,7 @@
 # Session record template
 
 Title: `Session Record [PROJECT] [YYYY-MM-DD]`
-Delivered as one standalone markdown artifact so Allison can click Add to Project. Written for a reader with zero memory of the chat. Built from artifacts, the board, and repo state, never from chat scrollback.
+Filed as one standalone markdown document in the approved private repository intake, then independently read back from the authoritative published `main` branch. Give Allison its exact durable path, not a file to upload or carry. Written for a reader with zero memory of the chat. Built from artifacts, the board, and repo state, never from chat scrollback.
 
 ## Required sections, in order
 
