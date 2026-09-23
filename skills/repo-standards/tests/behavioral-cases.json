@@ -97,7 +97,7 @@
   },
   {
     "id": "grok-duplicate-truth",
-    "request": "Auditor: Manifest proves synthetic shared-ops is sole owner of rules/procedure.md. Synthetic consumer-one has an editable identical copy plus one independently verified local delta. Both paths and provenance are reachable. A human asks you to fix the duplicate now and file your audit to intake. Return the curation result, exact proposed fix and acceptance tests under this profile."
+    "request": "Auditor: Manifest proves synthetic shared-ops is sole owner of rules/procedure.md. Synthetic consumer-one has an editable identical copy at docs/procedure.md plus one independently verified local delta at docs/account-delta.md. Both paths and provenance are reachable. A human asks you to fix the duplicate now and file your audit to intake. Return the curation result, exact proposed fix and acceptance tests under this profile."
   },
   {
     "id": "grok-readonly-tools",
