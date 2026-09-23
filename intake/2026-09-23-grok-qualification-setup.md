@@ -10,7 +10,7 @@ topic: Grok qualification preparation and feasibility
 ---
 # Grok qualification setup
 
-**DRAFT / NOT RELEASED. Preparation complete; qualification execution blocked.** No actual candidate-Bot test was run and no gate advanced. The draft belongs to the existing private source-owner repository and awaits the single unmerged review PR. An unmerged PR is review staging, not authoritative-main publication.
+**DRAFT / NOT RELEASED. Preparation complete; qualification execution blocked.** No actual candidate-Bot test was run and no gate advanced. The draft is preserved in the existing private source-owner repository through [review PR #35](https://github.com/ExpertPartners/expert-partners-skills/pull/35), OPEN and unmerged. An unmerged PR is review staging, not authoritative-main publication.
 
 SESSION: Grok Repo Templates - Qualification Setup
 Codex HOME: NORTH'S ESTATE CONTROL TOWER / Grok Repo Templates
@@ -68,3 +68,7 @@ Live open PR paths, registered skills worktrees, native tasks and the complete c
 The live Aura row write was rejected by automatic approval review before the proposed script or write ran. [Lifecycle handoff](2026-09-23-grok-qualification-setup/lifecycle-handoff.md) preserves the exact proposed row and rejection. No admission commit or live lifecycle publication is claimed. This does not invalidate completed file preparation, but it remains an explicit lifecycle gap for NORTH's review.
 
 This package and closeout are intentionally staged in an unmerged PR under the brief. Authoritative-main publication is not authorized in this assignment and is not claimed. NORTH owns PR review/publication disposition, the routed ledger row, and the route-proof decision. Keep this task open for that disposition; do not reopen the predecessor.
+
+## Review pointer and remote readback
+
+[PR #35](https://github.com/ExpertPartners/expert-partners-skills/pull/35) preserves the review branch. At initial head `7acec38fd36bd1c8e4f299ca1d0c17759a9a703f`, 24 manifest-listed artifact bodies were independently fetched from GitHub and matched their SHA-256/size. [Review receipt](2026-09-23-grok-qualification-setup/review-receipt.json) records that observation and hosted checks at capture. A later documentation-only receipt commit does not turn pending checks into passes. The PR itself carries current-head checks. No acceptance review, merge or authoritative publication is claimed.

@@ -23,6 +23,10 @@ Native runtime model/effort mismatch was reported: GPT-6 Astra/Ultra observed, H
 
 One lifecycle action remains blocked: automatic approval review rejected the proposed direct canonical Aura ledger-row write. The [review-only row handoff](../intake/2026-09-23-grok-qualification-setup/lifecycle-handoff.md) preserves the exact row and stated rejection. No ledger write/admission commit is claimed. The package, closeout and lifecycle handoff await NORTH's review/publication disposition in the requested unmerged PR; a clean pushed branch alone is not authoritative filing.
 
+## Review branch verification
+
+[Review PR #35](https://github.com/ExpertPartners/expert-partners-skills/pull/35) is OPEN, unmerged, auto-merge off. Preparation commit `7acec38fd36bd1c8e4f299ca1d0c17759a9a703f` was pushed; all 24 manifest-listed bodies were independently retrieved and hashed through GitHub. The following receipt commit only adds the PR reference/readback record and regenerates preparation artifact hashes. Current-head check evidence lives on the PR; captured results live in the package review receipt.
+
 ## Resume
 
 **Open in:** `/Users/allisongaddy/Claude/projects/worktrees/grok-qualification-setup-20260923/expert-partners-skills`, branch `codex/grok-qualification-setup-20260923`.
