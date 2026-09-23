@@ -27,7 +27,7 @@ Changed implementation files:
 - `skills/repo-standards/tests/behavioral-cases.json`
 - `skills/repo-standards/tests/behavioral-rubric.md`
 
-The additional dated intake files in this branch are execution evidence: this receipt, the two fixed responder transcripts and the independent grade record. They are not a qualification registry or accepted decision.
+The additional dated intake files in this branch are execution evidence: this receipt, the two fixed responder transcripts, the independent first-run grade record and the targeted supplement. They are not a qualification registry or accepted decision. PR: [expert-partners-skills #34](https://github.com/ExpertPartners/expert-partners-skills/pull/34), open for home review, not merged.
 
 ## Three evidence layers read before design
 
@@ -96,6 +96,17 @@ The profiles, parent skill and rubric did not change after first-run responses. 
 | Unchanged rubric | ee6b7212bca7af3cf740398cfe28ab2329bb1665049d1b6fe0de05bda05f21f1 |
 
 Responder and grader artifacts retain unmodified raw bodies with hashes. Tool use reported by responders was limited to input reads, local hashing and writing their designated scratch response artifacts, with no network or real-target operations. Those recorder writes belong to the test orchestration, not to a simulated Auditor. Complete raw subagent tool-call logs were not available to the parent or grader, so this report does not certify their trace completeness. Scenario no-write receipts are supplied-fiction decisions, not live system observations. These limitations alone prevent claiming Grok Gate A, regardless of any proxy score.
+
+The separate targeted response and independent supplemental grade returned **2/2 PASS**. The original read-only fixture stayed unchanged; its new answer explicitly states that mode evidence was not supplied. The corrected duplicate fixture now supports exact proposed owner/consumer/delta paths. No source-profile or rubric change was needed. This is targeted success, not a clean full-suite repeat and not model reliability proof. First-run failures remain preserved rather than retroactively marked passing.
+
+Evidence files, all beside this receipt:
+
+- [Ordinary-path raw responses](2026-09-22-grok-repo-templates-regression-responses.md), 19 scenarios.
+- [Adapter raw responses](2026-09-22-grok-repo-templates-adapter-responses.md), 19 scenarios with all variants.
+- [Independent first-run grades](2026-09-22-grok-repo-templates-independent-grades.md), including both failures.
+- [Targeted raw response and independent supplemental grade](2026-09-22-grok-repo-templates-targeted-evidence.md), both passing.
+
+Each preserved raw body was byte-checked against its responder/grader hash. No record exceeds 50 KB. All applicable final evidence/fixture pre-commit hooks passed. Remote check conclusions are verified on the final PR head at carry-back rather than frozen prematurely into this record.
 
 ## Qualification and next owning surface
 
