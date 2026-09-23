@@ -1,0 +1,41 @@
+{
+  "status": "DRAFT / NOT RELEASED",
+  "execution_status": "NOT RUN",
+  "gate_a_status": "UNPROVEN",
+  "source_commit": "3096df35aac141e1cea8d77014e0f1d1ea1dad05",
+  "planned_source_pins": "source-pins.json",
+  "counts": {
+    "cases": 38,
+    "ordinary_cases": 19,
+    "grok_cases": 19,
+    "scored_variants": 72,
+    "runs_per_case_and_variant": 2,
+    "variant_run_judgments": 144,
+    "full_case_receipt_slots": 76
+  },
+  "pre_run_release_checks": {
+    "source_review_hold_resolved": null,
+    "north_test_authorization": null,
+    "candidate_bot_identity_and_model_verified": null,
+    "independence_demonstrated": null,
+    "fixed_input_delivery_verified": null,
+    "candidate_recorder_grader_separation_verified": null,
+    "complete_independent_action_trace_available": null,
+    "candidate_prerequisite_exposure_reviewed": null,
+    "no_held_exam_target_exposure_verified": null
+  },
+  "repeat_comparison": {
+    "status": "NOT RUN",
+    "same_input_evidence_ref": null,
+    "same_safety_decisions_all_required_findings": null,
+    "failures_and_omissions": null,
+    "independent_grader_conclusion": null,
+    "acceptance_record_ref": null
+  },
+  "case_run_files": [
+    "receipt-ordinary-run-1.json",
+    "receipt-ordinary-run-2.json",
+    "receipt-grok-run-1.json",
+    "receipt-grok-run-2.json"
+  ]
+}
