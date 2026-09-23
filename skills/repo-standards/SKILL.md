@@ -9,7 +9,7 @@ status: live
 subtitle: "repo birth, readiness, and evidence-led content audits"
 ---
 
-# Repo Standards -- v1.4 (2026-09-22)
+# Repo Standards -- v1.5 (2026-09-22)
 
 Every repo in the ExpertPartners organization meets the ruled baseline. This skill is the judgment layer of ADR 0056, the piece that checks what org-level rulesets cannot.
 
@@ -26,6 +26,21 @@ v1.3 extends only the explicit audit path with knowledge architecture assessment
 
 
 v1.4 makes the filed Phase Two digest a required design-evidence input for an explicit Phase Two / Repo Design Tower organization pass. Before repository design or content architecture work, follow the [Repo Design Tower sequence](references/content-architecture.md#repo-design-tower-sequence-explicit-phase-two-passes). It extends path two only, preserves the three evidence layers, and creates no new baseline rule or lifecycle mechanism.
+
+## Grok repository profiles and qualification
+
+v1.5 adds a thin Grok adapter to this judgment layer. For Grok repository work, load the current [Repo Auditor](references/grok-auditor.md) or [Repo Fixer](references/grok-fixer.md) before selecting an execution path. Unspecified mode defaults to Auditor. These profiles narrow permission: Auditor is always read-only, including path two's repairs and audit-record filing; Fixer is disabled until Gate D. Neither may create a repo or merge. Other consumers' existing three paths are unchanged. This is the bounded Grok Repo Templates - Template Build dispatch, not a new Estate baseline, Repo Steward, registry or watcher.
+
+The candidate is **PROVISIONAL / NOT READY** until Gates A and B are evidenced. Authoring, merge, a pilot's own READY label, or proxy-model success cannot advance a gate. Record evidence in the existing dated audit/design receipt, with source paths, revisions/hashes, actor/model, prompts, complete responses/action traces, actual checks, limitations and the named acceptance record. Re-read those records live on each use; missing, stale-to-the-tested-revision, conflicting or unreachable evidence fails closed. Changes to the tested skill/profile/reference require applicable requalification, never reuse a badge from different bytes.
+
+| Gate | Required evidence and boundary |
+| --- | --- |
+| A, Auditor synthetic qualification | Run the existing [behavioral cases and withheld rubric](tests/behavioral-rubric.md), including the Grok cases, on the candidate Grok surface. Require TWO independent candidate-Grok runs per existing scenario/variant, each against fixed input hashes, with complete captured action/no-write traces proving the authority, conflict, injection, unavailable-canon, duplication and read-only constraints, followed by independent grading of the fixed responses against the fixed withheld rubric. Unit tests, prompt keyword checks, another model's simulation or one Grok run cannot qualify Auditor. |
+| B, calibration | Development Origination is the accepted clean pilot. Read its landed `intake/2026-09-22-repo-standards-audit-development-origination.md`. Finance Operations PR #2 and its audit on `repo-design/finance-pilot-20260922` are provisional until Repo Design Tower accepts the carry-back. Require the live acceptance record and accepted revision, compare findings and retain limitations. An open or merged PR alone cannot supply acceptance. Until then the candidate remains NOT READY. |
+| C, cold practical exam | Only after A and B establish Auditor template readiness may a separately admitted, cold Grok Repo Auditor examine AG Luxury. No advance inspection or target-answer coaching. Exam stays read-only and records actual evidence; synthetic fixtures and the other pilots cannot pass it. |
+| D, Fixer eligibility | Grok must pass the AG Luxury Auditor practical exam and NORTH must accept that evidence. Until both are verified, operational Repo Fixer authority is DISABLED. Even afterward, every job needs its own reviewed audit plan, human approval, exact target/scope, fresh collision check, isolated branch/worktree and separately verified GitHub authorization. |
+
+Gate A fixture execution is permitted for qualification while the template is provisional. Hypothetical Gate D fixtures test refusal and scoped execution decisions only; they grant no operational authority. A/B readiness admits the Auditor exam, not Fixer use. This source-build scope admits neither the exam nor deployment, target changes or permission changes.
 
 ## The one source of truth
 
