@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "6262b98b973e6993a9db75ec6be7bbcd7f8b304a",
-    "aura": "c0406b85e33d311c81a0244b58a632c8a8fec9a5"
+    "eps": "3096df35aac141e1cea8d77014e0f1d1ea1dad05",
+    "aura": "75f9f4241ce6b95e6b298ed59994bb977600b98e"
   },
   "zones": [
     "surfaces",
@@ -58,7 +58,7 @@
       "renderNote": null,
       "layout": {
         "x": 928,
-        "y": 2130,
+        "y": 1190,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -86,7 +86,7 @@
       "renderNote": null,
       "layout": {
         "x": 913,
-        "y": 2231,
+        "y": 1291,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -156,6 +156,36 @@
       }
     },
     {
+      "id": "batch-first-execution",
+      "source": "eps:skills/batch-first-execution/SKILL.md",
+      "repo": "eps",
+      "tier": "organization",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "session-model-advisor"
+      ],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "complete, ordered implementation handoffs",
+      "renderNote": null,
+      "layout": {
+        "x": 73,
+        "y": 3575,
+        "width": 236,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "complete, ordered implementation",
+          "handoffs"
+        ]
+      }
+    },
+    {
       "id": "brand-voice",
       "source": "eps:plugins/brand-voice/skills/brand-voice/SKILL.md",
       "repo": "eps",
@@ -209,8 +239,8 @@
       "subtitle": "plain language safe-to-close check",
       "renderNote": null,
       "layout": {
-        "x": 100,
-        "y": 2245,
+        "x": 97,
+        "y": 1970,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -237,8 +267,8 @@
       "subtitle": "canon and rule changes reach every surface, automatically",
       "renderNote": null,
       "layout": {
-        "x": 69,
-        "y": 3112,
+        "x": 66,
+        "y": 2708,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -266,7 +296,7 @@
       "renderNote": null,
       "layout": {
         "x": 916,
-        "y": 2520,
+        "y": 1580,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -296,7 +326,7 @@
       "renderNote": null,
       "layout": {
         "x": 577,
-        "y": 1931.5,
+        "y": 3247.5,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -323,8 +353,8 @@
       "subtitle": "hold the connection before you hold the screenshot",
       "renderNote": null,
       "layout": {
-        "x": 38,
-        "y": 3300,
+        "x": 35,
+        "y": 2520,
         "width": 274,
         "height": 77,
         "rectHeight": 62,
@@ -354,7 +384,7 @@
       "renderNote": null,
       "layout": {
         "x": 332,
-        "y": 1706.7,
+        "y": 3123.7,
         "width": 215,
         "height": 77,
         "rectHeight": 62,
@@ -381,8 +411,8 @@
       "subtitle": "deliverables land as named markdown links",
       "renderNote": null,
       "layout": {
-        "x": 332,
-        "y": 3401,
+        "x": 329,
+        "y": 2997,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -438,8 +468,8 @@
       "subtitle": "Poppins everywhere, hierarchy by size and color",
       "renderNote": null,
       "layout": {
-        "x": 60,
-        "y": 3401,
+        "x": 57,
+        "y": 2997,
         "width": 252,
         "height": 77,
         "rectHeight": 62,
@@ -495,8 +525,8 @@
       "subtitle": null,
       "renderNote": null,
       "layout": {
-        "x": 93.5,
-        "y": 2172,
+        "x": 90.5,
+        "y": 2447,
         "width": 163,
         "height": 49,
         "rectHeight": 34,
@@ -549,8 +579,8 @@
       "subtitle": "one classifier, six existing destinations, no new store",
       "renderNote": null,
       "layout": {
-        "x": 69,
-        "y": 2910,
+        "x": 66,
+        "y": 2809,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -638,7 +668,7 @@
       "renderNote": null,
       "layout": {
         "x": 937,
-        "y": 2419,
+        "y": 1479,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -666,7 +696,7 @@
       "renderNote": null,
       "layout": {
         "x": 1169,
-        "y": 2330.8,
+        "y": 1390.8,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -696,7 +726,7 @@
       "renderNote": null,
       "layout": {
         "x": 949,
-        "y": 2318,
+        "y": 1378,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -723,8 +753,8 @@
       "subtitle": "hand work to another session",
       "renderNote": null,
       "layout": {
-        "x": 69,
-        "y": 3213,
+        "x": 66,
+        "y": 2071,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -750,8 +780,8 @@
       "subtitle": "file content into a repo intake inbox",
       "renderNote": null,
       "layout": {
-        "x": 60,
-        "y": 2809,
+        "x": 57,
+        "y": 3387,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -778,8 +808,8 @@
       "subtitle": "plain language walkthroughs",
       "renderNote": null,
       "layout": {
-        "x": 72,
-        "y": 3589,
+        "x": 69,
+        "y": 3488,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -808,8 +838,8 @@
       "subtitle": "spawning new lanes with named homes",
       "renderNote": null,
       "layout": {
-        "x": 94,
-        "y": 1768,
+        "x": 91,
+        "y": 3185,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -896,8 +926,8 @@
       "subtitle": "set an accurate session name",
       "renderNote": null,
       "layout": {
-        "x": 69,
-        "y": 3502,
+        "x": 66,
+        "y": 2910,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -925,8 +955,8 @@
       "subtitle": "run the repo-standards gate, then bootstrap a justified project",
       "renderNote": null,
       "layout": {
-        "x": 333.5,
-        "y": 2695.2,
+        "x": 332,
+        "y": 1755.2,
         "width": 212,
         "height": 91,
         "rectHeight": 76,
@@ -980,8 +1010,8 @@
       "subtitle": "park work for a later resume",
       "renderNote": null,
       "layout": {
-        "x": 69,
-        "y": 2534,
+        "x": 66,
+        "y": 1782,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -1009,8 +1039,8 @@
       "subtitle": "carry-back envelope and place-keeping baton",
       "renderNote": null,
       "layout": {
-        "x": 348.5,
-        "y": 1944.3,
+        "x": 347,
+        "y": 3260.3,
         "width": 182,
         "height": 77,
         "rectHeight": 62,
@@ -1040,8 +1070,8 @@
       "subtitle": "where a piece of work should live",
       "renderNote": null,
       "layout": {
-        "x": 100,
-        "y": 2621,
+        "x": 97,
+        "y": 1681,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1070,8 +1100,8 @@
       "subtitle": null,
       "renderNote": null,
       "layout": {
-        "x": 362,
-        "y": 2622.2,
+        "x": 360.5,
+        "y": 1682.2,
         "width": 155,
         "height": 49,
         "rectHeight": 34,
@@ -1151,7 +1181,7 @@
       "renderNote": null,
       "layout": {
         "x": 913,
-        "y": 2621,
+        "y": 1681,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -1206,8 +1236,8 @@
       "subtitle": "resume parked or handed-off work",
       "renderNote": null,
       "layout": {
-        "x": 57,
-        "y": 2722,
+        "x": 54,
+        "y": 2259,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -1233,8 +1263,8 @@
       "subtitle": "structured session audit for consolidation",
       "renderNote": null,
       "layout": {
-        "x": 332,
-        "y": 2083.8,
+        "x": 329,
+        "y": 1982.8,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1263,8 +1293,8 @@
       "subtitle": "handoff note to main, clean worktree",
       "renderNote": null,
       "layout": {
-        "x": 106,
-        "y": 2071,
+        "x": 103,
+        "y": 2158,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -1291,7 +1321,7 @@
       "subtitle": "route work to the right project home",
       "renderNote": null,
       "layout": {
-        "x": 60,
+        "x": 57,
         "y": 1869,
         "width": 230,
         "height": 77,
@@ -1319,8 +1349,8 @@
       "subtitle": "model and effort fit-check at conversation start",
       "renderNote": null,
       "layout": {
-        "x": 66,
-        "y": 3011,
+        "x": 329,
+        "y": 3575,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -1350,8 +1380,8 @@
       "subtitle": "Claude Code takes care of Claude Code",
       "renderNote": null,
       "layout": {
-        "x": 76,
-        "y": 1970,
+        "x": 73,
+        "y": 3286,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -1378,7 +1408,7 @@
       "subtitle": "the one canonical session close-out",
       "renderNote": null,
       "layout": {
-        "x": 78,
+        "x": 75,
         "y": 2346,
         "width": 194,
         "height": 77,
@@ -1553,8 +1583,8 @@
       "subtitle": "screenshot shorthand",
       "renderNote": null,
       "layout": {
-        "x": 93,
-        "y": 1681,
+        "x": 90,
+        "y": 2621,
         "width": 164,
         "height": 63,
         "rectHeight": 48,
@@ -1610,8 +1640,8 @@
       "subtitle": "live-doc check before building",
       "renderNote": null,
       "layout": {
-        "x": 63,
-        "y": 2447,
+        "x": 60,
+        "y": 3098,
         "width": 224,
         "height": 63,
         "rectHeight": 48,
@@ -1670,6 +1700,27 @@
     },
     {
       "from": "ag-personal-brand",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "batch-first-execution",
+      "to": "session-model-advisor",
+      "type": "calls",
+      "points": [
+        {
+          "x": 309,
+          "y": 3613.5
+        },
+        {
+          "x": 329,
+          "y": 3613.5
+        }
+      ]
+    },
+    {
+      "from": "batch-first-execution",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -1839,20 +1890,12 @@
       "type": "calls",
       "points": [
         {
-          "x": 312,
-          "y": 2283.5
+          "x": 309,
+          "y": 2008.5
         },
         {
-          "x": 322,
-          "y": 2283.5
-        },
-        {
-          "x": 322,
-          "y": 2135.2
-        },
-        {
-          "x": 332,
-          "y": 2135.2
+          "x": 329,
+          "y": 2008.5
         }
       ]
     },
@@ -1881,11 +1924,11 @@
       "points": [
         {
           "x": 577,
-          "y": 1970
+          "y": 3286
         },
         {
-          "x": 530.5,
-          "y": 1970
+          "x": 529,
+          "y": 3286
         }
       ]
     },
@@ -1908,19 +1951,19 @@
       "points": [
         {
           "x": 547,
-          "y": 1745.2
+          "y": 3162.2
         },
         {
           "x": 567,
-          "y": 1745.2
+          "y": 3162.2
         },
         {
           "x": 567,
-          "y": 1944.3
+          "y": 3260.3
         },
         {
           "x": 577,
-          "y": 1944.3
+          "y": 3260.3
         }
       ]
     },
@@ -1948,12 +1991,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 312,
-          "y": 3439.5
+          "x": 309,
+          "y": 3035.5
         },
         {
-          "x": 332,
-          "y": 3439.5
+          "x": 329,
+          "y": 3035.5
         }
       ]
     },
@@ -2006,19 +2049,19 @@
       "points": [
         {
           "x": 1149,
-          "y": 2457.5
+          "y": 1517.5
         },
         {
           "x": 1159,
-          "y": 2457.5
+          "y": 1517.5
         },
         {
           "x": 1159,
-          "y": 2382.2
+          "y": 1442.2
         },
         {
           "x": 1169,
-          "y": 2382.2
+          "y": 1442.2
         }
       ]
     },
@@ -2041,11 +2084,11 @@
       "points": [
         {
           "x": 1149,
-          "y": 2356.5
+          "y": 1416.5
         },
         {
           "x": 1169,
-          "y": 2356.5
+          "y": 1416.5
         }
       ]
     },
@@ -2079,20 +2122,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 312,
-          "y": 1793.7
+          "x": 309,
+          "y": 3210.7
         },
         {
           "x": 557,
-          "y": 1793.7
+          "y": 3210.7
         },
         {
           "x": 557,
-          "y": 1957.2
+          "y": 3273.2
         },
         {
           "x": 577,
-          "y": 1957.2
+          "y": 3273.2
         }
       ]
     },
@@ -2102,20 +2145,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 312,
-          "y": 1819.3
+          "x": 309,
+          "y": 3236.3
         },
         {
-          "x": 322,
-          "y": 1819.3
+          "x": 319,
+          "y": 3236.3
         },
         {
-          "x": 322,
-          "y": 1970
+          "x": 319,
+          "y": 3286
         },
         {
-          "x": 348.5,
-          "y": 1970
+          "x": 347,
+          "y": 3286
         }
       ]
     },
@@ -2164,20 +2207,20 @@
       "type": "calls",
       "points": [
         {
-          "x": 545.5,
-          "y": 2740.7
+          "x": 544,
+          "y": 1800.7
         },
         {
           "x": 850,
-          "y": 2740.7
+          "y": 1800.7
         },
         {
           "x": 850,
-          "y": 2672.3
+          "y": 1732.3
         },
         {
           "x": 913,
-          "y": 2672.3
+          "y": 1732.3
         }
       ]
     },
@@ -2199,20 +2242,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 530.5,
-          "y": 1995.7
+          "x": 529,
+          "y": 3311.7
         },
         {
           "x": 557,
-          "y": 1995.7
+          "y": 3311.7
         },
         {
           "x": 557,
-          "y": 1982.8
+          "y": 3298.8
         },
         {
           "x": 577,
-          "y": 1982.8
+          "y": 3298.8
         }
       ]
     },
@@ -2228,20 +2271,20 @@
       "type": "calls",
       "points": [
         {
-          "x": 312,
-          "y": 2672.3
+          "x": 309,
+          "y": 1732.3
         },
         {
-          "x": 322,
-          "y": 2672.3
+          "x": 319,
+          "y": 1732.3
         },
         {
-          "x": 322,
-          "y": 2740.7
+          "x": 319,
+          "y": 1800.7
         },
         {
-          "x": 333.5,
-          "y": 2740.7
+          "x": 332,
+          "y": 1800.7
         }
       ]
     },
@@ -2251,12 +2294,12 @@
       "type": "calls",
       "points": [
         {
-          "x": 312,
-          "y": 2646.7
+          "x": 309,
+          "y": 1706.7
         },
         {
-          "x": 362,
-          "y": 2646.7
+          "x": 360.5,
+          "y": 1706.7
         }
       ]
     },
@@ -2272,12 +2315,12 @@
       "type": "calls",
       "points": [
         {
-          "x": 517,
-          "y": 2646.7
+          "x": 515.5,
+          "y": 1706.7
         },
         {
           "x": 913,
-          "y": 2646.7
+          "y": 1706.7
         }
       ]
     },
@@ -2329,12 +2372,20 @@
       "type": "calls",
       "points": [
         {
-          "x": 312,
-          "y": 2109.5
+          "x": 309,
+          "y": 2196.5
         },
         {
-          "x": 332,
-          "y": 2109.5
+          "x": 319,
+          "y": 2196.5
+        },
+        {
+          "x": 319,
+          "y": 2034.2
+        },
+        {
+          "x": 329,
+          "y": 2034.2
         }
       ]
     },
@@ -2362,28 +2413,28 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 312,
-          "y": 2021.3
+          "x": 309,
+          "y": 3337.3
         },
         {
-          "x": 322,
-          "y": 2021.3
+          "x": 319,
+          "y": 3337.3
         },
         {
-          "x": 322,
-          "y": 2031.3
-        },
-        {
-          "x": 567,
-          "y": 2031.3
+          "x": 319,
+          "y": 3347.3
         },
         {
           "x": 567,
-          "y": 1995.7
+          "y": 3347.3
+        },
+        {
+          "x": 567,
+          "y": 3311.7
         },
         {
           "x": 577,
-          "y": 1995.7
+          "y": 3311.7
         }
       ]
     },
@@ -2393,12 +2444,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 312,
-          "y": 1995.7
+          "x": 309,
+          "y": 3311.7
         },
         {
-          "x": 348.5,
-          "y": 1995.7
+          "x": 347,
+          "y": 3311.7
         }
       ]
     },
@@ -2871,7 +2922,7 @@
         "label": "The hands",
         "caption": "funnel work and account operations",
         "x": 891,
-        "y": 2082,
+        "y": 1142,
         "width": 524,
         "height": 638,
         "rooms": []
@@ -2880,9 +2931,9 @@
         "id": "routing",
         "label": "Session machinery",
         "caption": "routing, ledgers, session lifecycle",
-        "x": 16,
+        "x": 13,
         "y": 1633,
-        "width": 819,
+        "width": 822,
         "height": 2041,
         "rooms": []
       },

@@ -1,6 +1,7 @@
 ---
 name: session-model-advisor
-description: "Fires on the first user message of any new conversation, in Claude Chat, Claude Projects, and Claude Code. Reads the model and effort level currently in use, fetches ADR 0057 (Model and Effort Operating Standard, aura repo) LIVE, classifies the incoming task against ADR 0057's decision matrix, and states plainly, before doing anything else, whether to stay on the current model/effort or switch, with a one-line reason. Never hardcodes the decision matrix, always reads ADR 0057 fresh so a changed default never requires editing this skill. Use at the start of every conversation, whenever model or effort choice is in question, or when Allison asks 'right model for this,' 'should I switch,' or 'what effort level,' or whenever Aura is composing a Claude Code dispatch block for a NEW session, in which case it states what to click rather than whether to switch."
+description: "Choose one verified execution surface, model and effort for technical handoffs using Estate canon and current capability evidence. Preserve the fast path for Workers with matching runtime."
+
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -10,9 +11,16 @@ brand-scope: null
 subtitle: "model and effort fit-check at conversation start"
 ---
 
-# Session Model Advisor -- v1.0 (2026-08-08)
+# Session Model Advisor -- v1.1 (2026-09-23)
 
-Fires at the first user message of a new conversation, on every surface. Before doing anything else in the response, this skill answers one question out loud, plainly stated -- is the current model and effort level right for the task that just arrived, per ADR 0057 (`decisions/0057-model-and-effort-operating-standard.md`, aura repo)?
+Checks the running model and effort when starting a new conversation or when
+Allison asks for a fit check. For a dispatched Worker, decision 0093 provides
+a bounded fast path: when the dispatch model/effort line and the runtime banner
+match, accept that selection and begin the task. Run the full classification
+when the line is missing, the runtime disagrees, or the job materially changes.
+When NORTH prepares a new technical handoff, this skill recommends one current
+surface/model/effort combination and explains the fit briefly, under decisions
+0057 and 0072.
 
 This skill carries no copy of ADR 0057's decision matrix. It fetches the ADR live, every time it fires. If a model or effort default in the ADR changes, this file does not need to change. If you ever find the matrix text pasted into this file, that is a doctrine violation, delete it and re-point to Step 3.
 
@@ -20,8 +28,11 @@ A companion SessionStart hook (Claude Code only, lives outside this skill packag
 
 ## Step 1 -- Detect the surface
 
-Determine which of the three surfaces this conversation is running on.
+Determine which surface the conversation or handoff uses, including Codex Desktop.
 
+- **Codex Desktop** -- use native task/runtime metadata when exposed and
+  distinguish its internal effort identifier from the visible picker label.
+  Never infer that two labels are equivalent solely from spelling.
 - **Claude Code** -- a CLI session, tool access includes Bash/Read/Edit/the Claude Code tool surface, and a session transcript JSONL exists on disk.
 - **Claude Project** -- a claude.ai conversation running inside a named Project (project-level custom instructions and project knowledge are present in context).
 - **Claude Chat** -- a plain claude.ai conversation, no Project wrapper.
@@ -29,6 +40,16 @@ Determine which of the three surfaces this conversation is running on.
 The detection mechanism differs by what's actually reachable on each surface. Don't guess from vibes, check for the concrete signal (tool availability for Code, project context for Projects).
 
 ## Step 2 -- Read the current model and effort
+
+### Codex Desktop
+
+Read native task/runtime metadata if available. Verify which model and visible
+reasoning options this account's actual picker offers before recommending a
+change. A screenshot supplied by Allison can be dated evidence for her current
+UI, but cannot establish a permanent model matrix or prove an internal effort
+identifier maps to a visible label. If the picker cannot be inspected, retain
+an already approved running selection and say what remains unverified. Do not
+change account defaults or speed settings during a fit check.
 
 ### Claude Code
 
@@ -61,22 +82,37 @@ Never paste ADR 0057's decision matrix into this file. If a future session finds
 
 Read the ADR 0057 content fetched in Step 3, specifically the "Model and effort default by task category" section and, if operating as a named agent/persona rather than a bare session, "Model assignment by agent role." Match the current first message against the categories using their actual wording as fetched this run, not a memory of a prior run's categories, since the wording itself can change.
 
-If the task is genuinely ambiguous between two categories, name both in the Step 5 line and default to the higher-effort category. The cost of extra caution on a simple task is low, the cost of under-thinking a task the ADR would have flagged as dense or agentic is not.
+If the task spans two categories, name the relevant demands and choose effort
+from the actual complexity, ambiguity, risk, dependency breadth and
+verification burden. Do not automatically choose the maximum level. Preserve
+usage awareness without weakening a setting that the task materially needs.
 
 Also check the following, from the ADR text as fetched, not from memory.
 
 - Silent downgrade watch language (an "Opus limit reached" notice or an equivalent signal). If live and relevant this turn, surface it per the ADR's own instruction.
 - Refusal instrumentation language. Same treatment.
 
-## Step 5 -- State plainly, before anything else
+## Step 5 -- State the triggered check plainly
 
-Open the response with exactly one of these, before any other content.
+After Steps 3 and 4 are required, open the response with the applicable line below. The matching-Worker fast path in decision 0093 does not trigger these steps or a new opening line.
 
 - **Stay** -- "Model/effort check -- staying on `<model>` at `<effort>`. This reads as `<category from ADR 0057>`, which calls for this level. Proceeding."
 - **Switch** -- "Model/effort check -- this reads as `<category from ADR 0057>`, which the standard puts at `<recommended model/effort>`. You're currently on `<current model/effort>`. Recommend switching before I continue, `<one-line why>`."
 - **No introspection (Chat/Projects)** -- "Model/effort check -- I can't read your current selection on this surface. Based on the task (`<category>`), ADR 0057 calls for `<recommended>`. If that's not what's selected, switch via the model menu next to the send button before I continue."
 - **No ADR access** -- "Model/effort check -- can't reach ADR 0057 from this surface right now (`<reason>`). Proceeding on the current model/effort without a standard to check against."
-- **Dispatch** (composing a Claude Code dispatch block that spawns a NEW session) -- run Steps 3 and 4 against the JOB BEING HANDED OFF, not against this conversation's own task. State "RUN THIS SESSION AT: `<model>`, effort `<level>`." Name the level in ADR 0057's own vocabulary (`low`, `medium`, `high`, `xhigh`, `max`), verified fresh against current Claude Code documentation every time, never reused from an earlier verification the same day. When a level has grown a same-looking UI sibling, name both and say which one to actually click -- worked example, verified live 2026-08-10 against code.claude.com/docs/en/model-config: the strong-end setting that sits next to `max` on the `/effort` picker is `xhigh` plus standing permission to orchestrate dynamic workflows, a session-only Claude Code setting, not a separate or higher effort level. **Never write that setting's name bare in a dispatch block** -- the bare contiguous word, typed anywhere in a message a Claude Code session receives, fires the real behavior instead of describing it (this lane's own live incident, 2026-08-10). Write it broken (`Ultra-code`) and point to code.claude.com/docs/en/workflows for the exact canonical spelling. This line rides with the dispatch block's other envelope lines per the code-block-routing skill's "Model And Effort Line" section; this skill supplies its content, that skill enforces its presence.
+- **Dispatch** -- classify the job being handed off against current ADR 0057,
+  not the current conversation. Apply decision 0072 when selecting an
+  implementation engine. Check the current surface, model and exact effort or
+  speed options through [capability evidence](reference/handoff-capability.md).
+  Recommend one combination, with one short reason. For a new Claude Code
+  session, also supply code-block-routing's required MODEL AND EFFORT envelope
+  line. Batch-First Execution checks that this line and the other routing
+  fields are present before Allison receives the paste block. For a running
+  Worker that need not be interrupted, keep its selection and place any new
+  recommendation on the next run. Never use a Codex-specific label on Claude
+  Code without independent verification; never invent an unavailable level.
+  If current options cannot be verified, retain the currently configured
+  approved selection and label the uncertainty explicitly.
 
 Keep it to one to three lines. This is a fit-check, not an essay. State it, then move on to the actual work.
 
@@ -89,7 +125,7 @@ A separate SessionStart hook, `session-model-effort-banner.sh`, prints the curre
 - Don't hardcode ADR 0057's matrix into this file, ever, even "just this once" or "as a fallback for when the fetch fails." A failed fetch is Step 3's last bullet, not a reason to paste the matrix here.
 - Don't guess at Chat's or a Project's current model/effort and state the guess as fact.
 - Don't let the model/effort check become a wall of text. One to three lines, then the actual response.
-- Don't skip the check because the task "looks simple." Simple-looking, format-locked work is exactly where ADR 0057 says lower effort holds tighter and higher effort drifts.
+- Don't skip a triggered check because the task "looks simple." Simple-looking, format-locked work is exactly where ADR 0057 says lower effort holds tighter and higher effort drifts. A matching dispatched Worker follows decision 0093 instead of repeating the check.
 - Don't re-fetch ADR 0057 on every turn of a long conversation. Once per conversation, at the first message, is the trigger. Re-check mid-conversation only if the model/effort is changed or the task shape changes dramatically.
 - Don't claim Cowork/Projects introspection works "because Code has a way." The two surfaces are unrelated. Verify each on its own terms every time this skill or its documentation is revised.
 - Don't trust a remembered model/effort vocabulary mapping twice, even within the same day. The 2026-08-10 finding is why: the strong-end setting on the `/effort` picker (broken spelling `Ultra-code`, see code.claude.com/docs/en/workflows for the exact canonical spelling) looks like a sibling of `max` but is a session-only Claude Code setting (`xhigh` plus workflow orchestration), not an effort level, and the persisted `effortLevel` setting does not even accept it. A mapping that was correct at 9 AM is not evidence for 2 PM. Re-verify against current Claude Code documentation every time, not from memory of the last check today.

@@ -2,11 +2,11 @@
 
 ## What it's for
 
-Every Claude conversation runs on some model (Haiku, Sonnet, Opus, Fable) at some effort level (low, medium, high, xhigh, max). The right choice depends on the task -- a format-locked social post wants a smaller model at low effort, because lower effort holds tighter to narrow rules like "no em dashes." A dense financial analysis wants a bigger model at high effort. Nobody currently checks this on the way in. Allison ruled the answer in ADR 0057 (`decisions/0057-model-and-effort-operating-standard.md` in the aura repo) on 2026-08-08. This skill is what makes that ruling actually apply, turn one, every conversation, instead of sitting in a doc nobody reads before typing.
+Every implementation conversation runs on some model (Haiku, Sonnet, Opus, Fable) at some effort level (low, medium, high, xhigh, max). The right choice depends on the task -- a format-locked social post wants a smaller model at low effort, because lower effort holds tighter to narrow rules like "no em dashes." A dense financial analysis wants a bigger model at high effort. The fit check and handoff recommendation use the current Estate standard. Allison ruled the answer in ADR 0057 (`decisions/0057-model-and-effort-operating-standard.md` in the aura repo) on 2026-08-08. This skill is what makes that ruling actually apply, turn one, every conversation, instead of sitting in a doc nobody reads before typing.
 
 ## What it does, in one sentence
 
-At the very first message of a new conversation, before answering anything else, it checks what model/effort is running, fetches the ADR 0057 standard live, matches the task to the standard's categories, and says out loud "stay" or "switch" with one line of why.
+At conversation start or on a fit question, it checks the current selection against ADR 0057. When NORTH prepares a new technical handoff, it also recommends one verified surface, model and effort under ADR 0072. A correctly dispatched Worker whose selection matches its banner follows ADR 0093 and proceeds without repeating the whole fit check.
 
 ## Why it fetches the ADR live instead of just knowing the rules
 
@@ -29,4 +29,4 @@ This estate's skill standard (the four-artifact rule) calls for SKILL.md, a trai
 
 ## How to know it's working
 
-Open a new conversation on any surface and send a real first message. The very first thing back should be a one-to-three-line "Model/effort check" statement, before the actual answer to whatever was asked. If that line doesn't show up, or if it makes up a Chat/Projects model reading instead of saying it can't see one, something regressed -- check `SKILL.md` Step 5's phrasing against what actually came back.
+For a new handoff, check that NORTH names one current surface/model/effort combination with a short reason and supporting capability evidence. Batch-First Execution must then include every required routing field before Allison receives the prompt. For a dispatched Worker with a matching runtime banner, proceeding without another full classification is expected under ADR 0093. A live surface smoke test is still needed before claiming installation.
