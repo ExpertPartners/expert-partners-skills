@@ -4,8 +4,10 @@ import argparse
 import hashlib
 import json
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 REQUIRED = [
@@ -31,12 +33,28 @@ RUN_NULL_FIELDS = {
     'candidate_actor', 'candidate_model', 'candidate_surface', 'native_bot_id', 'native_run_id', 'isolation_evidence_ref', 'standing_instructions_hash', 'delivered_input_manifest_ref', 'delivered_input_hash', 'exact_request_artifact_ref', 'exact_request_artifact_sha256', 'raw_response_ref', 'raw_response_sha256', 'native_action_trace_ref', 'native_action_trace_sha256', 'trace_completeness_evidence_ref', 'before_snapshot_ref', 'after_snapshot_ref', 'recorder_identity', 'recorded_at', 'grader_identity', 'grader_model', 'graded_at', 'prohibited_action_count', 'coverage_omissions', 'limitations',
 }
 VARIANT_NULL_FIELDS = {'native_run_ids', 'independence_evidence_ref', 'fixed_response_citations', 'rubric_observations', 'missing_required_findings', 'failure_or_omission', 'grade'}
+SHARD_FIELDS = {'status', 'execution_status', 'group', 'run_number', 'case_runs'}
+PRE_RUN_RELEASE_CHECK_FIELDS = {
+    'source_review_hold_resolved', 'north_test_authorization',
+    'candidate_bot_identity_and_model_verified', 'independence_demonstrated',
+    'fixed_input_delivery_verified', 'candidate_recorder_grader_separation_verified',
+    'complete_independent_action_trace_available',
+    'candidate_prerequisite_exposure_reviewed', 'no_held_exam_target_exposure_verified',
+}
+REPEAT_COMPARISON_FIELDS = {
+    'status', 'same_input_evidence_ref', 'same_safety_decisions_all_required_findings',
+    'failures_and_omissions', 'independent_grader_conclusion', 'acceptance_record_ref',
+}
 DRAFT = 'DRAFT / NOT RELEASED'
 
 
 def require(condition, message):
     if not condition:
         raise ValueError(message)
+
+
+def require_exact_keys(value, expected, message):
+    require(isinstance(value, dict) and set(value) == expected, message)
 
 
 def digest(data):
@@ -59,7 +77,7 @@ def read_json(path):
     return json.loads(path.read_text(), object_pairs_hook=unique_keys)
 
 
-def validate(repo, package):
+def validate(repo, package, emit=True):
     require(package.is_dir() and not package.is_symlink(), 'package missing or symlinked')
     for path in package.rglob('*'):
         require(not path.is_symlink(), f'symlink not allowed in preparation package: {path}')
@@ -116,6 +134,8 @@ def validate(repo, package):
     require(receipt['status'] == DRAFT and receipt['execution_status'] == 'NOT RUN' and receipt['gate_a_status'] == 'UNPROVEN', 'blank receipt makes a result claim')
     require(receipt['source_commit'] == commit and receipt['planned_source_pins'] == 'source-pins.json', 'receipt pin mismatch')
     require(receipt['counts'] == COUNTS, 'receipt counts mismatch')
+    require_exact_keys(receipt['pre_run_release_checks'], PRE_RUN_RELEASE_CHECK_FIELDS, 'pre-run release check schema drift')
+    require_exact_keys(receipt['repeat_comparison'], REPEAT_COMPARISON_FIELDS, 'repeat comparison schema drift')
     require(all(v is None for v in receipt['pre_run_release_checks'].values()), 'release check falsely populated')
     require(receipt['repeat_comparison']['status'] == 'NOT RUN' and all(v is None for k, v in receipt['repeat_comparison'].items() if k != 'status'), 'repeat result falsely populated')
     expected_files = [f'receipt-{group}-run-{n}.json' for group in ('ordinary', 'grok') for n in (1, 2)]
@@ -123,6 +143,7 @@ def validate(repo, package):
     rows = []
     for name in expected_files:
         part = read_json(package / 'withheld' / name)
+        require_exact_keys(part, SHARD_FIELDS, f'receipt shard schema drift: {name}')
         require(part['status'] == DRAFT and part['execution_status'] == 'NOT RUN', f'nonblank execution: {name}')
         require(len(part['case_runs']) == 19, f'case shard incomplete: {name}')
         for row in part['case_runs']:
@@ -142,16 +163,55 @@ def validate(repo, package):
             require(set(v) == VARIANT_NULL_FIELDS | {'variant_id', 'status'} and v['status'] == 'NOT RUN' and all(v[k] is None for k in VARIANT_NULL_FIELDS), 'variant result fabricated or schema drift')
     for name in ['coverage.md', 'recorder-grader-handoff.md', 'withheld/README.md']:
         require(DRAFT in (package / name).read_text(), f'missing draft label: {name}')
-    print(json.dumps({'status': 'PASS', 'meaning': 'preparation consistency only; no candidate run or qualification', 'source_commit': commit, 'core_input_hashes_verified': 7, **COUNTS}, indent=2))
+    if emit:
+        print(json.dumps({'status': 'PASS', 'meaning': 'preparation consistency only; no candidate run or qualification', 'source_commit': commit, 'core_input_hashes_verified': 7, **COUNTS}, indent=2))
+
+
+def negative_probes(repo, package):
+    probes = [
+        ('extra shard result field', 'withheld/receipt-grok-run-1.json', 'add', 'gate_a_status', 'PASS', 'receipt shard schema drift'),
+        ('missing shard field', 'withheld/receipt-grok-run-1.json', 'remove', 'group', None, 'receipt shard schema drift'),
+        ('extra pre-run check key', 'withheld/receipt-template.json', 'add', 'unexpected_release_check', None, 'pre-run release check schema drift'),
+        ('missing pre-run check key', 'withheld/receipt-template.json', 'remove', 'no_held_exam_target_exposure_verified', None, 'pre-run release check schema drift'),
+        ('extra repeat comparison key', 'withheld/receipt-template.json', 'add', 'unexpected_comparison', None, 'repeat comparison schema drift'),
+        ('missing repeat comparison key', 'withheld/receipt-template.json', 'remove', 'same_input_evidence_ref', None, 'repeat comparison schema drift'),
+    ]
+    results = []
+    with tempfile.TemporaryDirectory(prefix='grok-qualification-probes-') as temp:
+        for index, (name, relative, action, key, value, expected_error) in enumerate(probes):
+            probe_package = Path(temp) / f'probe-{index}'
+            shutil.copytree(package, probe_package)
+            target = probe_package / relative
+            document = read_json(target)
+            mutated = document
+            if relative == 'withheld/receipt-template.json':
+                field = 'pre_run_release_checks' if 'pre-run' in name else 'repeat_comparison'
+                mutated = document[field]
+            if action == 'add':
+                mutated[key] = value
+            else:
+                mutated.pop(key)
+            target.write_text(json.dumps(document, indent=2) + '\n')
+            try:
+                validate(repo, probe_package, emit=False)
+            except ValueError as exc:
+                require(expected_error in str(exc), f'{name}: rejected for the wrong reason: {exc}')
+            else:
+                raise ValueError(f'{name}: mutation incorrectly passed validation')
+            results.append({'probe': name, 'result': 'REJECTED', 'reason': expected_error})
+    print(json.dumps({'negative_probes': results, 'result': 'PASS', 'canonical_package': 'unchanged'}, indent=2))
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--repo', type=Path, required=True, help='Existing verified source checkout; reads only')
     parser.add_argument('--package', type=Path, default=Path(__file__).resolve().parent, help='Package directory, default next to this script')
+    parser.add_argument('--negative-probes', action='store_true', help='Check six schema mutations in temporary package copies')
     args = parser.parse_args()
     try:
         validate(args.repo.resolve(), args.package.resolve())
+        if args.negative_probes:
+            negative_probes(args.repo.resolve(), args.package.resolve())
     except (ValueError, KeyError, OSError, subprocess.CalledProcessError) as exc:
         print(f'FAIL: {exc}', file=sys.stderr)
         return 1
