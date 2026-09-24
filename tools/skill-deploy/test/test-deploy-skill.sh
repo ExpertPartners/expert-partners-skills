@@ -399,7 +399,12 @@ git -C "$EPS" add -A >/dev/null 2>&1; git -C "$AURA" add -A >/dev/null 2>&1
 mkdir -p "$LH/.claude/skills/beta" && cp "$AURA/.claude/skills/beta/SKILL.md" "$LH/.claude/skills/beta/SKILL.md"
 # Codex user mount: alpha rewritten (Claude->Codex substitution on a pipeline copy, manifest now lies)
 "$D" alpha --to "$LH/.agents/skills" >/dev/null 2>&1
-sed -i '' 's/Canonical instructions for alpha./Canonical instructions for alpha, for Codex project conversations./' "$LH/.agents/skills/alpha/SKILL.md"
+python3 - "$LH/.agents/skills/alpha/SKILL.md" <<'PY2'
+import sys
+p = sys.argv[1]; t = open(p).read()
+assert "Canonical instructions for alpha." in t
+open(p, "w").write(t.replace("Canonical instructions for alpha.", "Canonical instructions for alpha, for Codex project conversations.", 1))
+PY2
 # Codex user mount: an ORPHAN pipeline copy whose canonical does not exist
 mkdir -p "$LH/.agents/skills/zeta"
 printf -- '---\nname: zeta\ndescription: orphan\n# DEPLOYED COPY (2026-09-01, skill-deploy pipeline): the canonical home is\n# expert-partners-skills skills/zeta/SKILL.md. Deployed at v1.0.\n# Edit the canonical copy first, then redeploy via tools/skill-deploy.\n---\n\nZeta.\n' > "$LH/.agents/skills/zeta/SKILL.md"
