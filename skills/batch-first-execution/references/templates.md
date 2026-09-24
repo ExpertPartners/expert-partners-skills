@@ -2,7 +2,11 @@
 
 Use the smallest template that fits. Fill in the actual known fields before
 delivery. Bracketed labels below are authoring placeholders, not instructions
-to send incomplete work to Allison.
+to send incomplete work to Allison. When `code-block-routing` governs a Claude
+Code paste, its one-block-per-response and step-one-only rule overrides the
+multi-step presentation in sections A and B: deliver only M01 or prompt 1,
+retain the plan in the checkpoint, and release the next block after verified
+predecessor evidence. The staged session-wrap exception remains scoped there.
 
 ## A. One-paste master assignment
 

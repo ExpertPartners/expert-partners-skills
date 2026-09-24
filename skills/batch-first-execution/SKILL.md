@@ -9,6 +9,7 @@ status: live
 inherits: operating-doctrine
 calls:
   - session-model-advisor
+  - code-block-routing
 subtitle: "complete, ordered implementation handoffs"
 ---
 
@@ -40,6 +41,15 @@ For implementation requiring another surface, choose:
 Do not require ten prompts merely because there are ten steps. Do not force a
 master assignment when Allison explicitly asks for a numbered packet. Never
 hide a required approval in a queue or treat silence as permission.
+
+When `code-block-routing` governs a Claude Code handoff, its one-block-per-
+response and step-one-only rule controls delivery. Give Allison only the first
+paste block in that response, keep the remaining ordered plan in the existing
+checkpoint, and send the next block only after the predecessor result is
+verified. Do not show a multi-step master assignment or numbered packet in one
+Claude Code response. Its session-wrap staged-kickoff exception applies only
+where that rule expressly allows it. On other surfaces, use the table above
+only where the current surface's routing rules permit that delivery.
 
 ## Brief Allison before the handoff
 
@@ -100,9 +110,10 @@ MODEL: <resolved value>
 EFFORT/SPEED: <resolved value>
 
 Before giving Allison any paste block, perform the sending-side completeness
-check. Confirm the five external briefing fields above, including WHY, have
-real values. For a new Code Worker, also validate the required current routing
-envelope from code-block-routing: exact SESSION NAME, destination, owning
+check. Confirm that WHERE TO GO, SURFACE, MODE, MODEL, EFFORT/SPEED, WHY,
+PASTE THIS and COME BACK WHEN each has a real value; the destination and return
+condition must be specific. For a new Code Worker, also validate the
+required current routing envelope from `code-block-routing`: exact SESSION NAME, destination, owning
 Room/Table and HOME, repository, assigned isolated WORKTREE and branch, MODEL
 AND EFFORT, return destination, and any other field required for that dispatch.
 For a continuation, name the actual existing Worker and preserve its identity.
