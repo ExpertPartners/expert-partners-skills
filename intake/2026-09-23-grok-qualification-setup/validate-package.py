@@ -110,6 +110,24 @@ SOURCE_MANIFEST_TOP_FIELDS = {
     'skills_base_commit',
     'status',
 }
+INDEPENDENT_CONTINUATION_FIELDS = {
+    'head',
+    'linked_sources',
+    'minor_stale_wording',
+    'reader',
+    'result',
+    'start',
+}
+REMOTE_READBACK_FIELDS = {
+    'artifact_hashes_checked',
+    'head',
+    'result',
+}
+EXPECTED_INDEPENDENT_CONTINUATION_RESULT = 'PASS, 38 cases/72 variants/144 required observations, all unrun, no gate/archive pass claimed'
+EXPECTED_REMOTE_READBACK_RESULT = 'PASS via independent GitHub contents reads'
+EXPECTED_REVIEW_LIFECYCLE = 'Own-row write rejected by automatic approval review before execution; proposed row remains a review-only handoff.'
+EXPECTED_REVIEW_PUBLICATION = 'Review branch only. Not authoritative-main publication. Merge and auto-merge not performed.'
+EXPECTED_SOURCE_REVIEW_FINDINGS = 'All three OPEN'
 
 
 def require(condition, message):
@@ -332,6 +350,19 @@ def validate(repo, package, emit=True):
     require_exact_keys(review_receipt, REVIEW_RECEIPT_FIELDS, 'review-receipt schema drift')
     require(review_receipt['status'] == DRAFT, 'review-receipt release state changed')
     require(review_receipt['candidate_runtime'] == 'NOT RUN', 'review-receipt claims candidate runtime')
+    require_text(review_receipt['captured_at'], 'review-receipt captured_at type drift')
+    require(type(review_receipt['review_pr']) is dict, 'review-receipt review_pr type drift')
+    require(review_receipt['lifecycle'] == EXPECTED_REVIEW_LIFECYCLE, 'review-receipt lifecycle claim changed')
+    require(review_receipt['publication'] == EXPECTED_REVIEW_PUBLICATION, 'review-receipt publication claim changed')
+    require(review_receipt['source_review_findings'] == EXPECTED_SOURCE_REVIEW_FINDINGS, 'review-receipt source-review claim changed')
+    continuation = review_receipt['independent_continuation_retrieval']
+    require_exact_keys(continuation, INDEPENDENT_CONTINUATION_FIELDS, 'review-receipt continuation schema drift')
+    require(continuation['result'] == EXPECTED_INDEPENDENT_CONTINUATION_RESULT, 'review-receipt continuation result claim changed')
+    require(type(continuation['linked_sources']) is list and all(type(v) is str for v in continuation['linked_sources']), 'review-receipt continuation sources type drift')
+    readback = review_receipt['remote_readback']
+    require_exact_keys(readback, REMOTE_READBACK_FIELDS, 'review-receipt remote-readback schema drift')
+    require(readback['result'] == EXPECTED_REMOTE_READBACK_RESULT, 'review-receipt remote-readback result claim changed')
+    require(type(readback['artifact_hashes_checked']) is int and readback['artifact_hashes_checked'] >= 0, 'review-receipt remote-readback count type drift')
     source_manifest = read_json(package / 'source-manifest.json')
     require_exact_keys(source_manifest, SOURCE_MANIFEST_TOP_FIELDS, 'source-manifest schema drift')
     require(source_manifest['status'] == DRAFT, 'source-manifest release state changed')

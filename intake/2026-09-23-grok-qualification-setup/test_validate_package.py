@@ -136,6 +136,12 @@ PROBES = [
     ('candidate mode-map mismatch', 'mode distinction lost', [
         ('set', 'candidate/case-modes.json', ('cases', 0, 'mode'), 'auditor'),
     ]),
+    ('review-receipt continuation result claim', 'review-receipt continuation result claim changed', [
+        ('set', 'review-receipt.json', ('independent_continuation_retrieval', 'result'), 'Gate A PASS'),
+    ]),
+    ('review-receipt remote-readback result claim', 'review-receipt remote-readback result claim changed', [
+        ('set', 'review-receipt.json', ('remote_readback', 'result'), 'qualification complete'),
+    ]),
     ('review-receipt claims candidate runtime', 'review-receipt claims candidate runtime', [
         ('set', 'review-receipt.json', ('candidate_runtime',), 'PASS'),
     ]),
