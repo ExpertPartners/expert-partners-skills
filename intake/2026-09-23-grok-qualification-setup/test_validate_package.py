@@ -136,6 +136,15 @@ PROBES = [
     ('candidate mode-map mismatch', 'mode distinction lost', [
         ('set', 'candidate/case-modes.json', ('cases', 0, 'mode'), 'auditor'),
     ]),
+    ('review-receipt claims PR merged', 'review-receipt claims PR merged or closed', [
+        ('set', 'review-receipt.json', ('review_pr', 'state'), 'MERGED'),
+    ]),
+    ('review-receipt claims auto-merge armed', 'review-receipt claims auto-merge armed', [
+        ('set', 'review-receipt.json', ('review_pr', 'autoMergeRequest'), {'enabledAt': 'now'}),
+    ]),
+    ('source-manifest disagrees with pins', 'source-manifest required_inputs disagree with pins', [
+        ('set', 'source-manifest.json', ('required_inputs', 0, 'sha256'), '0' * 64),
+    ]),
     ('review-receipt continuation result claim', 'review-receipt continuation result claim changed', [
         ('set', 'review-receipt.json', ('independent_continuation_retrieval', 'result'), 'Gate A PASS'),
     ]),

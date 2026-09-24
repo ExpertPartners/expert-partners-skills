@@ -128,6 +128,25 @@ EXPECTED_REMOTE_READBACK_RESULT = 'PASS via independent GitHub contents reads'
 EXPECTED_REVIEW_LIFECYCLE = 'Own-row write rejected by automatic approval review before execution; proposed row remains a review-only handoff.'
 EXPECTED_REVIEW_PUBLICATION = 'Review branch only. Not authoritative-main publication. Merge and auto-merge not performed.'
 EXPECTED_SOURCE_REVIEW_FINDINGS = 'All three OPEN'
+REVIEW_PR_FIELDS = {
+    'autoMergeRequest',
+    'baseRefOid',
+    'headRefOid',
+    'isDraft',
+    'state',
+    'statusCheckRollup',
+    'url',
+}
+SOURCE_MANIFEST_INPUT_FIELDS = {
+    'blob',
+    'bytes',
+    'candidate_delivery',
+    'commit',
+    'path',
+    'repo',
+    'sha256',
+    'url',
+}
 
 
 def require(condition, message):
@@ -351,7 +370,14 @@ def validate(repo, package, emit=True):
     require(review_receipt['status'] == DRAFT, 'review-receipt release state changed')
     require(review_receipt['candidate_runtime'] == 'NOT RUN', 'review-receipt claims candidate runtime')
     require_text(review_receipt['captured_at'], 'review-receipt captured_at type drift')
-    require(type(review_receipt['review_pr']) is dict, 'review-receipt review_pr type drift')
+    require_exact_keys(review_receipt['review_pr'], REVIEW_PR_FIELDS, 'review-receipt review_pr schema drift')
+    require(review_receipt['review_pr']['state'] == 'OPEN', 'review-receipt claims PR merged or closed')
+    require(review_receipt['review_pr']['autoMergeRequest'] is None, 'review-receipt claims auto-merge armed')
+    require(type(review_receipt['review_pr']['isDraft']) is bool, 'review-receipt review_pr isDraft type drift')
+    require_text(review_receipt['review_pr']['url'], 'review-receipt review_pr url type drift')
+    require_hex(review_receipt['review_pr']['baseRefOid'], 40, 'review-receipt review_pr baseRefOid type drift')
+    require_hex(review_receipt['review_pr']['headRefOid'], 40, 'review-receipt review_pr headRefOid type drift')
+    require(type(review_receipt['review_pr']['statusCheckRollup']) is list, 'review-receipt review_pr checks type drift')
     require(review_receipt['lifecycle'] == EXPECTED_REVIEW_LIFECYCLE, 'review-receipt lifecycle claim changed')
     require(review_receipt['publication'] == EXPECTED_REVIEW_PUBLICATION, 'review-receipt publication claim changed')
     require(review_receipt['source_review_findings'] == EXPECTED_SOURCE_REVIEW_FINDINGS, 'review-receipt source-review claim changed')
@@ -367,6 +393,23 @@ def validate(repo, package, emit=True):
     require_exact_keys(source_manifest, SOURCE_MANIFEST_TOP_FIELDS, 'source-manifest schema drift')
     require(source_manifest['status'] == DRAFT, 'source-manifest release state changed')
     require(source_manifest['candidate_execution'] == 'NOT RUN', 'source-manifest claims candidate execution')
+    require(source_manifest['skills_base_commit'] == commit, 'source-manifest base commit disagrees with pins')
+    require(type(source_manifest['required_inputs']) is list and len(source_manifest['required_inputs']) == len(REQUIRED), 'source-manifest required_inputs list drift')
+    for index, entry in enumerate(source_manifest['required_inputs']):
+        require_exact_keys(entry, SOURCE_MANIFEST_INPUT_FIELDS, 'source-manifest required_inputs schema drift')
+        pin = pins['inputs'][index]
+        require(
+            entry['repo'] == 'ExpertPartners/expert-partners-skills'
+            and entry['path'] == pin['path']
+            and entry['commit'] == pin['commit']
+            and entry['blob'] == pin['git_blob']
+            and entry['sha256'] == pin['sha256']
+            and entry['bytes'] == pin['bytes']
+            and entry['url'] == pin['source_url']
+            and type(entry['candidate_delivery']) is str
+            and bool(entry['candidate_delivery']),
+            f'source-manifest required_inputs disagree with pins: {pin["path"]}',
+        )
     manifest = read_json(package / 'artifact-manifest.json')
     require_exact_keys(manifest, MANIFEST_FIELDS, 'artifact manifest schema drift')
     require(manifest['status'] == DRAFT and type(manifest['meaning']) is str and
