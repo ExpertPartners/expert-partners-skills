@@ -12,6 +12,18 @@ topic: preparation validation and explicit evidence limits
 
 DRAFT / NOT RELEASED. These checks validate preparation artifacts only. No candidate turn, behavioral test, Gate A grade or acceptance decision occurred.
 
+## Validation contract map, before this continuation's repair
+
+| Object | Existing claim and check at reviewed head `e848326` | Required completion in this batch |
+| --- | --- | --- |
+| Seven withheld source pins | Fixed path order, source commit/blob, SHA-256, byte size, live checked-out bytes and URL were checked. | Exact object keys and field types; fixed repository, algorithm and commit relationships. |
+| Candidate source inputs | Six inputs and mode-scoped paths were compared to values copied from withheld pins. | Exact allowlisted top-level and per-input fields, then explicit candidate expectation from permitted fields. |
+| Coverage matrix | Case IDs, modes, request hashes, variant IDs, two-run lists and counts were checked. Scenario text was only tested for nonemptiness. | Exact object schemas and types; independently anchored hash of the 72 reviewed variant/scenario text pairs. |
+| Aggregate receipt | Draft/NOT RUN/UNPROVEN, source commit, counts, shard list, and blank pre-run/repeat values were checked. | Exact top-level schema and types, including rejection of added result/approval claims. |
+| Four receipt shards and nested rows | Shard top-level keys, nested case-run and variant keys, statuses and blank fields were checked, then rows were pooled. | Bind each filename to group, run number and its own ordered case/run identities while preserving nested exact checks. |
+
+The map describes documentary preparation validation. It cannot establish candidate context isolation, a complete action trace, or behavioral qualification.
+
 ## Completed checks
 
 | Check | Result and scope |
@@ -19,6 +31,10 @@ DRAFT / NOT RELEASED. These checks validate preparation artifacts only. No candi
 | Read-only package validator | PASS. Seven exact source blobs/SHA-256 values, exact canonical requests and withheld rubric, 38 cases, 72 variants, 76 full-case receipt slots, 144 required NOT RUN judgments; no populated runtime/grade fields. |
 | Receipt schema hardening | PASS. Exact top-level field set enforced on all four receipt shards. Exact key sets enforced on `pre_run_release_checks` and `repeat_comparison`, including its `status` field. Existing exact nested case-run and variant checks remain in place. |
 | Negative schema probes | PASS. Six temporary-copy mutations were independently rejected for the expected schema reason: extra shard result field (`gate_a_status: PASS`), missing shard field, extra and missing pre-run check key, and extra and missing repeat-comparison key. The canonical package was not mutated. |
+| Complete source/candidate pin contract | PASS. Exact top-level and per-input keys and types are required in both pin files. Candidate expectations use an explicit permitted-field allowlist. Matching unexpected metadata in both files is rejected before any candidate-boundary PASS. Commit, blob, SHA-256, byte size, URL, path, repository and algorithm checks remain. |
+| Coverage and scenario integrity | PASS. Coverage and case/variant schemas and types are exact; existing case/mode/request/run bindings remain. The 72 reviewed `(variant_id, scenario)` pairs are bound to a fixed SHA-256 anchor captured from the unchanged `e848326` package: `913762fdcf90d9b3faf1782c46eeee651a9367755d856ce04c7a7e717e818f9c`. |
+| Aggregate receipt and shard binding | PASS. The aggregate has exact top-level keys, fixed draft/NOT RUN/UNPROVEN states, typed counts and blank release/repeat fields. Each shard filename binds to its group, run number and ordered case/run identities; existing nested result schemas remain exact and blank. |
+| Expanded regression suite | PASS. Thirty-four additional temporary-copy probes reject matching pin metadata, added/missing/renamed/wrong-type fields, aggregate result claims, same-group and cross-group shard swaps, altered nonempty scenarios, and broken source/path/hash/mode bindings for their intended reasons. With the retained six probes, 40 negative mutations were tested. No real receipt or scenario was edited. |
 | Current source check | PASS. GitHub main independently read as `3096df35aac141e1cea8d77014e0f1d1ea1dad05`; all seven input SHA-256 values match the pinned working tree and source manifest. |
 | Candidate boundary | PASS for artifact content. Exactly four candidate files; no rubric, expected-answer fields, prior response or grading material. This does not prove runtime access isolation or safe transitive reads. |
 | Independent semantic review | Two contained draft corrections applied: 76 slots cannot establish sufficient independent executions, so actual presentation count remains unresolved and each variant has native-run-ID/isolation fields; approval wording preserves explicit approval by an authorized approver. |
@@ -32,7 +48,7 @@ DRAFT / NOT RELEASED. These checks validate preparation artifacts only. No candi
 
 ## Reproduce package checks
 
-From the isolated owner worktree run `python3 intake/2026-09-23-grok-qualification-setup/validate-package.py --repo . --negative-probes`. This checks the untouched canonical package, then creates temporary copies to verify six prohibited schema mutations fail. It reads local files and Git objects; the probes write only to temporary copies. It does not contact or invoke a model, run a candidate, create a registry, or test any business repository.
+From the isolated owner worktree run `python3 intake/2026-09-23-grok-qualification-setup/validate-package.py --repo . --negative-probes`, then `python3 intake/2026-09-23-grok-qualification-setup/test_validate_package.py --repo .`. The first command checks the untouched canonical package and six original negative probes; the second repeats the positive check and runs 34 additional negative probes. Both read local files and Git objects; probes write only to disposable copies. Neither contacts a model, runs a candidate, creates a registry, or tests a business repository.
 
 Use the existing `.ep/` changed-file brand/classification/provenance gates and the repository CI workflow. The complete canonical skill/profile/case/rubric diff is empty; only the admitted preparation files change. No deployment or generated-copy test was needed because no producer or deployed source changed. No software was installed for these checks.
 
