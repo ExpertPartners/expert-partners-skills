@@ -161,6 +161,7 @@ SOURCE_MANIFEST_SHA256 = '6097f31e99f5b06fa91d61e789c78cf97ff46a0204c1da3c161fcd
 # Reviewed preparation boundaries, independent of the refreshable artifact manifest.
 SOURCE_REVIEW_PROPOSALS_SHA256 = 'ed9ff93d86295dd6a809f29e6db0b7a74017b922272236ada5920e0d785ad1c7'
 RECORDER_GRADER_HANDOFF_SHA256 = 'cc8efdd3446f4a2898b3b385c9d0cf1106bc8ca1ebe96533fee25326d26a3512'
+WITHHELD_README_SHA256 = 'dc0b6201b8b8356bb6be51f95509d99a0720c45a825a42e720275fc55c517fe5'
 SOURCE_REVIEW_COMMENT_FIELDS = {'id', 'html_url', 'created_at', 'updated_at', 'body', 'body_sha256'}
 SOURCE_REVIEW_COMMENT_IDS = (5801594731, 4086060528, 4086060537, 4086060558)
 SOURCE_MANIFEST_INPUT_FIELDS = {
@@ -355,6 +356,8 @@ def validate(repo, package, emit=True):
             'source-review proposals changed')
     require(digest((package / 'recorder-grader-handoff.md').read_bytes()) == RECORDER_GRADER_HANDOFF_SHA256,
             'recorder-grader handoff changed')
+    require(digest((package / 'withheld/README.md').read_bytes()) == WITHHELD_README_SHA256,
+            'withheld boundary instructions changed')
     receipt = read_json(package / 'withheld/receipt-template.json')
     require_exact_keys(receipt, RECEIPT_FIELDS, 'aggregate receipt top-level schema drift')
     require(receipt['status'] == DRAFT and receipt['execution_status'] == 'NOT RUN' and receipt['gate_a_status'] == 'UNPROVEN', 'blank receipt makes a result claim')
@@ -493,6 +496,9 @@ def validate(repo, package, emit=True):
     for entry in manifest['files']:
         relative = entry['path']
         target = package / relative.removeprefix(PACKAGE_PREFIX) if relative.startswith(PACKAGE_PREFIX) else repo / relative
+        if relative in EXTERNAL_MANIFEST_FILES:
+            require_unaliased_dir(target.parent, f'external manifest path is symlinked: {relative}')
+            require(stat.S_ISREG(target.lstat().st_mode), f'external manifest target is not a regular file: {relative}')
         data = target.read_bytes()
         require(digest(data) == entry['sha256'] and len(data) == entry['bytes'],
                 f'artifact manifest hash/size mismatch: {relative}')

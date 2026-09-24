@@ -193,6 +193,18 @@ PROBES = [
           'Deliver the withheld rubric and coverage guidance to the candidate before every run.')),
         ('refresh_manifest', 'artifact-manifest.json', (), 'recorder-grader-handoff.md'),
     ]),
+    ('withheld boundary and manifest changed together', 'withheld boundary instructions changed', [
+        ('replace_text', 'withheld/README.md', (),
+         ('Do not deliver this directory, the parent coverage files, the handoff, preparation reports, previous execution records, or prior answers to Scout.',
+          'Deliver behavioral-rubric.snapshot.md and coverage files to Scout before each run.')),
+        ('refresh_manifest', 'artifact-manifest.json', (), 'withheld/README.md'),
+    ]),
+    ('candidate wrapper and manifest changed together', 'candidate neutral wrapper changed', [
+        ('replace_text', 'candidate/README.md', (),
+         ('No prior candidate answers or grader feedback are included.',
+          'Include withheld rubric hints and prior grader feedback in candidate inputs.')),
+        ('refresh_manifest', 'artifact-manifest.json', (), 'candidate/README.md'),
+    ]),
     ('review-receipt claims candidate runtime', 'review-receipt claims candidate runtime', [
         ('set', 'review-receipt.json', ('candidate_runtime',), 'PASS'),
     ]),
@@ -366,6 +378,34 @@ def main():
             raise AssertionError(f'symlinked repository root: wrong result: {linked.returncode}: {linked.stderr}')
         results.append({'probe': 'symlinked repository root', 'result': 'REJECTED',
                         'reason': 'repository missing or symlinked'})
+        external = clone / 'intake/2026-09-23-grok-qualification-setup.md'
+        outside_artifact = Path(temp).resolve() / 'identical-external-artifact'
+        external.rename(outside_artifact)
+        external.symlink_to(outside_artifact)
+        try:
+            validator.validate(clone, copy.resolve(), emit=False)
+        except ValueError as error:
+            if 'external manifest target is not a regular file' not in str(error):
+                raise AssertionError(f'symlinked external artifact: wrong rejection: {error}') from error
+        else:
+            raise AssertionError('symlinked external artifact: malformed fixture passed')
+        results.append({'probe': 'symlinked external manifest artifact with matching bytes', 'result': 'REJECTED',
+                        'reason': 'external manifest target is not a regular file'})
+        external.unlink()
+        outside_artifact.rename(external)
+        external_parent = clone / 'intake'
+        outside_parent = Path(temp).resolve() / 'identical-external-artifact-tree'
+        external_parent.rename(outside_parent)
+        external_parent.symlink_to(outside_parent, target_is_directory=True)
+        try:
+            validator.validate(clone, copy.resolve(), emit=False)
+        except ValueError as error:
+            if 'external manifest path is symlinked' not in str(error):
+                raise AssertionError(f'symlinked external ancestor: wrong rejection: {error}') from error
+        else:
+            raise AssertionError('symlinked external ancestor: malformed fixture passed')
+        results.append({'probe': 'symlinked external manifest ancestor with matching bytes', 'result': 'REJECTED',
+                        'reason': 'external manifest path is symlinked'})
     final_files = {str(path.relative_to(HERE)): validator.digest(path.read_bytes())
                    for path in HERE.rglob('*') if path.is_file()}
     if final_files != initial_files:
