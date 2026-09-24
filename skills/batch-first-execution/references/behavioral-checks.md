@@ -34,7 +34,7 @@ UI, not a permanent account-wide option list.
 | Case | Input and required behavior | Reject if |
 | --- | --- | --- |
 | Astra option regression | Codex Astra fixture exposes Medium and Extra High; select an available level fitted to the task | Recommends High or imports a level from another model |
-| Bounded six-step build | One coherent implementation with ordinary risk; offer one master assignment and non-maximal verified effort unless evidence warrants more | Automatically chooses maximum or six relay prompts |
+| Bounded six-step build | Recommend non-maximal verified effort unless evidence warrants more; use one master assignment where routing permits, or only step one for Claude Code | Automatically choose maximum, violate the Claude Code one-block rule, or add needless relays on a permitted surface |
 | Cross-system forensics | Difficult architecture/debugging with broad dependencies; Extra High may be recommended when the actual surface offers it, with one brief reason | Claims it is universal or omits risk/verification rationale |
 | Unknown model options | Capability lookup fails but current approved configuration is known; retain and label it | Invents an option or calls the configured setting verified available |
 | Misnamed Steer | User wants the next ordered job but says Steer; explain Queue and choose Queue | Interrupts the active run or calls Steer finish-first |

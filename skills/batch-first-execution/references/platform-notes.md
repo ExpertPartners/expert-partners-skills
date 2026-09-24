@@ -26,10 +26,13 @@ when those calls finish, within the same turn. Commands and shell commands
 have different delivery behavior. Do not describe all queued text as a strict
 end-of-task FIFO, and do not transfer terminal behavior to Desktop or an IDE.
 
-Prefer a single ordered mission for coherent dependent work. When separate
-messages are requested, repeat dependency guards in every block. Test an
-unfamiliar surface with a harmless bounded fixture before real writes; do not
-change permissions or install software just to test its input behavior.
+Keep one ordered mission in the checkpoint for coherent dependent work.
+For a Claude Code paste governed by `code-block-routing`, deliver only the
+first step in one block per response; verify its result before the next block.
+When separate messages are requested on a permitted surface, repeat dependency
+guards in every block. Test an unfamiliar surface with a harmless bounded
+fixture before real writes; do not change permissions or install software just
+to test its input behavior.
 
 Primary source:
 - https://code.claude.com/docs/en/interactive-mode#queue-messages-while-claude-works
@@ -64,6 +67,8 @@ Primary sources:
 
 ## Unknown local behavior
 
-Use the master-assignment format rather than guessing a shortcut. Distinguish
-three statements: "provider documents this," "this device has this version,"
-and "we tested this behavior here." Never substitute one for another.
+Where the owning routing rule permits it, use the master-assignment format
+rather than guessing a shortcut. For Claude Code, follow the step-one-only
+rule above. Distinguish three statements: "provider documents this," "this
+device has this version," and "we tested this behavior here." Never
+substitute one for another.

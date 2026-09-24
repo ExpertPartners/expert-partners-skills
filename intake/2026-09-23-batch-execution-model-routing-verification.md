@@ -78,7 +78,7 @@ smoke-test receipts before an installation claim.
 - All three complete review packages were independently copied and SHA-256
   read back in the existing private home
   `/Users/allisongaddy/Claude/estate-backups/skill-zips/batch-execution-model-routing-update-20260923/`.
-  Reviewed Batch ZIP: `9befca97fcb5c5d463185fd5306f0f1818004502b352bb359436b68c7cb202a8`.
+  Final Batch ZIP: `c80fe372bee9cb0fc4a18a1a7b5351025074a89fce739ab163285984d45e0517`.
   Reviewed Advisor ZIP: `88888af845e2927a652bf33e0f134859089f1a5f8226927ec1be6d7742682375`.
   Reviewed plugin bundle: `ceba807c27ec315e5001c1563af16f17a738b12350df522bc4e1ae557770cd44`.
   Both standalone ZIPs have one top-level Skill and one SKILL.md; all local
@@ -108,8 +108,25 @@ producer regression passed 53/53, skill-map tests passed 47/47, and the graph
 was regenerated at 57 nodes/88 edges. The corrected ZIPs were built by the
 producer, passed preflight and integrity checks, then copied non-overwriting
 with matching SHA-256 readback to the private home. Earlier package copies
-remain historical review artifacts and are superseded by the three
-`*-reviewed-20260923.zip` artifacts listed above.
+remain historical review artifacts. The final Batch ZIP above supersedes
+its reviewed predecessor; the Advisor and bundle reviewed ZIPs are unchanged.
+
+## Post-merge reference alignment
+
+PR 36 merged its initial head; PR 37 merged the eight-file review repairs.
+An independent main readback then exposed two leftover phrases in the
+secondary platform note that could still suggest a Claude Code master paste.
+The note now explicitly keeps the mission in the checkpoint and delivers only
+step one per Claude Code response under `code-block-routing`. The bounded
+six-step acceptance case now states the same surface condition. No routing
+rule or plugin source was changed in this final reference correction.
+
+`deploy-skill.sh --check-all` again passed all 41 skills. The final complete
+Batch-First Execution ZIP passed producer upload preflight, ZIP integrity,
+one-top-level-skill and local-link checks; its non-overwriting private copy has
+the final Batch ZIP hash above. The reviewed Advisor ZIP and plugin bundle
+remain byte-valid and unchanged. This source review still does not constitute
+a live installed-surface behavioral test.
 
 ## Release boundary
 
