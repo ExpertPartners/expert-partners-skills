@@ -8,7 +8,10 @@
 # detection, --verify-copies for a mixed mount, idempotent reruns across dates and
 # locales, junk-file exclusion, loud write failures, and the mirror-of-mirror refusal.
 #
-# The last test is a CONTRACT test: it feeds a real pipeline-produced mount to the
+# T16-T19 exercise the read-only lifecycle half (skill-lifecycle.py): the surface
+# audit and the release-receipt checker, on a fixture HOME.
+#
+# The T15 test is a CONTRACT test: it feeds a real pipeline-produced mount to the
 # real extractor, which is the only place render()'s output meets the extractor's
 # header regex and byte-fidelity check. Without it the two tools could drift apart
 # with both suites green.
@@ -353,6 +356,189 @@ EOF
 else
   echo "SKIP T15 contract test (extractor or node_modules unavailable)"
 fi
+
+# ---- T16 lifecycle audit: every surface classified against canonical ----
+# A fixture HOME with the surfaces skill-lifecycle.py walks: Claude Code user mount,
+# Codex user mount, Claude Code plugin cache (with installed_plugins.json), Codex
+# plugin cache (with config.toml), claude.ai sync mirrors, Cowork caches. Canonical
+# alpha (eps, standalone), gamma (eps, plugin-carried) and beta (aura-native, via the
+# graph) are audited against copies planted in known states.
+LH="$TMP/lifehome"; mkdir -p "$LH"
+LC="$EPS/tools/skill-deploy/skill-lifecycle.py"
+[ -f "$LC" ] || cp "$HERE/../skill-lifecycle.py" "$LC"
+# a plugin-carried canonical, gamma, inside a fixture plugin
+mkdir -p "$EPS/plugins/doctrine-fixture/.claude-plugin" "$EPS/plugins/doctrine-fixture/skills/gamma"
+printf '{"name":"doctrine-fixture","version":"1.2.0"}\n' > "$EPS/plugins/doctrine-fixture/.claude-plugin/plugin.json"
+cat > "$EPS/plugins/doctrine-fixture/skills/gamma/SKILL.md" <<'EOF'
+---
+name: gamma
+description: Fixture plugin-carried skill gamma. Use when testing the lifecycle audit.
+tier: plugin
+zone: routing
+status: live
+---
+
+# Gamma -- v2.0 (2026-09-24)
+
+Gamma body.
+EOF
+# a retired aura-native canonical, delta, plus a graph naming beta and delta as aura sources
+mkdir -p "$AURA/.claude/skills/delta"
+printf -- '---\nname: delta\ndescription: Retired fixture delta.\ntier: project\nzone: routing\nstatus: retired\n---\n\nDelta body.\n' > "$AURA/.claude/skills/delta/SKILL.md"
+mkdir -p "$EPS/tools/skill-map"
+cat > "$EPS/tools/skill-map/skills-graph.json" <<EOF
+{"schema":"skill-map/v1","nodes":[
+ {"id":"alpha","source":"eps:skills/alpha/SKILL.md","status":"live"},
+ {"id":"gamma","source":"eps:plugins/doctrine-fixture/skills/gamma/SKILL.md","status":"live"},
+ {"id":"beta","source":"aura:.claude/skills/beta/SKILL.md","status":"live"},
+ {"id":"delta","source":"aura:.claude/skills/delta/SKILL.md","status":"retired"}],"edges":[]}
+EOF
+git -C "$EPS" add -A >/dev/null 2>&1; git -C "$AURA" add -A >/dev/null 2>&1
+# Claude Code user mount: alpha CURRENT pipeline copy; beta UNTRACKED hand copy
+"$D" alpha --to "$LH/.claude/skills" >/dev/null 2>&1
+mkdir -p "$LH/.claude/skills/beta" && cp "$AURA/.claude/skills/beta/SKILL.md" "$LH/.claude/skills/beta/SKILL.md"
+# Codex user mount: alpha rewritten (Claude->Codex substitution on a pipeline copy, manifest now lies)
+"$D" alpha --to "$LH/.agents/skills" >/dev/null 2>&1
+sed -i '' 's/Canonical instructions for alpha./Canonical instructions for alpha, for Codex project conversations./' "$LH/.agents/skills/alpha/SKILL.md"
+# Codex user mount: an ORPHAN pipeline copy whose canonical does not exist
+mkdir -p "$LH/.agents/skills/zeta"
+printf -- '---\nname: zeta\ndescription: orphan\n# DEPLOYED COPY (2026-09-01, skill-deploy pipeline): the canonical home is\n# expert-partners-skills skills/zeta/SKILL.md. Deployed at v1.0.\n# Edit the canonical copy first, then redeploy via tools/skill-deploy.\n---\n\nZeta.\n' > "$LH/.agents/skills/zeta/SKILL.md"
+# Claude Code plugin cache: gamma at two versions, only 1.1.0 installed (stale, loads) while 1.2.0 sits inert
+for v in 1.1.0 1.2.0; do mkdir -p "$LH/.claude/plugins/cache/expert-partners/doctrine-fixture/$v/skills/gamma"; cp "$EPS/plugins/doctrine-fixture/skills/gamma/SKILL.md" "$LH/.claude/plugins/cache/expert-partners/doctrine-fixture/$v/skills/gamma/SKILL.md"; done
+printf '\nOld gamma paragraph.\n' >> "$LH/.claude/plugins/cache/expert-partners/doctrine-fixture/1.1.0/skills/gamma/SKILL.md"
+mkdir -p "$LH/.claude/plugins"
+printf '{"version":2,"plugins":{"doctrine-fixture@expert-partners":[{"scope":"user","version":"1.1.0"}]}}\n' > "$LH/.claude/plugins/installed_plugins.json"
+# Codex plugin caches: gamma current from expert-partners AND a stale imported copy, both enabled
+for m in expert-partners claude-cowork; do mkdir -p "$LH/.codex/plugins/cache/$m/doctrine-fixture/1.2.0/skills/gamma"; cp "$EPS/plugins/doctrine-fixture/skills/gamma/SKILL.md" "$LH/.codex/plugins/cache/$m/doctrine-fixture/1.2.0/skills/gamma/SKILL.md"; done
+printf '\nImported old gamma.\n' >> "$LH/.codex/plugins/cache/claude-cowork/doctrine-fixture/1.2.0/skills/gamma/SKILL.md"
+printf '[plugins."doctrine-fixture@expert-partners"]\nenabled = true\n\n[plugins."doctrine-fixture@claude-cowork"]\nenabled = true\n' > "$LH/.codex/config.toml"
+# claude.ai account shelf mirror: alpha STALE (older body); Cowork cache holds the same bytes
+SY="$LH/.claude/skills/synced/org_acct"; mkdir -p "$SY/alpha"
+printf -- '---\nname: alpha\ndescription: Test skill alpha. Use when testing the deploy pipeline.\n---\n\n# Alpha -- v0.9 (2026-08-01)\n\nOld alpha body.\n' > "$SY/alpha/SKILL.md"
+printf '{"lastUpdated":0,"skills":[{"name":"alpha","updatedAt":"2026-08-01T00:00:00Z","backingPluginId":"plugin_x"}]}\n' > "$SY/manifest.json"
+CW="$LH/Library/Application Support/Claude/local-agent-mode-sessions"; mkdir -p "$CW/skills-plugin/org/acct/skills/alpha"; cp "$SY/alpha/SKILL.md" "$CW/skills-plugin/org/acct/skills/alpha/SKILL.md"
+# Cowork org plugin store: gamma current
+mkdir -p "$CW/acct/org/rpm/plugin_1/.claude-plugin" "$CW/acct/org/rpm/plugin_1/skills/gamma"
+printf '{"name":"doctrine-fixture","version":"1.2.0"}\n' > "$CW/acct/org/rpm/plugin_1/.claude-plugin/plugin.json"
+cp "$EPS/plugins/doctrine-fixture/skills/gamma/SKILL.md" "$CW/acct/org/rpm/plugin_1/skills/gamma/SKILL.md"
+# retired delta still loading from the aura Codex repo mount
+"$D" --mirror-mount "$AURA/.claude/skills" --to "$AURA/.agents/skills" >/dev/null 2>&1
+
+out=$(python3 "$LC" audit --eps "$EPS" --aura "$AURA" --home "$LH" --json "$LH/audit.json" 2>&1); rc=$?
+[ $rc -ne 0 ]
+check "T16 audit exits non-zero when findings exist" $? "$out"
+python3 - "$LH/audit.json" <<'PY2'
+import json,sys
+a=json.load(open(sys.argv[1]))
+def states(sid,surface): return sorted((c["state"], c["loads"]) for c in a["skills"][sid]["copies"] if c["surface"]==surface)
+kinds={(f["id"],f["kind"]) for f in a["findings"]}
+ok=True
+def want(cond,msg):
+    global ok
+    if not cond: ok=False; print("MISSING:",msg)
+want(states("alpha","claude-code-user-mount")==[("CURRENT",True)],"alpha claude-code-user-mount CURRENT")
+want(states("beta","claude-code-user-mount")==[("UNTRACKED-COPY",True)],"beta hand copy UNTRACKED-COPY")
+want(states("alpha","codex-user-mount")==[("HAND-EDITED",True)],"rewritten alpha codex copy HAND-EDITED")
+want(("alpha","REWRITTEN") in kinds,"REWRITTEN finding for the Claude->Codex substitution")
+want(("zeta","ORPHAN") in kinds,"ORPHAN finding for a header naming a nonexistent canonical")
+want(states("gamma","claude-code-plugin-cache")==[("CURRENT",False),("STALE",True)],"stale installed 1.1.0 loads, current 1.2.0 inert")
+want(("gamma","STALE") in kinds,"STALE finding for the installed 1.1.0")
+want(("gamma","DUPLICATE-IDENTITY") in kinds,"DUPLICATE-IDENTITY for gamma across Codex caches")
+want(states("alpha","claudeai-account-skills-sync")==[("STALE",True)],"account shelf alpha STALE")
+want(states("alpha","cowork-account-skills")==[("STALE",True)],"Cowork alpha STALE (its own key, not inferred from Claude Code)")
+want(states("gamma","cowork-org-plugins")==[("CURRENT",True)],"Cowork rpm gamma CURRENT")
+want(("delta","RETIRED-LOADING") in kinds,"RETIRED-LOADING for delta")
+want("codex-user-mount" not in {c["surface"] for c in a["skills"]["beta"]["copies"]},"beta absent on the Codex user mount is not satisfied by its Claude Code copy")
+sys.exit(0 if ok else 1)
+PY2
+check "T16 audit classifies every planted state (CURRENT, UNTRACKED, HAND-EDITED, REWRITTEN, ORPHAN, STALE, DUPLICATE, RETIRED-LOADING) per surface" $?
+out=$(python3 "$LC" audit --eps "$EPS" --aura "$AURA" --home "$LH" --only beta --report-only 2>&1); rc=$?
+[ $rc -eq 0 ]
+check "T16 --report-only exits zero and --only narrows the walk" $? "$out"
+
+# ---- T17 receipt: the ladder is computed, never claimed ----
+RC="$LH/alpha.receipt.json"
+python3 "$LC" receipt-template alpha --eps "$EPS" --aura "$AURA" > "$RC.tmpl" 2>/dev/null
+python3 - "$RC.tmpl" "$EPS" <<'PY2'
+import json,sys,subprocess
+t=json.load(open(sys.argv[1]))
+n=len(t["surfaces"]); assert n>=13, n
+sys.exit(0)
+PY2
+check "T17 receipt-template lists every surface key" $?
+EPS_SHA=$(git -C "$EPS" rev-parse HEAD)
+ALPHA_SHA=$(shasum -a 256 "$EPS/skills/alpha/SKILL.md" | cut -d' ' -f1)
+write_receipt() { # write_receipt <installed-json|null> <discovered-json|null> <behavior-json|null> <cowork-disposition|null>
+  python3 - "$RC" "$EPS_SHA" "$ALPHA_SHA" "$1" "$2" "$3" "$4" <<'PY2'
+import json,sys
+out,commit,sha,inst,disc,beh,disp=sys.argv[1:8]
+keys=["claude-code-user-mount","claude-code-project-mount","claude-code-plugin-cache","claudeai-org-plugin-sync","claudeai-account-skills-sync","codex-user-mount","codex-repo-mount","codex-plugin-cache","codex-synced-mirror","cowork-account-skills","cowork-org-plugins","claude-chat","chatgpt-north"]
+J=lambda x: None if x=="null" else json.loads(x)
+r={"schema":"skill-release-receipt/v1","skill":"alpha","canonical":{"repo":"expert-partners-skills","path":"skills/alpha/SKILL.md","commit":commit,"skillmdSha256":sha},
+   "packaged":[{"kind":"claudeai-upload-zip","artifact":"alpha.zip","sha256":"ab"*32,"builtFrom":commit}],
+   "surfaces":{k:{"intended":False,"reason":"not owed in this fixture","installed":None,"discovered":None,"behaviorTested":None,"disposition":"fixture: copy noted, not owed by this release"} for k in keys}}
+r["surfaces"]["claude-code-user-mount"]={"intended":True,"reason":"owed","installed":J(inst),"discovered":J(disc),"behaviorTested":J(beh),"disposition":None}
+r["surfaces"]["cowork-account-skills"]["disposition"]=None if disp=="null" else disp
+json.dump(r,open(out,"w"),indent=1)
+PY2
+}
+write_receipt null null null null
+out=$(python3 "$LC" receipt-check "$RC" --eps "$EPS" --aura "$AURA" --home "$LH" 2>&1); rc=$?
+[ $rc -ne 0 ] && printf '%s' "$out" | grep -q 'claude-code-user-mount.*PACKAGED' && printf '%s' "$out" | grep -q 'cowork-account-skills: not intended, yet a copy loads'
+check "T17 no installed receipt: intended surface stops at PACKAGED; an unintended surface holding a copy without a disposition fails" $? "$out"
+write_receipt '{"verifiedAt":"2026-09-24","method":"deploy-skill --verify","evidence":"log"}' null null "stale account upload; disable at claude.ai Customize > Skills"
+out=$(python3 "$LC" receipt-check "$RC" --eps "$EPS" --aura "$AURA" --home "$LH" 2>&1); rc=$?
+[ $rc -ne 0 ] && printf '%s' "$out" | grep -q 'claude-code-user-mount.*INSTALLED' && printf '%s' "$out" | grep -q 'no discovery receipt'
+check "T17 installed without discovery reaches INSTALLED, not COMPLETE" $? "$out"
+write_receipt '{"verifiedAt":"2026-09-24","method":"deploy-skill --verify","evidence":"log"}' '{"verifiedAt":"2026-09-24","method":"claude skill list","evidence":"log"}' null "stale account upload; disable at claude.ai Customize > Skills"
+out=$(python3 "$LC" receipt-check "$RC" --eps "$EPS" --aura "$AURA" --home "$LH" 2>&1); rc=$?
+[ $rc -ne 0 ] && printf '%s' "$out" | grep -q 'claude-code-user-mount.*DISCOVERED' && printf '%s' "$out" | grep -q 'no passed behavior fixture'
+check "T17 discovered without a passed fixture reaches DISCOVERED, not COMPLETE" $? "$out"
+write_receipt '{"verifiedAt":"2026-09-24","method":"deploy-skill --verify","evidence":"log"}' '{"verifiedAt":"2026-09-24","method":"claude skill list","evidence":"log"}' '{"verifiedAt":"2026-09-24","fixture":"alpha-A","result":"pass","evidence":"log"}' "stale account upload; disable at claude.ai Customize > Skills"
+out=$(python3 "$LC" receipt-check "$RC" --eps "$EPS" --aura "$AURA" --home "$LH" 2>&1); rc=$?
+[ $rc -eq 0 ] && printf '%s' "$out" | grep -q 'claude-code-user-mount.*COMPLETE'
+check "T17 installed + discovered + passed fixture + dispositions = COMPLETE, exit 0" $? "$out"
+
+# ---- T18 receipt: a claim is checked against live state, and surfaces never substitute ----
+# claim installed on the Codex user mount where the live copy is the rewritten one
+python3 - "$RC" <<'PY2'
+import json,sys
+r=json.load(open(sys.argv[1]))
+r["surfaces"]["codex-user-mount"]={"intended":True,"reason":"owed","installed":{"verifiedAt":"2026-09-24","method":"deploy-skill --verify","evidence":"log"},"discovered":{"verifiedAt":"2026-09-24","method":"codex app-server skills/list","evidence":"log"},"behaviorTested":{"verifiedAt":"2026-09-24","fixture":"alpha-A","result":"pass","evidence":"log"},"disposition":None}
+json.dump(r,open(sys.argv[1],"w"),indent=1)
+PY2
+out=$(python3 "$LC" receipt-check "$RC" --eps "$EPS" --aura "$AURA" --home "$LH" 2>&1); rc=$?
+[ $rc -ne 0 ] && printf '%s' "$out" | grep -q 'codex-user-mount.*PACKAGED' && printf '%s' "$out" | grep -q 'loaded copy is HAND-EDITED'
+check "T18 an installed claim is refused when the live copy is HAND-EDITED (Claude Code evidence never covers Codex)" $? "$out"
+python3 - "$RC" <<'PY2'
+import json,sys
+r=json.load(open(sys.argv[1])); del r["surfaces"]["chatgpt-north"]; json.dump(r,open(sys.argv[1],"w"))
+PY2
+out=$(python3 "$LC" receipt-check "$RC" --eps "$EPS" --aura "$AURA" --home "$LH" 2>&1); rc=$?
+[ $rc -ne 0 ] && printf '%s' "$out" | grep -q 'missing chatgpt-north'
+check "T18 a receipt that omits ChatGPT/NORTH is refused" $? "$out"
+python3 - "$RC" <<'PY2'
+import json,sys
+r=json.load(open(sys.argv[1])); r["surfaces"]["chatgpt-north"]={"intended":False,"reason":"n/a","installed":None,"discovered":None,"behaviorTested":None,"disposition":None}; r["canonical"]["skillmdSha256"]="00"*32; json.dump(r,open(sys.argv[1],"w"))
+PY2
+out=$(python3 "$LC" receipt-check "$RC" --eps "$EPS" --aura "$AURA" --home "$LH" 2>&1); rc=$?
+[ $rc -ne 0 ] && printf '%s' "$out" | grep -q 'differs from live canonical'
+check "T18 a receipt whose canonical hash no longer matches live canonical is refused as stale" $? "$out"
+printf '{"schema":"skill-release-receipt/v1","skill":"nope","canonical":{},"packaged":[],"surfaces":{}}\n' > "$RC"
+out=$(python3 "$LC" receipt-check "$RC" --eps "$EPS" --aura "$AURA" --home "$LH" 2>&1); rc=$?
+[ $rc -ne 0 ] && printf '%s' "$out" | grep -q 'missing canonical home'
+check "T18 a receipt for a skill with no canonical home is refused" $? "$out"
+
+# ---- T19 the producer is the entry point ----
+out=$("$D" --audit-surfaces --aura "$AURA" --home "$LH" --only alpha --report-only 2>&1); rc=$?
+[ $rc -eq 0 ] && printf '%s' "$out" | grep -q '^alpha \['
+check "T19 deploy-skill.sh --audit-surfaces passes through to the audit" $? "$out"
+out=$("$D" --receipt-template alpha --aura "$AURA" 2>&1); rc=$?
+[ $rc -eq 0 ] && printf '%s' "$out" | grep -q '"skill-release-receipt/v1"'
+check "T19 deploy-skill.sh --receipt-template passes through" $? "$out"
+out=$("$D" --receipt 2>&1); rc=$?
+[ $rc -ne 0 ] && printf '%s' "$out" | grep -q 'needs a receipt file'
+check "T19 deploy-skill.sh --receipt without a file is refused" $? "$out"
 
 echo
 echo "deploy-skill tests: $PASS passed, $FAIL failed"
