@@ -38,7 +38,12 @@ The Manifest remains the ownership authority; this file is a structural entry po
   producer of deployed skill copies, checksum manifests and upload ZIPs.
   Correct the canonical source first. Use the existing producer and the skill's
   delivery instructions for authorized propagation; installed caches and
-  deployed copies are not editable sources.
+  deployed copies are not editable sources. Its read-only lifecycle modes
+  (`--audit-surfaces`, `--receipt`, `--receipt-template`, in
+  [skill-lifecycle.py](tools/skill-deploy/skill-lifecycle.py)) classify every
+  local copy against canonical and define release completion per surface; see
+  [canon-sync-protocol](skills/canon-sync-protocol/SKILL.md) for the surfaces a
+  rule-bearing skill owes.
 - [intake/README.md](intake/README.md) defines the append-only capture inbox.
   Read [decisions/](decisions/), [doctrine/](doctrine/) and [reference/](reference/)
   as applicable to the task. [archive/](archive/) preserves historical evidence;

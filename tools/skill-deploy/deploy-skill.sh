@@ -15,6 +15,31 @@
 #   deploy-skill.sh --mirror-mount <canonical-mount-dir> --to <deploy-dir> [--verify] [--repair-drift]
 #   deploy-skill.sh --verify-copies <mount-dir>
 #   deploy-skill.sh --check-all
+#   deploy-skill.sh --audit-surfaces [--aura <aura-checkout>] [--json <out>] [--only a,b] [--quiet] [--report-only]
+#   deploy-skill.sh --receipt <release-receipt.json> [--aura <aura-checkout>]
+#   deploy-skill.sh --receipt-template <skill-name> [--aura <aura-checkout>]
+#
+#   --audit-surfaces  read-only lifecycle audit (tools/skill-deploy/skill-lifecycle.py):
+#                  classify every local copy of every canonical skill on this
+#                  machine, on every surface that can load one (Claude Code
+#                  user and project mounts, plugin cache and claude.ai sync
+#                  mirrors; Codex user and repo mounts, plugin caches and the
+#                  unsourced .agents/skills/synced mirror; Cowork's account
+#                  skills and org plugin stores), against canonical, and exit
+#                  non-zero on STALE, HAND-EDITED, UNTRACKED, ORPHAN,
+#                  RETIRED-LOADING, REWRITTEN or DUPLICATE-IDENTITY findings.
+#                  --verify gates aura's repo mounts in CI; this gates the rest.
+#   --receipt      validate a skill release receipt (schema
+#                  skill-release-receipt/v1) against live canonical and a live
+#                  audit, print the lifecycle state every surface reached
+#                  (CANONICAL, PACKAGED, INSTALLED, DISCOVERED, BEHAVIOR TESTED,
+#                  COMPLETE) and exit zero only when every intended surface is
+#                  COMPLETE and every unintended copy carries a disposition.
+#                  That exit is what "release complete" means for a skill.
+#   --receipt-template
+#                  print a receipt skeleton with every surface key present, so
+#                  each surface (Claude Chat, Cowork, Claude Code, Codex,
+#                  ChatGPT/NORTH are five surfaces, never one shelf) is decided.
 #
 #   --check-all    repo-wide claude.ai upload-readiness sweep over every
 #                  canonical SKILL.md, no deploy and no zip. Exits non-zero
@@ -89,9 +114,20 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 
+# Lifecycle modes are read-only and live in skill-lifecycle.py beside this
+# script; the producer stays the one entry point. Arguments after the mode
+# flag pass through untouched (--aura, --json, --home, --only, ...).
+case "${1:-}" in
+  --audit-surfaces)   shift; exec python3 "$REPO_ROOT/tools/skill-deploy/skill-lifecycle.py" audit --eps "$REPO_ROOT" "$@" ;;
+  --receipt)          shift; [ -n "${1:-}" ] || { echo "FATAL: --receipt needs a receipt file" >&2; exit 1; }
+                      exec python3 "$REPO_ROOT/tools/skill-deploy/skill-lifecycle.py" receipt-check --eps "$REPO_ROOT" "$@" ;;
+  --receipt-template) shift; [ -n "${1:-}" ] || { echo "FATAL: --receipt-template needs a skill name" >&2; exit 1; }
+                      exec python3 "$REPO_ROOT/tools/skill-deploy/skill-lifecycle.py" receipt-template --eps "$REPO_ROOT" "$@" ;;
+esac
+
 NAME="" CHECK_ALL=0 DEPLOY_DIR="" ZIP_PATH="" BUNDLE=0
 FROM_DIR="" MIRROR_MOUNT="" VERIFY=0 REPAIR_DRIFT=0 VERIFY_COPIES=""
-USAGE="usage: deploy-skill.sh <skill-name|plugin-name> [--from dir] [--to dir] [--zip path] [--bundle] [--verify] | deploy-skill.sh --mirror-mount <dir> --to <dir> [--verify] [--repair-drift] | deploy-skill.sh --verify-copies <dir> | deploy-skill.sh --check-all"
+USAGE="usage: deploy-skill.sh <skill-name|plugin-name> [--from dir] [--to dir] [--zip path] [--bundle] [--verify] | deploy-skill.sh --mirror-mount <dir> --to <dir> [--verify] [--repair-drift] | deploy-skill.sh --verify-copies <dir> | deploy-skill.sh --check-all | deploy-skill.sh --audit-surfaces [...] | deploy-skill.sh --receipt <file> | deploy-skill.sh --receipt-template <skill>"
 while [ $# -gt 0 ]; do
   case "$1" in
     --to)            DEPLOY_DIR="${2:?--to needs a directory}"; shift 2 ;;
