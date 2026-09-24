@@ -84,6 +84,10 @@ EXTERNAL_MANIFEST_FILES = {
     'archive/session-grok-repo-templates-qualification-setup-closeout-2026-09-23.md',
     'intake/2026-09-23-grok-qualification-setup.md',
 }
+EXTERNAL_REVIEWED_SHA256 = {
+    'archive/session-grok-repo-templates-qualification-setup-closeout-2026-09-23.md': '010cc567ae8fcea0645bf9b2d559a5c7cd8a3991b1c716b0213a58b551e046cf',
+    'intake/2026-09-23-grok-qualification-setup.md': 'c07e2b735e21f399edc58a2504497a6f5f81372ca84feb769c35e3a383b84e27',
+}
 MANIFEST_FIELDS = {'status', 'meaning', 'source_commit', 'files'}
 MANIFEST_FILE_FIELDS = {'path', 'sha256', 'bytes'}
 REVIEW_RECEIPT_FIELDS = {
@@ -162,6 +166,7 @@ SOURCE_MANIFEST_SHA256 = '6097f31e99f5b06fa91d61e789c78cf97ff46a0204c1da3c161fcd
 SOURCE_REVIEW_PROPOSALS_SHA256 = 'ed9ff93d86295dd6a809f29e6db0b7a74017b922272236ada5920e0d785ad1c7'
 RECORDER_GRADER_HANDOFF_SHA256 = 'cc8efdd3446f4a2898b3b385c9d0cf1106bc8ca1ebe96533fee25326d26a3512'
 WITHHELD_README_SHA256 = 'dc0b6201b8b8356bb6be51f95509d99a0720c45a825a42e720275fc55c517fe5'
+ROUTE_ASSESSMENT_SHA256 = '122a6a5355c9e6d6681fa825102c3aa8bd1530d876ba9f0197a9d33b6f54d714'
 SOURCE_REVIEW_COMMENT_FIELDS = {'id', 'html_url', 'created_at', 'updated_at', 'body', 'body_sha256'}
 SOURCE_REVIEW_COMMENT_IDS = (5801594731, 4086060528, 4086060537, 4086060558)
 SOURCE_MANIFEST_INPUT_FIELDS = {
@@ -358,6 +363,8 @@ def validate(repo, package, emit=True):
             'recorder-grader handoff changed')
     require(digest((package / 'withheld/README.md').read_bytes()) == WITHHELD_README_SHA256,
             'withheld boundary instructions changed')
+    require(digest((package / 'route-assessment.md').read_bytes()) == ROUTE_ASSESSMENT_SHA256,
+            'route assessment candidate boundary changed')
     receipt = read_json(package / 'withheld/receipt-template.json')
     require_exact_keys(receipt, RECEIPT_FIELDS, 'aggregate receipt top-level schema drift')
     require(receipt['status'] == DRAFT and receipt['execution_status'] == 'NOT RUN' and receipt['gate_a_status'] == 'UNPROVEN', 'blank receipt makes a result claim')
@@ -500,6 +507,9 @@ def validate(repo, package, emit=True):
             require_unaliased_dir(target.parent, f'external manifest path is symlinked: {relative}')
             require(stat.S_ISREG(target.lstat().st_mode), f'external manifest target is not a regular file: {relative}')
         data = target.read_bytes()
+        if relative in EXTERNAL_MANIFEST_FILES:
+            require(digest(data) == EXTERNAL_REVIEWED_SHA256[relative],
+                    f'external reviewed artifact changed: {relative}')
         require(digest(data) == entry['sha256'] and len(data) == entry['bytes'],
                 f'artifact manifest hash/size mismatch: {relative}')
     if emit:

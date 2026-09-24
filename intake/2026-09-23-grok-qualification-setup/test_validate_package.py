@@ -205,6 +205,12 @@ PROBES = [
           'Include withheld rubric hints and prior grader feedback in candidate inputs.')),
         ('refresh_manifest', 'artifact-manifest.json', (), 'candidate/README.md'),
     ]),
+    ('route boundary and manifest changed together', 'route assessment candidate boundary changed', [
+        ('replace_text', 'route-assessment.md', (),
+         ('The candidate cannot read answers, rubric/grader notes, other runs, or recorder-only evidence.',
+          'The candidate receives the withheld rubric and recorder-only evidence before each run.')),
+        ('refresh_manifest', 'artifact-manifest.json', (), 'route-assessment.md'),
+    ]),
     ('review-receipt claims candidate runtime', 'review-receipt claims candidate runtime', [
         ('set', 'review-receipt.json', ('candidate_runtime',), 'PASS'),
     ]),
@@ -221,7 +227,7 @@ PROBES = [
     ('extra physical receipt shard', 'preparation package file set changed', [
         ('write_text', 'withheld/receipt-grok-run-3.json', (), '{"status":"PASS"}\n'),
     ]),
-    ('unmanifested change to narrative document', 'artifact manifest hash/size mismatch', [
+    ('unmanifested change to narrative document', 'route assessment candidate boundary changed', [
         ('append_text', 'route-assessment.md', (), '\nChanged after manifest review.\n'),
     ]),
     ('missing manifest entry', 'artifact manifest file list changed', [
@@ -294,7 +300,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--repo', type=Path, required=True)
     args = parser.parse_args()
-    repo = args.repo.resolve()
+    repo = args.repo.absolute()
     initial_files = {str(path.relative_to(HERE)): validator.digest(path.read_bytes())
                      for path in HERE.rglob('*') if path.is_file()}
     validator.validate(repo, HERE, emit=False)
@@ -406,6 +412,46 @@ def main():
             raise AssertionError('symlinked external ancestor: malformed fixture passed')
         results.append({'probe': 'symlinked external manifest ancestor with matching bytes', 'result': 'REJECTED',
                         'reason': 'external manifest path is symlinked'})
+        external_parent.unlink()
+        outside_parent.rename(external_parent)
+        for label, relative, before, after in (
+            ('candidate-boundary summary', 'intake/2026-09-23-grok-qualification-setup.md',
+             'Do not attach this whole package or mount this repository to the candidate.',
+             'Deliver the whole package, withheld rubric, and expected coverage to Scout.'),
+            ('closeout release claim', 'archive/session-grok-repo-templates-qualification-setup-closeout-2026-09-23.md',
+             'Gate A is not released.', 'Gate A is released.'),
+        ):
+            target = clone / relative
+            original = target.read_text()
+            if original.count(before) != 1:
+                raise AssertionError(f'{label}: expected one text occurrence')
+            target.write_text(original.replace(before, after))
+            manifest_path = copy / 'artifact-manifest.json'
+            original_manifest = manifest_path.read_bytes()
+            manifest = validator.read_json(manifest_path)
+            entry = next(item for item in manifest['files'] if item['path'] == relative)
+            data = target.read_bytes()
+            entry.update({'sha256': validator.digest(data), 'bytes': len(data)})
+            manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')
+            try:
+                validator.validate(clone, copy.resolve(), emit=False)
+            except ValueError as error:
+                if 'external reviewed artifact changed' not in str(error):
+                    raise AssertionError(f'{label}: wrong rejection: {error}') from error
+            else:
+                raise AssertionError(f'{label}: coordinated edit passed')
+            results.append({'probe': f'{label} and manifest changed together', 'result': 'REJECTED',
+                            'reason': 'external reviewed artifact changed'})
+            target.write_text(original)
+            manifest_path.write_bytes(original_manifest)
+        repo_alias = Path(temp).resolve() / 'regression-repo-alias'
+        repo_alias.symlink_to(repo, target_is_directory=True)
+        command = [sys.executable, '-B', str(HERE / 'test_validate_package.py'), '--repo', str(repo_alias)]
+        linked = subprocess.run(command, text=True, capture_output=True, check=False)
+        if linked.returncode != 1 or 'repository missing or symlinked' not in linked.stderr:
+            raise AssertionError(f'regression harness repo alias: wrong result: {linked.returncode}: {linked.stderr}')
+        results.append({'probe': 'regression harness rejects symlinked repository root', 'result': 'REJECTED',
+                        'reason': 'repository missing or symlinked'})
     final_files = {str(path.relative_to(HERE)): validator.digest(path.read_bytes())
                    for path in HERE.rglob('*') if path.is_file()}
     if final_files != initial_files:
