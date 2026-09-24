@@ -246,6 +246,7 @@ def read_json(path):
 
 
 def validate(repo, package, emit=True):
+    require_unaliased_dir(repo, 'repository missing or symlinked')
     require_unaliased_dir(package, 'package missing or symlinked')
     for path in package.rglob('*'):
         require(not path.is_symlink(), f'symlink not allowed in preparation package: {path}')
@@ -271,8 +272,9 @@ def validate(repo, package, emit=True):
         require(blob == pin['git_blob'], f'blob mismatch: {path}')
         require(digest(data) == pin['sha256'] and len(data) == pin['bytes'], f'source SHA/size mismatch: {path}')
         source_path = repo / path
+        require_unaliased_dir(source_path.parent, f'checked-out source path is symlinked: {path}')
         require(stat.S_ISREG(source_path.lstat().st_mode), f'checked-out source is not a regular file: {path}')
-        require((repo / path).read_bytes() == data, f'current checked-out source drift: {path}')
+        require(source_path.read_bytes() == data, f'current checked-out source drift: {path}')
         require(pin['source_url'] == f'https://github.com/ExpertPartners/expert-partners-skills/blob/{commit}/{path}', f'bad source pointer: {path}')
         source[path] = data
     candidate = package / 'candidate'
@@ -541,9 +543,9 @@ def main():
     parser.add_argument('--negative-probes', action='store_true', help='Check six schema mutations in temporary package copies')
     args = parser.parse_args()
     try:
-        validate(args.repo.resolve(), args.package.absolute())
+        validate(args.repo.absolute(), args.package.absolute())
         if args.negative_probes:
-            negative_probes(args.repo.resolve(), args.package.absolute())
+            negative_probes(args.repo.absolute(), args.package.absolute())
     except (ValueError, KeyError, OSError, subprocess.CalledProcessError) as exc:
         print(f'FAIL: {exc}', file=sys.stderr)
         return 1

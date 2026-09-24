@@ -340,6 +340,32 @@ def main():
             raise AssertionError('symlinked pinned source: malformed fixture passed')
         results.append({'probe': 'symlinked pinned source file with matching bytes', 'result': 'REJECTED',
                         'reason': 'checked-out source is not a regular file'})
+        source.unlink()
+        (Path(temp).resolve() / 'preserved-source').rename(source)
+        source_dir = clone / 'skills/repo-standards'
+        outside_dir = Path(temp).resolve() / 'identical-external-source-tree'
+        source_dir.rename(outside_dir)
+        source_dir.symlink_to(outside_dir, target_is_directory=True)
+        try:
+            validator.validate(clone, copy.resolve(), emit=False)
+        except ValueError as error:
+            if 'checked-out source path is symlinked' not in str(error):
+                raise AssertionError(f'symlinked pinned source ancestor: wrong rejection: {error}') from error
+        else:
+            raise AssertionError('symlinked pinned source ancestor: malformed fixture passed')
+        results.append({'probe': 'symlinked pinned source ancestor with matching bytes', 'result': 'REJECTED',
+                        'reason': 'checked-out source path is symlinked'})
+        source_dir.unlink()
+        outside_dir.rename(source_dir)
+        alias = Path(temp).resolve() / 'repo-root-alias'
+        alias.symlink_to(clone, target_is_directory=True)
+        command = [sys.executable, '-B', str(HERE / 'validate-package.py'), '--repo', str(alias),
+                   '--package', str(copy.resolve())]
+        linked = subprocess.run(command, text=True, capture_output=True, check=False)
+        if linked.returncode != 1 or 'repository missing or symlinked' not in linked.stderr:
+            raise AssertionError(f'symlinked repository root: wrong result: {linked.returncode}: {linked.stderr}')
+        results.append({'probe': 'symlinked repository root', 'result': 'REJECTED',
+                        'reason': 'repository missing or symlinked'})
     final_files = {str(path.relative_to(HERE)): validator.digest(path.read_bytes())
                    for path in HERE.rglob('*') if path.is_file()}
     if final_files != initial_files:
