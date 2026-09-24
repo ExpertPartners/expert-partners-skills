@@ -85,6 +85,31 @@ EXTERNAL_MANIFEST_FILES = {
 }
 MANIFEST_FIELDS = {'status', 'meaning', 'source_commit', 'files'}
 MANIFEST_FILE_FIELDS = {'path', 'sha256', 'bytes'}
+REVIEW_RECEIPT_FIELDS = {
+    'candidate_runtime',
+    'captured_at',
+    'independent_continuation_retrieval',
+    'lifecycle',
+    'publication',
+    'remote_readback',
+    'review_pr',
+    'source_review_findings',
+    'status',
+}
+SOURCE_MANIFEST_TOP_FIELDS = {
+    'authority_note',
+    'brief_sha256',
+    'candidate_execution',
+    'captured_at',
+    'governance_and_context',
+    'private_repositories',
+    'remote_heads_at_capture',
+    'required_inputs',
+    'resolved_lookup_errors',
+    'runtime_observation',
+    'skills_base_commit',
+    'status',
+}
 
 
 def require(condition, message):
@@ -303,6 +328,14 @@ def validate(repo, package, emit=True):
             require(v['status'] == 'NOT RUN' and all(v[k] is None for k in VARIANT_NULL_FIELDS), 'variant result fabricated')
     for name in ['coverage.md', 'recorder-grader-handoff.md', 'withheld/README.md']:
         require(DRAFT in (package / name).read_text(), f'missing draft label: {name}')
+    review_receipt = read_json(package / 'review-receipt.json')
+    require_exact_keys(review_receipt, REVIEW_RECEIPT_FIELDS, 'review-receipt schema drift')
+    require(review_receipt['status'] == DRAFT, 'review-receipt release state changed')
+    require(review_receipt['candidate_runtime'] == 'NOT RUN', 'review-receipt claims candidate runtime')
+    source_manifest = read_json(package / 'source-manifest.json')
+    require_exact_keys(source_manifest, SOURCE_MANIFEST_TOP_FIELDS, 'source-manifest schema drift')
+    require(source_manifest['status'] == DRAFT, 'source-manifest release state changed')
+    require(source_manifest['candidate_execution'] == 'NOT RUN', 'source-manifest claims candidate execution')
     manifest = read_json(package / 'artifact-manifest.json')
     require_exact_keys(manifest, MANIFEST_FIELDS, 'artifact manifest schema drift')
     require(manifest['status'] == DRAFT and type(manifest['meaning']) is str and
@@ -343,6 +376,7 @@ def negative_probes(repo, package):
         for index, (name, relative, action, key, value, expected_error) in enumerate(probes):
             probe_package = Path(temp) / f'probe-{index}'
             shutil.copytree(package, probe_package)
+            probe_package = probe_package.resolve()
             target = probe_package / relative
             document = read_json(target)
             mutated = document
@@ -367,7 +401,7 @@ def negative_probes(repo, package):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--repo', type=Path, required=True, help='Existing verified source checkout; reads only')
-    parser.add_argument('--package', type=Path, default=Path(__file__).resolve().parent, help='Package directory, default next to this script')
+    parser.add_argument('--package', type=Path, default=Path(__file__).absolute().parent, help='Package directory, default next to this script')
     parser.add_argument('--negative-probes', action='store_true', help='Check six schema mutations in temporary package copies')
     args = parser.parse_args()
     try:

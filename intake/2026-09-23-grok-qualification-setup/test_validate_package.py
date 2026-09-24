@@ -10,7 +10,7 @@ import tempfile
 from pathlib import Path
 
 
-HERE = Path(__file__).resolve().parent
+HERE = Path(__file__).absolute().parent
 sys.dont_write_bytecode = True
 SPEC = importlib.util.spec_from_file_location('grok_package_validator', HERE / 'validate-package.py')
 validator = importlib.util.module_from_spec(SPEC)
@@ -136,7 +136,13 @@ PROBES = [
     ('candidate mode-map mismatch', 'mode distinction lost', [
         ('set', 'candidate/case-modes.json', ('cases', 0, 'mode'), 'auditor'),
     ]),
-    ('extra result file outside candidate', 'preparation package file set changed', [
+    ('review-receipt claims candidate runtime', 'review-receipt claims candidate runtime', [
+        ('set', 'review-receipt.json', ('candidate_runtime',), 'PASS'),
+    ]),
+    ('source-manifest claims candidate execution', 'source-manifest claims candidate execution', [
+        ('set', 'source-manifest.json', ('candidate_execution',), 'PASS'),
+    ]),
+        ('extra result file outside candidate', 'preparation package file set changed', [
         ('write_text', 'withheld/receipt-results.json', (), '{"gate_a_status":"PASS"}\n'),
     ]),
     ('extra physical receipt shard', 'preparation package file set changed', [
@@ -203,6 +209,7 @@ def main():
             copy = Path(temp) / f'probe-{index}'
             shutil.copytree(HERE, copy)
             mutate(copy, edits)
+            copy = copy.resolve()
             try:
                 validator.validate(repo, copy, emit=False)
             except ValueError as error:
