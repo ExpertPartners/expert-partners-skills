@@ -146,6 +146,19 @@ REVIEW_PR_FIELDS = {
     'statusCheckRollup',
     'url',
 }
+REVIEW_CHECK_FIELDS = {
+    '__typename', 'completedAt', 'conclusion', 'detailsUrl',
+    'name', 'startedAt', 'status', 'workflowName',
+}
+# Anchors from the unchanged historical capture at 384b153. The artifact
+# manifest can be refreshed with an altered claim, so it is not the authority
+# for these result-bearing records.
+REVIEW_CHECKS_SHA256 = 'a99e99df0a5eaad34c222ac60fcab7cad810cab7c9d2e8fbb4e4e9fd49a9944b'
+REVIEW_RECEIPT_SHA256 = 'f8653693cdf024f611bc509570787ab89c46dd1d1754bf282c8479011902e618'
+SOURCE_REVIEW_COMMENTS_SHA256 = '6c74e6ba1193a57df13cfcf0b5ec197a91216a1e4a14ca090af3e354eac8cc62'
+SOURCE_MANIFEST_SHA256 = '6097f31e99f5b06fa91d61e789c78cf97ff46a0204c1da3c161fcd5a894bf9be'
+SOURCE_REVIEW_COMMENT_FIELDS = {'id', 'html_url', 'created_at', 'updated_at', 'body', 'body_sha256'}
+SOURCE_REVIEW_COMMENT_IDS = (5801594731, 4086060528, 4086060537, 4086060558)
 SOURCE_MANIFEST_INPUT_FIELDS = {
     'blob',
     'bytes',
@@ -193,6 +206,10 @@ def require_pin_fields(pin, message):
 
 def digest(data):
     return hashlib.sha256(data).hexdigest()
+
+
+def record_digest(value):
+    return digest(json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode())
 
 
 def mode(case_id):
@@ -386,7 +403,16 @@ def validate(repo, package, emit=True):
     require_text(review_receipt['review_pr']['url'], 'review-receipt review_pr url type drift')
     require_hex(review_receipt['review_pr']['baseRefOid'], 40, 'review-receipt review_pr baseRefOid type drift')
     require_hex(review_receipt['review_pr']['headRefOid'], 40, 'review-receipt review_pr headRefOid type drift')
-    require(type(review_receipt['review_pr']['statusCheckRollup']) is list, 'review-receipt review_pr checks type drift')
+    checks = review_receipt['review_pr']['statusCheckRollup']
+    require(type(checks) is list and len(checks) == 8, 'review-receipt check rollup changed')
+    for check in checks:
+        require_exact_keys(check, REVIEW_CHECK_FIELDS, 'review-receipt check entry schema drift')
+        require(check['__typename'] == 'CheckRun', 'review-receipt check entry type drift')
+        for key in ('completedAt', 'detailsUrl', 'name', 'startedAt', 'status'):
+            require_text(check[key], f'review-receipt check {key} type drift')
+        require(type(check['conclusion']) is str and type(check['workflowName']) is str,
+                'review-receipt check result type drift')
+    require(record_digest(checks) == REVIEW_CHECKS_SHA256, 'review-receipt check rollup changed')
     require(review_receipt['lifecycle'] == EXPECTED_REVIEW_LIFECYCLE, 'review-receipt lifecycle claim changed')
     require(review_receipt['publication'] == EXPECTED_REVIEW_PUBLICATION, 'review-receipt publication claim changed')
     require(review_receipt['source_review_findings'] == EXPECTED_SOURCE_REVIEW_FINDINGS, 'review-receipt source-review claim changed')
@@ -397,7 +423,9 @@ def validate(repo, package, emit=True):
     readback = review_receipt['remote_readback']
     require_exact_keys(readback, REMOTE_READBACK_FIELDS, 'review-receipt remote-readback schema drift')
     require(readback['result'] == EXPECTED_REMOTE_READBACK_RESULT, 'review-receipt remote-readback result claim changed')
-    require(type(readback['artifact_hashes_checked']) is int and readback['artifact_hashes_checked'] >= 0, 'review-receipt remote-readback count type drift')
+    require(type(readback['artifact_hashes_checked']) is int, 'review-receipt remote-readback count type drift')
+    require(readback['artifact_hashes_checked'] == 24, 'review-receipt remote-readback count changed')
+    require(record_digest(review_receipt) == REVIEW_RECEIPT_SHA256, 'review-receipt captured facts changed')
     source_manifest = read_json(package / 'source-manifest.json')
     require_exact_keys(source_manifest, SOURCE_MANIFEST_TOP_FIELDS, 'source-manifest schema drift')
     require(source_manifest['status'] == DRAFT, 'source-manifest release state changed')
@@ -418,6 +446,22 @@ def validate(repo, package, emit=True):
             and entry['candidate_delivery'] == EXPECTED_CANDIDATE_DELIVERY[index],
             f'source-manifest required_inputs disagree with pins: {pin["path"]}',
         )
+    require(record_digest(source_manifest) == SOURCE_MANIFEST_SHA256,
+            'source-manifest captured facts changed')
+    source_comments = read_json(package / 'source-review-comments.json')
+    require(type(source_comments) is list and len(source_comments) == len(SOURCE_REVIEW_COMMENT_IDS),
+            'source-review record set changed')
+    for record in source_comments:
+        require_exact_keys(record, SOURCE_REVIEW_COMMENT_FIELDS, 'source-review record schema drift')
+        require(type(record['id']) is int, 'source-review record id type drift')
+        for key in ('html_url', 'created_at', 'updated_at', 'body'):
+            require_text(record[key], f'source-review record {key} type drift')
+        require_hex(record['body_sha256'], 64, 'source-review body digest type drift')
+        require(digest(record['body'].encode()) == record['body_sha256'], 'source-review body digest mismatch')
+    require(tuple(record['id'] for record in source_comments) == SOURCE_REVIEW_COMMENT_IDS,
+            'source-review record set changed')
+    require(record_digest(source_comments) == SOURCE_REVIEW_COMMENTS_SHA256,
+            'source-review captured records changed')
     manifest = read_json(package / 'artifact-manifest.json')
     require_exact_keys(manifest, MANIFEST_FIELDS, 'artifact manifest schema drift')
     require(manifest['status'] == DRAFT and type(manifest['meaning']) is str and

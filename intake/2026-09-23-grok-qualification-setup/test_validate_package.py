@@ -154,11 +154,44 @@ PROBES = [
     ('review-receipt remote-readback result claim', 'review-receipt remote-readback result claim changed', [
         ('set', 'review-receipt.json', ('remote_readback', 'result'), 'qualification complete'),
     ]),
+    ('extra nested hosted-check result field', 'review-receipt check entry schema drift', [
+        ('set', 'review-receipt.json', ('review_pr', 'statusCheckRollup', 0, 'gate_a_status'), 'PASS'),
+        ('refresh_manifest', 'artifact-manifest.json', (), 'review-receipt.json'),
+    ]),
+    ('missing nested hosted-check field', 'review-receipt check entry schema drift', [
+        ('remove', 'review-receipt.json', ('review_pr', 'statusCheckRollup', 0, 'detailsUrl'), None),
+        ('refresh_manifest', 'artifact-manifest.json', (), 'review-receipt.json'),
+    ]),
+    ('forged successful Gate A hosted check', 'review-receipt check rollup changed', [
+        ('append_check', 'review-receipt.json', (), None),
+        ('refresh_manifest', 'artifact-manifest.json', (), 'review-receipt.json'),
+    ]),
+    ('zero remote-readback count', 'review-receipt remote-readback count changed', [
+        ('set', 'review-receipt.json', ('remote_readback', 'artifact_hashes_checked'), 0),
+        ('refresh_manifest', 'artifact-manifest.json', (), 'review-receipt.json'),
+    ]),
+    ('removed source-review records', 'source-review record set changed', [
+        ('set_root', 'source-review-comments.json', (), []),
+        ('refresh_manifest', 'artifact-manifest.json', (), 'source-review-comments.json'),
+    ]),
+    ('source-review body changed without digest', 'source-review body digest mismatch', [
+        ('set', 'source-review-comments.json', (1, 'body'), 'Altered source finding body'),
+        ('refresh_manifest', 'artifact-manifest.json', (), 'source-review-comments.json'),
+    ]),
+    ('source-review body and digest changed together', 'source-review captured records changed', [
+        ('set', 'source-review-comments.json', (1, 'body'), 'Altered source finding body'),
+        ('set', 'source-review-comments.json', (1, 'body_sha256'), validator.digest(b'Altered source finding body')),
+        ('refresh_manifest', 'artifact-manifest.json', (), 'source-review-comments.json'),
+    ]),
     ('review-receipt claims candidate runtime', 'review-receipt claims candidate runtime', [
         ('set', 'review-receipt.json', ('candidate_runtime',), 'PASS'),
     ]),
     ('source-manifest claims candidate execution', 'source-manifest claims candidate execution', [
         ('set', 'source-manifest.json', ('candidate_execution',), 'PASS'),
+    ]),
+    ('source-manifest erases effort mismatch', 'source-manifest captured facts changed', [
+        ('set', 'source-manifest.json', ('runtime_observation', 'mismatch_disclosed'), False),
+        ('refresh_manifest', 'artifact-manifest.json', (), 'source-manifest.json'),
     ]),
         ('extra result file outside candidate', 'preparation package file set changed', [
         ('write_text', 'withheld/receipt-results.json', (), '{"gate_a_status":"PASS"}\n'),
@@ -178,6 +211,28 @@ PROBES = [
 def mutate(package, edits):
     for action, relative, pointer, value in edits:
         path = package / relative
+        if action == 'refresh_manifest':
+            manifest = validator.read_json(path)
+            entry_path = validator.PACKAGE_PREFIX + value
+            entries = [entry for entry in manifest['files'] if entry['path'] == entry_path]
+            if len(entries) != 1:
+                raise AssertionError(f'Expected one manifest entry for {value}')
+            data = (package / value).read_bytes()
+            entries[0]['sha256'] = validator.digest(data)
+            entries[0]['bytes'] = len(data)
+            path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')
+            continue
+        if action == 'set_root':
+            path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
+            continue
+        if action == 'append_check':
+            document = validator.read_json(path)
+            checks = document['review_pr']['statusCheckRollup']
+            forged = dict(checks[0])
+            forged.update({'name': 'Gate A qualification', 'conclusion': 'SUCCESS'})
+            checks.append(forged)
+            path.write_text(json.dumps(document, ensure_ascii=False, indent=2) + '\n')
+            continue
         if action == 'swap':
             other = package / value
             first, second = path.read_bytes(), other.read_bytes()
