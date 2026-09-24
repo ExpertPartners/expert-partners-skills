@@ -21,25 +21,28 @@
 #
 #   --audit-surfaces  read-only lifecycle audit (tools/skill-deploy/skill-lifecycle.py):
 #                  classify every local copy of every canonical skill on this
-#                  machine, on every surface that can load one (Claude Code
-#                  user and project mounts, plugin cache and claude.ai sync
-#                  mirrors; Codex user and repo mounts, plugin caches and the
-#                  unsourced .agents/skills/synced mirror; Cowork's account
-#                  skills and org plugin stores), against canonical, and exit
-#                  non-zero on STALE, HAND-EDITED, UNTRACKED, ORPHAN,
-#                  RETIRED-LOADING, REWRITTEN or DUPLICATE-IDENTITY findings.
-#                  --verify gates aura's repo mounts in CI; this gates the rest.
+#                  machine (Claude Code user and project mounts, plugin cache and
+#                  claude.ai sync mirrors; Codex user and repo mounts, plugin
+#                  caches and the unsourced .agents/skills/synced mirror; Cowork's
+#                  account skills and org plugin stores) against canonical at a
+#                  git ref (default origin/main, else HEAD; --canonical-ref and
+#                  --aura-ref override, WORKTREE reads the working tree), resolve
+#                  which copies actually load, and exit non-zero on STALE,
+#                  HAND-EDITED, UNTRACKED, ORPHAN, SHADOWED, RETIRED-LOADING,
+#                  REWRITTEN or DUPLICATE-IDENTITY findings. --verify gates aura's
+#                  repo mounts in CI; this gates the rest.
 #   --receipt      validate a skill release receipt (schema
-#                  skill-release-receipt/v1) against live canonical and a live
-#                  audit, print the lifecycle state every surface reached
-#                  (CANONICAL, PACKAGED, INSTALLED, DISCOVERED, BEHAVIOR TESTED,
-#                  COMPLETE) and exit zero only when every intended surface is
-#                  COMPLETE and every unintended copy carries a disposition.
-#                  That exit is what "release complete" means for a skill.
+#                  skill-release-receipt/v1, '-' reads stdin) against canonical
+#                  and a live audit. Each surface climbs CANONICAL, PACKAGED,
+#                  INSTALLED, DISCOVERED, BEHAVIOR TESTED from its own evidence;
+#                  the verdict is RELEASE COMPLETE (exit 0) only when every
+#                  intended surface reached BEHAVIOR TESTED and every loading copy
+#                  on an unintended surface carries a disposition.
 #   --receipt-template
-#                  print a receipt skeleton with every surface key present, so
-#                  each surface (Claude Chat, Cowork, Claude Code, Codex,
-#                  ChatGPT/NORTH are five surfaces, never one shelf) is decided.
+#                  print a receipt skeleton with every surface key present and
+#                  every evidence slot null, so each surface (Claude Chat, Cowork,
+#                  Claude Code, Codex and ChatGPT/NORTH are five clients, never one
+#                  shelf) is decided.
 #
 #   --check-all    repo-wide claude.ai upload-readiness sweep over every
 #                  canonical SKILL.md, no deploy and no zip. Exits non-zero

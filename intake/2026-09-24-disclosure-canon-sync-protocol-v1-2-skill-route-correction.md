@@ -8,39 +8,44 @@ captured_at: 2026-09-24T19:30:00Z
 record_type: supersession-disclosure
 status: proposed-unmerged
 ---
-# Disclosure: canon-sync-protocol v1.2 supersedes the v1.1 skill route (proposed, unmerged)
+# Disclosure: canon-sync-protocol v1.2 proposes to supersede the v1.1 skill route (unmerged)
 
 SESSION: Skill Lifecycle - Reconciliation Audit
 CLAUDE HOME: NORTH'S ESTATE CONTROL TOWER / Skill Lifecycle
 
 This disclosure accompanies a PROPOSED amendment to `skills/canon-sync-protocol/SKILL.md`
-on the isolated branch `claude/skill-lifecycle-reconciliation-20260924`. Nothing here is
-a ruling. The amendment stays unmerged and undeployed until NORTH and Allison rule on it,
-and the v1.1 text it supersedes remains the operative minimum meanwhile.
+on the isolated branch `claude/skill-lifecycle-reconciliation-20260924`. Nothing here is a
+ruling. The amendment becomes canon only when Allison rules it with Lock That under aura
+decisions 0060 and 0061. NORTH reviews and recommends. A merge alone never rules it. Until
+then the v1.1 text it would supersede remains the operative minimum.
 
-## What is superseded
+## What would be superseded
 
 The v1.1 skill route (ruling of record aura intake/2026-08-08-ruling-canon-sync-protocol-repo-home-and-shelf-surfaces.md, commit 2f70ea0) says a rule-encoding skill has its canonical source in expert-partners-skills and mounts on one or both of two shelves.
 
-## What replaces it, and why
+## What would replace it, and why
 
-1. Canonical homes are two repos. The skills graph on expert-partners-skills main
-   (4b0f5e58) recognises 16 Aura-native canonical skills whose home is aura, beside 41
-   homed here. README.md and AGENTS.md on the same main say so. v1.1 was written before
-   the graph carried `aura:` sources.
-2. Six surfaces, not two shelves. Verified on 2026-09-24: Claude Code mounts and plugin
-   cache; Codex mounts and plugin caches; the claude.ai organization plugin marketplace
-   (GitHub sync, live at operating-doctrine 2.49.0); the claude.ai account Skills shelf,
-   loaded by Claude Chat and by Cowork; ChatGPT/NORTH. v1.1 named neither ChatGPT/NORTH
-   nor Codex and treated Chat and Cowork as one shelf. Evidence: aura
-   intake/2026-09-24-skill-lifecycle-reconciliation/ (surface-inventory.json,
-   reconciliation-matrix.md, lifecycle-gap-analysis.md).
-3. Complete means receipted. No mechanism defined release completion; the matrix shows 22
-   canonical skills with a stale deployment and 17 with duplicate identities as a result.
-   The amendment names `deploy-skill.sh --receipt` as the definition of complete.
+1. Canonical sources sit in two repos. The skills graph on expert-partners-skills main
+   lists 41 sources in this repo and 16 `aura:` sources (9 live, 1 retired, 6 designed
+   and not yet canonical). The graph already carried those 16 `aura:` sources when v1.1
+   was committed (59a07d0, graph at that commit: 33 eps, 16 aura), so v1.1 omitted a
+   canonical home that existed at the time.
+2. Five clients read thirteen distinct surface keys. Claude Code reads its personal and
+   project mounts, its plugin cache, the claude.ai org plugins and the account Skills
+   shelf. Codex reads its user and repo mounts, its plugin caches and an unsourced synced
+   mirror. Claude Chat and Cowork share the account Skills shelf and the org plugins, but
+   each client keeps its own copy, so an install proven for one client is not proof for
+   another. ChatGPT/NORTH loads its own uploads. v1.1 named none of the clients, so a
+   delivery proven on one was taken as proof for the rest. Evidence: aura
+   intake/2026-09-24-skill-lifecycle-reconciliation/.
+3. Complete means receipted. No mechanism defined release completion. The audit found
+   stale, duplicate and shadowed copies loading on every local client as a result. The
+   amendment names `deploy-skill.sh --receipt` as the check that decides completion.
 
 ## What is not changed
 
 The canon-doc route (surfaces 1 through 4), the trigger list, the Team GPT pause, the
 Both Shelves mechanics in code-block-routing, and the 2026-08-07 GitHub-sync ruling all
-stand. The amendment adds surfaces and a completion check; it removes none.
+stand. The amendment adds surface keys and a completion check. It removes none. It names
+the retirement of standalone uploads of plugin-carried skills as the proposed disposition
+under the 2026-08-07 ruling, which still needs Allison's per-item approval.
