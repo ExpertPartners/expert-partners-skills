@@ -128,6 +128,15 @@ EXPECTED_REMOTE_READBACK_RESULT = 'PASS via independent GitHub contents reads'
 EXPECTED_REVIEW_LIFECYCLE = 'Own-row write rejected by automatic approval review before execution; proposed row remains a review-only handoff.'
 EXPECTED_REVIEW_PUBLICATION = 'Review branch only. Not authoritative-main publication. Merge and auto-merge not performed.'
 EXPECTED_SOURCE_REVIEW_FINDINGS = 'All three OPEN'
+EXPECTED_CANDIDATE_DELIVERY = (
+    'mode-scoped only; see candidate inputs',
+    'mode-scoped only; see candidate inputs',
+    'mode-scoped only; see candidate inputs',
+    'mode-scoped only; see candidate inputs',
+    'mode-scoped only; see candidate inputs',
+    'mode-scoped only; see candidate inputs',
+    'withheld',
+)
 REVIEW_PR_FIELDS = {
     'autoMergeRequest',
     'baseRefOid',
@@ -406,8 +415,7 @@ def validate(repo, package, emit=True):
             and entry['sha256'] == pin['sha256']
             and entry['bytes'] == pin['bytes']
             and entry['url'] == pin['source_url']
-            and type(entry['candidate_delivery']) is str
-            and bool(entry['candidate_delivery']),
+            and entry['candidate_delivery'] == EXPECTED_CANDIDATE_DELIVERY[index],
             f'source-manifest required_inputs disagree with pins: {pin["path"]}',
         )
     manifest = read_json(package / 'artifact-manifest.json')

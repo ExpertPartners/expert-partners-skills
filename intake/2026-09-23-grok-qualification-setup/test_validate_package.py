@@ -142,6 +142,9 @@ PROBES = [
     ('review-receipt claims auto-merge armed', 'review-receipt claims auto-merge armed', [
         ('set', 'review-receipt.json', ('review_pr', 'autoMergeRequest'), {'enabledAt': 'now'}),
     ]),
+    ('source-manifest rubric delivery claim', 'source-manifest required_inputs disagree with pins', [
+        ('set', 'source-manifest.json', ('required_inputs', 6, 'candidate_delivery'), 'deliver rubric to candidate'),
+    ]),
     ('source-manifest disagrees with pins', 'source-manifest required_inputs disagree with pins', [
         ('set', 'source-manifest.json', ('required_inputs', 0, 'sha256'), '0' * 64),
     ]),

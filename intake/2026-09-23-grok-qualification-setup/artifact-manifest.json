@@ -75,18 +75,18 @@
     },
     {
       "path": "intake/2026-09-23-grok-qualification-setup/test_validate_package.py",
-      "sha256": "66c924974ef0f4292bb0c525482ed1101d4e90067c5b9d0c4b8a5e8c3fcd7a87",
-      "bytes": 12894
+      "sha256": "bdb6cf6b052cd9162cdf9cb3076e9e55c40139c0757f042d9b24428639239245",
+      "bytes": 13122
     },
     {
       "path": "intake/2026-09-23-grok-qualification-setup/validate-package.py",
-      "sha256": "ac96e9370052ae8b4da754d979d21daaaf39da0f2f5c7764206b09028e9823c6",
-      "bytes": 31015
+      "sha256": "e36c86354cce957bd2ee32e42c956bfeeb746ccef82ad9be37e30ba7da4b9012",
+      "bytes": 31316
     },
     {
       "path": "intake/2026-09-23-grok-qualification-setup/validation.md",
-      "sha256": "877c661131e9e8e1aadb4ee3c34b70392e47b90f9efd9f690f830f76491fec89",
-      "bytes": 9820
+      "sha256": "a28278db38608960e67b6ea198f064970a23986460ba487753cc09c7901cece0",
+      "bytes": 9806
     },
     {
       "path": "intake/2026-09-23-grok-qualification-setup/withheld/README.md",
