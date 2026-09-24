@@ -183,6 +183,16 @@ PROBES = [
         ('set', 'source-review-comments.json', (1, 'body_sha256'), validator.digest(b'Altered source finding body')),
         ('refresh_manifest', 'artifact-manifest.json', (), 'source-review-comments.json'),
     ]),
+    ('proposal status and manifest changed together', 'source-review proposals changed', [
+        ('replace_text', 'source-review-proposals.md', (), ('All three findings remain OPEN.', 'All three findings remain ACCEPTED.')),
+        ('refresh_manifest', 'artifact-manifest.json', (), 'source-review-proposals.md'),
+    ]),
+    ('recorder handoff and manifest changed together', 'recorder-grader handoff changed', [
+        ('replace_text', 'recorder-grader-handoff.md', (),
+         ('Do not upload this package wholesale, grant directory access, send the rubric, attach coverage/expected behavior, include historical responses/grades, or include recorder/grader conversation history.',
+          'Deliver the withheld rubric and coverage guidance to the candidate before every run.')),
+        ('refresh_manifest', 'artifact-manifest.json', (), 'recorder-grader-handoff.md'),
+    ]),
     ('review-receipt claims candidate runtime', 'review-receipt claims candidate runtime', [
         ('set', 'review-receipt.json', ('candidate_runtime',), 'PASS'),
     ]),
@@ -306,6 +316,30 @@ def main():
         if linked.returncode != 1 or 'package missing or symlinked' not in linked.stderr:
             raise AssertionError(f'symlinked ancestor: wrong result: {linked.returncode}: {linked.stderr}')
         results.append({'probe': 'symlinked package ancestor', 'result': 'REJECTED', 'reason': 'package missing or symlinked'})
+        clone = Path(temp).resolve() / 'source-clone'
+        subprocess.run(['git', 'clone', '--quiet', '--shared', '--no-checkout', str(repo), str(clone)], check=True)
+        pins = validator.read_json(HERE / PINS)
+        subprocess.run(['git', '-C', str(clone), 'checkout', pins['source_commit'], '--', *validator.REQUIRED], check=True)
+        for relative in validator.EXTERNAL_MANIFEST_FILES:
+            destination = clone / relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(repo / relative, destination)
+        source = clone / validator.REQUIRED[0]
+        outside = Path(temp).resolve() / 'identical-outside-source'
+        outside.write_bytes(source.read_bytes())
+        source.rename(Path(temp).resolve() / 'preserved-source')
+        source.symlink_to(outside)
+        copy = Path(temp) / 'symlink-source-package'
+        shutil.copytree(HERE, copy)
+        try:
+            validator.validate(clone, copy.resolve(), emit=False)
+        except ValueError as error:
+            if 'checked-out source is not a regular file' not in str(error):
+                raise AssertionError(f'symlinked pinned source: wrong rejection: {error}') from error
+        else:
+            raise AssertionError('symlinked pinned source: malformed fixture passed')
+        results.append({'probe': 'symlinked pinned source file with matching bytes', 'result': 'REJECTED',
+                        'reason': 'checked-out source is not a regular file'})
     final_files = {str(path.relative_to(HERE)): validator.digest(path.read_bytes())
                    for path in HERE.rglob('*') if path.is_file()}
     if final_files != initial_files:

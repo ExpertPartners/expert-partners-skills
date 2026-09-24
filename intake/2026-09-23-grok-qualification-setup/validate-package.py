@@ -5,6 +5,7 @@ import hashlib
 import json
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -157,6 +158,9 @@ REVIEW_CHECKS_SHA256 = 'a99e99df0a5eaad34c222ac60fcab7cad810cab7c9d2e8fbb4e4e9fd
 REVIEW_RECEIPT_SHA256 = 'f8653693cdf024f611bc509570787ab89c46dd1d1754bf282c8479011902e618'
 SOURCE_REVIEW_COMMENTS_SHA256 = '6c74e6ba1193a57df13cfcf0b5ec197a91216a1e4a14ca090af3e354eac8cc62'
 SOURCE_MANIFEST_SHA256 = '6097f31e99f5b06fa91d61e789c78cf97ff46a0204c1da3c161fcd5a894bf9be'
+# Reviewed preparation boundaries, independent of the refreshable artifact manifest.
+SOURCE_REVIEW_PROPOSALS_SHA256 = 'ed9ff93d86295dd6a809f29e6db0b7a74017b922272236ada5920e0d785ad1c7'
+RECORDER_GRADER_HANDOFF_SHA256 = 'cc8efdd3446f4a2898b3b385c9d0cf1106bc8ca1ebe96533fee25326d26a3512'
 SOURCE_REVIEW_COMMENT_FIELDS = {'id', 'html_url', 'created_at', 'updated_at', 'body', 'body_sha256'}
 SOURCE_REVIEW_COMMENT_IDS = (5801594731, 4086060528, 4086060537, 4086060558)
 SOURCE_MANIFEST_INPUT_FIELDS = {
@@ -266,6 +270,8 @@ def validate(repo, package, emit=True):
         blob = subprocess.check_output(['git', '-C', str(repo), 'rev-parse', f'{commit}:{path}'], text=True).strip()
         require(blob == pin['git_blob'], f'blob mismatch: {path}')
         require(digest(data) == pin['sha256'] and len(data) == pin['bytes'], f'source SHA/size mismatch: {path}')
+        source_path = repo / path
+        require(stat.S_ISREG(source_path.lstat().st_mode), f'checked-out source is not a regular file: {path}')
         require((repo / path).read_bytes() == data, f'current checked-out source drift: {path}')
         require(pin['source_url'] == f'https://github.com/ExpertPartners/expert-partners-skills/blob/{commit}/{path}', f'bad source pointer: {path}')
         source[path] = data
@@ -343,6 +349,10 @@ def validate(repo, package, emit=True):
     scenario_bytes = json.dumps(scenario_pairs, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()
     require(digest(scenario_bytes) == SCENARIO_TEXT_SHA256, 'coverage scenario descriptions changed')
     require(digest((package / 'coverage.md').read_bytes()) == COVERAGE_MD_SHA256, 'coverage markdown changed')
+    require(digest((package / 'source-review-proposals.md').read_bytes()) == SOURCE_REVIEW_PROPOSALS_SHA256,
+            'source-review proposals changed')
+    require(digest((package / 'recorder-grader-handoff.md').read_bytes()) == RECORDER_GRADER_HANDOFF_SHA256,
+            'recorder-grader handoff changed')
     receipt = read_json(package / 'withheld/receipt-template.json')
     require_exact_keys(receipt, RECEIPT_FIELDS, 'aggregate receipt top-level schema drift')
     require(receipt['status'] == DRAFT and receipt['execution_status'] == 'NOT RUN' and receipt['gate_a_status'] == 'UNPROVEN', 'blank receipt makes a result claim')
