@@ -63,6 +63,28 @@ REPEAT_COMPARISON_FIELDS = {
     'failures_and_omissions', 'independent_grader_conclusion', 'acceptance_record_ref',
 }
 DRAFT = 'DRAFT / NOT RELEASED'
+COVERAGE_MD_SHA256 = '3646b5ead333c322a4b57c279487f5819bd504166060073b122638bbf79a6e28'
+PACKAGE_PREFIX = 'intake/2026-09-23-grok-qualification-setup/'
+PACKAGE_FILES = {
+    'candidate/README.md', 'candidate/case-modes.json',
+    'candidate/requests.json', 'candidate/source-inputs.json',
+    'coverage.json', 'coverage.md', 'lifecycle-handoff.md',
+    'recorder-grader-handoff.md', 'review-receipt.json',
+    'route-assessment.md', 'source-manifest.json',
+    'source-review-comments.json', 'source-review-proposals.md',
+    'test_validate_package.py', 'validate-package.py', 'validation.md',
+    'withheld/README.md', 'withheld/behavioral-rubric.snapshot.md',
+    'withheld/receipt-grok-run-1.json', 'withheld/receipt-grok-run-2.json',
+    'withheld/receipt-ordinary-run-1.json',
+    'withheld/receipt-ordinary-run-2.json',
+    'withheld/receipt-template.json', 'withheld/source-pins.json',
+}
+EXTERNAL_MANIFEST_FILES = {
+    'archive/session-grok-repo-templates-qualification-setup-closeout-2026-09-23.md',
+    'intake/2026-09-23-grok-qualification-setup.md',
+}
+MANIFEST_FIELDS = {'status', 'meaning', 'source_commit', 'files'}
+MANIFEST_FILE_FIELDS = {'path', 'sha256', 'bytes'}
 
 
 def require(condition, message):
@@ -122,6 +144,8 @@ def validate(repo, package, emit=True):
     require(package.is_dir() and not package.is_symlink(), 'package missing or symlinked')
     for path in package.rglob('*'):
         require(not path.is_symlink(), f'symlink not allowed in preparation package: {path}')
+    actual_files = {str(path.relative_to(package)) for path in package.rglob('*') if path.is_file()}
+    require(actual_files == PACKAGE_FILES | {'artifact-manifest.json'}, 'preparation package file set changed')
     pins = read_json(package / 'withheld/source-pins.json')
     require_exact_keys(pins, SOURCE_PIN_FIELDS, 'source-pin top-level schema drift')
     require(pins['status'] == DRAFT, 'source pin release state changed')
@@ -217,6 +241,7 @@ def validate(repo, package, emit=True):
     scenario_pairs = [{'variant_id': variant['variant_id'], 'scenario': variant['scenario']} for row in matrix['cases'] for variant in row['variants']]
     scenario_bytes = json.dumps(scenario_pairs, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()
     require(digest(scenario_bytes) == SCENARIO_TEXT_SHA256, 'coverage scenario descriptions changed')
+    require(digest((package / 'coverage.md').read_bytes()) == COVERAGE_MD_SHA256, 'coverage markdown changed')
     receipt = read_json(package / 'withheld/receipt-template.json')
     require_exact_keys(receipt, RECEIPT_FIELDS, 'aggregate receipt top-level schema drift')
     require(receipt['status'] == DRAFT and receipt['execution_status'] == 'NOT RUN' and receipt['gate_a_status'] == 'UNPROVEN', 'blank receipt makes a result claim')
@@ -265,6 +290,28 @@ def validate(repo, package, emit=True):
             require(v['status'] == 'NOT RUN' and all(v[k] is None for k in VARIANT_NULL_FIELDS), 'variant result fabricated')
     for name in ['coverage.md', 'recorder-grader-handoff.md', 'withheld/README.md']:
         require(DRAFT in (package / name).read_text(), f'missing draft label: {name}')
+    manifest = read_json(package / 'artifact-manifest.json')
+    require_exact_keys(manifest, MANIFEST_FIELDS, 'artifact manifest schema drift')
+    require(manifest['status'] == DRAFT and type(manifest['meaning']) is str and
+            manifest['meaning'] == 'Prepared artifact bytes, no executed candidate results. This manifest excludes itself.' and
+            manifest['source_commit'] == commit, 'artifact manifest identity changed')
+    require(type(manifest['files']) is list, 'artifact manifest file list type drift')
+    expected_manifest_paths = {PACKAGE_PREFIX + name for name in PACKAGE_FILES} | EXTERNAL_MANIFEST_FILES
+    manifest_paths = []
+    for entry in manifest['files']:
+        require_exact_keys(entry, MANIFEST_FILE_FIELDS, 'artifact manifest entry schema drift')
+        require(type(entry['path']) is str, 'artifact manifest path type drift')
+        require_hex(entry['sha256'], 64, 'artifact manifest hash type drift')
+        require(type(entry['bytes']) is int and entry['bytes'] >= 0, 'artifact manifest size type drift')
+        manifest_paths.append(entry['path'])
+    require(len(manifest_paths) == len(expected_manifest_paths) and
+            set(manifest_paths) == expected_manifest_paths, 'artifact manifest file list changed')
+    for entry in manifest['files']:
+        relative = entry['path']
+        target = package / relative.removeprefix(PACKAGE_PREFIX) if relative.startswith(PACKAGE_PREFIX) else repo / relative
+        data = target.read_bytes()
+        require(digest(data) == entry['sha256'] and len(data) == entry['bytes'],
+                f'artifact manifest hash/size mismatch: {relative}')
     if emit:
         print(json.dumps({'status': 'PASS', 'meaning': 'preparation consistency only; no candidate run or qualification', 'source_commit': commit, 'core_input_hashes_verified': 7, **COUNTS}, indent=2))
 
@@ -311,9 +358,9 @@ def main():
     parser.add_argument('--negative-probes', action='store_true', help='Check six schema mutations in temporary package copies')
     args = parser.parse_args()
     try:
-        validate(args.repo.resolve(), args.package.resolve())
+        validate(args.repo.resolve(), args.package.absolute())
         if args.negative_probes:
-            negative_probes(args.repo.resolve(), args.package.resolve())
+            negative_probes(args.repo.resolve(), args.package.absolute())
     except (ValueError, KeyError, OSError, subprocess.CalledProcessError) as exc:
         print(f'FAIL: {exc}', file=sys.stderr)
         return 1

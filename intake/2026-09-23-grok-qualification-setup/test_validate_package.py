@@ -4,11 +4,14 @@ import argparse
 import importlib.util
 import json
 import shutil
+import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
 
 HERE = Path(__file__).resolve().parent
+sys.dont_write_bytecode = True
 SPEC = importlib.util.spec_from_file_location('grok_package_validator', HERE / 'validate-package.py')
 validator = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(validator)
@@ -79,6 +82,9 @@ PROBES = [
     ('altered nonempty scenario description', 'coverage scenario descriptions changed', [
         ('set', COVERAGE, ('cases', 0, 'variants', 0, 'scenario'), 'All prerequisites present'),
     ]),
+    ('altered nonempty markdown scenario', 'coverage markdown changed', [
+        ('replace_text', 'coverage.md', (), ('Digest read, section B.5 qualification omitted', 'Digest read, section B.5 qualification passed')),
+    ]),
     ('coverage mode mismatch', 'mode mismatch', [
         ('set', COVERAGE, ('cases', 0, 'mode'), 'auditor'),
     ]),
@@ -130,6 +136,18 @@ PROBES = [
     ('candidate mode-map mismatch', 'mode distinction lost', [
         ('set', 'candidate/case-modes.json', ('cases', 0, 'mode'), 'auditor'),
     ]),
+    ('extra result file outside candidate', 'preparation package file set changed', [
+        ('write_text', 'withheld/receipt-results.json', (), '{"gate_a_status":"PASS"}\n'),
+    ]),
+    ('extra physical receipt shard', 'preparation package file set changed', [
+        ('write_text', 'withheld/receipt-grok-run-3.json', (), '{"status":"PASS"}\n'),
+    ]),
+    ('unmanifested change to narrative document', 'artifact manifest hash/size mismatch', [
+        ('append_text', 'route-assessment.md', (), '\nChanged after manifest review.\n'),
+    ]),
+    ('missing manifest entry', 'artifact manifest file list changed', [
+        ('remove', 'artifact-manifest.json', ('files', 0), None),
+    ]),
 ]
 
 
@@ -141,6 +159,19 @@ def mutate(package, edits):
             first, second = path.read_bytes(), other.read_bytes()
             path.write_bytes(second)
             other.write_bytes(first)
+            continue
+        if action == 'write_text':
+            path.write_text(value)
+            continue
+        if action == 'append_text':
+            path.write_text(path.read_text() + value)
+            continue
+        if action == 'replace_text':
+            before, after = value
+            content = path.read_text()
+            if content.count(before) != 1:
+                raise AssertionError(f'Expected one text occurrence in {relative}')
+            path.write_text(content.replace(before, after))
             continue
         document = validator.read_json(path)
         parent = document
@@ -163,6 +194,8 @@ def main():
     parser.add_argument('--repo', type=Path, required=True)
     args = parser.parse_args()
     repo = args.repo.resolve()
+    initial_files = {str(path.relative_to(HERE)): validator.digest(path.read_bytes())
+                     for path in HERE.rglob('*') if path.is_file()}
     validator.validate(repo, HERE, emit=False)
     results = []
     with tempfile.TemporaryDirectory(prefix='grok-qualification-regressions-') as temp:
@@ -178,6 +211,17 @@ def main():
             else:
                 raise AssertionError(f'{name}: malformed fixture passed')
             results.append({'probe': name, 'result': 'REJECTED', 'reason': expected})
+        link = Path(temp) / 'linked-package'
+        link.symlink_to(HERE, target_is_directory=True)
+        command = [sys.executable, '-B', str(HERE / 'validate-package.py'), '--repo', str(repo), '--package', str(link)]
+        linked = subprocess.run(command, text=True, capture_output=True, check=False)
+        if linked.returncode != 1 or 'package missing or symlinked' not in linked.stderr:
+            raise AssertionError(f'symlink package: wrong result: {linked.returncode}: {linked.stderr}')
+        results.append({'probe': 'symlinked package argument', 'result': 'REJECTED', 'reason': 'package missing or symlinked'})
+    final_files = {str(path.relative_to(HERE)): validator.digest(path.read_bytes())
+                   for path in HERE.rglob('*') if path.is_file()}
+    if final_files != initial_files:
+        raise AssertionError('canonical package changed during regression run')
     print(json.dumps({'status': 'PASS', 'additional_negative_probes': len(results), 'results': results, 'canonical_package': 'unchanged'}, indent=2))
 
 
