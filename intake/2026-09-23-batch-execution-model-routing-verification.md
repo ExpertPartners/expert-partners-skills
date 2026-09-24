@@ -27,7 +27,8 @@ this change. The chosen composition is one new standalone canonical
 handoff completeness, calling the existing advisor for surface/model/effort
 selection. The advisor reads Aura decisions 0057 and 0072 and current
 capability evidence; no vendor matrix is duplicated in the batch skill.
-The skill graph now has 57 nodes and 87 edges, including the new call edge.
+The skill graph now has 57 nodes and 88 edges, including call edges to both the
+model advisor and the existing code-block-routing owner.
 
 Current OpenAI guidance checked on 2026-09-23:
 https://developers.openai.com/blog/mastering-codex-remote-for-engineering
@@ -64,9 +65,10 @@ smoke-test receipts before an installation claim.
 - Repository `deploy-skill.sh --check-all` passed all 41 skills. The producer
   reports portability warnings for other existing skills; the two touched
   descriptions no longer exceed the stricter published 200-character threshold.
-- The canonical skill-map extractor generated 57 nodes and 87 edges, with
-  one newly discovered Batch-First Execution node and two additional edges.
+- The canonical skill-map extractor generated 57 nodes and 88 edges, with
+  one newly discovered Batch-First Execution node and its required call edges.
 - The unchanged producer's regression suite passed 53 tests, zero failures.
+- The skill-map test suite passed 47 tests, zero failures.
 - Producer-built complete standalone ZIPs for Batch-First Execution v1.1 and
   Session Model Advisor from plugin 2.49.0, plus full operating-doctrine
   bundle 2.49.0, all passed ZIP preflight. These branch packages are review
@@ -76,11 +78,38 @@ smoke-test receipts before an installation claim.
 - All three complete review packages were independently copied and SHA-256
   read back in the existing private home
   `/Users/allisongaddy/Claude/estate-backups/skill-zips/batch-execution-model-routing-update-20260923/`.
-  Batch ZIP: `87154b0eae1ba2d8e2ce6950ea8c56adae0c667027a0f32bfa68613d7ddf896b`.
-  Advisor ZIP: `b96065220e39fca5b8ebb160a085ef9ed5214b7f03e1f96726e1c05e033e43c7`.
-  Plugin bundle: `17ad5c32550db1c1c7088ae57004df88540335ec13d9ec3ec0dcceb44fc049b2`.
+  Reviewed Batch ZIP: `9befca97fcb5c5d463185fd5306f0f1818004502b352bb359436b68c7cb202a8`.
+  Reviewed Advisor ZIP: `88888af845e2927a652bf33e0f134859089f1a5f8226927ec1be6d7742682375`.
+  Reviewed plugin bundle: `ceba807c27ec315e5001c1563af16f17a738b12350df522bc4e1ae557770cd44`.
   Both standalone ZIPs have one top-level Skill and one SKILL.md; all local
   Markdown links resolve within their own packages. No upload has occurred.
+
+## Review repair and owning-rule alignment
+
+Automated PR review on the first head found that the advisor's shortened
+frontmatter description had dropped its conversation-start trigger, 2.49.0
+lacked a changelog entry, and the Estate integration reference named two
+nonexistent skills. All three were repaired. The advisor description again
+triggers on the first message and explicit model/effort questions while
+preserving the matching-Worker fast path. The changelog records 2.49.0, and
+Estate integration names only verified skill ownership.
+
+The same review found that `code-block-routing` requires one Claude Code paste
+block per response and step one only. Batch-First Execution now declares that
+skill in its graph metadata and defers Claude Code delivery to the existing
+rule; the templates and behavioral cases match it. No governing routing rule
+was amended. A separate sending-side check now validates WHERE TO GO and COME
+BACK WHEN as well as every execution field, so an incomplete continuation or
+non-Code handoff is rejected before Allison receives it. The receiving
+Worker's safeguards remain intact.
+
+After these repairs, the structural check again passed all 41 skills,
+producer regression passed 53/53, skill-map tests passed 47/47, and the graph
+was regenerated at 57 nodes/88 edges. The corrected ZIPs were built by the
+producer, passed preflight and integrity checks, then copied non-overwriting
+with matching SHA-256 readback to the private home. Earlier package copies
+remain historical review artifacts and are superseded by the three
+`*-reviewed-20260923.zip` artifacts listed above.
 
 ## Release boundary
 

@@ -6,8 +6,8 @@ surface tested unless it actually produced an observed passing response.
 
 | Scenario | Required behavior | Failure signal |
 | --- | --- | --- |
-| User requests ten separate prompts | Produce numbered complete blocks, exact order and repeated dependency guards | Force one prompt, or omit later blocks |
-| One cohesive six-step audit | Prefer one master assignment with checks and one return | Six unnecessary human carry-back loops |
+| User requests ten separate prompts | On a surface that permits a packet, produce complete numbered blocks with repeated guards; for a Claude Code handoff, send step one only and release each later block after verified predecessor evidence | Put multiple Claude Code paste blocks in one response, force one prompt on a permitted surface, or omit later work |
+| One cohesive six-step audit | Prefer one master assignment with checks and one return where routing permits it; obey Claude Code step-one-only delivery | Violate the owning routing rule or add unnecessary relays where a master assignment is allowed |
 | User calls serial input Steer | Explain Queue versus Steer; verify exact surface | Tell user Steer guarantees finish-first behavior |
 | Claude text arrives during tool work | Preserve ordered milestones and dependency gates | Start later dependent work immediately |
 | M02 fails; M03 depends on M02 | Mark M03 BLOCKED; do not execute it | Assume an ended response means M02 passed |
@@ -42,7 +42,7 @@ UI, not a permanent account-wide option list.
 | Claude Code handoff | Verify Claude-specific model and effort options on Claude Code | Reuses Codex UI names without evidence |
 | Lineup change | Replace the refreshable capability evidence with a changed provider fixture; recompute recommendation without changing ADR 0057 | Freezes old model names into policy or requires canon rewrite |
 | NORTH recommendation | Allison asks what to use; give one verified surface/model/effort recommendation and a reason | Asks her to select from a routine technical menu |
-| Complete technical brief | Before PASTE THIS, emit WHERE TO GO, settings with surface/mode/model/effort, WHY and COME BACK WHEN | Any relevant field is blank, vague or absent |
+| Complete technical brief | Before PASTE THIS, validate WHERE TO GO, surface, mode, model, effort/speed, WHY and COME BACK WHEN, then emit all fields | Any destination, return condition or setting is blank, vague or absent |
 | New Worker missing worktree | Candidate prompt lacks WORKTREE or branch; block sending and resolve the exact assigned path | Asks Allison to paste so receiving Worker can bounce it |
 | New Worker missing identity | Candidate lacks exact session name, Room/Table, HOME or return destination; block sending | Invents identity or hands incomplete prompt to Allison |
 | New Worker missing model line | External settings exist but required MODEL AND EFFORT envelope line is absent; block sending | Treats external brief as a substitute for the Worker safeguard |
