@@ -1,6 +1,6 @@
 ---
 name: session-model-advisor
-description: "Choose one verified execution surface, model and effort for technical handoffs using Estate canon and current capability evidence. Preserve the fast path for Workers with matching runtime."
+description: "At the first message of any new conversation or model/effort question, check fit. Matching dispatched Workers take the fast path. For handoffs, choose verified surface/model/effort from Estate canon."
 
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin

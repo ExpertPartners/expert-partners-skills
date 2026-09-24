@@ -1,5 +1,15 @@
 # operating-doctrine changelog
 
+## 2.49.0 -- 2026-09-23
+
+`session-model-advisor` v1.1 retains conversation-start and explicit
+model/effort-question invocation, preserves decision 0093's matching-Worker
+fast path, and adds current surface capability checks for technical handoffs.
+The separate Batch-First Execution v1.1 skill composes with the advisor for
+model selection and with `code-block-routing` for sending-side envelope
+completeness. It does not change code-block-routing's one-block-per-response
+rule. No model matrix is copied into the plugin.
+
 ## 2.48.0 -- 2026-09-08
 
 Two-word worker titles per decision 0091 (ruled by Allison 2026-09-07 via Lock

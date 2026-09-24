@@ -2,10 +2,11 @@
 
 ## Preserve existing ownership
 
-For Estate work, compose with the installed estate-knowledge-retrieval,
-connection-first-implementation, ember-browser-routing and applicable task
-skills. Read the live Estate Manifest through Estate Brain first, then retrieve
-narrowly. Do not infer current state from this bundle or chat history.
+For Estate work, use Estate Brain retrieval and compose with the installed
+`connection-first-implementation` and applicable task skills. That skill owns
+the current browser execution ladder. Read the live Estate Manifest through
+Estate Brain first, then retrieve narrowly. Do not infer current state from
+this bundle or chat history.
 
 The Manifest and repository entry point retrieved on 2026-09-23 identify
 ExpertPartners/expert-partners-skills as the owner of canonical skills and
