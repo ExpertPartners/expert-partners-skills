@@ -130,6 +130,19 @@ def mode(case_id):
     return 'hypothetical-fixer' if case_id.startswith('grok-fixer-') else 'auditor'
 
 
+
+def require_unaliased_dir(path, message):
+    """Reject missing dirs and any symlink in the path or its ancestors."""
+    require(path.exists() and path.is_dir(), message)
+    cursor = path
+    while True:
+        require(not cursor.is_symlink(), message)
+        parent = cursor.parent
+        if parent == cursor:
+            break
+        cursor = parent
+
+
 def read_json(path):
     def unique_keys(pairs):
         result = {}
@@ -141,7 +154,7 @@ def read_json(path):
 
 
 def validate(repo, package, emit=True):
-    require(package.is_dir() and not package.is_symlink(), 'package missing or symlinked')
+    require_unaliased_dir(package, 'package missing or symlinked')
     for path in package.rglob('*'):
         require(not path.is_symlink(), f'symlink not allowed in preparation package: {path}')
     actual_files = {str(path.relative_to(package)) for path in package.rglob('*') if path.is_file()}

@@ -218,6 +218,14 @@ def main():
         if linked.returncode != 1 or 'package missing or symlinked' not in linked.stderr:
             raise AssertionError(f'symlink package: wrong result: {linked.returncode}: {linked.stderr}')
         results.append({'probe': 'symlinked package argument', 'result': 'REJECTED', 'reason': 'package missing or symlinked'})
+        alias = Path(temp) / 'alias'
+        alias.symlink_to(HERE.parent, target_is_directory=True)
+        aliased = alias / HERE.name
+        command = [sys.executable, '-B', str(HERE / 'validate-package.py'), '--repo', str(repo), '--package', str(aliased)]
+        linked = subprocess.run(command, text=True, capture_output=True, check=False)
+        if linked.returncode != 1 or 'package missing or symlinked' not in linked.stderr:
+            raise AssertionError(f'symlinked ancestor: wrong result: {linked.returncode}: {linked.stderr}')
+        results.append({'probe': 'symlinked package ancestor', 'result': 'REJECTED', 'reason': 'package missing or symlinked'})
     final_files = {str(path.relative_to(HERE)): validator.digest(path.read_bytes())
                    for path in HERE.rglob('*') if path.is_file()}
     if final_files != initial_files:
