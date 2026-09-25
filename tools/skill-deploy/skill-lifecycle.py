@@ -328,13 +328,23 @@ def load_canonical(eps, aura, eps_ref=None, aura_ref=None, graph_path=None):
     eref, ecommit = resolve_ref(eps, eps_ref)
     etree = Tree(eps, eref, ecommit)
     graph_bytes = open(graph_path, "rb").read() if graph_path else etree.read("tools/skill-map/skills-graph.json")
-    graph = json.loads(graph_bytes) if graph_bytes else {"nodes": []}
+    if not graph_bytes:
+        fatal("canonical skills graph is missing or empty")
+    graph = json.loads(graph_bytes)
+    if not graph.get("nodes"):
+        fatal("canonical skills graph has no nodes")
     status_by_id, aura_nodes = {}, {}
-    for n in graph.get("nodes", []):
-        status_by_id[n["id"]] = n.get("status", "live")
+    graph_nodes = graph.get("nodes", [])
+    for n in graph_nodes:
+        sid = n["id"]
+        if sid in status_by_id:
+            fatal(f"graph has duplicate canonical id {sid}")
+        status_by_id[sid] = n.get("status", "live")
         repo, rel = n["source"].split(":", 1)
+        if repo not in ("eps", "aura"):
+            fatal(f"graph source for {sid} has unknown owner {repo}")
         if repo == "aura":
-            aura_nodes[n["id"]] = rel
+            aura_nodes[sid] = rel
     canon = {}
     for sid in etree.subdirs("skills"):
         rec = make_record(sid, "eps", f"skills/{sid}", etree, status_by_id.get(sid, "live"))
@@ -365,6 +375,19 @@ def load_canonical(eps, aura, eps_ref=None, aura_ref=None, graph_path=None):
                 fatal(f"{sid} is canonical in both expert-partners-skills and aura")
             canon[sid] = rec
         refs["aura"] = {"ref": aref, "commit": acommit}
+    for sid, rec in canon.items():
+        if sid not in status_by_id:
+            fatal(f"canonical source {rec['repoKey']}:{rec['path']} is absent from the graph")
+    for n in graph_nodes:
+        sid = n["id"]
+        repo, rel = n["source"].split(":", 1)
+        if repo == "aura" and not aura:
+            continue
+        rec = canon.get(sid)
+        if rec is None:
+            fatal(f"graph node {sid} has no canonical home at {n['source']}")
+        if rec["repoKey"] != repo or rec["path"] != rel:
+            fatal(f"graph source mismatch for {sid}: {n['source']} != {rec['repoKey']}:{rec['path']}")
     return canon, refs, set(aura_nodes)
 
 
