@@ -46,7 +46,7 @@ Gate A fixture execution is permitted for qualification while the template is pr
 
 ### Current operational delegation
 
-v1.6 implements Allison's explicit 2026-09-25 Repo Tower direction, recorded in [the delegation disclosure](https://github.com/ExpertPartners/expert-partners-skills/blob/main/intake/2026-09-25-disclosure-scout-fixer-delegation.md). It replaces v1.5's absolute Gate D operational block and per-job human plan-approval requirement only for the pre-delegated low-risk, reversible classes in [Grok Repo Fixer](references/grok-fixer.md#delegated-repair-classes). Formal A-D evidence remains separate and does not block those classes.
+v1.6 implements Allison's locked 2026-09-25 operational delegation, recorded in [the Scout bounded operational Fixer authority ruling](../../intake/2026-09-25-ruling-scout-bounded-operational-fixer-authority.md). It replaces v1.5's absolute Gate D operational block and per-job human plan-approval requirement only for the pre-delegated low-risk, reversible classes in [Grok Repo Fixer](references/grok-fixer.md#delegated-repair-classes). Formal A-D evidence remains separate and does not block those classes.
 
 Scout is one accountable repository steward. Auditor is its read-only mode; Fixer is its bounded repair mode. A standing stewardship assignment permits selection of Fixer for those classes after its per-job checks, without a new Allison approval for each plan. An explicitly read-only audit stays read-only; do not silently switch modes mid-audit. Unspecified requests still default to Auditor. Codex or Claude Code may handle work outside Scout's capability or delegation; they are not mandatory intermediaries for delegated routine repairs.
 
