@@ -11,7 +11,7 @@ topic: operational Scout delegation implementation and supersession disclosure
 SESSION: Repo Tower - Closure Sprint
 Codex HOME: NORTH'S ESTATE CONTROL TOWER / Repo Tower
 
-Allison explicitly directed implementation of pre-delegated low-risk reversible repository stewardship in the existing repo-standards skill and Grok Fixer profile. This record preserves that task authorization; it does not claim a new Lock That event, passed examination or access grant.
+Allison explicitly directed implementation of pre-delegated low-risk reversible repository stewardship in the existing repo-standards skill and Grok Fixer profile. That operating direction was subsequently locked by Allison on 2026-09-25; the durable decision is the Scout bounded operational Fixer authority ruling at `intake/2026-09-25-ruling-scout-bounded-operational-fixer-authority.md`. This disclosure remains implementation history and does not claim a passed examination or access grant.
 
 ## Replaces
 
