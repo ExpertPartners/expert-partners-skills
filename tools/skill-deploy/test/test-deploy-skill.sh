@@ -533,6 +533,38 @@ check "T16 --only narrows the walk, the findings and the count to the named skil
 out=$(python3 "$LC" audit --eps "$EPS" --aura "$AURA" --home "$LH" --only betaa 2>&1); rc=$?
 [ $rc -ne 0 ] && printf '%s' "$out" | grep -q 'names no canonical skill: betaa'
 check "T16 an unknown --only id is refused, never an empty pass" $? "$out"
+python3 - "$EPS/tools/skill-map/skills-graph.json" "$LH" <<'PY2'
+import copy, json, sys
+source, out = sys.argv[1:]
+base = json.load(open(source))
+for name, node in (
+    ("missing-eps", {"id": "missing-eps", "source": "eps:skills/missing-eps/SKILL.md", "status": "live"}),
+    ("missing-aura", {"id": "missing-aura", "source": "aura:.claude/skills/missing-aura/SKILL.md", "status": "live"}),
+):
+    graph = copy.deepcopy(base)
+    graph["nodes"].append(node)
+    with open(f"{out}/{name}-graph.json", "w") as f:
+        json.dump(graph, f)
+graph = copy.deepcopy(base)
+next(n for n in graph["nodes"] if n["id"] == "alpha")["source"] = "eps:skills/mu/SKILL.md"
+with open(f"{out}/wrong-source-graph.json", "w") as f:
+    json.dump(graph, f)
+graph = copy.deepcopy(base)
+graph["nodes"] = [n for n in graph["nodes"] if n["id"] != "alpha"]
+with open(f"{out}/ungraphed-source-graph.json", "w") as f:
+    json.dump(graph, f)
+graph = copy.deepcopy(base)
+graph["nodes"].append(copy.deepcopy(graph["nodes"][0]))
+with open(f"{out}/duplicate-id-graph.json", "w") as f:
+    json.dump(graph, f)
+with open(f"{out}/empty-graph.json", "w") as f:
+    json.dump({"nodes": []}, f)
+PY2
+for name in missing-eps missing-aura wrong-source ungraphed-source duplicate-id empty; do
+  out=$(python3 "$LC" audit --eps "$EPS" --aura "$AURA" --home "$LH" --only alpha --graph "$LH/$name-graph.json" --report-only 2>&1); rc=$?
+  [ $rc -ne 0 ] && printf '%s' "$out" | grep -Eq 'no canonical home|graph source mismatch|absent from the graph|duplicate canonical id|graph has no nodes'
+  check "T16 graph $name fails even when the missing or mismapped node is outside --only" $? "$out"
+done
 printf '\nAn uncommitted edit in the working tree.\n' >> "$EPS/skills/alpha/SKILL.md"
 out=$(python3 "$LC" audit --eps "$EPS" --home "$LH" --only alpha --json "$LH/ref.json" --report-only 2>&1)
 python3 -c "import json,sys; a=json.load(open('$LH/ref.json')); s=[c['state'] for c in a['skills']['alpha']['copies'] if c['surface']=='claude-code-user-mount']; sys.exit(0 if s==['CURRENT'] else 1)"
