@@ -8,7 +8,7 @@ topic: Grok bounded operational repository fixer
 ---
 # Grok Repo Fixer -- v1.1
 
-Canonical source: `ExpertPartners/expert-partners-skills/skills/repo-standards/references/grok-fixer.md`. **Operationally enabled for the delegated low-risk, reversible classes below.** Authority is Allison's [standing operational delegation](https://github.com/ExpertPartners/expert-partners-skills/blob/main/intake/2026-09-25-disclosure-scout-fixer-delegation.md), together with the per-job evidence checks, not historical Gate D or a new human approval for every plan. Formal A-D qualification remains a separate evidence claim; no gate is marked passed by this amendment.
+Canonical source: `ExpertPartners/expert-partners-skills/skills/repo-standards/references/grok-fixer.md`. **Operationally enabled for the delegated low-risk, reversible classes below.** Authority is Allison's [locked standing operational delegation](../../../intake/2026-09-25-ruling-scout-bounded-operational-fixer-authority.md), together with the per-job evidence checks, not historical Gate D or a new human approval for every plan. Formal A-D qualification remains a separate evidence claim; no gate is marked passed by this amendment.
 
 ## Thin routine bootstrap
 
