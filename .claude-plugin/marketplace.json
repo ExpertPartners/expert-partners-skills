@@ -14,8 +14,8 @@
     {
       "name": "brand-voice",
       "source": "./plugins/brand-voice",
-      "description": "Canonical brand context for the aura ADR 0045 brand registry (Expert Partners, EPIC, AG Personal Brand, AG Luxury, FAM, Don Hobbs; Moxie benched)",
-      "version": "0.5.1"
+      "description": "Canonical brand context for the aura ADR 0045 brand registry (Expert Partners, EPIC, AG Personal Brand with The Strong Ones inside it, AG Luxury, Free Agent Movement, Don Hobbs sub-label; Moxie benched)",
+      "version": "0.5.2"
     },
     {
       "name": "content-engines",

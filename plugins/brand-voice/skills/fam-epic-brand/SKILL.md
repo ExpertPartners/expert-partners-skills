@@ -1,6 +1,6 @@
 ---
 name: fam-epic-brand
-description: "Apply Free Agent Movement (FAM) and Expert Partners (EPIC) brand standards to all written and visual outputs. Use this skill whenever Allison Gaddy is creating content for Expert Partners, Inner Circle Resources, the Free Agent Movement, Funnel Pilot, G2M (Gateway to Mastery), the YouTube channel @TheAllisonGaddy, or any coaching/training deliverable. Triggers for emails, social posts, slides, web pages, HTML mockups, marketing copy, scripts, frameworks, lead magnets, brand documents, or any output that represents EPIC, FAM, or Allison's coaching brand. Locks brand tokens per brand, enforces Allison's voice rules (no em dashes ever, voice memo energy, banned phrases list, no bold or italics), applies the truth hook then tension then framework then CTA structure, and enforces canonical brand spellings. Apply this skill any time the work is for the EPIC or FAM brand, even if the user does not explicitly say so. It inherits the operating-doctrine and never overrides it."
+description: "Apply Free Agent Movement (FAM) and Expert Partners (EPIC) brand standards to all written and visual outputs. Use this skill whenever Allison Gaddy is creating content for Expert Partners, Inner Circle Resources, the Free Agent Movement, Funnel Pilot, G2M (Gateway to Mastery), or any coaching/training deliverable (YouTube @TheAllisonGaddy is ag-personal-brand). Triggers for emails, social posts, slides, web pages, HTML mockups, marketing copy, scripts, frameworks, lead magnets, brand documents, or any output that represents EPIC, FAM, or Allison's coaching brand. Locks brand tokens per brand, enforces Allison's voice rules (no em dashes ever, voice memo energy, banned phrases list, no bold or italics), applies the truth hook then tension then framework then CTA structure, and enforces canonical brand spellings. Apply this skill any time the work is for the EPIC or FAM brand, even if the user does not explicitly say so. It inherits the operating-doctrine and never overrides it."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: brands
@@ -96,7 +96,7 @@ Never deviate from the correct system's tokens. For full visual specs (sizing, s
 
 These names and concepts do not need re-explanation. Use them naturally:
 
-- Moxie Signature Group (separate brand, see Moxie skill if relevant)
+- Moxie Signature Group (benched per aura ADR 0045; consumer real estate routes to AG Luxury)
 - EPIC, Expert Partners
 - Free Agent Movement, Free Agent Nation, Free Agent Formula
 - Inner Circle Resources, innercircleresources.com

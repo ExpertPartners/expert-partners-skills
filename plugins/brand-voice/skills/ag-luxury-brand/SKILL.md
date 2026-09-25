@@ -14,9 +14,9 @@ subtitle: "luxury real estate voice under Allison’s name"
 
 ## Canon and live context
 
-Canonical repo: `ExpertPartners/ag-luxury`. `docs/DECISION-LOG.md` is the append-only ruling record and wins over this skill wherever they conflict. `docs/governance/` holds the approved claim set. The estate-brain does not index ag-luxury (verified 2026-08-02), so this skill is the working reference for sessions without the repo.
+Canonical repo: `ExpertPartners/ag-luxury`. `docs/DECISION-LOG.md` is the append-only ruling record and wins over this skill wherever they conflict. `docs/governance/` holds the approved claim set. As of 2026-09-25 the estate-brain serves this repo: where the estate-brain MCP is connected, call `get_brand_context("ag-luxury")` first and apply it as authoritative. This skill is the fallback reference for sessions without MCP or repo access. (Earlier note, now stale: the estate-brain did not index ag-luxury when this card was derived on 2026-08-02.)
 
-Visual tokens (color, type, spacing) are owned by AG Luxury Brand Guide v1, ruled authoritative by Allison 2026-07-25 as D024 in the decision log. Do not restate or improvise visual tokens here or anywhere; read D024. Its one governing idea carries into copy: restraint is the luxury signal, and all warmth comes from photography, never from decoration.
+Visual tokens (color, type, spacing) are owned by the ag-luxury repo, never by this skill. As of 2026-09-25, `docs/DECISION-LOG.md` D036 (AG Luxury visual system follows the live brand guide) makes the live AG Luxury brand guide at `https://brand.agluxurytx.com/` the authority for visual-system facts and supersedes the conflicting visual clauses of D024 and earlier rulings; `canon/brand.md` in the ag-luxury repo is the owner summary. Do not restate or improvise visual tokens here or anywhere; read the owner canon. Its one governing idea carries into copy: restraint is the luxury signal, and all warmth comes from photography, never from decoration.
 
 ## Naming ruling (never deviate)
 
@@ -45,7 +45,7 @@ Consumers only. Luxury sellers and buyers, estate, ranch, and equestrian owners,
 - (The receipts-over-sizzle mandate came OUT of this voice spec for now, ruled 2026-08-06, too firm, too much pressure. The rest of the ruled voice stands.)
 - Producer framing throughout: a producer causes the thing to exist, finds the story, engineers the launch. Listings get a produced launch, not a promotion.
 - Stillness and restraint. No hype, no urgency, no countdowns, no exclamation-heavy copy. Grace reads as confidence in this market.
-- No coaching or recruiting energy ever. No black-and-gold luxury cliche, in copy or in look (D024 removed gold entirely). No cliches: never "Luxury living redefined," "Your dream home awaits," "Once in a lifetime."
+- No coaching or recruiting energy ever. No black-and-gold luxury cliche in copy. Whether and how gold appears in the visual system is an ag-luxury owner-canon question (D036), not a copy decision. No cliches: never "Luxury living redefined," "Your dream home awaits," "Once in a lifetime."
 - Discretion is a feature. The clientele buys it. No client names in marketing or stories without documented consent.
 
 Language bank, reuse until strangers repeat them: The producer came home. Receipts, not reach. Produced like a film, priced like an asset. Attention is easy, outcomes are hard. Global reach, local proof. I do not chase seventeen billion strangers, I find the twelve buyers who matter. My brokerage serves the agent so I can serve you.
