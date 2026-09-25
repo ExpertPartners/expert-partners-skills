@@ -3,12 +3,13 @@ name: funnel-migration
 description: >-
   Move a funnel out of the old PartnerSync location and into EPIC or
   Expert Partners, verify every object-model element transferred, certify
-  the cutover with a live behavioral test, then document it. Use this whenever
-  someone wants to migrate a funnel, move a funnel to the new location, port a
-  funnel out of the legacy Expert Partners GHL, cut over a funnel, or rebuild
-  an old funnel in a clean location. Use it even if they do not say "migrate,"
-  as long as the intent is moving an existing funnel from old to new. This
-  skill is temporary and retires once the Expert Partners migration is done.
+  the cutover with a live behavioral test, then document it. STALE since
+  2026-07-27, retirement pending: the migration it served is over (see the
+  STATUS line in the body). Use it only when someone wants to migrate, move,
+  port, or cut over an existing funnel between GHL locations AND Allison has
+  confirmed a genuine funnel move is in play; read the canonical GHL location
+  registry first. Do not auto-fire it for new funnel builds (funnel-build) or
+  for documenting a funnel (funnel-documentation).
   It ends by calling the Funnel Documentation skill, so the funnel lands fully
   documented. Built for a non-technical teammate; hand-hold one step at a time.
   It inherits the operating-doctrine and never overrides it.
