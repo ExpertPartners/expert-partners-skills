@@ -18,7 +18,7 @@ defers-to:
 subtitle: "canonical brand context, registry per ADR 0045"
 ---
 
-# Brand Voice — canonical brand context
+# Brand Voice, canonical brand context
 
 The brand registry is canonical in aura ADR 0045 (resynced from the ADR as it read on 2026-08-05). The active brands,
 
@@ -49,21 +49,22 @@ This skill also bundles three legacy brand context documents,
 ## How to use
 
 1. Identify which brand the work is for. If unclear, ask.
-2. Read the relevant `brand-context-*.md` from this folder before drafting.
-3. Apply the brand's voice rules verbatim. Note any tension between brands and surface it.
-4. After drafting, validate against the brand-context doc — every claim about audience, differentiator, voice, visual identity must match.
+2. Load the per-brand voice card for that brand (ep-brand, fam-epic-brand, ag-personal-brand, ag-luxury-brand, don-hobbs-brand, the-strong-ones-brand). Where the estate-brain MCP is connected, also call `get_brand_context("<brand>")` for the live owner-repo context, which wins over any inline fallback.
+3. Use the legacy `brand-context-*.md` documents in this folder only as background. They cover Expert Partners / EPIC, Free Agent Movement, and the benched Moxie brand only, and they predate the ADR 0045 registry, so any conflict resolves to the per-brand card and the owning brand repo.
+4. Apply the brand's voice rules verbatim. Note any tension between brands and surface it.
+5. After drafting, validate against the per-brand card. Every claim about audience, differentiator, voice, and visual identity must match.
 
 ## Authoritative source
 
-- Drive (live editing surface): per Allison's GitHub-everywhere principle, brand context lives in both Drive and GitHub. Drive is the editing canonical.
-- GitHub canonical (this folder): `ExpertPartners/expert-partners-skills/plugins/brand-voice/skills/brand-voice/`
-- The old Aura local mirror at `~/Claude/projects/Aura/skills/` was retired 2026-08-05; read canonical instead
-- Should also reach Ember (M4 Mini) once cross-machine sync is wired.
+- Editable brand truth lives in each brand's owning GitHub repo (for example `ExpertPartners/ag-personal-brand` and `ExpertPartners/ag-luxury`, each with a `canon/` folder). Person-level Allison voice lives in `ExpertPartners/allison-gaddy` under `voice/` (aura ADR 0086). This plugin packages that truth for agent sessions; it is not an editing surface.
+- GitHub is the canonical technical source and marketplace-manifest home for this packaged capability (aura ADR 0098): `ExpertPartners/expert-partners-skills/plugins/brand-voice/`.
+- Drive copies of brand documents are working or legacy material, not the editing canonical. When a Drive document disagrees with the owning repo, the owning repo wins.
+- The old Aura local mirror at `~/Claude/projects/Aura/skills/` was retired 2026-08-05; read canonical instead.
+- Ember (M4 Mini) delivery is not wired; the Ember repos are parked. Do not assume Ember carries this skill.
 
 ## Update cadence
 
 Brand context evolves. When updating:
-1. Edit on Drive first.
-2. Export to markdown, place in this folder, commit + push.
-3. Verify Aura local picks up the change.
-4. Verify Ember pulls the change.
+1. Change the brand truth in the owning brand repo first (or in `allison-gaddy/voice/` for person-level voice).
+2. Re-sync the affected per-brand card in this plugin from that source, then bump the plugin version in both `plugins/brand-voice/.claude-plugin/plugin.json` and the `.claude-plugin/marketplace.json` entry, in the same commit.
+3. Open a pull request. Deployment to claude.ai, Claude Code, and other surfaces happens through the deployment path after merge, not from the edit itself.
