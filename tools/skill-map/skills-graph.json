@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "384b65d0e840cbc2c32aee548d484e2a30de9fe3",
-    "aura": "429183b192bf4e0ad094f74e92ee36a48f188874"
+    "eps": "ed08134763ffb8a8633ef63899efc48fac3f547e",
+    "aura": "6c26e9b9172fc527dfbb5f3146a4ac9dc9ef86d6"
   },
   "zones": [
     "surfaces",
@@ -2739,13 +2739,9 @@
         "path": "aura:.agents/skills/repo-standards/SKILL.md",
         "id": "repo-standards",
         "canonical": "eps:skills/repo-standards/SKILL.md",
-        "deployedAt": "2026-09-25",
+        "deployedAt": "2026-09-27",
         "stamp": "v1.6",
-        "mount": "aura:.agents/skills/",
-        "status": "VERIFIED STALE",
-        "awaitingRedeploy": true,
-        "verifiedCanonicalCommit": "55d1e49d39594ffcb2e8d0a46a8cb9577201deb4",
-        "verifiedCanonicalBlob": "8ec2aa6aff7e9ccf68e4c4433f9fb8be23a5600d"
+        "mount": "aura:.agents/skills/"
       },
       {
         "path": "aura:.agents/skills/research-intake/SKILL.md",
@@ -2799,13 +2795,9 @@
         "path": "aura:.claude/skills/repo-standards/SKILL.md",
         "id": "repo-standards",
         "canonical": "eps:skills/repo-standards/SKILL.md",
-        "deployedAt": "2026-09-25",
+        "deployedAt": "2026-09-27",
         "stamp": "v1.6",
-        "mount": null,
-        "status": "VERIFIED STALE",
-        "awaitingRedeploy": true,
-        "verifiedCanonicalCommit": "55d1e49d39594ffcb2e8d0a46a8cb9577201deb4",
-        "verifiedCanonicalBlob": "8ec2aa6aff7e9ccf68e4c4433f9fb8be23a5600d"
+        "mount": null
       },
       {
         "path": "aura:.claude/skills/research-intake/SKILL.md",
