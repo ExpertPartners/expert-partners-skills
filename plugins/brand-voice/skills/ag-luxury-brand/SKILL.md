@@ -1,6 +1,6 @@
 ---
 name: ag-luxury-brand
-description: "Apply the AG Luxury brand voice to consumer-facing real estate content for Allison Gaddy: listing copy, listing films and video scripts, bios, case studies, press materials, site copy, social, and email aimed at luxury sellers and buyers in North Dallas and the western ranch corridor. The public-facing brand is Allison Gaddy, the full name; AG Luxury is the internal workspace name only (aura ADR 0045). Producer positioning (The Producer Came Home), warm editorial first person, no hype, no urgency, never coaching or recruiting energy, never agents as the audience, never EP/EPIC/FAM vocabulary. Use for any content that represents Allison as a luxury real estate advisor to consumers -- NOT for Expert Partners, EPIC, FAM, or AG Personal Brand content. It inherits the operating-doctrine and never overrides it."
+description: "Apply the AG Luxury brand voice to consumer-facing real estate content for Allison Gaddy: listing copy, listing films and video scripts, bios, case studies, press materials, site copy, social, and email aimed at luxury sellers and buyers in North Dallas and the western ranch corridor. The public-facing brand is Allison Gaddy, the full name; AG Luxury is the internal workspace name only (aura ADR 0045). Producer positioning (The Producer Came Home), warm editorial voice, situational point of view, no hype, no urgency, never coaching or recruiting energy, never agents as the audience, never EP/EPIC/FAM vocabulary. Use for any content that represents Allison as a luxury real estate advisor to consumers -- NOT for Expert Partners, EPIC, FAM, or AG Personal Brand content. It inherits the operating-doctrine and never overrides it."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: brands
@@ -16,7 +16,7 @@ subtitle: "luxury real estate voice under Allison’s name"
 
 Canonical repo: `ExpertPartners/ag-luxury`. `docs/DECISION-LOG.md` is the append-only ruling record and wins over this skill wherever they conflict. `docs/governance/` holds the approved claim set. The estate-brain does not index ag-luxury (verified 2026-08-02), so this skill is the working reference for sessions without the repo.
 
-Visual tokens (color, type, spacing) are owned by AG Luxury Brand Guide v1, ruled authoritative by Allison 2026-07-25 as D024 in the decision log. Do not restate or improvise visual tokens here or anywhere; read D024. Its one governing idea carries into copy: restraint is the luxury signal, and all warmth comes from photography, never from decoration.
+The live brand guide at https://brand.agluxurytx.com/ is the current source of brand truth and owns the visual tokens (color, type, spacing), per ag-luxury DECISION-LOG D036 and D037. Do not restate or improvise visual tokens here or anywhere; read the guide. Its governing idea carries into copy: restraint is the luxury signal, and photography brings the living color, never decoration.
 
 ## Naming ruling (never deviate)
 
@@ -40,12 +40,12 @@ Consumers only. Luxury sellers and buyers, estate, ranch, and equestrian owners,
 
 ## Voice
 
-- First person as Allison, or close third when the format requires it (formal bios, press boilerplate).
+- Point of view is situational (ag-luxury DECISION-LOG D038). First person when Allison is speaking to a client or the market: letters, email, social, presentations, voiceover, her about story. Third person when the piece is about a property or a third party: listing copy, property pages, bios written as introductions, press.
 - Warm first-name storytelling. Editorial and exact. Full sentences, unhurried cadence, trusted-advisor register, not voice-memo casual and not corporate.
 - (The receipts-over-sizzle mandate came OUT of this voice spec for now, ruled 2026-08-06, too firm, too much pressure. The rest of the ruled voice stands.)
 - Producer framing throughout: a producer causes the thing to exist, finds the story, engineers the launch. Listings get a produced launch, not a promotion.
 - Stillness and restraint. No hype, no urgency, no countdowns, no exclamation-heavy copy. Grace reads as confidence in this market.
-- No coaching or recruiting energy ever. No black-and-gold luxury cliche, in copy or in look (D024 removed gold entirely). No cliches: never "Luxury living redefined," "Your dream home awaits," "Once in a lifetime."
+- No coaching or recruiting energy ever. No black-and-gold luxury cliche in copy. In design, Rich Gold stays a restrained jewelry-scale accent as the live guide sets it (D036). No cliches: never "Luxury living redefined," "Your dream home awaits," "Once in a lifetime."
 - Discretion is a feature. The clientele buys it. No client names in marketing or stories without documented consent.
 
 Language bank, reuse until strangers repeat them: The producer came home. Receipts, not reach. Produced like a film, priced like an asset. Attention is easy, outcomes are hard. Global reach, local proof. I do not chase seventeen billion strangers, I find the twelve buyers who matter. My brokerage serves the agent so I can serve you.
@@ -62,6 +62,7 @@ Language bank, reuse until strangers repeat them: The producer came home. Receip
 - Superlative lock: "the top ranked film school in the country," attributed if pushed. Never an unqualified world's number one.
 - Bella Cima (210 Bella Cima Drive, Austin) is framed as her final Austin sale before coming home to Dallas, never pushed as recent activity.
 - Every competitor metric, if ever cited, is described as their self-reported marketing data.
+- Never invent facts: local knowledge, property details, market facts, rankings, testimonials, or eXp Luxury capabilities (ag-luxury DECISION-LOG D042).
 
 ## Banned
 
@@ -77,11 +78,12 @@ Language bank, reuse until strangers repeat them: The producer came home. Receip
 - No em dashes anywhere. Use commas, periods, parentheses, or double hyphens.
 - Colons and semicolons allowed in drafted prose, sparingly, never overused (ruled 2026-08-04). Commas, periods, parentheses, and double hyphens stay preferred.
 - No bold or italics in copy (legal and MLS requirements are the only exception).
+- No horizontal rules or decorative dividers. Always write eXp (ag-luxury DECISION-LOG D040).
 
 ## Self-check before delivering anything
 
 1. "AG Luxury" in consumer copy? Replace with Allison Gaddy.
-2. Em dashes, colons, or semicolons in prose? Bold or italics? Rewrite.
+2. Em dashes, or overused colons or semicolons? Bold, italics, or decorative dividers? Rewrite.
 3. Any sold price or percentage not compliance-cleared? Remove; route to the in-person walkthrough.
 4. Any pattern claim or unattributed superlative? Rewrite as a specific past fact.
 5. EP/EPIC/FAM vocabulary, coaching energy, or agent-facing framing? Remove.
@@ -97,4 +99,4 @@ If any check fails, fix before delivering.
 
 Derived 2026-08-02 from the four canonical Drive sources (AG-Luxury-Brand-Conviction-Playbook-v4-Producers-Edition, the primary voice source in Allison's own words; AG-Formal-Luxury-Listing-Bio-CORRECTED, the voice in finished application; the Allison Gaddy identity design creative brief; the Allison Gaddy Luxury Brand and Website Strategist Brief) plus the ag-luxury repo canon (DECISION-LOG D024, PROJECT-INSTRUCTIONS-ALLISONGADDY-REWRITE, AG-CONSOLIDATION-REPORT).
 
-Not verified and named as such: the exact lockup title has not been checked against live TREC or eXp rules (the sources themselves gate it on that check; the licensed title in the formal bio is Broker Associate). The AG-LUXURY-BRAND-GUIDE-v1.md file referenced by D024 is not present at ag-luxury main HEAD as of 2026-08-02; the D024 decision-log entry is the reachable token source until the file lands.
+Not verified and named as such: the exact lockup title has not been checked against live TREC or eXp rules (the sources themselves gate it on that check; the licensed title in the formal bio is Broker Associate). Visual tokens now come from the live brand guide at https://brand.agluxurytx.com/ (D036, D037), not from the Brand Guide v1 file named by D024.
