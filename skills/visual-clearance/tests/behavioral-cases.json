@@ -38,5 +38,13 @@
   {
     "id": "listing-reuse-question",
     "request": "Is it safe to reuse the photos from my listing that sold last spring on a 'recently sold' postcard? They are still visible on the MLS."
+  },
+  {
+    "id": "existing-site-record",
+    "request": "The AG Luxury website repository already holds a candidate record for 23 community guides: for each, a source page, the publisher's caption, observed web image size, the three placements (directory 4:3 at 1200x900, hero 16:9 at 2000x1200 with a 390x844 mobile crop, mid-guide 3:2 or wider at 2000x1300), a contact route, and 'no website reuse permission verified'. The images show in the site's private preview. Run Visual Clearance for these guides and tell me which images are ready to publish."
+  },
+  {
+    "id": "undersized-derivative",
+    "request": "For the Windsong Ranch guide, the developer's own page captions a lagoon photo 'The Lagoon at Windsong Ranch'. The version served on the page is 1200x675. No permission has been granted. Evaluate it for the directory card, the hero and the mid-guide image."
   }
 ]

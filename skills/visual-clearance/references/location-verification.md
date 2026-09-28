@@ -23,7 +23,7 @@ Record each item with a short detail and, where one exists, a pointer (source pa
 | D | `map_corroboration` | View compared against satellite or street-level imagery, viewing only, never copied |
 | E | `independent_corroboration` | A developer, city or news photo of the same structure |
 | F | `reverse_image_earliest` | Reverse image search finding the earliest source, mislabeling or a different original owner |
-| none | `search_label`, `ai_inference` | Recorded for transparency, worth nothing as evidence |
+| none | `search_label`, `ai_inference`, `page_placement` | Recorded for transparency, worth nothing as evidence. `page_placement` is an image merely appearing on a neighborhood, agent or developer page without a caption naming the scene |
 | stop | `contradiction` | Anything showing the image depicts somewhere else |
 
 ## Grades
@@ -36,6 +36,7 @@ Record each item with a short detail and, where one exists, a pointer (source pa
 ## Rules
 
 - Grades rise only when new evidence is recorded. A claimed grade above what the evidence supports is flagged as a grade violation and the computed grade stands.
+- A caption from the community's own owner (developer, HOA, official site) is still one A item. It makes an image PROBABLE, not VERIFIED.
 - PROBABLE is not VERIFIED. It can support a generic or secondary use; it cannot carry a named-place page.
 - Reverse image results (F) protect provenance and ownership; they do not by themselves locate the image.
 - Map and street-level imagery is for viewing during verification. It is never downloaded, stored or used as a candidate (Mapillary under CC BY-SA is the one downloadable exception, as evidence only).

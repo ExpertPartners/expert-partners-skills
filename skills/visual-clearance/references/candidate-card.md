@@ -31,7 +31,7 @@ Apply the first rule that matches. `clearance_rules.decide` enforces the same or
 
 1. Generated imagery offered for a named place: REJECT.
 2. Location REJECT, or UNVERIFIED on a named-place request: REJECT, even when a creator or owner is reachable. Raise the grade with recorded evidence first; a permission request never substitutes for identity evidence.
-3. Technical fit FAIL for this surface: REJECT for this use.
+3. Technical fit FAIL for this surface on an original file: REJECT for this use. When the measured file is only an observed web derivative (`dimensions_basis: observed_web`) and only resolution fails, the image is not rejected; the missing original-resolution file becomes an ask in the permission route, and the candidate can never read USE until the original is measured.
 4. Rights NOT CLEARED: LICENSE when a purchasable license covers the exact use, else REQUEST PERMISSION when an owner or creator route exists, else REJECT.
 5. PROBABLE on a named-place request: REQUEST PERMISSION when the owner or creator can confirm identity and grant rights, else REJECT.
 6. Rights NEEDS HUMAN DECISION (ShareAlike in advertising or print, unresolved people, logo or home flags): REQUEST PERMISSION when a route exists, else REJECT. Allison can still decide the gate herself.

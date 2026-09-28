@@ -42,7 +42,8 @@ EVIDENCE_TYPES = {
     "independent_corroboration": "E",
     "reverse_image_earliest": "F",
 }
-NON_EVIDENCE = {"search_label", "ai_inference"}
+# page_placement: an image merely appearing on a neighborhood, agent or developer page.
+NON_EVIDENCE = {"search_label", "ai_inference", "page_placement"}
 CONTRADICTION = "contradiction"
 
 # Rights bases. Distinct on purpose; none of them is by itself exact-use clearance.
@@ -220,6 +221,9 @@ def evaluate_rights(candidate: dict, request: dict, today: dt.date) -> dict:
     if basis not in NO_RIGHTS_BASES and not (rights.get("license_evidence_pointer") or "").strip():
         failures.append("no durable license or permission evidence pointer")
 
+    for conflict in rights.get("conflicts") or []:
+        failures.append(f"license claim contradicted by recorded evidence: {conflict}")
+
     permission = rights.get("permission") or {}
     expires = permission.get("expires")
     if expires and dt.date.fromisoformat(str(expires)) < today:
@@ -293,6 +297,20 @@ def decide(candidate: dict, request: dict, fit: dict | None, today: dt.date) -> 
     if candidate.get("source_class") == "ai_generated":
         flags.append("AI-generated imagery")
 
+    # Observed web derivatives prove composition, not resolution. A size failure on
+    # one is a missing original, not a verdict on the image.
+    size_checks = {"crop_resolution", "mobile_density", "target_source"}
+    failing = {c["check"] for c in (fit or {}).get("checks", []) if c.get("result") == "fail"}
+    derivative_only = (
+        candidate.get("dimensions_basis") == "observed_web"
+        and bool(fit)
+        and bool(fit.get("insufficient_resolution"))
+        and failing <= size_checks
+    )
+    if derivative_only:
+        req = fit.get("required_crop_px") or {}
+        flags.append(f"original-resolution file required (observed web image too small; needs a crop of at least {req.get('w')}x{req.get('h')})")
+
     route = candidate.get("owner_contact_route")
     purchase = candidate.get("license_purchase") or {}
     action = None
@@ -302,7 +320,7 @@ def decide(candidate: dict, request: dict, fit: dict | None, today: dt.date) -> 
         action, reasons = "REJECT", ["location evidence contradicts the subject"]
     elif named and location["grade"] == "UNVERIFIED":
         action, reasons = "REJECT", ["UNVERIFIED imagery cannot represent a named place"]
-    elif fit and fit.get("technical_fit") == "FAIL":
+    elif fit and fit.get("technical_fit") == "FAIL" and not derivative_only:
         action = "REJECT"
         reasons = ["fails technical fit for this surface" + (" (insufficient resolution)" if fit.get("insufficient_resolution") else "")]
     elif rights["state"] == "NOT CLEARED":
@@ -319,6 +337,9 @@ def decide(candidate: dict, request: dict, fit: dict | None, today: dt.date) -> 
     elif rights["state"] == "NEEDS HUMAN DECISION":
         reasons = list(rights["gates"])
         action = "REQUEST PERMISSION" if route else "REJECT"
+    elif derivative_only:
+        reasons = ["observed web image is below the surface minimum; the original file must be obtained and re-checked"]
+        action = "REQUEST PERMISSION" if route else "REJECT"
     elif fit and fit.get("technical_fit") == "PENDING REVIEW":
         raise RuleError(
             f"candidate {candidate.get('candidate_id')!r} passes every other gate but its visual review "
@@ -332,8 +353,10 @@ def decide(candidate: dict, request: dict, fit: dict | None, today: dt.date) -> 
         extra = list(rights["failures"]) + list(rights["gates"])
         if named and location["grade"] == "PROBABLE":
             extra.append("PROBABLE is not VERIFIED; a named-place page needs VERIFIED")
-        if fit and fit.get("technical_fit") == "FAIL":
+        if fit and fit.get("technical_fit") == "FAIL" and not derivative_only:
             extra.append("fails technical fit for this surface")
+        if derivative_only:
+            extra.append("request the original-resolution file with any grant")
         reasons += [item for item in extra if not any(item in r or r in item for r in reasons)]
 
     return {

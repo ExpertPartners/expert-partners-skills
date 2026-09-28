@@ -1,0 +1,14 @@
+{
+  "profile_id": "ag-luxury-guide-mid",
+  "profile_version": "1.0.0",
+  "surface": "AG Luxury website full-width mid-guide image (before listings or Connect)",
+  "owner": "ExpertPartners/ag-luxury-site (website placements and size requirements)",
+  "provenance": "Consumer copy of targetCrops.midGuide in docs/evidence/community-photo-candidates-2026-09-28.json and docs/visual-photo-replacements-2026-09-28.md line 7, read at ag-luxury-site f2f9095696284114c10686a9f40e5a7992795b59 on 2026-09-28. The owner record wins; scripts/evaluate_site_record.py fails on drift.",
+  "orientation": "landscape",
+  "aspect_ratio": { "w": 3, "h": 2 },
+  "aspect_mode": "min",
+  "min_crop_px": { "w": 2000, "h": 1300 },
+  "visual_review_items": [
+    "full_width_fit: holds a full-width editorial slot without visible upscaling"
+  ]
+}

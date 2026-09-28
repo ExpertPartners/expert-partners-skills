@@ -9,11 +9,20 @@ topic: visual-assets register reads, record schema and filing after approval
 
 # Register and filing
 
-The canonical register is the `ExpertPartners/visual-assets` repository. It owns cleared asset metadata, approval state, rights and provenance records, location-verification evidence records, permission and license evidence pointers, hashes and approved usage records. This skill owns only the method and the schema at `schemas/asset-record.schema.json`.
+This skill owns only the method and the schema at `schemas/asset-record.schema.json`. It owns no records.
+
+## Current record owners (reconciled 2026-09-28)
+
+- AG Luxury website: `ExpertPartners/ag-luxury-site` owns the records for assets it places and candidates it researches. Placed-asset provenance lives in `docs/neighborhood-source-register.md` and `docs/evidence/area-photo-assets-2026-09-28.json`; candidate research and contact routes in `docs/evidence/community-photo-candidates-2026-09-28.json`; packaged media hashes in `source-reference/asset-manifest.json`. Read them at a pinned revision, by pointer. Never edit, migrate or delete them. Any future transfer needs an explicit owner-approved transition with source pointers and preserved history.
+- Shared register: `ExpertPartners/visual-assets` is proposed for assets cleared for more than one consumer. It does not exist, and its creation waits on the ownership decision recorded in aura `intake/2026-09-28-visual-clearance-ownership-reconciliation.md`. The sections below describe it for when it is born.
+
+## The proposed shared register
+
+It would own cleared asset metadata, approval state, rights and provenance records, location-verification evidence records, permission and license evidence pointers, hashes and approved usage records for assets whose approved scope spans consumers.
 
 ## Reading the register
 
-Read `register/` in visual-assets through the first path that works: a local checkout at a fetched revision, the Estate Brain door if it serves the repo, or the GitHub contents API. Name the revision read. If no path works, report `register unreachable` on the output and continue external sourcing without claiming what the register holds. An unregistered or unborn register is reported the same way.
+Read the current owner's records first (above). For the shared register, read `register/` in visual-assets through the first path that works: a local checkout at a fetched revision, the Estate Brain door if it serves the repo, or the GitHub contents API. Name the revision read. If no path works, report `register unreachable` on the output and continue external sourcing without claiming what the register holds. An unregistered or unborn register is reported the same way.
 
 ## Pointer boundary
 

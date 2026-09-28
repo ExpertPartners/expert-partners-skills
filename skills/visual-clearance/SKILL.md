@@ -23,10 +23,10 @@ The 2026-09-28 research report (AI-Assisted Visual Asset Sourcing for AG Luxury,
 | Concern | Owner |
 | --- | --- |
 | This method, its scripts, schema and profiles | this skill, `expert-partners-skills skills/visual-clearance/` |
-| Cleared asset records, approval state, rights, provenance, location evidence records, usages, hashes | `ExpertPartners/visual-assets` register (see [register and filing](references/register-and-filing.md)) |
+| Asset records, approval state, rights, provenance, location evidence, usages, hashes | today, the consuming application's own asset records (AG Luxury website: `ExpertPartners/ag-luxury-site`); a shared `visual-assets` register is proposed and waits on an ownership decision (see [register and filing](references/register-and-filing.md)) |
 | Master image files and large evidence (PDF captures, contracts) | Google Drive, referenced by pointer |
 | Brand visual rules and voice | the owning brand repo, resolved through the Estate Manifest and `aura registry.yaml` |
-| Deployment copies on a site | the consuming application, never the owner of rights truth |
+| Page layouts, placements, placement size requirements, preview behavior, publishing | the consuming application; this skill reads them and never edits them |
 
 No vendor (Perplexity, Canva, Adobe, Grok or any other) is ever the source of truth for a clearance.
 
@@ -34,7 +34,7 @@ No vendor (Perplexity, Canva, Adobe, Grok or any other) is ever the source of tr
 
 A. Define the request. Collect or infer subject or place, intended use and use contexts, brand, required format or crop, visual direction, and whether a named real place is represented. Read the brand's canon and the requesting application first; ask only for what neither supplies. Use the technical-fit profile the surface supplies or the matching one in [profiles/](profiles/). When none matches the surface, build a request-scoped profile from the stated format and crop, say so on the output, and never grade against a different surface's profile.
 
-B. Check owned and cleared assets first. Search the visual-assets register before any external search. Reuse only when the record's status, brand scope, place identity, use scope, modifications, expiry, review date and technical fit all cover the new request (`clearance_rules.check_reuse`). If the register is unreachable, say so on the output and continue sourcing, but never claim an owned asset exists or does not exist.
+B. Check owned and cleared assets first. Read the current record owner before any external search: the application's own asset and candidate records at a pinned revision (`scripts/evaluate_site_record.py` for the AG Luxury website record), or the visual-assets register once it exists. Reuse the owner's existing candidates, sources, contact routes and dimensions instead of repeating their searches; never copy them into a second register. Reuse only when the record's status, brand scope, place identity, use scope, modifications, expiry, review date and technical fit all cover the new request (`clearance_rules.check_reuse`). If the register is unreachable, say so on the output and continue sourcing, but never claim an owned asset exists or does not exist.
 
 C. Source candidates down the waterfall in [sourcing-waterfall.md](references/sourcing-waterfall.md), using the best available approved research, search or browser tool. Perplexity is preferred for deep web research when present; any approved tool runs the same method. Log every source searched. No scrapers built to get around vendor terms.
 
@@ -48,7 +48,7 @@ G. Output at most five candidate cards per [candidate-card.md](references/candid
 
 H. Hold the human gates below. Draft outreach per [outreach-drafts.md](references/outreach-drafts.md); never send it.
 
-I. File after approval. Only after Allison or the authorized human approves a specific card, write the record through the authorized visual-assets repository workflow (branch and pull request), validated by `scripts/validate_record.py`. A recommendation is not an approval.
+I. File after approval. Only after Allison or the authorized human approves a specific card, hand a record validated by `scripts/validate_record.py` to the current record owner's own asset workflow (for the AG Luxury website, its source asset workflow run by the website owner). The skill never edits an application's repository, branch or deployment. A recommendation is not an approval.
 
 ## Never
 
@@ -72,6 +72,7 @@ Allison or the authorized human decides: final use of any asset, sending any per
 | `scripts/clearance_rules.py` | location grading, rights clearance, human gates, next action, register reuse |
 | `scripts/render_cards.py` | ranked cards, five-card cap, zero-result route |
 | `scripts/validate_record.py` | register record schema, cross-field rules and privacy checks |
+| `scripts/evaluate_site_record.py` | evaluates an application's existing candidate record in place, every placement, with owner-drift checks |
 
 Standard library only (PyYAML for YAML records). Tests: `python3 -m unittest discover -s skills/visual-clearance/tests -p 'test_*.py' -v`. Behavioral cases for cold-reader runs live in [tests/behavioral-cases.json](tests/behavioral-cases.json) with a withheld rubric.
 

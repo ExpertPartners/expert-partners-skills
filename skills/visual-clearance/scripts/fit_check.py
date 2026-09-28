@@ -27,8 +27,14 @@ import sys
 from pathlib import Path
 
 
-def center_crop(width: int, height: int, aspect_w: int, aspect_h: int) -> dict:
-    """Largest centered crop of the requested aspect ratio."""
+def center_crop(width: int, height: int, aspect_w: int, aspect_h: int, mode: str = "exact") -> dict:
+    """Largest centered crop of the requested aspect ratio.
+
+    mode "exact" crops to the ratio. mode "min" means "this ratio or wider":
+    a source already at least that wide is used whole, never cropped narrower.
+    """
+    if mode == "min" and width * aspect_h >= height * aspect_w:
+        return {"x": 0, "y": 0, "w": width, "h": height}
     if width * aspect_h >= height * aspect_w:
         crop_h = height
         crop_w = (height * aspect_w) // aspect_h
@@ -50,7 +56,9 @@ def review_keys(profile: dict) -> list[str]:
 def evaluate(width: int, height: int, profile: dict, review: dict | None = None) -> dict:
     review = review or {}
     aspect = profile["aspect_ratio"]
-    crop = center_crop(width, height, aspect["w"], aspect["h"])
+    mode = profile.get("aspect_mode", "exact")
+    crop = center_crop(width, height, aspect["w"], aspect["h"], mode)
+    ratio_label = f"{aspect['w']}:{aspect['h']}" + (" or wider" if mode == "min" else "")
     checks: list[dict] = []
 
     orientation = "landscape" if width > height else ("portrait" if height > width else "square")
@@ -60,7 +68,7 @@ def evaluate(width: int, height: int, profile: dict, review: dict | None = None)
     checks.append({
         "check": "orientation",
         "result": "pass" if wanted in (None, orientation) else "info",
-        "detail": f"source is {orientation}; profile wants {wanted}; the {aspect['w']}:{aspect['h']} crop is evaluated below",
+        "detail": f"source is {orientation}; profile wants {wanted}; the {ratio_label} crop is evaluated below",
     })
 
     min_crop = profile["min_crop_px"]
@@ -68,8 +76,17 @@ def evaluate(width: int, height: int, profile: dict, review: dict | None = None)
     checks.append({
         "check": "crop_resolution",
         "result": "pass" if crop_ok else "fail",
-        "detail": f"{aspect['w']}:{aspect['h']} crop {crop['w']}x{crop['h']} vs minimum {min_crop['w']}x{min_crop['h']}",
+        "detail": f"{ratio_label} crop {crop['w']}x{crop['h']} vs minimum {min_crop['w']}x{min_crop['h']}",
     })
+
+    if mode == "min":
+        # "this ratio or wider": the minimum height stands and the width must reach the ratio.
+        need_h = min_crop["h"]
+        need_w = max(min_crop["w"], -(-need_h * aspect["w"] // aspect["h"]))
+    else:
+        need_h = max(min_crop["h"], -(-min_crop["w"] * aspect["h"] // aspect["w"]))
+        need_w = max(min_crop["w"], -(-need_h * aspect["w"] // aspect["h"]))
+    required = {"w": need_w, "h": need_h, "note": f"smallest {ratio_label} crop meeting both documented minimums"}
 
     target = profile.get("target_source_px")
     if target:
@@ -80,13 +97,15 @@ def evaluate(width: int, height: int, profile: dict, review: dict | None = None)
             "detail": f"source {width}x{height} vs approximate target {target['w']}x{target['h']}",
         })
 
-    zone = profile["heading_safe_zone"]
-    safe = {
-        "x": crop["x"] + round(crop["w"] * zone["x"]),
-        "y": crop["y"] + round(crop["h"] * zone["y"]),
-        "w": round(crop["w"] * zone["w"]),
-        "h": round(crop["h"] * zone["h"]),
-    }
+    zone = profile.get("heading_safe_zone")
+    safe = None
+    if zone:
+        safe = {
+            "x": crop["x"] + round(crop["w"] * zone["x"]),
+            "y": crop["y"] + round(crop["h"] * zone["y"]),
+            "w": round(crop["w"] * zone["w"]),
+            "h": round(crop["h"] * zone["h"]),
+        }
 
     mobile = profile.get("mobile")
     mobile_result = None
@@ -131,6 +150,8 @@ def evaluate(width: int, height: int, profile: dict, review: dict | None = None)
         "profile_version": profile.get("profile_version"),
         "source": {"w": width, "h": height},
         "crop": crop,
+        "aspect_mode": mode,
+        "required_crop_px": required,
         "heading_safe_zone_px": safe,
         "overlay_under_review": profile.get("overlay"),
         "mobile": mobile_result,

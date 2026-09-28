@@ -35,6 +35,8 @@ Exact-use clearance is computed, never entered. Never collapse "free to download
 - Per-design licenses (Canva Pro content) cannot become standalone library assets. Hotlink-only API terms cannot put a master in the register. Single-seat or no-DAM terms (Unsplash+) conflict with a shared library and go to Allison.
 - Paid and permission bases need recorded scope covering this exact use. Every basis except the no-rights ones needs a durable license or permission evidence pointer.
 - Expired permission fails.
+- A license claim contradicted by recorded evidence fails (`rights.conflicts`), for example embedded metadata naming a different copyright owner or All Rights Reserved under an upload page's Creative Commons claim. Resolve the contradiction with the actual owner before any reliance.
+- Private-preview or internal-review placement is not evidence of permission.
 - Attribution required means attribution text is recorded (the renderer composes "Photo: creator, license, via source" when creator and license are known). Attribution never cures any failure above.
 
 ## Third-party concerns that survive any license

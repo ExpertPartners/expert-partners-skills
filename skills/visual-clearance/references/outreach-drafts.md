@@ -13,7 +13,9 @@ The skill may draft a request so Allison can approve it in one step. It never se
 
 ## Voice
 
-Write the draft in the requesting brand's voice, read live from that brand's owning canon before drafting. This file carries no voice rules. If the brand is ambiguous, ask which brand before drafting.
+Write the draft in the requesting brand's voice, read live from that brand's owning canon before drafting, including its public-naming rule. This file carries no voice rules. If the brand is ambiguous, ask which brand before drafting. An internal workspace name never appears in outward requests when the brand's canon says it is internal only (AG Luxury canon names Allison Gaddy as the public brand).
+
+When the consuming application already holds a request template, reuse it as the base and make only the changes canon or the specific request requires.
 
 ## What every request must make clear
 

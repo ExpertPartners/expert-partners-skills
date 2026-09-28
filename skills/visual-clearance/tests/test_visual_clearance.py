@@ -27,6 +27,7 @@ sys.path.insert(0, str(SCRIPTS))
 import clearance_rules as rules  # noqa: E402
 import fit_check  # noqa: E402
 import inspect_image  # noqa: E402
+import evaluate_site_record  # noqa: E402
 import render_cards  # noqa: E402
 import validate_record  # noqa: E402
 
@@ -197,8 +198,9 @@ class PilotTests(unittest.TestCase):
         self.assertIn("currency", flags)
         tower = decisions["lf-water-tower"]
         self.assertEqual(tower["technical_fit"], "PENDING REVIEW")
-        self.assertEqual(tower["rights"]["state"], "RIGHTS CLEAR")
-        self.assertFalse(tower["exact_use_cleared"], "a rights pass on a PROBABLE place is not exact-use clearance")
+        self.assertEqual(tower["rights"]["state"], "NOT CLEARED", "the website record found a contradicting copyright owner")
+        self.assertIn("license claim contradicted", " ".join(tower["reasons"]))
+        self.assertFalse(tower["exact_use_cleared"])
         self.assertIn("PROBABLE is not VERIFIED", " ".join(tower["reasons"]))
         self.assertEqual(tower["rights"]["attribution_text"], "Photo: Michael.Rihani, CC-BY-SA-4.0, via Wikimedia Commons")
 
@@ -337,10 +339,10 @@ class GuardTests(unittest.TestCase):
         evaluation = load_fixture("pilot-light-farms.json")
         evaluation["request"].update({"represents_named_place": False, "use_contexts": ["print"], "profile": None})
         result = build(evaluation)
-        tower = next(dec for _, _, dec in result["cards"] if dec["candidate_id"] == "lf-water-tower")
-        self.assertEqual(tower["rights"]["state"], "NEEDS HUMAN DECISION")
-        self.assertTrue(any("ShareAlike adaptation" in g for g in tower["human_gates"]))
-        self.assertNotEqual(tower["next_action"], "USE")
+        fitness = next(dec for _, _, dec in result["cards"] if dec["candidate_id"] == "lf-fitness")
+        self.assertEqual(fitness["rights"]["state"], "NEEDS HUMAN DECISION")
+        self.assertTrue(any("ShareAlike adaptation" in g for g in fitness["human_gates"]))
+        self.assertNotEqual(fitness["next_action"], "USE")
 
     def test_five_card_cap_and_no_padding(self):
         evaluation = load_fixture("pilot-generic-lifestyle.json")
@@ -396,6 +398,75 @@ class GuardTests(unittest.TestCase):
                               capture_output=True, text=True)
         self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
         self.assertIn("VALID", proc.stdout)
+
+
+class SiteRecordTests(unittest.TestCase):
+    """The website's own record is read in place; nothing is copied or promoted."""
+
+    def evaluate(self, record=None):
+        record = record or load_fixture("site-record-sample.json")
+        return evaluate_site_record.evaluate(record, "fixture-rev", TODAY)
+
+    def test_each_placement_checked_with_documented_minimums(self):
+        rows = {r["slug"]: r for r in self.evaluate()["candidates"]}
+        labeled = rows["sample-labeled"]["placements"]
+        self.assertEqual(set(labeled), {"directory", "hero", "midGuide"})
+        self.assertEqual(labeled["directory"]["crop"], "900x675")
+        self.assertEqual(labeled["hero"]["required"], "2134x1200")
+        self.assertEqual(labeled["midGuide"]["required"], "2000x1300")
+        page_only = rows["sample-page-only"]["placements"]
+        self.assertEqual(page_only["hero"]["crop"], "3000x1687")
+        self.assertTrue(page_only["midGuide"]["resolution_ok"], "3:2 or wider uses the whole 3:2 frame")
+
+    def test_page_placement_is_not_identity_evidence_and_nothing_is_verified(self):
+        result = self.evaluate()
+        rows = {r["slug"]: r for r in result["candidates"]}
+        self.assertEqual(rows["sample-page-only"]["location_grade"], "UNVERIFIED")
+        self.assertEqual(rows["sample-page-only"]["next_action"], "REJECT")
+        self.assertEqual(rows["sample-labeled"]["location_grade"], "PROBABLE")
+        self.assertEqual(result["counts"]["verified"], 0)
+        self.assertEqual(result["counts"]["exact_use_cleared"], 0)
+
+    def test_undersized_web_derivative_asks_for_the_original(self):
+        row = {r["slug"]: r for r in self.evaluate()["candidates"]}["sample-labeled"]
+        self.assertEqual(row["next_action"], "REQUEST PERMISSION")
+        self.assertTrue(any("original-resolution file required" in f for f in row["risk_flags"]))
+        self.assertTrue(row["missing"]["resolution"])
+        original = {"candidate_id": "x", "dimensions_basis": "original", "owner_contact_route": "publisher",
+                    "location": {"evidence": [{"type": "source_metadata", "detail": "labeled"}]},
+                    "rights": {"basis": "visible_online"}}
+        fit = fit_check.evaluate(1200, 675, HERO)
+        self.assertEqual(rules.decide(original, {"represents_named_place": True}, fit, TODAY)["next_action"], "REJECT")
+
+    def test_listing_photos_are_mls_and_flag_the_home(self):
+        row = {r["slug"]: r for r in self.evaluate()["candidates"]}["sample-listing"]
+        self.assertTrue(row["mls"])
+        self.assertEqual(row["rights_state"], "NOT CLEARED")
+        self.assertTrue(any("identifiable_home" in f for f in row["risk_flags"]))
+        self.assertTrue(any("not Allison's" in m for m in row["missing"]["rights"]))
+
+    def test_owner_requirement_drift_fails_the_run(self):
+        record = load_fixture("site-record-sample.json")
+        record["candidates"][0]["targetCrops"]["hero"] = "16:9, at least 2400x1350"
+        with self.assertRaises(evaluate_site_record.DriftError):
+            self.evaluate(record)
+
+    def test_grants_name_the_public_brand_not_the_internal_one(self):
+        for row in self.evaluate()["candidates"]:
+            for line in row["missing"]["rights"]:
+                self.assertNotIn("AG Luxury", line)
+
+    def test_adapter_never_writes(self):
+        source = (SCRIPTS / "evaluate_site_record.py").read_text(encoding="utf-8")
+        self.assertIsNone(re.search(r"write_text|open\([^)]*[\"'][wa]", source))
+
+    def test_min_aspect_mode(self):
+        mid = fit_check.load_profile(SKILL / "profiles" / "ag-luxury-guide-mid.json")
+        wide = fit_check.evaluate(2600, 1300, mid, {"full_width_fit": "pass"})
+        self.assertEqual(wide["crop"], {"x": 0, "y": 0, "w": 2600, "h": 1300})
+        self.assertEqual(wide["technical_fit"], "PASS")
+        narrow = fit_check.evaluate(2000, 1500, mid)
+        self.assertEqual((narrow["crop"]["w"], narrow["crop"]["h"]), (2000, 1333))
 
 
 if __name__ == "__main__":
