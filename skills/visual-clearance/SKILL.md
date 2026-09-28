@@ -32,7 +32,7 @@ No vendor (Perplexity, Canva, Adobe, Grok or any other) is ever the source of tr
 
 ## Workflow
 
-A. Define the request. Collect or infer subject or place, intended use and use contexts, brand, required format or crop, visual direction, and whether a named real place is represented. Read the brand's canon and the requesting application first; ask only for what neither supplies. Pick the technical-fit profile the surface supplies, else the closest profile in [profiles/](profiles/).
+A. Define the request. Collect or infer subject or place, intended use and use contexts, brand, required format or crop, visual direction, and whether a named real place is represented. Read the brand's canon and the requesting application first; ask only for what neither supplies. Use the technical-fit profile the surface supplies or the matching one in [profiles/](profiles/). When none matches the surface, build a request-scoped profile from the stated format and crop, say so on the output, and never grade against a different surface's profile.
 
 B. Check owned and cleared assets first. Search the visual-assets register before any external search. Reuse only when the record's status, brand scope, place identity, use scope, modifications, expiry, review date and technical fit all cover the new request (`clearance_rules.check_reuse`). If the register is unreachable, say so on the output and continue sourcing, but never claim an owned asset exists or does not exist.
 
@@ -44,7 +44,7 @@ E. Clear rights with [rights-clearance.md](references/rights-clearance.md). Keep
 
 F. Test technical fit with `scripts/fit_check.py` and the surface profile. Record the visual review items (calm center, overlay tolerance, mobile subject) before any card can read USE. Surface insufficient resolution explicitly.
 
-G. Output at most five candidate cards per [candidate-card.md](references/candidate-card.md), rendered with `scripts/render_cards.py`. One NEXT action per card, from USE, REQUEST PERMISSION, LICENSE, COMMISSION or REJECT. Never pad to five. "No defensible candidate found" with a route is a successful result.
+G. Output at most five candidate cards per [candidate-card.md](references/candidate-card.md), rendered with `scripts/render_cards.py`. One NEXT action per card, from USE, REQUEST PERMISSION, LICENSE, COMMISSION or REJECT, chosen by the precedence in that reference (identity failures reject before any permission route). Never pad to five. "No defensible candidate found" with a route is a successful result.
 
 H. Hold the human gates below. Draft outreach per [outreach-drafts.md](references/outreach-drafts.md); never send it.
 

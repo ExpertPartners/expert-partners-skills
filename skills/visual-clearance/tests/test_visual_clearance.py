@@ -263,6 +263,17 @@ class GuardTests(unittest.TestCase):
         relabeled["location_confidence"] = "UNVERIFIED"
         self.assertTrue(any("only VERIFIED may represent a named place" in e for e in validate_record.validate(relabeled)))
 
+    def test_reachable_creator_never_substitutes_for_identity_evidence(self):
+        request = {"represents_named_place": True, "use_contexts": ["advertising"], "modifications": [], "commercial": True}
+        candidate = {"candidate_id": "prosper-nc", "source_class": "open_license", "creator": "Flickr Photographer",
+                     "owner_contact_route": "creator", "location": {"evidence": [{"type": "search_label", "detail": "tagged Prosper"}]},
+                     "rights": {"basis": "creative_commons", "license_id": "CC-BY-NC-2.0", "commercial_use": "prohibited",
+                                "conditions": ["attribution", "noncommercial"], "license_evidence_pointer": "https://example.com/p"}}
+        decision = rules.decide(candidate, request, None, TODAY)
+        self.assertEqual(decision["next_action"], "REJECT")
+        self.assertIn("UNVERIFIED imagery cannot represent a named place", decision["reasons"])
+        self.assertTrue(any("commercial use" in r for r in decision["reasons"]), "the rights failure stays visible")
+
     def test_contradiction_rejects_even_with_strong_evidence(self):
         graded = rules.grade_location([
             {"type": "landmark_match_official", "detail": "monument matches"},
