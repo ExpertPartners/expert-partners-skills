@@ -1,0 +1,18 @@
+{
+  "profile_id": "ag-luxury-community-hero",
+  "profile_version": "1.0.0",
+  "surface": "AG Luxury website community page hero",
+  "provenance": "Minimum values set by the Visual Clearance v1 dispatch (NORTH, Luxury Photo Sourcing table, 2026-09-28), drawn from the 2026-09-28 AI-Assisted Visual Asset Sourcing research report. No AG Luxury canon file carried hero specs when checked 2026-09-28. If ExpertPartners/ag-luxury canon or the consuming site defines these values later, that owner wins and this profile is updated to match, never the reverse.",
+  "orientation": "landscape",
+  "aspect_ratio": { "w": 16, "h": 9 },
+  "min_crop_px": { "w": 2000, "h": 1125 },
+  "target_source_px": { "w": 2000, "h": 1200 },
+  "heading_safe_zone": { "x": 0.2, "y": 0.3, "w": 0.6, "h": 0.4 },
+  "overlay": { "type": "dark", "opacity": 0.3 },
+  "mobile": { "viewport": { "w": 390, "h": 844 }, "min_density": 1.0, "report_densities": [2, 3] },
+  "visual_review_items": [
+    "calm_center: the heading safe zone is low-detail and free of signage, faces, house numbers and busy texture",
+    "overlay_tolerance: the image still reads as the named place under the profile's dark overlay",
+    "mobile_subject: the identifying subject stays inside the mobile slice"
+  ]
+}

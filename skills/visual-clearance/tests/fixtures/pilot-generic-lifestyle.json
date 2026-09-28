@@ -1,0 +1,48 @@
+{
+  "fixture_note": "Pilot 3. A generic luxury lifestyle header that names no real place, so generic stock is in scope. Both candidates are synthetic.",
+  "as_of": "2026-09-28",
+  "request": {
+    "subject": "Luxury lifestyle, evening terrace",
+    "represents_named_place": false,
+    "intended_use": "blog header",
+    "use_contexts": ["website"],
+    "brand": "ag-luxury",
+    "profile": "generic-web-landscape",
+    "modifications": ["16:9 crop"],
+    "commercial": true
+  },
+  "register_check": {"status": "checked", "note": "no approved generic lifestyle asset covering this use"},
+  "search_log": [{"source": "Unsplash", "query": "evening terrace luxury", "results": 40}, {"source": "Adobe Stock", "query": "evening terrace luxury", "results": 200}],
+  "candidates": [
+    {
+      "candidate_id": "unsplash-terrace",
+      "subject": "Evening terrace with lounge seating",
+      "source": "Unsplash (synthetic)",
+      "source_class": "platform_free",
+      "creator": "Synthetic Photographer",
+      "source_url": "https://unsplash.example/photos/terrace-1",
+      "dimensions": {"w": 5000, "h": 3333},
+      "capture_date": "2025",
+      "location": {"evidence": []},
+      "rights": {"basis": "free_commercial_platform", "license_id": "Unsplash-License", "license_url": "https://unsplash.com/license", "license_evidence_pointer": "drive:synthetic-license-capture", "commercial_use": "allowed", "modification": "allowed", "conditions": [], "scope_covers_use": true},
+      "third_party_flags": [],
+      "visual_review": {"on_brand_mood": "pass"}
+    },
+    {
+      "candidate_id": "adobe-terrace",
+      "subject": "Terrace at dusk with city lights",
+      "source": "Adobe Stock (synthetic preview)",
+      "source_class": "paid_stock",
+      "creator": "Synthetic Contributor",
+      "source_url": "https://stock.adobe.example/terrace-2",
+      "dimensions": {"w": 6720, "h": 4480},
+      "capture_date": "2026",
+      "location": {"evidence": []},
+      "rights": {"basis": "visible_online", "commercial_use": "unknown", "modification": "unknown", "conditions": [], "scope_covers_use": "unknown"},
+      "third_party_flags": [],
+      "license_purchase": {"available": true, "vendor": "Adobe Stock Standard", "covers_use": true},
+      "visual_review": {"on_brand_mood": "pass"}
+    }
+  ],
+  "expected": {"defensible_count": 2, "empty_route": null, "actions": {"unsplash-terrace": "USE", "adobe-terrace": "LICENSE"}}
+}

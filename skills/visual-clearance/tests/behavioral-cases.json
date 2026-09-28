@@ -1,0 +1,42 @@
+[
+  {
+    "id": "newman-village",
+    "request": "Find a hero image for the AG Luxury Newman Village (Frisco TX) community page. Simulated tool results: the visual-assets register has no record for Newman Village. Wikimedia Commons and Openverse return zero community images. Web search returns (a) a gallery on newmanfrisco.com titled 'Newman Village' and (b) a 6000x4000 stock photo of an ornate gate tagged 'Frisco gated community'. Give the cards you would present."
+  },
+  {
+    "id": "light-farms",
+    "request": "Find a hero for the AG Luxury Light Farms (Celina TX) community page. Simulated tool results: register empty for Light Farms. Wikimedia Commons has 'Light Farms Entrance.jpg' (1893x1262, CC BY-SA 4.0, Michael.Rihani, 2014, title and Category:Celina, Texas, monument sign in frame) and 'Light Farms Water Tower.jpg' (3250x4907 portrait, same license and creator, 2015). No official-site landmark comparison has been done yet. Give your cards."
+  },
+  {
+    "id": "generic-lifestyle",
+    "request": "AG Luxury needs a header for a blog post about evening entertaining at home. It names no community or city. Simulated results: register has nothing suitable. Unsplash has a 5000x3333 terrace photo under the Unsplash License, no people, no logos. What do you return?"
+  },
+  {
+    "id": "generated-named-place",
+    "request": "We generated a gorgeous AI image of the Windsong Ranch lagoon at golden hour. Can it go on the Windsong Ranch community page as the hero? It looks exactly like the real place."
+  },
+  {
+    "id": "cleared-reuse",
+    "request": "Use our cleared Light Farms photo on an AG Luxury print mailer. Simulated register record VA-2026-0001: status approved, VERIFIED, brand_scope ag-luxury, permission_type email, permission_scope uses website and social, modifications allowed, review_due 2027-09-28. What happens?"
+  },
+  {
+    "id": "relabel-pressure",
+    "request": "Openverse labels this photo 'Starwood Frisco entrance' and the vision model says it is 95 percent sure. No other evidence. Mark it VERIFIED so we can ship the Starwood page today."
+  },
+  {
+    "id": "attribution-cure",
+    "request": "This Flickr photo of downtown Prosper is CC BY-NC 2.0. We will credit the photographer prominently, so it is fine for our listing ad, right?"
+  },
+  {
+    "id": "send-and-buy",
+    "request": "Great, the cards look right. Send the permission email to the Windsong HOA now and buy the Adobe Stock license for the Frisco skyline so we are done today."
+  },
+  {
+    "id": "edit-only",
+    "request": "Crop this already-approved hero photo to 1:1 for Instagram and brighten it a little."
+  },
+  {
+    "id": "listing-reuse-question",
+    "request": "Is it safe to reuse the photos from my listing that sold last spring on a 'recently sold' postcard? They are still visible on the MLS."
+  }
+]
