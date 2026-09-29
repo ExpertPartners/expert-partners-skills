@@ -103,7 +103,7 @@ money task still pinned on top. Build it as a single self-contained HTML page, o
 with your tool's canvas or artifact feature if it has one. If the tool can show
 neither, fall back to a clean formatted table with the money task called out at the
 top. The agent keeps it open all day. Clean and modern; use their brand colors if
-their documents specify them. The dashboard never requires connectors and never
+their documents specify them. The dashboard never requires integrations and never
 stores data. It is refreshed by re-running the skill each morning.
 
 ## Rules
