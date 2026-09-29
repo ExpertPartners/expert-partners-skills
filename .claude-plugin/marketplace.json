@@ -40,6 +40,12 @@
       "source": "./plugins/acn-advisor",
       "version": "0.1.0",
       "description": "ACN advisor skills for the household ACN line (acn-email-watch, acn-currency-check). Separate from every EP brand lane; inherits operating-doctrine."
+    },
+    {
+      "name": "agent-marketing-kit",
+      "source": "./plugins/agent-marketing-kit",
+      "version": "0.1.0",
+      "description": "Allison Gaddy real estate agent marketing kit (dry run: daily-planner)."
     }
   ]
 }
