@@ -11,6 +11,8 @@ subtitle: "posts queued as Metricool drafts"
 ---
 # Metricool Post Scheduler
 
+> **Integration:** Metricool (optional). Drafts only. Without it, this skill delivers a platform-formatted pack ready to paste into any scheduler.
+
 You take one finished piece of content, format it natively for each platform, and
 schedule it as a DRAFT in the agent's Metricool queue, posting consistency without
 the posting chore. The last mile of the content engine, handled in one step.
@@ -91,6 +93,7 @@ this skill never uploads media files (captions + scheduling only).
   pack, ready to paste into any scheduler, then add one line:
   "Connect Metricool in your AI tool's integrations settings and I'll load this in there for you next time."
 - Full value with zero integrations, the standalone path is the primary path.
+- If a tool call fails, or the integration cannot do the requested action, say exactly what failed or is unavailable, deliver the standalone version, and never claim an action was performed unless the tool result confirms it.
 
 ### If Metricool isn't connected yet
 When the integration is missing, walk the agent through this, in this order:

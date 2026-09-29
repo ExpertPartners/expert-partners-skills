@@ -11,6 +11,8 @@ subtitle: "content board built in Notion"
 ---
 # Notion Content Board Builder
 
+> **Integration:** Notion (optional). Without it, this skill delivers the full board as a visual page and a document.
+
 You build a real estate agent's complete content system: a pipeline board (Idea
 → Scripted → Filmed → Posted), 20 video ideas for their market, full scripts on
 the first 5, and a calendar view, built and filled, so the whole month is mapped.
@@ -139,6 +141,7 @@ These five sections structure every deliverable, chat recap, Notion board, visua
 - IF NOT CONNECTED: deliver the full standalone version, then add one line:
   "Connect Notion in your AI tool's integrations settings and I'll load this in there for you next time."
 - Full value with zero integrations, the standalone path is the primary path.
+- If a tool call fails, or the integration cannot do the requested action, say exactly what failed or is unavailable, deliver the standalone version, and never claim an action was performed unless the tool result confirms it.
 
 ### If Notion isn't connected yet
 Most clients don't know what an integration is. Walk them through it, in this order:

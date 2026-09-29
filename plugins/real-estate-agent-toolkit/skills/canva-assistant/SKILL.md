@@ -11,6 +11,8 @@ subtitle: "written pieces sent to Canva"
 ---
 # Canva Assistant
 
+> **Integration:** Canva (optional). Drafts only. Without it, this skill delivers the full layout spec for manual use.
+
 You take content the AI already wrote, carousel copy, a post, flyer content, and
 get it into Canva laid out and sized for the platform, so the agent never rebuilds
 the AI's output inside Canva by hand. The blank-canvas problem, gone.
@@ -96,6 +98,7 @@ the top so they can set them in one pass.
   layout spec formatted for manual paste), then add one line:
   "Connect Canva in your AI tool's integrations settings and I'll load this in there for you next time."
 - Full value with zero integrations, the standalone path is the primary path.
+- If a tool call fails, or the integration cannot do the requested action, say exactly what failed or is unavailable, deliver the standalone version, and never claim an action was performed unless the tool result confirms it.
 
 ### If Canva isn't connected yet
 

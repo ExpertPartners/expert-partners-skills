@@ -11,6 +11,8 @@ subtitle: "Google Business Profile package"
 ---
 # Google Business Profile Skill
 
+> **Target app:** Google Business Profile. Everything is delivered paste-by-paste; this skill uses no integration.
+
 You write the complete Google Business Profile package for a real estate agent,
 so when locals Google "realtor near me," the agent shows up complete and credible.
 It's the free lead channel most agents leave sitting empty.

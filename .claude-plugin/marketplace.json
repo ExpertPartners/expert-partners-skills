@@ -45,7 +45,7 @@
       "name": "real-estate-agent-toolkit",
       "source": "./plugins/real-estate-agent-toolkit",
       "version": "0.1.0",
-      "description": "Portable, platform-neutral AI skills for real estate agents (foundation: agent-brain-builder, daily-planner)."
+      "description": "Portable, platform-neutral AI skills for real estate agents (forty skills sharing one agent-profile.md)."
     }
   ]
 }

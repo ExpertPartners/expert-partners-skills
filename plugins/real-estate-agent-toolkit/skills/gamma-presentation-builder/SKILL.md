@@ -11,6 +11,8 @@ subtitle: "decks planned and built in Gamma"
 ---
 # Gamma Presentation Builder
 
+> **Integration:** Gamma (optional). Without it, this skill delivers the deck plan and one paste-ready Gamma prompt.
+
 Turn real estate presentation content into a complete deck plan and, when Gamma tools are available, create a new editable Gamma from that plan.
 
 ## Workflow
