@@ -80,10 +80,10 @@ SURFACES = {
     "claude-code-plugin-cache":     {"client": "claude-code", "local": True,  "what": "~/.claude/plugins/cache/<marketplace>/<plugin>/<version> (installed plugins)"},
     "claudeai-org-plugin-sync":     {"client": "claude-code", "local": True,  "what": "~/.claude/plugins/synced/<org_account> (claude.ai org plugins, GitHub sync, one-way download)"},
     "claudeai-account-skills-sync": {"client": "claude-code", "local": True,  "what": "~/.claude/skills/synced/<org_account> (claude.ai account Skills shelf, one-way download)"},
-    "codex-user-mount":             {"client": "codex",       "local": True,  "what": "~/.agents/skills (Codex user skills)"},
+    "codex-user-mount":             {"client": "codex",       "local": True,  "what": "~/.agents/skills (Codex user skills; Codex Desktop's external-agent import also copies Claude personal skills here, SKILL.md reworded, added once and never updated)"},
     "codex-repo-mount":             {"client": "codex",       "local": True,  "what": "<aura>/.agents/skills (Codex repo skills, pipeline copies)"},
     "codex-plugin-cache":           {"client": "codex",       "local": True,  "what": "~/.codex/plugins/cache/<marketplace>/<plugin>/<version> (enabled in config.toml)"},
-    "codex-synced-mirror":          {"client": "codex",       "local": True,  "what": "~/.agents/skills/synced/<org_account> (a copy no producer writes; never a release target)"},
+    "codex-synced-mirror":          {"client": "codex",       "local": True,  "what": "~/.agents/skills/synced/<org_account> (the copy Codex Desktop's external-agent import makes of ~/.claude/skills/synced: added once, SKILL.md reworded, never updated or deleted, so a frozen snapshot; never a release target)"},
     "cowork-account-skills":        {"client": "cowork",      "local": True,  "what": "Claude desktop local-agent-mode-sessions/skills-plugin/<org>/<account>/skills (the account Skills shelf as Cowork loads it)"},
     "cowork-org-plugins":           {"client": "cowork",      "local": True,  "what": "Claude desktop local-agent-mode-sessions/<account>/<org>/rpm/<plugin_id>/skills (org plugins as Cowork loads them)"},
     "claude-chat":                  {"client": "claude-chat", "local": False, "what": "claude.ai chat (loads the account Skills shelf and org plugins; no local read)"},
@@ -103,6 +103,8 @@ HDR_DATE = re.compile(rb"^(# DEPLOYED COPY \()\d{4}-\d{2}-\d{2}(, skill-deploy p
 TITLE_VER = re.compile(r"^# .*?\bv(\d+\.\d+(?:\.\d+)?)\b", re.M)
 PRODUCER_VER = re.compile(r"v[0-9]+\.[0-9]+")
 CODEX = re.compile(r"\bCodex\b")
+IMPORT_NOTE = ("the reword Codex Desktop's external-agent import applies to SKILL.md; an import copies a folder only when it is "
+               "missing and never updates or deletes it, so an imported copy is a frozen snapshot")
 PLACEHOLDER = re.compile(r"<[^>]*>|^YYYY|^\s*$")
 
 
@@ -403,10 +405,12 @@ def copy_files(skill_dir, drop_junk=True):
     return out
 
 
-def manifest_state(skill_dir):
+def manifest_mismatches(skill_dir):
+    """Relative paths where checksums.sha256 disagrees with the folder (a changed file, a listed file
+    that is gone, or a file the manifest does not list). None when there is no manifest."""
     mf = os.path.join(skill_dir, "checksums.sha256")
     if not os.path.isfile(mf):
-        return "absent"
+        return None
     listed = {}
     for line in open(mf, encoding="utf-8"):
         line = line.rstrip("\n")
@@ -414,7 +418,12 @@ def manifest_state(skill_dir):
             h, _, p = line.partition("  ")
             listed[os.path.normpath(p)] = h.strip()
     actual = {os.path.normpath(rel): sha256b(b) for rel, b in copy_files(skill_dir, drop_junk=False).items()}
-    return "ok" if listed == actual else "fails"
+    return {p for p in set(listed) | set(actual) if listed.get(p) != actual.get(p)}
+
+
+def manifest_state(skill_dir):
+    bad = manifest_mismatches(skill_dir)
+    return "absent" if bad is None else ("ok" if not bad else "fails")
 
 
 def render_expected(canon):
@@ -531,7 +540,10 @@ def classify(canon, skill_dir, surface):
             return rec
         ms = manifest_state(skill_dir)
         rec["manifest"] = ms
-        if ms != "ok":
+        # Codex Desktop's external-agent import rewrites SKILL.md and copies checksums.sha256 verbatim, so the
+        # manifest disagrees with SKILL.md and with nothing else. That is the import's doing, not a hand edit.
+        import_rewrite = ms == "fails" and rec["rewritten"] and manifest_mismatches(skill_dir) == {"SKILL.md"}
+        if ms != "ok" and not import_rewrite:
             rec["state"] = "HAND-EDITED"
             rec["detail"] = f"checksums.sha256 {ms}"
         else:
@@ -542,6 +554,10 @@ def classify(canon, skill_dir, surface):
                                  f"{canon['stamp']} today; " + "; ".join(diffs[:6]))
             else:
                 rec["state"] = "CURRENT"
+            if import_rewrite:
+                rec["detail"] = ("checksums.sha256 disagrees with SKILL.md only because of the Claude-to-Codex rewrite "
+                                 "(an import copies the manifest verbatim) and every other file matches"
+                                 + ("; " + rec["detail"] if rec["detail"] else ""))
     else:
         diffs = content_diff(canon, files)
         if surface in PIPELINE_SURFACES:
@@ -552,6 +568,11 @@ def classify(canon, skill_dir, surface):
             rec["detail"] = "; ".join(diffs[:6])
     if rec["rewritten"]:
         rec["detail"] = (rec["detail"] + "; " if rec["detail"] else "") + "Claude-to-Codex text rewrite of canonical"
+        if surface.startswith("codex"):
+            rec["detail"] += f" ({IMPORT_NOTE})"
+    if surface == "codex-synced-mirror" and rec["state"] != "CURRENT":
+        rec["detail"] = (rec["detail"] + "; " if rec["detail"] else "") + \
+            "frozen snapshot: Codex Desktop's external-agent import copies this folder once and never updates or deletes it"
     return rec
 
 
@@ -731,7 +752,7 @@ def collect_audit(args):
                 meta = {}
         for sid, d in walk_mount(os.path.join(kroot, acct)).items():
             add(sid, d, "claudeai-account-skills-sync", updatedAt=(meta.get(sid) or {}).get("updatedAt"))
-    # Codex synced mirror (a copy nothing produces)
+    # Codex synced mirror (Codex Desktop's external-agent import copies Claude's synced bucket once and never updates or deletes it)
     xroot = os.path.join(home, ".agents", "skills", "synced")
     for acct in sorted(os.listdir(xroot)) if os.path.isdir(xroot) else []:
         for sid, d in walk_mount(os.path.join(xroot, acct)).items():
