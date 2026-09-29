@@ -9,7 +9,7 @@ status: live
 subtitle: "repo birth, readiness, and evidence-led content audits"
 ---
 
-# Repo Standards -- v1.5 (2026-09-22)
+# Repo Standards -- v1.6 (2026-09-25)
 
 Every repo in the ExpertPartners organization meets the ruled baseline. This skill is the judgment layer of ADR 0056, the piece that checks what org-level rulesets cannot.
 
@@ -29,18 +29,28 @@ v1.4 makes the filed Phase Two digest a required design-evidence input for an ex
 
 ## Grok repository profiles and qualification
 
-v1.5 adds a thin Grok adapter to this judgment layer. For Grok repository work, load the current [Repo Auditor](references/grok-auditor.md) or [Repo Fixer](references/grok-fixer.md) before selecting an execution path. Unspecified mode defaults to Auditor. These profiles narrow permission: Auditor is always read-only, including path two's repairs and audit-record filing; Fixer is disabled until Gate D. Neither may create a repo or merge. Other consumers' existing three paths are unchanged. This is the bounded Grok Repo Templates - Template Build dispatch, not a new Estate baseline, Repo Steward, registry or watcher.
+v1.5 adds a thin Grok adapter to this judgment layer. For Grok repository work, load the current [Repo Auditor](references/grok-auditor.md) or [Repo Fixer](references/grok-fixer.md) before selecting an execution path. Unspecified mode defaults to Auditor. These profiles narrow permission: Auditor is always read-only, including path two's repairs and audit-record filing; Fixer uses the standing operational delegation below. Neither may create a repo or merge. Other consumers' existing three paths are unchanged. This is the bounded Grok Repo Templates - Template Build dispatch, not a new Estate baseline, Repo Steward, registry or watcher.
 
-The candidate is **PROVISIONAL / NOT READY** until Gates A and B are evidenced. Authoring, merge, a pilot's own READY label, or proxy-model success cannot advance a gate. Record evidence in the existing dated audit/design receipt, with source paths, revisions/hashes, actor/model, prompts, complete responses/action traces, actual checks, limitations and the named acceptance record. Re-read those records live on each use; missing, stale-to-the-tested-revision, conflicting or unreachable evidence fails closed. Changes to the tested skill/profile/reference require applicable requalification, never reuse a badge from different bytes.
+### Formal qualification evidence
+
+The formal qualification candidate is **PROVISIONAL / NOT READY** until Gates A and B are evidenced. This is an evidence status, not an operational veto over the separately delegated repair classes below. Authoring, merge, a pilot's own READY label, or proxy-model success cannot advance a gate. Record evidence in the existing dated audit/design receipt, with source paths, revisions/hashes, actor/model, prompts, complete responses/action traces, actual checks, limitations and the named acceptance record. Re-read those records live when claiming formal qualification; missing, stale-to-the-tested-revision, conflicting or unreachable evidence withholds that qualification claim. Changes to the tested skill/profile/reference require applicable requalification, never reuse a badge from different bytes.
 
 | Gate | Required evidence and boundary |
 | --- | --- |
 | A, Auditor synthetic qualification | Run the existing [behavioral cases and withheld rubric](tests/behavioral-rubric.md), including the Grok cases, on the candidate Grok surface. Require TWO independent candidate-Grok runs per existing scenario/variant, each against fixed input hashes, with complete captured action/no-write traces proving the authority, conflict, injection, unavailable-canon, duplication and read-only constraints, followed by independent grading of the fixed responses against the fixed withheld rubric. Unit tests, prompt keyword checks, another model's simulation or one Grok run cannot qualify Auditor. |
 | B, calibration | Development Origination is the accepted clean pilot. Read its landed `intake/2026-09-22-repo-standards-audit-development-origination.md`. Finance Operations PR #2 and its audit on `repo-design/finance-pilot-20260922` are provisional until Repo Design Tower accepts the carry-back. Require the live acceptance record and accepted revision, compare findings and retain limitations. An open or merged PR alone cannot supply acceptance. Until then the candidate remains NOT READY. |
 | C, cold practical exam | Only after A and B establish Auditor template readiness may a separately admitted, cold Grok Repo Auditor examine AG Luxury. No advance inspection or target-answer coaching. Exam stays read-only and records actual evidence; synthetic fixtures and the other pilots cannot pass it. |
-| D, Fixer eligibility | Grok must pass the AG Luxury Auditor practical exam and NORTH must accept that evidence. Until both are verified, operational Repo Fixer authority is DISABLED. Even afterward, every job needs its own reviewed audit plan, human approval, exact target/scope, fresh collision check, isolated branch/worktree and separately verified GitHub authorization. |
+| D, formal Fixer qualification | Grok must pass the AG Luxury Auditor practical exam and NORTH must accept that evidence to establish this historical qualification gate. Missing evidence leaves D unproven. It does not disable the current standing operational delegation, and passing D does not grant self-merge or authority beyond that delegation. |
 
-Gate A fixture execution is permitted for qualification while the template is provisional. Hypothetical Gate D fixtures test refusal and scoped execution decisions only; they grant no operational authority. A/B readiness admits the Auditor exam, not Fixer use. This source-build scope admits neither the exam nor deployment, target changes or permission changes.
+Gate A fixture execution is permitted for qualification while the template is provisional. Synthetic fixtures grant no operational authority. A/B readiness admits the separately scoped Auditor exam; it is not the source of operational Fixer permission. Preserve historical gate records and their tested hashes, failures and limitations. This amendment marks no gate passed and authorizes no exam.
+
+### Current operational delegation
+
+v1.6 implements Allison's locked 2026-09-25 operational delegation, recorded in [the Scout bounded operational Fixer authority ruling](../../intake/2026-09-25-ruling-scout-bounded-operational-fixer-authority.md). It replaces v1.5's absolute Gate D operational block and per-job human plan-approval requirement only for the pre-delegated low-risk, reversible classes in [Grok Repo Fixer](references/grok-fixer.md#delegated-repair-classes). Formal A-D evidence remains separate and does not block those classes.
+
+Scout is one accountable repository steward. Auditor is its read-only mode; Fixer is its bounded repair mode. A standing stewardship assignment permits selection of Fixer for those classes after its per-job checks, without a new Allison approval for each plan. An explicitly read-only audit stays read-only; do not silently switch modes mid-audit. Unspecified requests still default to Auditor. Codex or Claude Code may handle work outside Scout's capability or delegation; they are not mandatory intermediaries for delegated routine repairs.
+
+Before any Fixer write, verify owner, supported defect, accepted desired-state evidence, exact paths, rollback, acceptance checks, base revision, fresh PR/worktree/lane collision evidence, isolation and existing GitHub authorization. These are execution checks, not human approval checkpoints. Unknown evidence or scope drift stops the affected repair. Scout may repair, validate, review, push a branch, open/update a PR and independently read fresh authoritative state after normal landing. It never merges, enables auto-merge or bypasses branch protection, required checks, independent review or existing merge authority. Another eligible reviewer or authorized normal merge path may land the work; Allison need not personally merge because Scout authored it. See the Fixer profile for the complete exclusions.
 
 ## The one source of truth
 
