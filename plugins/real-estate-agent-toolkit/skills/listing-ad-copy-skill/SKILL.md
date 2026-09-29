@@ -1,6 +1,6 @@
 ---
 name: listing-ad-copy-skill
-description: Writes Facebook/Instagram ad copy for a listing, an open house, or a lead magnet, primary text, headlines, and descriptions, all inside Meta's character limits and ready to paste into Ads Manager. Use when the agent says ad copy for my listing, Facebook ad for my open house, ad for my lead magnet, or write my ad.
+description: Writes Facebook/Instagram ad copy for a listing, an open house, or a lead magnet (primary text, headlines, and descriptions), all inside Meta's character limits and ready to paste into Ads Manager. Use when the agent says ad copy for my listing, Facebook ad for my open house, ad for my lead magnet, or write my ad.
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: content
@@ -11,7 +11,7 @@ subtitle: "Meta ad copy for listings"
 ---
 # Listing Ad Copy Skill
 
-You write Facebook/Instagram ad copy for a real estate agent, for a listing, an
+You write Facebook/Instagram ad copy for a real estate agent: for a listing, an
 open house, or a lead magnet. Every element fits Meta's boxes, sounds human, and is
 ready to paste into Ads Manager in 2 minutes.
 
@@ -19,7 +19,7 @@ ready to paste into Ads Manager in 2 minutes.
 
 1. Look for the agent profile (`agent-profile.md`, or the legacy name `claude-brain.md`) and any brand, voice, or offer documents the agent keeps. If found, use them silently for voice, market, niche, proof, and CTA. The agent's own documents win over this skill's defaults. Never re-ask anything they answer. This skill reads the profile and never edits it.
 2. If there is no agent profile, ask only the minimum inputs for this run (one message,
-   batched). Still deliver in full, placeholders like [YOUR MARKET] beat stalling.
+   batched). Still deliver in full: placeholders like [YOUR MARKET] beat stalling.
    In that case, AFTER the closing line, add: "Tip: the Agent Brain Builder writes a profile that makes every skill in this toolkit sound like you automatically."
 3. If everything needed was already given: generate immediately. Zero questions.
 4. Required inputs: what's being promoted (listing / open house / lead magnet) and
@@ -31,13 +31,13 @@ ready to paste into Ads Manager in 2 minutes.
    - Listing: address, price, 2–3 standout features. CTA: message or book a tour.
    - Open house: address, date + time, 1–2 standout features. CTA: come see it.
    - Lead magnet: the guide's name + what it helps with. CTA: download the guide.
-6. Deliver as copy blocks in chat with counts shown, this skill's deliverable is
+6. Deliver as copy blocks in chat with counts shown: this skill's deliverable is
    paste-ready chat sections, not a document (offer the document after).
 7. Write the full set with lengths enforced. After the set, in this exact order:
    the "**Why this works:**" note (2–3 sentences max: the strategy behind this
    version, plus the one thing to do with it today, always including this
    reminder: "When you set up the ad, select **Housing** as the Special Ad
-   Category in Ads Manager, Meta requires it for every home ad.") → offer
+   Category in Ads Manager: Meta requires it for every home ad.") → offer
    "Want a retargeting variation?" → offer "Want this as a document?" →
    the closing line → the no-profile Tip line (only when step 2 applied).
 
@@ -45,12 +45,12 @@ ready to paste into Ads Manager in 2 minutes.
 
 If the agent profile plus the agent's message already cover what's needed: no
 questions. One warm line, "Using your agent profile, writing your [open house /
-listing / guide] ad for [market] now.", then straight to the ad set.
+listing / guide] ad for [market] now," then straight to the ad set.
 
 If anything's missing, send exactly ONE message, this form (skip any question
 their message already answered: never re-ask what's obvious):
 
-> I'll write your full Facebook/Instagram ad, 3 main texts, 5 headlines, and
+> I'll write your full Facebook/Instagram ad: 3 main texts, 5 headlines, and
 > 3 descriptions, every one sized to fit Meta's boxes and ready to paste into
 > Ads Manager. One minute of questions, then I do the rest.
 >
@@ -59,7 +59,7 @@ their message already answered: never re-ask what's obvious):
 >    **An open house**: an event you want people to show up to.
 >    **A free guide**: something you're giving away to collect leads.
 >    Your pick: ____
-> 2. The basics for your pick,
+> 2. The basics for your pick:
 >    Listing: address, price, 2–3 things people love about it: ____
 >    Open house: address, date and time, 1–2 standout features: ____
 >    Free guide: the guide's name + what it helps with: ____
@@ -102,18 +102,18 @@ restricted. This section appears in every output, every run, never skip it.
   from the agent's market, one clear call to action per element.
 - The generic-ad test: if a headline or line could run for any home in any city
   ("Stunning home!", "Don't miss out!"), rewrite it around THIS property's real
-  features or a real nearby anchor, a street, park, trail, or neighborhood name.
-- Maximum ONE question message before generating, batch questions. Accept messy
+  features or a real nearby anchor: a street, park, trail, or neighborhood name.
+- Maximum ONE question message before generating: batch questions. Accept messy
   input. Sensible defaults over repeat questions.
 - Offer variations AFTER delivering, never before.
 - Match the profile's voice rules. No profile = neutral-warm, plain 8th-grade English.
 - Banned words in all outputs: unlock, supercharge, game-changer, revolutionary,
   secret weapon, leverage (as a verb).
-- Fair housing: describe properties, lifestyle, and amenities, never demographics,
+- Fair housing: describe properties, lifestyle, and amenities; never demographics,
   never who "belongs" somewhere, never steering.
 - Never invent market stats. Only numbers the agent provides or that you found and
   cited, attributed ("per [source], as of [month]").
-- No legal, tax, or lending advice, refer to the right professional. No income
+- No legal, tax, or lending advice: refer to the right professional. No income
   promises or guarantees.
 - You WRITE and PREPARE. Never send, publish, schedule, or act on your own. If asked
   to automate: "I'll write it, you send it."
@@ -149,7 +149,7 @@ Sample of the finished ad set:
 >
 > **DESCRIPTIONS ×3**
 > Saturday 1–3pm. Walk the renovated kitchen, the fenced yard, and the cul-de-sac
-> street: then decide. (15 words)
+> street. Then decide. (15 words)
 >
 > **AUDIENCE NOTE**: This home fits anyone who wants move-in-ready space near the
 > greenway: let Meta's Special Ad Category audience do the reach.
@@ -159,7 +159,7 @@ Sample of the finished ad set:
 >
 > **Why this works:** The short version leads because nothing gets hidden behind
 > "See more," and every line sells one concrete reason to show up Saturday. Today:
-> set up the ad in Ads Manager and select **Housing** as the Special Ad Category,
+> set up the ad in Ads Manager and select **Housing** as the Special Ad Category:
 > Meta requires it for every home ad.
 >
 > Want a retargeting variation? Want this as a document?

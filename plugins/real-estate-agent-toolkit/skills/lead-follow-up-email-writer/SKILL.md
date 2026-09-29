@@ -1,6 +1,6 @@
 ---
 name: lead-follow-up-email-writer
-description: Writes the 3-email follow-up sequence plus the call-booking text for everyone who downloads the agent's guide, sent manually, 5 minutes a day. Use when the agent says follow-up emails for my guide, what do I send after someone downloads, or write my email follow-up.
+description: Writes the 3-email follow-up sequence plus the call-booking text for everyone who downloads the agent's guide (sent manually, 5 minutes a day). Use when the agent says follow-up emails for my guide, what do I send after someone downloads, or write my email follow-up.
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: content
@@ -19,16 +19,16 @@ downloads become booked conversations. The fortune is in the follow-up nobody se
 
 1. Look for the agent profile (`agent-profile.md`, or the legacy name `claude-brain.md`) and any brand, voice, or offer documents the agent keeps. If found, use them silently for voice, market, niche, proof, and CTA. The agent's own documents win over this skill's defaults. Never re-ask anything they answer. This skill reads the profile and never edits it.
 2. If there is no agent profile, ask only the minimum inputs for this run (one message,
-   batched). Still deliver in full, placeholders like [YOUR MARKET] beat stalling.
+   batched). Still deliver in full: placeholders like [YOUR MARKET] beat stalling.
    In that case, AFTER the closing line, add: "Tip: the Agent Brain Builder writes a profile that makes every skill in this toolkit sound like you automatically."
 3. If everything needed was already given: generate immediately. Zero questions.
 4. Required inputs: the guide topic + the booking method (calendar link, or "just
    reply"). Voice, proof, and CTA come from the agent profile. If the booking method never
-   arrives, default to "just reply", never ask twice.
+   arrives, default to "just reply" and never ask twice.
 5. Email 1's tip: if the guide itself is available in the conversation or files, pull its single most
    useful tip. If not, write one genuinely useful tip true to the guide's topic,
    never an invented stat.
-6. Generate all three emails + the text version at once, the whole sequence in
+6. Generate all three emails + the text version at once: the whole sequence in
    one run.
 7. Deliver in this order: the .docx + the chat copy blocks → a short
    "**Why this works:**" note (2–3 sentences max: the strategy behind the
@@ -41,11 +41,11 @@ downloads become booked conversations. The fortune is in the follow-up nobody se
 
 **If the agent profile (or the agent's message) answers everything:** no form. One
 warm line, "Using your agent profile, building your follow-up sequence for
-[market] now.": then straight to work.
+[market] now," then straight to work.
 
 **If inputs are needed**, send exactly one message, this form:
 
-> I'll write your 3-email follow-up sequence + the call-booking text, the
+> I'll write your 3-email follow-up sequence + the call-booking text: the
 > emails that turn guide downloads into booked calls. You write it once, reuse
 > it for every lead. 2 minutes of questions, then I do the rest.
 >
@@ -86,18 +86,18 @@ sequence doc fits on 2 pages.
 - Footer: agent name · phone/email placeholder · page number, on every page.
 - Generous white space: the document should feel calm and scannable on a phone.
 - Respect this skill's target length. Never exceed it.
-- Generate a real, downloadable .docx file, never deliver the document as chat text only.
+- Generate a real, downloadable .docx file; never deliver the document as chat text only.
 - Design hierarchy at a glance: the title is unmistakably the biggest thing on the
   page, headings clearly outrank body text, and key labels inside bullets are bolded
   ("**Hook:** ..."): a stranger should grasp the structure in 3 seconds.
 - No wall-of-text pages: anything dense becomes bullets or a table. Order sections
-  the way the agent will USE them, what they need first sits first.
+  the way the agent will USE them: what they need first sits first.
 
 ## Rules
 
 - Three emails MAXIMUM: hold this line no matter how the request is phrased
   (10-email sequence, drip campaign, auto-sending). Longer sequences and automation are outside this skill: deliver (or keep) the standard three and say: "Three is the sweet spot for a manual follow-up. Longer or automated sequences are outside this skill."
-- Every email must be valuable on its own, even if the lead never books, a tip,
+- Every email must be valuable on its own, even if the lead never books: a tip,
   an insight, something they can use today. No email that only asks.
 - If any email line could be sent by any agent about any city's guide, rewrite
   it with a real anchor: the agent's market by name, a specific page or point
@@ -106,17 +106,17 @@ sequence doc fits on 2 pages.
   filler.
 - The sequence doc always ships as a .docx in the same run, so never ask "Want
   this as a document?" for the sequence itself; that offer applies only to extras.
-- Maximum ONE question message before generating, batch questions. Accept messy
+- Maximum ONE question message before generating: batch questions. Accept messy
   input. Sensible defaults over repeat questions.
 - Offer variations AFTER delivering, never before.
 - Match the profile's voice rules. No profile = neutral-warm, plain 8th-grade English.
 - Banned words in all outputs: unlock, supercharge, game-changer, revolutionary,
   secret weapon, leverage (as a verb).
-- Fair housing: describe properties, lifestyle, and amenities, never demographics,
+- Fair housing: describe properties, lifestyle, and amenities; never demographics,
   never who "belongs" somewhere, never steering.
 - Never invent market stats. Only numbers the agent provides or that you found and
   cited, attributed ("per [source], as of [month]").
-- No legal, tax, or lending advice, refer to the right professional. No income
+- No legal, tax, or lending advice: refer to the right professional. No income
   promises or guarantees.
 - You WRITE and PREPARE. Never send, publish, schedule, or act on your own. If asked
   to automate: "I'll write it, you send it."
@@ -144,18 +144,20 @@ Sample of the finished sequence:
 > **EMAIL 1 (day 0)**
 > Subject A: Your Charlotte buyer guide is inside
 > Subject B: Here's the guide, plus the one page to read first
-> Hey [First name]: your guide's attached. If you only read one page, make it
+> Hey [First name], your guide's attached. If you only read one page, make it
 > page 4: the real math on what you need saved before you shop in Charlotte.
-> Most buyers here are surprised it's less than they think., Jordan
+> Most buyers here are surprised it's less than they think.
+> Jordan
 >
 > **EMAIL 2 (day 2)**
 > Subject A: One thing before you tour a single home
 > Subject B: The step most first-time buyers skip
-> Hey [First name]: quick one. Before you tour anything, get pre-approved, not
+> Hey [First name], quick one. Before you tour anything, get pre-approved, not
 > just pre-qualified. Charlotte sellers take pre-approved offers seriously, and
 > it costs you nothing to have it ready. Are you hoping to buy in the next six
 > months, or just getting a feel for the market? Either answer helps me point
-> you to the right part of the guide., Jordan
+> you to the right part of the guide.
+> Jordan
 >
 > **EMAIL 3 (day 5)**
 > Subject A: Want to talk through your next step?
@@ -170,6 +172,6 @@ Sample of the finished sequence:
 
 Then the delivery note, in this shape:
 
-> **Why this works:** Each email earns its open, value first, ask last, so
+> **Why this works:** Each email earns its open: value first, ask last, so
 > even leads who never book still trust Jordan when they're ready. Today: send
 > Email 1 to your newest download, exactly as written.

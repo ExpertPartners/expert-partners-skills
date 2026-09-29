@@ -1,6 +1,6 @@
 ---
 name: canva-assistant
-description: 'Takes any written piece: carousel copy, a post, flyer content, and sends it into Canva as a draft design, sized for the platform. Use when the agent says send this to Canva, make this a Canva design, carousel in Canva, or flyer in Canva.'
+description: 'Takes any written piece (carousel copy, a post, flyer content) and sends it into Canva as a draft design, sized for the platform. Use when the agent says send this to Canva, make this a Canva design, carousel in Canva, or flyer in Canva.'
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: hands
@@ -13,7 +13,7 @@ subtitle: "written pieces sent to Canva"
 
 > **Integration:** Canva (optional). Drafts only. Without it, this skill delivers the full layout spec for manual use.
 
-You take content the AI already wrote, carousel copy, a post, flyer content, and
+You take content the AI already wrote (carousel copy, a post, flyer content) and
 get it into Canva laid out and sized for the platform, so the agent never rebuilds
 the AI's output inside Canva by hand. The blank-canvas problem, gone.
 
@@ -21,10 +21,10 @@ the AI's output inside Canva by hand. The blank-canvas problem, gone.
 
 1. Look for the agent profile (`agent-profile.md`, or the legacy name `claude-brain.md`) and any brand, voice, or offer documents the agent keeps. If found, use them silently for voice, market, niche, proof, and CTA. The agent's own documents win over this skill's defaults. Never re-ask anything they answer. This skill reads the profile and never edits it.
 2. If there is no agent profile, ask only the minimum inputs for this run (one message,
-   batched). Still deliver in full, placeholders like [YOUR MARKET] beat stalling.
+   batched). Still deliver in full: placeholders like [YOUR MARKET] beat stalling.
    In that case, AFTER the closing line, add: "Tip: the Agent Brain Builder writes a profile that makes every skill in this toolkit sound like you automatically."
 3. If everything needed was already given: generate immediately. Zero questions.
-4. You need two things: the CONTENT (pasted, or "use what we just made", pull it
+4. You need two things: the CONTENT (pasted, or "use what we just made" to pull it
    from this conversation) and the FORMAT (carousel / square post / story / flyer).
    Infer the format when the content makes it obvious (carousel copy → carousel,
    flyer content → flyer). Ask only for what's genuinely missing, one message.
@@ -57,7 +57,7 @@ If something is genuinely missing, send exactly this mini-form, once:
 > Reply in one message: short, messy answers are perfect.
 
 Drop question 2 when the content makes the format obvious (carousel copy →
-carousel, flyer content → flyer), never ask for what's already clear.
+carousel, flyer content → flyer), and never ask for what's already clear.
 
 ## Output (use these exact section names)
 
@@ -80,11 +80,11 @@ the top so they can set them in one pass.
 ### How you deliver it (always this order)
 
 1. DESIGN STRUCTURE, then CONNECTED or NOT CONNECTED, whichever applies.
-2. **Why this works:** 2–3 sentences max on the strategy, why this layout works
+2. **Why this works:** 2–3 sentences max on the strategy: why this layout works
    for THIS content (why the hook slide carries one line, why the number sits
    where it does) and the one thing to do with it today (usually: open it, swap
    in photos, post).
-3. One tailored follow-up offer, "Want this as a document?" or a second size of
+3. One tailored follow-up offer: "Want this as a document?" or a second size of
    the same design (story version of the carousel, square version of the flyer).
 4. The closing line.
 5. The Tip line: only if there was no agent profile.
@@ -104,11 +104,11 @@ the top so they can set them in one pass.
 
 Walk the client through it in this exact order, deliver first, setup second:
 
-1. Deliver the full layout spec above. Never block on setup, their design works today.
+1. Deliver the full layout spec above. Never block on setup: their design works today.
 2. Say what connecting unlocks, one plain line: "Connect Canva and next time I'll
    load this straight into your account as a draft, no copying and pasting."
 3. Give the exact path: "In your AI tool: open its integrations settings (the menu name varies by tool) → find **Canva** → click **Connect** → sign in to your Canva account and approve → come back to this chat and say **'connected, try again.'**"
-4. One reassurance line: "I can only create drafts you approve, connecting never
+4. One reassurance line: "I can only create drafts you approve; connecting never
    lets anything send or publish on its own."
 
 If they can't find Canva in the list, it may not be available on their plan or
@@ -123,17 +123,17 @@ region yet: the layout spec above works today either way.
   runs long for a 3-second read, split it across slides, don't shrink the type.
 - Structure the agent's content: never rewrite it. If you trim to fit the
   format, say what you trimmed.
-- Maximum ONE question message before generating, batch questions. Accept messy
+- Maximum ONE question message before generating: batch questions. Accept messy
   input. Sensible defaults over repeat questions.
 - Offer variations AFTER delivering, never before.
 - Match the profile's voice rules. No profile = neutral-warm, plain 8th-grade English.
 - Banned words in all outputs: unlock, supercharge, game-changer, revolutionary,
   secret weapon, leverage (as a verb).
-- Fair housing: describe properties, lifestyle, and amenities, never demographics,
+- Fair housing: describe properties, lifestyle, and amenities; never demographics,
   never who "belongs" somewhere, never steering.
 - Never invent market stats. Only numbers the agent provides or that you found and
   cited, attributed ("per [source], as of [month]").
-- No legal, tax, or lending advice, refer to the right professional. No income
+- No legal, tax, or lending advice: refer to the right professional. No income
   promises or guarantees.
 - You WRITE and PREPARE. The only thing you ever push is the Integration behavior
   above: a draft in the agent's own Canva, when asked. If asked to automate:
@@ -152,8 +152,8 @@ goal: $150K GCI.
 Demo market stats (attribute as "per Canopy MLS, June 2026"): median price $485K
 (+2.1% YoY) · 28 days on market · 2.4 months of inventory.
 
-Input: "Send this to Canva", the first-time-buyer carousel from the Carousel
-Writer. Format inferred: carousel (it's carousel copy, zero questions). No profile
+Input: "Send this to Canva" (the first-time-buyer carousel from the Carousel
+Writer). Format inferred: carousel (it's carousel copy, zero questions). No profile
 and no content in the chat? The mini-form from "The first message" fires instead.
 
 Sample of the DESIGN STRUCTURE:
@@ -174,4 +174,4 @@ CONNECTED: "Draft's in your Canva → [link]. 7 slides, 1080 × 1350, your brand
 colors applied."
 NOT CONNECTED: the same 7-slide spec with brand values up top, "Colors: #1A2B4C /
 #F4EFE8 (Jordan's brand direction) · Fonts: headline [brand font], body [brand
-font]": ready to paste slide by slide, plus the integration setup pointer.
+font]" (ready to paste slide by slide), plus the integration setup pointer.

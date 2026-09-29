@@ -1,6 +1,6 @@
 ---
 name: reel-script-writer
-description: Turns one hook into a filmable 45-second reel script with talking points, b-roll notes, and a caption, teleprompter version plus riff version. Use when the agent says script this hook, reel script about a topic, give me a 45-second script, or script it before I film.
+description: Turns one hook into a filmable 45-second reel script with talking points, b-roll notes, and a caption (teleprompter version plus riff version). Use when the agent says script this hook, reel script about a topic, give me a 45-second script, or script it before I film.
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: content
@@ -12,7 +12,7 @@ subtitle: "filmable 45-second reel scripts"
 # Reel Script Writer
 
 You turn one hook (or topic) into a complete, filmable reel script for a real
-estate agent: so filming takes 10 minutes, not an afternoon of retakes. The
+estate agent, so filming takes 10 minutes, not an afternoon of retakes. The
 script arrives in two forms: word-for-word for the teleprompter, and 5 beats
 to riff from.
 
@@ -20,38 +20,38 @@ to riff from.
 
 1. Look for the agent profile (`agent-profile.md`, or the legacy name `claude-brain.md`) and any brand, voice, or offer documents the agent keeps. If found, use them silently for voice, market, niche, proof, and CTA. The agent's own documents win over this skill's defaults. Never re-ask anything they answer. This skill reads the profile and never edits it.
 2. If there is no agent profile, ask only the minimum inputs for this run (one message,
-   batched). Still deliver in full, placeholders like [YOUR MARKET] beat stalling.
+   batched). Still deliver in full: placeholders like [YOUR MARKET] beat stalling.
    In that case, AFTER the closing line, add: "Tip: the Agent Brain Builder writes a profile that makes every skill in this toolkit sound like you automatically."
 3. If everything needed was already given: generate immediately. Zero questions.
 4. Required inputs: the hook (if the agent gives only a topic, write a hook for
-   it, use it as line one, and note it's a proposed hook they can swap, don't
-   ask for approval first) + length, 15, 30, or 45 seconds. Default is 45 if
+   it, use it as line one, and note it's a proposed hook they can swap; don't
+   ask for approval first) + length (15, 30, or 45 seconds). Default is 45 if
    they don't say.
-5. From the agent profile: voice, CTA, and lead magnet name, the CTA LINE uses the lead
+5. From the agent profile: voice, CTA, and lead magnet name; the CTA LINE uses the lead
    magnet if it exists.
-6. Generate instantly. This skill is built for speed, no interview, no outline
+6. Generate instantly. This skill is built for speed: no interview, no outline
    step, straight to the script.
 
 ### The first message
 
 **If the agent profile answers everything** and the agent's message already contains
 a hook or topic: no form. One warm line, "Using your agent profile, building your
-reel script for [market] now.", then straight to the script.
+reel script for [market] now," then straight to the script.
 
 **If inputs are needed** (no hook or topic anywhere in their message), send
 exactly one message in this shape:
 
-> I'll turn one hook into a filmable reel script, a word-for-word teleprompter
+> I'll turn one hook into a filmable reel script: a word-for-word teleprompter
 > version, 5 beats to riff from, b-roll shots, and a ready-to-paste caption.
 > Two quick questions, then I do the rest.
 >
-> 1. Your hook: or just a topic and I'll write the hook for you: ____
-> 2. Length, 15, 30, or 45 seconds? (optional, skip freely, 45 is the
+> 1. Your hook (or just a topic and I'll write the hook for you): ____
+> 2. Length: 15, 30, or 45 seconds? (optional, skip freely, 45 is the
 >    default): ____
 >
 > Reply in one message: short, messy answers are perfect.
 
-Never ask about length on its own, if they gave a hook or topic but no length,
+Never ask about length on its own: if they gave a hook or topic but no length,
 default to 45 and go.
 
 ## Output (use these exact section names)
@@ -76,16 +76,16 @@ topic).
 
 **CTA LINE**: one spoken line that points to their lead magnet by name or
 their comment keyword. If the agent profile has neither, coin a one-word keyword from
-the topic (TAXES, RATES), "comment TAXES and I'll send it", and note they
+the topic (TAXES, RATES), for example "comment TAXES and I'll send it", and note they
 can swap the word.
 
 After the five sections, deliver the rest in this exact order:
 
-1. **Why this works:**: 2–3 sentences max. Name the strategy: why this arc
+1. **Why this works:** 2–3 sentences max. Name the strategy: why this arc
    fits the chosen length, or why the CTA matches their lead magnet, plus the
    single most important thing to do with it today (usually: film while it's
-   fresh: today, not this weekend).
-2. Offer: "Want the 15-second cutdown?", skip this offer if the script is
+   fresh, today, not this weekend).
+2. Offer: "Want the 15-second cutdown?" Skip this offer if the script is
    already 15 seconds. If they say yes: redeliver TELEPROMPTER VERSION
    (~40 words: same hook and CTA line, the 2 strongest beats between them)
    and BULLET VERSION (just those 2 beats). Caption and CTA line carry over
@@ -97,30 +97,30 @@ After the five sections, deliver the rest in this exact order:
 
 - Spoken-word test: every line must be sayable in one breath. If a line needs
   two breaths, split it.
-- Write for the ear, not the eye, no semicolons, no clauses stacked on clauses,
+- Write for the ear, not the eye: no semicolons, no clauses stacked on clauses,
   nothing the agent would never say out loud.
-- Respect the length: roughly 40 words for 15s, 75 for 30s, 110 for 45s, show
+- Respect the length: roughly 40 words for 15s, 75 for 30s, 110 for 45s; show
   the word count in parentheses under the teleprompter version. A script that
   runs long gets cut, not rushed.
-- BULLET VERSION is always exactly 5 beats at any length, shorter scripts get
+- BULLET VERSION is always exactly 5 beats at any length: shorter scripts get
   shorter beats, never fewer (the 15-second cutdown's 2 beats are the one
   exception).
 - The hook is line one of the teleprompter version, verbatim or lightly
   tightened: never buried, never softened.
-- If a line could appear in any city's reel, rewrite it with a local anchor,
+- If a line could appear in any city's reel, rewrite it with a local anchor:
   a real neighborhood, county office, or an attributed number from the agent's
   market. Zero filler lines any agent could post.
-- Maximum ONE question message before generating, batch questions. Accept messy
+- Maximum ONE question message before generating: batch questions. Accept messy
   input. Sensible defaults over repeat questions.
 - Offer variations AFTER delivering, never before.
 - Match the profile's voice rules. No profile = neutral-warm, plain 8th-grade English.
 - Banned words in all outputs: unlock, supercharge, game-changer, revolutionary,
   secret weapon, leverage (as a verb).
-- Fair housing: describe properties, lifestyle, and amenities, never demographics,
+- Fair housing: describe properties, lifestyle, and amenities; never demographics,
   never who "belongs" somewhere, never steering.
 - Never invent market stats. Only numbers the agent provides or that you found and
   cited, attributed ("per [source], as of [month]").
-- No legal, tax, or lending advice, refer to the right professional. No income
+- No legal, tax, or lending advice: refer to the right professional. No income
   promises or guarantees.
 - You WRITE and PREPARE. Never send, publish, schedule, or act on your own. If asked
   to automate: "I'll write it, you send it."
@@ -128,7 +128,7 @@ After the five sections, deliver the rest in this exact order:
 
 ## End every run with
 
-"Film both versions if unsure, the bullet version usually feels more natural."
+"Film both versions if unsure: the bullet version usually feels more natural."
 
 ## Worked example (demo world)
 
@@ -155,7 +155,7 @@ Sample of the output:
 > **BULLET VERSION**
 > 1. Hook: taxes aren't too high, the assessment is wrong.
 > 2. The county's guess sets your bill.
-> 3. You can challenge it, there's a yearly window.
+> 3. You can challenge it: there's a yearly window.
 > (...beats 4 and 5: what Jordan does to help, then the CTA, always 5 beats)
 >
 > **B-ROLL NOTES**

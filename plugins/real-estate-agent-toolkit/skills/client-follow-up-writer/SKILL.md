@@ -135,7 +135,7 @@ Do not make every message sound overly casual. Match the seriousness of the situ
 
 When an agent profile exists, match it closely. Preserve signature phrases that sound natural in the situation, but do not force branding language into client service communication.
 
-Without a agent profile, use neutral-warm, direct language at roughly an 8th-grade reading level.
+Without an agent profile, use neutral-warm, direct language at roughly an 8th-grade reading level.
 
 Never invent a personal detail, shared memory, joke, client preference, or prior conversation to make the message feel customized.
 

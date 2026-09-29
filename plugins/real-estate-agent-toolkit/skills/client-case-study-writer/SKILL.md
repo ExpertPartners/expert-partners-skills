@@ -146,7 +146,7 @@ Then offer one relevant next step, such as turning the story into a carousel, em
 - Do not give legal, tax, lending, or fair-housing advice. Refer the user to the appropriate professional when needed.
 - Do not write discriminatory targeting language.
 - Do not imply a review is required, incentivized, or expected to be positive.
-- Match the agent profile's voice rules. Without a agent profile, use plain, warm, direct language at roughly an 8th-grade reading level.
+- Match the agent profile's voice rules. Without an agent profile, use plain, warm, direct language at roughly an 8th-grade reading level.
 - Avoid generic AI marketing words such as `unlock`, `supercharge`, `game-changer`, `revolutionary`, `secret weapon`, and `leverage` used as a verb.
 - Write and prepare only. Do not publish, post, send, or request the review on the agent's behalf unless the user separately asks and an authorized tool supports that action.
 

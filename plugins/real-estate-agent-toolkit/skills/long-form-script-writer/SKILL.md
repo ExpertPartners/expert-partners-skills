@@ -1,6 +1,6 @@
 ---
 name: long-form-script-writer
-description: Turns one video idea into a complete, filmable YouTube script, hook options, chaptered body, retention beats marked, CTA, in a teleprompter version and a bullet version. Use when the agent says write my YouTube script, long form script about..., script this video idea, or write the script for [title].
+description: Turns one video idea into a complete, filmable YouTube script (hook options, chaptered body, retention beats marked, CTA) in a teleprompter version and a bullet version. Use when the agent says write my YouTube script, long form script about..., script this video idea, or write the script for [title].
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: content
@@ -18,27 +18,27 @@ agent: a filmable script in 10 minutes instead of a blank doc for a week.
 
 1. Look for the agent profile (`agent-profile.md`, or the legacy name `claude-brain.md`) and any brand, voice, or offer documents the agent keeps. If found, use them silently for voice, market, niche, proof, and CTA. The agent's own documents win over this skill's defaults. Never re-ask anything they answer. This skill reads the profile and never edits it.
 2. If there is no agent profile, ask only the minimum inputs for this run (one message,
-   batched). Still deliver in full, placeholders like [YOUR MARKET] beat stalling.
+   batched). Still deliver in full: placeholders like [YOUR MARKET] beat stalling.
    In that case, AFTER the closing line, add: "Tip: the Agent Brain Builder writes a profile that makes every skill in this toolkit sound like you automatically."
 3. If everything needed was already given: generate immediately. Zero questions.
 4. Required inputs: the idea or title (or one picked from the YouTube Video Ideas
-   Skill) + target length, 5, 8, or 12 minutes. From the agent profile: voice, market,
+   Skill) + target length (5, 8, or 12 minutes). From the agent profile: voice, market,
    CTA, lead magnet.
 
 ### The first message
 
 If the agent profile (or the agent's message) already gives the idea and a length,
 or they gave an idea and shrugged at length (default 8), NO form. One warm line:
-"Using your agent profile: scripting '[title]' for [market] now." Then straight to work.
+"Using your agent profile, scripting '[title]' for [market] now." Then straight to work.
 
 If inputs are needed, send exactly ONE message, in this shape:
 
-> I turn one video idea into a complete, filmable YouTube script, hooks, chapters,
+> I turn one video idea into a complete, filmable YouTube script: hooks, chapters,
 > retention beats, CTA, plus a bullet version if you'd rather riff. 1 minute of
 > questions, then I do the rest.
 >
 > 1. Your video idea or title (or pick one from your YouTube Video Ideas list): ____
-> 2. Target length, 5, 8, or 12 minutes? (8 is the sweet spot for most topics): ____
+> 2. Target length: 5, 8, or 12 minutes? (8 is the sweet spot for most topics): ____
 >
 > Reply in one message: short, messy answers are perfect.
 
@@ -48,7 +48,7 @@ question 2, script it at 8 minutes without asking again.
 ### Delivery order (always this exact sequence)
 
 1. The full script: all five output sections + the .docx.
-2. **Why this works:** 2–3 sentences max, which hook to pick and why, and what the
+2. **Why this works:** 2–3 sentences max: which hook to pick and why, and what the
    retention beats are doing for watch time. End with the ONE thing to do today
    (usually: block 30 minutes and film Chapter 1 before the script goes cold).
 3. Offer: "Want it tighter, longer, or more personal?" Tighter = cut ~20% of the
@@ -91,12 +91,12 @@ Deliverable: a formatted .docx, teleprompter-ready.
 - Footer: agent name · phone/email placeholder · page number, on every page.
 - Generous white space: the document should feel calm and scannable on a phone.
 - Respect this skill's target length. Never exceed it.
-- Generate a real, downloadable .docx file, never deliver the document as chat text only.
+- Generate a real, downloadable .docx file; never deliver the document as chat text only.
 - Design hierarchy at a glance: the title is unmistakably the biggest thing on the
   page, headings clearly outrank body text, and key labels inside bullets are bolded
   ("**Hook:** ..."): a stranger should grasp the structure in 3 seconds.
 - No wall-of-text pages: anything dense becomes bullets or a table. Order sections
-  the way the agent will USE them, what they need first sits first.
+  the way the agent will USE them: what they need first sits first.
 
 ## Rules
 
@@ -107,17 +107,17 @@ Deliverable: a formatted .docx, teleprompter-ready.
 - The failure mode is a script any agent in any city could read aloud. If a chapter
   could run unchanged in another market, rewrite it around a real neighborhood,
   street, price point, or the agent's own story until it couldn't.
-- Maximum ONE question message before generating, batch questions. Accept messy
+- Maximum ONE question message before generating: batch questions. Accept messy
   input. Sensible defaults over repeat questions.
 - Offer variations AFTER delivering, never before.
 - Match the profile's voice rules. No profile = neutral-warm, plain 8th-grade English.
 - Banned words in all outputs: unlock, supercharge, game-changer, revolutionary,
   secret weapon, leverage (as a verb).
-- Fair housing: describe properties, lifestyle, and amenities, never demographics,
+- Fair housing: describe properties, lifestyle, and amenities; never demographics,
   never who "belongs" somewhere, never steering.
 - Never invent market stats. Only numbers the agent provides or that you found and
   cited, attributed ("per [source], as of [month]").
-- No legal, tax, or lending advice, refer to the right professional. No income
+- No legal, tax, or lending advice: refer to the right professional. No income
   promises or guarantees.
 - You WRITE and PREPARE. Never send, publish, schedule, or act on your own. If asked
   to automate: "I'll write it, you send it."
@@ -125,7 +125,7 @@ Deliverable: a formatted .docx, teleprompter-ready.
 
 ## End every run with
 
-"Film it: then run the YouTube SEO Skill before you upload."
+"Film it, then run the YouTube SEO Skill before you upload."
 
 ## Worked example (demo world)
 
@@ -137,14 +137,14 @@ Demo market stats (attribute as "per Canopy MLS, June 2026"): median price $485K
 
 Input: "Moving to Charlotte: What $500K Gets You" · scripted at 8 minutes.
 (With no agent profile, this run would open with the two-question form from "The first
-message": idea + length: then deliver exactly what follows.)
+message": idea + length, then deliver exactly what follows.)
 
 > **HOOK, Option 1 (31 words):** "Five hundred thousand dollars. In some cities
 > that's a condo with a parking problem. In Charlotte? Let me show you what it
-> actually buys: and one neighborhood that surprised even me."
+> actually buys, and one neighborhood that surprised even me."
 >
 > **THE SCRIPT, Chapter 1 of 6 · The $500K reality check (0:00–1:30):**
-> [OPEN LOOP: "one neighborhood that surprised even me", pays off in Chapter 4]
+> [OPEN LOOP: "one neighborhood that surprised even me" pays off in Chapter 4]
 > "Here's the real answer. The median home in Charlotte is $485K right now, per
 > Canopy MLS, June 2026. So $500K puts you right in the heart of the market. Not
 > stretching. Not settling. Right in the middle."
@@ -157,7 +157,7 @@ message": idea + length: then deliver exactly what follows.)
 > Chapter 4 · Pattern break at 6:00 (Chapter 5).
 >
 > **CTA:** "If Charlotte's on your list, grab my free Charlotte Relocation Guide,
-> link in the description: or book a 15-minute call and let's do the math together."
+> link in the description, or book a 15-minute call and let's do the math together."
 >
 > **BULLET VERSION, Chapter 1:** $485K median (per Canopy MLS, June 2026) ·
 > $500K = middle of the market, not the bottom · plant the surprise-neighborhood loop.

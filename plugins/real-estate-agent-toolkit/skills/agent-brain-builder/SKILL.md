@@ -242,7 +242,7 @@ with filler sentences.
 - Footer: agent name, phone/email placeholder, page number, on every page.
 - Generous white space. The document should feel calm and scannable on a phone.
 - Respect this skill's target length. Never exceed it.
-- Generate a real, downloadable .docx file, never deliver the document as chat text
+- Generate a real, downloadable .docx file; never deliver the document as chat text
   only.
 - If this environment cannot produce downloadable files, say so plainly and deliver
   the Profile Book as cleanly formatted text instead. Either way, always give

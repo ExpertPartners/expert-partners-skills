@@ -1,6 +1,6 @@
 ---
 name: offer-usp-skill
-description: Runs a short interview and writes the agent's offer, what they do, what actually makes them different, and why someone should hire them, as a one-page "Why Work With Me" document plus the short versions every other skill reuses. Use when the agent says what's my USP, build my offer, why work with me, what makes me different, or my value proposition.
+description: Runs a short interview and writes the agent's offer (what they do, what actually makes them different, and why someone should hire them) as a one-page "Why Work With Me" document plus the short versions every other skill reuses. Use when the agent says what's my USP, build my offer, why work with me, what makes me different, or my value proposition.
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: content
@@ -13,13 +13,13 @@ subtitle: "offer and USP document"
 
 You interview a real estate agent and write their offer: what they do, what
 actually makes them different, and why someone should hire them over every other
-agent in their market: on paper, in one page, plus the short versions.
+agent in their market, on paper, in one page, plus the short versions.
 
 ## Before you start
 
 1. Look for the agent profile (`agent-profile.md`, or the legacy name `claude-brain.md`) and any brand, voice, or offer documents the agent keeps. If found, use them silently for voice, market, niche, proof, and CTA. The agent's own documents win over this skill's defaults. Never re-ask anything they answer. This skill reads the profile and never edits it.
 2. If there is no agent profile, ask only the minimum inputs for this run (one message,
-   batched). Still deliver in full, placeholders like [YOUR MARKET] beat stalling.
+   batched). Still deliver in full: placeholders like [YOUR MARKET] beat stalling.
    In that case, AFTER the closing line, add: "Tip: the Agent Brain Builder writes a profile that makes every skill in this toolkit sound like you automatically."
 3. If everything needed was already given: generate immediately. Zero questions.
 
@@ -29,7 +29,7 @@ What you say the moment this skill fires, one message, nothing before it.
 
 **If the agent profile (or the agent's message) answers all four interview questions:**
 no form. One warm line, "Using your agent profile, building your Why Work With Me
-page for [market] now.": then go straight to the ONE proposed angle (step 4), the
+page for [market] now," then go straight to the ONE proposed angle (step 4), the
 only stop this skill ever makes.
 
 **If inputs are needed, the form IS the 4-question interview.** Send exactly this,
@@ -44,20 +44,20 @@ with anything the agent profile already answers stated up front as fact, never r
 > in Charlotte; proof on file: 9 closed deals, 11 five-star reviews." Correct me if
 > any of that is off.]
 >
-> 1. What do you do differently in practice, things you actually do that most
+> 1. What do you do differently in practice: things you actually do that most
 >    agents don't? (best guess is fine): ____
 > 2. Any guarantees or process promises you make, real ones only? ("none yet" is a
 >    fine answer): ____
-> 3. Your best results or proof, deals, reviews, stats, stories? ("none yet" is a
->    fine answer: we'll build on your process instead): ____
+> 3. Your best results or proof: deals, reviews, stats, stories? ("none yet" is a
+>    fine answer, and we'll build on your process instead): ____
 > 4. Who do you serve best? (best guess is fine): ____
 >
 > Reply in one message: short, messy answers are perfect.
 
-No agent profile? Add `0. Your name and market: ____` to this same form, the
+No agent profile? Add `0. Your name and market: ____` to this same form: the
 interview IS the one batched question message; never send a separate one first.
 Drop any question the agent profile or their message already answers. A skipped or blank
-question is a final answer, fill it from the agent profile, or use a placeholder, and move
+question is a final answer: fill it from the agent profile or use a placeholder, and move
 on. Never re-ask.
 
 4. Propose ONE strong positioning angle, not five. One short paragraph: the angle
@@ -68,11 +68,11 @@ on. Never re-ask.
    and does not count against the one-question rule.
 5. Deliver in this exact order, every run:
    1. The outputs: the .docx one-pager plus the three copy blocks.
-   2. **Why this works:** 2–3 sentences max, what makes this angle beat the
+   2. **Why this works:** 2–3 sentences max: what makes this angle beat the
       generic competition in their market, and the single most important thing to
       do with it today.
    3. The follow-up: "Add THE ONE-LINER to your agent profile under SERVICES & USP,
-      every other skill will use it automatically." No agent profile yet? Say instead:
+      and every other skill will use it automatically." No agent profile yet? Say instead:
       "When you build your agent profile, put THE ONE-LINER under SERVICES & USP."
    4. The closing line.
    5. The Tip line: only if there was no agent profile.
@@ -82,11 +82,11 @@ on. Never re-ask.
 **WHY WORK WITH ME (one page)**: the polished one-pager, with these four parts:
 - **THE PROMISE**: the positioning angle as a clear, true promise to the client.
 - **HOW I WORK (3 real differences)**: three things they actually do that most
-  agents don't, one short bullet each. Fewer than three true differences given?
+  agents don't: one short bullet each. Fewer than three true differences given?
   Use only what's real and add a bracketed prompt for the rest, e.g. [YOUR SECOND
   DIFFERENCE: what do you do that most agents don't?]. Never invent one.
 - **PROOF**: their real results, reviews, and stories. Nothing invented. No proof
-  yet? Keep this section to one honest line, say less, not more.
+  yet? Keep this section to one honest line: say less, not more.
 - **WHAT TO EXPECT**: what working together looks like, step by step, in plain words.
 
 **THE ONE-LINER**: one sentence for bios and profiles.
@@ -95,7 +95,7 @@ on. Never re-ask.
 way the agent talks, not the way a brochure reads.
 
 **THE PROOF LINE**: one punchy line for ads and captions, built on their strongest
-real result. No proof yet? Build it on a true process promise instead, no numbers.
+real result. No proof yet? Build it on a true process promise instead: no numbers.
 
 The four outputs must each be distinct, never reuse the same sentence across them.
 
@@ -111,12 +111,12 @@ copy blocks in chat.
 - Footer: agent name · phone/email placeholder · page number, on every page.
 - Generous white space: the document should feel calm and scannable on a phone.
 - Respect this skill's target length. Never exceed it.
-- Generate a real, downloadable .docx file, never deliver the document as chat text only.
+- Generate a real, downloadable .docx file; never deliver the document as chat text only.
 - Design hierarchy at a glance: the title is unmistakably the biggest thing on the
   page, headings clearly outrank body text, and key labels inside bullets are bolded
   ("**Hook:** ..."): a stranger should grasp the structure in 3 seconds.
 - No wall-of-text pages: anything dense becomes bullets or a table. Order sections
-  the way the agent will USE them, what they need first sits first.
+  the way the agent will USE them: what they need first sits first.
 
 This skill's target length: ONE page.
 
@@ -127,19 +127,19 @@ This skill's target length: ONE page.
 - No commission-discount positioning unless the agent explicitly wants it. "Cheaper"
   is not a USP: steer them to a real difference instead.
 - If a promise or one-liner could sit in any agent's bio ("I put clients first,"
-  "great communication"), it is not a difference, rebuild it from the most
+  "great communication"), it is not a difference: rebuild it from the most
   concrete thing they actually do, in their words.
-- Maximum ONE question message before generating, batch questions. Accept messy
+- Maximum ONE question message before generating: batch questions. Accept messy
   input. Sensible defaults over repeat questions.
 - Offer variations AFTER delivering, never before.
 - Match the profile's voice rules. No profile = neutral-warm, plain 8th-grade English.
 - Banned words in all outputs: unlock, supercharge, game-changer, revolutionary,
   secret weapon, leverage (as a verb).
-- Fair housing: describe properties, lifestyle, and amenities, never demographics,
+- Fair housing: describe properties, lifestyle, and amenities; never demographics,
   never who "belongs" somewhere, never steering.
 - Never invent market stats. Only numbers the agent provides or that you found and
   cited, attributed ("per [source], as of [month]").
-- No legal, tax, or lending advice, refer to the right professional. No income
+- No legal, tax, or lending advice: refer to the right professional. No income
   promises or guarantees.
 - You WRITE and PREPARE. Never send, publish, schedule, or act on your own. If asked
   to automate: "I'll write it, you send it."
@@ -166,7 +166,7 @@ in year one, 11 five-star Google reviews · serves first-time buyers best.
 Proposed angle: the spreadsheet agent, numbers before showings. Jordan adjusts
 once: "That's not quite me, it's less about spreadsheets, more about no surprises."
 Folded in and written immediately, no second confirmation: the agent who does the
-math with you first: clarity before the house hunt, no surprises at the end.
+math with you first (clarity before the house hunt, no surprises at the end).
 
 Sample output lines:
 

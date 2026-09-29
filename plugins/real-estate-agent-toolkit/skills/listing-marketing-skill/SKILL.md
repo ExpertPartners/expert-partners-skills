@@ -1,6 +1,6 @@
 ---
 name: listing-marketing-skill
-description: Everything to win a listing and launch it, a complete listing presentation (WIN IT) and the MLS description plus launch posts (LAUNCH IT), one skill with two modes. Use when the agent says listing presentation for [address], write my listing marketing, MLS description for this house, just listed post, or I have a listing appointment Thursday.
+description: Everything to win a listing and launch it in one skill with two modes, a complete listing presentation (WIN IT) and the MLS description plus launch posts (LAUNCH IT). Use when the agent says listing presentation for [address], write my listing marketing, MLS description for this house, just listed post, or I have a listing appointment Thursday.
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: content
@@ -13,13 +13,13 @@ subtitle: "listing presentation and launch copy"
 
 You handle both halves of a listing's marketing for a real estate agent: WIN IT
 builds the presentation that wins the inventory; LAUNCH IT writes the MLS
-description and launch copy that sells it, run either mode, or BOTH.
+description and launch copy that sells it; run either mode, or BOTH.
 
 ## Before you start
 
 1. Look for the agent profile (`agent-profile.md`, or the legacy name `claude-brain.md`) and any brand, voice, or offer documents the agent keeps. If found, use them silently for voice, market, niche, proof, and CTA. The agent's own documents win over this skill's defaults. Never re-ask anything they answer. This skill reads the profile and never edits it.
 2. If there is no agent profile, ask only the minimum inputs for this run (one message,
-   batched). Still deliver in full, placeholders like [YOUR MARKET] beat stalling.
+   batched). Still deliver in full: placeholders like [YOUR MARKET] beat stalling.
    In that case, AFTER the closing line, add: "Tip: the Agent Brain Builder writes a profile that makes every skill in this toolkit sound like you automatically."
 3. If everything needed was already given: generate immediately. Zero questions.
 4. Pick the mode from what the agent said: a listing appointment or presentation
@@ -30,7 +30,7 @@ description and launch copy that sells it, run either mode, or BOTH.
    default 1,000 / 500 / 250-character versions. Otherwise ask once, inside the
    same single form (this one question is allowed even when everything else was
    given), and tell the agent to add it to their profile so it's remembered.
-6. Seller situation and timeline sharpen the presentation, use them if offered,
+6. Seller situation and timeline sharpen the presentation: use them if offered,
    never ask extra questions for them.
 7. Generate the chosen mode in full, then deliver in this exact order, every run:
    deliverable(s) → **Why this works:** (2–3 sentences max: the strategy behind
@@ -41,9 +41,9 @@ description and launch copy that sells it, run either mode, or BOTH.
 
 ### The first message
 
-If the agent profile: or the agent's own message, answers everything: NO form.
+If the agent profile (or the agent's own message) answers everything: NO form.
 One warm line, "Using your agent profile, building your [presentation / launch
-pack] for [their market] now.", then straight to work. If inputs are needed,
+pack] for [their market] now," then straight to work. If inputs are needed,
 send exactly ONE message: this mini-form, minus any question already answered.
 
 > This is your listing machine: the presentation that wins the appointment and
@@ -53,7 +53,7 @@ send exactly ONE message: this mini-form, minus any question already answered.
 >    appointment · **B) LAUNCH IT**: the MLS description + launch posts for
 >    listing day · **C) BOTH**: ____
 > 2. Property address or area (or say "use the demo listing" to practice on a
->    ready-made home: great first run): ____
+>    ready-made home, a great first run): ____
 > 3. Beds / baths: ____
 > 4. Top 3 features of the home: ____
 > 5. Price band (rough is fine): ____
@@ -64,7 +64,7 @@ send exactly ONE message: this mini-form, minus any question already answered.
 >
 > Reply in one message: short, messy answers are perfect.
 
-"Use the demo listing" answers questions 2–5, generate from the demo world below.
+"Use the demo listing" answers questions 2–5; generate from the demo world below.
 
 ## Output (use these exact section names)
 
@@ -87,14 +87,14 @@ agent, market snapshot, prep and staging), same headline + talking-points patter
 - **MLS DESCRIPTION**: sized to THEIR MLS character limit, plus two shorter
   cuts (roughly 500 and 250 characters; if their limit is already 500 or less,
   step the cuts down proportionally). Show the character count under each
-  version, and every version MUST come in under its limit, count before you
+  version, and every version MUST come in under its limit: count before you
   show it, trim if over.
 - **JUST LISTED POST**: caption + hashtags.
 - **OPEN HOUSE INVITE LINE**
 
 **DESIGN BRIEF**: a paste-ready design brief for the presentation deck,
 brand colors and fonts baked in (from the agent profile; clean neutral defaults if none).
-Ships with WIN IT and BOTH runs. A LAUNCH IT–only run has no deck to brief, skip
+Ships with WIN IT and BOTH runs. A LAUNCH IT–only run has no deck to brief: skip
 this section; the closing line still ends the run.
 
 Deliverable: WIN IT = a formatted .docx + the design brief · LAUNCH IT = chat copy.
@@ -108,12 +108,12 @@ Deliverable: WIN IT = a formatted .docx + the design brief · LAUNCH IT = chat c
 - Footer: agent name · phone/email placeholder · page number, on every page.
 - Generous white space: the document should feel calm and scannable on a phone.
 - Respect this skill's target length. Never exceed it.
-- Generate a real, downloadable .docx file, never deliver the document as chat text only.
+- Generate a real, downloadable .docx file; never deliver the document as chat text only.
 - Design hierarchy at a glance: the title is unmistakably the biggest thing on the
   page, headings clearly outrank body text, and key labels inside bullets are bolded
   ("**Hook:** ..."): a stranger should grasp the structure in 3 seconds.
 - No wall-of-text pages: anything dense becomes bullets or a table. Order sections
-  the way the agent will USE them, what they need first sits first.
+  the way the agent will USE them: what they need first sits first.
 
 ## Rules
 
@@ -121,22 +121,22 @@ Deliverable: WIN IT = a formatted .docx + the design brief · LAUNCH IT = chat c
   neighbors or the "type of people."
 - No invented features: only what the agent provided.
 - If a line could appear under any listing in any city, rewrite it with an anchor
-  from THIS home or a real place in their market, "the greenway around the
+  from THIS home or a real place in their market: "the greenway around the
   corner" beats "close to everything."
 - PROOF uses only real items from the agent profile or the agent's message. None
   available? Use a process promise ("here's what I do in your first 7 days").
 - No listing yet? Run either mode on the demo listing to practice first.
-- Maximum ONE question message before generating, batch questions. Accept messy
+- Maximum ONE question message before generating: batch questions. Accept messy
   input. Sensible defaults over repeat questions.
 - Offer variations AFTER delivering, never before.
 - Match the profile's voice rules. No profile = neutral-warm, plain 8th-grade English.
 - Banned words in all outputs: unlock, supercharge, game-changer, revolutionary,
   secret weapon, leverage (as a verb).
-- Fair housing: describe properties, lifestyle, and amenities, never demographics,
+- Fair housing: describe properties, lifestyle, and amenities; never demographics,
   never who "belongs" somewhere, never steering.
 - Never invent market stats. Only numbers the agent provides or that you found and
   cited, attributed ("per [source], as of [month]").
-- No legal, tax, or lending advice, refer to the right professional. No income
+- No legal, tax, or lending advice: refer to the right professional. No income
   promises or guarantees.
 - You WRITE and PREPARE. Never send, publish, schedule, or act on your own. If asked
   to automate: "I'll write it, you send it."
@@ -144,7 +144,7 @@ Deliverable: WIN IT = a formatted .docx + the design brief · LAUNCH IT = chat c
 
 ## End every run with
 
-"Paste the design brief into your design tool, designed deck in minutes."
+"Paste the design brief into your design tool and get a designed deck in minutes."
 
 ## Worked example (demo world)
 
@@ -177,5 +177,5 @@ Sample of the output:
 > bio: sellers hire the agent who talks about them. Rehearse the OPENING PROMISE
 > out loud before Thursday.
 
-Note the pattern: every line sells the property and the lifestyle, the greenway,
-the yard, the kitchen: never the neighbors, and no feature beyond what was given.
+Note the pattern: every line sells the property and the lifestyle (the greenway,
+the yard, the kitchen), never the neighbors, and no feature beyond what was given.

@@ -1,6 +1,6 @@
 ---
 name: business-plan-builder
-description: 'A 3-phase planning interview: the money, the engine, the future, turned into a 3–4 page 90-day plan book with the math done, 3 weekly activities chosen around what the agent will actually do, and a working weekly dashboard. Use when the agent says build my business plan, plan my next 90 days, how many deals do I need to hit my goal, or set my goals.'
+description: 'A 3-phase planning interview (the money, the engine, the future) turned into a 3–4 page 90-day plan book with the math done, 3 weekly activities chosen around what the agent will actually do, and a working weekly dashboard. Use when the agent says build my business plan, plan my next 90 days, how many deals do I need to hit my goal, or set my goals.'
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: hands
@@ -29,7 +29,7 @@ it runnable.
 
 ### The first message (a 3-phase planning interview, 9 questions, not a form)
 
-Run all three batches, one message each, in order. THE BRAIN RULE: drop any
+Run all three batches, one message each, in order. THE PROFILE RULE: drop any
 question the agent profile or their messages already answer, and say what you're using
 ("From your profile: $850K GCI, building on that."). Never re-ask; when a profile
 fact is related but shallower than the question, fold it in ("Your profile says
@@ -69,7 +69,7 @@ renumbered: adapt the opener line ("From your profile: $300K, so just two:").
 >    pickup, a day job, no weekends): ____
 > 6. Which money-making activities do you actually ENJOY, calls, open houses,
 >    filming, events, texting your sphere? And any you dread? (Plans built on
->    activities you hate get abandoned by week 3, I plan around this.): ____
+>    activities you hate get abandoned by week 3; I plan around this.): ____
 >
 > Reply in one message: short, messy answers are perfect.
 
@@ -123,9 +123,9 @@ the default assumptions below and print what you used, never ask a second time.
    perfect-90-days answer (Q9) becomes the scoreboard they'll be graded against.
 7. Deliver in this exact order: the full Plan Book (.docx) → the 90-DAY
    DASHBOARD visual page → "**Why this works:**" (2–3 sentences max: why this math
-   and these 3 activities connect today's work to THEIR goal, it's a
-   scoreboard, not a promise: plus the one thing to do today, usually: log this
-   week's first conversation on the dashboard now) → one tailored offer (e.g.,
+   and these 3 activities connect today's work to THEIR goal (it's a
+   scoreboard, not a promise), plus the one thing to do today (usually: log this
+   week's first conversation on the dashboard now)) → one tailored offer (e.g.,
    "Want the same math at a stretch goal, or an activity swapped?") → the
    closing line → (Tip line if no profile).
 
@@ -152,10 +152,10 @@ Plus the **Assumptions table** (commission %, conversion rates) marked
 always print whichever you used: commission 2.5% · brokerage split 10% ·
 conversation → appointment 1 in 8 · appointment → deal 1 in 3 · time costs ~15 min
 per conversation, ~90 min per appointment, ~2 hrs/week per active deal, plus
-per-activity costs (reel ≈ 60–90 min · open house ≈ 3 hrs · coffee ≈ 1 hr),
+per-activity costs (reel ≈ 60–90 min · open house ≈ 3 hrs · coffee ≈ 1 hr);
 every activity in the plan gets priced, content included.
 
-Close the math: every run, right after the Assumptions table, with the exact
+Close the math every run, right after the Assumptions table, with the exact
 line: "This is math, not a promise."
 
 Deliverable: **THE 90-DAY PLAN BOOK (.docx)**: 3 to 4 pages, this exact structure:
@@ -179,7 +179,7 @@ Deliverable: **THE 90-DAY PLAN BOOK (.docx)**: 3 to 4 pages, this exact structur
   VISION developed (2–3 sentences of what this quarter builds toward, in their
   words).
 
-Never transcribe: develop: every section makes the plan MORE runnable, not
+Never transcribe, develop: every section makes the plan MORE runnable, not
 just restated. The depth bar: at least 3 full pages, ~1,200+ words of substance,
 and the coach test: if a section wouldn't survive being handed over by a paid
 business coach ("what do I actually SAY?" has an answer on page 2), it's not
@@ -195,12 +195,12 @@ filler sentences.
 - Footer: agent name · phone/email placeholder · page number, on every page.
 - Generous white space: the document should feel calm and scannable on a phone.
 - Respect this skill's target length. Never exceed it.
-- Generate a real, downloadable .docx file, never deliver the document as chat text only.
+- Generate a real, downloadable .docx file; never deliver the document as chat text only.
 - Design hierarchy at a glance: the title is unmistakably the biggest thing on the
   page, headings clearly outrank body text, and key labels inside bullets are bolded
   ("**Hook:** ..."): a stranger should grasp the structure in 3 seconds.
 - No wall-of-text pages: anything dense becomes bullets or a table. Order sections
-  the way the agent will USE them, what they need first sits first.
+  the way the agent will USE them: what they need first sits first.
 
 ## Visual view
 
@@ -217,7 +217,7 @@ what do I do THIS week · am I on pace · what's the next milestone. Required:
   logged vs. target, and CUMULATIVE closings logged vs. cumulative needed
   (closings aren't linear week to week), so falling behind is visible by week
   2, not day 89.
-- **Deal log**: tap to log a closing (price editable, defaults to their average)
+- **Deal log**: tap to log a closing (price editable, defaults to their average);
   the goal thermometer fills with real banked GCI vs. the goal.
 - **Milestones**: the WHAT PERFECT LOOKS LIKE checkboxes, checkable.
 - **State persists**: use localStorage so tallies, deals, and checkmarks survive
@@ -236,17 +236,17 @@ The .docx stays the document of record; the visual page never requires integrati
   honestly: never quietly inflate conversion rates to make it fit.
 - If a core activity could sit in any agent's plan ("post on social media", "call
   your sphere"), rewrite it until it names THEIR niche, channel, and weekly number.
-- Maximum ONE question message before generating, batch questions. Accept messy
+- Maximum ONE question message before generating: batch questions. Accept messy
   input. Sensible defaults over repeat questions.
 - Offer variations AFTER delivering, never before.
 - Match the profile's voice rules. No profile = neutral-warm, plain 8th-grade English.
 - Banned words in all outputs: unlock, supercharge, game-changer, revolutionary,
   secret weapon, leverage (as a verb).
-- Fair housing: describe properties, lifestyle, and amenities, never demographics,
+- Fair housing: describe properties, lifestyle, and amenities; never demographics,
   never who "belongs" somewhere, never steering.
 - Never invent market stats. Only numbers the agent provides or that you found and
   cited, attributed ("per [source], as of [month]").
-- No legal, tax, or lending advice, refer to the right professional. No income
+- No legal, tax, or lending advice: refer to the right professional. No income
   promises or guarantees.
 - You WRITE and PREPARE. Never send, publish, schedule, or act on your own. If asked
   to automate: "I'll write it, you send it."

@@ -1,6 +1,6 @@
 ---
 name: google-business-profile-skill
-description: Writes everything for the agent's Google Business Profile, description, services list, first month of Google posts, Q&A answers, and review reply templates, delivered as a paste-by-paste setup checklist. Use when the agent says set up my Google Business Profile, Google profile, GBP, show up on Google Maps, or Google posts for my profile.
+description: Writes everything for the agent's Google Business Profile (description, services list, first month of Google posts, Q&A answers, and review reply templates), delivered as a paste-by-paste setup checklist. Use when the agent says set up my Google Business Profile, Google profile, GBP, show up on Google Maps, or Google posts for my profile.
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: content
@@ -21,7 +21,7 @@ It's the free lead channel most agents leave sitting empty.
 
 1. Look for the agent profile (`agent-profile.md`, or the legacy name `claude-brain.md`) and any brand, voice, or offer documents the agent keeps. If found, use them silently for voice, market, niche, proof, and CTA. The agent's own documents win over this skill's defaults. Never re-ask anything they answer. This skill reads the profile and never edits it.
 2. If there is no agent profile, ask only the minimum inputs for this run (one message,
-   batched). Still deliver in full, placeholders like [YOUR MARKET] beat stalling.
+   batched). Still deliver in full: placeholders like [YOUR MARKET] beat stalling.
    In that case, AFTER the closing line, add: "Tip: the Agent Brain Builder writes a profile that makes every skill in this toolkit sound like you automatically."
 3. If everything needed was already given: generate immediately. Zero questions.
 4. This skill needs two things (batch into the one question message if missing):
@@ -36,10 +36,10 @@ It's the free lead channel most agents leave sitting empty.
    into the profile, and the checklist gives the exact order.
 7. Then: generate the full package and deliver in this exact order:
    1. All six output sections + the .docx (the paste-by-paste checklist).
-   2. **Why this works:** 2–3 sentences max, the strategy behind this version
+   2. **Why this works:** 2–3 sentences max: the strategy behind this version
       and the single most important move today (usually: paste the description
-      and set categories first: that's what makes the profile start showing up).
-   3. The offer: "Rerun me on the 1st of every month, I'll write the next 4 posts."
+      and set categories first; that's what makes the profile start showing up).
+   3. The offer: "Rerun me on the 1st of every month: I'll write the next 4 posts."
    4. The closing line.
    5. (Tip line, only if no profile.)
    On a monthly rerun, write only a fresh 4 GOOGLE POSTS (same week pattern),
@@ -49,27 +49,27 @@ It's the free lead channel most agents leave sitting empty.
 
 If the agent profile answers everything and the agent's message already settles
 profile status: NO form. One warm line, "Using your agent profile, building your
-Google Business Profile package for [market] now.", then straight to work.
+Google Business Profile package for [market] now," then straight to work.
 
 If inputs are needed, send exactly one message, structured like this:
 
 > When locals Google "realtor near me," I want you to be the complete, credible
-> profile that shows up. I'll write your whole Google Business Profile,
+> profile that shows up. I'll write your whole Google Business Profile:
 > description, services, a month of posts, Q&A answers, and review replies, as
 > a paste-by-paste checklist. 2 minutes of questions, then I do the rest.
 >
-> Don't have a profile at all? Totally normal, creating one is free at
+> Don't have a profile at all? Totally normal: creating one is free at
 > google.com/business, and your checklist will walk you through it.
 >
 > 1. Is your Google Business Profile brand new (or nonexistent), or does it
 >    exist already? If it exists, paste its current description here: ____
-> 2. What do you actually offer, plain list is fine (e.g. "buyers, sellers,
+> 2. What do you actually offer? A plain list is fine (e.g. "buyers, sellers,
 >    relocation help"): ____
 >
 > Reply in one message: short, messy answers are perfect.
 
 Drop any question the agent profile or their message already answers ("my profile is
-empty" settles question 1 as NEW; the profile's offer covers question 2), never
+empty" settles question 1 as NEW; the profile's offer covers question 2), and never
 ask for a mode that's already obvious.
 
 ## Output (use these exact section names)
@@ -107,34 +107,34 @@ Deliverable: a formatted .docx (the paste-by-paste checklist) + copy blocks in c
 - Footer: agent name · phone/email placeholder · page number, on every page.
 - Generous white space: the document should feel calm and scannable on a phone.
 - Respect this skill's target length. Never exceed it.
-- Generate a real, downloadable .docx file, never deliver the document as chat text only.
+- Generate a real, downloadable .docx file; never deliver the document as chat text only.
 - Design hierarchy at a glance: the title is unmistakably the biggest thing on the
   page, headings clearly outrank body text, and key labels inside bullets are bolded
   ("**Hook:** ..."): a stranger should grasp the structure in 3 seconds.
 - No wall-of-text pages: anything dense becomes bullets or a table. Order sections
-  the way the agent will USE them, what they need first sits first.
+  the way the agent will USE them: what they need first sits first.
 
 ## Rules
 
 - Keywords the way locals search, natural phrases like "realtor in [city]" and
   "[niche] agent near [area]." No keyword stuffing, ever.
-- Never scripts fake reviews. Reply templates only, for reviews real people wrote.
+- Never script fake reviews. Reply templates only, for reviews real people wrote.
 - Fair-housing safe throughout: every post, answer, and description passes the
   fair-housing check before it ships.
-- If a line could sit on any city's profile, rewrite it with a local anchor, a
+- If a line could sit on any city's profile, rewrite it with a local anchor: a
   real neighborhood, landmark, or the agent's actual niche. The description, every
   post, and every Q&A answer must read like they belong to this ONE agent.
-- Maximum ONE question message before generating, batch questions. Accept messy
+- Maximum ONE question message before generating: batch questions. Accept messy
   input. Sensible defaults over repeat questions.
 - Offer variations AFTER delivering, never before.
 - Match the profile's voice rules. No profile = neutral-warm, plain 8th-grade English.
 - Banned words in all outputs: unlock, supercharge, game-changer, revolutionary,
   secret weapon, leverage (as a verb).
-- Fair housing: describe properties, lifestyle, and amenities, never demographics,
+- Fair housing: describe properties, lifestyle, and amenities; never demographics,
   never who "belongs" somewhere, never steering.
 - Never invent market stats. Only numbers the agent provides or that you found and
   cited, attributed ("per [source], as of [month]").
-- No legal, tax, or lending advice, refer to the right professional. No income
+- No legal, tax, or lending advice: refer to the right professional. No income
   promises or guarantees.
 - You WRITE and PREPARE. Never send, publish, schedule, or act on your own. If asked
   to automate: "I'll write it, you send it."
@@ -173,12 +173,12 @@ one-line "what changed" note under the rewritten description.) Sample lines:
 > MLS, June 2026). Here's what that means if you're buying this fall...
 >
 > **4 GOOGLE POSTS**: Week 4 (review spotlight): "[PASTE A LINE FROM A REAL
-> REVIEW]": thank you, [first name]! Helping first-time buyers land the right
+> REVIEW]" Thank you, [first name]! Helping first-time buyers land the right
 > home in Charlotte is why I do this.
 >
-> **Q&A PACK**: Q: Do I pay a realtor as a buyer? A: Here's the real answer, it
+> **Q&A PACK**: Q: Do I pay a realtor as a buyer? A: Here's the real answer: it
 > depends on the agreement, and I walk you through it before you sign anything.
 >
 > **REVIEW REPLY TEMPLATES** (tough one): Thank you for the honest feedback,
-> [name]. That's not the experience I want anyone to have, I'd like to make it
+> [name]. That's not the experience I want anyone to have; I'd like to make it
 > right. Call me directly at [phone].
