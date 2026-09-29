@@ -498,7 +498,7 @@ checks = [
  ("header-less older eta on the user mount is UNTRACKED-COPY-STALE", cp("eta", "claude-code-user-mount") == [("UNTRACKED-COPY-STALE", True)]),
  ("the aura canonical eta is shadowed by the personal copy, with a SHADOWED finding", cp("eta", "claude-code-project-mount") == [("CANONICAL", False)] and has("eta", "SHADOWED", "claude-code-project-mount")),
  ("an identical personal beta shadows the project canonical without a SHADOWED finding", cp("beta", "claude-code-project-mount") == [("CANONICAL", False)] and not has("beta", "SHADOWED")),
- ("the rewritten Codex alpha is HAND-EDITED and REWRITTEN on codex-user-mount", cp("alpha", "codex-user-mount") == [("HAND-EDITED", True)] and has("alpha", "REWRITTEN", "codex-user-mount")),
+ ("the rewritten Codex alpha is STALE and REWRITTEN on codex-user-mount, never HAND-EDITED (a rewrite that only SKILL.md's manifest line disagrees with is the import's doing)", cp("alpha", "codex-user-mount") == [("STALE", True)] and has("alpha", "REWRITTEN", "codex-user-mount") and not has("alpha", "HAND-EDITED", "codex-user-mount")),
  ("a stale supporting file under a clean manifest is STALE on codex-user-mount", cp("mu", "codex-user-mount") == [("STALE", True)] and has("mu", "STALE", "codex-user-mount")),
  ("a description-only drift under a clean manifest is STALE on codex-user-mount", cp("gamma", "codex-user-mount") == [("STALE", True)]),
  ("an orphan pipeline copy is reported on codex-user-mount", has("zeta", "ORPHAN", "codex-user-mount")),
@@ -527,6 +527,68 @@ for m in bad:
 sys.exit(1 if bad else 0)
 PY2
 check "T16 audit classifies every planted state on the surface it was planted on" $?
+python3 - "$LC" "$LH" <<'PY4'
+import hashlib, importlib.util, os, re, sys
+lc, lh = sys.argv[1:3]
+spec = importlib.util.spec_from_file_location("sl", lc); sl = importlib.util.module_from_spec(spec); spec.loader.exec_module(sl)
+def import_rewrite(t):
+    # stand-in for Codex Desktop's import rewrite: word-bounded claude variants become Codex, CLAUDE.md becomes AGENTS.md
+    t = t.replace("CLAUDE.md", "AGENTS.md")
+    return re.sub(r"(?<![A-Za-z0-9_])(claude code|claude-code|claude_code|claudecode|claude)(?![A-Za-z0-9_])", "Codex", t, flags=re.I)
+text = ("---\nname: probe\ndescription: Probe skill.\n---\n\n# Probe -- v1.0 (2026-09-24)\n\n"
+        "Use Claude Code for this. Read CLAUDE.md first.\nClaude keeps notes in the log.\nMention Claude again here.\n")
+canon = {"files": {"SKILL.md": text.encode(), "guide.md": b"guide\n"}, "text": text, "name": "probe",
+         "description": "Probe skill.", "label": "expert-partners-skills skills/probe/SKILL.md", "stamp": "v1.0"}
+def plant(name):
+    d = os.path.join(lh, "unit-probe", name); os.makedirs(d, exist_ok=True)
+    files = sl.render_expected(canon)
+    files["SKILL.md"] = files["SKILL.md"].replace(b"(DATE,", b"(2026-09-01,")
+    for rel, b in files.items():
+        open(os.path.join(d, rel), "wb").write(b)
+    remanifest(d)
+    return d
+def remanifest(d):
+    lines = []
+    for dp, _, fn in os.walk(d):
+        for f in fn:
+            if f != "checksums.sha256":
+                p = os.path.join(dp, f)
+                lines.append((("./" + os.path.relpath(p, d)).encode(), hashlib.sha256(open(p, "rb").read()).hexdigest()))
+    open(os.path.join(d, "checksums.sha256"), "w").write("".join(f"{h}  {r.decode()}\n" for r, h in sorted(lines)))
+def edit(d, rel, fn):
+    p = os.path.join(d, rel)
+    before = open(p).read()
+    open(p, "w").write(fn(before))
+clean = plant("clean")
+imp = plant("import"); edit(imp, "SKILL.md", import_rewrite)                       # manifest still records the original
+imp_extra = plant("import-extra"); edit(imp_extra, "SKILL.md", import_rewrite); open(os.path.join(imp_extra, "notes.txt"), "w").write("unlisted\n")
+imp_other = plant("import-other"); edit(imp_other, "SKILL.md", import_rewrite); edit(imp_other, "guide.md", lambda t: t + "hand edit\n")
+hand = plant("hand"); edit(hand, "SKILL.md", lambda t: t + "A hand-written line.\n")
+imp_re = plant("import-remanifested"); edit(imp_re, "SKILL.md", import_rewrite); remanifest(imp_re)
+def cl(d, surface="codex-user-mount"):
+    return sl.classify(canon, d, surface)
+r_clean, r_imp, r_extra, r_other, r_hand, r_re = (cl(d) for d in (clean, imp, imp_extra, imp_other, hand, imp_re))
+mirror = cl(imp, "codex-synced-mirror")
+checks = [
+ ("an untouched pipeline copy is CURRENT and not rewritten", r_clean["state"] == "CURRENT" and not r_clean["rewritten"]),
+ ("a rewrite where only SKILL.md disagrees with the manifest is STALE and rewritten, not HAND-EDITED", r_imp["state"] == "STALE" and r_imp["rewritten"]),
+ ("that classification says why: the manifest was copied verbatim and every other file matches", "only because of the Claude-to-Codex rewrite" in r_imp["detail"] and "every other file matches" in r_imp["detail"]),
+ ("a Codex copy names the import and its frozen behavior", "external-agent import" in r_imp["detail"] and "frozen snapshot" in r_imp["detail"]),
+ ("a rewrite plus an unlisted extra file is still HAND-EDITED", r_extra["state"] == "HAND-EDITED"),
+ ("a rewrite plus a hand-edited supporting file is still HAND-EDITED", r_other["state"] == "HAND-EDITED"),
+ ("a genuine hand edit of SKILL.md with no rewrite is still HAND-EDITED", r_hand["state"] == "HAND-EDITED" and not r_hand["rewritten"]),
+ ("a rewrite under a recomputed manifest takes the ordinary path and is STALE", r_re["state"] == "STALE" and r_re["rewritten"] and "only because of" not in r_re["detail"]),
+ ("a synced-mirror copy is marked as a frozen snapshot made by the import", "frozen snapshot" in mirror["detail"] and "external-agent import" in mirror["detail"]),
+ ("the synced-mirror surface no longer claims no producer writes it", "no producer" not in sl.SURFACES["codex-synced-mirror"]["what"] and "external-agent import" in sl.SURFACES["codex-synced-mirror"]["what"]),
+ ("the Codex user-mount surface names the import as a second writer", "external-agent import" in sl.SURFACES["codex-user-mount"]["what"]),
+ ("a Claude-side rewritten copy does not get the Codex import note", "external-agent import" not in cl(imp, "claude-code-user-mount")["detail"]),
+]
+bad = [m for m, ok in checks if not ok]
+for m in bad:
+    print("MISSING:", m)
+sys.exit(1 if bad else 0)
+PY4
+check "T16 an import rewrite is not a hand edit, a real hand edit still is, and the import is named as the producer" $?
 out=$(python3 "$LC" audit --eps "$EPS" --aura "$AURA" --home "$LH" --only beta --json "$LH/only.json" 2>&1); rc=$?
 python3 -c "import json,sys; a=json.load(open('$LH/only.json')); sys.exit(0 if list(a['skills'])==['beta'] and a['findings'] and all(f['id']=='beta' for f in a['findings']) and a['auditedCount']==1 else 1)" && [ $rc -eq 1 ]
 check "T16 --only narrows the walk, the findings and the count to the named skill" $? "$out"
@@ -677,8 +739,8 @@ python3 "$LC" receipt-template eta --eps "$EPS" --aura "$AURA" > "$LH/tmpl-eta.j
 python3 "$LC" receipt-template gamma --eps "$EPS" --aura "$AURA" > "$LH/tmpl-gamma.json" 2>/dev/null
 rchk() { python3 "$LC" receipt-check "$LH2/r.json" --eps "$EPS" --aura "$AURA" --home "$LH" 2>&1; }
 rx "$LH/tmpl-alpha.json" 'full("codex-user-mount")'; out=$(rchk); rc=$?
-[ $rc -ne 0 ] && printf '%s' "$out" | grep -q 'codex-user-mount .*a loading copy is HAND-EDITED' && printf '%s' "$out" | grep -q 'Claude-to-Codex rewrite'
-check "T18 an installed claim on Codex is refused while the live copy is a hand-edited rewrite" $? "$out"
+[ $rc -ne 0 ] && printf '%s' "$out" | grep -q 'codex-user-mount .*a loading copy is STALE' && printf '%s' "$out" | grep -q 'Claude-to-Codex rewrite'
+check "T18 an installed claim on Codex is refused while the live copy is a stale rewrite" $? "$out"
 rx "$LH/tmpl-alpha.json" 'full("claude-code-user-mount")'; out=$(rchk); rc=$?
 [ $rc -ne 0 ] && printf '%s' "$out" | grep -q 'divergent duplicate identity in claude-code'
 check "T18 a current copy does not install while a divergent copy of the same skill loads in the same client" $? "$out"
