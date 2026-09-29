@@ -1,0 +1,5 @@
+{
+  "name": "real-estate-agent-toolkit",
+  "version": "0.1.0",
+  "description": "Portable, platform-neutral AI skills for real estate agents. Foundation release: agent-brain-builder (writes the shared agent-profile.md) and daily-planner. Works with any AI assistant that can load skills or read a text file; existing brand, voice, and offer canon always wins over the profile."
+}

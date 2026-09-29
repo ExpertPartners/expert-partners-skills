@@ -40,6 +40,12 @@
       "source": "./plugins/acn-advisor",
       "version": "0.1.0",
       "description": "ACN advisor skills for the household ACN line (acn-email-watch, acn-currency-check). Separate from every EP brand lane; inherits operating-doctrine."
+    },
+    {
+      "name": "real-estate-agent-toolkit",
+      "source": "./plugins/real-estate-agent-toolkit",
+      "version": "0.1.0",
+      "description": "Portable, platform-neutral AI skills for real estate agents (foundation: agent-brain-builder, daily-planner)."
     }
   ]
 }
