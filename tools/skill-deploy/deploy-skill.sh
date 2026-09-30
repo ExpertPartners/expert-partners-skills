@@ -23,8 +23,9 @@
 #                  classify every local copy of every canonical skill on this
 #                  machine (Claude Code user and project mounts, plugin cache and
 #                  claude.ai sync mirrors; Codex user and repo mounts, plugin
-#                  caches and the unsourced .agents/skills/synced mirror; Cowork's
-#                  account skills and org plugin stores) against canonical at a
+#                  caches and the .agents/skills/synced mirror that Codex Desktop's
+#                  import writes; Cowork's account skills and org plugin stores)
+#                  against canonical at a
 #                  git ref (default origin/main, else HEAD; --canonical-ref and
 #                  --aura-ref override, WORKTREE reads the working tree), resolve
 #                  which copies actually load, and exit non-zero on STALE,

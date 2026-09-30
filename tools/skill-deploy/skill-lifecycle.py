@@ -1157,7 +1157,7 @@ def receipt_check(args):
             rows.append((key, "NOT INTENDED", note))
             continue
         if key in NEVER_INTENDED:
-            problems.append(f"{key}: an unsourced mirror is never a release target; intend the surface it mirrors instead")
+            problems.append(f"{key}: a mirror written by Codex Desktop's external-agent import is never a release target; intend the surface it mirrors instead")
             rows.append((key, "REFUSED", "never a release target"))
             continue
         if key in PLUGIN_SURFACES and not c["plugin"]:

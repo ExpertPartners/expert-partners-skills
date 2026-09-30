@@ -963,6 +963,12 @@ printf '%s' "$out_rc" | grep -q 'codex-synced-mirror: not intended, yet a copy l
 check "T20 receipt control: a loading synced-mirror copy on an unintended surface needs a disposition" $? "$out_rc"
 ! printf '%s' "$out_dis" | grep -q 'codex-synced-mirror: not intended, yet a copy loads there' && printf '%s' "$out_dis" | grep -q 'codex-synced-mirror  *NOT INTENDED  *no loading copy; inert copy present: STALE'
 check "T20 receipt: a path-disabled synced-mirror copy needs no disposition and is reported as an inert copy" $? "$out_dis"
+rx "$LH/tmpl-alpha.json" 'full("claude-code-user-mount"); full("codex-synced-mirror")'
+out_ref=$(rchk5 "$LH")
+printf '%s' "$out_ref" | grep -q "codex-synced-mirror: a mirror written by Codex Desktop's external-agent import is never a release target; intend the surface it mirrors instead"
+check "T20 a receipt that intends the synced mirror is refused, and the reason names the import that writes it" $? "$out_ref"
+! grep -qi 'unsourced' "$LC" "$D"
+check "T20 neither the audit tool nor the producer script calls the Codex synced mirror unsourced" $? ""
 
 echo
 echo "deploy-skill tests: $PASS passed, $FAIL failed"
