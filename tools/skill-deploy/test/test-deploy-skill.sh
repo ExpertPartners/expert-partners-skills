@@ -770,6 +770,200 @@ out=$("$D" --receipt 2>&1); rc=$?
 [ $rc -ne 0 ] && printf '%s' "$out" | grep -q 'needs a receipt file'
 check "T19 deploy-skill.sh --receipt without a file is refused" $? "$out"
 
+# ---- T20 the audit honors Codex [[skills.config]] path disables ----
+# A copy whose SKILL.md path Codex has disabled does not load: it stays in the audit as an inert copy and raises no
+# finding and no duplicate. LH is the control (no entries), LH5 is the same home plus entries, LH6 is LH5 with a config.toml
+# that is not valid TOML. The entries cover an importer-rewritten copy, a description-drift copy, a stale import, a
+# hand-edited twin spelled with ~, a path reached through a symlinked directory, an orphan, an older cached version that
+# is already inert, an explicit enabled = true, a folder form and a name selector (the last two must not disable anything)
+# and a Claude Code copy's path (a Codex disable must never neutralize a Claude Code copy).
+cat > "$TMP/t20_fixture.py" <<'PY5'
+import os, shutil, sys
+lh, aura = sys.argv[1], sys.argv[2]
+broken = len(sys.argv) > 3 and sys.argv[3] == "broken"
+def copytree(src, dst):
+    shutil.rmtree(dst, ignore_errors=True)
+    shutil.copytree(src, dst)
+def w(p, s):
+    os.makedirs(os.path.dirname(p), exist_ok=True)
+    open(p, "w").write(s)
+# a genuinely hand-edited Codex copy that loads (beta on the user mount) and a hand-edited twin the config will neutralize
+for mount in (f"{lh}/.agents/skills/beta", f"{lh}/.agents/skills/synced/acct_sync/beta"):
+    copytree(f"{lh}/.claude/skills/beta", mount)
+    open(f"{mount}/SKILL.md", "a").write("\nA hand-written line.\n")
+# an older header-less eta on the Codex user mount, reached by the config through a symlinked spelling of the mount
+w(f"{lh}/.agents/skills/eta/SKILL.md", open(f"{aura}/.claude/skills/eta/SKILL.md").read().replace("Eta current body.", "Eta older body."))
+alias = f"{os.path.dirname(lh)}/agents-alias-{os.path.basename(lh)}"
+os.symlink(f"{lh}/.agents", alias)
+ep = f"{lh}/.codex/plugins/cache/expert-partners/doctrine-fixture"
+entries = [
+    (f"{lh}/.agents/skills/synced/acct_sync/alpha/SKILL.md", False),                                    # importer-rewritten, path-disabled
+    (f"{lh}/.codex/plugins/cache/claude-cowork/doctrine-fixture/1.0.0/skills/gamma/SKILL.md", False),  # the stale import
+    (f"{lh}/.agents/skills/gamma/SKILL.md", False),                                                     # user-mount description drift
+    ("~/.agents/skills/synced/acct_sync/beta/SKILL.md", False),                                         # hand-edited twin, spelled with ~
+    (f"{lh}/.agents/skills/mu/SKILL.md", True),                                                         # explicitly enabled, still loads
+    (f"{ep}/1.2.0/skills/gamma", False),                                                                # folder form, not honored
+    (f"{ep}/1.1.0/skills/gamma/SKILL.md", False),                                                       # older cached version, already inert
+    (f"{alias}/skills/eta/SKILL.md", False),                                                            # through a symlinked directory
+    (f"{lh}/.agents/skills/zeta/SKILL.md", False),                                                      # an orphan pipeline copy
+    (f"{lh}/.claude/skills/mu/SKILL.md", False),                                                        # a Claude Code path, which Codex never loads
+]
+cfg = open(f"{lh}/.codex/config.toml").read().rstrip("\n") + "\n"
+for n, (path, enabled) in enumerate(entries):
+    cfg += f'\n[[skills.config]]\npath = "{path}"\nenabled = {"true" if enabled else "false"}\n'
+    if broken and n == 3:
+        cfg += "\n[broken table\nkey = 1\n"                            # TOML no parser accepts, in the middle of the entries
+cfg += '\n[[skills.config]]\nname = "gamma"\nenabled = false\n'          # a selector by name, not interpreted
+open(f"{lh}/.codex/config.toml", "w").write(cfg)
+PY5
+LH5="$TMP/lifehome5"; LH6="$TMP/lifehome6"; cp -R "$LH" "$LH5"; cp -R "$LH" "$LH6"
+python3 "$TMP/t20_fixture.py" "$LH5" "$AURA" || fail_setup "T20 skills.config fixture"
+python3 "$TMP/t20_fixture.py" "$LH6" "$AURA" broken || fail_setup "T20 broken-config fixture"
+out_ctl=$(python3 "$LC" audit --eps "$EPS" --aura "$AURA" --home "$LH" --json "$TMP/t20-control.json" 2>&1)
+out5=$(python3 "$LC" audit --eps "$EPS" --aura "$AURA" --home "$LH5" --json "$TMP/t20-lh5.json" 2>&1); rc=$?
+[ $rc -eq 1 ] && ! printf '%s' "$out5" | grep -q 'Traceback'
+check "T20 the audit still runs and exits 1 while genuine findings remain" $? "$out5"
+printf '%s' "$out5" | grep -q 'codex skills.config: 8 SKILL.md path disable(s) read, 5 audited copy/copies neutralized, 1 re-enabled, 1 folder-form and 1 name-selector entr(ies) not interpreted'
+check "T20 the report says how many entries were read, how many copies they stopped from loading, and what was not interpreted" $? "$out5"
+! printf '%s' "$out_ctl" | grep -q 'codex skills.config'
+check "T20 a home with no skills.config entries prints no skills.config line" $? "$out_ctl"
+python3 - "$TMP/t20-control.json" "$TMP/t20-lh5.json" <<'PY6'
+import json, re, sys
+ctl, a = json.load(open(sys.argv[1])), json.load(open(sys.argv[2]))
+def copies(aud, sid, surface, frag=None):
+    return [c for c in aud["skills"][sid]["copies"] if c["surface"] == surface and (frag is None or frag in c["path"])]
+def finding(aud, sid, kind, surface=None, frag=None, client=None):
+    return any(f["id"] == sid and f["kind"] == kind and (surface is None or f.get("surface") == surface) and (frag is None or frag in f.get("path", ""))
+               and (client is None or f.get("client") == client) for f in aud["findings"])
+def dup_detail(aud, sid, client):
+    return next((f["detail"] for f in aud["findings"] if f["id"] == sid and f["kind"] == "DUPLICATE-IDENTITY" and f.get("client") == client), "")
+def home_relative(p): return re.sub(r"^.*/lifehome5?/", "", p or "")
+SYN, USR, PLG = "codex-synced-mirror", "codex-user-mount", "codex-plugin-cache"
+syn_a, usr_a = ".agents/skills/synced/acct_sync/alpha", ".agents/skills/alpha"
+cow_g, usr_g, ep_g, old_g = "claude-cowork/doctrine-fixture/1.0.0", ".agents/skills/gamma", "expert-partners/doctrine-fixture/1.2.0", "expert-partners/doctrine-fixture/1.1.0"
+usr_b, syn_b = ".agents/skills/beta", ".agents/skills/synced/acct_sync/beta"
+sa = copies(a, "alpha", SYN, syn_a)[0]
+ua = copies(a, "alpha", USR, usr_a)[0]
+cg = copies(a, "gamma", PLG, cow_g)[0]
+ug = copies(a, "gamma", USR, usr_g)[0]
+eg = copies(a, "gamma", PLG, ep_g)[0]
+og = copies(a, "gamma", PLG, old_g)[0]
+mu = copies(a, "mu", USR)[0]
+ub = copies(a, "beta", USR, usr_b)[0]
+sb = copies(a, "beta", SYN, syn_b)[0]
+et = copies(a, "eta", USR, ".agents/skills/eta")[0]
+cu = copies(a, "mu", "claude-code-user-mount")[0]
+neutralized = [c for sid in a["skills"] for c in a["skills"][sid]["copies"] if c.get("pathDisabled")]
+is_codex = lambda f: f.get("surface", "").startswith("codex-") or f.get("client") == "codex"
+non_codex = lambda aud: sorted((f["id"], f["kind"], f.get("client"), f.get("surface"), home_relative(f.get("path"))) for f in aud["findings"] if not is_codex(f))
+checks = [
+ ("control: without entries the synced alpha loads and raises STALE and REWRITTEN, alpha and gamma are duplicated in Codex",
+  copies(ctl, "alpha", SYN)[0]["loads"] and finding(ctl, "alpha", "STALE", SYN, syn_a) and finding(ctl, "alpha", "REWRITTEN", SYN, syn_a)
+  and finding(ctl, "alpha", "DUPLICATE-IDENTITY", client="codex") and finding(ctl, "gamma", "DUPLICATE-IDENTITY", client="codex")),
+ ("a path-disabled importer-rewritten copy does not load, is marked, says why, and keeps its STALE and REWRITTEN classification",
+  sa["loads"] is False and sa.get("pathDisabled") is True and "skills.config" in sa["inertReason"] and sa["state"] == "STALE" and sa["rewritten"] is True),
+ ("a path-disabled copy raises no STALE and no REWRITTEN finding, while the Claude.ai account-sync copy of the same skill keeps its own",
+  not finding(a, "alpha", "STALE", SYN, syn_a) and not finding(a, "alpha", "REWRITTEN", SYN, syn_a)
+  and finding(a, "alpha", "STALE", "claudeai-account-skills-sync", "synced/acct_sync/alpha")),
+ ("no finding of any kind points at a copy the config disabled",
+  len(neutralized) == 6 and not any(f.get("path") == c["path"] for c in neutralized for f in a["findings"])),
+ ("the enabled importer-rewritten copy of the same skill still loads and still raises STALE and REWRITTEN",
+  ua["loads"] is True and not ua.get("pathDisabled") and finding(a, "alpha", "STALE", USR, usr_a) and finding(a, "alpha", "REWRITTEN", USR, usr_a)),
+ ("disabling the stale import and the drifted user copy leaves one intended route, so the Codex duplicate is resolved",
+  cg["loads"] is False and ug["loads"] is False and eg["loads"] is True and eg["state"] == "CURRENT" and not eg.get("pathDisabled")
+  and "3 copies load in codex" in dup_detail(ctl, "gamma", "codex") and not finding(a, "gamma", "DUPLICATE-IDENTITY", client="codex")),
+ ("a duplicate is counted among loading copies only: alpha drops from three loading Codex copies to two and is still flagged, because two enabled routes remain",
+  "3 copies load in codex" in dup_detail(ctl, "alpha", "codex") and "2 copies load in codex" in dup_detail(a, "alpha", "codex")),
+ ("a folder-form entry and a name selector neutralize nothing, the intended route keeps loading", eg["loads"] is True and not eg.get("pathDisabled")),
+ ("a copy that was already inert keeps its own reason, is marked path-disabled, and is not counted as neutralized",
+  og["loads"] is False and og.get("pathDisabled") is True and "older cached version" in og["inertReason"]),
+ ("an entry that says enabled = true leaves a genuinely stale copy loading and flagged",
+  mu["loads"] is True and mu["state"] == "STALE" and not mu.get("pathDisabled") and finding(a, "mu", "STALE", USR, ".agents/skills/mu")),
+ ("a genuinely hand-edited Codex copy that loads is HAND-EDITED, not REWRITTEN, and is reported",
+  ub["loads"] is True and ub["state"] == "HAND-EDITED" and not ub["rewritten"] and finding(a, "beta", "HAND-EDITED", USR, usr_b) and not finding(a, "beta", "REWRITTEN", USR, usr_b)),
+ ("a hand-edited twin the config disables through a ~ path is inert, stays HAND-EDITED in its record, and raises no finding",
+  sb["loads"] is False and sb.get("pathDisabled") is True and sb["state"] == "HAND-EDITED" and not finding(a, "beta", "HAND-EDITED", SYN, syn_b)),
+ ("a path spelled through a symlinked directory neutralizes the copy it resolves to, leaving the repo copy as eta's only Codex route",
+  "eta" in ctl["skills"] and not copies(ctl, "eta", USR) and et["loads"] is False and et.get("pathDisabled") is True
+  and not finding(a, "eta", "UNTRACKED-COPY-STALE", USR) and not finding(a, "eta", "DUPLICATE-IDENTITY", client="codex")),
+ ("a Codex path disable never neutralizes a Claude Code copy, which Codex does not load and Claude Code still does",
+  cu["loads"] is True and not cu.get("pathDisabled") and cu["state"] == "CURRENT"),
+ ("an orphan stays reported when its path is disabled, a stray pipeline copy is hygiene and not a loading finding",
+  finding(ctl, "zeta", "ORPHAN", USR, ".agents/skills/zeta") and finding(a, "zeta", "ORPHAN", USR, ".agents/skills/zeta")),
+ ("the audit JSON carries the counts",
+  a["codexSkillsConfig"] == {"pathDisableEntries": 8, "reEnabledEntries": 1, "folderFormEntries": 1, "nameSelectorEntries": 1, "copiesNeutralized": 5}),
+ ("the control JSON carries zero counts", ctl["codexSkillsConfig"] == {"pathDisableEntries": 0, "reEnabledEntries": 0, "folderFormEntries": 0, "nameSelectorEntries": 0, "copiesNeutralized": 0}),
+ ("only Codex findings change: every non-Codex finding is identical with and without the entries",
+  non_codex(ctl) == non_codex(a) and len(non_codex(a)) > 0),
+]
+bad = [m for m, ok in checks if not ok]
+for m in bad:
+    print("MISSING:", m)
+sys.exit(1 if bad else 0)
+PY6
+check "T20 the audit treats path-disabled Codex copies as not loading and leaves genuine ones alone" $?
+out6=$(python3 "$LC" audit --eps "$EPS" --aura "$AURA" --home "$LH6" --json "$TMP/t20-lh6.json" 2>&1); rc=$?
+python3 - "$LH6/.codex/config.toml" "$TMP/t20-lh5.json" "$TMP/t20-lh6.json" <<'PY8'
+import json, sys
+try:
+    import tomllib
+    try:
+        tomllib.loads(open(sys.argv[1]).read()); print("MISSING: the fixture config.toml must not be valid TOML"); sys.exit(1)
+    except tomllib.TOMLDecodeError:
+        pass
+except ImportError:
+    pass
+a, b = json.load(open(sys.argv[2])), json.load(open(sys.argv[3]))
+same = json.dumps(a["findings"], sort_keys=True) == json.dumps(b["findings"], sort_keys=True).replace("lifehome6", "lifehome5")
+if not same or a["codexSkillsConfig"] != b["codexSkillsConfig"]:
+    print("MISSING: a config.toml that is not valid TOML must give the same findings and counts as the valid one"); sys.exit(1)
+PY8
+[ $rc -eq 1 ] && ! printf '%s' "$out6" | grep -q 'Traceback'
+check "T20 a config.toml that is not valid TOML still has its skills.config entries honored, with the same findings and counts" $? "$out6"
+python3 - "$LC" "$TMP/t20-parse" <<'PY7'
+import importlib.util, os, sys
+spec = importlib.util.spec_from_file_location("sl", sys.argv[1]); sl = importlib.util.module_from_spec(spec); spec.loader.exec_module(sl)
+root = sys.argv[2]; home = os.path.join(root, "home"); codex = os.path.join(home, ".codex"); os.makedirs(codex, exist_ok=True)
+def run(text):
+    open(os.path.join(codex, "config.toml"), "w").write(text)
+    return sl.codex_skills_config(codex, home)
+def entry(path, enabled): return f'[[skills.config]]\npath = "{path}"\nenabled = {enabled}\n\n'
+P = lambda *a: os.path.join(home, *a)
+tomllib_text = entry(P("a", "SKILL.md"), "false") + entry(P("b", "SKILL.md"), "true") + entry(P("c"), "false") + '[[skills.config]]\nname = "x"\nenabled = false\n\n' + '[plugins."p@m"]\nenabled = true\n'
+d1, st1 = run(tomllib_text)
+d2 = {os.path.normpath(e["path"]) for e in sl._skills_config_regex(tomllib_text) if e.get("path") and e.get("enabled") is False and e["path"].endswith("SKILL.md")}
+empty = os.path.join(root, "empty"); os.makedirs(os.path.join(empty, ".codex"), exist_ok=True)
+lit = "[[skills.config]]\npath = '%s'\nenabled = false # kept off\n" % P("j", "SKILL.md")
+checks = [
+ ("parser: a disabled SKILL.md path is read, an enabled one and a folder and a name selector are counted and not disabling",
+  d1 == {P("a", "SKILL.md")} and (st1["pathDisableEntries"], st1["reEnabledEntries"], st1["folderFormEntries"], st1["nameSelectorEntries"]) == (1, 1, 1, 1)),
+ ("parser: the regex fallback reads the same entries as tomllib", d1 == d2),
+ ("parser: the last entry for a path decides, false then true is enabled", run(entry(P("d", "SKILL.md"), "false") + entry(P("d", "SKILL.md"), "true"))[0] == set()),
+ ("parser: the last entry for a path decides, true then false is disabled", run(entry(P("d", "SKILL.md"), "true") + entry(P("d", "SKILL.md"), "false"))[0] == {P("d", "SKILL.md")}),
+ ("parser: a tilde path and a dotted path are normalized against the audited home", run(entry("~/e/SKILL.md", "false") + entry(P("f", "..", "g", "SKILL.md"), "false"))[0] == {P("e", "SKILL.md"), P("g", "SKILL.md")}),
+ ("parser: an entry with no enabled key is not a disable", run('[[skills.config]]\npath = "%s"\n' % P("h", "SKILL.md"))[0] == set()),
+ ("parser: no config.toml gives nothing and zero counts", sl.codex_skills_config(os.path.join(empty, ".codex"), empty) == (set(), {"pathDisableEntries": 0, "reEnabledEntries": 0, "folderFormEntries": 0, "nameSelectorEntries": 0, "copiesNeutralized": 0})),
+ ("parser: a config that tomllib cannot read still yields the skills.config block by pattern",
+  run(entry(P("i", "SKILL.md"), "false") + "[broken table\nkey = 1\n")[0] == {P("i", "SKILL.md")}),
+ ("parser: the pattern fallback reads a literal string path and a trailing comment, as tomllib does",
+  {os.path.normpath(e["path"]) for e in sl._skills_config_regex(lit) if e.get("enabled") is False} == {P("j", "SKILL.md")} == run(lit)[0]),
+ ("parser: the pattern fallback stops a block at the next table, so a later table's enabled key is not borrowed",
+  run("[[skills.config]]\npath = \"%s\"\n\n[plugins.\"p@m\"]\nenabled = false\n" % P("k", "SKILL.md"))[0] == set()),
+]
+bad = [m for m, ok in checks if not ok]
+for m in bad:
+    print("MISSING:", m)
+sys.exit(1 if bad else 0)
+PY7
+check "T20 the skills.config parser reads path disables, re-enables, folder forms and name selectors, and survives a broken config" $?
+rchk5() { python3 "$LC" receipt-check "$LH2/r.json" --eps "$EPS" --aura "$AURA" --home "$1" 2>&1; }
+rx "$LH/tmpl-alpha.json" 'full("claude-code-user-mount"); r["surfaces"]["codex-synced-mirror"]["disposition"] = None'
+out_rc=$(rchk5 "$LH"); out_dis=$(rchk5 "$LH5")
+printf '%s' "$out_rc" | grep -q 'codex-synced-mirror: not intended, yet a copy loads there'
+check "T20 receipt control: a loading synced-mirror copy on an unintended surface needs a disposition" $? "$out_rc"
+! printf '%s' "$out_dis" | grep -q 'codex-synced-mirror: not intended, yet a copy loads there' && printf '%s' "$out_dis" | grep -q 'codex-synced-mirror  *NOT INTENDED  *no loading copy; inert copy present: STALE'
+check "T20 receipt: a path-disabled synced-mirror copy needs no disposition and is reported as an inert copy" $? "$out_dis"
+
 echo
 echo "deploy-skill tests: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]
