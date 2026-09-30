@@ -49,6 +49,14 @@ Which copies load (what the audit calls loads=true), each rule from a live sourc
     not merged (learn.chatgpt.com/docs/build-skills, read 2026-09-24); a plugin cache
     copy loads when plugin@marketplace is enabled in config.toml, and only the newest
     cached version dir of a plugin is taken as active (assumption, stated in output).
+    A copy whose SKILL.md path is disabled in config.toml [[skills.config]] (what Codex's
+    skills/config/write records) does not load, on any Codex surface. Verified 2026-09-30 on
+    Codex CLI 0.158.0-alpha.2.1 with a session override and `codex debug prompt-input`: the
+    SKILL.md file path removes the skill from the model-visible catalog, the skill FOLDER path
+    (with or without a trailing slash) does not, although the config reference
+    (learn.chatgpt.com/docs/config-file/config-reference, read 2026-09-30) documents the folder
+    form. Only the file form neutralizes a copy here. Folder-form and name-selector entries
+    are counted and reported, never assumed to disable anything.
   * Cowork: only the signed-in org and account (~/.claude.json oauthAccount) load;
     other org/account caches are inert.
 
@@ -624,6 +632,75 @@ def codex_enabled(codex_home):
     return out
 
 
+def _skills_config_regex(text):
+    """Fallback for Python without tomllib or a config.toml tomllib cannot parse. It reads only the [[skills.config]]
+    array-of-tables form Codex itself writes, with double or single quoted strings; an inline array would be missed,
+    which errs toward reporting a copy as loading and is visible as a zero entry count."""
+    out = []
+    for blk in re.split(r"(?m)^[ \t]*\[\[skills\.config\]\][ \t]*(?:#.*)?$", text)[1:]:
+        blk = re.split(r"(?m)^[ \t]*\[", blk, maxsplit=1)[0]
+        e = {}
+        for key in ("path", "name"):
+            m = re.search(r'(?m)^[ \t]*%s[ \t]*=[ \t]*(?:"((?:[^"\\]|\\.)*)"|\'([^\']*)\')' % key, blk)
+            if m:
+                if m.group(1) is None:
+                    e[key] = m.group(2)
+                else:
+                    try:
+                        e[key] = json.loads('"%s"' % m.group(1))
+                    except ValueError:
+                        e[key] = m.group(1)
+        m = re.search(r"(?m)^[ \t]*enabled[ \t]*=[ \t]*(true|false)\b", blk)
+        if m:
+            e["enabled"] = m.group(1) == "true"
+        out.append(e)
+    return out
+
+
+def _skills_config_entries(text):
+    try:
+        import tomllib
+        return list((tomllib.loads(text).get("skills") or {}).get("config") or [])
+    except Exception:  # no tomllib before Python 3.11, or TOML it cannot read: take the blocks we need by pattern
+        return _skills_config_regex(text)
+
+
+def _norm_skill_path(p, home):
+    if p == "~" or p.startswith("~/"):
+        p = os.path.join(home, p[2:])
+    return os.path.normpath(os.path.abspath(p))
+
+
+def codex_skills_config(codex_home, home):
+    """The SKILL.md paths Codex has disabled in <codex_home>/config.toml under [[skills.config]], plus counts.
+
+    Returns (disabled, stats). disabled holds normalized SKILL.md file paths whose entry says enabled = false. When a
+    path appears twice the last entry decides (assumption, Codex's own write replaces by path and never duplicates).
+    Entries whose path is not a SKILL.md file, and entries that select by name, are counted and never disable.
+    """
+    stats = {"pathDisableEntries": 0, "reEnabledEntries": 0, "folderFormEntries": 0, "nameSelectorEntries": 0, "copiesNeutralized": 0}
+    cfg = os.path.join(codex_home, "config.toml")
+    if not os.path.isfile(cfg):
+        return set(), stats
+    decided = {}
+    for e in _skills_config_entries(open(cfg, encoding="utf-8", errors="replace").read()):
+        if not isinstance(e, dict):
+            continue
+        if e.get("path") is None:
+            if e.get("name") is not None:
+                stats["nameSelectorEntries"] += 1
+            continue
+        p = _norm_skill_path(str(e["path"]), home)
+        if os.path.basename(p) != "SKILL.md":
+            stats["folderFormEntries"] += 1
+            continue
+        decided[p] = e.get("enabled", True) is not False
+    disabled = {p for p, enabled in decided.items() if not enabled}
+    stats["pathDisableEntries"] = len(disabled)
+    stats["reEnabledEntries"] = sum(1 for enabled in decided.values() if enabled)
+    return disabled, stats
+
+
 def active_cowork(home, app):
     p = os.path.join(home, ".claude.json")
     if os.path.isfile(p):
@@ -666,6 +743,7 @@ def collect_audit(args):
     installed = installed_claude_plugins(home)
     local_enabled_plugins = {k.split("@")[0] for k in installed if enabled.get(k, True) is not False}
     cx_enabled = codex_enabled(codex_home)
+    cx_path_disabled, cx_cfg_stats = codex_skills_config(codex_home, home)
     c_org, c_acct, c_how = active_cowork(home, app)
 
     copies = defaultdict(list)
@@ -796,6 +874,20 @@ def collect_audit(args):
                     add(sid, d, "cowork-org-plugins", active, None if active else "inactive Cowork org/account",
                         plugin=pjson.get("name"), pluginVersion=pjson.get("version"), org=org, account=acct)
 
+    # Codex skills.config: a copy whose SKILL.md path is disabled does not load, so it raises no finding and no duplicate
+    if cx_path_disabled:
+        disabled_real = {os.path.realpath(x) for x in cx_path_disabled}
+        for cs in copies.values():
+            for r in cs:
+                if SURFACES[r["surface"]]["client"] != "codex":
+                    continue
+                if os.path.normpath(os.path.abspath(r["path"])) in cx_path_disabled or os.path.realpath(r["path"]) in disabled_real:
+                    r["pathDisabled"] = True
+                    if r["loads"]:  # a copy already inert for another reason keeps that reason and is not counted as neutralized
+                        r["loads"] = False
+                        r["inertReason"] = "path-disabled in config.toml [[skills.config]]"
+                        cx_cfg_stats["copiesNeutralized"] += 1
+
     # Claude Code precedence: personal beats project for the same name
     for sid, cs in copies.items():
         personal = [r for r in cs if r["surface"] == "claude-code-user-mount"]
@@ -854,6 +946,7 @@ def collect_audit(args):
         by_kind[f["kind"]] += 1
     return {"schema": SCHEMA_AUDIT, "canonicalRefs": refs, "home": home, "activeCowork": {"org": c_org, "account": c_acct, "how": c_how},
             "canonicalCount": len(canon), "auditedCount": len(wanted), "surfacesObserved": LOCAL_SURFACES,
+            "codexSkillsConfig": cx_cfg_stats,
             "skills": per_skill, "findings": findings, "summary": {"findings": len(findings), "byKind": dict(sorted(by_kind.items()))}}
 
 
@@ -871,6 +964,10 @@ def run_audit(args):
             inert = "" if r["loads"] else f" (inert: {r['inertReason']})"
             rw = " REWRITTEN" if r.get("rewritten") else ""
             print(f"  {r['surface']}: {r['state']}{inert}{rw} {r.get('version') or ''} {r['path']}")
+    cc = res["codexSkillsConfig"]
+    if any(cc.values()):
+        print(f"codex skills.config: {cc['pathDisableEntries']} SKILL.md path disable(s) read, {cc['copiesNeutralized']} audited copy/copies neutralized, "
+              f"{cc['reEnabledEntries']} re-enabled, {cc['folderFormEntries']} folder-form and {cc['nameSelectorEntries']} name-selector entr(ies) not interpreted")
     print(f"audit-surfaces: {res['auditedCount']} of {res['canonicalCount']} canonical skill(s) audited, {res['summary']['findings']} finding(s)"
           + (f" {res['summary']['byKind']}" if res["findings"] else ""))
     if args.json:
