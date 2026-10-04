@@ -80,6 +80,26 @@ jobs:
           python3 -m pip install --quiet pyyaml
           python3 .ep/skill-description-lint.py --selftest
 
+  chatgpt-package:
+    name: ChatGPT package gate (Agent Skills spec + package shape)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      # Runs on EVERY push, not only when the skill or generator is in the
+      # diff. The generated ChatGPT package is derived from canonical SKILL.md
+      # sources, so an unrelated edit to a canonical skill can break the
+      # package without touching a single file under tools/chatgpt-package/.
+      - name: Build and validate the ChatGPT package
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet pyyaml
+          python3 tools/chatgpt-package/build-chatgpt-plugin.py --selftest
+          python3 tools/chatgpt-package/test_build_chatgpt_plugin.py
+
   ruling-provenance:
     name: ruling provenance gate (citations, supersession, disclosure)
     runs-on: ubuntu-latest

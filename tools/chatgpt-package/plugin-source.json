@@ -1,0 +1,21 @@
+{
+  "$comment": "Plugin-level metadata for the ChatGPT/Codex package. Behavior is NOT defined here. Every behavioral instruction lives in the canonical SKILL.md files named in `skills`, which are the same files the claude.ai and plugin shelves deploy. This file carries only what the Agent Skills standard has no place for: the plugin wrapper's identity, version, and which canonical skills it carries.",
+  "name": "expert-partners-estate",
+  "version": "1.2.0",
+  "description": "Estate knowledge retrieval for Allison Gaddy's Expert Partners Estate. Retrieves canonical decisions, doctrine, and research through the Estate Brain before answering.",
+  "author": "Expert Partners",
+  "skills": [
+    "estate-knowledge-retrieval"
+  ],
+  "interface": {
+    "display_name": "Expert Partners Estate",
+    "short_description": "Retrieve Estate knowledge before answering"
+  },
+  "mcp_dependency": {
+    "type": "mcp",
+    "value": "estate-brain",
+    "description": "Read-only Estate Brain door serving canonical Expert Partners knowledge (get_manifest, search, fetch, list_repos, get_brand_context, list_topics).",
+    "transport": "streamable_http",
+    "url": "https://mcp.expertpartners.com/mcp"
+  }
+}

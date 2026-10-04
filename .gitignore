@@ -13,3 +13,6 @@
 *.secret
 __pycache__/
 *.pyc
+
+# Generated surface adapters (tools/chatgpt-package). Build output, never committed.
+dist/

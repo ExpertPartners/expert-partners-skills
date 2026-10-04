@@ -1,0 +1,183 @@
+{
+  "$comment": "Fresh-chat acceptance set for the estate-knowledge-retrieval skill. Every prompt is run in a BRAND NEW ChatGPT conversation with no project context and no instruction to look anything up. Expected targets were verified live against the aura repo on 2026-09-03; line numbers are docs/research/INDEX.md at that date and may drift as the index grows, so match on the entry TITLE first and treat the line number as a hint.",
+  "magic_words_forbidden": [
+    "estate brain",
+    "repo",
+    "repository",
+    "canon",
+    "research folder",
+    "knowledge retrieval",
+    "look it up",
+    "search your",
+    "check the index",
+    "use the connector",
+    "use the tool"
+  ],
+  "tests": [
+    {
+      "id": "T1",
+      "name": "positive automatic retrieval",
+      "polarity": "positive",
+      "prompt": "Should we reconsider our automation architecture?",
+      "expect_retrieval": true,
+      "expected_targets": [
+        "expert-partners doctrine/automation-map.md",
+        "aura docs/estate/estate-manifest.md"
+      ],
+      "expected_content_signals": [
+        "Make.com is retiring",
+        "Migration gate",
+        "n8n"
+      ],
+      "pass_criteria": "Environment decides. (A) ORDINARY fresh ChatGPT conversation with no applicable Estate identity gate: retrieval happens and the answer rests on retrieved Estate sources, reflecting that Make.com is retiring completely and the migration gate has not passed. The skill must not invent any naming, retitling, or 'reply done' step. (B) GOVERNED NORTH context where an applicable identity gate legitimately applies: the skill respects that gate, and retrieval follows according to that governance. Satisfying a legitimate gate first is a PASS, not a failure.",
+      "fail_signatures": [
+        "generic automation-platform comparison with no Expert Partners specifics",
+        "recommends Make.com for new work",
+        "asks Allison which system she means before retrieving anything",
+        "INVENTS a rename, retitle, workstream declaration, or 'reply done' step where no applicable governance requires it",
+        "treats a merely odd-looking conversation title as a reason to stop and ask for one",
+        "overrides, argues with, or routes around an identity gate that legitimately applies",
+        "retrieval remains blocked after any applicable identity gate has been satisfied"
+      ],
+      "observed_failures": [
+        {
+          "date": "2026-09-04",
+          "version": "1.0.0",
+          "what_happened": "Estate-specific behavior fired, but ChatGPT declared the conversation had to be titled exactly 'Automation Architecture', asked Allison to rename it and say 'done', and stopped. No Estate Brain retrieval occurred.",
+          "graded": "skill fired YES, retrieval NO, grounded in canon NO, overall FAIL",
+          "root_cause": "Not the package. The canonical SKILL.md and the whole generated bundle were grep-proven free of chair, table, title, parity, rename, and control tower vocabulary. The naming gate was injected into that conversation from elsewhere in the ChatGPT account (an installed skill, project or custom instructions, or ChatGPT persistent memory), all of which are outside this worker's visibility.",
+          "fix": "v1.1.0 added a guard, but it overreached by claiming retrieval outranks any naming act. Corrected in v1.2.0 to the narrower and correct principle: the skill never CREATES, INFERS, or DEMANDS identity ceremony of its own, and a vendor-generated visible title is never identity, but where higher-priority governance genuinely applies and explicitly requires an identity act, the skill YIELDS rather than overriding. Per aura decision 0082's bridge clause (read live 2026-09-04), the pre-cutover wiring including automatic birth declarations still binds until Allison's coordinated cutover under decision 0080 Section 24, so an override claim would have been wrong."
+        },
+        {
+          "date": "2026-09-04",
+          "version": "1.2.0",
+          "what_happened": "Brand-new ordinary ChatGPT conversation, no project selected. ChatGPT made three tool calls unprompted and grounded its answer in live Estate sources, citing ghl-automation/doctrine/automation-platform-selection.md and partnersync/decisions/0011-make-to-n8n-migration.md, treating Make as retired and frozen and n8n as an execution runtime rather than the only option. It also consulted current external vendor evidence. Then it appended: 'One governance note before we turn this into a ruling or dispatch any build: this Chair needs to be titled exactly `Automation Architecture Review`.'",
+          "graded": "automatic Estate retrieval PASS, tool retrieval PASS, canon-grounded answer PASS, no magic lookup words PASS, clean ordinary-chat behavior FAIL",
+          "root_cause": "Not the skill, and not the retrieval architecture, which this run proved works. The v1.2 skill is grep-proven free of the word Chair on every build and correctly declines to invent ceremony. A stray Control Tower instruction is still reaching ordinary conversations from a surface outside this package.",
+          "fix": "None in this package. Adding override language was the v1.1 mistake and was reverted. The fix is to find and remove the stray instruction at its source; see the source-trace section of fresh-chat-acceptance.md.",
+          "conversation_title": "ChatGPT generated 'Reconsider automation architecture' on its own. That title is correct and stays. Nobody renames it."
+        }
+      ],
+      "environment_dependent": true,
+      "not_a_failure": [
+        "the presence of a legitimate higher-priority identity gate, in a governed context, before retrieval",
+        "retrieval occurring after that gate is satisfied under the governance that owns it"
+      ],
+      "investigate_injection_only_if": [
+        "ceremony appears where no applicable governance requires it",
+        "retrieval remains improperly blocked after any applicable gate is satisfied"
+      ]
+    },
+    {
+      "id": "T2",
+      "name": "prior research discovered without naming it",
+      "polarity": "positive",
+      "prompt": "How should I be choosing between the different Claude models for different kinds of work?",
+      "expect_retrieval": true,
+      "expected_targets": [
+        "aura decisions/0057-model-and-effort-operating-standard.md"
+      ],
+      "expected_content_signals": [
+        "0057",
+        "effort"
+      ],
+      "expected_research_entries": [
+        "Claude Model Lineup and the Effort Parameter, A Current-State Deep Research Report (August 2026)",
+        "Model Selection and the Effort Parameter Across Claude Chat, Claude Cowork, and Claude Code",
+        "Model, Effort, and Evaluation Hardening"
+      ],
+      "pass_criteria": "The answer surfaces the accepted model-and-effort standard as the governing position, and may cite the underlying research as supporting evidence. Discovering the corpus material without the corpus being named is the point of this test.",
+      "fail_signatures": [
+        "generic public advice about Claude model tiers with no Expert Partners standard cited",
+        "cites only research and never the accepted standard"
+      ]
+    },
+    {
+      "id": "T3",
+      "name": "authority collision, canon governs over research",
+      "polarity": "positive",
+      "prompt": "How should our brands be organized underneath PartnerSync?",
+      "expect_retrieval": true,
+      "expected_targets": [
+        "aura decisions/0043-brand-architecture-brand-vs-location-registry.md"
+      ],
+      "expected_content_signals": [
+        "0043",
+        "PartnerSync",
+        "infrastructure"
+      ],
+      "expected_research_entries": [
+        "AI-Ready Operating System for a Multi-Brand Digital Business"
+      ],
+      "pass_criteria": "The premise is corrected from accepted canon: PartnerSync is infrastructure, not the brand umbrella, per ADR 0043. If the superseded research that modeled PartnerSync as the umbrella is surfaced, it must be named as superseded evidence, not blended into the answer as though it still held.",
+      "fail_signatures": [
+        "accepts the premise and designs a brand hierarchy under PartnerSync",
+        "presents the research position and the canon position as equally live",
+        "silently drops the conflict instead of naming it"
+      ],
+      "notes": "This is the corpus's one fully closed research-versus-canon collision. INDEX.md's own epistemic header names ADR 0043 as the governing precedent, and the research entry carries Disposition superseded, Superseded by ADR 0043 explicitly."
+    },
+    {
+      "id": "T3b",
+      "name": "authority collision, open research against a standing rejection",
+      "polarity": "positive",
+      "prompt": "Would consolidating everything into one single project be simpler than the split we have now?",
+      "expect_retrieval": true,
+      "expected_targets": [
+        "aura decisions/0023-multi-repo-vs-monorepo.md"
+      ],
+      "expected_content_signals": [
+        "0023",
+        "multi-repo"
+      ],
+      "expected_research_entries": [
+        "One Canonical Layer for a Six-Brand AI Operating System",
+        "Estate Brain Canon Blueprint, Monorepo Architecture for Multi-Brand AI Operations"
+      ],
+      "pass_criteria": "ADR 0023 governs: the monorepo migration was formally rejected and the multi-repo SOP ratified. Research arguing the other way may be surfaced, but only as unruled evidence, explicitly flagged as awaiting ruling.",
+      "fail_signatures": [
+        "recommends consolidating to a monorepo",
+        "cites the research as though it were the estate's position"
+      ],
+      "notes": "Prompt deliberately avoids the word repository, which is a magic word under acceptance test 5. The question still lands on the monorepo-versus-multi-repo decision."
+    },
+    {
+      "id": "T4",
+      "name": "negative control, generic technical request",
+      "polarity": "negative",
+      "prompt": "Write a Python function that reverses a singly linked list in place.",
+      "expect_retrieval": false,
+      "pass_criteria": "Answers directly with code. No Estate retrieval fires and no Estate sources are cited.",
+      "fail_signatures": [
+        "calls any Estate tool",
+        "mentions Expert Partners, the manifest, or any canonical source",
+        "asks whether this relates to the Estate"
+      ]
+    },
+    {
+      "id": "T4b",
+      "name": "negative control, general knowledge",
+      "polarity": "negative",
+      "prompt": "What is the difference between TCP and UDP?",
+      "expect_retrieval": false,
+      "pass_criteria": "Answers as ordinary general knowledge. No Estate retrieval fires.",
+      "fail_signatures": [
+        "calls any Estate tool",
+        "cites Expert Partners sources"
+      ]
+    },
+    {
+      "id": "T6",
+      "name": "retrieval gap is named, never papered over",
+      "polarity": "degraded",
+      "prompt": "Should we reconsider our automation architecture?",
+      "precondition": "Run with the Estate Brain app disconnected or unavailable in this conversation.",
+      "expect_retrieval": false,
+      "pass_criteria": "The answer states plainly that Estate sources could not be reached, names what it would have retrieved, and labels any general reasoning it offers as unverified. It must NOT present a memory-based answer as though Estate state had been checked.",
+      "fail_signatures": [
+        "answers confidently about Expert Partners systems with no retrieval and no disclosure",
+        "invents a current position on Make.com or n8n"
+      ]
+    }
+  ]
+}
