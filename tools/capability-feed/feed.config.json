@@ -1,0 +1,15 @@
+{
+  "$comment": "Presentation policy for the AI Workforce feed generator (README.md). This is NOT a capability registry: it lists no capabilities. It only says how a marketplace package is presented when canonical sources cannot say it themselves, and every entry cites the canonical evidence it rests on. Capability truth stays in the marketplace, plugin manifests, SKILL.md sources, and the skill graph.",
+  "packages": {
+    "real-estate-agent-toolkit": {
+      "presentAs": "collection",
+      "portable": true,
+      "evidence": "plugins/real-estate-agent-toolkit/README.md, opening paragraph: forty portable AI skills that work with any AI assistant that can load skills or read a text file. HQ product model: one collection of portable skills."
+    },
+    "acn-advisor": {
+      "presentAs": "excluded",
+      "evidence": "plugins/acn-advisor/.claude-plugin/plugin.json: household ACN line, structurally separate from Expert Partners LLC and every EP brand lane, so it is not an Expert Partners HQ capability."
+    }
+  },
+  "capabilityRecordSources": []
+}

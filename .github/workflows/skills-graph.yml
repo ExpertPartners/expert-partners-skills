@@ -4,6 +4,13 @@
 # The extractor exits non-zero on any dangling inherits / calls / defers-to id, duplicate
 # skill id, name/folder mismatch, or frontmatter parse error, which fails this workflow.
 # Branch pushes get validation only; the regenerated graph is committed back on main.
+#
+# The same run regenerates the AI Workforce feed for Expert Partners HQ
+# (tools/capability-feed/README.md) from the graph it just built plus the marketplace,
+# plugin manifests, and SKILL.md sources, and commits it with the graph on main, so the
+# feed can never lag the graph it is derived from. The feed is refused, and this
+# workflow fails, when a source is invalid, the feed would break HQ's contract, or any
+# value fails the public-safety scan.
 name: skills-graph
 
 on:
@@ -23,6 +30,12 @@ on:
       # fires in the repo that owns the canonical.
       - "skills/**"
       - "plugins/*/skills/**"
+      # AI Workforce feed inputs and producer. A package description, version, or
+      # README shelf changes what HQ shows even when no SKILL.md moved.
+      - ".claude-plugin/marketplace.json"
+      - "plugins/*/.claude-plugin/**"
+      - "plugins/*/README.md"
+      - "tools/capability-feed/**"
   repository_dispatch:
     types: [skill-md-changed]
   workflow_dispatch:
@@ -78,9 +91,45 @@ jobs:
           (cd tools/skill-map && npm test)
           bash tools/skill-deploy/test/test-deploy-skill.sh
 
+      # The feed producer's own proofs (determinism, refusal on invalid sources, no
+      # leaks, relationships and collection membership resolve, nothing promoted to
+      # Active without verification, drift detection, source-change behavior).
+      - name: AI Workforce feed tests
+        working-directory: eps/tools/capability-feed
+        run: |
+          set -euo pipefail
+          npm ci
+          npm test
+
       - name: Extract and validate (fails on any dangling reference)
         working-directory: eps/tools/skill-map
         run: node extract-skills-graph.mjs --eps "$GITHUB_WORKSPACE/eps" --aura "$GITHUB_WORKSPACE/aura" --out "$GITHUB_WORKSPACE/eps/tools/skill-map/skills-graph.json"
+
+      # Built from the graph the step above just regenerated. On main the feed file is
+      # rewritten (only when its records change) and committed with the graph below.
+      # On a branch nothing is written: the feed is generated and validated, and a
+      # branch that edits the feed file itself must carry exactly what the generator
+      # produces from that branch's committed sources, so a hand edit fails here.
+      - name: Generate and validate the AI Workforce feed
+        working-directory: eps
+        run: |
+          set -euo pipefail
+          FEED=tools/capability-feed/ai-workforce-feed.json
+          if [ "$GITHUB_REF" = "refs/heads/main" ]; then
+            node tools/capability-feed/generate-feed.mjs --write
+            exit 0
+          fi
+          node tools/capability-feed/generate-feed.mjs
+          git show HEAD:tools/skill-map/skills-graph.json > "$RUNNER_TEMP/committed-skills-graph.json"
+          if node tools/capability-feed/generate-feed.mjs --check --graph "$RUNNER_TEMP/committed-skills-graph.json"; then
+            exit 0
+          fi
+          if git rev-parse --verify --quiet origin/main >/dev/null && git diff --quiet origin/main...HEAD -- "$FEED"; then
+            echo "::notice title=AI Workforce feed regenerates on merge::This branch changes feed sources but not $FEED. The skills-graph run on main regenerates and commits it; no action needed."
+            exit 0
+          fi
+          echo "::error title=AI Workforce feed drift::$FEED differs from what this branch's committed sources produce. It is generated output: run node tools/capability-feed/generate-feed.mjs --write, never hand-edit it."
+          exit 1
 
       # Forward signal, never a block. This repo owns canonicals that aura deploys
       # as copies, so a change here can leave aura's mounts stale -- and aura's own
@@ -100,18 +149,25 @@ jobs:
             echo "::warning title=aura skill mounts are stale::A canonical in this repo moved, so aura's deployed copies no longer match it. Canonical-first delivery is allowed only for VERIFIED STALE copies with committed-history proof. The later Aura redeploy step remains owed: tools/skill-deploy/deploy-skill.sh --mirror-mount .claude/skills --to .agents/skills (plus --to .claude/skills for the copies this repo owns). Until then aura's deployed-copy-drift job will be red."
           fi
 
-      - name: Commit regenerated graph (main only)
+      - name: Commit regenerated graph and AI Workforce feed (main only)
         if: github.ref == 'refs/heads/main'
         working-directory: eps
         run: |
-          git add tools/skill-map/skills-graph.json
-          if git diff --cached --quiet -- tools/skill-map/skills-graph.json; then
-            echo "skills-graph.json unchanged; nothing to commit."
+          GRAPH=tools/skill-map/skills-graph.json
+          FEED=tools/capability-feed/ai-workforce-feed.json
+          git add "$GRAPH" "$FEED"
+          if git diff --cached --quiet -- "$GRAPH" "$FEED"; then
+            echo "skills-graph.json and ai-workforce-feed.json unchanged; nothing to commit."
             exit 0
+          fi
+          if git diff --cached --quiet -- "$FEED"; then
+            MSG="skills-graph: regenerate from SKILL.md sources"
+          else
+            MSG="skills-graph: regenerate graph and AI Workforce feed from canonical sources"
           fi
           git config user.name "skills-graph-bot"
           git config user.email "actions@users.noreply.github.com"
-          git commit -m "skills-graph: regenerate from SKILL.md sources"
+          git commit -m "$MSG"
           # Push race guard (same shape as aura c6999c5): if main moved while
           # this run was in flight, rebase onto the new tip, regenerate against
           # the new tree, and retry, instead of failing red on a
@@ -123,9 +179,17 @@ jobs:
             echo "Push rejected, main moved. Rebase and regenerate, attempt ${attempt}."
             git pull --rebase origin main
             (cd tools/skill-map && node extract-skills-graph.mjs --eps "$GITHUB_WORKSPACE/eps" --aura "$GITHUB_WORKSPACE/aura" --out "$GITHUB_WORKSPACE/eps/tools/skill-map/skills-graph.json")
-            git add tools/skill-map/skills-graph.json
+            node tools/capability-feed/generate-feed.mjs --write
+            git add "$GRAPH" "$FEED"
             if ! git diff --cached --quiet; then
               git commit --amend --no-edit
             fi
           done
           git push
+
+      # What landed on main must be exactly what the canonical sources produce. A
+      # stale or hand-edited feed on main fails here, after the bot commit above.
+      - name: Verify the committed AI Workforce feed matches its sources (main only)
+        if: github.ref == 'refs/heads/main'
+        working-directory: eps
+        run: node tools/capability-feed/generate-feed.mjs --check
