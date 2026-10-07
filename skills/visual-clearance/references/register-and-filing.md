@@ -14,7 +14,7 @@ This skill owns only the method and the schema at `schemas/asset-record.schema.j
 ## Current record owners (reconciled 2026-09-28)
 
 - AG Luxury website: `ExpertPartners/ag-luxury-site` owns the records for assets it places and candidates it researches. Placed-asset provenance lives in `docs/neighborhood-source-register.md` and `docs/evidence/area-photo-assets-2026-09-28.json`; candidate research and contact routes in `docs/evidence/community-photo-candidates-2026-09-28.json`; packaged media hashes in `source-reference/asset-manifest.json`. Read them at a pinned revision, by pointer. Never edit, migrate or delete them. Any future transfer needs an explicit owner-approved transition with source pointers and preserved history.
-- Shared register: `ExpertPartners/visual-assets` is proposed for assets cleared for more than one consumer. It does not exist, and its creation waits on the ownership decision recorded in aura `intake/2026-09-28-visual-clearance-ownership-reconciliation.md`. The sections below describe it for when it is born.
+- Shared register: `ExpertPartners/visual-assets` is not created. Allison's 2026-10-07 direction (aura `intake/2026-10-07-ruling-visual-clearance-parked-asset-records-stay-with-owner.md`) keeps photo-rights records with the repository that uses the asset and revisits a shared registry only when a cleared asset is actually reused across a second brand, website or channel. The sections below describe the register for that day; until then, never write to it or behave as if it exists.
 
 ## The proposed shared register
 

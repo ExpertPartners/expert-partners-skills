@@ -23,7 +23,7 @@ The 2026-09-28 research report (AI-Assisted Visual Asset Sourcing for AG Luxury,
 | Concern | Owner |
 | --- | --- |
 | This method, its scripts, schema and profiles | this skill, `expert-partners-skills skills/visual-clearance/` |
-| Asset records, approval state, rights, provenance, location evidence, usages, hashes | today, the consuming application's own asset records (AG Luxury website: `ExpertPartners/ag-luxury-site`); a shared `visual-assets` register is proposed and waits on an ownership decision (see [register and filing](references/register-and-filing.md)) |
+| Asset records, approval state, rights, provenance, location evidence, usages, hashes | today, the consuming application's own asset records (AG Luxury website: `ExpertPartners/ag-luxury-site`); a shared `visual-assets` register is deferred until a cleared asset is reused across a second brand, website or channel (see [register and filing](references/register-and-filing.md)) |
 | Master image files and large evidence (PDF captures, contracts) | Google Drive, referenced by pointer |
 | Brand visual rules and voice | the owning brand repo, resolved through the Estate Manifest and `aura registry.yaml` |
 | Page layouts, placements, placement size requirements, preview behavior, publishing | the consuming application; this skill reads them and never edits them |
@@ -77,5 +77,8 @@ Allison or the authorized human decides: final use of any asset, sending any per
 Standard library only (PyYAML for YAML records). Tests: `python3 -m unittest discover -s skills/visual-clearance/tests -p 'test_*.py' -v`. Behavioral cases for cold-reader runs live in [tests/behavioral-cases.json](tests/behavioral-cases.json) with a withheld rubric.
 
 ## Delivery
+
+PARKED since 2026-10-07 by Allison's direction: preserved, not deployed, not blocking the AG Luxury IDX and custom-search launch. No permission requests are sent and no website or photo changes are made while parked.
+
 
 Canonical source lives here and nowhere else. Deployed copies and upload ZIPs come only from `tools/skill-deploy/deploy-skill.sh`. v1 ships canonical source and validation evidence only: no claude.ai upload, no Aura deployed copy and no Codex mirror is produced until a separately authorized delivery step names its shelves. `status: designed` flips to `live` in that delivery pass. A dedicated Visual Librarian role is out of scope until recurring permission follow-ups, license re-checks and usage audits exist to own.
