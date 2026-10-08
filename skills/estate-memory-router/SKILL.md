@@ -1,6 +1,6 @@
 ---
 name: estate-memory-router
-description: "The thin classifier that decides where a newly learned thing belongs, so Allison is never the Estate's detection mechanism for what deserves to survive. Sweeps at four moments that already happen -- a meaningful topic change, immediately before a dispatch, after a carry-back is accepted, and at session or table wrap -- and routes each durable candidate into a mechanism that already exists: future obligation to remember-this, evidence and working knowledge to the owning repo's intake, founder decisions preserved as candidates that only Allison's exact Lock That may promote, deterministic operational state only where a contract already authorizes the write, repo-ownership questions to repo-standards, canon and rule changes to canon-sync-protocol. Resolves owners live, refuses duplicates, writes no secrets, and stays silent when nothing qualifies. It creates NO new memory store and NO new control plane. It inherits the operating-doctrine and never overrides it."
+description: "The thin classifier that decides where a newly learned thing belongs, so Allison is never the Estate's detection mechanism for what deserves to survive. Sweeps at four moments that already happen -- a meaningful topic change, immediately before a dispatch, after a carry-back is accepted, and at session or table wrap -- and routes each durable candidate into a mechanism that already exists: future obligation to remember-this, evidence and working knowledge to the owning repo's intake, founder decisions Allison has clearly made saved as made under decision 0101 and anything not yet clearly decided preserved as a candidate, deterministic operational state only where a contract already authorizes the write, repo-ownership questions to repo-standards, canon and rule changes to canon-sync-protocol. Resolves owners live, refuses duplicates, writes no secrets, and stays silent when nothing qualifies. It creates NO new memory store and NO new control plane. It inherits the operating-doctrine and never overrides it."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Born dressed 2026-09-04 (Immediate Pain Controls campaign, issue #16).
 # Canonical home is this file. It is homed under skills/ and carried by no plugin,
@@ -12,7 +12,9 @@ status: live
 subtitle: "one classifier, six existing destinations, no new store"
 ---
 
-# Estate Memory Router -- v1.0 (2026-09-04)
+# Estate Memory Router -- v1.1 (2026-10-08)
+
+v1.1 amendment 2026-10-08 (ruling of record aura intake/2026-10-08-ruling-claude-code-location-and-remove-lock-that.md, under decision 0101): the `Lock that` phrase gate is removed. A clear decision is saved as made. Candidates, the no-new-store rule, and every other route are unchanged.
 
 The Estate already has strong downstream memory mechanisms. What it lacked was anything that decides, continuously and without being asked, which mechanism should receive a thing that was just learned. That decision was landing on Allison. This skill takes it off her.
 
@@ -66,7 +68,7 @@ Knowledge with no action attached goes here, never to `remember-this`. That dist
 
 Something Allison decided, leaned toward, or that reads like it should become durable truth. Preserve it as evidence in the correct existing mechanism, marked plainly as a candidate, with what was said and when.
 
-**Only Allison's exact `Lock that` creates or supersedes durable Estate authority**, under decisions 0060 and 0061, and encountering that phrase requires a mandatory live read of both before acting. Nothing this router does is a lock. Casual agreement, approval, acceptance, or direction language never promotes anything, and this router never promotes on its own recommendation. Capturing a candidate is the whole action; if a lock is warranted, that is a ripe question for Allison under Decide Now, asked in the live conversation, not a thing this router decides.
+**A clear decision is saved as made, with no phrase required** (decision 0101, which supersedes the exact-phrase gates of decisions 0060 and 0061). Allison's clear instruction, or her unambiguous confirmation of one specific proposal, is enough: route it to the owning repo's decision save and complete the write and readback in the same response cycle. A recommendation, brainstorm, ambiguous yes, quoted text, or question is not a decision, and this router never promotes on its own recommendation or invents her approval. Preserve those as candidates. When the intended decision or its owning home is genuinely unresolved, that is one focused question for Allison under Decide Now, asked in the live conversation.
 
 ### 4. Deterministic operational state -> only where a contract already authorizes the write
 
@@ -104,7 +106,7 @@ If a destination is unavailable or a write cannot be verified, **never report th
 
 - Never create a new memory store, registry, queue, dashboard, watcher, or control plane.
 - Never open a routing-state, registrar, or Table-registry write.
-- Never promote a candidate into canon. Only Allison's exact `Lock that` does that.
+- Never promote a candidate into canon on your own say-so. A candidate becomes a decision only when Allison clearly decides it, and it is then saved under decision 0101.
 - Never guess an owner from topic similarity.
 - Never create a repo, or propose one outside the `repo-standards` gate.
 - Never write a secret or credential-bearing material to any destination.
