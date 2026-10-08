@@ -12,7 +12,9 @@ status: live
 subtitle: "the one canonical session close-out"
 ---
 
-# Session Wrap -- v1.14 (2026-09-23)
+# Session Wrap -- v1.15 (2026-10-08)
+
+v1.15 amendment 2026-10-08 (ruling of record aura intake/2026-10-08-ruling-claude-code-location-and-remove-lock-that.md, under decision 0101): the `Lock that` phrase gate is removed from step 3A routing and Table Closeout Gate obligation One. A clear decision is saved as made, and the gate now verifies those saves. Every other obligation is unchanged.
 
 v1.14 filing correction 2026-09-23 (Allison's Report Filing authorization, aura intake/2026-09-23-report-filing-batch-dispatch.md): routine session records and continuity notes stay in their approved private repository home, with publication to the authoritative branch and a verified continuation read. An intake failure is preserved in the owning repo's approved private recovery or staging location and reported as unpublished; it never creates a Desktop or Downloads copy or a manual-only handoff. This applies the owner rule at `~/.claude/rules/file-delivery.md` and does not create a second filing rule. The Table Closeout Gate and other lifecycle rulings are unchanged.
 
@@ -91,7 +93,7 @@ Run the `estate-memory-router` gate once over the closing session, after the can
 
 What the sweep asks, exactly once, over the whole session: is there anything here a cold future worker would need, or whose loss would cause drift, rework, contradiction, or lost provenance, that has NOT been given a durable home by the record, the continuity note, the ledger row, or a staged kickoff?
 
-Route each qualifying item to its existing destination under the router's six routes. A future obligation goes to `remember-this` and gets one open issue in the owning repo carrying a mechanical `RETURN WHEN` line. Evidence and working knowledge go to the owning repo's intake. A founder decision is preserved as a candidate and is never promoted; only Allison's exact `Lock that` does that, under decisions 0060 and 0061. A canon or rule change fires `canon-sync-protocol`, which step 5's promotion gate already requires.
+Route each qualifying item to its existing destination under the router's six routes. A future obligation goes to `remember-this` and gets one open issue in the owning repo carrying a mechanical `RETURN WHEN` line. Evidence and working knowledge go to the owning repo's intake. A founder decision Allison clearly made is saved as made under decision 0101 and needs no phrase. One she has not clearly made is preserved as a candidate and is never promoted on the AI's own say-so. A canon or rule change fires `canon-sync-protocol`, which step 5's promotion gate already requires.
 
 Bounds, all load-bearing:
 
@@ -124,9 +126,9 @@ Sequencing note so this does not fight the one-block-per-response rule in code-b
 
 Ruled by Allison 2026-08-26, ruling of record aura decisions/0075-table-closeout-gate-and-worker-only-archive-vocabulary.md, delivered here at v1.10. Before any table may reach Mission achieved, the wrap runs six obligations. Each one clears with evidence or blocks the verdict. Table type never reduces obligations one, two, three, five, or six, which apply to every table wrap regardless of type.
 
-One. Every actual Allison-issued Lock That signal completed the decision 0060 flow through its delivered receipt. The obligation is Allison's real lock commands, never lexical appearances of the phrase. Quoted source material, pasted prompts or instructions containing the phrase, examples, AI-authored text, and discussion of what Lock That means are all excluded. This check verifies completion only and never re-litigates or reinterprets a lock.
+One. Every clear decision Allison made in this table was saved under decision 0101 through its readback, reported as Saved and read back, Saved with the shared reader blocked, or Not saved. The obligation is her real clear decisions, never quoted source material, pasted prompts, examples, AI recommendations, or discussion of a topic. No phrase is required or checked for. This check verifies completion only and never re-litigates or reinterprets a decision.
 
-Two. Every approved Book Moment is captured to the book repo with its required frontmatter and its USCO contribution log entry. Approved means Allison identified something as a Book Moment or directly instructed its capture, or the AI surfaced a candidate and Allison explicitly accepted it. A noticed-but-unapproved candidate may be offered once at wrap and Allison's no clears it. Book Moment capture is narrative preservation, never governance, and it never substitutes for Lock That in either direction.
+Two. Every approved Book Moment is captured to the book repo with its required frontmatter and its USCO contribution log entry. Approved means Allison identified something as a Book Moment or directly instructed its capture, or the AI surfaced a candidate and Allison explicitly accepted it. A noticed-but-unapproved candidate may be offered once at wrap and Allison's no clears it. Book Moment capture is narrative preservation, never governance, and it never substitutes for a decision save in either direction.
 
 Three. No table closes over a worker it still owns. Every Claude Code worker the table dispatched must have completed decision 0070's closure loop and reached its proper worker disposition, which since v1.11 includes its terminal transition: the worker released every monitor, check-in, subscription, scheduled wakeup, and background agent it owned (session-steward v1.3, section 7A), and its ledger row states its true current state rather than a stale wait. A worker that is genuinely finished but still advertising itself as active in the ledger is an unclear obligation three, cleared by reconciling the row here, not by asserting the worker is fine. A worker genuinely waiting on a named condition keeps its owning table at Mission not achieved for as long as the table owns it. Worker ownership is never silently transferred to a successor table to permit closure. Cloud-worker registration in the lane ledger row remains mandatory and a missing registration is repaired at wrap, but registration alone never makes an open worker compatible with table closure.
 

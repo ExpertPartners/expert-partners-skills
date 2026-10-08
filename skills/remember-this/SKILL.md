@@ -1,6 +1,6 @@
 ---
 name: remember-this
-description: "Turns a future obligation into a durable, self-resurfacing commitment so Allison stops carrying it mentally. Fires when she says remember this or clearly asks to preserve a follow-up, and fires on its own when an advisor notices an important non-blocking item that would cost real drift, rework, or lost leverage if forgotten but would hijack the current mission if pursued now. Resolves the owning repo LIVE, writes ONE open GitHub issue in that repo carrying a mechanical RETURN WHEN condition, refuses duplicates, verifies the write before claiming it, and reports in one short line. Proactive capture is allowed; proactive activation is not. Distinct from Lock That (which alone creates or supersedes Allison's durable authority), from pin (a lightweight current-position bookmark), from intake (evidence and working knowledge), and from operational state. It inherits the operating-doctrine and never overrides it."
+description: "Turns a future obligation into a durable, self-resurfacing commitment so Allison stops carrying it mentally. Fires when she says remember this or clearly asks to preserve a follow-up, and fires on its own when an advisor notices an important non-blocking item that would cost real drift, rework, or lost leverage if forgotten but would hijack the current mission if pursued now. Resolves the owning repo LIVE, writes ONE open GitHub issue in that repo carrying a mechanical RETURN WHEN condition, refuses duplicates, verifies the write before claiming it, and reports in one short line. Proactive capture is allowed; proactive activation is not. Distinct from saving a decision (decision 0101: a clear decision is saved as made in its owning repo), from pin (a lightweight current-position bookmark), from intake (evidence and working knowledge), and from operational state. It inherits the operating-doctrine and never overrides it."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Born dressed 2026-09-04 (Immediate Pain Controls campaign, issue #15).
 # Canonical home is this file. It is homed under skills/ and carried by no plugin,
@@ -12,7 +12,9 @@ status: live
 subtitle: "future obligations get a durable home and a wake condition"
 ---
 
-# Remember This -- v1.0 (2026-09-04)
+# Remember This -- v1.1 (2026-10-08)
+
+v1.1 amendment 2026-10-08 (ruling of record aura intake/2026-10-08-ruling-claude-code-location-and-remove-lock-that.md, under decision 0101): the `Lock that` phrase gate is removed. A clear decision is saved as made. Obligation capture is unchanged.
 
 Allison must be able to say `remember this`, or say nothing at all, and trust that the thing does not evaporate. This skill is the mechanism that earns that trust. It does not store anything itself. It routes a future obligation into the durable home that already owns it and attaches the wake condition that brings it back.
 
@@ -26,7 +28,7 @@ A future obligation gets ONE open GitHub issue in the repo that owns the work, c
 
 These four boundaries are load-bearing. Blurring any of them is the failure this skill exists to prevent.
 
-- **Not Lock That.** Only Allison's exact `Lock that` creates or supersedes durable Estate authority, under decisions 0060 and 0061, and encountering that phrase triggers a mandatory live read of both before anything is done. Remembering an obligation never promotes a decision, never ratifies a recommendation, and never turns a candidate into canon. A captured item may say a decision is pending; it may never say a decision is made.
+- **Not a decision save.** A clear decision from Allison is saved as made in its owning repo under decision 0101, with no phrase required and a readback in the same response cycle. Remembering an obligation is a different act. It never promotes a decision, never ratifies a recommendation, and never turns a candidate into canon. A captured item may say a decision is pending; it may never say a decision is made.
 - **Not pin.** Pin is a lightweight bookmark of the current position between surfaces. It is a place-keeper for right now, it expires with the moment, and it is never durable memory.
 - **Not intake.** Intake preserves evidence and working knowledge a cold future reader would need. Remember This preserves an ACTION still owed. Knowledge that has no action attached goes to intake, not here.
 - **Not operational state.** Lane rows, board cards, and work-state records are deterministic machinery with their own contracts. A wait that already has a home in the lane ledger's waiting-on column with a named condition and a stale date is already remembered, and duplicating it here is memory spam.
@@ -136,7 +138,7 @@ No daemon, no sweeper, no cron, no queue, no dashboard, no second registry. If a
 - Never capture without a live-resolved owner.
 - Never create a second durable entry for an obligation that already has one.
 - Never create a repo, or route to a repo that does not own the work, to have a destination.
-- Never promote a captured item into canon. Only Allison's exact `Lock that` does that, after the live read of decisions 0060 and 0061.
+- Never promote a captured item into canon. A decision is saved only when Allison clearly decides it, under decision 0101, never because this skill captured something.
 - Never write a secret into an issue.
 - Never claim a capture that was not read back.
 - Never turn a capture into a side quest, a lane, or a re-scope of the open mission.
