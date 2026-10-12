@@ -1,8 +1,8 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-10-12T21:39:57Z",
-  "verifiedAt": "2026-10-12T21:39:57Z",
+  "generatedAt": "2026-10-12T22:04:34Z",
+  "verifiedAt": "2026-10-12T22:04:34Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
@@ -182,7 +182,7 @@
       "id": "content-engines-plugin",
       "humanName": "Content Engines Plugin",
       "kind": "plugin",
-      "summary": "Allison Gaddy content and marketing engines (master-marketer-free-agent-builder, rare-content-engine, xavier-offer-builder, dm-to-dollars).",
+      "summary": "Allison Gaddy content and marketing engines (master-marketer-free-agent-builder, rare-content-engine, xavier-offer-builder, dm-to-dollars, video-transcript-relay).",
       "status": "Unknown",
       "maintainer": "ExpertPartners",
       "collectionIds": [],
@@ -192,25 +192,26 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the content-engines plugin, version 0.4.0, in the expert-partners plugin marketplace.",
-        "Contains 4 skills. Each one activates when a request matches its purpose."
+        "Packaged as the content-engines plugin, version 0.5.0, in the expert-partners plugin marketplace.",
+        "Contains 5 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.4.0.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.5.0.",
       "containsSkillIds": [
         "dm-to-dollars",
         "master-marketer-free-agent-builder",
         "rare-content-engine",
+        "video-transcript-relay",
         "xavier-offer-builder"
       ],
       "relatedIds": [],
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/content-engines",
-        "packageVersion": "0.4.0",
+        "packageVersion": "0.5.0",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
-        "skillCount": "4"
+        "skillCount": "5"
       },
       "keywords": [
         "agent",
@@ -228,6 +229,9 @@
         "offer",
         "plugin",
         "rare",
+        "relay",
+        "transcript",
+        "video",
         "xavier"
       ],
       "bestFor": [],
@@ -1981,7 +1985,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.4.0.",
+        "Packaged in the Content Engines plugin, version 0.5.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1996,7 +2000,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.4.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.5.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -3809,7 +3813,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.4.0.",
+        "Packaged in the Content Engines plugin, version 0.5.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3825,7 +3829,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.4.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.5.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "xavier-offer-builder"
       },
@@ -4753,7 +4757,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.4.0.",
+        "Packaged in the Content Engines plugin, version 0.5.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4768,7 +4772,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.4.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.5.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6112,6 +6116,68 @@
       "example": false
     },
     {
+      "id": "video-transcript-relay",
+      "humanName": "Video Transcript Relay",
+      "kind": "skill",
+      "summary": "Relay any video to Claude Code for transcription and bring the transcript back to Cowork automatically via Google Drive, with zero clipboard courier work by Allison.",
+      "status": "Unknown",
+      "maintainer": "ExpertPartners",
+      "collectionIds": [],
+      "categories": [
+        "The marketing engines"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Content Engines plugin, version 0.5.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "content-engines-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/content-engines/skills/video-transcript-relay/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "content",
+        "packaging": "content-engines plugin v0.5.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine"
+      },
+      "keywords": [
+        "allison",
+        "automatically",
+        "back",
+        "bring",
+        "claude",
+        "clipboard",
+        "code",
+        "content",
+        "courier",
+        "cowork",
+        "drive",
+        "engines",
+        "google",
+        "marketing",
+        "relay",
+        "transcript",
+        "transcription",
+        "via",
+        "video",
+        "work",
+        "zero"
+      ],
+      "bestFor": [
+        "video to transcript relay"
+      ],
+      "useCases": [],
+      "askExamples": [],
+      "example": false
+    },
+    {
       "id": "xavier-offer-builder",
       "humanName": "XAVIER Offer Builder",
       "kind": "skill",
@@ -6125,7 +6191,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.4.0.",
+        "Packaged in the Content Engines plugin, version 0.5.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6140,7 +6206,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.4.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.5.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [

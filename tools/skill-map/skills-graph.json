@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "806c0c868d3849c9b5e6ca8f2da5be7de31df738",
-    "aura": "b01b4aadc0e0e0cb1b9afd234c5700a06de80666"
+    "eps": "9de29a6824d55e47f4952f9ff2459dd9b46ed5af",
+    "aura": "9631e2967e8e0ced647166699c45ce8cf86b5025"
   },
   "zones": [
     "surfaces",
@@ -449,7 +449,7 @@
       "renderNote": null,
       "layout": {
         "x": 72.5,
-        "y": 6707,
+        "y": 6794,
         "width": 224,
         "height": 63,
         "rectHeight": 48,
@@ -500,7 +500,7 @@
       "renderNote": null,
       "layout": {
         "x": 77,
-        "y": 6519,
+        "y": 6606,
         "width": 215,
         "height": 77,
         "rectHeight": 62,
@@ -634,7 +634,7 @@
       "renderNote": null,
       "layout": {
         "x": 69.5,
-        "y": 6620,
+        "y": 6707,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -745,7 +745,7 @@
       "renderNote": null,
       "layout": {
         "x": 78.5,
-        "y": 6258,
+        "y": 6345,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -1107,7 +1107,7 @@
       "renderNote": null,
       "layout": {
         "x": 55,
-        "y": 6432,
+        "y": 6519,
         "width": 259,
         "height": 63,
         "rectHeight": 48,
@@ -1295,7 +1295,7 @@
       "renderNote": null,
       "layout": {
         "x": 62.5,
-        "y": 6345,
+        "y": 6432,
         "width": 244,
         "height": 63,
         "rectHeight": 48,
@@ -1471,7 +1471,7 @@
       "renderNote": null,
       "layout": {
         "x": 81.5,
-        "y": 6084,
+        "y": 6171,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -1500,7 +1500,7 @@
       "renderNote": null,
       "layout": {
         "x": 36.5,
-        "y": 5983,
+        "y": 6070,
         "width": 296,
         "height": 77,
         "rectHeight": 62,
@@ -2558,6 +2558,33 @@
       }
     },
     {
+      "id": "video-transcript-relay",
+      "source": "eps:plugins/content-engines/skills/video-transcript-relay/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "video to transcript relay",
+      "renderNote": null,
+      "layout": {
+        "x": 81,
+        "y": 6258,
+        "width": 207,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "video to transcript relay"
+        ]
+      }
+    },
+    {
       "id": "xavier-offer-builder",
       "source": "eps:plugins/content-engines/skills/xavier-offer-builder/SKILL.md",
       "repo": "eps",
@@ -2574,7 +2601,7 @@
       "renderNote": null,
       "layout": {
         "x": 372.5,
-        "y": 5990,
+        "y": 6077,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -2599,7 +2626,7 @@
       "renderNote": null,
       "layout": {
         "x": 62.5,
-        "y": 6171,
+        "y": 5722,
         "width": 244,
         "height": 63,
         "rectHeight": 48,
@@ -2624,7 +2651,7 @@
       "renderNote": null,
       "layout": {
         "x": 96.5,
-        "y": 5722,
+        "y": 4911,
         "width": 176,
         "height": 63,
         "rectHeight": 48,
@@ -2649,7 +2676,7 @@
       "renderNote": null,
       "layout": {
         "x": 70,
-        "y": 4911,
+        "y": 5983,
         "width": 229,
         "height": 63,
         "rectHeight": 48,
@@ -3187,11 +3214,11 @@
       "points": [
         {
           "x": 332.5,
-          "y": 6021.5
+          "y": 6108.5
         },
         {
           "x": 372.5,
-          "y": 6021.5
+          "y": 6108.5
         }
       ]
     },
@@ -3642,6 +3669,12 @@
       "points": null
     },
     {
+      "from": "video-transcript-relay",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
       "from": "xavier-offer-builder",
       "to": "operating-doctrine",
       "type": "inherits",
@@ -3789,7 +3822,7 @@
   "layout": {
     "engine": "elkjs layered, single INCLUDE_CHILDREN hierarchy over zones and brand rooms, build-time only",
     "width": 1462,
-    "height": 6800,
+    "height": 6887,
     "zones": [
       {
         "id": "brain",
@@ -3904,7 +3937,7 @@
         "x": 14.5,
         "y": 3777,
         "width": 842,
-        "height": 3015,
+        "height": 3102,
         "rooms": []
       },
       {
