@@ -12,7 +12,11 @@ status: live
 subtitle: "the one canonical session close-out"
 ---
 
-# Session Wrap -- v1.15 (2026-10-08)
+# Session Wrap -- v1.16 (2026-10-12)
+
+v1.16 amendment, decision 0107: mandatory Room/Table/Chair/Worker naming ceremony is retired. A wrap never blocks on Table Birth, Rejoin, Reseat, title parity, exact visible names, two-word naming, Worker self-titling, or a rename hand step. Historical naming paragraphs below remain provenance only. Continuity uses the actual goal, acceptance evidence, repo/worktree/branch, durable work state and stable native session identifiers. The Table Closeout Gate survives except where an obligation depended only on exact successor-table naming; a successor may be identified by concrete destination, owner, repo, issue, or task context without a formal Table name.
+
+
 
 v1.15 amendment 2026-10-08 (ruling of record aura intake/2026-10-08-ruling-claude-code-location-and-remove-lock-that.md, under decision 0101): the `Lock that` phrase gate is removed from step 3A routing and Table Closeout Gate obligation One. A clear decision is saved as made, and the gate now verifies those saves. Every other obligation is unchanged.
 
