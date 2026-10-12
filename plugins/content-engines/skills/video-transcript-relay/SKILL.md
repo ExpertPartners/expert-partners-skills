@@ -1,6 +1,13 @@
 ---
 name: "video-transcript-relay"
 description: "Relay any video to Claude Code for transcription and bring the transcript back to Cowork automatically via Google Drive, with zero clipboard courier work by Allison. Fires the moment a video URL or video file appears in a Cowork conversation with any intent to use what is said in it: transcribe this video, pull the transcript, what does this video say, take this YouTube video and, analyze this reference film, mine this for hooks, turn this training video into a module, or just a bare YouTube, Vimeo, Loom, or Instagram link pasted with an instruction attached. Fires even when Allison never says the word transcribe, because Cowork's network cannot reach video hosts and the fetch must route to Claude Code. Never ask Allison to paste a transcript by hand; that is the failure condition this skill exists to remove. It inherits the operating-doctrine and never overrides it."
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
+tier: plugin
+zone: content
+status: live
+inherits: operating-doctrine
+brand-scope: null
+subtitle: "video to transcript relay"
 ---
 
 # Video Transcript Relay
