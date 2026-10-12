@@ -1,6 +1,13 @@
 ---
 name: ep-brand
-description: Apply Expert Partners (parent organization) brand standards to all written outputs. Use when creating content for Expert Partners as a company -- coaching programs, training materials, event copy, email campaigns, sales pages, social posts, operator-facing content, or any deliverable representing Expert Partners (not specifically FAM or EPIC). Locks brand tokens (Black #000000 dominant, Brand Blue #2757CF accent, PT Serif headlines, Overpass subheads, Poppins body), enforces operator-grounded proof-based "we" voice, applies no-em-dash rule, bans hype language, and requires proof architecture (named operators, real results). IMPORTANT: Expert Partners is the PARENT COMPANY. EPIC is a PROGRAM inside Expert Partners. Use this skill for the company; use fam-epic-brand for EPIC program content. It inherits the operating-doctrine and never overrides it.
+description: "Apply Expert Partners (parent organization) brand standards to all written outputs. Use when creating content for Expert Partners as a company -- coaching programs, training materials, event copy, email campaigns, sales pages, social posts, operator-facing content, or any deliverable representing Expert Partners (not specifically FAM or EPIC). Locks brand tokens (Black #000000 dominant, Brand Blue #2757CF accent, PT Serif headlines, Overpass subheads, Poppins body), enforces operator-grounded proof-based \"we\" voice, applies no-em-dash rule, bans hype language, and requires proof architecture (named operators, real results). IMPORTANT: Expert Partners is the PARENT COMPANY. EPIC is a PROGRAM inside Expert Partners. Use this skill for the company; use fam-epic-brand for EPIC program content. It inherits the operating-doctrine and never overrides it."
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
+tier: plugin
+zone: brands
+status: live
+inherits: operating-doctrine
+brand-scope: expert-partners
+subtitle: "Expert Partners parent voice"
 ---
 
 # Expert Partners Brand System
@@ -18,6 +25,8 @@ This returns the live `doctrine/mission.md`, `doctrine/voice.md`, `brand/identit
 ## Identity
 
 Expert Partners is the parent real estate coaching, training, marketing, and events company. Co-founded by Allison Gaddy and Don Hobbs. Operator-led, not guru-led. We build the next generation of real estate leaders by giving operators the systems, mindset, and community required to scale beyond personal production.
+
+Tagline: "Think Big. Build Smart." (the tagline flip, ruled 2026-08-05, superseding the same-day initial assignment). The think-big-build-smart line family belongs to Don Hobbs; the Expert Partners tagline deliberately echoes it. EPIC's tagline under the same flip is "Empowering Dreams, Elevating Success."
 
 **Critical distinction:** Expert Partners = the company. EPIC = the inner-circle program for eXp agents inside Expert Partners. Do not conflate.
 
@@ -41,7 +50,7 @@ Expert Partners is the parent real estate coaching, training, marketing, and eve
 - Expert Partners = parent organization (never "EP" as shorthand in external copy)
 - EPIC = Expert Partners Inner Circle (program, not the company)
 - eXp: lowercase e, uppercase XP
-- Don Hobbs (D-O-N), Allison Gaddy (two Ls), Melony (never Melanie)
+- Don Hobbs (D-O-N), Allison Gaddy (two Ls)
 - No em dashes anywhere
 
 ## What Expert Partners never sounds like

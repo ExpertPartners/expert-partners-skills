@@ -3,7 +3,10 @@ name: ci-gates
 # Expert Partners CI quality gates -- deployed from L6 Gatekeeper (aura).
 # Mirrors .pre-commit-config.yaml: same ruleset, server-side enforced.
 # Gates the diff (changed files); gitleaks scans full history.
-# Tools live in .ep/ -- self-contained, no cross-repo dependency.
+# Tools live in .ep/ -- self-contained, with one named exception: the ruling
+# provenance gate resolves aura-repo citations via a read-only checkout using
+# the existing SKILLS_GRAPH_TOKEN secret (same credential the skills-graph
+# job already uses for the same purpose).
 
 on:
   pull_request:
@@ -22,7 +25,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -35,10 +38,17 @@ jobs:
           set -euo pipefail
           GLOBS=( '*.md' '*.markdown' '*.mdx' '*.txt' '*.rst' )
           if [ -z "${BASE_SHA:-}" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
-            git ls-files -- "${GLOBS[@]}" > changed_files.txt
-          else
-            git diff --name-only --diff-filter=ACMR "$BASE_SHA" "$HEAD_SHA" -- "${GLOBS[@]}" > changed_files.txt
+            # No prior SHA to diff against (workflow_dispatch, or the first
+            # push of a branch). This gate is diff-scoped (header comment:
+            # "Gates the diff"); sweeping every tracked file here lints files
+            # the commit never touched and can never pass while brand docs
+            # deliberately quote counter-examples (e.g. the misspellings the
+            # ag-personal-brand skill exists to forbid). Gate the tip commit
+            # instead; only a parentless first commit falls back to the empty
+            # tree.
+            BASE_SHA=$(git rev-parse --verify --quiet "${HEAD_SHA}^" || git hash-object -t tree /dev/null)
           fi
+          git diff --name-only --diff-filter=ACMR "$BASE_SHA" "$HEAD_SHA" -- "${GLOBS[@]}" > changed_files.txt
           echo "count=$(grep -c . changed_files.txt || true)" >> "$GITHUB_OUTPUT"
           echo "Changed text files:"; cat changed_files.txt
 
@@ -58,6 +68,64 @@ jobs:
           if [ "${#FILES[@]}" -gt 0 ]; then
             python3 .ep/frontmatter-lint.py --schema .ep/classification-schema.json "${FILES[@]}"
           fi
+
+      # F6 -- Agent Skills description cap. Runs on EVERY push, not only when a SKILL.md
+      # is in the diff: the gate is repo-wide, the headroom table is the point, and a
+      # cheap always-on sweep means a breach can never ride in behind an unrelated change.
+      # --selftest proves the no-PyYAML fallback still agrees with PyYAML character for
+      # character, so the pre-commit path (system python3, no pyyaml) stays trustworthy.
+      - name: Agent Skills description cap (F6)
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet pyyaml
+          python3 .ep/skill-description-lint.py --selftest
+
+  ruling-provenance:
+    name: ruling provenance gate (citations, supersession, disclosure)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout expert-partners-skills
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      # Read-only cross-repo checkout for resolving aura-repo ruling citations.
+      # Reuses the SKILLS_GRAPH_TOKEN secret already granted for this exact
+      # purpose by the skills-graph workflow; this is a second READ of an
+      # already-existing credential, not a new grant.
+      - name: Checkout aura (for cross-repo ruling citation resolution)
+        uses: actions/checkout@v6
+        with:
+          repository: ExpertPartners/aura
+          token: ${{ secrets.SKILLS_GRAPH_TOKEN }}
+          path: aura-ref
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Offline selftest (fixture proof, no PyYAML, system python3)
+        run: python3 .ep/ruling-provenance-lint.py --selftest --aura-path "$GITHUB_WORKSPACE/aura-ref"
+
+      - name: Live diff check (BASE_SHA..HEAD_SHA)
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [ -z "${BASE_SHA:-}" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            # No prior SHA to diff against (workflow_dispatch, or the first
+            # push of a branch). The gate is diff-scoped by its own design
+            # (.ep/ruling-provenance-lint.py: "This gate does not
+            # retroactively validate existing rules... only DIFFS are
+            # checked"), so the old empty-tree fallback here was wrong for
+            # workflow_dispatch: it swept the entire repo and failed on
+            # pre-gate rule text the tip commit never touched. Gate the tip
+            # commit instead; only a parentless first commit falls back to
+            # the empty tree, so the gate still never silently no-ops.
+            BASE_SHA=$(git rev-parse --verify --quiet "${HEAD_SHA}^" || git hash-object -t tree /dev/null)
+          fi
+          python3 .ep/ruling-provenance-lint.py --ci "$BASE_SHA" "$HEAD_SHA" --aura-path "$GITHUB_WORKSPACE/aura-ref"
 
   gitleaks:
     name: gitleaks secret scan (full history)

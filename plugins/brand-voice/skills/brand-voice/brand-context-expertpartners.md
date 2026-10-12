@@ -3,6 +3,7 @@
 ## Brand Identity
 
 - Brand Name: Expert Partners (community / inner circle: EPIC, Expert Partners Inner Circle)
+- Tagline: "Think Big. Build Smart." for Expert Partners; "Empowering Dreams, Elevating Success" for EPIC (the tagline flip, ruled 2026-08-05)
 - Co-Founders: Allison Gaddy and Don Hobbs
 - Category: Real Estate Coaching, Mastermind, and Operator Education
 - What We Sell: High-level coaching, mastermind community, live events, training programs, and AI-powered tools for elite real estate operators (top-producing agents, team leaders, brokerage builders)
@@ -62,7 +63,6 @@ We build the next generation of real estate leaders by giving operators the syst
 - eXp: lowercase "e," uppercase "XP" when referenced
 - "We" voice for all brand statements (never "I")
 - eXcelerate: not "accelerate" when referencing the brand-related term
-- Melony: not Melanie <!-- brand-lint: ignore -->
 - No em dashes. Use commas, semicolons, colons, parentheses, or double hyphens.
 
 ## Things We Never Say

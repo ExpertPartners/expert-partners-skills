@@ -1,0 +1,3942 @@
+{
+  "schema": "skill-map/v1",
+  "generatedFrom": {
+    "eps": "806c0c868d3849c9b5e6ca8f2da5be7de31df738",
+    "aura": "b01b4aadc0e0e0cb1b9afd234c5700a06de80666"
+  },
+  "zones": [
+    "surfaces",
+    "brain",
+    "hands",
+    "routing",
+    "finance",
+    "content",
+    "cataloging",
+    "brands"
+  ],
+  "brands": {
+    "expert-partners": {
+      "parent": null
+    },
+    "epic": {
+      "parent": null
+    },
+    "fam": {
+      "parent": null
+    },
+    "ag-personal-brand": {
+      "parent": null
+    },
+    "ag-luxury": {
+      "parent": null
+    },
+    "don-hobbs": {
+      "parent": "expert-partners"
+    },
+    "the-strong-ones": {
+      "parent": "ag-personal-brand"
+    },
+    "moxie": {
+      "parent": null
+    }
+  },
+  "nodes": [
+    {
+      "id": "acn-currency-check",
+      "source": "eps:plugins/acn-advisor/skills/acn-currency-check/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "monthly ACN staying-current check",
+      "renderNote": null,
+      "layout": {
+        "x": 959,
+        "y": 1768,
+        "width": 206,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "monthly ACN staying-current",
+          "check"
+        ]
+      }
+    },
+    {
+      "id": "acn-email-watch",
+      "source": "eps:plugins/acn-advisor/skills/acn-email-watch/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "ACN inbox sweep, deadlines first",
+      "renderNote": null,
+      "layout": {
+        "x": 944,
+        "y": 2043,
+        "width": 236,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "ACN inbox sweep, deadlines first"
+        ]
+      }
+    },
+    {
+      "id": "ag-luxury-brand",
+      "source": "eps:plugins/brand-voice/skills/ag-luxury-brand/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "brands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [
+        "ag-luxury"
+      ],
+      "subtitle": "luxury real estate voice under Allison’s name",
+      "renderNote": null,
+      "layout": {
+        "x": 447,
+        "y": 360,
+        "width": 224,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "luxury real estate voice under",
+          "Allison’s name"
+        ]
+      }
+    },
+    {
+      "id": "ag-personal-brand",
+      "source": "eps:plugins/brand-voice/skills/ag-personal-brand/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "brands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [
+        "ag-personal-brand"
+      ],
+      "subtitle": "Allison’s first person voice",
+      "renderNote": null,
+      "layout": {
+        "x": 452,
+        "y": 511,
+        "width": 212,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "Allison’s first person voice"
+        ]
+      }
+    },
+    {
+      "id": "agent-bio-writer",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/agent-bio-writer/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "social bios and headlines",
+      "renderNote": null,
+      "layout": {
+        "x": 87.5,
+        "y": 4086,
+        "width": 194,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "social bios and headlines"
+        ]
+      }
+    },
+    {
+      "id": "agent-brain-builder",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/agent-brain-builder/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "brain",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "writes the shared agent profile",
+      "renderNote": null,
+      "layout": {
+        "x": 320.5,
+        "y": 1226,
+        "width": 230,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "writes the shared agent profile"
+        ]
+      }
+    },
+    {
+      "id": "batch-first-execution",
+      "source": "eps:skills/batch-first-execution/SKILL.md",
+      "repo": "eps",
+      "tier": "organization",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "session-model-advisor",
+        "code-block-routing"
+      ],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "complete, ordered implementation handoffs",
+      "renderNote": null,
+      "layout": {
+        "x": 324,
+        "y": 2420.2,
+        "width": 236,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "complete, ordered implementation",
+          "handoffs"
+        ]
+      }
+    },
+    {
+      "id": "brand-direction-builder",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/brand-direction-builder/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "brands",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "one-page brand direction",
+      "renderNote": null,
+      "layout": {
+        "x": 141,
+        "y": 212.9,
+        "width": 215,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "one-page brand direction"
+        ]
+      }
+    },
+    {
+      "id": "brand-voice",
+      "source": "eps:plugins/brand-voice/skills/brand-voice/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "brands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [
+        "ep-brand",
+        "fam-epic-brand",
+        "ag-personal-brand",
+        "ag-luxury-brand",
+        "don-hobbs-brand",
+        "the-strong-ones-brand",
+        "moxie-signature-group-brand"
+      ],
+      "brandScope": [],
+      "subtitle": "canonical brand context, registry per ADR 0045",
+      "renderNote": null,
+      "layout": {
+        "x": 168,
+        "y": 111.9,
+        "width": 188,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "canonical brand context,",
+          "registry per ADR 0045"
+        ]
+      }
+    },
+    {
+      "id": "business-plan-builder",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/business-plan-builder/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "90-day plan book and weekly dashboard",
+      "renderNote": null,
+      "layout": {
+        "x": 959,
+        "y": 2433,
+        "width": 206,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "90-day plan book and weekly",
+          "dashboard"
+        ]
+      }
+    },
+    {
+      "id": "can-i-close",
+      "source": "aura:.claude/skills/can-i-close/SKILL.md",
+      "repo": "aura",
+      "tier": "project",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "session-audit"
+      ],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "plain language safe-to-close check",
+      "renderNote": null,
+      "layout": {
+        "x": 92,
+        "y": 3474,
+        "width": 212,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "plain language safe-to-close",
+          "check"
+        ]
+      }
+    },
+    {
+      "id": "canon-sync-protocol",
+      "source": "eps:skills/canon-sync-protocol/SKILL.md",
+      "repo": "eps",
+      "tier": "organization",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "canon and rule changes reach every surface, automatically",
+      "renderNote": null,
+      "layout": {
+        "x": 61,
+        "y": 2332,
+        "width": 212,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "canon and rule changes reach",
+          "every surface, automatically"
+        ]
+      }
+    },
+    {
+      "id": "canva-assistant",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/canva-assistant/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "written pieces sent to Canva",
+      "renderNote": null,
+      "layout": {
+        "x": 956,
+        "y": 2809,
+        "width": 212,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "written pieces sent to Canva"
+        ]
+      }
+    },
+    {
+      "id": "capability-currency",
+      "source": "eps:skills/capability-currency/SKILL.md",
+      "repo": "eps",
+      "tier": "organization",
+      "zone": "hands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "twice-monthly estate capability sweep",
+      "renderNote": null,
+      "layout": {
+        "x": 947,
+        "y": 2534,
+        "width": 230,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "twice-monthly estate capability",
+          "sweep"
+        ]
+      }
+    },
+    {
+      "id": "carousel-writer",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/carousel-writer/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "carousel copy and design brief",
+      "renderNote": null,
+      "layout": {
+        "x": 72.5,
+        "y": 6707,
+        "width": 224,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "carousel copy and design brief"
+        ]
+      }
+    },
+    {
+      "id": "client-case-study-writer",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/client-case-study-writer/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "sold post, case study, review request",
+      "renderNote": null,
+      "layout": {
+        "x": 73.5,
+        "y": 4347,
+        "width": 222,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "sold post, case study, review",
+          "request"
+        ]
+      }
+    },
+    {
+      "id": "client-follow-up-writer",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/client-follow-up-writer/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "relationship-first follow-up messages",
+      "renderNote": null,
+      "layout": {
+        "x": 77,
+        "y": 6519,
+        "width": 215,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "relationship-first follow-up",
+          "messages"
+        ]
+      }
+    },
+    {
+      "id": "client-welcome-pack-writer",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/client-welcome-pack-writer/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "welcome email and roadmap",
+      "renderNote": null,
+      "layout": {
+        "x": 66,
+        "y": 5374,
+        "width": 237,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "welcome email and roadmap"
+        ]
+      }
+    },
+    {
+      "id": "code-block-routing",
+      "source": "eps:plugins/operating-doctrine/skills/code-block-routing/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [
+        "pin"
+      ],
+      "brandScope": [],
+      "subtitle": "paste block routing and the lane ledger",
+      "renderNote": null,
+      "layout": {
+        "x": 600,
+        "y": 2562.2,
+        "width": 236,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "paste block routing and the lane",
+          "ledger"
+        ]
+      }
+    },
+    {
+      "id": "competitor-analysis-skill",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/competitor-analysis-skill/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "brain",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "competitor differentiation plan",
+      "renderNote": null,
+      "layout": {
+        "x": 320.5,
+        "y": 1414,
+        "width": 230,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "competitor differentiation plan"
+        ]
+      }
+    },
+    {
+      "id": "connection-first-implementation",
+      "source": "eps:plugins/operating-doctrine/skills/connection-first-implementation/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "hold the connection before you hold the screenshot",
+      "renderNote": null,
+      "layout": {
+        "x": 30,
+        "y": 2621,
+        "width": 274,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "hold the connection before you",
+          "hold the screenshot"
+        ]
+      }
+    },
+    {
+      "id": "content-multiplier",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/content-multiplier/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "one idea into a week of content",
+      "renderNote": null,
+      "layout": {
+        "x": 69.5,
+        "y": 6620,
+        "width": 230,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "one idea into a week of content"
+        ]
+      }
+    },
+    {
+      "id": "cowork-direct-execution",
+      "source": "eps:plugins/operating-doctrine/skills/cowork-direct-execution/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [
+        "code-block-routing"
+      ],
+      "brandScope": [],
+      "subtitle": "direct execution on surfaces that hold the access",
+      "renderNote": null,
+      "layout": {
+        "x": 345,
+        "y": 2556.7,
+        "width": 215,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "direct execution on surfaces",
+          "that hold the access"
+        ]
+      }
+    },
+    {
+      "id": "daily-planner",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/daily-planner/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "time-blocked day, money task first",
+      "renderNote": null,
+      "layout": {
+        "x": 956,
+        "y": 1667,
+        "width": 212,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "time-blocked day, money task",
+          "first"
+        ]
+      }
+    },
+    {
+      "id": "deliverable-link",
+      "source": "eps:plugins/operating-doctrine/skills/deliverable-link/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "deliverables land as named markdown links",
+      "renderNote": null,
+      "layout": {
+        "x": 324,
+        "y": 3648,
+        "width": 200,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "deliverables land as named",
+          "markdown links"
+        ]
+      }
+    },
+    {
+      "id": "dm-to-dollars",
+      "source": "eps:plugins/content-engines/skills/dm-to-dollars/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "DM to Dollars content engine",
+      "renderNote": null,
+      "layout": {
+        "x": 78.5,
+        "y": 6258,
+        "width": 212,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "DM to Dollars content engine"
+        ]
+      }
+    },
+    {
+      "id": "document-formatting-standard",
+      "source": "eps:plugins/operating-doctrine/skills/document-formatting-standard/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [
+        "deliverable-link"
+      ],
+      "brandScope": [],
+      "subtitle": "Poppins everywhere, hierarchy by size and color",
+      "renderNote": null,
+      "layout": {
+        "x": 52,
+        "y": 3648,
+        "width": 252,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "Poppins everywhere, hierarchy by",
+          "size and color"
+        ]
+      }
+    },
+    {
+      "id": "don-hobbs-brand",
+      "source": "eps:plugins/brand-voice/skills/don-hobbs-brand/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "brands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [
+        "don-hobbs"
+      ],
+      "subtitle": "Don’s personal brand voice",
+      "renderNote": null,
+      "layout": {
+        "x": 468,
+        "y": 207,
+        "width": 200,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "Don’s personal brand voice"
+        ]
+      }
+    },
+    {
+      "id": "ember-reactivate",
+      "source": "aura:.claude/skills/ember-reactivate/SKILL.md",
+      "repo": "aura",
+      "tier": "project",
+      "zone": "routing",
+      "status": "retired",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": null,
+      "renderNote": null,
+      "layout": {
+        "x": 85.5,
+        "y": 3575,
+        "width": 163,
+        "height": 49,
+        "rectHeight": 34,
+        "annotationHeight": 15,
+        "subtitleLines": []
+      }
+    },
+    {
+      "id": "ep-brand",
+      "source": "eps:plugins/brand-voice/skills/ep-brand/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "brands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [
+        "expert-partners"
+      ],
+      "subtitle": "Expert Partners parent voice",
+      "renderNote": null,
+      "layout": {
+        "x": 452,
+        "y": 90,
+        "width": 212,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "Expert Partners parent voice"
+        ]
+      }
+    },
+    {
+      "id": "estate-memory-router",
+      "source": "eps:skills/estate-memory-router/SKILL.md",
+      "repo": "eps",
+      "tier": "organization",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "one classifier, six existing destinations, no new store",
+      "renderNote": null,
+      "layout": {
+        "x": 61,
+        "y": 2029,
+        "width": 212,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "one classifier, six existing",
+          "destinations, no new store"
+        ]
+      }
+    },
+    {
+      "id": "expert-partners-systems-map",
+      "source": "eps:plugins/systems-map/skills/expert-partners-systems-map/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "brain",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "where every system lives and what Claude can reach",
+      "renderNote": null,
+      "layout": {
+        "x": 313.5,
+        "y": 1125,
+        "width": 244,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "where every system lives and",
+          "what Claude can reach"
+        ]
+      }
+    },
+    {
+      "id": "fam-epic-brand",
+      "source": "eps:plugins/brand-voice/skills/fam-epic-brand/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "brands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [
+        "fam",
+        "epic"
+      ],
+      "subtitle": "FAM and EPIC voice",
+      "renderNote": null,
+      "layout": {
+        "x": 447,
+        "y": 795,
+        "width": 152,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "FAM and EPIC voice"
+        ]
+      }
+    },
+    {
+      "id": "funnel-build",
+      "source": "eps:plugins/funnel-operations/skills/funnel-build/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "funnel-documentation"
+      ],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "build a funnel that does not exist yet",
+      "renderNote": null,
+      "layout": {
+        "x": 976,
+        "y": 2332,
+        "width": 212,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "build a funnel that does not",
+          "exist yet"
+        ]
+      }
+    },
+    {
+      "id": "funnel-documentation",
+      "source": "eps:plugins/funnel-operations/skills/funnel-documentation/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "one complete Notion record per funnel",
+      "renderNote": null,
+      "layout": {
+        "x": 1208,
+        "y": 2142.8,
+        "width": 224,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "one complete Notion record per",
+          "funnel"
+        ]
+      }
+    },
+    {
+      "id": "funnel-migration",
+      "source": "eps:plugins/funnel-operations/skills/funnel-migration/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "funnel-documentation"
+      ],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "per-funnel walk from old location to clean location",
+      "renderNote": null,
+      "layout": {
+        "x": 988,
+        "y": 2130,
+        "width": 200,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "per-funnel walk from old",
+          "location to clean location"
+        ]
+      }
+    },
+    {
+      "id": "gamma-presentation-builder",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/gamma-presentation-builder/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "decks planned and built in Gamma",
+      "renderNote": null,
+      "layout": {
+        "x": 943.5,
+        "y": 1869,
+        "width": 237,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "decks planned and built in Gamma"
+        ]
+      }
+    },
+    {
+      "id": "gmail-assistant",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/gmail-assistant/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "emails loaded into Gmail drafts",
+      "renderNote": null,
+      "layout": {
+        "x": 947,
+        "y": 2722,
+        "width": 230,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "emails loaded into Gmail drafts"
+        ]
+      }
+    },
+    {
+      "id": "google-business-profile-skill",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/google-business-profile-skill/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "Google Business Profile package",
+      "renderNote": null,
+      "layout": {
+        "x": 55,
+        "y": 6432,
+        "width": 259,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "Google Business Profile package"
+        ]
+      }
+    },
+    {
+      "id": "handoff",
+      "source": "aura:tools/continuity-skills/handoff/SKILL.md",
+      "repo": "aura",
+      "tier": "user",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "hand work to another session",
+      "renderNote": null,
+      "layout": {
+        "x": 61,
+        "y": 2722,
+        "width": 212,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "hand work to another session"
+        ]
+      }
+    },
+    {
+      "id": "hook-generator",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/hook-generator/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "30 scroll-stopping hooks",
+      "renderNote": null,
+      "layout": {
+        "x": 90.5,
+        "y": 4998,
+        "width": 188,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "30 scroll-stopping hooks"
+        ]
+      }
+    },
+    {
+      "id": "instagram-story-skill",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/instagram-story-skill/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "Instagram story sequences",
+      "renderNote": null,
+      "layout": {
+        "x": 84.5,
+        "y": 4824,
+        "width": 200,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "Instagram story sequences"
+        ]
+      }
+    },
+    {
+      "id": "intake",
+      "source": "eps:skills/intake/SKILL.md",
+      "repo": "eps",
+      "tier": "user",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "file content into a repo intake inbox",
+      "renderNote": null,
+      "layout": {
+        "x": 52,
+        "y": 3373,
+        "width": 230,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "file content into a repo intake",
+          "inbox"
+        ]
+      }
+    },
+    {
+      "id": "kindergartner-mode",
+      "source": "eps:plugins/operating-doctrine/skills/kindergartner-mode/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "plain language walkthroughs",
+      "renderNote": null,
+      "layout": {
+        "x": 64,
+        "y": 2809,
+        "width": 206,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "plain language walkthroughs"
+        ]
+      }
+    },
+    {
+      "id": "lane-spawn",
+      "source": "eps:plugins/operating-doctrine/skills/lane-spawn/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [
+        "code-block-routing",
+        "pin"
+      ],
+      "brandScope": [],
+      "subtitle": "spawning new lanes with durable homes",
+      "renderNote": null,
+      "layout": {
+        "x": 74,
+        "y": 2896,
+        "width": 230,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "spawning new lanes with durable",
+          "homes"
+        ]
+      }
+    },
+    {
+      "id": "lead-follow-up-email-writer",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/lead-follow-up-email-writer/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "3-email lead follow-up sequence",
+      "renderNote": null,
+      "layout": {
+        "x": 62.5,
+        "y": 6345,
+        "width": 244,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "3-email lead follow-up sequence"
+        ]
+      }
+    },
+    {
+      "id": "lead-magnet-builder",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/lead-magnet-builder/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "local guides worth an email",
+      "renderNote": null,
+      "layout": {
+        "x": 81.5,
+        "y": 4535,
+        "width": 206,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "local guides worth an email"
+        ]
+      }
+    },
+    {
+      "id": "lead-magnet-delivery-scripts",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/lead-magnet-delivery-scripts/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "scripts to give a guide away",
+      "renderNote": null,
+      "layout": {
+        "x": 58.5,
+        "y": 4260,
+        "width": 252,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "scripts to give a guide away"
+        ]
+      }
+    },
+    {
+      "id": "listing-ad-copy-skill",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/listing-ad-copy-skill/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "Meta ad copy for listings",
+      "renderNote": null,
+      "layout": {
+        "x": 84.5,
+        "y": 4448,
+        "width": 200,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "Meta ad copy for listings"
+        ]
+      }
+    },
+    {
+      "id": "listing-marketing-skill",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/listing-marketing-skill/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "listing presentation and launch copy",
+      "renderNote": null,
+      "layout": {
+        "x": 69.5,
+        "y": 4622,
+        "width": 230,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "listing presentation and launch",
+          "copy"
+        ]
+      }
+    },
+    {
+      "id": "long-form-script-writer",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/long-form-script-writer/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "long-form YouTube scripts",
+      "renderNote": null,
+      "layout": {
+        "x": 77,
+        "y": 5186,
+        "width": 215,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "long-form YouTube scripts"
+        ]
+      }
+    },
+    {
+      "id": "market-research-skill",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/market-research-skill/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "brain",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "cited market research brief",
+      "renderNote": null,
+      "layout": {
+        "x": 332.5,
+        "y": 1501,
+        "width": 206,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "cited market research brief"
+        ]
+      }
+    },
+    {
+      "id": "market-video-scripter",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/market-video-scripter/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "market update video package",
+      "renderNote": null,
+      "layout": {
+        "x": 81.5,
+        "y": 6084,
+        "width": 206,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "market update video package"
+        ]
+      }
+    },
+    {
+      "id": "master-marketer-free-agent-builder",
+      "source": "eps:plugins/content-engines/skills/master-marketer-free-agent-builder/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [
+        "xavier-offer-builder"
+      ],
+      "brandScope": [],
+      "subtitle": "marketing strategy in Allison’s voice",
+      "renderNote": null,
+      "layout": {
+        "x": 36.5,
+        "y": 5983,
+        "width": 296,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "marketing strategy in Allison’s",
+          "voice"
+        ]
+      }
+    },
+    {
+      "id": "metricool-post-scheduler",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/metricool-post-scheduler/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "posts queued as Metricool drafts",
+      "renderNote": null,
+      "layout": {
+        "x": 944,
+        "y": 1956,
+        "width": 236,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "posts queued as Metricool drafts"
+        ]
+      }
+    },
+    {
+      "id": "moxie-signature-group-brand",
+      "source": "eps:plugins/brand-voice/skills/moxie-signature-group-brand/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "brands",
+      "status": "benched",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [
+        "moxie"
+      ],
+      "subtitle": "benched, consumer real estate routes to AG Luxury",
+      "renderNote": null,
+      "layout": {
+        "x": 447,
+        "y": 932,
+        "width": 244,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "benched, consumer real estate",
+          "routes to AG Luxury"
+        ]
+      }
+    },
+    {
+      "id": "new-project",
+      "source": "eps:skills/new-project/SKILL.md",
+      "repo": "eps",
+      "tier": "user",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "repo-standards"
+      ],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "run the repo-standards gate, then bootstrap a justified project",
+      "renderNote": null,
+      "layout": {
+        "x": 336,
+        "y": 2305.2,
+        "width": 212,
+        "height": 91,
+        "rectHeight": 76,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "run the repo-standards gate,",
+          "then bootstrap a justified",
+          "project"
+        ]
+      }
+    },
+    {
+      "id": "newsletter-writer",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/newsletter-writer/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "monthly database newsletter",
+      "renderNote": null,
+      "layout": {
+        "x": 81.5,
+        "y": 3912,
+        "width": 206,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "monthly database newsletter"
+        ]
+      }
+    },
+    {
+      "id": "notion-content-board-builder",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/notion-content-board-builder/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "content board built in Notion",
+      "renderNote": null,
+      "layout": {
+        "x": 936,
+        "y": 2635,
+        "width": 252,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "content board built in Notion"
+        ]
+      }
+    },
+    {
+      "id": "objection-response-writer",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/objection-response-writer/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "client-centered objection responses",
+      "renderNote": null,
+      "layout": {
+        "x": 70,
+        "y": 5273,
+        "width": 229,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "client-centered objection",
+          "responses"
+        ]
+      }
+    },
+    {
+      "id": "offer-usp-skill",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/offer-usp-skill/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "offer and USP document",
+      "renderNote": null,
+      "layout": {
+        "x": 96.5,
+        "y": 5896,
+        "width": 176,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "offer and USP document"
+        ]
+      }
+    },
+    {
+      "id": "open-house-kit-writer",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/open-house-kit-writer/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "open house kit from one listing",
+      "renderNote": null,
+      "layout": {
+        "x": 69.5,
+        "y": 5461,
+        "width": 230,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "open house kit from one listing"
+        ]
+      }
+    },
+    {
+      "id": "operating-doctrine",
+      "source": "eps:plugins/operating-doctrine/skills/operating-doctrine/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "brain",
+      "status": "live",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "the standard every skill inherits",
+      "renderNote": "single faint anchor, inheritance edges collapsed",
+      "layout": {
+        "x": 341.5,
+        "y": 1588,
+        "width": 188,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "the standard every skill",
+          "inherits"
+        ]
+      }
+    },
+    {
+      "id": "park",
+      "source": "aura:tools/continuity-skills/park/SKILL.md",
+      "repo": "aura",
+      "tier": "user",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "park work for a later resume",
+      "renderNote": null,
+      "layout": {
+        "x": 61,
+        "y": 3084,
+        "width": 212,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "park work for a later resume"
+        ]
+      }
+    },
+    {
+      "id": "pin",
+      "source": "eps:plugins/operating-doctrine/skills/pin/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [
+        "code-block-routing"
+      ],
+      "brandScope": [],
+      "subtitle": "carry-back envelope and place-keeping baton",
+      "renderNote": null,
+      "layout": {
+        "x": 351,
+        "y": 2870.3,
+        "width": 182,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "carry-back envelope and",
+          "place-keeping baton"
+        ]
+      }
+    },
+    {
+      "id": "pre-listing-package-writer",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/pre-listing-package-writer/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "pre-listing email and one-pager",
+      "renderNote": null,
+      "layout": {
+        "x": 66,
+        "y": 5635,
+        "width": 237,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "pre-listing email and one-pager"
+        ]
+      }
+    },
+    {
+      "id": "project-architect",
+      "source": "aura:.claude/skills/project-architect/SKILL.md",
+      "repo": "aura",
+      "tier": "project",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "project-builder",
+        "new-project"
+      ],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "where a piece of work should live",
+      "renderNote": null,
+      "layout": {
+        "x": 92,
+        "y": 2231,
+        "width": 212,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "where a piece of work should",
+          "live"
+        ]
+      }
+    },
+    {
+      "id": "project-builder",
+      "source": "aura:.claude/skills/project-builder/SKILL.md",
+      "repo": "aura",
+      "tier": "project",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "repo-standards"
+      ],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": null,
+      "renderNote": null,
+      "layout": {
+        "x": 364.5,
+        "y": 2232.2,
+        "width": 155,
+        "height": 49,
+        "rectHeight": 34,
+        "annotationHeight": 15,
+        "subtitleLines": []
+      }
+    },
+    {
+      "id": "rare-content-engine",
+      "source": "eps:plugins/content-engines/skills/rare-content-engine/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "RARE content engine",
+      "renderNote": null,
+      "layout": {
+        "x": 92,
+        "y": 3825,
+        "width": 185,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "RARE content engine"
+        ]
+      }
+    },
+    {
+      "id": "real-estate-postcard-writer",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/real-estate-postcard-writer/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "farm-area postcard copy",
+      "renderNote": null,
+      "layout": {
+        "x": 62.5,
+        "y": 4173,
+        "width": 244,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "farm-area postcard copy"
+        ]
+      }
+    },
+    {
+      "id": "reel-script-writer",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/reel-script-writer/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "filmable 45-second reel scripts",
+      "renderNote": null,
+      "layout": {
+        "x": 69.5,
+        "y": 5809,
+        "width": 230,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "filmable 45-second reel scripts"
+        ]
+      }
+    },
+    {
+      "id": "remember-this",
+      "source": "eps:skills/remember-this/SKILL.md",
+      "repo": "eps",
+      "tier": "organization",
+      "zone": "brain",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "future obligations get a durable home and a wake condition",
+      "renderNote": null,
+      "layout": {
+        "x": 317.5,
+        "y": 1313,
+        "width": 236,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "future obligations get a durable",
+          "home and a wake condition"
+        ]
+      }
+    },
+    {
+      "id": "repo-standards",
+      "source": "eps:skills/repo-standards/SKILL.md",
+      "repo": "eps",
+      "tier": "organization",
+      "zone": "hands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "repo birth, readiness, and evidence-led content audits",
+      "renderNote": null,
+      "layout": {
+        "x": 936,
+        "y": 2231,
+        "width": 206,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "repo birth, readiness, and",
+          "evidence-led content audits"
+        ]
+      }
+    },
+    {
+      "id": "research-intake",
+      "source": "eps:skills/research-intake/SKILL.md",
+      "repo": "eps",
+      "tier": "user",
+      "zone": "cataloging",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "file a research report into the aura research index",
+      "renderNote": null,
+      "layout": {
+        "x": 320.5,
+        "y": 1765,
+        "width": 230,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "file a research report into the",
+          "aura research index"
+        ]
+      }
+    },
+    {
+      "id": "resume-work",
+      "source": "aura:tools/continuity-skills/resume-work/SKILL.md",
+      "repo": "aura",
+      "tier": "user",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "resume parked or handed-off work",
+      "renderNote": null,
+      "layout": {
+        "x": 49,
+        "y": 1942,
+        "width": 236,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "resume parked or handed-off work"
+        ]
+      }
+    },
+    {
+      "id": "review-referral-writer",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/review-referral-writer/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "review requests, replies, proof posts",
+      "renderNote": null,
+      "layout": {
+        "x": 69.5,
+        "y": 4723,
+        "width": 230,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "review requests, replies, proof",
+          "posts"
+        ]
+      }
+    },
+    {
+      "id": "session-audit",
+      "source": "aura:.claude/skills/session-audit/SKILL.md",
+      "repo": "aura",
+      "tier": "project",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "structured session audit for consolidation",
+      "renderNote": null,
+      "layout": {
+        "x": 324,
+        "y": 3183.8,
+        "width": 212,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "structured session audit for",
+          "consolidation"
+        ]
+      }
+    },
+    {
+      "id": "session-closeout",
+      "source": "aura:.claude/skills/session-closeout/SKILL.md",
+      "repo": "aura",
+      "tier": "project",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "session-audit"
+      ],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "handoff note to main, clean worktree",
+      "renderNote": null,
+      "layout": {
+        "x": 98,
+        "y": 3171,
+        "width": 206,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "handoff note to main, clean",
+          "worktree"
+        ]
+      }
+    },
+    {
+      "id": "session-home",
+      "source": "eps:skills/session-home/SKILL.md",
+      "repo": "eps",
+      "tier": "user",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "route work to the right project home",
+      "renderNote": null,
+      "layout": {
+        "x": 52,
+        "y": 2130,
+        "width": 230,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "route work to the right project",
+          "home"
+        ]
+      }
+    },
+    {
+      "id": "session-model-advisor",
+      "source": "eps:plugins/operating-doctrine/skills/session-model-advisor/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "model and effort fit-check at conversation start",
+      "renderNote": null,
+      "layout": {
+        "x": 600,
+        "y": 2407.3,
+        "width": 218,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "model and effort fit-check at",
+          "conversation start"
+        ]
+      }
+    },
+    {
+      "id": "session-steward",
+      "source": "eps:plugins/operating-doctrine/skills/session-steward/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [
+        "code-block-routing",
+        "pin"
+      ],
+      "brandScope": [],
+      "subtitle": "Claude Code takes care of Claude Code",
+      "renderNote": null,
+      "layout": {
+        "x": 68,
+        "y": 2520,
+        "width": 236,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "Claude Code takes care of Claude",
+          "Code"
+        ]
+      }
+    },
+    {
+      "id": "session-wrap",
+      "source": "eps:skills/session-wrap/SKILL.md",
+      "repo": "eps",
+      "tier": "organization",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "the one canonical session close-out",
+      "renderNote": null,
+      "layout": {
+        "x": 70,
+        "y": 3272,
+        "width": 194,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "the one canonical session",
+          "close-out"
+        ]
+      }
+    },
+    {
+      "id": "social-brand-brief",
+      "source": "aura:project-knowledge/operations/blotato-social-automation/skills-staging/social-brand-brief/SKILL.md",
+      "repo": "aura",
+      "tier": "project",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "per-account voice contract",
+      "renderNote": null,
+      "layout": {
+        "x": 372.5,
+        "y": 5068.9,
+        "width": 200,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "per-account voice contract"
+        ]
+      }
+    },
+    {
+      "id": "social-content-coach",
+      "source": "aura:project-knowledge/operations/blotato-social-automation/skills-staging/social-content-coach/SKILL.md",
+      "repo": "aura",
+      "tier": "project",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "social-brand-brief",
+        "social-post-writer",
+        "social-post-grader",
+        "social-post-scheduler"
+      ],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "orchestrator for the Blotato pack",
+      "renderNote": null,
+      "layout": {
+        "x": 120.5,
+        "y": 5085,
+        "width": 212,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "orchestrator for the Blotato",
+          "pack"
+        ]
+      }
+    },
+    {
+      "id": "social-post-grader",
+      "source": "aura:project-knowledge/operations/blotato-social-automation/skills-staging/social-post-grader/SKILL.md",
+      "repo": "aura",
+      "tier": "project",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "social-post-writer"
+      ],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "virality rubric, nothing ships below eight of ten",
+      "renderNote": null,
+      "layout": {
+        "x": 610.5,
+        "y": 5157.7,
+        "width": 224,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "virality rubric, nothing ships",
+          "below eight of ten"
+        ]
+      }
+    },
+    {
+      "id": "social-post-scheduler",
+      "source": "aura:project-knowledge/operations/blotato-social-automation/skills-staging/social-post-scheduler/SKILL.md",
+      "repo": "aura",
+      "tier": "project",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "the only skill that publishes through Blotato",
+      "renderNote": null,
+      "layout": {
+        "x": 372.5,
+        "y": 5242.9,
+        "width": 218,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "the only skill that publishes",
+          "through Blotato"
+        ]
+      }
+    },
+    {
+      "id": "social-post-writer",
+      "source": "aura:project-knowledge/operations/blotato-social-automation/skills-staging/social-post-writer/SKILL.md",
+      "repo": "aura",
+      "tier": "project",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "social-post-grader"
+      ],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "drafts hooks first, then body",
+      "renderNote": null,
+      "layout": {
+        "x": 372.5,
+        "y": 5155.9,
+        "width": 218,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "drafts hooks first, then body"
+        ]
+      }
+    },
+    {
+      "id": "ss",
+      "source": "aura:_tools/personal-skills/ss/SKILL.md",
+      "repo": "aura",
+      "tier": "user",
+      "zone": "routing",
+      "status": "designed",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "screenshot shorthand",
+      "renderNote": null,
+      "layout": {
+        "x": 85,
+        "y": 2433,
+        "width": 164,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "screenshot shorthand"
+        ]
+      }
+    },
+    {
+      "id": "the-strong-ones-brand",
+      "source": "eps:plugins/brand-voice/skills/the-strong-ones-brand/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "brands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [
+        "the-strong-ones"
+      ],
+      "subtitle": "The Strong Ones voice inside AG Personal Brand",
+      "renderNote": null,
+      "layout": {
+        "x": 468,
+        "y": 628,
+        "width": 230,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "The Strong Ones voice inside AG",
+          "Personal Brand"
+        ]
+      }
+    },
+    {
+      "id": "this-week-in-city-writer",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/this-week-in-city-writer/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "weekly local roundup post",
+      "renderNote": null,
+      "layout": {
+        "x": 73.5,
+        "y": 5548,
+        "width": 222,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "weekly local roundup post"
+        ]
+      }
+    },
+    {
+      "id": "verify-docs",
+      "source": "eps:skills/verify-docs/SKILL.md",
+      "repo": "eps",
+      "tier": "user",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "live-doc check before building",
+      "renderNote": null,
+      "layout": {
+        "x": 55,
+        "y": 2997,
+        "width": 224,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "live-doc check before building"
+        ]
+      }
+    },
+    {
+      "id": "video-repurposer-skill",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/video-repurposer-skill/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "long video into 3 shorts",
+      "renderNote": null,
+      "layout": {
+        "x": 81,
+        "y": 3999,
+        "width": 207,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "long video into 3 shorts"
+        ]
+      }
+    },
+    {
+      "id": "xavier-offer-builder",
+      "source": "eps:plugins/content-engines/skills/xavier-offer-builder/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "offer construction and audit",
+      "renderNote": null,
+      "layout": {
+        "x": 372.5,
+        "y": 5990,
+        "width": 212,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "offer construction and audit"
+        ]
+      }
+    },
+    {
+      "id": "youtube-channel-setup-skill",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/youtube-channel-setup-skill/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "YouTube channel setup checklist",
+      "renderNote": null,
+      "layout": {
+        "x": 62.5,
+        "y": 6171,
+        "width": 244,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "YouTube channel setup checklist"
+        ]
+      }
+    },
+    {
+      "id": "youtube-seo-skill",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/youtube-seo-skill/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "YouTube upload package",
+      "renderNote": null,
+      "layout": {
+        "x": 96.5,
+        "y": 5722,
+        "width": 176,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "YouTube upload package"
+        ]
+      }
+    },
+    {
+      "id": "youtube-video-ideas-skill",
+      "source": "eps:plugins/real-estate-agent-toolkit/skills/youtube-video-ideas-skill/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "20 searchable YouTube ideas",
+      "renderNote": null,
+      "layout": {
+        "x": 70,
+        "y": 4911,
+        "width": 229,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "20 searchable YouTube ideas"
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "acn-currency-check",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "acn-email-watch",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "ag-luxury-brand",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "ag-personal-brand",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "batch-first-execution",
+      "to": "code-block-routing",
+      "type": "calls",
+      "points": [
+        {
+          "x": 560,
+          "y": 2471.5
+        },
+        {
+          "x": 580,
+          "y": 2471.5
+        },
+        {
+          "x": 580,
+          "y": 2573.2
+        },
+        {
+          "x": 600,
+          "y": 2573.2
+        }
+      ]
+    },
+    {
+      "from": "batch-first-execution",
+      "to": "session-model-advisor",
+      "type": "calls",
+      "points": [
+        {
+          "x": 560,
+          "y": 2445.8
+        },
+        {
+          "x": 600,
+          "y": 2445.8
+        }
+      ]
+    },
+    {
+      "from": "batch-first-execution",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "brand-voice",
+      "to": "ag-luxury-brand",
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 356,
+          "y": 140.8
+        },
+        {
+          "x": 406,
+          "y": 140.8
+        },
+        {
+          "x": 406,
+          "y": 398.5
+        },
+        {
+          "x": 447,
+          "y": 398.5
+        }
+      ]
+    },
+    {
+      "from": "brand-voice",
+      "to": "ag-personal-brand",
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 356,
+          "y": 150.4
+        },
+        {
+          "x": 396,
+          "y": 150.4
+        },
+        {
+          "x": 396,
+          "y": 542.5
+        },
+        {
+          "x": 452,
+          "y": 542.5
+        }
+      ]
+    },
+    {
+      "from": "brand-voice",
+      "to": "don-hobbs-brand",
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 356,
+          "y": 131.1
+        },
+        {
+          "x": 416,
+          "y": 131.1
+        },
+        {
+          "x": 416,
+          "y": 238.5
+        },
+        {
+          "x": 468,
+          "y": 238.5
+        }
+      ]
+    },
+    {
+      "from": "brand-voice",
+      "to": "ep-brand",
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 356,
+          "y": 121.5
+        },
+        {
+          "x": 452,
+          "y": 121.5
+        }
+      ]
+    },
+    {
+      "from": "brand-voice",
+      "to": "fam-epic-brand",
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 356,
+          "y": 169.6
+        },
+        {
+          "x": 376,
+          "y": 169.6
+        },
+        {
+          "x": 376,
+          "y": 826.5
+        },
+        {
+          "x": 447,
+          "y": 826.5
+        }
+      ]
+    },
+    {
+      "from": "brand-voice",
+      "to": "moxie-signature-group-brand",
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 356,
+          "y": 179.3
+        },
+        {
+          "x": 366,
+          "y": 179.3
+        },
+        {
+          "x": 366,
+          "y": 970.5
+        },
+        {
+          "x": 447,
+          "y": 970.5
+        }
+      ]
+    },
+    {
+      "from": "brand-voice",
+      "to": "the-strong-ones-brand",
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 356,
+          "y": 160
+        },
+        {
+          "x": 386,
+          "y": 160
+        },
+        {
+          "x": 386,
+          "y": 666.5
+        },
+        {
+          "x": 468,
+          "y": 666.5
+        }
+      ]
+    },
+    {
+      "from": "brand-voice",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "can-i-close",
+      "to": "session-audit",
+      "type": "calls",
+      "points": [
+        {
+          "x": 304,
+          "y": 3512.5
+        },
+        {
+          "x": 314,
+          "y": 3512.5
+        },
+        {
+          "x": 314,
+          "y": 3235.2
+        },
+        {
+          "x": 324,
+          "y": 3235.2
+        }
+      ]
+    },
+    {
+      "from": "can-i-close",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "canon-sync-protocol",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "capability-currency",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "code-block-routing",
+      "to": "pin",
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 600,
+          "y": 2606.2
+        },
+        {
+          "x": 570,
+          "y": 2606.2
+        },
+        {
+          "x": 570,
+          "y": 2896
+        },
+        {
+          "x": 533,
+          "y": 2896
+        }
+      ]
+    },
+    {
+      "from": "code-block-routing",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "connection-first-implementation",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "cowork-direct-execution",
+      "to": "code-block-routing",
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 560,
+          "y": 2595.2
+        },
+        {
+          "x": 600,
+          "y": 2595.2
+        }
+      ]
+    },
+    {
+      "from": "cowork-direct-execution",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "deliverable-link",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "dm-to-dollars",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "document-formatting-standard",
+      "to": "deliverable-link",
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 304,
+          "y": 3686.5
+        },
+        {
+          "x": 324,
+          "y": 3686.5
+        }
+      ]
+    },
+    {
+      "from": "document-formatting-standard",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "don-hobbs-brand",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "ember-reactivate",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "ep-brand",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "estate-memory-router",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "expert-partners-systems-map",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "fam-epic-brand",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "funnel-build",
+      "to": "funnel-documentation",
+      "type": "calls",
+      "points": [
+        {
+          "x": 1188,
+          "y": 2370.5
+        },
+        {
+          "x": 1198,
+          "y": 2370.5
+        },
+        {
+          "x": 1198,
+          "y": 2194.2
+        },
+        {
+          "x": 1208,
+          "y": 2194.2
+        }
+      ]
+    },
+    {
+      "from": "funnel-build",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "funnel-documentation",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "funnel-migration",
+      "to": "funnel-documentation",
+      "type": "calls",
+      "points": [
+        {
+          "x": 1188,
+          "y": 2168.5
+        },
+        {
+          "x": 1208,
+          "y": 2168.5
+        }
+      ]
+    },
+    {
+      "from": "funnel-migration",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "handoff",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "intake",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "kindergartner-mode",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "lane-spawn",
+      "to": "code-block-routing",
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 304,
+          "y": 2947.3
+        },
+        {
+          "x": 314,
+          "y": 2947.3
+        },
+        {
+          "x": 314,
+          "y": 2957.3
+        },
+        {
+          "x": 590,
+          "y": 2957.3
+        },
+        {
+          "x": 590,
+          "y": 2628.2
+        },
+        {
+          "x": 600,
+          "y": 2628.2
+        }
+      ]
+    },
+    {
+      "from": "lane-spawn",
+      "to": "pin",
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 304,
+          "y": 2921.7
+        },
+        {
+          "x": 351,
+          "y": 2921.7
+        }
+      ]
+    },
+    {
+      "from": "lane-spawn",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "master-marketer-free-agent-builder",
+      "to": "xavier-offer-builder",
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 332.5,
+          "y": 6021.5
+        },
+        {
+          "x": 372.5,
+          "y": 6021.5
+        }
+      ]
+    },
+    {
+      "from": "master-marketer-free-agent-builder",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "moxie-signature-group-brand",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "new-project",
+      "to": "repo-standards",
+      "type": "calls",
+      "points": [
+        {
+          "x": 548,
+          "y": 2350.7
+        },
+        {
+          "x": 873,
+          "y": 2350.7
+        },
+        {
+          "x": 873,
+          "y": 2282.3
+        },
+        {
+          "x": 936,
+          "y": 2282.3
+        }
+      ]
+    },
+    {
+      "from": "new-project",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "park",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "pin",
+      "to": "code-block-routing",
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 533,
+          "y": 2921.7
+        },
+        {
+          "x": 580,
+          "y": 2921.7
+        },
+        {
+          "x": 580,
+          "y": 2617.2
+        },
+        {
+          "x": 600,
+          "y": 2617.2
+        }
+      ]
+    },
+    {
+      "from": "pin",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "project-architect",
+      "to": "new-project",
+      "type": "calls",
+      "points": [
+        {
+          "x": 304,
+          "y": 2282.3
+        },
+        {
+          "x": 314,
+          "y": 2282.3
+        },
+        {
+          "x": 314,
+          "y": 2350.7
+        },
+        {
+          "x": 336,
+          "y": 2350.7
+        }
+      ]
+    },
+    {
+      "from": "project-architect",
+      "to": "project-builder",
+      "type": "calls",
+      "points": [
+        {
+          "x": 304,
+          "y": 2256.7
+        },
+        {
+          "x": 364.5,
+          "y": 2256.7
+        }
+      ]
+    },
+    {
+      "from": "project-architect",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "project-builder",
+      "to": "repo-standards",
+      "type": "calls",
+      "points": [
+        {
+          "x": 519.5,
+          "y": 2256.7
+        },
+        {
+          "x": 936,
+          "y": 2256.7
+        }
+      ]
+    },
+    {
+      "from": "project-builder",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "rare-content-engine",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "remember-this",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "repo-standards",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "research-intake",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "resume-work",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "session-audit",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "session-closeout",
+      "to": "session-audit",
+      "type": "calls",
+      "points": [
+        {
+          "x": 304,
+          "y": 3209.5
+        },
+        {
+          "x": 324,
+          "y": 3209.5
+        }
+      ]
+    },
+    {
+      "from": "session-closeout",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "session-home",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "session-model-advisor",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "session-steward",
+      "to": "code-block-routing",
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 304,
+          "y": 2545.7
+        },
+        {
+          "x": 570,
+          "y": 2545.7
+        },
+        {
+          "x": 570,
+          "y": 2584.2
+        },
+        {
+          "x": 600,
+          "y": 2584.2
+        }
+      ]
+    },
+    {
+      "from": "session-steward",
+      "to": "pin",
+      "type": "defers-to",
+      "points": [
+        {
+          "x": 304,
+          "y": 2571.3
+        },
+        {
+          "x": 314,
+          "y": 2571.3
+        },
+        {
+          "x": 314,
+          "y": 2896
+        },
+        {
+          "x": 351,
+          "y": 2896
+        }
+      ]
+    },
+    {
+      "from": "session-steward",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "session-wrap",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "social-brand-brief",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "social-content-coach",
+      "to": "social-brand-brief",
+      "type": "calls",
+      "points": [
+        {
+          "x": 332.5,
+          "y": 5100.4
+        },
+        {
+          "x": 372.5,
+          "y": 5100.4
+        }
+      ]
+    },
+    {
+      "from": "social-content-coach",
+      "to": "social-post-grader",
+      "type": "calls",
+      "points": [
+        {
+          "x": 332.5,
+          "y": 5146.6
+        },
+        {
+          "x": 342.5,
+          "y": 5146.6
+        },
+        {
+          "x": 342.5,
+          "y": 5329.9
+        },
+        {
+          "x": 600.5,
+          "y": 5329.9
+        },
+        {
+          "x": 600.5,
+          "y": 5215.4
+        },
+        {
+          "x": 610.5,
+          "y": 5215.4
+        }
+      ]
+    },
+    {
+      "from": "social-content-coach",
+      "to": "social-post-scheduler",
+      "type": "calls",
+      "points": [
+        {
+          "x": 332.5,
+          "y": 5131.2
+        },
+        {
+          "x": 352.5,
+          "y": 5131.2
+        },
+        {
+          "x": 352.5,
+          "y": 5281.4
+        },
+        {
+          "x": 372.5,
+          "y": 5281.4
+        }
+      ]
+    },
+    {
+      "from": "social-content-coach",
+      "to": "social-post-writer",
+      "type": "calls",
+      "points": [
+        {
+          "x": 332.5,
+          "y": 5115.8
+        },
+        {
+          "x": 362.5,
+          "y": 5115.8
+        },
+        {
+          "x": 362.5,
+          "y": 5187.4
+        },
+        {
+          "x": 372.5,
+          "y": 5187.4
+        }
+      ]
+    },
+    {
+      "from": "social-content-coach",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "social-post-grader",
+      "to": "social-post-writer",
+      "type": "calls",
+      "points": [
+        {
+          "x": 610.5,
+          "y": 5196.2
+        },
+        {
+          "x": 600.5,
+          "y": 5196.2
+        },
+        {
+          "x": 600.5,
+          "y": 5197.9
+        },
+        {
+          "x": 590.5,
+          "y": 5197.9
+        }
+      ]
+    },
+    {
+      "from": "social-post-grader",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "social-post-scheduler",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "social-post-writer",
+      "to": "social-post-grader",
+      "type": "calls",
+      "points": [
+        {
+          "x": 590.5,
+          "y": 5176.9
+        },
+        {
+          "x": 610.5,
+          "y": 5176.9
+        }
+      ]
+    },
+    {
+      "from": "social-post-writer",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "ss",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "the-strong-ones-brand",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "verify-docs",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "xavier-offer-builder",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    }
+  ],
+  "flags": {
+    "declaredDuplicates": [
+      "eps:operating-doctrine/SKILL.md"
+    ],
+    "deployedMounts": [
+      {
+        "path": "aura:.agents/skills/can-i-close/SKILL.md",
+        "id": "can-i-close",
+        "canonical": "aura:.claude/skills/can-i-close/SKILL.md",
+        "deployedAt": "2026-09-04",
+        "stamp": "tree sha256 a6b3a1799a92",
+        "mount": "aura:.agents/skills/"
+      },
+      {
+        "path": "aura:.agents/skills/ember-reactivate/SKILL.md",
+        "id": "ember-reactivate",
+        "canonical": "aura:.claude/skills/ember-reactivate/SKILL.md",
+        "deployedAt": "2026-09-04",
+        "stamp": "tree sha256 ef1e9f73d887",
+        "mount": "aura:.agents/skills/"
+      },
+      {
+        "path": "aura:.agents/skills/estate-memory-router/SKILL.md",
+        "id": "estate-memory-router",
+        "canonical": "eps:skills/estate-memory-router/SKILL.md",
+        "deployedAt": "2026-10-08",
+        "stamp": "v1.1",
+        "mount": "aura:.agents/skills/"
+      },
+      {
+        "path": "aura:.agents/skills/project-architect/SKILL.md",
+        "id": "project-architect",
+        "canonical": "aura:.claude/skills/project-architect/SKILL.md",
+        "deployedAt": "2026-09-04",
+        "stamp": "tree sha256 37e7ab8b236e",
+        "mount": "aura:.agents/skills/"
+      },
+      {
+        "path": "aura:.agents/skills/project-builder/SKILL.md",
+        "id": "project-builder",
+        "canonical": "aura:.claude/skills/project-builder/SKILL.md",
+        "deployedAt": "2026-09-20",
+        "stamp": "tree sha256 c77f121d82fa",
+        "mount": "aura:.agents/skills/"
+      },
+      {
+        "path": "aura:.agents/skills/remember-this/SKILL.md",
+        "id": "remember-this",
+        "canonical": "eps:skills/remember-this/SKILL.md",
+        "deployedAt": "2026-10-08",
+        "stamp": "v1.1",
+        "mount": "aura:.agents/skills/"
+      },
+      {
+        "path": "aura:.agents/skills/repo-standards/SKILL.md",
+        "id": "repo-standards",
+        "canonical": "eps:skills/repo-standards/SKILL.md",
+        "deployedAt": "2026-09-27",
+        "stamp": "v1.6",
+        "mount": "aura:.agents/skills/"
+      },
+      {
+        "path": "aura:.agents/skills/research-intake/SKILL.md",
+        "id": "research-intake",
+        "canonical": "eps:skills/research-intake/SKILL.md",
+        "deployedAt": "2026-09-04",
+        "stamp": "tree sha256 7c8710c18d31",
+        "mount": "aura:.agents/skills/"
+      },
+      {
+        "path": "aura:.agents/skills/session-audit/SKILL.md",
+        "id": "session-audit",
+        "canonical": "aura:.claude/skills/session-audit/SKILL.md",
+        "deployedAt": "2026-10-12",
+        "stamp": "tree sha256 ab3f6dc2fa82",
+        "mount": "aura:.agents/skills/"
+      },
+      {
+        "path": "aura:.agents/skills/session-closeout/SKILL.md",
+        "id": "session-closeout",
+        "canonical": "aura:.claude/skills/session-closeout/SKILL.md",
+        "deployedAt": "2026-10-12",
+        "stamp": "tree sha256 99e025ff3c34",
+        "mount": "aura:.agents/skills/"
+      },
+      {
+        "path": "aura:.agents/skills/session-wrap/SKILL.md",
+        "id": "session-wrap",
+        "canonical": "eps:skills/session-wrap/SKILL.md",
+        "deployedAt": "2026-10-12",
+        "stamp": "v1.18",
+        "mount": "aura:.agents/skills/"
+      },
+      {
+        "path": "aura:.claude/skills/estate-memory-router/SKILL.md",
+        "id": "estate-memory-router",
+        "canonical": "eps:skills/estate-memory-router/SKILL.md",
+        "deployedAt": "2026-10-08",
+        "stamp": "v1.1",
+        "mount": null
+      },
+      {
+        "path": "aura:.claude/skills/remember-this/SKILL.md",
+        "id": "remember-this",
+        "canonical": "eps:skills/remember-this/SKILL.md",
+        "deployedAt": "2026-10-08",
+        "stamp": "v1.1",
+        "mount": null
+      },
+      {
+        "path": "aura:.claude/skills/repo-standards/SKILL.md",
+        "id": "repo-standards",
+        "canonical": "eps:skills/repo-standards/SKILL.md",
+        "deployedAt": "2026-09-27",
+        "stamp": "v1.6",
+        "mount": null
+      },
+      {
+        "path": "aura:.claude/skills/research-intake/SKILL.md",
+        "id": "research-intake",
+        "canonical": "eps:skills/research-intake/SKILL.md",
+        "deployedAt": "2026-09-04",
+        "stamp": "tree sha256 7c8710c18d31",
+        "mount": null
+      },
+      {
+        "path": "aura:.claude/skills/session-wrap/SKILL.md",
+        "id": "session-wrap",
+        "canonical": "eps:skills/session-wrap/SKILL.md",
+        "deployedAt": "2026-10-12",
+        "stamp": "v1.18",
+        "mount": null
+      }
+    ]
+  },
+  "excluded": [
+    "aura:docs/estate/extracts/mission-control/SKILL.md"
+  ],
+  "layout": {
+    "engine": "elkjs layered, single INCLUDE_CHILDREN hierarchy over zones and brand rooms, build-time only",
+    "width": 1462,
+    "height": 6800,
+    "zones": [
+      {
+        "id": "brain",
+        "label": "The brain",
+        "caption": "the law and the map of the house",
+        "x": 291.5,
+        "y": 1077,
+        "width": 288,
+        "height": 610,
+        "rooms": []
+      },
+      {
+        "id": "brands",
+        "label": "The voices",
+        "caption": "one room per brand, registry per ADR 0045",
+        "x": 119,
+        "y": 8,
+        "width": 633,
+        "height": 1039,
+        "rooms": [
+          {
+            "key": "ag-luxury",
+            "brands": [
+              "ag-luxury"
+            ],
+            "label": "AG Luxury",
+            "parent": null,
+            "x": 431,
+            "y": 326,
+            "width": 256,
+            "height": 127
+          },
+          {
+            "key": "ag-personal-brand",
+            "brands": [
+              "ag-personal-brand"
+            ],
+            "label": "AG Personal Brand",
+            "parent": null,
+            "x": 431,
+            "y": 477,
+            "width": 299,
+            "height": 260
+          },
+          {
+            "key": "the-strong-ones",
+            "brands": [
+              "the-strong-ones"
+            ],
+            "label": "The Strong Ones",
+            "parent": "ag-personal-brand",
+            "x": 452,
+            "y": 594,
+            "width": 262,
+            "height": 127
+          },
+          {
+            "key": "expert-partners",
+            "brands": [
+              "expert-partners"
+            ],
+            "label": "Expert Partners",
+            "parent": null,
+            "x": 431,
+            "y": 56,
+            "width": 269,
+            "height": 246
+          },
+          {
+            "key": "don-hobbs",
+            "brands": [
+              "don-hobbs"
+            ],
+            "label": "Don Hobbs",
+            "parent": "expert-partners",
+            "x": 452,
+            "y": 173,
+            "width": 232,
+            "height": 113
+          },
+          {
+            "key": "fam+epic",
+            "brands": [
+              "fam",
+              "epic"
+            ],
+            "label": "FAM and EPIC",
+            "parent": null,
+            "x": 431,
+            "y": 761,
+            "width": 184,
+            "height": 113
+          },
+          {
+            "key": "moxie",
+            "brands": [
+              "moxie"
+            ],
+            "label": "Moxie",
+            "parent": null,
+            "x": 431,
+            "y": 898,
+            "width": 276,
+            "height": 127
+          }
+        ]
+      },
+      {
+        "id": "content",
+        "label": "The marketing engines",
+        "caption": "strategy, offers, content, conversations",
+        "x": 14.5,
+        "y": 3777,
+        "width": 842,
+        "height": 3015,
+        "rooms": []
+      },
+      {
+        "id": "hands",
+        "label": "The hands",
+        "caption": "funnel work and account operations",
+        "x": 914,
+        "y": 1619,
+        "width": 540,
+        "height": 1275,
+        "rooms": []
+      },
+      {
+        "id": "routing",
+        "label": "Session machinery",
+        "caption": "routing, ledgers, session lifecycle",
+        "x": 8,
+        "y": 1894,
+        "width": 850,
+        "height": 1853,
+        "rooms": []
+      },
+      {
+        "id": "cataloging",
+        "label": "The librarians",
+        "caption": "catalogs and registries",
+        "x": 298.5,
+        "y": 1717,
+        "width": 274,
+        "height": 147,
+        "rooms": []
+      }
+    ]
+  }
+}

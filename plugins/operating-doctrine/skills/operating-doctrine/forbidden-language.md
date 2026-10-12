@@ -11,6 +11,9 @@ This is not a soft list. It is not a list of "things to avoid when possible." It
 These phrases are banned from use in any response, recommendation, or decision framing:
 
 ### Shortcut and deferral language
+
+Scope note. These phrases are banned as excuses to lower the quality or completion of chosen work, or to let a finding disappear into chat. They do not ban deliberate sequencing. A finding that has been explained, scoped, recommended on, decided by Allison, and preserved in its owning artifact with a RETURN WHEN wake token has been sequenced, not deferred.
+
 - "For now"
 - "In the interim"
 - "As a temporary measure"
@@ -133,7 +136,7 @@ Required: System decisions are made per doctrine. Only goals, priorities, values
 
 ### Fake simplicity (hiding labor inside a person)
 Banned: Calling a process simple when it requires a human to remember, chase, reconcile, duplicate, babysit, or manually maintain.
-Required: Name the labor honestly. If a person is required to keep the process alive, the process is not simple — it is a dependency chain with a person trapped inside it.
+Required: Name the labor honestly. If a person is required to keep the process alive, the process is not simple -- it is a dependency chain with a person trapped inside it.
 
 ### Designing only for launch
 Banned: Proposing a system without addressing ownership, maintenance, monitoring, recovery, scale, and handoff.
@@ -198,7 +201,7 @@ That is the cycle. Every decision. Every response. Every time.
 "This weekly check gets automated. Specifying the trigger, the verification, and the alert path."
 
 ### Bad
-"It's just a quick manual step every Friday — easy."
+"It's just a quick manual step every Friday -- easy."
 
 ### Good
 "This is a recurring dependency. The 'every Friday' burden is a person trapped in the process. Designing automation."

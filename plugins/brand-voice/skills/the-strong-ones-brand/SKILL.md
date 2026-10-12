@@ -1,6 +1,13 @@
 ---
 name: the-strong-ones-brand
-description: "Apply The Strong Ones brand voice for Allison Gaddy's personal legacy work. Use when working on The Strong Ones book, podcast, community content, or The Potent Woman lineage -- Allison's long-term project for women building lives of deep meaning. This is a PRIVATE brand: warm, raw, permission-giving, first-person, deeply personal. No real estate language, no hustle culture, no recruiting tone, no urgency. This voice is categorically different from Expert Partners, FAM, and Moxie -- it exists outside of launch cycles and business frameworks. The goal is to make the reader feel seen, not sold. It inherits the operating-doctrine and never overrides it."
+description: "Apply The Strong Ones brand voice for Allison Gaddy's legacy work. Use when working on The Strong Ones book, podcast, community content, or The Potent Woman lineage -- Allison's long-term project for women building lives of deep meaning. The Strong Ones lives inside AG Personal Brand and, per Allison's ruling of 2026-08-04, it is part of her visible, industry-facing professional voice: warm, raw, permission-giving, first-person, deeply personal. No real estate language, no hustle culture, no recruiting tone, no urgency. It exists outside of launch cycles and business frameworks, and the goal is to make the reader feel seen, not sold. It inherits the operating-doctrine and never overrides it."
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
+tier: plugin
+zone: brands
+status: live
+inherits: operating-doctrine
+brand-scope: the-strong-ones
+subtitle: "The Strong Ones voice inside AG Personal Brand"
 ---
 
 # The Strong Ones Brand System
@@ -19,7 +26,7 @@ This returns the live brand context from the canonical `ExpertPartners/the-stron
 
 The Strong Ones is Allison Gaddy's long-term legacy project, the direct lineage of The Potent Woman. Book, podcast, and community for women building lives of deep meaning: sovereignty, self-trust, and leading from the inside out. This brand is not a business. It predates the real estate coaching work and will outlast it.
 
-**Privacy:** This is a private brand. Content generated here is not for public use without explicit approval. Do not surface this content in public-facing outputs.
+**Visibility (ruled by Allison 2026-08-04):** The Strong Ones lives inside AG Personal Brand and is part of Allison's visible, industry-facing professional voice. It moved out of the private drawer; this work can appear on AG Personal Brand surfaces (YouTube @theallisongaddy, keynotes, essays, social) as Allison shows up with it. Visible never means commercial: nothing here is sold, launched, or funneled, and publishing any specific piece still takes Allison's explicit approval. This supersedes the prior PRIVATE designation.
 
 ## Voice (non-negotiables)
 
@@ -34,9 +41,9 @@ The Strong Ones is Allison Gaddy's long-term legacy project, the direct lineage 
 
 ## Scope
 
-This is personal legacy work: book, podcast, community.
+This is personal legacy work: book, podcast, community, now carried in Allison's visible AG Personal Brand voice.
 
-**Never apply this voice to:** Expert Partners programs, FAM recruiting, EPIC content, Moxie real estate, any commercial funnel or launch sequence.
+**Never apply this voice to:** Expert Partners programs, FAM recruiting, EPIC content, consumer real estate (AG Luxury; Moxie is benched per ADR 0045), any commercial funnel or launch sequence.
 
 ## Naming
 

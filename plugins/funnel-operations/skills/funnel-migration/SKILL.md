@@ -12,6 +12,15 @@ description: >-
   It ends by calling the Funnel Documentation skill, so the funnel lands fully
   documented. Built for a non-technical teammate; hand-hold one step at a time.
   It inherits the operating-doctrine and never overrides it.
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
+tier: plugin
+zone: hands
+status: live
+inherits: operating-doctrine
+calls:
+  - funnel-documentation
+brand-scope: null
+subtitle: "per-funnel walk from old location to clean location"
 ---
 
 # Funnel Migration

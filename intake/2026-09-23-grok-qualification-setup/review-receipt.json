@@ -1,0 +1,117 @@
+{
+  "status": "DRAFT / NOT RELEASED",
+  "captured_at": "2026-09-23T20:50:38.294244+00:00",
+  "review_pr": {
+    "autoMergeRequest": null,
+    "baseRefOid": "3096df35aac141e1cea8d77014e0f1d1ea1dad05",
+    "headRefOid": "7acec38fd36bd1c8e4f299ca1d0c17759a9a703f",
+    "isDraft": false,
+    "state": "OPEN",
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-09-23T20:49:52Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/ExpertPartners/expert-partners-skills/actions/runs/35918442989/job/107375935426",
+        "name": "Analyze (actions)",
+        "startedAt": "2026-09-23T20:48:56Z",
+        "status": "COMPLETED",
+        "workflowName": "CodeQL"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-09-23T20:49:02Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/ExpertPartners/expert-partners-skills/actions/runs/35918445463/job/107375939703",
+        "name": "brand + classification lint (changed files)",
+        "startedAt": "2026-09-23T20:48:55Z",
+        "status": "COMPLETED",
+        "workflowName": "ci-gates"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-09-23T20:50:12Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/ExpertPartners/expert-partners-skills/actions/runs/35918442989/job/107375935375",
+        "name": "Analyze (javascript-typescript)",
+        "startedAt": "2026-09-23T20:48:55Z",
+        "status": "COMPLETED",
+        "workflowName": "CodeQL"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-09-23T20:50:04Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/ExpertPartners/expert-partners-skills/actions/runs/35918442989/job/107375934874",
+        "name": "Analyze (python)",
+        "startedAt": "2026-09-23T20:48:55Z",
+        "status": "COMPLETED",
+        "workflowName": "CodeQL"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-09-23T20:49:07Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/ExpertPartners/expert-partners-skills/actions/runs/35918445463/job/107375939553",
+        "name": "ruling provenance gate (citations, supersession, disclosure)",
+        "startedAt": "2026-09-23T20:48:55Z",
+        "status": "COMPLETED",
+        "workflowName": "ci-gates"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-09-23T20:49:04Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/ExpertPartners/expert-partners-skills/actions/runs/35918445463/job/107375939792",
+        "name": "gitleaks secret scan (full history)",
+        "startedAt": "2026-09-23T20:48:56Z",
+        "status": "COMPLETED",
+        "workflowName": "ci-gates"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "conclusion": "",
+        "detailsUrl": "https://github.com/ExpertPartners/expert-partners-skills/runs/107375934320",
+        "name": "Claude Code Review",
+        "startedAt": "2026-09-23T20:48:52Z",
+        "status": "IN_PROGRESS",
+        "workflowName": ""
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-09-23T20:49:43Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/ExpertPartners/expert-partners-skills/runs/107376236384",
+        "name": "CodeQL",
+        "startedAt": "2026-09-23T20:49:41Z",
+        "status": "COMPLETED",
+        "workflowName": ""
+      }
+    ],
+    "url": "https://github.com/ExpertPartners/expert-partners-skills/pull/35"
+  },
+  "remote_readback": {
+    "head": "7acec38fd36bd1c8e4f299ca1d0c17759a9a703f",
+    "artifact_hashes_checked": 24,
+    "result": "PASS via independent GitHub contents reads"
+  },
+  "publication": "Review branch only. Not authoritative-main publication. Merge and auto-merge not performed.",
+  "candidate_runtime": "NOT RUN",
+  "source_review_findings": "All three OPEN",
+  "lifecycle": "Own-row write rejected by automatic approval review before execution; proposed row remains a review-only handoff.",
+  "independent_continuation_retrieval": {
+    "head": "7acec38fd36bd1c8e4f299ca1d0c17759a9a703f",
+    "reader": "separate preparation reviewer",
+    "start": "intake/2026-09-23-grok-qualification-setup.md",
+    "linked_sources": [
+      "route-assessment.md",
+      "coverage.json",
+      "withheld/source-pins.json",
+      "recorder-grader-handoff.md",
+      "../../archive/session-grok-repo-templates-qualification-setup-closeout-2026-09-23.md"
+    ],
+    "result": "PASS, 38 cases/72 variants/144 required observations, all unrun, no gate/archive pass claimed",
+    "minor_stale_wording": "PR creation wording corrected in receipt commit"
+  }
+}

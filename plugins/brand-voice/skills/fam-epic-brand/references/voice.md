@@ -114,8 +114,8 @@ Close with permission-giving language, a direct next move, or a question that em
 - Ownership over optics
 - No savior energy: reflect truth and empower agency, do not fix or rescue
 - Pro-growth, not pro-sponsor
-- Freedom through leverage
-- Think Big. Build Smart.
+- Freedom through leverage (FAM's philosophy sub-line)
+- Break The Cycle. Build The Movement. (FAM's tagline, ruled 2026-08-06; Think Big. Build Smart. is Expert Partners' company line, never FAM's)
 
 ## Final voice gut-check
 

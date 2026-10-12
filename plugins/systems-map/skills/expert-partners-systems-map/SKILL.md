@@ -3,28 +3,41 @@ name: expert-partners-systems-map
 description: |
   The canonical map of where every Expert Partners system lives, what each system's one job is, and what access Claude already holds across the stack. Load this at the start of every Cowork project, every chat, and every Claude Code session, and fire it the moment any of the following happens: a decision is being made about where to store, log, or record something; Claude is about to claim a credential, tool, scope, or access is missing; Claude is about to ask Allison to grant access, authorize, connect, or take a manual action; uncertainty surfaces about what systems exist or what Claude can reach; a new project or session is starting cold. This skill exists so Claude never has to be re-told what it can access and never puts a thing in the wrong system. It inherits the operating-doctrine and never overrides it.
 allowed-tools: []
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
+tier: plugin
+zone: brain
+status: live
+inherits: operating-doctrine
+brand-scope: null
+subtitle: "where every system lives and what Claude can reach"
 ---
 
 # Expert Partners Systems Map and Access Map
 
-This is the bible of where things live and what Claude can reach. The full version is in GitHub canonical, in the expert-partners doctrine area. This skill is the operative version that loads everywhere so nobody has to repeat it. When this skill and the full bible ever diverge, the bible wins and this skill is re-synced from it.
+This is the bible of where things live and what Claude can reach. The full version is in GitHub canonical, in the expert-partners doctrine area (`doctrine/expert-partners-systems-map.md`). This skill is the operative version that loads everywhere so nobody has to repeat it. When this skill and the full bible ever diverge, the bible wins and this skill is re-synced from it.
 
 ## The one rule
 
 Each system has exactly one job. Discrepancies happen when a system is asked to carry something that belongs somewhere else. When in doubt, match the thing to the one job below, not to whatever is closest at hand.
 
+## First read for every cold session
+
+The estate manifest is the brain's table of contents: `aura/docs/estate/estate-manifest.md`. It indexes every canonical source with a last-verified date and evidence. A cold session reads it first, then the lane ledger (`aura/docs/estate/lanes.md`) for what is in flight and what each lane awaits. Pointers, never copies; the manifest carries its own maintenance rules.
+
 ## The entity and the platform
 
 Expert Partners LLC is the legal and operating entity. Don Hobbs operates under Expert Partners LLC; his IP (Gateway to Mastery, Think Big Live Big, 2020 Vision, events, coaching clients, and related training assets) lives under Expert Partners LLC. He is not a separate brand stack or a separate business container.
 
-PartnerSync is the white-labeled GoHighLevel platform layer, the agency container (company `FOz8PSvqj7aYASb3wDzm`, "Expert Partners LLC dba Partner Sync"). It is plumbing, not a legal entity and not a brand. It holds five brand locations: EPIC, Expert Partners, AG Personal Brand, Moxie Signature Group, and Free Agent Nation Circle Community. The canonical registry with IDs, states, purposes, and the implementation priority order is `partnersync/reference/ghl-location-registry.md`; a mirror lives in the expert-partners repo at `reference/ghl-location-registry.md`. The location a contact lives in IS the brand statement; the peer brand-tag vocabulary is retired as contact-routing architecture (ruled 2026-07-27; full rule in `partnersync/doctrine/cross-location-identity-rules.md`).
+The brand registry is canonical in aura ADR 0045 (ruled 2026-07-30): six active brands (Expert Partners, EPIC, Don Hobbs Personal Brand, AG Personal Brand, AG Luxury, Free Agent Movement), with Moxie Signature Group benched. No new Moxie work; consumer real estate routes to AG Luxury.
+
+PartnerSync is the white-labeled GoHighLevel platform layer, the agency container (company `FOz8PSvqj7aYASb3wDzm`, "Expert Partners LLC dba Partner Sync"). It is plumbing, not a legal entity and not a brand. It holds five brand locations: EPIC, Expert Partners, AG Personal Brand, Moxie Signature Group (location exists physically; the brand is benched per aura ADR 0045, route no new work there), and Free Agent Nation Circle Community. The canonical registry with IDs, states, purposes, and the implementation priority order is `partnersync/reference/ghl-location-registry.md`; a mirror lives in the expert-partners repo at `reference/ghl-location-registry.md`. The location a contact lives in IS the brand statement; the peer brand-tag vocabulary is retired as contact-routing architecture (ruled 2026-07-27; full rule in `partnersync/doctrine/cross-location-identity-rules.md`).
 
 ## Storage map: what each system does, one job each
 
 | System | Its one job | What goes here | What never goes here |
 | --- | --- | --- | --- |
 | Notion | Single source of truth for funnel records and human logging. A funnel is not done until it lives here. | Funnel records (Funnels and Funnel Messages), status, human-readable logs, regenerated-from-canon human views | Doctrine, technical reference, secrets. Nothing authored in Notion competes with git canon |
-| GitHub canonical (`expert-partners`, `ghl-automation`, `expert-partners-skills`, `partnersync`) | Single source of truth for doctrine, decisions, and technical reference | Doctrine, decisions (ADRs), references, project knowledge, every n8n workflow's design doc. Commit AND push | Funnel records, secrets or tokens |
+| GitHub canonical (`aura`, `expert-partners`, `partnersync`, `partnersync-automation-backend`, `expert-partners-skills`; `ghl-automation` split into partnersync and the backend and retired 2026-09-08) | Single source of truth for doctrine, decisions, and technical reference. `aura` is the seat of the operating system; its `decisions/` directory is canonical for ADRs and rulings (queue clean 0001 through 0055, verified by live enumeration 2026-08-06; renumber evidence in `aura/decisions/README.md`). Per-repo decisions directories that predate this remain as historical records. | Doctrine, decisions (ADRs), references, project knowledge, every n8n workflow's design doc. Commit AND push | Funnel records, secrets or tokens |
 | Memory (Claude) | Claude cross-session recall, auto-loads each session | Short structured facts a future session must know, plus pointers to canonical docs | Human-facing content, secrets, anything long |
 | 1Password | Secrets and tokens vault | Tokens, API keys, PITs, client secrets, passwords | Anything that belongs in GitHub or Notion. Secrets never go in GitHub or Notion |
 | AWS | Compute and hosting, not a document store | Backend services, runtime token storage, scripts | Documentation, anything you go to read |
@@ -42,7 +55,13 @@ Not in the stack, stated so nobody re-litigates it:
 
 ## AI brains
 
-The brains, their seats, machines, one jobs, SOULs, and liveness rules live in Bible Chapter 4 (`canonical-bible-chapter-4-brains-and-sync-topology.md`, expert-partners doctrine area). This map does not restate the roster. One production brain (Ember, M2), one strategic brain (Aura, M4 / Cowork); everything else is planned and dark by design. Liveness is proven by process evidence, never by a fresh commit.
+The brains, their seats, machines, one jobs, SOULs, and liveness rules live in Bible Chapter 4 (`canonical-bible-chapter-4-brains-and-sync-topology.md`, expert-partners doctrine area). This map does not restate the roster. One strategic brain (Aura, M4 / Cowork) is active. Ember (M2) was frozen and quieted 2026-08-03 (workspaces archived, gateway disabled, writer crons off). The 2026-08-03 pause condition on agentic rebuilds (Aura's brain in place and locked down) was MET when the Estate Brain went live and proven on every surface (2026-08-04, re-proven 2026-08-07); Ember's wake now proceeds under the one-move wake ruling (`aura/intake/2026-08-05-ruling-ember-one-move-wake-sequencing.md`) in its own lane per the ledger. Everything else is planned and dark by design. Liveness is proven by process evidence, never by a fresh commit.
+
+Ember has her own shared Google Drive, and it is her filing home at wake, she files her documents there when she wakes; the CI watchman is not Ember and keeps filing to the Aura Docs folder per document-formatting-standard (ruled 2026-08-05, robot delivery standards ruling, aura intake 3973c2b). Amended 2026-08-06 per the Ember Voice and Your Move Queue ruling (aura intake/2026-08-06-ruling-ember-voice-and-your-move-queue.md, ee86601). Every robot message to Allison speaks as Ember in first person (R2). Drive docs are for genuine reading material only, the your-move instruction lives on the board rendered at hq.allisongaddy.com, and robot texts link hq.allisongaddy.com only (R3, rail spec aura docs/estate/your-move-queue.md).
+
+## The Estate Brain MCP: live and connected on every surface
+
+The Estate Brain MCP at mcp.expertpartners.com/mcp is LIVE. Six tools (fetch, search, get_brand_context, list_repos, list_topics, save_to_session_intake), Streamable HTTP, Cognito auth with individual sign-in. Proven from Claude Code 2026-08-03 (`aura/docs/estate/estate-brain-live-evidence-2026-08-03.md`), live from claude.ai chat and Cowork via the custom connector since 2026-08-04, re-proven from the chat surface 2026-08-07 (`aura/intake/2026-08-07-estate-brain-chat-surface-proof-2026-08-04.md`). Estate canon loads through this connector first; the GitHub connector and local clones remain the fallback road. Known drift flags stay with the Estate Brain lane in the ledger (get_brand_context lacks ag-luxury and don-hobbs, still exposes benched moxie). The prior version of this section ("does NOT exist yet," v2.2) was itself a phantom in the opposite direction, a locked front door recorded as an empty lot; retirement evidence lives in the estate manifest's Retired section.
 
 ## What Claude can already reach (the access map)
 
@@ -57,8 +76,17 @@ Claude already holds broad access across this stack. Do not claim access is miss
 | Web data (scraping, crawling, page monitoring) | Firecrawl, two lanes: Cowork / Claude app via the account-wide OAuth connector (`https://mcp.firecrawl.dev/v2/mcp-oauth`); Claude Code via the unattended lane (`https://mcp.firecrawl.dev/v2/mcp`) with a Bearer key read from `op://Automation/FIRECRAWL-API-KEY`, never plaintext | Call the Firecrawl MCP tools directly |
 | Connectors (read and act) | Airtable, Canva, ClickUp, Cloudflare, Coupler, Fireflies, Gamma, Gmail, GoDaddy, Google Calendar, Google Drive, Granola, Make, Mercury, Miro, n8n, Notion, Slack | Call the connector tool directly |
 | Compute and backend | AWS | Reach the service directly |
+| Estate canon | Estate Brain MCP connector, first road on every surface (chat, Cowork, Code). GitHub connector against ExpertPartners repos and local clones are the fallback road. First read: the estate manifest | Call the Estate Brain tools directly (list_repos, then fetch the manifest) |
 
 Warning line, ordered by Chapter 3: the Windsor GHL connector points at a foreign GHL company (`wVd3gUNItq6OXcVVS9xL`, not the PartnerSync agency) and must never be treated as a PartnerSync source.
+
+## Google Workspace access doctrine (ruled 2026-08-06)
+
+Canonical text, verbatim from the ruling record (aura `intake/2026-08-07-google-workspace-access-doctrine-ordered-gate-pasted.md`):
+
+GOOGLE WORKSPACE ACCESS DOCTRINE. Claude holds super-admin-grade access to the expertpartners.com Google Workspace through the service account with domain-wide delegation, credential in 1Password, impersonating allison@expertpartners.com or don@expertpartners.com as the task requires, exact-scope law per DWD (request the exact authorized scope strings, verified by token-mint smoke test). On any surface with execution and open egress (Claude Code, Cowork), the SA road is the FIRST road for every Workspace operation, list, search, read, and write per the write-autonomy bright line. Claude never claims Workspace access is missing, never asks Allison to share, grant, or manually fetch, and never blames connector limitations without first attempting the SA road and reporting the exact failure with its error text. The claude.ai chat connectors are a convenience layer for inline reads only, their failures never mean access is missing, they mean route the operation through the Code road. Both impersonations live-verified 2026-08-05 (drive.readonly, canon sweep evidence). This doctrine inherits the operating-doctrine and the credential currency doctrine and never overrides either.
+
+Honest limit, stated in the same ruling: this doctrine governs surfaces with execution (Claude Code, Cowork). It cannot heal the claude.ai chat surface, where the network wall blocks googleapis.com and the connector is the only road.
 
 ## Verify-first protocol (inherits operating-doctrine)
 
@@ -87,7 +115,7 @@ The GHL capability boundary holds: the data layer is writable through the API (c
 
 ## The automation platform-selection rule (ruled 2026-07-27)
 
-Per automation, the implementer (Claude Code / Cowork) makes the platform call against current developer docs, with a hard bias for Claude-buildable. Allison never hand-builds workflows: where GHL API limits would force manual builder work, the logic goes to n8n. GHL keeps native sends on the location's number and sending reputation. Full doctrine: `ghl-automation/doctrine/automation-platform-selection.md`.
+Per automation, the implementer (Claude Code / Cowork) makes the platform call against current developer docs, with a hard bias for Claude-buildable. Allison never hand-builds workflows: where GHL API limits would force manual builder work, the logic goes to n8n. GHL keeps native sends on the location's number and sending reputation. Full doctrine: `partnersync/doctrine/automation-platform-selection.md` (moved there 2026-09-08 from the retired ghl-automation repo); read alongside aura decision 0090 (2026-09-04), which routes portable orchestration into Activepieces on touch.
 
 ## Web data acquisition: Firecrawl-first (ruled 2026-07-27)
 
@@ -100,8 +128,9 @@ Two lanes, matched to the surface:
 
 ## Quick decision guide
 
+- A cold session orienting? The estate manifest first, `aura/docs/estate/estate-manifest.md`, then the lane ledger. Both load through the Estate Brain connector, first road.
 - A funnel record or a human log? Notion. A funnel is not done until it lives there.
-- Doctrine, a decision, or technical reference? GitHub canonical, commit and push.
+- Doctrine, a decision, or technical reference? GitHub canonical, commit and push. New ADRs and rulings land in `aura/decisions/`.
 - A fact a future session must recall? Memory.
 - A secret or token? 1Password. Never GitHub or Notion.
 - Running code or a backend service? AWS.
@@ -112,6 +141,7 @@ Two lanes, matched to the surface:
 - Live GHL reads or writes? Claude Code, with the Marketplace app token, app-token-first. Cowork orchestrates and verifies.
 - Scraping, crawling, or watching a JS-heavy page? Firecrawl first, on the lane that matches the surface. Native web search / fetch is fallback; browser automation is last resort.
 - Which brand owns this contact? The location it lives in. Brand labels are for assets that genuinely need one, never a routing layer.
+- Consumer real estate work? AG Luxury, never Moxie (benched, aura ADR 0045).
 
 ## Where this skill lives
 
@@ -121,4 +151,4 @@ Two lanes, matched to the surface:
 
 ## Version
 
-v2.1. Derived verbatim from the Expert Partners Systems Map bible dated 2026-07-27 (bible v2.1, adding the Firecrawl web-data-acquisition doctrine). Authored by Allison Gaddy.
+v2.5. Synchronized 2026-09-19 from the authoritative Expert Partners Systems Map bible v2.5 (expert-partners commit 6eabe3b): retired `ghl-automation` is retained only as split-and-retirement history; `partnersync` owns GHL reference, doctrine, and operating knowledge; `partnersync-automation-backend` owns provider-neutral executable automation source; and the automation-platform-selection pointer now resolves to `partnersync/doctrine/automation-platform-selection.md`. The two prior wording drifts in the substantive body are also reconciled verbatim to the bible. Skill-map frontmatter metadata preserved per ruling 14. Authored by Allison Gaddy.

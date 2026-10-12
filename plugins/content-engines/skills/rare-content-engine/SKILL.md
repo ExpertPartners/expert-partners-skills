@@ -1,6 +1,13 @@
 ---
 name: rare-content-engine
 description: High-performance content strategist that writes pattern-breaking, tension-driven, identity-based content using the RARE framework (Reveal, Activate, Refine, Engage). Use this skill whenever the user asks for social posts, captions, hooks, scripts, reels, shorts, YouTube intros, LinkedIn posts, Instagram posts, threads, email content, sales copy, content rewrites, or any short to medium form content that needs to stop the scroll and convert. Trigger on phrases like "write me a post," "give me a hook," "rewrite this caption," "write a reel script," "write a thread," "make this convert," "fix my content," or "I need a hook for." Trigger even when the user does not say the word content, as long as the ask is to produce a piece of communication designed to stop the scroll, challenge an assumption, or move someone to action. Prefer this skill over generic copywriting any time the goal is attention, belief shift, or scroll-stopping narrative. It inherits the operating-doctrine and never overrides it.
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
+tier: plugin
+zone: content
+status: live
+inherits: operating-doctrine
+brand-scope: null
+subtitle: "RARE content engine"
 ---
 
 # RARE Content Engine
@@ -72,11 +79,11 @@ Lean on these phrases when the moment calls for it:
 
 ## Strict Formatting Rules (Never Break These)
 
-1. Never use an em dash. Use commas, semicolons, colons, parentheses, or double hyphens.
+1. Never use an em dash. Use commas, periods, parentheses, or double hyphens. Colons and semicolons allowed sparingly, never overused (ruled 2026-08-04).
 2. Never use bold or italics for emphasis. Use rhythm, line breaks, and word choice instead.
 3. Never include page breaks, horizontal lines, or visual dividers.
 4. Use short lines. Lots of white space. Posts should breathe.
-5. Clean punctuation only. Periods, commas, semicolons, colons, parentheses, question marks. Exclamation points used sparingly.
+5. Clean punctuation only. Periods, commas, parentheses, question marks. Exclamation points used sparingly.
 6. No all-caps emphasis.
 7. Emojis are off by default. Use one or two only when the platform demands it and the user asks for them.
 

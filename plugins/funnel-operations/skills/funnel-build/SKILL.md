@@ -1,10 +1,12 @@
 ---
 name: funnel-build
 description: >-
-  Build a brand new funnel in the funnel's brand location (per the five-location
-  registry: EPIC, Expert Partners, AG Personal Brand, Moxie Signature Group, or
-  Free Agent Nation Circle Community), then document it so it is born
-  documented. Use this whenever someone wants to build a new funnel, create a
+  Build a brand new funnel in the funnel's brand location, read live from the
+  canonical GHL location registry
+  (partnersync/reference/ghl-location-registry.md, four permanent brand
+  locations, and the registry wins over any disagreeing doc), then document it
+  so it is born documented. Use this whenever someone wants to build a new
+  funnel, create a
   funnel, stand up a funnel, launch a new funnel, or spin up a funnel from
   scratch. Use
   it even if they do not say "build," as long as the intent is a new funnel
@@ -12,11 +14,20 @@ description: >-
   Funnel Documentation skill, so every new funnel lands fully documented from
   day one. Built for a non-technical teammate; hand-hold one step at a time.
   It inherits the operating-doctrine and never overrides it.
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
+tier: plugin
+zone: hands
+status: live
+inherits: operating-doctrine
+calls:
+  - funnel-documentation
+brand-scope: null
+subtitle: "build a funnel that does not exist yet"
 ---
 
 # Funnel Build
 
-This walks the build of a new funnel in the funnel's brand location and then runs Funnel Documentation so the funnel is born documented. Locations come from the canonical registry (partnersync/reference/ghl-location-registry.md, updated 2026-07-27); never work from remembered location names. No new funnel exists undocumented. That is the whole point.
+This walks the build of a new funnel in the funnel's brand location and then runs Funnel Documentation so the funnel is born documented. Locations come from the canonical registry (partnersync/reference/ghl-location-registry.md). Read it live every time, never work from remembered location names. If any doc disagrees with the registry, the registry wins. No new funnel exists undocumented. That is the whole point.
 
 ## Who you are talking to
 
@@ -104,4 +115,4 @@ Then the exact block to paste. Then the instruction to come back. Make it imposs
 
 Use this in Step 7. Fill in the location, funnel name, and public entry link.
 
-"Run a behavioral test-audit on the live GHL funnel for [funnel name] in the [EPIC / Expert Partners] location at [public entry link]. Submit a contained test identity: a non-deliverable example.com email, marked do-not-disturb, clearly tagged as a test. Then read the resulting contact and opportunity and confirm four things: the form fired, the expected tags applied, the expected workflow enrolled, and the opportunity landed in the right pipeline and stage. Print the contact ID, today's date, and a clear PASS or FAIL for each of the four checks, then print DONE."
+"Run a behavioral test-audit on the live GHL funnel for [funnel name] in the [brand location, per the canonical registry] at [public entry link]. Submit a contained test identity: a non-deliverable example.com email, marked do-not-disturb, clearly tagged as a test. Then read the resulting contact and opportunity and confirm four things: the form fired, the expected tags applied, the expected workflow enrolled, and the opportunity landed in the right pipeline and stage. Print the contact ID, today's date, and a clear PASS or FAIL for each of the four checks, then print DONE."

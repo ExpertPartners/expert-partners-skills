@@ -3,8 +3,8 @@
 frontmatter-lint.py -- data-classification frontmatter validator (L6 Gatekeeper, F5).
 
 Enforces the Expert Partners data-classification standard so brand content is born tagged
-rather than retrofitted. Wired to tools/classification-schema.json (the canonical schema,
-provisional pending L1's data-classification ADR / Track E1).
+rather than retrofitted. Wired to the classification-schema.json shipped next to this
+script (the canonical schema, ratified by ADR-0025).
 
 Two layers of enforcement, by design non-breaking on the existing untagged estate:
 
@@ -24,10 +24,10 @@ Frontmatter parsing:
 Escape hatch:
   Put `frontmatter-lint: ignore-file` anywhere in a file to skip it entirely.
 
-Usage:
-  python3 tools/frontmatter-lint.py [FILE ...]   # validate named files (pre-commit passes these)
-  python3 tools/frontmatter-lint.py              # validate all git-tracked markdown
-  python3 tools/frontmatter-lint.py --schema P   # use an alternate schema path
+Usage (the kit directory is tools/ in aura, .ep/ in deployed repos):
+  python3 .ep/frontmatter-lint.py [FILE ...]   # validate named files (pre-commit passes these)
+  python3 .ep/frontmatter-lint.py              # validate all git-tracked markdown
+  python3 .ep/frontmatter-lint.py --schema P   # use an alternate schema path
 
 Exit code: 0 = clean, 1 = at least one violation, 2 = bad invocation / unreadable schema.
 """
@@ -50,7 +50,10 @@ except ImportError:  # pragma: no cover - depends on environment
 
 IGNORE_FILE_TOKEN = "frontmatter-lint: ignore-file"
 MARKDOWN_SUFFIXES = {".md", ".markdown", ".mdx"}
-DEFAULT_SCHEMA_REL = Path("tools") / "classification-schema.json"
+# The schema ships beside this script (tools/ in aura, .ep/ in deployed repos), so the
+# default resolves script-adjacent; --schema still overrides (deployed CI passes it
+# explicitly). A repo-relative tools/ default previously broke bare runs in deployed repos.
+DEFAULT_SCHEMA_PATH = Path(__file__).resolve().parent / "classification-schema.json"
 
 
 @dataclass
@@ -164,8 +167,8 @@ def validate_file(path: Path, repo_root: Path, schema: dict) -> list[Finding]:
     return findings
 
 
-def load_schema(repo_root: Path, override: str | None) -> dict:
-    schema_path = Path(override) if override else (repo_root / DEFAULT_SCHEMA_REL)
+def load_schema(override: str | None) -> dict:
+    schema_path = Path(override) if override else DEFAULT_SCHEMA_PATH
     try:
         schema = json.loads(schema_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
@@ -185,7 +188,7 @@ def main(argv: list[str]) -> int:
     args = parser.parse_args(argv)
 
     repo_root = find_repo_root(Path.cwd())
-    schema = load_schema(repo_root, args.schema)
+    schema = load_schema(args.schema)
 
     if args.files:
         targets = [Path(f) for f in args.files if Path(f).suffix.lower() in MARKDOWN_SUFFIXES]

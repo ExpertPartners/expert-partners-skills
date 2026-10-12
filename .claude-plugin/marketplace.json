@@ -8,20 +8,20 @@
     {
       "name": "operating-doctrine",
       "source": "./plugins/operating-doctrine",
-      "version": "2.5.1",
+      "version": "2.53.0",
       "description": "The non-negotiable operating standard. Loads at every session."
     },
     {
       "name": "brand-voice",
       "source": "./plugins/brand-voice",
-      "description": "Canonical brand context for Expert Partners, Free Agent Movement, and Moxie Signature Group",
-      "version": "0.2.0"
+      "description": "Canonical brand context for the aura ADR 0045 brand registry (Expert Partners, EPIC, AG Personal Brand, AG Luxury, FAM, Don Hobbs; Moxie benched)",
+      "version": "0.5.1"
     },
     {
       "name": "content-engines",
       "source": "./plugins/content-engines",
-      "version": "0.2.0",
-      "description": "Allison Gaddy content and marketing engines (master-marketer-free-agent-builder, rare-content-engine)."
+      "version": "0.5.0",
+      "description": "Allison Gaddy content and marketing engines (master-marketer-free-agent-builder, rare-content-engine, xavier-offer-builder, dm-to-dollars, video-transcript-relay)."
     },
     {
       "name": "funnel-operations",
@@ -32,8 +32,20 @@
     {
       "name": "systems-map",
       "source": "./plugins/systems-map",
+      "version": "0.5.2",
+      "description": "The canonical map of where every Expert Partners system lives. Loads at session start; inherits operating-doctrine."
+    },
+    {
+      "name": "acn-advisor",
+      "source": "./plugins/acn-advisor",
       "version": "0.1.0",
-      "description": "The canonical map of where every Expert Partners system lives and what access Claude already holds. Loads at session start; inherits operating-doctrine."
+      "description": "ACN advisor skills for the household ACN line (acn-email-watch, acn-currency-check). Separate from every EP brand lane; inherits operating-doctrine."
+    },
+    {
+      "name": "real-estate-agent-toolkit",
+      "source": "./plugins/real-estate-agent-toolkit",
+      "version": "0.1.0",
+      "description": "Portable, platform-neutral AI skills for real estate agents (forty skills sharing one agent-profile.md)."
     }
   ]
 }

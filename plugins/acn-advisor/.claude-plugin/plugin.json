@@ -1,0 +1,8 @@
+{
+  "name": "acn-advisor",
+  "version": "0.1.0",
+  "description": "ACN advisor skills for Allison and Don's household ACN IBO positions, structurally separate from Expert Partners LLC and every EP brand lane: acn-email-watch (triaged Gmail sweep of the ACN ecosystem at every session start) and acn-currency-check (monthly re-verification of ACN fees, plan versions, promotions, and DingoBlu status against live sources and the two Firecrawl monitors). Both inherit the operating-doctrine and the ACN Advisor guardrails.",
+  "author": {
+    "name": "Allison Gaddy"
+  }
+}

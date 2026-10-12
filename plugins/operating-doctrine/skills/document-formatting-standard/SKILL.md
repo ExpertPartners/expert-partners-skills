@@ -1,11 +1,20 @@
 ---
 name: "document-formatting-standard"
-description: "Allison's default formatting and delivery standard (v2) for every document Claude creates: Poppins throughout, 1.5 line spacing, size-and-color headers with Brand Blue H2s, no bold or italics, no em dashes, no colons or semicolons in drafted prose, YYYY-MM-DD date-prefixed filenames, and delivery as a styled Google Doc via SA+DWD with only a two-line summary in chat. Apply whenever creating, restyling, or delivering a document unless a brand skill's typography explicitly governs that deliverable."
+description: "Allison's default formatting and delivery standard (v3) for every document Claude creates: Poppins throughout, 1.5 line spacing, size-and-color headers with Brand Blue H2s, no bold or italics, no em dashes, colons and semicolons only sparingly, plain title filenames with no date prefix, and delivery as a styled Google Doc into the Aura Docs Drive folder with only a two-line summary in chat. Apply whenever creating, restyling, or delivering a document unless a brand skill's typography explicitly governs that deliverable."
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
+tier: plugin
+zone: routing
+status: live
+inherits: operating-doctrine
+defers-to:
+  - deliverable-link
+brand-scope: null
+subtitle: "Poppins everywhere, hierarchy by size and color"
 ---
 
 # Document Formatting Standard (v2)
 
-Ruled by Allison Gaddy, July 27, 2026, after the Wave 1 message review doc. Upgraded to v2 the same day with the punctuation rule and the delivery rule. This is the default look and delivery path for every document Claude produces in Cowork or Claude Code: Word docs, PDFs, Google Docs, review docs, reports, SOPs rendered as deliverables, anything styled. It applies unless a brand skill's visual identity explicitly governs the deliverable (a Moxie listing piece, a FAM lead magnet, an EP-branded sales page keep their brand typography; internal and working documents use this standard).
+Ruled by Allison Gaddy, July 27, 2026, after the Wave 1 message review doc. Upgraded to v2 the same day with the punctuation rule and the delivery rule. Destination rule added August 4, 2026. This is the default look and delivery path for every document Claude produces in Cowork or Claude Code: Word docs, PDFs, Google Docs, review docs, reports, SOPs rendered as deliverables, anything styled. It applies unless a brand skill's visual identity explicitly governs the deliverable (a Moxie listing piece, a FAM lead magnet, an EP-branded sales page keep their brand typography; internal and working documents use this standard).
 
 ## The standard
 
@@ -27,33 +36,36 @@ Quoted or message-style content: indent left 360 DXA, body size, so it reads as 
 
 Page: US Letter (12240 x 15840 DXA), 1 inch margins all around.
 
-Filenames: date-prefixed, `YYYY-MM-DD <Title>`, using the date the document is created.
+Filenames: the document's title, no date prefix (ruled 2026-08-05, amending the earlier `YYYY-MM-DD <Title>` rule). The platform (Drive, GitHub) carries the dates; the names do not need them. Caveat from the same ruling: aura intake inbox filenames are stamped by the Estate Brain save tool itself (append-only convention), so intake files keep their stamps until that tool changes.
 
-## Punctuation rule (v2, ruled by Allison 2026-07-27)
+## Punctuation rule (v3, ruled by Allison 2026-08-04)
 
-No colons or semicolons anywhere in drafted prose. Periods and commas only.
+Colons and semicolons are allowed in drafted prose, sparingly, never overused. Periods and commas stay preferred. Em dashes remain banned.
 
 This applies to every document, email draft, message draft, and deliverable written for Allison or her team. It covers body text, headers, subtitles, and captions inside the deliverable.
 
 Exempt: code blocks, technical references (file paths, URLs, config values, API syntax, timestamps), and data tables. The rule governs prose, not notation.
 
-## Delivery rule (v2, ruled by Allison 2026-07-27)
+## Delivery rule (v2, ruled by Allison 2026-07-27; destination ruled 2026-08-04)
 
 Anything drafted for Allison to read, send, or keep lands as a styled Google Doc:
 
-- Created via the SA+DWD path impersonating allison@expertpartners.com (never the read-only Google connectors), so ownership is native.
-- Real Poppins and 1.5 line spacing applied through the Google Docs API (batchUpdate text and paragraph styles), not left as defaults.
-- Filename date-prefixed per the filename rule above.
-- Link handed to Allison in chat as a markdown hyperlink, never a raw URL.
+- Created via the SA+DWD path impersonating allison@expertpartners.com where that path is reachable, otherwise via a write-capable Drive connector, so ownership is native. Never the read-only Google connectors.
+- Saved into the Aura Docs folder in Drive, folder ID 1awtAUORC9PAspfIoIoM5YlkwfDOvG-rx, set as the parent on every document create. Every deliverable lands in this one folder unless Allison names a different destination for a specific document.
+- Real Poppins and 1.5 line spacing applied through the Google Docs API (batchUpdate text and paragraph styles) or HTML-conversion equivalent, not left as defaults.
+- Filename is the document's title with no date prefix, per the filename rule above.
+- Link handed to Allison in chat as a markdown hyperlink whose link text is the document's exact name, never a raw URL (see the deliverable-link skill).
 - Chat carries only a two-line summary of the document. The document is the deliverable; chat is the pointer.
 
 Stays in chat: Claude Code paste blocks (commands, prompts, snippets bound for another surface) and quick factual answers. Those are not documents and do not get wrapped in one.
+
+Rider, 2026-08-05 (Allison's robot delivery standards ruling, aura intake 3973c2b): this standard extends to every automated sender (robots); every document a robot creates for Allison is a Google Doc in Poppins with 1.5 line spacing per this skill, including the CI watchman and Ember at wake. Amended 2026-08-06 per the Ember Voice and Your Move Queue ruling (aura intake/2026-08-06-ruling-ember-voice-and-your-move-queue.md, ee86601). Poppins 1.5 Google Docs are for genuine reading material only. The your-move instruction itself lives on the board rendered at hq.allisongaddy.com, never a per-task doc, robot texts link hq.allisongaddy.com only, and every robot message to Allison speaks as Ember in first person (rail spec, aura docs/estate/your-move-queue.md).
 
 ## Hard rules (inherit Allison's voice rules)
 
 - Never bold, never italics. Hierarchy comes from size and color only.
 - Never an em dash, anywhere, including headers.
-- No colons or semicolons in drafted prose (see punctuation rule above).
+- Colons and semicolons sparingly, never overused (see punctuation rule above).
 - Never horizontal rules, dividers, or decorative lines.
 - No emoji in documents.
 - Subtitle and provenance lines (date, audience, draft status) in gray meta style under the title.

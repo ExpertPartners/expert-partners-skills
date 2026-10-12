@@ -52,9 +52,9 @@ PT Serif, Overpass, Poppins. Nothing else.
 
 ---
 
-# FREE AGENT MOVEMENT (FAM) visual tokens — Visual Identity System v3.1
+# FREE AGENT MOVEMENT (FAM) visual tokens -- Visual Identity System v3.1
 
-> v3.1 retired FAM's old system in full. The prior "FAM inherits Expert Partners" setup (Brand Blue #2757CF accent, Overpass and Poppins) is **retired for FAM**. FAM is now its own accent-less system so it can layer over each member's personal brand. Never reintroduce blue, brown, or sepia to FAM. Source of truth: ExpertPartners/fam brand/brand-guide.md + brand/identity.md.
+> v3.1 retired FAM's old system in full. The prior "FAM inherits Expert Partners" setup (Brand Blue #2757CF accent, Overpass and Poppins) is **retired for FAM**. FAM is now its own accent-less system so it can layer over each member's personal brand. Never reintroduce blue, brown, or sepia to FAM. Source of truth: ExpertPartners/free-agent-nation brand/brand-guide.md + brand/identity.md.
 
 ## Color palette
 
@@ -123,9 +123,8 @@ When writing copy that will appear inside a visual asset (slide, web page, socia
 
 ## Hashtags and social
 
-- #eXpProud
-- #BreakTheCycle
-- Include both on Free Agent Movement-aligned social posts.
+- FAM posts: #BreakTheCycle and #FreeAgentMovement. #eXpProud never appears on FAM content (EPIC-only flag, ruled 2026-08-06; FAM is a movement for the whole real estate industry, not any one brokerage).
+- EPIC posts: #eXpProud allowed.
 
 ## What NOT to use
 

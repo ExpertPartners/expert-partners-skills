@@ -1,6 +1,13 @@
 ---
 name: fam-epic-brand
 description: "Apply Free Agent Movement (FAM) and Expert Partners (EPIC) brand standards to all written and visual outputs. Use this skill whenever Allison Gaddy is creating content for Expert Partners, Inner Circle Resources, the Free Agent Movement, Funnel Pilot, G2M (Gateway to Mastery), the YouTube channel @TheAllisonGaddy, or any coaching/training deliverable. Triggers for emails, social posts, slides, web pages, HTML mockups, marketing copy, scripts, frameworks, lead magnets, brand documents, or any output that represents EPIC, FAM, or Allison's coaching brand. Locks brand tokens per brand, enforces Allison's voice rules (no em dashes ever, voice memo energy, banned phrases list, no bold or italics), applies the truth hook then tension then framework then CTA structure, and enforces canonical brand spellings. Apply this skill any time the work is for the EPIC or FAM brand, even if the user does not explicitly say so. It inherits the operating-doctrine and never overrides it."
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
+tier: plugin
+zone: brands
+status: live
+inherits: operating-doctrine
+brand-scope: [fam, epic]
+subtitle: "FAM and EPIC voice"
 ---
 
 # FAM / EPIC Brand System
@@ -11,7 +18,7 @@ When this skill triggers, you are operating as a brand-keeper for two interconne
 - **Expert Partners (EPIC)**: Real estate coaching, training, and events company co-founded by Allison Gaddy and Don Hobbs.
 - **Free Agent Movement (FAM)**: The umbrella content and coaching brand. Includes Free Agent Nation, Free Agent Formula.
 
-These brands share **voice, spelling, structure, and positioning** — treat those as one system. But as of Visual Identity System v3.1 (2026-06-13) they have **separate visual systems**: EPIC/Expert Partners keeps Black + Brand Blue (#2757CF) accent with Overpass/Poppins; FAM is accent-less (Black/White/Warm Bone, Neue Swiss, IBM Plex Mono) so it can layer over each member's personal brand. Always pick the visual system that matches the brand of the asset. See `references/tokens.md`.
+These brands share **voice, spelling, structure, and positioning** -- treat those as one system. But as of Visual Identity System v3.1 (2026-06-13) they have **separate visual systems**: EPIC/Expert Partners keeps Black + Brand Blue (#2757CF) accent with Overpass/Poppins; FAM is accent-less (Black/White/Warm Bone, Neue Swiss, IBM Plex Mono) so it can layer over each member's personal brand. Always pick the visual system that matches the brand of the asset. See `references/tokens.md`.
 
 ## Quick reference
 
@@ -25,11 +32,10 @@ Read both reference files before generating any non-trivial deliverable. For sho
 
 ### Spelling and naming (never deviate)
 
-- eXp (lowercase "e," uppercase "XP"). Never "EXP" or "Exp".
+- eXp (lowercase "e," uppercase "XP"). Never "EXP" or "Exp". <!-- brand-lint: ignore -->
 - eXcelerate (never "accelerate").
 - Don (D-O-N). Never "Dawn".
-- Allison Gaddy. Never "Alison" or "Allyson".
-- Melony. Never "Melanie".
+- Allison Gaddy. Never "Alison" or "Allyson". <!-- brand-lint: ignore -->
 - Expert Partners or EPIC (both acceptable).
 - Free Agent Movement, Free Agent Nation, Free Agent Formula (capitalize when referring to the brand).
 - YouTube handle: @TheAllisonGaddy.
@@ -64,9 +70,9 @@ Never rescue or fix. Reflect truth and empower agency.
 - Hands-on C-level leadership, open playbooks, collaboration over competition, innovation over inertia.
 - Self-love as the foundation of inclusive leadership.
 - Pro-growth, not pro-sponsor.
-- Freedom through leverage.
-- "Think Big. Build Smart."
-- Social posts for the movement include #eXpProud and #BreakTheCycle.
+- Taglines are brand-scoped (ruled 2026-08-05 and 2026-08-06). FAM's tagline: "Break The Cycle. Build The Movement." with the philosophy sub-line "Freedom through leverage." "Think Big. Build Smart." is Expert Partners' company tagline and never appears as a FAM line.
+- Social posts: #eXpProud lives on EPIC content ONLY, never on anything FAM (ruled 2026-08-06). FAM's tags stay #BreakTheCycle and #FreeAgentMovement.
+- FAM holds NO courses (course ownership law, ruled 2026-08-06). All classroom and program content belongs to Expert Partners; EPIC receives the courses as free membership goodies; course and resource listings never appear in FAM materials. Program names never change: Think Big Live Big stays Think Big Live Big.
 
 ### Banned phrases (never use)
 
@@ -80,7 +86,7 @@ Pick the system that matches the brand of the asset. Do not mix them.
 - Black (#000000) dominant; Brand Blue (#2757CF) accent only.
 - PT Serif headlines, Overpass subheads, Poppins Light/Medium body.
 
-**Free Agent Movement (FAM)** — Visual Identity System v3.1:
+**Free Agent Movement (FAM)** -- Visual Identity System v3.1:
 - Black (#000000), White (#FFFFFF), Warm Bone (#F7F4EF). NO color accent; the Brand Blue accent is retired for FAM. Emphasis comes from contrast and typography. Warmth comes only from photography.
 - PT Serif headlines, Neue Swiss subheads/body/labels, IBM Plex Mono for technical detail. Never reintroduce Overpass, Poppins, blue, brown, or sepia to FAM.
 
@@ -121,7 +127,7 @@ Flag gaps rather than guessing.
 3. Banned phrases? Replace with substance.
 4. Voice memo energy or polished essay? If polished, rewrite.
 5. Truth hook open and CTA close? If missing, add.
-6. eXp / Don / Melony / Allison spelled correctly? Verify.
+6. eXp / Don / Allison spelled correctly? Verify.
 7. Page breaks or dividers? Remove.
 
 If any of these fail, fix it before delivering. Do not ask permission to self-correct.

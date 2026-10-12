@@ -1,0 +1,16 @@
+{
+  "name": "capability-feed",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Generates the public-safe Expert Partners AI Workforce feed (schema expert-partners-ai-workforce/v1) from canonical repo truth: the marketplace, plugin manifests, the skill graph, and canonical SKILL.md sources. HQ reads the generated file server-side through the Estate Brain fetch tool. See README.md.",
+  "type": "module",
+  "scripts": {
+    "generate": "node generate-feed.mjs --write",
+    "check": "node generate-feed.mjs --check",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "zod": "^4.0.0"
+  }
+}

@@ -1,0 +1,24 @@
+name: repo-standards
+on:
+  pull_request:
+    paths:
+      - 'skills/repo-standards/**'
+      - '.github/workflows/repo-standards.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'skills/repo-standards/**'
+      - '.github/workflows/repo-standards.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  move-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Move verification against synthetic repositories
+        run: python3 -m unittest discover -s skills/repo-standards/tests -p 'test_*.py' -v

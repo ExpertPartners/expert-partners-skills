@@ -10,7 +10,6 @@ What it checks (high-precision, word-boundary anchored):
   ERROR rules (fail the commit):
     - eXp casing:        EXP / Exp  ->  eXp
     - Allison spelling:  Alison / Allyson  ->  Allison
-    - Melony spelling:   Melanie  ->  Melony
     - Em dashes:         U+2014 / U+2015 outside code fences/inline code  ->  comma, semicolon,
                          colon, parentheses, or double hyphen
   WARN rules (reported, do not fail unless --strict):
@@ -24,17 +23,22 @@ Code awareness:
 Escape hatches (for legitimate exceptions -- quotes, tickers, third-party names):
   - Whole-file skip:  put `brand-lint: ignore-file` anywhere in the file.
   - Single-line skip:  put `brand-lint: ignore` on the offending line (e.g. in an HTML comment).
-  - Allowlist file:    tools/brand-lint-allow.txt -- one Python regex per line; any match is skipped.
+  - Allowlist file:    brand-lint-allow.txt next to this script -- one Python regex per line;
+                       any line whose full text matches a pattern is exempt from all findings
+                       on that line.
 
-Usage:
-  python3 tools/brand-lint.py [FILE ...]        # lint the named files (pre-commit passes these)
-  python3 tools/brand-lint.py                   # lint all git-tracked text files
-  python3 tools/brand-lint.py --strict ...      # treat WARN as failure too
-  python3 tools/brand-lint.py --rules           # print the active ruleset and exit
+Usage (the kit directory is tools/ in aura, .ep/ in deployed repos):
+  python3 .ep/brand-lint.py [FILE ...]          # lint the named files (pre-commit passes these)
+  python3 .ep/brand-lint.py                     # lint all git-tracked text files
+  python3 .ep/brand-lint.py --strict ...        # treat WARN as failure too
+  python3 .ep/brand-lint.py --rules             # print the active ruleset and exit
 
 Exit code: 0 = clean, 1 = at least one ERROR (or any finding under --strict), 2 = bad invocation.
 
 Verified against the org operating standard and Aura CLAUDE.md brand section, 2026-06-02.
+Allowlist revised 2026-08-26: loads from the script's own directory (the old hard-coded
+tools/ path left deployed .ep/ allowlists silently unread), and patterns now match the
+whole line rather than only the flagged span, so context entries work as documented.
 """
 
 from __future__ import annotations
@@ -80,13 +84,6 @@ RULES: list[Rule] = [
         ERROR,
         "Name must be spelled 'Allison' (two L's).",
         "Allison",
-    ),
-    Rule(
-        "melony-spelling",
-        re.compile(r"\bMelanie\b"),
-        ERROR,
-        "Name must be spelled 'Melony', never 'Melanie'.",
-        "Melony",
     ),
     Rule(
         "em-dash",
@@ -159,12 +156,17 @@ def mask_codeblocks(lines: list[str]) -> list[str]:
 # Allowlist
 # ---------------------------------------------------------------------------
 
-def load_allowlist(repo_root: Path) -> list[re.Pattern]:
-    allow_path = repo_root / "tools" / "brand-lint-allow.txt"
+# The kit ships as one flat directory (tools/ in aura, .ep/ in deployed repos) with the
+# allowlist beside this script, so resolve it script-adjacent. A repo-relative tools/ path
+# here previously left every deployed .ep/brand-lint-allow.txt silently unread.
+ALLOWLIST_PATH = Path(__file__).resolve().parent / "brand-lint-allow.txt"
+
+
+def load_allowlist() -> list[re.Pattern]:
     patterns: list[re.Pattern] = []
-    if not allow_path.exists():
+    if not ALLOWLIST_PATH.exists():
         return patterns
-    for raw in allow_path.read_text(encoding="utf-8").splitlines():
+    for raw in ALLOWLIST_PATH.read_text(encoding="utf-8").splitlines():
         line = raw.strip()
         if not line or line.startswith("#"):
             continue
@@ -175,8 +177,11 @@ def load_allowlist(repo_root: Path) -> list[re.Pattern]:
     return patterns
 
 
-def allowed(span_text: str, allowlist: list[re.Pattern]) -> bool:
-    return any(p.search(span_text) for p in allowlist)
+def allowed(line_text: str, allowlist: list[re.Pattern]) -> bool:
+    # Patterns run against the full raw line, not just the flagged span, so context
+    # entries work; a match exempts every finding on that line, the same granularity
+    # as the inline ignore token.
+    return any(p.search(line_text) for p in allowlist)
 
 
 # ---------------------------------------------------------------------------
@@ -211,15 +216,14 @@ def lint_file(path: Path, allowlist: list[re.Pattern]) -> list[Finding]:
     for idx, (raw_line, masked_line) in enumerate(zip(raw_lines, masked_lines), start=1):
         if IGNORE_LINE_TOKEN in raw_line:
             continue
+        if allowed(raw_line, allowlist):
+            continue
         for rule in RULES:
             # All brand rules run against code-masked text: brand naming and formatting
             # standards govern prose/copy, not code samples, config, or identifiers inside
             # fenced or inline code. This keeps the gate from failing on legitimate examples.
             target = masked_line
             for m in rule.pattern.finditer(target):
-                span = m.group(0)
-                if allowed(span, allowlist):
-                    continue
                 findings.append(
                     Finding(
                         path=str(path),
@@ -292,7 +296,7 @@ def main(argv: list[str]) -> int:
         return 0
 
     repo_root = find_repo_root(Path.cwd())
-    allowlist = load_allowlist(repo_root)
+    allowlist = load_allowlist()
 
     if args.files:
         targets = [Path(f) for f in args.files if Path(f).suffix.lower() in TEXT_SUFFIXES]

@@ -1,6 +1,14 @@
 ---
 name: moxie-signature-group-brand
-description: BENCHED 2026-07-30 (aura ADR 0045, Allison's ruling). The Moxie Signature Group brand is tabled and its repo archived; do NOT apply this skill to new work. Route consumer-facing real estate content to the AG Luxury brand instead. Retained for revival only (unarchive + new ADR). Original scope: Moxie Signature Group brand standards for North Dallas luxury real estate (Elevated Accessible Premium, 700K to 1.2M, Frisco and Prosper; Playfair Display + Montserrat; inclusive luxury voice; TREC-required eXp Realty co-branding).
+description: >-
+  BENCHED 2026-07-30 (aura ADR 0045, Allison's ruling). The Moxie Signature Group brand is tabled and its repo archived; do NOT apply this skill to new work. Route consumer-facing real estate content to the AG Luxury brand instead. Retained for revival only (unarchive + new ADR). Original scope: Moxie Signature Group brand standards for North Dallas luxury real estate (Elevated Accessible Premium, 700K to 1.2M, Frisco and Prosper; Playfair Display + Montserrat; inclusive luxury voice; TREC-required eXp Realty co-branding).
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
+tier: plugin
+zone: brands
+status: benched
+inherits: operating-doctrine
+brand-scope: moxie
+subtitle: "benched, consumer real estate routes to AG Luxury"
 ---
 
 # Moxie Signature Group Brand System
