@@ -1,8 +1,8 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-10-12T18:46:39Z",
-  "verifiedAt": "2026-10-12T18:46:39Z",
+  "generatedAt": "2026-10-12T18:53:20Z",
+  "verifiedAt": "2026-10-12T18:53:20Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
@@ -4003,7 +4003,7 @@
       "id": "name-session",
       "humanName": "Name Session",
       "kind": "skill",
-      "summary": "Set an accurate session name.",
+      "summary": "Optional navigation label.",
       "status": "Unknown",
       "collectionIds": [],
       "categories": [
@@ -4029,14 +4029,15 @@
         "inherits": "operating-doctrine"
       },
       "keywords": [
-        "accurate",
+        "label",
         "machinery",
         "name",
-        "session",
-        "set"
+        "navigation",
+        "optional",
+        "session"
       ],
       "bestFor": [
-        "set an accurate session name"
+        "optional navigation label"
       ],
       "useCases": [],
       "askExamples": [],

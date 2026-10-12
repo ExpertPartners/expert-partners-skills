@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "b671f7096e0ac0a770a47c0929e97a99b319b773",
-    "aura": "5ef2a635d086a81c943a5b1ab42894c816cbe19f"
+    "eps": "cc0beed83cd8b24061d75043b5a8e0e7ddd59db8",
+    "aura": "7a1519d6433738bed0ca58f27319b59811bc3220"
   },
   "zones": [
     "surfaces",
@@ -1579,17 +1579,17 @@
       "calls": [],
       "defersTo": [],
       "brandScope": [],
-      "subtitle": "set an accurate session name",
+      "subtitle": "optional navigation label",
       "renderNote": null,
       "layout": {
-        "x": 61,
+        "x": 70,
         "y": 3171,
-        "width": 212,
+        "width": 194,
         "height": 63,
         "rectHeight": 48,
         "annotationHeight": 15,
         "subtitleLines": [
-          "set an accurate session name"
+          "optional navigation label"
         ]
       }
     },
@@ -3714,8 +3714,8 @@
         "path": "aura:.agents/skills/name-session/SKILL.md",
         "id": "name-session",
         "canonical": "aura:.claude/skills/name-session/SKILL.md",
-        "deployedAt": "2026-09-04",
-        "stamp": "tree sha256 eda7c9274d65",
+        "deployedAt": "2026-10-12",
+        "stamp": "tree sha256 39d3288942e2",
         "mount": "aura:.agents/skills/"
       },
       {
@@ -3762,29 +3762,25 @@
         "path": "aura:.agents/skills/session-audit/SKILL.md",
         "id": "session-audit",
         "canonical": "aura:.claude/skills/session-audit/SKILL.md",
-        "deployedAt": "2026-09-04",
-        "stamp": "tree sha256 b73ea17ef0b5",
+        "deployedAt": "2026-10-12",
+        "stamp": "tree sha256 ab3f6dc2fa82",
         "mount": "aura:.agents/skills/"
       },
       {
         "path": "aura:.agents/skills/session-closeout/SKILL.md",
         "id": "session-closeout",
         "canonical": "aura:.claude/skills/session-closeout/SKILL.md",
-        "deployedAt": "2026-09-04",
-        "stamp": "tree sha256 189ff5374ea1",
+        "deployedAt": "2026-10-12",
+        "stamp": "tree sha256 d0c088aad583",
         "mount": "aura:.agents/skills/"
       },
       {
         "path": "aura:.agents/skills/session-wrap/SKILL.md",
         "id": "session-wrap",
         "canonical": "eps:skills/session-wrap/SKILL.md",
-        "deployedAt": "2026-10-08",
-        "stamp": "v1.15",
-        "mount": "aura:.agents/skills/",
-        "status": "VERIFIED STALE",
-        "awaitingRedeploy": true,
-        "verifiedCanonicalCommit": "def595a5363c3d464bbba6f6db7f2cf5b4ebffd6",
-        "verifiedCanonicalBlob": "aba5a5d3157e8ba24505553a09679894d92caa3d"
+        "deployedAt": "2026-10-12",
+        "stamp": "v1.17",
+        "mount": "aura:.agents/skills/"
       },
       {
         "path": "aura:.claude/skills/estate-memory-router/SKILL.md",
@@ -3822,13 +3818,9 @@
         "path": "aura:.claude/skills/session-wrap/SKILL.md",
         "id": "session-wrap",
         "canonical": "eps:skills/session-wrap/SKILL.md",
-        "deployedAt": "2026-10-08",
-        "stamp": "v1.15",
-        "mount": null,
-        "status": "VERIFIED STALE",
-        "awaitingRedeploy": true,
-        "verifiedCanonicalCommit": "def595a5363c3d464bbba6f6db7f2cf5b4ebffd6",
-        "verifiedCanonicalBlob": "aba5a5d3157e8ba24505553a09679894d92caa3d"
+        "deployedAt": "2026-10-12",
+        "stamp": "v1.17",
+        "mount": null
       }
     ]
   },
