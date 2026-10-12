@@ -16,6 +16,8 @@ subtitle: "paste block routing and the lane ledger"
 
 ## Current naming rule -- decision 0107, 2026-10-12
 
+Decision 0107 (ruling of record `aura/decisions/0107-retire-routing-naming-ceremony.md`) supersedes the prior mandatory naming and visible-title rules in this skill wherever they conflict with the current rule below.
+
 Human-visible routing names are optional navigation metadata. Do not require ROOM, TABLE NAME, SESSION NAME, Chair title, Worker title, title parity, two-word naming, Table Birth naming, self-titling, or rename confirmation before work proceeds. Do not bounce an otherwise executable block solely because naming metadata is missing, different, or auto-generated. Do not ask Allison to rename a chat or worker for governance.
 
 The routing line still names the destination surface because that changes where Allison pastes. For a new Code worker, WORKTREE and MODEL AND EFFORT remain separate hard safeguards. Repository, worktree/branch, execution scope, destination capability, and return location remain the useful routing facts. Historical naming sections below are preserved for provenance and are non-operative wherever they conflict with decision 0107.
