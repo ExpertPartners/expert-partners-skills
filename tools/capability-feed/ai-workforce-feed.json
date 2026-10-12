@@ -1,8 +1,8 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-10-12T21:31:13Z",
-  "verifiedAt": "2026-10-12T21:31:13Z",
+  "generatedAt": "2026-10-12T21:39:57Z",
+  "verifiedAt": "2026-10-12T21:39:57Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
@@ -3994,50 +3994,6 @@
       ],
       "bestFor": [
         "benched, consumer real estate routes to AG Luxury"
-      ],
-      "useCases": [],
-      "askExamples": [],
-      "example": false
-    },
-    {
-      "id": "name-session",
-      "humanName": "Name Session",
-      "kind": "skill",
-      "summary": "Optional navigation label.",
-      "status": "Unknown",
-      "collectionIds": [],
-      "categories": [
-        "Session machinery"
-      ],
-      "portable": "unknown",
-      "verifiedSurfaces": [],
-      "invocationInstructions": [
-        "Standalone skill in the aura repository.",
-        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
-      ],
-      "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
-      "containsSkillIds": [],
-      "relatedIds": [],
-      "accessNote": "Where this is available has not been verified yet.",
-      "technicalDetail": {
-        "canonicalSource": "aura/.claude/skills/name-session/SKILL.md",
-        "lifecycle": "live",
-        "tier": "project",
-        "zone": "routing",
-        "packaging": "standalone",
-        "inherits": "operating-doctrine"
-      },
-      "keywords": [
-        "label",
-        "machinery",
-        "name",
-        "navigation",
-        "optional",
-        "session"
-      ],
-      "bestFor": [
-        "optional navigation label"
       ],
       "useCases": [],
       "askExamples": [],
