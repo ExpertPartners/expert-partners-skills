@@ -16,6 +16,8 @@ subtitle: "carry-back envelope and place-keeping baton"
 
 ## Current naming rule -- decision 0107, 2026-10-12
 
+Decision 0107 (ruling of record `aura/decisions/0107-retire-routing-naming-ceremony.md`) supersedes the prior mandatory naming and visible-title rules in this skill wherever they conflict with the current rule below.
+
 Pins and carry-backs do not require exact SESSION, TABLE, ROOM, Chair, or Worker visible names. Use a helpful label when known, but stable IDs, repo/worktree/branch, task context, and return destination are stronger. Never refuse or stop solely because a title or naming label differs. Never ask Allison to rename a chat or worker for pin correctness.
 
 Historical naming and title-repair sections below are superseded wherever they conflict with this rule.
