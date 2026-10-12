@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "79ca52c0cbede9142e19fe815621f4825ae28010",
-    "aura": "fd0dc400ade358cf1b71a9cc4018ed3e505c8f71"
+    "eps": "e5bb4dc6b88f34bfc9db999381d03dc0d6ae1006",
+    "aura": "1805fa079756460692818c429676b14cd85e8315"
   },
   "zones": [
     "surfaces",
@@ -3780,7 +3780,11 @@
         "canonical": "eps:skills/session-wrap/SKILL.md",
         "deployedAt": "2026-10-08",
         "stamp": "v1.15",
-        "mount": "aura:.agents/skills/"
+        "mount": "aura:.agents/skills/",
+        "status": "VERIFIED STALE",
+        "awaitingRedeploy": true,
+        "verifiedCanonicalCommit": "def595a5363c3d464bbba6f6db7f2cf5b4ebffd6",
+        "verifiedCanonicalBlob": "aba5a5d3157e8ba24505553a09679894d92caa3d"
       },
       {
         "path": "aura:.claude/skills/estate-memory-router/SKILL.md",
@@ -3820,7 +3824,11 @@
         "canonical": "eps:skills/session-wrap/SKILL.md",
         "deployedAt": "2026-10-08",
         "stamp": "v1.15",
-        "mount": null
+        "mount": null,
+        "status": "VERIFIED STALE",
+        "awaitingRedeploy": true,
+        "verifiedCanonicalCommit": "def595a5363c3d464bbba6f6db7f2cf5b4ebffd6",
+        "verifiedCanonicalBlob": "aba5a5d3157e8ba24505553a09679894d92caa3d"
       }
     ]
   },
