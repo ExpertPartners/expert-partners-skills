@@ -75,7 +75,7 @@ Per the code-block-routing skill: name the destination surface outside the fence
 PASTE INTO: Claude Code, existing session "Canon Doc Sync"
 
 (fenced block begins)
-SESSION: Canon Doc Sync -- self-verify this name against your own custom-title record before executing (pin skill section 5).
+DESTINATION: canonical repository and document path named below. Visible session title is optional and must not be verified or repaired.
 
 Update [Doc XX - Name] in the partnersync repo to match the newly promoted Drive version.
 Source file: [local path]

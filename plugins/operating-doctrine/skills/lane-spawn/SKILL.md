@@ -10,7 +10,7 @@ defers-to:
   - code-block-routing
   - pin
 brand-scope: null
-subtitle: "spawning new lanes with named homes"
+subtitle: "spawning new lanes with durable homes"
 ---
 
 # Lane Spawn -- v1.10 (2026-10-12)
@@ -80,9 +80,9 @@ DONE WHEN: Two consecutive briefings send unattended and land on Allison's phone
 WHAT THIS LANE IS: ...
 ```
 
-The name appears twice on purpose. Line one is for the auto-titler, which reads the message and cannot be told anything. The CONVERSATION line is for the receiving Claude, which needs the project as well as the name.
+A short navigation label may appear when helpful, but the kickoff does not depend on the auto-titler or exact visible-title output. Destination capability and durable return state govern.
 
-PASTE 2 -- CODE BLOCK (only when a worker session is needed). Per the code-block-routing skill, with one requirement specific to spawning: its `CLAUDE HOME` names the NEW lane, never the origin lane. The carry-back must land where the work will be ruled. The Code half keeps `SESSION NAME`, keeps its first-contact self-title-and-verify instruction, and carries its `WORKTREE` line naming the isolated worktree the worker creates from a freshly fetched remote ref and confirms by absolute path at first contact (v1.3, per code-block-routing's Worktree Isolation); none of the chat rules touch it. Under v1.9 (decision 0091) the worker title is exactly two clear words identifying the job, the owning table rides in the CLAUDE HOME line and the lane ledger row rather than in the title, and the worker titles itself on Desktop, so no `claude -n` launch line rides unless the target is a CLI-only launch.
+PASTE 2 -- CODE BLOCK (only when a worker session is needed). Per the code-block-routing skill, its durable return destination names the new lane rather than the origin lane so the carry-back lands where the work will be ruled. The Code half carries its separate `WORKTREE` and `MODEL AND EFFORT` safeguards. A human-readable worker label is optional; no session-name, self-title, or title-verification step rides as a prerequisite.
 
 RESUME LINE (always, same message, after the blocks). One line stating what the origin lane awaits from the new lane (or 'nothing, fully detached'), then the origin lane's next step, immediately. The origin lane never closes its turn on the detour.
 
@@ -106,23 +106,23 @@ The failure this replaces, 2026-08-07: a spawn block buried the conversation nam
 
 What did NOT come back: routine, repeated, or unprompted chat rename requests stay banned, `/rename` is still never handed out for a chat in any form, and chat lanes still never get PARITY MISMATCH flags. Table Birth is a single naming act at the moment a table is created, not a maintenance loop, and the NAME set there changes afterward only by Allison's explicit rename (decision 0091), never by AI and never by a drifted sidebar title. What v1.8 changes under decision 0088 is the title mirror, not the name. The birth-only limit on raising a chair title correction is superseded, because the visible chair title must read exactly the TABLE NAME for the chair's whole life, so the correction is raised at Birth, at Rejoin, at Reseat, and whenever drift is actually observed or reported. A title mismatch never changes the table's identity, the title is repaired back to the table. A manual visible-title rename alone, Allison's own included, never changes the TABLE NAME, the table's identity, or the ledger's record of it, so the ledger never follows a retitled sidebar. If the visible chair title differs from the TABLE NAME, that is title drift, and it is repaired back to the exact TABLE NAME under decision 0088. A genuinely different durable mission gets a different table by deliberate Birth, never by renaming a sidebar title.
 
-## The mission contract: MISSION and DONE WHEN (v1.7)
+## The mission contract: MISSION and DONE WHEN
 
-A mission table exists to accomplish a stated thing. The contract is the two lines that say what that thing is and how anyone will know it happened, and it is written once, at Birth, into the table's own durable record.
+A finite mission exists to accomplish a stated thing. Its durable contract records what that thing is and how anyone will know it happened. It does not depend on a Room, Table, title, Birth declaration, or any other naming ceremony.
 
 `MISSION:` one sentence naming what this table exists to accomplish. Allison's stated outcome, not the build. "Restore the Ember briefing rail so the 8 AM briefing sends on its own," never "edit the launchd plist."
 
 `DONE WHEN:` the acceptance evidence that proves the mission achieved. It must be something a later reader can check without asking Allison, so it names artifacts, merges, live behavior, or delivery proof. "Two consecutive briefings send unattended and land on Allison's phone, verified from delivery logs" is a DONE WHEN. "The rail works" is not, because nothing can be checked against it. When the honest completion condition is Allison's own acceptance of a deliverable, say that exactly, naming the deliverable she accepts, so the check has one real thing to look for.
 
-Which tables carry it, and which correctly do not. Every mission table carries it, meaning any table born to accomplish a stated outcome, whether it dispatches workers or not. A Scratch or general-purpose conversation carries neither line and is exempt: it is thinking, reading, exploring, or keeping Allison company on a subject, it holds no table identity under decision 0081, and it is never nagged to archive merely because a topic ended. A standing-subject table under decision 0066, one that exists to be there rather than to finish, is exempt the same way and says so plainly in place of a DONE WHEN, so the exemption is a recorded fact rather than a missing line. Absence of the contract is never treated as an unfinished table.
+Which work carries it, and which correctly does not. Record it for a finite mission with a stated outcome, whether it dispatches workers or not. A general-purpose conversation carries neither line and is exempt: it is thinking, reading, exploring, or keeping Allison company on a subject, and it is never nagged to archive merely because a topic ended. A standing subject that exists to be there rather than to finish is exempt the same way and says so plainly in place of a DONE WHEN, so the exemption is a recorded fact rather than a missing line. Absence of the contract is never treated as unfinished work.
 
-What reads it. The session-wrap terminality check (session-wrap v1.11, section 0A) reads this contract when acceptance evidence lands and decides whether the mission is achieved. That is the whole point of writing it at Birth: the table proves its own completion from its own record, so Allison never has to be the one who notices the work is over.
+What reads it. The session-wrap terminality check reads this contract when acceptance evidence lands and decides whether the mission is achieved. Durable work state proves completion from its own record, so Allison never has to be the one who notices the work is over.
 
 What it is not. It is not a plan, a scope, a task list, or a success metric, and it never grows as the work goes. A mission that genuinely changed is Allison's ruling to make, and a completed table never rewrites its own DONE WHEN to keep itself alive (session-wrap v1.11, section 4B).
 
-Pre-cutover boundary. The contract rides on the birth declaration wiring installed today, which decision 0082's bridge clause keeps binding until Allison rules the one cutover. It creates no registry, no registrar record, and no routing-state write.
+The contract creates no identity, registry, registrar record, or naming requirement. It is task context and completion evidence only.
 
-**The worker half (v1.4, concurrency amended v1.6, boundary v1.8).** A worker is a temporary execution session dispatched from the table into an approved implementation engine. It is not a chair, even though Claude Code presents it as a session. The chair stays home at the table while the worker executes, and the worker returns its evidence to the table's chair before following its own terminal lifecycle (decision 0088). Worker admission is registrar-governed by exact execution scope (decision 0082): a table may hold multiple active workers whose exact scopes do not conflict, and a duplicate same-table same-title worker or an exact scope collision is refused. If a detour genuinely needs its own separable implementation, giving it its own table is still the cleanest move, and a spawn pair is exactly what produces one. Bridge until cutover: the registrar does not exist yet, so until Allison rules the cutover the installed one-active-worker practice continues to bind and a second concurrent implementation job still gets its own exactly named table first. Worker naming and self-titling live in code-block-routing, Session Naming; classification, drift repair, and the registration and scope-collision check live in the session-steward skill.
+**The execution half.** A temporary execution session works in an approved implementation engine and returns evidence to its durable origin. Admission is governed by exact execution scope: concurrent work proceeds when scopes do not conflict and an actual mutable-scope collision is refused. Visible labels, shared titles, or missing names do not establish a collision. Worktree, model and effort, repository/host, credential and production boundaries, and terminal lifecycle requirements remain enforced.
 
 ## Historical: CONVERSATION/SESSION naming vocabulary (superseded by decision 0107)
 
@@ -141,19 +141,19 @@ A misroute in live use (2026-08-03) proved that any paste without identity lines
 
 Under v1.2 a chat kickoff satisfies this with its first line (the bare conversation name) plus its `CONVERSATION:` line immediately below. The bare name does not replace the envelope; it sits above it.
 
-## Landing on the wrong door (v1.6, inspect before adopt)
+## Landing on the wrong execution surface
 
-Chat conversations and Claude Code sessions look nearly identical to a human mid-flow, and rooms look alike in a sidebar. Misroutes will happen. The v1.1 rule said the receiving surface ADOPTS a fully named block. That rule is retired by decision 0081's chair authority law, because adoption is how a wrong door quietly becomes a second identity for work it does not own.
+Chat conversations and execution surfaces can look alike mid-flow. Inspect the task's actual destination and capability requirements rather than treating its labels as authority.
 
-The rule for the RECEIVING surface. Read the envelope first, before executing anything. If the block names a destination that is not this surface, this room, or this table, INSPECT it, REFUSE it, and state the correct routing plainly, naming the exact room, table, or session it belongs to. Do not execute the brief. Do not declare Birth from it. Do not write anything durable under the inbound identity. Do not claim the identity the block carries. Say what the block appears to be for, so Allison can carry it to the right door in one move.
+Refuse only when substantive evidence proves the task belongs elsewhere: wrong repository, wrong execution host, incompatible destination capability, production or credential boundary, destructive-action gate, or an actual execution-scope collision. State that concrete mismatch and the correct destination.
 
-A refusal is the correct, successful behavior, not a failure and not an obstruction. The proof it works is live, 2026-08-30: this table's authoritative birth packet was misdelivered to NORTH, NORTH refused it and stated the correct routing, and that refusal is preserved as a positive acceptance fixture at aura intake/2026-08-30-wrong-door-refusal-example-routing-architecture-birth-packet.md.
+A refusal remains correct when one of those substantive conditions is proven. Decision 0107 retires the older naming-only refusal fixture as governing behavior; it remains historical evidence.
 
-The envelope word is still the tell. A block opening `CONVERSATION:` that arrives in Claude Code is a chat kickoff at the wrong door, and a block opening `SESSION:` that arrives in a chat is a worker dispatch at the wrong door. Name which it is when refusing, so the correction is one paste, not a conversation.
+`CONVERSATION`, `SESSION`, ROOM, TABLE, Chair, Worker, and visible-title text are navigation metadata. None is a refusal trigger by itself.
 
-The first-contact question in the pin skill, section 0, is unaffected. It exists for blocks that name nothing. A block that names everything gets an envelope check and, if this is the wrong door, a refusal.
+Recover return context from the current thread, native IDs, durable lane state, and dispatch evidence. Ask only when a required return destination cannot be recovered and the task genuinely needs one.
 
-One narrow exception, and only this one. A surface may continue work when it IS the named destination and only a non-identity detail is wrong, a stale surface label on a block that correctly names this room and table. When Claude discovers a lane is genuinely living on a different surface than planned, it says so once, updates the lane ledger row to record the real surface, and the lane continues where it actually lives. Nobody re-pastes a lane to move it unless Allison asks. That is a surface correction inside a correct identity, never adoption of an identity from another door.
+When only a label is stale, continue, correct the durable routing record if needed, and do not ask Allison to re-paste or rename anything.
 
 ## Historical naming rules (superseded by decision 0107)
 
