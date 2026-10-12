@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "e5bb4dc6b88f34bfc9db999381d03dc0d6ae1006",
-    "aura": "1805fa079756460692818c429676b14cd85e8315"
+    "eps": "b671f7096e0ac0a770a47c0929e97a99b319b773",
+    "aura": "5ef2a635d086a81c943a5b1ab42894c816cbe19f"
   },
   "zones": [
     "surfaces",
@@ -1265,17 +1265,17 @@
         "pin"
       ],
       "brandScope": [],
-      "subtitle": "spawning new lanes with named homes",
+      "subtitle": "spawning new lanes with durable homes",
       "renderNote": null,
       "layout": {
-        "x": 86,
+        "x": 74,
         "y": 2983,
-        "width": 218,
+        "width": 230,
         "height": 77,
         "rectHeight": 62,
         "annotationHeight": 15,
         "subtitleLines": [
-          "spawning new lanes with named",
+          "spawning new lanes with durable",
           "homes"
         ]
       }
