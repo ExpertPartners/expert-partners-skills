@@ -9,6 +9,13 @@ and preserves worktree, model/effort, scope-collision, wrong-repo,
 wrong-host, production, credential, destructive-action and lifecycle controls.
 Historical version prose remains marked as provenance and is not governing.
 
+Review addendum (same release, independent Claude Code review of this PR):
+code-block-routing's operative lane-ledger rule no longer requires a two-word
+worker title, a Table Birth home, or parity-mismatch renames; the first ledger
+cell is any short label or stable session id. canon-sync-protocol's dispatch
+recipe no longer puts an exact session name first or describes launch-naming
+and off-disk self-verification as current.
+
 ## 2.51.0 - 2026-10-12
 
 Decision 0107 retires mandatory Room/Table/Chair/Worker naming ceremony and visible-title gates. code-block-routing no longer requires exact session/table names or naming-only bounces; lane-spawn drops Table Birth/title ceremony; session-steward drops birth self-title and drift repair; pin and session-wrap no longer enforce title parity; batch-first-execution validates substantive execution fields instead of naming metadata. Worktree isolation, model/effort, real scope collision, wrong-repo/host, production, credential, and lifecycle safeguards remain.
