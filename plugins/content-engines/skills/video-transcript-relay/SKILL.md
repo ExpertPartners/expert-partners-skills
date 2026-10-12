@@ -43,16 +43,14 @@ The raw transcript file stays plain text. It is working input, not a deliverable
 
 ## The session lane
 
-All video fetches route to one Claude Code session named "Video Ingest". One lane per workstream. It holds yt-dlp, the script, the Drive delivery path, and the accumulating library of what has already been pulled, so the second video costs a fraction of the first.
+All video fetches route to one Claude Code session. One lane per workstream. It holds yt-dlp, the script, the Drive delivery path, and the accumulating library of what has already been pulled, so the second video costs a fraction of the first.
 
-Register it in the code-block-routing known-sessions list on first use. Route to it as an existing session on every video after the first.
 
 ## The paste block template
 
-Routing line above the fence, session name as the first line inside the fence, exactly as code-block-routing requires. One block per response. Substitute the real URL.
+Routing line above the fence, then the block, per code-block-routing. One block per response. Substitute the real URL.
 
 ```
-Video Ingest: this is the session name. If this session is not already named "Video Ingest", make your very first output a request that Allison paste /rename Video Ingest into this session's input box, then execute the brief below.
 
 Fetch and deliver a video transcript.
 
