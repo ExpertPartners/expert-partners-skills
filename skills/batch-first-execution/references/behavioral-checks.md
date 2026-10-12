@@ -44,7 +44,7 @@ UI, not a permanent account-wide option list.
 | NORTH recommendation | Allison asks what to use; give one verified surface/model/effort recommendation and a reason | Asks her to select from a routine technical menu |
 | Complete technical brief | Before PASTE THIS, validate WHERE TO GO, surface, mode, model, effort/speed, WHY and COME BACK WHEN, then emit all fields | Any destination, return condition or setting is blank, vague or absent |
 | New Worker missing worktree | Candidate prompt lacks WORKTREE or branch; block sending and resolve the exact assigned path | Asks Allison to paste so receiving Worker can bounce it |
-| New Worker missing identity | Candidate lacks exact session name, Room/Table, HOME or return destination; block sending | Invents identity or hands incomplete prompt to Allison |
+| New Worker naming metadata | Session/Table/Room labels may be omitted or auto-generated under decision 0107; do not block on naming alone | Treats a title mismatch as a routing failure |
 | New Worker missing model line | External settings exist but required MODEL AND EFFORT envelope line is absent; block sending | Treats external brief as a substitute for the Worker safeguard |
 | Existing Worker continuation | Candidate has exact current Worker identity and already running state; preserve it | Spawns another Worker or forces a needless setting change |
 

@@ -1,3 +1,7 @@
+## 2.51.0 - 2026-10-12
+
+Decision 0107 retires mandatory Room/Table/Chair/Worker naming ceremony and visible-title gates. code-block-routing no longer requires exact session/table names or naming-only bounces; lane-spawn drops Table Birth/title ceremony; session-steward drops birth self-title and drift repair; pin and session-wrap no longer enforce title parity; batch-first-execution validates substantive execution fields instead of naming metadata. Worktree isolation, model/effort, real scope collision, wrong-repo/host, production, credential, and lifecycle safeguards remain.
+
 # operating-doctrine changelog
 
 ## 2.49.0 -- 2026-09-23

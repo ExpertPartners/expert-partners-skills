@@ -12,7 +12,17 @@ brand-scope: null
 subtitle: "carry-back envelope and place-keeping baton"
 ---
 
-# Pin -- v4.10 (2026-09-08)
+# Pin
+
+## Current naming rule -- decision 0107, 2026-10-12
+
+Decision 0107 (ruling of record `aura/decisions/0107-retire-routing-naming-ceremony.md`) supersedes the prior mandatory naming and visible-title rules in this skill wherever they conflict with the current rule below.
+
+Pins and carry-backs do not require exact SESSION, TABLE, ROOM, Chair, or Worker visible names. Use a helpful label when known, but stable IDs, repo/worktree/branch, task context, and return destination are stronger. Never refuse or stop solely because a title or naming label differs. Never ask Allison to rename a chat or worker for pin correctness.
+
+Historical naming and title-repair sections below are superseded wherever they conflict with this rule.
+
+ -- v4.10 (2026-09-08)
 
 v4.8 (ruled by Allison 2026-08-26, decision of record aura decisions/0074-naming-and-session-steward.md) rewrites naming authority again, in the opposite direction from v4.3's `/rename` demotion: Claude Code Desktop's native session-management tools let a worker set its OWN title and repair other sessions' titles, proven live 2026-08-25/26 with persistence verified on independent reread. So the worker names itself at birth, repairs its own drift, and `/rename` retires from the routine path entirely, surviving only as the last-resort repair on surfaces without those tools. The name format changes with it, from three segments to `<Table Name> - <Specific Job>` (that form is itself superseded by v4.10 under decision 0091). See section 5.
 
@@ -26,7 +36,7 @@ A pin is a bookmark, not a task. It marks the exact spot where work handed off b
 
 Pins persist to `~/.claude/baton.md`. Every surface reads the same baton file, so one pin trail spans all of them.
 
-## 0. First contact in a new Code session (v4, ruled 2026-08-03)
+## 0. First contact in a Code session
 
 Assume every briefing block arriving in a fresh Claude Code session came from a Claude conversation Allison is having. Before running the block, the session must know its home: the Claude project name AND the conversation name. If the block does not name both (CLAUDE HOME line, or legacy COWORK HOME, or Allison stating them), ask FIRST, before executing anything:
 
@@ -120,7 +130,7 @@ A block that spawns a NEW Code session carries a `WORKTREE` line in its envelope
 
 Judgment the check requires (v4.3, amended v4.8): a name mismatch is not automatically a misaddressed block. A session the harness auto-titled, or one launched without a name, will read a title that differs from a briefing genuinely meant for it. Distinguish the two: a block addressed to a DIFFERENT lane's work stops cold; a block that is plainly this lane's own continuation, arriving at a session never named to convention, proceeds and REPAIRS ITS OWN TITLE through the native tool alongside the work (v4.8), reporting the before and after rather than handing Allison anything. When it is genuinely ambiguous, ask before executing.
 
-## 5. Naming authority (v4.8, ruled by Allison 2026-08-26; supersedes v4.3)
+## 5. Historical naming authority (superseded by decision 0107)
 
 The SESSION NAME line in the block that spawns or briefs a session IS its name, adopted verbatim for life. Never improvise, abbreviate, or restyle it. Everything below is how that name gets onto the session and how the session proves it carries the right one.
 

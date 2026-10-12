@@ -1,6 +1,6 @@
 ---
 name: "code-block-routing"
-description: "Fires on every Claude Code paste block or implementation brief for Allison. Requires a routing line naming surface and exact session, the session name first inside the block, a WORKTREE line and a MODEL AND EFFORT line on every block spawning a Code session (missing either, the block bounces home), a waiting-on statement per hand-off, a lane ledger row at dispatch and carry-back, one block per response, nothing fenced but terminal or Code, versions from canonical only, and the pin only AFTER Allison confirms the paste. Chat kickoffs lead with the conversation name, use CONVERSATION not SESSION, and a table is named at Birth, Allison alone renames it (0091). Code workers carry a two-word job title (decision 0091) and TITLE THEMSELVES at birth, so no rename hand step ships. Every carry-back ends with the status line plus an earned verdict, and SAFE TO ARCHIVE also requires releasing every monitor, check-in, subscription, wakeup, and background agent the session owns."
+description: "Fires on Claude Code paste blocks and implementation briefs for Allison. Requires the destination surface plus the non-naming execution safeguards that still matter, including WORKTREE and MODEL AND EFFORT on a new Code worker, waiting-on state, lane ledger lifecycle, canonical version reads, and earned closeout. Decision 0107 retires mandatory Room/Table/Chair/Worker naming ceremony, exact SESSION NAME gates, title parity, two-word title rules, and naming-only bounces."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -14,32 +14,37 @@ subtitle: "paste block routing and the lane ledger"
 
 # Code Block Routing
 
+## Current naming rule -- decision 0107, 2026-10-12
+
+Decision 0107 (ruling of record `aura/decisions/0107-retire-routing-naming-ceremony.md`) supersedes the prior mandatory naming and visible-title rules in this skill wherever they conflict with the current rule below.
+
+Human-visible routing names are optional navigation metadata. Do not require ROOM, TABLE NAME, SESSION NAME, Chair title, Worker title, title parity, two-word naming, Table Birth naming, self-titling, or rename confirmation before work proceeds. Do not bounce an otherwise executable block solely because naming metadata is missing, different, or auto-generated. Do not ask Allison to rename a chat or worker for governance.
+
+The routing line still names the destination surface because that changes where Allison pastes. For a new Code worker, WORKTREE and MODEL AND EFFORT remain separate hard safeguards. Repository, worktree/branch, execution scope, destination capability, and return location remain the useful routing facts. Historical naming sections below are preserved for provenance and are non-operative wherever they conflict with decision 0107.
+
+
 Rule authored by Allison, 2026-07-27. Every time a block is handed to Allison to paste into a Claude Code session (intake block, implementation brief, fix instruction, verification request, anything), the block must be preceded by exactly one routing line, outside the code fence.
 
 ## The Routing Line Names The Surface, Not Just The Session
 
 Amended 2026-07-28 at Allison's instruction: "always say paste into Claude Code Ember audit, even though it seems obvious, because sometimes the names get off." Naming the surface removes the ambiguity that appears when a session's window title has drifted from its authoritative name, or when the same workstream has both a Cowork conversation and a Claude Code session.
 
-Required format, one of:
+Required format:
 
-PASTE INTO: Claude Code, existing session "Session Name"
+PASTE INTO: Claude Code
 
-PASTE INTO: Claude Code, new session, name it "Short Name"
-
-The surface always appears first and is always spelled Claude Code. Never ship a routing line that names only the session. Never shorten to "paste into Ember audit" or "Routing: ember-audit."
-
-If a block is ever bound for a surface other than Claude Code, that surface is named the same way in the same position (for example, PASTE INTO: Terminal). Blocks bound for a browser, 1Password, or any GUI are not fenced at all; see the fencing rules below.
+A short existing-session or new-session hint may be added when it helps Allison find the right window, but no exact session name is required and no visible title is authoritative.
 
 Rules for the routing line:
 
-1. Always present. No paste block ships without it.
-2. One line, first thing above the block, easy to spot.
-3. Session names follow the worker format in the Session Naming section below (exactly two clear words identifying the job, decision 0091, which supersedes the `<Table Name> - <Specific Job>` form of decision 0074), readable words throughout. The assistant picks the name and ships it as the block's SESSION NAME line; the worker titles itself at birth through the native session-management tool, and Allison never types it.
-4. Route to an EXISTING session when the work continues a thread that session already holds context for (a pending brief, a prior fix, a repo it already has open). Name the session exactly as Allison named it.
-5. Route to a NEW session when the work is a fresh workstream, a different repo, or would pollute an existing session's context.
-6. Track known session names as they are created or mentioned, and reuse them consistently so both sides always know where a thread lives. Never invent a session name and register it as if it exists. If Allison reveals the real name, adopt her exact spelling immediately and correct the registry.
-7. When it is unknown whether a coinciding session exists, say so on the routing line and default to a new session with a name: PASTE INTO: Claude Code, new session, name it "X" (or your existing session for this work if one is open).
-8. Never route two concurrent sessions at the same shared state (the same repo, the same credential, the same config file). One lane per workstream. If a second session is already open on that state, say so and route everything to one of them. Amended 2026-08-30 (decision 0082, ruling of record aura decisions/0082-registrar-model-amendment-to-decision-0074.md): shared state is judged by exact execution scope, which is what the registrar admits or refuses, so non-conflicting exact scopes in one repository are legitimately concurrent while a duplicate same-table same-title worker or an exact scope collision is refused. Until the coordinated revision cutover of decision 0080 Section 17, ruled by Allison, the installed practice continues to bind and the dispatcher still serializes rather than assuming isolation.
+1. Always name the destination surface.
+2. Keep it one line and easy to spot.
+3. Human-readable session/workstream labels are optional and never a gate.
+4. Continue an existing worker when the actual task context and execution state show it is the same job. Otherwise start a new isolated worker.
+5. Prefer stable native session identifiers, repo/worktree/branch, durable lane state, and exact scope over visible titles.
+6. Never invent a worker as existing merely because a label sounds familiar.
+7. Actual execution-scope collisions still block; title similarities or differences do not.
+
 
 ## Dispatch Dedupe: Read The Ledger For A Standing Owner First
 
@@ -91,7 +96,7 @@ Name the level in ADR 0057's own vocabulary (`low`, `medium`, `high`, `xhigh`, `
 
 **When a level has grown a same-looking UI sibling, name both and say which one to actually click.** Worked example, verified live 2026-08-10 against code.claude.com/docs/en/model-config: Claude Code's `/effort` picker grew an entry sitting at the strong end of the slider next to `max` for a Claude Code SETTING, not a separate or higher effort level. It sends `xhigh` plus gives Claude standing permission to orchestrate dynamic multi-agent workflows for substantive tasks, and it does not persist to `effortLevel` in settings.json the way `low`/`medium`/`high`/`xhigh` do. **Never spell that setting's name bare and contiguous in this file, in a dispatch block, or in any prose a session will read as a live prompt.** Live-confirmed 2026-08-10 (this lane's own incident, recorded in its ledger row): the bare word, typed anywhere in a message a Claude Code session receives, including inside a quoted worked example describing it, is read by the harness as the literal activation keyword and fires the real behavior, not merely describes it. Write it broken (`Ultra-code`) and point to code.claude.com/docs/en/workflows for the exact canonical spelling when someone actually needs to type it. A dispatch that means `xhigh` writes `xhigh`. A dispatch that means the orchestration behavior names it by its broken spelling, never lets the two get read as interchangeable just because they sit next to each other on the same picker, and never risks firing it by accident.
 
-## Session Naming: Two-Word Job Title, Self-Titled At Birth
+## Historical naming rules -- superseded by decision 0107
 
 Ruled by Allison 2026-08-26, decision of record aura decisions/0074-naming-and-session-steward.md. SUPERSEDES the three-segment format of the 2026-08-07 ruling (which itself extended the 2026-08-04 lane tag rule, intake/2026-08-05-ruling-lane-tag-session-naming-rule.md). The capability ground shifted: Claude Code Desktop's native session-management tools let a session title itself and repair other sessions' titles (proven live 2026-08-25/26), so naming moved from a dispatch-side launch flag plus a manual repair path to a worker-side act at birth.
 
@@ -119,7 +124,7 @@ Mechanics:
 7. Room segment authority (decision 0077, 2026-08-26): the block-writer composes the `CLAUDE HOME` line's room segment from the dispatching room's own Project Instructions ROOM identity literal, never reconstructed from canon prose, ledger rows, or memory. The worker, which cannot read any Project's instructions, echoes the dispatched `CLAUDE HOME` line verbatim for the life of the session and never rebuilds the room segment from any other source. Amended 2026-08-30 (decision 0084, aura decisions/0084-registry-consumption-amendment-to-decision-0077.md): the table registry consumes, validates, carries, and points at that installed literal and never silently replaces it, the installed literal wins on any disagreement with the disagreement surfaced, and identity resolves through the registry so worker, lane, and execution-session identity can never override ROOM or TABLE.
 8. Chair/worker title boundary (2026-09-04, decision 0088, ruling of record aura decisions/0088-chair-worker-boundary-and-title-parity.md). The worker is a temporary execution session dispatched from the table and is never the table's chair, even though the surface presents it as a session. Its carry-back returns to the table's chair, the authoritative home conversation the CLAUDE HOME line names, and that chair stays home while the worker executes. The chair's visible title is exactly the TABLE NAME and the worker's is exactly two clear words identifying the job (amended 2026-09-07 by decision 0091, ruling of record aura decisions/0091-allison-controlled-two-word-routing-names.md, superseding the `<Table Name> - <Specific Job>` form decision 0088 restated here), and no dispatch, steward action, or wrap ever retitles the chair to a worker's job or a worker to its table's name. The chair-title-equals-TABLE-NAME rule stands and consumes the two-word Table name.
 
-## Window Titles Drift; Session Names Do Not
+## Historical: window-title rules -- superseded by decision 0107
 
 Added 2026-07-28 after a live incident, and this is still why the parity rule exists. A Claude Code window displayed the title "Atlas bot token cleanup" while the session inside it was authoritatively "ember-audit," which it confirmed by its own envelope check. Allison nearly archived an active worker because of it. Drift is real, it is dangerous, and the cost is a live lane killed by mistake.
 
@@ -134,7 +139,7 @@ Consequences:
 - Birth self-title is the actual fix (on Desktop, `set_session_title` self as the first management action; on CLI-only launches, `claude -n`). Exception-only self-verification is the safety net under it, never a routine second step.
 - Never advise archiving or closing a session based on its window title alone. Confirm what work that session still holds first, from transcript and lane-state evidence (session-steward skill, identify before you classify).
 
-## Lane Identity By Surface: Kickoff Header Is Canonical In Cowork
+## Historical: lane naming by surface -- superseded by decision 0107
 
 Ruled by Allison 2026-08-03. Cowork and Claude.ai chat titles are auto-generated from conversation content and cannot be set by any session, tool, or API; live-verified 2026-08-03 when the auto-namer paraphrased a first message that opened with the exact intended lane name. Manually renaming Cowork chats to match a convention is retired as of this ruling. Manual renaming was a failure condition; the identity rule moves instead. Amended 2026-09-04 by decision 0088 (ruling of record aura decisions/0088-chair-worker-boundary-and-title-parity.md), superseding only the absolute. Retired means retired as a routine convention-matching habit. The one manual act that survives is a drift-driven repair of a chair's title to the exact TABLE NAME, at Birth, Rejoin, Reseat, or actually observed drift, because the chair title is a continuing parity invariant and a chat surface cannot repair its own.
 
@@ -143,7 +148,7 @@ The rule by surface:
 - Cowork and Claude.ai chat lanes (tables, decisions 0066 and 0081). Amended 2026-08-30 by decisions 0081 and 0082, ruling of record aura decisions/0081-chair-model-amendment-to-decision-0066.md and aura decisions/0082-registrar-model-amendment-to-decision-0074.md: a table is the durable logical workstream and its authoritative home conversation is the chair seated at it, so canonical identity is the declared table name and never a chair's visible title or a chair's own assertion. Narrowed 2026-09-04 by decision 0088 (ruling of record aura decisions/0088-chair-worker-boundary-and-title-parity.md), superseding the broader reading that any conversation is a chair. A Claude Code worker session is never a chair. Chair authority arrives only through Birth, Rejoin, or Reseat, and a conversation holding none of those is Scratch, holds no table identity, owns no workers, and dispatches none. Table Birth is a deliberate declared act, not an automatic consequence of a first substantive turn: at deliberate Birth the chair declares `ROOM` and `TABLE NAME`; if the visible conversation title is not exactly that name, the surface hands Allison the exact required chair title, the bare TABLE NAME, and the name stands until Allison herself renames the Table by explicit direction (decision 0091, exactly two clear words, prior names kept as historical aliases to the same Table). Amended 2026-09-04 by decision 0088, superseding the birth-only limit. Chair title parity is a continuing invariant, so the exact title is handed to her again at Rejoin, at Reseat, and whenever drift is actually observed or reported, a surface that can read and set its own title maintains parity itself, and a title mismatch never changes the table's identity. Until the coordinated revision cutover of decision 0080 Section 17, ruled by Allison, the installed automatic birth-declaration wiring continues to bind as a pre-cutover act a chair performs on behalf of its table (decision 0082, bridge until cutover). No implementation dispatch leaves an unnamed or unconfirmed table. This retires the "near match is good enough" acceptance for tables. What does NOT return: routine, repeated, or unprompted chat rename requests stay banned, chat lanes still never get PARITY MISMATCH flags, and Table Birth is a single naming act, never a maintenance loop (the NAME is set at Birth and changes afterward only by Allison's explicit rename under decision 0091, never by AI and never by a drifted sidebar title, and the title mirror is repaired on observed drift, never polled). The kickoff-header-line identity rule of 2026-08-03/2026-08-07 remains the mechanism a dispatched kickoff uses to land the name (the name is still the first line, plain and alone, because titles cannot be set programmatically). Amended 2026-08-26 by decision 0077 (room identity literal): the Table Birth declaration is now TWO lines, `ROOM: <exact room identity>` above `TABLE NAME: <exact table name>` (two clear words, standing until Allison renames it, decision 0091). The exact ROOM string comes solely from that room's own Project Instructions ROOM identity literal, never reconstructed from canon prose, ledger rows, intake records, conversation memory, or any shared skill (this skill carries the ROOM value, it never owns one). Platform honesty rides with it: a chat surface cannot read its own visible title, so at birth it declares the exact intended TABLE NAME, states plainly that visible-title parity cannot be programmatically verified from that surface, and asks Allison for the glance and the exact-title rename if the visible title differs, at Birth and again on any observed or reported drift (decision 0088). No surface ever claims a title was inspected, matched, or fixed when it cannot know that.
 - Claude Code sessions (workers). Exact-name parity stays enforced, and as of decision 0074 it is enforced by the worker itself: birth self-title via the native `set_session_title` tool (`session_id="self"`) whose success result is the verification, a one-time disk read only where no successful title call exists, and SELF-REPAIR on mismatch trusting the repair's tool result, transcript rereads exception-only (implementation detail adopted 2026-09-08, Startup Efficiency audit, no rule change). A PARITY MISMATCH on a Code lane resolves by the session (or the Session Steward cross-session) renaming it through the native tool, with evidence, never by handing Allison a `/rename` line where the native tools exist and never by Allison hunting windows to rename them cold. A Claude Code session is a worker, never a chair, whatever its title reads (decision 0088). Its title is exactly two clear words identifying the job (decision 0091, superseding the `<Table Name> - <Specific Job>` form), never its table's own name, and a worker whose title reads as its table's name is drift impersonating the chair, repaired to the two-word job form.
 
-## Session Name Goes First Inside The Block
+## Historical: session-name-first rule -- superseded by decision 0107
 
 Added 2026-07-28 at Allison's instruction, rewritten 2026-08-07 under the launch-line ruling. This section governs blocks bound for Claude Code. Blocks bound for a chat conversation lead with the conversation name instead and never carry a SESSION line at all; see Chat Blocks Lead With The Conversation Name below.
 
@@ -161,7 +166,7 @@ Substitute the actual two-word worker title (decision 0091) for each block. The 
 
 If the native session-management tools are unexpectedly absent at first contact, the worker reports that limitation plainly, continues under the authoritative SESSION NAME, and does not hand Allison a `/rename` line as the routine path (`/rename` survives only as the last-resort repair on surfaces without the tools). Absence is established by one tool search, never a retry loop (added 2026-09-08, Startup Efficiency audit; two workers that day spent three and four searches each on the same absent tool).
 
-## The Naming Line Is Hard-Enforced, Same As Worktree And Model And Effort
+## Historical: hard naming-line enforcement -- superseded by decision 0107
 
 <!-- RULED-BY: aura/intake/2026-08-11-ruling-naming-line-hard-enforcement.md date:2026-08-10 -->
 
@@ -171,7 +176,7 @@ Amended 2026-08-26 (decision 0074): what is hard-enforced is the NAME, not the l
 
 Scoped to spawning (new-session) dispatch blocks only. Continuation-block behavior: a block routed to an EXISTING session never carries a launch line by design, and a drifted title there is a self-verify finding the session repairs itself through the native tool (or flags with the `/rename` line only on surfaces without the tools), then proceeds. A missing name on a spawning block is a malformed dispatch that bounces home unexecuted; a drifted title on a continuation block is repaired and worked through, never a reason to refuse the brief.
 
-## Chat Blocks Lead With The Conversation Name
+## Historical: chat-title seeding -- superseded by decision 0107
 
 Ruled by Allison 2026-08-07, same lane as the naming and archive rulings. The section above governs blocks bound for Claude Code. This one governs blocks bound for a chat conversation in the Claude app or Cowork, and the two rules do not overlap at any point.
 
