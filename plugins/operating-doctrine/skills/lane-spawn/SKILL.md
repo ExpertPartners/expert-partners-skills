@@ -1,6 +1,6 @@
 ---
 name: lane-spawn
-description: "Detour hand-off protocol for Allison's Claude project conversations. Fires the moment a side task, new topic, audit, investigation, or question surfaces mid-lane that is not the current lane's job: Allison says 'new conversation for this', 'put this somewhere else', 'go audit X', or Claude itself notices work that belongs in its own lane. Instead of absorbing the detour or deferring it with 'we'll come back to this', ship a SPAWN PAIR: a lane kickoff block for a new Claude conversation, plus, when a worker is needed, a Claude Code block homed to the NEW lane, then state what the origin lane awaits and resume the origin thread in the same message. A chat kickoff opens with the conversation name as its literal first line and heads its envelope CONVERSATION, never SESSION. A mission table is born with a MISSION and a DONE WHEN line so it can prove completion, and Scratch carries neither. Wrong-door packets are refused, chats get no routine rename. It inherits the operating-doctrine and never overrides it."
+description: "Detour hand-off protocol for Allison. Fires when side work should move out of the current thread. Ships the minimum context and, when needed, a Code worker brief, then returns to the main thread. Decision 0107 retires mandatory conversation/Table naming, Table Birth naming, Room/Table declarations, title parity, and rename chores. Worktree/model safeguards and substantive wrong-destination checks remain."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -13,7 +13,16 @@ brand-scope: null
 subtitle: "spawning new lanes with named homes"
 ---
 
-# Lane Spawn -- v1.9 (2026-09-08)
+# Lane Spawn -- v1.10 (2026-10-12)
+
+## Current naming rule -- decision 0107
+
+A detour does not need a named Table, Table Birth, ROOM/TABLE declaration, exact visible chat title, or Worker self-title in order to move. Use a short human label only when it helps navigation. Never ask Allison to rename a chat for routing correctness. A missing or mismatched naming label alone is not a wrong-door condition.
+
+MISSION and DONE WHEN may still be used when they materially help a finite handoff, but they are a completion aid, not a naming ceremony. The Code half still carries the separate WORKTREE and MODEL AND EFFORT safeguards when it spawns a new worker.
+
+Historical naming/version paragraphs below remain provenance only where they conflict with decision 0107.
+
 
 Ruled by Allison 2026-08-03 (Aura: Strategic Advisor / Repo Walk). The problem this kills: a detour surfaces mid-lane, gets half-absorbed into the wrong conversation, derails the thread, and its state lives nowhere. The fix: every detour gets its own lane at the moment it appears, the origin lane names what it is waiting on, and the origin thread continues without a beat.
 
@@ -77,7 +86,7 @@ PASTE 2 -- CODE BLOCK (only when a worker session is needed). Per the code-block
 
 RESUME LINE (always, same message, after the blocks). One line stating what the origin lane awaits from the new lane (or 'nothing, fully detached'), then the origin lane's next step, immediately. The origin lane never closes its turn on the detour.
 
-## The conversation name is the first line (v1.2)
+## Historical: conversation-name-first rule (superseded by decision 0107)
 
 Chat conversation titles cannot be set programmatically. The Claude app and Cowork auto-title a conversation from its first message, and no session, tool, or API can override that (live-verified 2026-08-03, reconfirmed by the 2026-08-07 failure below). The only lever the block-writer has is what the first message says first.
 
@@ -115,7 +124,7 @@ Pre-cutover boundary. The contract rides on the birth declaration wiring install
 
 **The worker half (v1.4, concurrency amended v1.6, boundary v1.8).** A worker is a temporary execution session dispatched from the table into an approved implementation engine. It is not a chair, even though Claude Code presents it as a session. The chair stays home at the table while the worker executes, and the worker returns its evidence to the table's chair before following its own terminal lifecycle (decision 0088). Worker admission is registrar-governed by exact execution scope (decision 0082): a table may hold multiple active workers whose exact scopes do not conflict, and a duplicate same-table same-title worker or an exact scope collision is refused. If a detour genuinely needs its own separable implementation, giving it its own table is still the cleanest move, and a spawn pair is exactly what produces one. Bridge until cutover: the registrar does not exist yet, so until Allison rules the cutover the installed one-active-worker practice continues to bind and a second concurrent implementation job still gets its own exactly named table first. Worker naming and self-titling live in code-block-routing, Session Naming; classification, drift repair, and the registration and scope-collision check live in the session-steward skill.
 
-## Vocabulary lock: CONVERSATION for chats, SESSION for Code (v1.2)
+## Historical: CONVERSATION/SESSION naming vocabulary (superseded by decision 0107)
 
 The two surfaces get two words, and they never trade.
 
@@ -146,7 +155,7 @@ The first-contact question in the pin skill, section 0, is unaffected. It exists
 
 One narrow exception, and only this one. A surface may continue work when it IS the named destination and only a non-identity detail is wrong, a stale surface label on a block that correctly names this room and table. When Claude discovers a lane is genuinely living on a different surface than planned, it says so once, updates the lane ledger row to record the real surface, and the lane continues where it actually lives. Nobody re-pastes a lane to move it unless Allison asks. That is a surface correction inside a correct identity, never adoption of an identity from another door.
 
-## Naming
+## Historical naming rules (superseded by decision 0107)
 
 Claude proposes the conversation name: exactly two clear words (decision 0091), the topic, readable in a sidebar (e.g. `Ember Audit`, `Funnel Audit`). Keep it to the words that identify the lane; date suffixes and the word "kickoff" no longer ride on the name itself under v1.2, because the name is now the line the auto-titler reads. When a lane is genuinely date-bound, the date goes in the block body, not in the name.
 
@@ -160,13 +169,11 @@ If a Code block already shipped before the new lane existed (the detour escalate
 
 ## Rules
 
-- Never absorb a detour into the current lane, and never defer one with 'later' language. Spawn it or do it inline (verification reads only), those are the only two moves.
-- One spawn pair per message. A second detour in the same turn waits for the next message.
-- The kickoff block inherits facts, never work. If the origin lane's queue leaks into the new lane, the spawn failed.
-- The origin lane records the spawn as a waiting-on item; the pin skill handles the paste confirmations on each surface as usual.
-- Findings that change origin-lane decisions travel back as a short paste Allison carries, never assumed to be known cross-lane.
-- Every paste carries the envelope (v1.1). A receiving surface that is not the block's named destination inspects it, refuses it, and states the correct routing, and never adopts the inbound identity (v1.6, decision 0081).
-- A chat kickoff opens with the bare conversation name; a chat block heads its envelope CONVERSATION, never SESSION; a chat never gets a routine or unprompted rename instruction (v1.2), and a drift-driven chair title repair under v1.8 is not one.
-- The Code half of a spawn pair carries its WORKTREE line; a spawning Code block without one is malformed and bounces home (v1.3).
-- A table is named at deliberate Table Birth, exactly two clear words: declared as ROOM plus TABLE NAME (v1.5, decision 0077, trigger amended by decision 0082), renamed afterward only by Allison's explicit direction (v1.9, decision 0091), and its chair's visible title is kept exactly equal to the current name for the chair's life, self-maintained where the surface can read and set its title, otherwise handed to Allison as the exact title at Birth, Rejoin, Reseat, and on observed or reported drift (v1.8, decision 0088). A mission table declares MISSION and DONE WHEN in the same breath (v1.7); Scratch and standing-subject tables carry neither and are never nagged to archive. A conversation that has not performed Birth is Scratch and holds no table identity. The ROOM string comes solely from the room's own Project Instructions literal, which the registry consumes and validates but never replaces (decision 0084), and no surface claims title parity it cannot read (v1.5).
-- Worker concurrency is governed by registrar scope admission, not by a count (decision 0082), and until Allison rules the cutover the installed one-active-worker practice still binds; the worker names itself with its exactly two-word job title through the native tool (v1.9, decision 0091). A worker is never a chair, it returns its evidence to the table's chair, and the chair stays home while it executes (v1.8, decision 0088).
+- Never absorb a true detour into the current work when it has become an independent body of work; either handle a tiny in-scope verification inline or hand off the independent job.
+- Keep the handoff minimal and return to the origin thread.
+- Human-visible Room/Table/Chair/Worker names are optional and never a gate under decision 0107.
+- Do not require Table Birth, Rejoin, Reseat, title parity, two-word names, or manual renames.
+- A substantive wrong destination such as the wrong repo, production target, or execution host is still refused. A title or Table-label mismatch by itself is not.
+- A new Code worker still carries its WORKTREE and MODEL AND EFFORT safeguards.
+- Actual execution-scope collisions remain protected.
+- If a finite mission benefits from MISSION and DONE WHEN, include them as task context, not as identity ceremony.
