@@ -1,6 +1,6 @@
 ---
 name: session-steward
-description: "The canonical Session Steward for Claude Code Desktop sessions. Fires whenever a session needs naming care or continuity care: a worker titling itself at birth, a drifted title needing repair, a mystery session needing identification, an orphan needing honest classification, an archive candidate needing evidence, a cross-session message, registration and scope-collision checks, or a finished worker needing terminalization. Built on the native ccd_session_mgmt tools (list_sessions, get_session, list_events, send_message, set_session_title, archive_session). A worker with no owned action left releases every monitor, check-in, subscription, scheduled wakeup, and background agent it owns before SAFE TO ARCHIVE, and archive plus ledger flip are one close, so it stops advertising an active wait. Never classifies from a visible title alone, never archives without Allison's confirmation, never builds the table registry or a ledger column. It inherits the operating-doctrine and never overrides it."
+description: "Continuity and lifecycle steward for Claude Code sessions. Uses stable session IDs, repo/worktree/branch, durable work state, transcript evidence, scope-collision checks, messaging, and closeout evidence. Decision 0107 removes birth self-titling, title parity, two-word title rules, rename repair, and naming-only refusal. Visible titles are optional navigation metadata."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -13,7 +13,15 @@ brand-scope: null
 subtitle: "Claude Code takes care of Claude Code"
 ---
 
-# Session Steward -- v1.5 (2026-09-08)
+# Session Steward
+
+## Current naming rule -- decision 0107, 2026-10-12
+
+Do not title, retitle, verify, repair, or classify a worker because of its visible name. Do not search for title-management tools on the normal path. Do not ask Allison to rename anything. Stable session IDs, durable lane/dispatch state, repository, worktree/branch, transcript evidence, and actual scope identify the work.
+
+A missing SESSION NAME or title mismatch never blocks execution by itself. Historical naming sections below are superseded wherever they conflict with this rule.
+
+ -- v1.5 (2026-09-08)
 
 Ruled by Allison 2026-08-26, decision of record aura decisions/0074-naming-and-session-steward.md. The problem this kills: Allison hunting through Ungrouped for mystery Code sessions, remembering which worker belongs to which table, manually correcting Claude Code titles, and being handed /rename lines for work the product can now do itself. Claude Code takes care of Claude Code.
 
@@ -29,24 +37,17 @@ v1.2 (ruled by Allison 2026-08-30, ruling of record aura decisions/0081-chair-mo
 
 This is a capability, not an agent. No new dashboard, database, registry, service, or system of record. The lane ledger (aura docs/estate/lanes.md) stays the only durable work state, unchanged in schema. The Steward reads and writes through the proven native ccd_session_mgmt tools plus the existing ledger path, and nothing else.
 
-## 0. The naming rules the Steward enforces (decision 0074)
+## 0. Naming is not enforced
 
-- A Project is a room. A table is the durable logical workstream and the durable continuity anchor, and the table's authoritative home conversation is its chair (decision 0081 as narrowed by decision 0088). A table is named at deliberate Table Birth, exactly two clear words, and renamed afterward only by Allison's explicit direction (decision 0091) (ROOM and TABLE NAME declared at Birth, which is a deliberate declared act and never automatic on a first substantive turn, decision 0082; the chair's visible title reads exactly the current TABLE NAME for the chair's life, self-maintained where the surface can read and set it and otherwise handed to Allison as the exact title at Birth, Rejoin, Reseat, and on observed drift, decision 0088; the name standing until Allison renames it, prior names kept as historical aliases; no dispatch from an unnamed table, and none at all from a Scratch conversation). The ROOM string comes from the room's installed Project Instructions literal, which the registry consumes and validates and never replaces (decision 0084).
-- A Claude Code session is a temporary worker dispatched from a table, never the table's chair (decision 0088). Title exactly two clear words identifying the job (decision 0091, superseding `<Table Name> - <Specific Job>`), never the table's own name. No room or table prefix; the owning table is carried in the lane ledger row and the dispatched CLAUDE HOME line, never in the title. Descriptive job words, never job numbers just because workers are sequential.
-- Worker admission is governed by exact execution scope, not by a count (decision 0082). A table may hold multiple active workers whose exact scopes do not conflict, and a duplicate same-table same-title worker or an exact scope collision is refused. Bridge until cutover: the registrar does not exist yet, so until Allison rules the cutover the installed practice still binds, a table runs one active worker at a time, and a second concurrent implementation job needs its own exactly named table first.
-- Sidebar groups are navigation convenience only, never identity. Never build naming correctness on group placement.
+Decision 0107 retires naming ceremony. Visible session titles are navigation only.
 
-## 1. Birth self-title
+## 1. Session identification
 
-A Desktop worker's first management action is titling itself: `set_session_title` with `session_id="self"` and the exact worker name. The tool's own success result is the birth verification (implementation detail adopted 2026-09-08, Startup Efficiency audit, no rule change). The last `custom-title` record in the session's own transcript at `~/.claude/projects/<encoded-cwd>/<session-id>.jsonl` is read only on a tool error, on actually observed drift, or as evidence to resolve a mismatch, never as a routine second confirmation. CLI-only launches keep the `claude -n "<name>"` launch line. A dispatch's SESSION NAME line is the authoritative requested name (decision 0065, unchanged); the worker adopts it verbatim.
+Identify workers from stable native session ID, durable lane/dispatch state, repository, worktree/branch, transcript evidence, model and creation time as needed. A title may be used as a convenience hint only.
 
-If the tools are unexpectedly absent, report the limitation plainly in the first response and continue under the authoritative name. Do not hand Allison a /rename line as the routine path, and do not silently accept an autogenerated title. One discovery attempt only (added 2026-09-08, Startup Efficiency audit, implementation of this paragraph rather than new law): a single tool search for the session-management tool decides presence or absence for the life of the session. Live evidence, two 2026-09-08 workers on a surface without the tools spent three and four searches each on the same question. Likewise, when the tool is present, its own success result is the verification of a birth self-title, and the transcript reread is reserved for a tool error or a later drift check, never a routine second confirmation of a call that just succeeded.
+## 2. No title repair
 
-## 2. Drift and mismatch self-repair
-
-At first contact where no successful birth title call exists (a CLI launch, a pre-rule session, a continuation into an unnamed session), and whenever drift is actually observed or reported or scope visibly changes, compare the actual title (own disk record, or `get_session` for another session) against the authoritative name. On mismatch, repair it through `set_session_title`, trust the repair's tool result (a reread is for a tool error only), then report the before and after. This replaces the old PARITY MISMATCH resolution of handing Allison a /rename line. A worker title that reads its table's own name, or that is not exactly two clear words identifying the job, is a mismatch of the same kind, drift impersonating the chair or drifting from the ruled form, and is repaired to the two-word job form (decision 0088 as amended by decision 0091). Workers admitted before 2026-09-07 keep their admitted titles and are never renamed mid-flight (decision 0091). The Steward never titles any Code session with a bare table name and never touches a chat chair's title, which that chair's own surface or Allison maintains. `/rename` survives only where native session-management tools do not exist.
-
-An explicit rename overwrites even a hand-set title, so when the request did not come from Allison, rename only titles that are clearly stale or autogenerated, and never destroy useful identity. A convention rename must be evidence-based (section 3 first).
+Do not perform birth self-title, title-parity checks, drift repair, two-word enforcement, or rename loops. If Allison or the product changes a visible title, continue normally.
 
 ## 3. Identify before you classify
 
