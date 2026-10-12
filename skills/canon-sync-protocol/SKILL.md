@@ -70,7 +70,7 @@ A skill that mounts on only one shelf owes only that shelf, and the report says 
 
 ## The canon-doc dispatch, exact shape
 
-Per the code-block-routing skill: routing line outside the fence, session name first inside the fence, pin after paste confirmation. Canon promotions always route to the session named "Canon Doc Sync" (as an existing session; if Allison reports it does not exist, route as new session with that exact name, which means the block also ships the `claude -n` launch line and a `WORKTREE` line).
+Per the code-block-routing skill: name the destination surface outside the fence, carry the substantive execution safeguards, and pin after paste confirmation. Under decision 0107, an exact session title is optional. Canon promotions may continue an existing Canon Doc Sync worker when its actual context matches, or use a new isolated worker with the required WORKTREE and MODEL AND EFFORT lines.
 
 PASTE INTO: Claude Code, existing session "Canon Doc Sync"
 
