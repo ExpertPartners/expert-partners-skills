@@ -1,6 +1,6 @@
 ---
 name: pin
-description: "Carry-back envelope and place-keeping baton between Allison's Claude project conversations (Claude app, CoWork) and Claude Code. Fires at first contact in a new Code session, when composing ANY report bound back to a Claude project, when a block arrives with return-routing metadata, when Allison types /pin or says \"pin\", and when she confirms a paste (\"pasted\", \"done\"). Pin fires only after her paste confirmation. Stable session IDs, repository/worktree/branch, task context, destination capability, and return location govern routing; visible names are optional navigation labels under decision 0107. A pin is a bookmark, never a task. It inherits the operating-doctrine and never overrides it."
+description: "Carry-back envelope and place-keeping baton between Allison's Claude project conversations (Claude app, CoWork) and Claude Code. Fires when composing ANY report bound back to a Claude project, when a block arrives with return-routing metadata, when Allison types /pin or says \"pin\", and when she confirms a paste (\"pasted\", \"done\"). Pin fires only after her paste confirmation. A pin is a bookmark, never a task. It inherits the operating-doctrine and never overrides it."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -14,38 +14,17 @@ subtitle: "carry-back envelope and place-keeping baton"
 
 # Pin
 
-## Current naming rule -- decision 0107, 2026-10-12
+<!-- RULED-BY: aura/decisions/0107-retire-routing-naming-ceremony.md date:2026-10-12 superseded naming text removed -->
 
-Decision 0107 (ruling of record `aura/decisions/0107-retire-routing-naming-ceremony.md`) supersedes the prior mandatory naming and visible-title rules in this skill wherever they conflict with the current rule below.
-
-Pins and carry-backs do not require exact SESSION, TABLE, ROOM, Chair, or Worker visible names. Use a helpful label when known, but stable IDs, repo/worktree/branch, task context, and return destination are stronger. Never refuse or stop solely because a title or naming label differs. Never ask Allison to rename a chat or worker for pin correctness.
-
-Historical naming and title-repair sections below are superseded wherever they conflict with this rule.
-
- -- v4.10 (2026-09-08)
-
-v4.8 (ruled by Allison 2026-08-26, decision of record aura decisions/0074-naming-and-session-steward.md) rewrites naming authority again, in the opposite direction from v4.3's `/rename` demotion: Claude Code Desktop's native session-management tools let a worker set its OWN title and repair other sessions' titles, proven live 2026-08-25/26 with persistence verified on independent reread. So the worker names itself at birth, repairs its own drift, and `/rename` retires from the routine path entirely, surviving only as the last-resort repair on surfaces without those tools. The name format changes with it, from three segments to `<Table Name> - <Specific Job>` (that form is itself superseded by v4.10 under decision 0091). See section 5.
-
-<!-- RULED-BY: aura/decisions/0088-chair-worker-boundary-and-title-parity.md date:2026-09-04 -->
-v4.9 (ruled by Allison 2026-09-04 via Lock that, ruling of record aura decisions/0088-chair-worker-boundary-and-title-parity.md) draws the chair/worker boundary through this skill. The CLAUDE HOME line names the table's CHAIR, the authoritative home conversation that stays seated at the table while the worker is away and receives the carry-back. A Claude Code session is a WORKER, a temporary execution session dispatched from the table, never a chair, even though the product presents it as a session. A CONVERSATION block landing in Code is therefore refused at the wrong door and never adopted, which SUPERSEDES the v4.4 adopt-and-continue instruction in section 4 (lane-spawn v1.6 had already retired adoption on its side). Titles follow roles. The chair reads exactly the TABLE NAME, the worker reads exactly `<Table Name> - <Specific Job>` (superseded by v4.10 under decision 0091, exactly two clear words), and the section 5 birth-only limit on chair title repair is superseded by continuing chair title parity. Envelope, timing, carry-back template, and verdict rules are unchanged.
-
-<!-- RULED-BY: aura/decisions/0091-allison-controlled-two-word-routing-names.md date:2026-09-07 -->
-v4.10 (ruled by Allison 2026-09-07 via Lock that, ruling of record aura decisions/0091-allison-controlled-two-word-routing-names.md; applied 2026-09-08): two-word routing names. This SUPERSEDES the `<Table Name> - <Specific Job>` worker form in section 5 and in the v4.8 and v4.9 paragraphs above, exactly as decision 0091 supersedes it in decisions 0074 and 0088. Every new WORKER visible title is exactly two clear words identifying the job, every new TABLE NAME and every Allison-authorized Table rename is exactly two clear words, and the chair's title stays exactly the current TABLE NAME (decision 0088). Worker ownership and return identity ride in durable routing state, the lane ledger row and the CLAUDE HOME line before registrar cutover, never in the title, so the CLAUDE HOME line this skill already requires on every carry-back is the worker's proof of home. Allison may rename a Table by explicit direction, prior names stay historical aliases so old pins and packets still resolve, and workers active before 2026-09-07 finish under their admitted titles. Envelope, timing, carry-back template, and verdict rules are unchanged.
-
-A pin is a bookmark, not a task. It marks the exact spot where work handed off between Claude Code and the Claude project conversation that drives it. v4 (ruled by Allison 2026-08-03) makes the protocol surface-neutral: the home is a Claude PROJECT plus CONVERSATION, never assumed to be CoWork. v4 also adds the first-contact question and the "come back here" pin close. v4.1 (ruled by Allison 2026-08-03, same day) rewrites the carry-back SESSION STATUS line: it names the paste-back PROJECT and CONVERSATION explicitly, the ARCHIVE verdict is part of the line, and a session that is NOT clean to archive must give the instructions at that point instead of the ARCHIVE sentence. v4.2 (ruled by Allison 2026-08-03, same day) DELETES the closing line ("Let me know once you've pasted this back into ..., and I'll pin."): the carry-back ends at the SESSION STATUS line and never solicits a paste confirmation. v4.3 (ruled by Allison 2026-08-07) rewrites naming authority (section 5): sessions are named AT LAUNCH via `claude -n`, the name format is `<Project short name> - <Conversation name> - <Job name>`, and every session self-verifies its own name off disk at first contact (that routine disk self-verification is superseded by v4.10, where it survives only as the exception path in section 5). `/rename` is demoted to the exception repair. v4.3 also (same ruling, addendum) strips the ARCHIVE verdict out of the carry-back entirely: a session never declares itself ready to archive, the SESSION STATUS line ends at "carry-back delivered, awaiting verification at home," and archive authority moves to the home conversation. This supersedes the v4.1 ARCHIVE-verdict rule above. v4.4 (ruled by Allison 2026-08-07, same lane) adds the surface vocabulary lock: `SESSION` labels a Claude Code session and only ever that, a block bound for a chat conversation heads its envelope `CONVERSATION`, and `/rename` is a Code-only repair that is never handed out for a chat. See section 4 and section 5. v4.5 (re-ruled by Allison 2026-08-07 evening, in the Estate Brain Door Phase B Code session) brings the ARCHIVE verdict BACK and retires "carry-back delivered, awaiting verification at home" permanently: the session determines its own disposition and tells Allison plainly, SAFE TO ARCHIVE with evidence or NOT safe with the one move that closes it, because sessions that cannot say whether they are done pile up. This supersedes the v4.3 no-verdict addendum. See section 1. v4.6 (ruled by Allison 2026-08-07 afternoon, the worktree dispatch ruling; ruling of record aura intake/2026-08-07-ruling-dispatch-blocks-must-name-worktrees.md): a dispatch block that spawns a Code session also carries a `WORKTREE` line, and the session's first contact includes creating that worktree from a freshly fetched remote ref and confirming the absolute path, alongside the name self-verify. A spawning block without a WORKTREE line is malformed and bounces home, per code-block-routing's Worktree Isolation. See sections 4 and 5. v4.7 (ruled by Allison 2026-08-07, Aura / Code Rule Fix lane) adds the earned verdict line, amending the v4.5 archive verdict without replacing it: every carry-back ends with the standing SESSION STATUS line PLUS one earned verdict line, `RECOMMEND ARCHIVE -- all pushed, nothing pending on Allison's side` (permitted only when the checklist verifies: every commit pushed, the whole brief executed, nothing gated or held open, no deliverable still owed) or `RECOMMEND HOLD OPEN, waiting on <the one named thing>`. Archive authority stays with home and home's GitHub grading remains the backstop, but Allison may archive on the spot on a RECOMMEND ARCHIVE. See section 1.
+A pin is a bookmark, not a task. It marks the exact spot where work handed off between Claude Code and the Claude project conversation that drives it. v4 (ruled by Allison 2026-08-03) makes the protocol surface-neutral: the home is a Claude PROJECT plus CONVERSATION, never assumed to be CoWork, and adds the "come back here" pin close. v4.2 (ruled by Allison 2026-08-03) deletes the closing line that solicited a paste confirmation. v4.5 (re-ruled by Allison 2026-08-07 evening) has the session give its own archive verdict. v4.6 (ruled by Allison 2026-08-07, ruling of record aura intake/2026-08-07-ruling-dispatch-blocks-must-name-worktrees.md) adds the WORKTREE line to spawning blocks. v4.7 (ruled by Allison 2026-08-07, Aura / Code Rule Fix lane) adds the earned verdict line.
 
 Pins persist to `~/.claude/baton.md`. Every surface reads the same baton file, so one pin trail spans all of them.
-
-## 0. First contact in a Code session
-
-Use any supplied return location, stable session ID, repository/worktree/branch, and task context to preserve continuity. A missing visible project, conversation, or session name never blocks otherwise executable work. Ask for a return destination only when the assignment genuinely requires a carry-back and no stable destination can be recovered from the dispatch, current thread, lane state, or native session metadata.
 
 ## 1. Carry-back template
 
 Every report or block bound back to a Claude project ends exactly like this:
 
 ```
-SESSION: {stable session ID or helpful label, when known}
 CLAUDE HOME: {Claude project name} / {conversation name}
 
 {the report}
@@ -54,7 +33,7 @@ SESSION STATUS: {the standing status line, section below}
 VERDICT: {RECOMMEND ARCHIVE -- all pushed, nothing pending on Allison's side | RECOMMEND HOLD OPEN, waiting on <the one named thing>}
 ```
 
-The VERDICT line is the last line of the carry-back, directly after the SESSION STATUS line (v4.7). There is no closing "Let me know once you've pasted... and I'll pin" line (deleted in v4.2); the carry-back never solicits a paste confirmation. Never write "into Cowork" anywhere in the carry-back. Always name the actual Claude project and conversation; if the session somehow reached a carry-back without knowing them, ask (section 0) before sending the report.
+The VERDICT line is the last line of the carry-back, directly after the SESSION STATUS line (v4.7). There is no closing "Let me know once you've pasted... and I'll pin" line (deleted in v4.2); the carry-back never solicits a paste confirmation. Never write "into Cowork" anywhere in the carry-back. Name the Claude project and conversation the report returns to, from the CLAUDE HOME line or durable dispatch state; ask once only if nothing names it.
 
 ### The session gives the archive verdict (v4.5, re-ruled by Allison 2026-08-07 evening)
 
@@ -74,7 +53,7 @@ SAFE TO ARCHIVE is a verified claim, never a phrase. It is issued only after all
 
 NOT safe means the session diagnoses AND prescribes: it names exactly what is open and the single move that closes it, /session-wrap when chat-only decisions or flags are unrecorded, /session-closeout when shipped work has no handoff note on main, or the named open action otherwise. Never leave Allison to work out which.
 
-What stays with the home conversation: the actual archive click, and the ledger flip. Home flips the lane's row to `archived` in aura `docs/estate/lanes.md` as one motion with the archive, and no dispatch block is ever written against a row reading `archived`. Native session IDs and durable lane state preserve identity; visible titles do not. Sessions born before v4.5 follow the lifecycle rule from their next response.
+What stays with the home conversation: the actual archive click, and the ledger flip. Home flips the lane's row to `archived` in aura `docs/estate/lanes.md` as one motion with the archive, and no dispatch block is ever written against a row reading `archived`. Sessions born before v4.5 follow the lifecycle rule from their next response.
 
 ### The earned verdict line (v4.7, ruled by Allison 2026-08-07, Aura / Code Rule Fix lane)
 
@@ -110,101 +89,15 @@ Doctrine note (added 2026-08-03): the pin confirms the paste; it is not the lane
 
 ## 4. Envelope check (inbound)
 
-Inspect inbound routing metadata against substantive execution state: repository, worktree/branch, exact mutable scope, execution host, production boundary, credential boundary, destination capability, and return location. Refuse when one of those facts proves the assignment belongs elsewhere or would collide with active work. A missing or different `SESSION`, `CONVERSATION`, ROOM, TABLE, Chair, Worker, or visible-title label is never sufficient reason to stop.
-
-### SESSION means Claude Code, always (v4.4, ruled 2026-08-07)
-
-`SESSION` and `CONVERSATION` may remain useful human-facing surface hints. They are not authority. A stale or swapped label is corrected in the working record without bouncing otherwise executable work.
-
-If the task genuinely requires a capability unavailable on the receiving surface, state that capability mismatch and route it to the correct surface. Do not infer a capability mismatch from naming vocabulary alone.
-
-`WORKER SESSION:` inside a chat kickoff and `CLAUDE HOME:` inside a Code block are pointers to the other surface, not envelope headers, and neither one violates the lock.
+Inspect an inbound block against substantive execution state: repository, worktree/branch, exact mutable scope, execution host, production boundary, credential boundary, destination capability, and return location. A block addressed to a different repository, worktree, host, production target, credential context, or a conflicting mutable scope stops; say in one line what it is for and where it belongs. If the task genuinely requires a capability unavailable on the receiving surface, state that mismatch and route it to the correct surface.
 
 ### A spawning block also carries its WORKTREE line (v4.6)
 
-A block that spawns a NEW Code session carries a `WORKTREE` line in its envelope, naming the isolated worktree the session creates and works in. A spawning block arriving without one is malformed and bounces home, same as a block missing its routing line: do not execute it, reply naming what is missing so the dispatcher reships the block whole. Continuation blocks to an existing session inherit its established worktree and need not restate it. Full mechanics: code-block-routing, Worktree Isolation.
+A block that spawns a NEW Code session carries a `WORKTREE` line in its envelope, naming the isolated worktree the session creates and works in. The session creates that worktree from a freshly fetched remote ref before any other work and confirms the ABSOLUTE path in its first report. No work happens in the shared main tree. A spawning block arriving without one is malformed and bounces home, same as a block missing its routing line: do not execute it, reply naming what is missing so the dispatcher reships the block whole. Continuation blocks to an existing session inherit its established worktree and need not restate it. Full mechanics: code-block-routing, Worktree Isolation.
 
-Judge ownership from durable state and actual scope. A block addressed to a different repository, worktree, host, production target, credential context, or conflicting mutable scope stops. A block whose only mismatch is a label proceeds without title repair.
+## 5. Home fidelity
 
-## 5. Historical naming authority (superseded by decision 0107)
-
-The SESSION NAME line in the block that spawns or briefs a session IS its name, adopted verbatim for life. Never improvise, abbreviate, or restyle it. Everything below is how that name gets onto the session and how the session proves it carries the right one.
-
-### The name format
-
-Exactly two clear words identifying the job. Decision 0091 (ruled 2026-09-07), superseding the `<Table Name> - <Specific Job>` form of decision 0074 and its restatement in decision 0088, which is preserved below for history only.
-
-The table is the durable workstream and continuity anchor (decision 0066 as amended by decision 0081). Its authoritative home conversation is the chair, and the worker this name titles is never that chair (decision 0088). No room or table prefix. Worker ownership and return identity ride in durable routing state, before registrar cutover the lane ledger row and the dispatched CLAUDE HOME line, never in the visible title (decision 0091). Job words are descriptive; never numbered merely because a table has run several workers in sequence.
-
-Example: `Steward Build`. Superseded example, history only: `Naming Claude Chats & Code Sessions - Steward Build`.
-
-The worker title is its two-word job, the chair's title is exactly the TABLE NAME (itself two clear words for every new or renamed Table under decision 0091), and neither is ever given the other's form (decision 0088). A worker is never the chair of its table.
-
-This SUPERSEDES the three-segment `<Project short name> - <Conversation name> - <Job name>` format of the 2026-08-07 ruling, which in turn extended the 2026-08-04 lane tag rule. What survives from both: readable words throughout, the job name as the trailing segment, and the requirement that the name identify its lane on sight with no ledger lookup. Under decision 0091 (v4.10) the lane-on-sight requirement is retired for workers: the title identifies the job, and the owning table is read from the lane ledger row or the CLAUDE HOME line.
-
-One table, one active worker (decision 0074): a table runs many sequential workers over its life and never two concurrent independent ones. A second concurrent implementation job needs its own exactly named table first. Amended 2026-08-30 by decision 0082 (ruling of record aura decisions/0082-registrar-model-amendment-to-decision-0074.md): registrar scope admission replaces the count, and the bridge until cutover keeps the installed one-active-worker practice binding until Allison rules the one cutover. Ownership is proven from lane state, dispatch, or transcript evidence, never inferred from a shared repo, branch, PR, or topic.
-
-### The worker names itself at birth
-
-On Claude Code Desktop, the worker's FIRST management action is titling itself:
-
-```
-set_session_title(session_id="self", title="<Two Word Job>")
-```
-
-Then nothing more when the call succeeds: the tool's own success result is the birth verification (implementation detail adopted 2026-09-08, Startup Efficiency audit, no rule change). The reread of the last `custom-title` record in its own transcript is exception-only, for a tool error, actually observed drift, or evidence needed to resolve a mismatch, and the search for the tool itself is made once, with absence reported plainly and the session continuing under the SESSION NAME line, never a retry loop. Live-verified 2026-08-25 and again 2026-08-26: a session renamed itself with no Allison and no `/rename`, one Desktop session renamed another, and both changes persisted on independent reread.
-
-For CLI-only launches the dispatch still ships `claude -n "<full name>"` (`-n, --name` live-verified 2026-08-07 on Claude Code 2.1.223, and a headless run wrote the exact string to the session's `custom-title` record). A CLI-launched worker has no tool result to trust, so it reads its `custom-title` record once at first contact.
-
-Birth self-titling is the whole point. A session born correctly named never needs a repair, and Allison never touches a window title.
-
-### First-contact self-verification (exception path)
-
-This recipe is for a session with no successful birth title call of its own: a CLI launch, a pre-rule session, a continuation into an unnamed session, a tool error, or actually observed drift (implementation detail adopted 2026-09-08, Startup Efficiency audit, no rule change). A Desktop worker whose `set_session_title` call succeeded is already verified by that result and skips this. When it applies, the session reads its OWN name off disk once and compares it to the SESSION line in its briefing. No human is in that loop. The name lives in the session transcript:
-
-```
-~/.claude/projects/<url-encoded-cwd>/<session-id>.jsonl
-```
-
-The encoded cwd is the absolute working directory with every `/` replaced by `-` (the leading `-` is kept). The name is the `customTitle` field of the record whose `type` is `custom-title`; take the LAST such record, because the harness rewrites it when it auto-titles.
-
-```bash
-python3 -c "
-import json,sys
-p=sys.argv[1]; t=None
-for line in open(p):
-    try: o=json.loads(line)
-    except: continue
-    if o.get('type')=='custom-title': t=o['customTitle']
-print(t)
-" ~/.claude/projects/<encoded-cwd>/<session-id>.jsonl
-```
-
-Verified live 2026-08-07 on Claude Code 2.1.223. This supersedes the read half of the old claim that a session cannot read its own title; a session can, and on this exception path does, reporting the result in its first response.
-
-When this path ran, report the comparison plainly: the name read off disk, the name in the briefing, and match or mismatch. On mismatch the session repairs itself in the same turn (v4.8), trusts the repair's tool result, and reports the before and after; on a Desktop session the `get_session` metadata read is an equally valid check when evidence is needed.
-
-First contact has a second half when the briefing spawned the session (v4.6): create the worktree the briefing's `WORKTREE` line names, from a freshly fetched remote ref, before any other work, and confirm the ABSOLUTE path in the same first report. No work happens in the shared main tree. Mechanics and the malformed-block bounce live in code-block-routing, Worktree Isolation.
-
-### A session CAN rename itself (v4.8, supersedes the v4.3 set-half claim)
-
-The set half of the old claim is superseded by live product behavior on Claude Code Desktop. The native session-management tool accepts `session_id="self"`, and it also renames OTHER sessions by their stable `local_<uuid>` sessionId. Both proven live 2026-08-25 and 2026-08-26, persistence confirmed by independent reread in each case.
-
-What the v4.3 tracker citations (#33165, #83543, #84041, #84587) recorded remains historically accurate for the harness surface and the period they were checked. They no longer describe the Desktop capability, and no doctrine file may cite them to claim a session cannot name itself.
-
-### Self-repair is the routine; /rename is the last resort
-
-On mismatch or a missing title, the worker repairs ITSELF through the native tool and reports the before and after in its first response. Nothing goes to Allison. The Session Steward does the same across sessions, on evidence, per the session-steward skill.
-
-An explicit rename overwrites even a hand-set title, so a rename Allison did not ask for is aimed only at titles that are clearly stale or autogenerated, never at one that carries useful identity. Never cold-rename a fleet; a pre-rule session gains its convention name the next time it is touched, evidence first.
-
-`/rename` survives ONLY where the native session-management tools are absent, and only for these two cases: self-verification found a mismatch it cannot repair itself, or the session predates this rule on such a surface. In both, hand Allison the exact line once and keep using the authoritative name.
-
-`/rename` is a Claude Code repair and nothing else (v4.4, unchanged). It is never handed out for a chat conversation, in any form. Chat titles cannot be set programmatically, so table naming is handled at deliberate Table Birth instead (decision 0082). The chair declares `ROOM` and `TABLE NAME`, and where the visible title is not exact the surface hands Allison the exact required chair title, the bare TABLE NAME. Amended v4.9 under decision 0088, superseding the birth-only limit that stood here from decision 0074. Chair title parity is continuing, so the same exact title is handed to her again at Rejoin, at Reseat, and whenever drift is actually observed or reported, never on a schedule. That is drift repair, not a rename instruction loop, and it does not revive routine manual chat renaming, which stays retired.
-
-## 6. Home fidelity
-
-Keep one stable return destination for the session, recovered from durable dispatch state, native IDs, or the `CLAUDE HOME` pointer when present. Echo a helpful `SESSION` label and `CLAUDE HOME` label when known, but neither is authoritative or required. If Allison corrects or supplies the return destination mid-lane, adopt that durable correction. Carry-back returns there without title checks, Chair/Table classification, or Reseat ceremony.
+Keep one stable return destination for the session, from the CLAUDE HOME line or durable dispatch state. Echo the CLAUDE HOME line on every carry-back. If Allison corrects or supplies the return destination mid-lane, adopt her correction from that point on.
 
 When the lane ends, the session pronounces on archiving with evidence (v4.5, re-ruled 2026-08-07 evening; amended v4.7 same day): it ends at the SESSION STATUS line plus the earned VERDICT line per section 1, RECOMMEND ARCHIVE earned by the verified checklist or RECOMMEND HOLD OPEN naming the one wait.
 

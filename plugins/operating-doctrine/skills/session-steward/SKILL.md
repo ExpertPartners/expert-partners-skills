@@ -1,6 +1,6 @@
 ---
 name: session-steward
-description: "Continuity and lifecycle steward for Claude Code sessions. Uses stable session IDs, repo/worktree/branch, durable work state, transcript evidence, scope-collision checks, messaging, and closeout evidence. Decision 0107 removes birth self-titling, title parity, two-word title rules, rename repair, and naming-only refusal. Visible titles are optional navigation metadata."
+description: "Continuity and lifecycle steward for Claude Code sessions. Identifies workers from stable session IDs, repository/worktree/branch, durable lane state, and transcript evidence; flags unregistered workers and proven scope collisions; relays context by messaging; has a finished worker release what it owns; and surfaces archive candidates behind Allison's confirmation."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -15,56 +15,34 @@ subtitle: "Claude Code takes care of Claude Code"
 
 # Session Steward
 
-## Current naming rule -- decision 0107, 2026-10-12
+<!-- RULED-BY: aura/decisions/0107-retire-routing-naming-ceremony.md date:2026-10-12 superseded naming text removed -->
 
-Do not title, retitle, verify, repair, or classify a worker because of its visible name. Do not search for title-management tools on the normal path. Do not ask Allison to rename anything. Stable session IDs, durable lane/dispatch state, repository, worktree/branch, transcript evidence, and actual scope identify the work.
-
-A missing SESSION NAME or title mismatch never blocks execution by itself. Historical naming sections below are superseded wherever they conflict with this rule.
-
- -- v1.5 (2026-09-08)
-
-Ruled by Allison 2026-08-26, decision of record aura decisions/0074-naming-and-session-steward.md. The problem this kills: Allison hunting through Ungrouped for mystery Code sessions, remembering which worker belongs to which table, manually correcting Claude Code titles, and being handed /rename lines for work the product can now do itself. Claude Code takes care of Claude Code.
-
-<!-- RULED-BY: aura/decisions/0091-allison-controlled-two-word-routing-names.md date:2026-09-07 -->
-v1.5 (ruled by Allison 2026-09-07 via Lock that, ruling of record aura decisions/0091-allison-controlled-two-word-routing-names.md; applied 2026-09-08): two-word worker titles. This SUPERSEDES the `<Table Name> - <Specific Job>` worker form in section 0, section 2, and the v1.4 paragraph below, exactly as decision 0091 supersedes it in decisions 0074 and 0088. Every new WORKER visible title is exactly two clear words identifying the job. Worker ownership and return identity are read from durable routing state, the lane ledger row and the dispatched CLAUDE HOME line before registrar cutover, never from the title, which is what section 3's identify-before-you-classify rule already required. Workers admitted before 2026-09-07 keep their admitted titles and are never renamed mid-flight, and legacy Table or Chair names are never mass-renamed by AI. Chair title parity (decision 0088) stands and consumes the two-word Table name. Registration, scope admission, collision, the wrong-door law, the ROOM literal, and the pre-cutover bridge are unchanged.
+Ruled by Allison 2026-08-26. The problem this kills: Allison hunting for mystery Code sessions and remembering which worker belongs to which work. Claude Code takes care of Claude Code.
 
 v1.3 (ruled by Allison 2026-09-01, the founder-load worker-lifecycle amendment, ruling of record aura intake/2026-09-01-ruling-table-and-worker-lifecycle-terminality.md, source aura issue #200, delivered 2026-09-03): the worker's terminal transition becomes a real thing it performs, not a state it drifts into. Two additions. New section 7A: a worker with no remaining owned action, whose accepted handoff or merge is finished, RELEASES what it owns before any SAFE TO ARCHIVE, meaning its monitors, its scheduled wakeups and check-ins, its PR and CI subscriptions, and its background agents and tasks. Section 7 amended: the archive motion and the lane-ledger flip are ONE lifecycle close, so a worker that has actually been archived stops advertising itself as an active wait, reconciled on evidence at the moment of the close rather than by a later human cleanup or a sweeper. Archive authority is unchanged, Allison's product confirmation still gates every archive and the home conversation still owns the flip. The live failures that forced it, 2026-09-01 to 2026-09-03: the Final Reconciliation worker stayed alive after its substantive work was complete because it kept re-arming hourly check-ins and PR subscriptions while waiting on a merge NORTH had already made, producing ongoing noise Allison had to interpret; and lanes.md still read waiting-on-carry-back for two finished workers, one of them after Allison had physically archived it. This adds no registry, no dashboard, no daemon, and no ledger column.
 
-<!-- RULED-BY: aura/decisions/0088-chair-worker-boundary-and-title-parity.md date:2026-09-04 -->
-v1.4 (ruled by Allison 2026-09-04 via Lock that, ruling of record aura decisions/0088-chair-worker-boundary-and-title-parity.md): the chair/worker boundary. A CHAIR is the authoritative home conversation where a table is seated. A WORKER is a temporary execution session dispatched from the table into an approved implementation engine, and every Claude Code session the Steward touches is a worker, never a chair, whatever its title reads and however the product presents it. The chair stays home at the table while the worker executes and receives the worker's evidence, and the worker then moves through its terminal lifecycle (section 7A). Titles follow roles. A chair reads exactly the TABLE NAME, a worker reads exactly `<Table Name> - <Specific Job>` (SUPERSEDED IN PART by v1.5 under decision 0091: a worker reads exactly two clear words identifying its job), and a worker whose title has collapsed to the bare table name is drift impersonating the chair, repaired to the worker form under section 2. Chair title parity is a continuing invariant maintained by the surface where it can read and set its title, so the Steward's self-repair discipline for workers is the Code-side half of the same rule. This SUPERSEDES the v1.2 sentence that a Project conversation is a chair, narrowing it to the authoritative home conversation exactly as decision 0088 narrows decision 0081, and it changes nothing in registration, scope admission, collision, the wrong-door law, the ROOM literal, or the pre-cutover bridge.
-
-v1.2 (ruled by Allison 2026-08-30, ruling of record aura decisions/0081-chair-model-amendment-to-decision-0066.md, aura decisions/0082-registrar-model-amendment-to-decision-0074.md, and aura decisions/0084-registry-consumption-amendment-to-decision-0077.md, implementing decision 0080 Section 28): the enforcement target moves with the rule it enforces. Concurrency itself is no longer the violation. A violation is an unregistered worker or a worker whose exact execution scope collides with another, under the same evidence standard decision 0074 set. A table is the durable logical workstream and a conversation is a chair seated at it, and Table Birth is a deliberate declared act, so a Scratch conversation owns no workers and the Steward never recovers an owning table from a chair's own assertion or from a visible title. Bridge until cutover, decision 0082 and decision 0080 Section 24: the registrar and the table registry do not exist yet, so until Allison rules the one cutover the installed one-active-worker practice continues to bind and the Steward keeps checking it, as pre-cutover discipline rather than target-state law.
+v1.2 (ruled by Allison 2026-08-30, ruling of record aura decisions/0082-registrar-model-amendment-to-decision-0074.md, implementing decision 0080 Section 28): the enforcement target moves with the rule it enforces. Concurrency itself is no longer the violation. A violation is an unregistered worker or a worker whose exact execution scope collides with another, proven from evidence. Bridge until cutover, decision 0082 and decision 0080 Section 24: the registrar and the table registry do not exist yet, so until Allison rules the one cutover the installed one-active-worker practice continues to bind and the Steward keeps checking it, as pre-cutover discipline rather than target-state law.
 
 This is a capability, not an agent. No new dashboard, database, registry, service, or system of record. The lane ledger (aura docs/estate/lanes.md) stays the only durable work state, unchanged in schema. The Steward reads and writes through the proven native ccd_session_mgmt tools plus the existing ledger path, and nothing else.
 
-## 0. Naming is not enforced
-
-Decision 0107 retires naming ceremony. Visible session titles are navigation only.
-
 ## 1. Session identification
 
-Identify workers from stable native session ID, durable lane/dispatch state, repository, worktree/branch, transcript evidence, model and creation time as needed. A title may be used as a convenience hint only.
-
-## 2. No title repair
-
-Do not perform birth self-title, title-parity checks, drift repair, two-word enforcement, or rename loops. If Allison or the product changes a visible title, continue normally.
+Identify workers from stable native session ID, durable lane/dispatch state, repository, worktree/branch, transcript evidence, model and creation time as needed.
 
 ## 3. Identify before you classify
 
-Never classify a session from its visible title alone. A Claude Code session is a worker, never a chair, regardless of what its title reads (decision 0088). Identification uses, in order of strength: durable lane state (the ledger row), dispatch evidence (the block that spawned it, its SESSION NAME and CLAUDE HOME lines), transcript evidence (`list_events`, `search_session_transcripts`), and session metadata (`get_session` for worktree, branch, model, creation time). Stable identity is the `local_<uuid>` sessionId, recorded in prose in the ledger row's Window title/parity cell, never in a new column.
+Identification uses, in order of strength: durable lane state (the ledger row), dispatch evidence (the block that spawned it and its CLAUDE HOME line), transcript evidence (`list_events`, `search_session_transcripts`), and session metadata (`get_session` for worktree, branch, model, creation time). Stable identity is the `local_<uuid>` sessionId, recorded in the ledger row's second cell, never in a new column.
 
 Honest classifications, from evidence:
 
-- Owned worker. Durable lane or dispatch evidence identifies its owner and return destination. A title mismatch needs no repair.
+- Owned worker. Durable lane or dispatch evidence identifies its owner and return destination.
 - Orphan. Real work, no recoverable owning table from any evidence. Report it as an orphan with what the transcript shows it did; never invent a home (ledger Rule 5).
 - Mixed-purpose. The transcript shows genuinely different jobs sharing one session. Say mixed, plainly. Do not force a clean genealogy that never existed, and do not split history retroactively.
 - Side-fix. Work discovered inside another mission. Distinguish the discovered-from context from the operational home; a worker can have one discovery source and a different operational branch or home, and a shared repo, branch family, issue, PR, or topic is NEVER by itself proof of shared table ownership.
 
-Historical Room/Table labels may be carried verbatim when they help a human find old state, but they are never authority. Current ownership and return routing come from stable native IDs, actual repository/worktree/branch, durable lane state, destination capability, and task evidence.
-
 ## 4. Worker registration and scope collision (enforcement, retargeted v1.2)
 
-Retargeted 2026-08-30 by decision 0082 and narrowed by decision 0107. Concurrency itself is not a violation. The two violations the Steward flags are an unregistered worker with no admitted durable ownership/scope record, and a proven exact execution-scope collision. Same or different visible titles never establish a collision.
+Retargeted 2026-08-30 by decision 0082. Concurrency itself is not a violation. The two violations the Steward flags are an unregistered worker with no admitted durable ownership/scope record, and a proven exact execution-scope collision.
 
 When checking: inventory active workers (`list_sessions` plus the ledger's Active lanes), establish each one's owning table and its exact execution scope from evidence per section 3, and only flag a violation when the missing registration or the exact scope conflict is PROVABLE. Suspected-but-unproven cases are reported separately as suspicions, never flagged as violations and never cleaned up on suspicion. Two workers on one table with genuinely disjoint exact scopes are not a violation and are not reported as one.
 
@@ -74,7 +52,7 @@ Bridge until cutover, decision 0082 and decision 0080 Section 24: no registrar a
 
 ## 5. Side-fix handling
 
-When a worker discovers unrelated legitimate work: never silently absorb it and never silently spawn an untracked worker. Decide whether it blocks the current mission. Non-blocking work is preserved through the existing waiting or staged-kickoff mechanism. Genuinely required concurrent work gets its own admitted, non-conflicting scope and durable return path; a visible name is optional.
+When a worker discovers unrelated legitimate work: never silently absorb it and never silently spawn an untracked worker. Decide whether it blocks the current mission. Non-blocking work is preserved through the existing waiting or staged-kickoff mechanism. Genuinely required concurrent work gets its own admitted, non-conflicting scope and durable return path.
 
 ## 6. Messaging
 
@@ -118,13 +96,11 @@ Cloud-dispatched Code sessions do not appear in local Desktop `list_sessions`, a
 
 ## 9. Ledger writes (minimum, existing schema only)
 
-The Steward writes only the minimum existing lane-state updates: its own row at registration and carry-back, stable session ID, actual repository/worktree/branch, scope, status, and return state in existing cells. It never writes title-parity or title-repair evidence. Never a new column, lineage token schema, rewrite of Completed rows, or rewrite of historical resolved state. Amended 2026-08-30 (decision 0082, narrow registry retirement): the machine-structured table registry and structured worker lifecycle state that decision 0080 requires are authorized outside this skill and are built by their own workstream, lanes.md remains worker and lane operational state until implementation evidence earns a migration, all current parser guarantees hold until the coordinated revision cutover of decision 0080 Section 17, and this skill still creates no registry, column, database, dashboard, or competing source of truth. All writes obey the shared-canonical-file-writes directive; the estate-brain `update_lane_row` tool is the preferred guarded path.
+The Steward writes only the minimum existing lane-state updates: its own row at registration and carry-back, stable session ID, actual repository/worktree/branch, scope, status, and return state in existing cells. Never a new column, lineage token schema, rewrite of Completed rows, or rewrite of historical resolved state. Amended 2026-08-30 (decision 0082, narrow registry retirement): the machine-structured table registry and structured worker lifecycle state that decision 0080 requires are authorized outside this skill and are built by their own workstream, lanes.md remains worker and lane operational state until implementation evidence earns a migration, all current parser guarantees hold until the coordinated revision cutover of decision 0080 Section 17, and this skill still creates no registry, column, database, dashboard, or competing source of truth. All writes obey the shared-canonical-file-writes directive; the estate-brain `update_lane_row` tool is the preferred guarded path.
 
 ## Rules
 
-- Never classify from a visible title alone, and never from a chair's own assertion of identity; evidence first, always (decision 0081).
-- A Claude Code session is an execution worker; its visible title is optional navigation metadata and never determines authority or ownership.
-- Never initiate title repair, rename, or parity verification as governance work.
+- Classify from evidence first, always.
 - Never archive without Allison's product-level confirmation; never propose PRs or fixtures under review as cleanup targets.
 - A finished worker releases every monitor, check-in, subscription, scheduled wakeup, and background agent it owns BEFORE any archive verdict, and reports background activity as NONE with that verdict (section 7A). Re-arming a check-in on work the worker no longer owns is the bug, and an item it cannot stop makes the verdict NOT safe rather than passing silently.
 - Never stop a monitor, task, or job the worker does not own. Estate rails and other lanes' work are somebody else's; when ownership is unclear, leave it running and say so.

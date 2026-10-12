@@ -15,6 +15,8 @@ subtitle: "canon and rule changes reach every surface, automatically"
 
 # Canon Sync Protocol -- v1.1 (2026-08-07)
 
+<!-- RULED-BY: aura/decisions/0107-retire-routing-naming-ceremony.md date:2026-10-12 superseded naming text removed -->
+
 Rule authored by Allison, 2026-07-28. Her words: this is the Ten Commandments. Any time a canon doc or a rule changes anywhere, the sync happens automatically, 100 percent of the time, and Claude initiates it. Allison never has to ask, never has to remember, and never discovers a stale copy later.
 
 v1.1 amendment 2026-08-07, ruled YES by Allison, both halves (ruling of record aura intake/2026-08-08-ruling-canon-sync-protocol-repo-home-and-shelf-surfaces.md, commit 2f70ea0). Half one, this skill gets a canonical home in the expert-partners-skills repo like every other rule-bearing skill, and the claude.ai user-scope copy becomes a deployed copy of it. Half two, the surface list gains the two skill shelves. The gap that forced both halves was found by the Both Shelves Rule lane and is worth stating plainly, because it is the exact failure this protocol exists to prevent: the trigger list below has always fired on a rule-encoding skill being created or overwritten, while the surface list named Drive, project knowledge, the partnersync repo, and the paused Team GPT. Not one of those is a skill shelf. The protocol caught skill changes and routed them nowhere.
@@ -48,7 +50,7 @@ Every canon doc lives in these places, and Claude drives each step to the edge o
 
 2. Claude project knowledge. Check HOW the project holds the doc before instructing anything: if the knowledge file shows a Drive sync badge, the Drive paste already propagates and Allison does NOTHING here; say so explicitly. Only if the copy is a static upload does Allison get a remove-and-reupload step.
 
-3. GitHub, the partnersync repo copy under project-knowledge/. Claude produces the Canon Doc Sync dispatch in the same response as the promotion, automatically, following the code-block-routing skill exactly: routing line above the fence, an optional short session label (no exact name, no title verification, decision 0107), the WORKTREE and MODEL AND EFFORT lines when the block spawns a session, one block per response, waiting-on sentence, and the pin only AFTER Allison confirms the paste. The block tells Claude Code to read the promoted file from the local project folder, replace the repo copy exactly (git mv for renames so history follows), diff, commit with a dated promotion message, push, and report the commit hash. Claude marks this surface green only when the hash comes back.
+3. GitHub, the partnersync repo copy under project-knowledge/. Claude produces the Canon Doc Sync dispatch in the same response as the promotion, automatically, following the code-block-routing skill exactly: routing line above the fence, the WORKTREE and MODEL AND EFFORT lines when the block spawns a session, one block per response, waiting-on sentence, and the pin only AFTER Allison confirms the paste. The block tells Claude Code to read the promoted file from the local project folder, replace the repo copy exactly (git mv for renames so history follows), diff, commit with a dated promotion message, push, and report the commit hash. Claude marks this surface green only when the hash comes back.
 
 4. ChatGPT Team GPT: PAUSED at Allison's direction, 2026-07-28. The Team GPT is known-stale and she will refresh it in one batch on her own schedule. Do NOT flag UPDATE TEAM GPT per promotion, do not nag, do not track it as an open item. Reactivate this surface only when Allison says the Team GPT is being refreshed; at that moment, hand her the current canonical file set in one batch.
 
@@ -70,19 +72,17 @@ A skill that mounts on only one shelf owes only that shelf, and the report says 
 
 ## The canon-doc dispatch, exact shape
 
-Per the code-block-routing skill: name the destination surface outside the fence, carry the substantive execution safeguards, and pin after paste confirmation. Under decision 0107, an exact session title is optional. Canon promotions may continue an existing Canon Doc Sync worker when its actual context matches, or use a new isolated worker with the required WORKTREE and MODEL AND EFFORT lines.
+Per the code-block-routing skill: name the destination surface outside the fence, carry the execution safeguards, and pin after paste confirmation. Canon promotions may continue an existing Canon Doc Sync worker when its actual context matches, or use a new isolated worker with the required WORKTREE and MODEL AND EFFORT lines.
 
 PASTE INTO: Claude Code, existing session "Canon Doc Sync"
 
 (fenced block begins)
-DESTINATION: canonical repository and document path named below. Visible session title is optional and must not be verified or repaired.
+DESTINATION: the partnersync repo, at the document path named below.
 
 Update [Doc XX - Name] in the partnersync repo to match the newly promoted Drive version.
 Source file: [local path]
 Steps: locate the repo copy under project-knowledge/, verify branch (canon lives on main, stop and report if not on main), replace content exactly, rename with git mv if the doc was retitled, diff and summarize, commit "[Doc XX]: [summary] (promoted from Drive [date])", push, report the commit hash.
 (fenced block ends)
-
-Corrected 2026-08-07 in the same pass that adopted this skill into canonical. The skeleton previously carried the retired self-rename instruction, which told the session to ask Allison to paste `/rename Canon Doc Sync`. The launch-naming and off-disk self-verification that replaced it on 2026-08-07 are themselves superseded by decision 0107 (ruling of record aura/decisions/0107-retire-routing-naming-ceremony.md): no session is named, title-verified, or renamed as part of this protocol. Keeping an old skeleton would ship a superseded block format out of canonical every time this protocol fired.
 
 ## Canonical home and deployed copies
 

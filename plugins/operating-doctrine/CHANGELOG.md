@@ -1,3 +1,12 @@
+## 2.53.0 - 2026-10-12
+
+Removes the remaining routing naming text from pin, code-block-routing,
+lane-spawn, session-steward, cowork-direct-execution and session-model-advisor,
+with matching removals in session-wrap v1.18, canon-sync-protocol and
+batch-first-execution, per Allison's 2026-10-12 amendment to decision 0107
+(delete, never restate). Worktree, model and effort, ledger and closeout rules
+are unchanged.
+
 ## 2.52.0 - 2026-10-12
 
 Completes the decision 0107 propagation sweep after 2.51.0. Removes remaining

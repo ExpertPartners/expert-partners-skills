@@ -112,7 +112,7 @@ EFFORT/SPEED: <resolved value>
 Before giving Allison any paste block, perform the sending-side completeness
 check. Confirm that WHERE TO GO, SURFACE, MODE, MODEL, EFFORT/SPEED, WHY,
 PASTE THIS and COME BACK WHEN each has a real value; the destination and return
-condition must be specific. For a new Code Worker, validate the current non-naming routing envelope from `code-block-routing`: destination, repository, assigned isolated WORKTREE and branch, MODEL AND EFFORT, exact scope, return destination, and any other substantive field required for that dispatch. Human-readable session or workstream labels are optional.
+condition must be specific. For a new Code Worker, validate the routing envelope from `code-block-routing`: destination, repository, assigned isolated WORKTREE and branch, MODEL AND EFFORT, exact scope, return destination, and any other field required for that dispatch.
 For a continuation, name the actual existing Worker and preserve its identity.
 Do not emit a blank, placeholder or omitted required field; resolve it through
 available records and tools first. If the missing value is Allison-only truth,
@@ -122,8 +122,8 @@ Worker's own envelope checks remain in force as a second safeguard.
 Include:
 
 - Outcome and completion evidence; current task identity and return destination
-  when actually established. Preserve them exactly. Do not invent a Room,
-  Table, title, new worker, or identity ceremony to answer an ordinary question.
+  when actually established. Preserve them exactly. Do not invent a new worker
+  to answer an ordinary question.
 - Allowed systems, paths and actions; protected state and forbidden actions;
   prerequisites and genuinely required approvals.
 - Ordered milestone IDs, each with input, action, deliverable, verification,
