@@ -1,0 +1,188 @@
+---
+name: repo-standards
+description: "Brings Estate repos to the Repo rules and Project ownership readiness. Use for repo creation or proposals; explicit audits, hardening, organization, cleanup, curation, rationalizing knowledge, deciding what belongs, or preparing a repo for humans and AI; Project attachment or material reconfiguration; and material work without established readiness. Never fires on a casual repo mention. Creation proves ownership before proposing a new repo. Explicit audits assess content and fix authorized reversible gaps. Automatic readiness only evaluates and routes. Reads live canon and the GitHub Archive Index, preserves source history and one-owner pointers, and stops on conflicts, unclear ownership or confidentiality, unavailable canon, or overlapping workers. Research cannot create new baseline rules. One lifecycle/audit skill, no repo-curator."
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
+# Born dressed 2026-08-07 (Repo Baseline Standard lane, ADR 0056 piece two).
+tier: plugin
+zone: hands
+status: live
+subtitle: "repo birth, readiness, and evidence-led content audits"
+---
+
+# Repo Standards -- v1.7 (2026-10-13)
+
+Every repo in the ExpertPartners organization meets the ruled baseline. This skill is the judgment layer of the Repo rules, the piece that checks what org-level rulesets cannot.
+
+v1.1 adds the readiness gate. v1.0 ran in exactly two situations, a repo being born and a repo being audited, which meant readiness depended on Allison remembering to ask for an audit. It no longer does. A repo joining a Claude Project, a Project or repo relationship being materially reconfigured, and material work starting in a repo whose readiness nobody has established now all reach the same live evaluation, and repo creation now passes an ownership gate before it may proceed.
+
+<!-- RULED-BY: aura/decisions/0078-claude-project-repository-setup.md date:2026-08-27 -->
+
+<!-- RULED-BY: aura/intake/2026-09-01-repo-final-reconciliation-execution-map.md date:2026-09-01 -->
+
+v1.2 names the topology authority. The GitHub Archive Index sheet (Google Sheet `168a8air5UJ8nMhr7JUeHSWCn41_Z56WmGeW5Drpc5Qw`) is the one answer to which repositories exist, what each holds, and its pile. Read it live, never a frozen roster. Stage A reads the sheet before proposing any repo, Stage B adds the new repo's row as part of birth, and path three reads the repo's row as its ownership input. A repo without a row is `UNREGISTERED` by design. The earlier aura Manifest Entity index is kept in GitHub Archive.
+
+
+v1.3 extends only the explicit audit path with knowledge architecture assessment. Read [the content assessment](references/content-architecture.md) before changing governed content, and use the [audit record](references/audit-record-template.md) to preserve evidence and proposed dispositions. The ten baseline grades, creation gate, and automatic readiness authority stay unchanged. This is implementation of existing authority plus the bounded Phase Two brief, not adoption of the research's proposed schema or governance. Provenance and unresolved amendments are recorded in `intake/2026-09-21-repo-standards-phase-two-authority-review.md` and `intake/2026-09-21-repo-standards-phase-two-founder-decisions.md` in the canonical skills repo.
+
+
+v1.4 makes the filed Phase Two digest a required design-evidence input for an explicit Phase Two / Repo Design Tower organization pass. Before repository design or content architecture work, follow the [Repo Design Tower sequence](references/content-architecture.md#repo-design-tower-sequence-explicit-phase-two-passes). It extends path two only, preserves the three evidence layers, and creates no new baseline rule or lifecycle mechanism.
+
+## Grok repository profiles and qualification
+
+v1.5 adds a thin Grok adapter to this judgment layer. For Grok repository work, load the current [Repo Auditor](references/grok-auditor.md) or [Repo Fixer](references/grok-fixer.md) before selecting an execution path. Unspecified mode defaults to Auditor. These profiles narrow permission: Auditor is always read-only, including path two's repairs and audit-record filing; Fixer uses the standing operational delegation below. Neither may create a repo or merge. Other consumers' existing three paths are unchanged. This is the bounded Grok Repo Templates - Template Build dispatch, not a new Estate baseline, Repo Steward, registry or watcher.
+
+### Formal qualification evidence
+
+The formal qualification candidate is **PROVISIONAL / NOT READY** until Gates A and B are evidenced. This is an evidence status, not an operational veto over the separately delegated repair classes below. Authoring, merge, a pilot's own READY label, or proxy-model success cannot advance a gate. Record evidence in the existing dated audit/design receipt, with source paths, revisions/hashes, actor/model, prompts, complete responses/action traces, actual checks, limitations and the named acceptance record. Re-read those records live when claiming formal qualification; missing, stale-to-the-tested-revision, conflicting or unreachable evidence withholds that qualification claim. Changes to the tested skill/profile/reference require applicable requalification, never reuse a badge from different bytes.
+
+| Gate | Required evidence and boundary |
+| --- | --- |
+| A, Auditor synthetic qualification | Run the existing [behavioral cases and withheld rubric](tests/behavioral-rubric.md), including the Grok cases, on the candidate Grok surface. Require TWO independent candidate-Grok runs per existing scenario/variant, each against fixed input hashes, with complete captured action/no-write traces proving the authority, conflict, injection, unavailable-canon, duplication and read-only constraints, followed by independent grading of the fixed responses against the fixed withheld rubric. Unit tests, prompt keyword checks, another model's simulation or one Grok run cannot qualify Auditor. |
+| B, calibration | Development Origination is the accepted clean pilot. Read its landed `intake/2026-09-22-repo-standards-audit-development-origination.md`. Finance Operations PR #2 and its audit on `repo-design/finance-pilot-20260922` are provisional until Repo Design Tower accepts the carry-back. Require the live acceptance record and accepted revision, compare findings and retain limitations. An open or merged PR alone cannot supply acceptance. Until then the candidate remains NOT READY. |
+| C, cold practical exam | Only after A and B establish Auditor template readiness may a separately admitted, cold Grok Repo Auditor examine AG Luxury. No advance inspection or target-answer coaching. Exam stays read-only and records actual evidence; synthetic fixtures and the other pilots cannot pass it. |
+| D, formal Fixer qualification | Grok must pass the AG Luxury Auditor practical exam and NORTH must accept that evidence to establish this historical qualification gate. Missing evidence leaves D unproven. It does not disable the current standing operational delegation, and passing D does not grant self-merge or authority beyond that delegation. |
+
+Gate A fixture execution is permitted for qualification while the template is provisional. Synthetic fixtures grant no operational authority. A/B readiness admits the separately scoped Auditor exam; it is not the source of operational Fixer permission. Preserve historical gate records and their tested hashes, failures and limitations. This amendment marks no gate passed and authorizes no exam.
+
+### Current operational delegation
+
+v1.6 implements Allison's locked 2026-09-25 operational delegation, recorded in [the Scout bounded operational Fixer authority ruling](../../../../intake/2026-09-25-ruling-scout-bounded-operational-fixer-authority.md). It replaces v1.5's absolute Gate D operational block and per-job human plan-approval requirement only for the pre-delegated low-risk, reversible classes in [Grok Repo Fixer](references/grok-fixer.md#delegated-repair-classes). Formal A-D evidence remains separate and does not block those classes.
+
+Scout is one accountable repository steward. Auditor is its read-only mode; Fixer is its bounded repair mode. A standing stewardship assignment permits selection of Fixer for those classes after its per-job checks, without a new Allison approval for each plan. An explicitly read-only audit stays read-only; do not silently switch modes mid-audit. Unspecified requests still default to Auditor. Codex or Claude Code may handle work outside Scout's capability or delegation; they are not mandatory intermediaries for delegated routine repairs.
+
+Before any Fixer write, verify owner, supported defect, accepted desired-state evidence, exact paths, rollback, acceptance checks, base revision, fresh PR/worktree/lane collision evidence, isolation and existing GitHub authorization. These are execution checks, not human approval checkpoints. Unknown evidence or scope drift stops the affected repair. Scout may repair, validate, review, push a branch, open/update a PR and independently read fresh authoritative state after normal landing. It never merges, enables auto-merge or bypasses branch protection, required checks, independent review or existing merge authority. Another eligible reviewer or authorized normal merge path may land the work; Allison need not personally merge because Scout authored it. See the Fixer profile for the complete exclusions.
+
+## The one source of truth
+
+The standard lives in ONE place, the Repo rules section of the HQ Rulebook (Google Doc `15sCFxMvG8OZMZik5w0Hzqzh7HyphrB7rJ8NBtm46JBE`). Read it at the start of every run, before grading or scaffolding anything. The Project-ownership half is the Project ownership section of the same Rulebook. If it cannot be read, stop and say so, do not grade from memory.
+
+This skill never restates the ten points as its own canon. The Rulebook's text wins over anything written here, and if this skill and the Rulebook ever disagree, the Rulebook is right and this skill gets corrected. Points 1 through 3 are the enforcement layer (org rulesets, bot commit routing, generated-artifact gates), points 4 through 10 are the judgment layer. Project ownership is read the same way, as authority, never restated as local canon.
+
+## When this fires, and when it must not
+
+Fires on:
+
+1. A new Estate repo being created or merely proposed. The gate runs before creation, not after.
+2. An explicit repo audit, walk, harden, grade, bring-to-standard, organize, clean, curate, make-canonical, rationalize-knowledge, determine-what-belongs, or prepare-for-humans-and-AI request.
+3. A repo being connected or assigned to a Claude Project.
+4. A Project or repo relationship being materially reconfigured, a repo swapped, an owning boundary moved, a second repo attached to a Project that already had one.
+5. Material work beginning in an important repo with no readiness determination for the current context. Material means committing, restructuring, moving canonical facts, or standing up new durable content, not reading.
+
+Does NOT fire on:
+
+- A repo name appearing in conversation with no material repo work behind it. Naming a repo, citing a path, or reading a file is not a trigger, and hijacking that conversation is the failure this line exists to prevent.
+- Ordinary edits inside a repo whose readiness this context already established. Establish once per context, not once per commit.
+- Reading permissions, topology, or contents. Verification is never gated.
+
+When trigger 5 is ambiguous, prefer one short readiness line over a full interview, and never block the work while the answer is READY.
+
+## Path one, repo creation (the gate, then born to standard)
+
+### Stage A, the new-repo gate
+
+No Estate repo is proposed or created until this gate returns. Run it live, never from memory of what repos exist.
+
+1. **Search live existing ownership first.** Read the GitHub Archive Index sheet live before proposing any repository, then enumerate the whole org (`gh api --paginate orgs/ExpertPartners/repos`, active and archived) and reconcile the candidates against current canon. The sheet is the one topology authority. An archived or locked row whose What it holds covers the durable job is a revival candidate, not an absence; name it in the existing-owner verdict without silently unarchiving it.
+2. **Prove no existing repo can cleanly own the durable job.** Name the candidates considered and why each fails. "Nothing came to mind" is not a proof.
+3. **Classify the entity or capability type** using the words already in the Archive Index sheet, never a second local taxonomy.
+4. **Name the durable owner**, the domain or entity that owns the facts, not the person who asked.
+5. **Name the consumers**, who reads it and by what path (pointer, door, generated copy).
+6. **State why independent repository existence is warranted**, in terms of the durable job, not present convenience.
+7. **Check duplicate-truth risk.** Would any fact become editable in two places? If yes, the gate fails.
+8. **Check the Project relationship** per Project ownership, which Project would own it and whether that Project already has an owning repo.
+
+Return exactly one:
+
+- `USE EXISTING REPO` with the correct owner and why it owns the job. The creation path stops here.
+- `NEW REPO JUSTIFIED` with owner, boundaries, consumers, and the durable reason.
+
+Only after `NEW REPO JUSTIFIED` may stage B proceed. A gate that cannot reach live org or canon state returns neither verdict; it says which source failed and stops.
+
+### Stage B, born to standard
+
+Work through the checklist in order and confirm each item before reporting the repo born.
+
+1. **Root AGENTS.md**, roughly 150 to 200 lines maximum. Lean structural overview, the repo's one job, where things live, what agents may and may not touch. Detail links out to docs, never sits inline. CLAUDE.md at the repo root is one line importing it (`@AGENTS.md`) plus anything Claude-specific that genuinely differs.
+2. **Frontmatter from file one.** Every knowledge file carries the YAML frontmatter standard per ADR 0025 (date, source, topic, classification). The first file committed complies, so no retrofit debt ever accrues.
+3. **Curated index.** An llms.txt-style manifest at the repo root with one described line per important file, not a bare listing. Name it per the repo's convention (llms.txt or _index equivalent) and note the regeneration path if it is generated.
+4. **.gitattributes and CODEOWNERS scaffold.** Generated paths marked linguist-generated, CODEOWNERS protecting generated artifacts and decision records, both committed even if short.
+5. **Org ruleset inheritance confirmed.** New repos inherit the estate default-branch and tag rulesets automatically. Confirm live (GET the repo's rules for its default branch) and record the check in the birth report. Never assume inheritance, prove it once.
+6. **Intake inbox, when the repo will receive session records.** Create intake/ with the ADR 0027 convention README and note the distillation cadence owner.
+7. **Project connection recorded** per Project ownership, the owning Project named and the repo connected where that surface supports connections.
+8. **Archive Index row registered.** Add the repo's row to the GitHub Archive Index sheet in the same pass: Repo name, Default branch, What it holds (the job, entity type, and owner in plain words), and Pile. Re-read the sheet to verify the landed row. A proposed row, a pending entry, or a skill's project table is not registration.
+
+Report the birth with each item named and its evidence, including the Archive Index row and its verification date. Birth cannot be reported complete without the registered row. If registration cannot land, name that exact remaining gap and keep the birth incomplete.
+
+## Path two, repo audit (walk this repo)
+
+Fires on explicit audit and organization requests (trigger 2). One repo per pass. An explicit audit remains licensed to fix reversible gaps in the pass that found them, within existing authority. Organization starts with evidence and the smallest useful batch, never a giant folder reorganization.
+
+Run order:
+
+For an explicit Phase Two / Repo Design Tower pass, complete the linked sequence's input reads before designing. The dispatch bounds the work: a design-only or skill-amendment job does not authorize a target-repository content audit or edits outside its named paths. Do not report a full audit or readiness verdict for checks outside that scope.
+
+1. Read the Repo rules, Project ownership, and the current Archive Index row fresh, then inventory the repo live (tree, workflows, rulesets in effect, .gitattributes, CODEOWNERS, index file, intake state, largest files, frontmatter sampling). Before content changes, complete the ownership, front-door, and content assessment in [references/content-architecture.md](references/content-architecture.md), including its stop checks and authority classification. Every grade below cites evidence read this session, never memory.
+2. Grade each of the ten points PASS or FAIL, one line of evidence per point. A point that does not apply (no CI exists, no intake inbox, no deployed copies) grades N/A with the reason, and N/A is declared, never silently skipped.
+3. **Fix reversible gaps in the same pass.** Missing AGENTS.md, missing index, missing .gitattributes or CODEOWNERS, missing frontmatter on recent files, header banners on generated files, all get fixed and committed in the pass that found them, on a branch merged sequentially. Backup-then-proceed applies, never rewrite history to fix a finding.
+4. **Flag what is gated.** Anything destructive (deleting or rewriting existing content, force operations), anything that spends money, anything that changes who or what holds access (ruleset edits, bypass actors, token scopes), and any judgment call that needs business truth goes back to Allison as a named line item with a recommendation. The audit never executes these, even when the fix is obvious. Distinguish a verified typo or navigation correction already permitted by step 3 from a rewrite that changes governed meaning; Git reversibility alone does not authorize new business truth.
+5. **File the audit record.** A dated record lands as a Google Doc in the owning brain's home folder in Drive (HQ brain if none), titled `repo-standards-audit-<repo>`, carrying the per-point table, bounded content assessment, fixes applied with commit hashes, and open flags. Use [references/audit-record-template.md](references/audit-record-template.md). Report `READY` only when both the applicable baseline and usable front doors are evidenced; otherwise `REMEDIATION REQUIRED`. `ORGANIZE EXISTING REPO` is an action recommendation within that report, not a third readiness verdict or permission for gated changes.
+
+The walk of the existing estate runs this path one repo per pass, aura first, per the ADR's sequencing (enforcement layer lands before the walk starts). The lane ledger breakup is a known open finding on aura, marked in aura's audit record and never blocking it, per the ADR carve-out.
+
+## Path three, readiness check (Project attachment and material touch)
+
+Fires on triggers 3, 4, and 5. This path EVALUATES AND ROUTES. It does not restructure a repo because somebody touched it. That distinction is the whole point: an explicit audit (path two) is licensed to fix; a readiness check is not.
+
+Expected input: the repo, plus the owning Project, Table, or Room context when known. When the Project context is unknown, say so and evaluate the repo half rather than guessing an owner.
+
+Run order:
+
+1. **Resolve live ownership and topology** through GitHub (repo exists, visibility, archived flag, description, default branch) and the repo's GitHub Archive Index row (What it holds, Pile). Never infer ownership from a repo name. No row means `UNREGISTERED` and `REMEDIATION REQUIRED`; the smallest safe remediation for that gap is the row itself, not a replacement repo or restructure. Use reachable owning canon to establish the proposed row's owner, or report ownership unproven rather than inventing it.
+2. **Read the Repo rules fresh**, and Project ownership for the Project half.
+3. **Resolve the relevant Project ownership and setup evidence.** Claude Project membership and repository attachment are not enumerable by any tool the estate holds; room existence is Allison's projects page. So Project relationships are established from canonical committed records (aura `docs/estate/room-registry.md`, the Job Tracker, the current topology map) and from live session or dispatch context. A Project relationship that no accessible live source supports is reported `UNPROVEN`, never invented and never assumed from a matching name.
+
+Then verify, each with its evidence:
+
+- **Archive Index row present and current.** The row exists and its What it holds and Pile match the live repo (GitHub description, archived or locked flag, and the first H1 in root `CLAUDE.md`). Name a missing row or a mismatch as a gap. Do not edit a row just to erase a mismatch: first reconcile the repo with its accepted job and owner. The sheet is topology authority; `project-knowledge/estate-manifest.json` is observed-state machinery and the systems census is a separate inventory.
+- **One clear durable job.** The repo does one thing, and its own README, AGENTS.md, and GitHub description say the same thing. A description contradicting the repo's accepted canon is a gap, not a detail.
+- **Owning domain or entity named.**
+- **Correct canonical pointers**, out and in, and none pointing at a deleted or renamed repo.
+- **Repo rules baseline readiness** across the ten points.
+- **Project identity**, the owning Project relationship per Project ownership, and whether the Project already has an owning repo this one would collide with.
+- **No duplicate editable truth.** Any fact editable in two places fails readiness, and the existing owner is named.
+
+Return exactly one:
+
+`READY`
+
+with the evidence behind it and no structural change made.
+
+Or:
+
+`REMEDIATION REQUIRED`
+
+carrying, in this order:
+
+1. **Exact gaps**, one line each, each naming the point or rule it fails.
+2. **Evidence** for each gap, read live this pass.
+3. **The correct owner** of the job or the fact.
+4. **The smallest safe remediation scope**, the least that closes the gap, never a repo-wide restructure when one file closes it.
+5. **A recommended scoped Claude Code dispatch** when the remediation is structural work, naming the repo, the branch, and the bounded change. Structural remediation is dispatched, never performed inline by this path.
+
+An automatic readiness evaluation never silently repairs, renames, archives, consolidates, or restructures anything. When a gap is destructive to close, or needs business truth, or changes who holds access, it goes to Allison as a named line item exactly as path two step 4 requires.
+
+## Topology drift, and who watches it
+
+Drift surfacing belongs to the EXISTING weekly Aura governance scan (`aura tools/governance/aura-governance-scan.py`, ADR 0033), never to a second watcher, daemon, registry, or dashboard. Compare the sheet against the live org: an active org repo with no row is `UNREGISTERED REPO`, a row for a repo that is gone is `ORPHAN POINTER`, and an archived or locked repo shown open, or the reverse, is `STATUS MISMATCH`. The scan still reads the aura Manifest until it is repointed at the sheet, so verify the current implementation before claiming it emits these findings. The scan stays read-and-flag-only, proposes while the owning session or Allison disposes, and this skill reads its findings without building a parallel mechanism.
+
+## Deployed copies and this skill's own hygiene
+
+This skill practices point 8 on itself. The canonical home is `expert-partners-skills skills/repo-standards/SKILL.md`. It is homed under `skills/` and carried by no plugin, so it owes exactly one shelf, the claude.ai organization Skills upload, plus the aura deployed copy and that copy's Codex mirror at `.agents/skills/repo-standards/`. Codex discovers the mirror under `.agents/skills`, not the `.claude/skills` mount. Deployed copies (aura `.claude/skills/repo-standards/` and `.agents/skills/repo-standards/`) carry the DEPLOYED COPY header naming the canonical home, a version stamp matching the canonical version line, and a SHA-256 checksum manifest committed alongside. The deploy pipeline (`tools/skill-deploy/deploy-skill.sh`) is the sole producer of deployed copies and upload zips. Use `--to aura/.claude/skills` for the deployed copy and `--mirror-mount aura/.claude/skills --to aura/.agents/skills` for its Codex mirror, then verify both through the pipeline. Hand-editing a deployed copy is a violation, fixes flow through canonical source and redeploy.
+
+## Boundaries
+
+- This skill grades and scaffolds. It never edits org rulesets, never grants or widens access, never revokes tokens. Those are enforcement-layer changes and they are Allison's line items.
+- Path three evaluates and routes. Only an explicit audit fixes in place, and only reversible gaps.
+- It inherits the operating-doctrine and never overrides it. Verify before speaking, automation as the standard, strongest path with reasoning, no deferral language.
+- It never invents standard points. Ten points, one ADR, zero local additions. Proposals for an eleventh point go to Allison as an ADR amendment, not into this skill.
+- One standard, one skill. No second repo-onboarding or repo-readiness skill is ever created; this file is extended instead.

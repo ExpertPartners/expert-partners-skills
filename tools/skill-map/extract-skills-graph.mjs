@@ -77,6 +77,23 @@ const EXCLUDE = [
   /^aura:docs\/estate\/extracts\//,  // reference extracts of external systems
 ];
 
+// Skills whose canonical home moved inside expert-partners-skills (2026-10-13, standalone
+// skills moved into marketplace plugins so every surface gets them by sync). A deployed
+// copy cut before the move still names the old path in its DEPLOYED COPY header. Aura
+// cannot be redeployed (it is being locked), so the header's old path is resolved to the
+// new canonical for the id and home checks, and the historical byte proof still runs
+// against the OLD path, where that copy's committed version lives in git history.
+const RELOCATED_CANONICAL = new Map([
+  ['skills/session-wrap/SKILL.md', 'plugins/operating-doctrine/skills/session-wrap/SKILL.md'],
+  ['skills/remember-this/SKILL.md', 'plugins/operating-doctrine/skills/remember-this/SKILL.md'],
+  ['skills/estate-memory-router/SKILL.md', 'plugins/operating-doctrine/skills/estate-memory-router/SKILL.md'],
+  ['skills/batch-first-execution/SKILL.md', 'plugins/operating-doctrine/skills/batch-first-execution/SKILL.md'],
+  ['skills/canon-sync-protocol/SKILL.md', 'plugins/operating-doctrine/skills/canon-sync-protocol/SKILL.md'],
+  ['skills/repo-standards/SKILL.md', 'plugins/operating-doctrine/skills/repo-standards/SKILL.md'],
+  ['skills/capability-currency/SKILL.md', 'plugins/research-ops/skills/capability-currency/SKILL.md'],
+  ['skills/research-intake/SKILL.md', 'plugins/research-ops/skills/research-intake/SKILL.md'],
+]);
+
 // Declared duplicates / pointers: paths that intentionally shadow a canonical copy.
 // The mapped node comes from `keep`; the other path is recorded, not mapped.
 // Ruled 2026-08-05 (flags item 3): the plugin path is canonical; the repo-root
@@ -312,8 +329,10 @@ for (const { tagged, abs, raw, header, mountRoot } of deployedFiles) {
     fail(`deployed copy names an unknown canonical repo: ${tagged} says its canonical home is "${header.repoName} ${header.canonicalPath}", and this walk covers only ${Object.keys(REPO_NAME_TO_KEY).join(', ')}`);
     continue;
   }
-  const canonicalTagged = `${repoKey}:${header.canonicalPath}`;
-  const canonicalAbs = path.join(REPOS[repoKey], ...header.canonicalPath.split('/'));
+  const relocatedTo = header.repoName === 'expert-partners-skills' ? RELOCATED_CANONICAL.get(header.canonicalPath) : undefined;
+  const canonicalPath = relocatedTo || header.canonicalPath;
+  const canonicalTagged = `${repoKey}:${canonicalPath}`;
+  const canonicalAbs = path.join(REPOS[repoKey], ...canonicalPath.split('/'));
   if (canonicalTagged === tagged) {
     // The canonical file itself carries a header naming its own path: a mirror was
     // pasted back over canonical. Say that, because "orphan copy" would send the

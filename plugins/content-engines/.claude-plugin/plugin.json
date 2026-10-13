@@ -1,5 +1,5 @@
 {
   "name": "content-engines",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Allison Gaddy content and marketing engines: master-marketer-free-agent-builder (strategy and voice layer), rare-content-engine (RARE-framework scroll-stopping content), video-transcript-relay (video-to-transcript relay through Claude Code and Google Drive), and the Titans family (xavier-offer-builder for offer construction and audit, dm-to-dollars for profile audits, lead-flow math, and conversation-to-offer bridging; shared core at references/titans-core.md). Voice and brand tokens defer to the brand-voice plugin."
 }

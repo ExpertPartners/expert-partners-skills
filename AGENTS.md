@@ -11,7 +11,7 @@ The Manifest remains the ownership authority; this file is a structural entry po
 - Read the canonical [Operating Doctrine](plugins/operating-doctrine/skills/operating-doctrine/SKILL.md)
   and the skill relevant to the task before making changes. The root
   [operating-doctrine pointer](operating-doctrine/SKILL.md) is not a second copy.
-- Use [repo-standards](skills/repo-standards/SKILL.md) for baseline work; its
+- Use [repo-standards](plugins/operating-doctrine/skills/repo-standards/SKILL.md) for baseline work; its
   governing standard is Aura's [ADR 0056](https://github.com/ExpertPartners/aura/blob/main/decisions/0056-repo-baseline-standard.md).
 - Use the [marketplace](.claude-plugin/marketplace.json) to find plugin packages
   and the [skill graph](tools/skill-map/skills-graph.json) to find individual
