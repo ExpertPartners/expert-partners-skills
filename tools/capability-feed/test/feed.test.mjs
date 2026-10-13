@@ -12,7 +12,6 @@ import { readInputs, FeedSourceError } from '../lib/sources.mjs';
 import { buildRecords, buildEnvelope, serialize, sameRecords } from '../lib/build-feed.mjs';
 import { parseWorkforceEnvelope, contractIssues } from '../lib/hq-contract.mjs';
 import { scanForLeaks } from '../lib/public-safety.mjs';
-import { unwrapFetchText, frameLikeEstateBrain } from '../lib/estate-brain-framing.mjs';
 import { makeRepo, skillMd } from './fixture-repo.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -149,7 +148,7 @@ describe('3. secrets and private-only fields cannot leak', () => {
     assert.throws(() => generate(bad), FeedSourceError);
   });
 
-  test('a feed too large for the Estate Brain fetch path is refused', () => {
+  test('a feed too large for one HQ read is refused', () => {
     const records = buildRecords(readInputs(makeRepo()));
     assert.throws(() => buildEnvelope(records, { generatedAt: NOW, maxBytes: 1000 }), e => e instanceof FeedSourceError && /size/.test(e.message));
   });
@@ -315,14 +314,6 @@ describe('HQ consumer contract, end to end', () => {
     const parsed = parseWorkforceEnvelope(JSON.parse(serialize(env)));
     assert.ok(parsed);
     assert.equal(parsed.source, 'canonical');
-  });
-
-  test('Estate Brain fetch framing: raw tool text does not parse, unwrapped text does', () => {
-    const text = serialize(generate(makeRepo()));
-    const framed = frameLikeEstateBrain('expert-partners-skills', 'tools/capability-feed/ai-workforce-feed.json', text);
-    assert.throws(() => JSON.parse(framed));
-    assert.ok(parseWorkforceEnvelope(JSON.parse(unwrapFetchText(framed))));
-    assert.equal(unwrapFetchText(text), text, 'unwrapping unframed text is a no-op');
   });
 });
 

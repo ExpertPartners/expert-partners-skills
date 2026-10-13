@@ -449,10 +449,10 @@ function applyCapabilityRecords(records, sources, explicitStatus, problems) {
   }
 }
 
-// The Estate Brain fetch tool reads files through GitHub's repository contents API,
-// which returns an empty `content` field for files over 1 MB unless a raw media type
-// is requested (docs.github.com/en/rest/repos/contents, read 2026-10-03). A feed
-// past that size would reach HQ as "No content found", so refuse it well before.
+// HQ reads the feed from GitHub's repository contents API, which returns an empty
+// `content` field for files over 1 MB unless a raw media type is requested
+// (docs.github.com/en/rest/repos/contents, read 2026-10-03). Refuse a feed well before
+// that size so a reader on the default media type never gets an empty body.
 export const MAX_FEED_BYTES = 900 * 1024;
 
 /** Wrap records in the HQ envelope, then refuse it unless it passes HQ's contract, the public-safety scan, and the size limit. */
@@ -463,7 +463,7 @@ export function buildEnvelope(records, { generatedAt, maxBytes = MAX_FEED_BYTES 
   for (const issue of contractIssues(envelope)) problems.push(`HQ contract: ${issue}`);
   for (const f of scanForLeaks(envelope)) problems.push(`public-safety: ${f.rule} at ${f.at} (${f.excerpt})`);
   const bytes = Buffer.byteLength(serialize(envelope));
-  if (bytes > maxBytes) problems.push(`size: the feed is ${bytes} bytes, over the ${maxBytes}-byte limit the Estate Brain fetch path can serve; split the feed or move the reader to a raw-content path first`);
+  if (bytes > maxBytes) problems.push(`size: the feed is ${bytes} bytes, over the ${maxBytes}-byte limit HQ's single read can serve; split the feed first`);
   if (problems.length) throw new FeedSourceError(problems);
   return envelope;
 }
