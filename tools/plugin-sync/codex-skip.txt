@@ -1,0 +1,1 @@
+# Plugin names Codex should NOT auto-install, one per line. Empty means install every plugin in the repo.
