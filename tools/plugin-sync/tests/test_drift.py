@@ -29,6 +29,9 @@ class Drift(unittest.TestCase):
         got = drift.parse_codex_list(LIST)
         self.assertEqual(got, {"operating-doctrine": "2.56.0", "research-ops": None, "systems-map": "0.6.1"})
 
+    def test_missing_in_claude_code(self):
+        self.assertEqual(drift.missing_in_claude_code({"a": "1", "b": "2", "c": "3"}, {"b": "2"}), ["a", "c"])
+
     def test_marketplace_versions(self):
         raw = '{"plugins":[{"name":"a","version":"1.0.0"},{"name":"b"}]}'
         self.assertEqual(drift.versions_from_marketplace(raw), {"a": "1.0.0", "b": ""})
