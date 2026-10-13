@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "b4a3803591ebad0e554861e5d5905b54d6195273",
-    "aura": "29e5826f0125b4db1995e1265d06f8fde999c7ec"
+    "eps": "d27695c73e0fcfec17d865ca8b53fde6f8bac153",
+    "aura": "fabb83cb63ffac6cd68ed7f7821418f94c7bbe2d"
   },
   "zones": [
     "surfaces",
@@ -57,8 +57,8 @@
       "subtitle": "monthly ACN staying-current check",
       "renderNote": null,
       "layout": {
-        "x": 953,
-        "y": 1768,
+        "x": 977,
+        "y": 1277,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -85,8 +85,8 @@
       "subtitle": "ACN inbox sweep, deadlines first",
       "renderNote": null,
       "layout": {
-        "x": 938,
-        "y": 2043,
+        "x": 962,
+        "y": 1552,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -170,7 +170,7 @@
       "renderNote": null,
       "layout": {
         "x": 84.5,
-        "y": 4086,
+        "y": 4347,
         "width": 194,
         "height": 63,
         "rectHeight": 48,
@@ -207,9 +207,9 @@
     },
     {
       "id": "batch-first-execution",
-      "source": "eps:skills/batch-first-execution/SKILL.md",
+      "source": "eps:plugins/operating-doctrine/skills/batch-first-execution/SKILL.md",
       "repo": "eps",
-      "tier": "organization",
+      "tier": "plugin",
       "zone": "routing",
       "status": "live",
       "inherits": [
@@ -311,8 +311,8 @@
       "subtitle": "90-day plan book and weekly dashboard",
       "renderNote": null,
       "layout": {
-        "x": 953,
-        "y": 2433,
+        "x": 977,
+        "y": 1942,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -355,9 +355,9 @@
     },
     {
       "id": "canon-sync-protocol",
-      "source": "eps:skills/canon-sync-protocol/SKILL.md",
+      "source": "eps:plugins/operating-doctrine/skills/canon-sync-protocol/SKILL.md",
       "repo": "eps",
-      "tier": "organization",
+      "tier": "plugin",
       "zone": "routing",
       "status": "live",
       "inherits": [
@@ -395,8 +395,8 @@
       "subtitle": "written pieces sent to Canva",
       "renderNote": null,
       "layout": {
-        "x": 950,
-        "y": 2809,
+        "x": 974,
+        "y": 2607,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -408,9 +408,9 @@
     },
     {
       "id": "capability-currency",
-      "source": "eps:skills/capability-currency/SKILL.md",
+      "source": "eps:plugins/research-ops/skills/capability-currency/SKILL.md",
       "repo": "eps",
-      "tier": "organization",
+      "tier": "plugin",
       "zone": "hands",
       "status": "live",
       "inherits": [
@@ -422,8 +422,8 @@
       "subtitle": "twice-monthly estate capability sweep",
       "renderNote": null,
       "layout": {
-        "x": 941,
-        "y": 2534,
+        "x": 965,
+        "y": 2043,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -449,7 +449,7 @@
       "renderNote": null,
       "layout": {
         "x": 69.5,
-        "y": 6794,
+        "y": 7386,
         "width": 224,
         "height": 63,
         "rectHeight": 48,
@@ -474,7 +474,7 @@
       "renderNote": null,
       "layout": {
         "x": 70.5,
-        "y": 4347,
+        "y": 4622,
         "width": 222,
         "height": 77,
         "rectHeight": 62,
@@ -500,7 +500,7 @@
       "renderNote": null,
       "layout": {
         "x": 74,
-        "y": 6606,
+        "y": 7198,
         "width": 215,
         "height": 77,
         "rectHeight": 62,
@@ -526,7 +526,7 @@
       "renderNote": null,
       "layout": {
         "x": 63,
-        "y": 5374,
+        "y": 5736,
         "width": 237,
         "height": 63,
         "rectHeight": 48,
@@ -620,6 +620,33 @@
       }
     },
     {
+      "id": "content-coach",
+      "source": "eps:plugins/content-engines/skills/content-coach/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "content engine orchestrator",
+      "renderNote": null,
+      "layout": {
+        "x": 78.5,
+        "y": 7299,
+        "width": 206,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "content engine orchestrator"
+        ]
+      }
+    },
+    {
       "id": "content-multiplier",
       "source": "eps:plugins/real-estate-agent-toolkit/skills/content-multiplier/SKILL.md",
       "repo": "eps",
@@ -634,7 +661,7 @@
       "renderNote": null,
       "layout": {
         "x": 66.5,
-        "y": 6707,
+        "y": 6937,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -688,8 +715,8 @@
       "subtitle": "time-blocked day, money task first",
       "renderNote": null,
       "layout": {
-        "x": 950,
-        "y": 1667,
+        "x": 974,
+        "y": 1176,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -745,7 +772,7 @@
       "renderNote": null,
       "layout": {
         "x": 75.5,
-        "y": 6345,
+        "y": 7111,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -870,9 +897,9 @@
     },
     {
       "id": "estate-memory-router",
-      "source": "eps:skills/estate-memory-router/SKILL.md",
+      "source": "eps:plugins/operating-doctrine/skills/estate-memory-router/SKILL.md",
       "repo": "eps",
-      "tier": "organization",
+      "tier": "plugin",
       "zone": "routing",
       "status": "live",
       "inherits": [
@@ -972,8 +999,8 @@
       "subtitle": "build a funnel that does not exist yet",
       "renderNote": null,
       "layout": {
-        "x": 970,
-        "y": 2332,
+        "x": 1018,
+        "y": 1841,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1000,8 +1027,8 @@
       "subtitle": "one complete Notion record per funnel",
       "renderNote": null,
       "layout": {
-        "x": 1202,
-        "y": 2142.8,
+        "x": 1250,
+        "y": 1651.8,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -1030,8 +1057,8 @@
       "subtitle": "per-funnel walk from old location to clean location",
       "renderNote": null,
       "layout": {
-        "x": 982,
-        "y": 2130,
+        "x": 1030,
+        "y": 1639,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -1056,8 +1083,8 @@
       "subtitle": "decks planned and built in Gamma",
       "renderNote": null,
       "layout": {
-        "x": 937.5,
-        "y": 1869,
+        "x": 961.5,
+        "y": 1378,
         "width": 237,
         "height": 63,
         "rectHeight": 48,
@@ -1081,8 +1108,8 @@
       "subtitle": "emails loaded into Gmail drafts",
       "renderNote": null,
       "layout": {
-        "x": 941,
-        "y": 2722,
+        "x": 965,
+        "y": 2520,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -1107,7 +1134,7 @@
       "renderNote": null,
       "layout": {
         "x": 52,
-        "y": 6519,
+        "y": 5287,
         "width": 259,
         "height": 63,
         "rectHeight": 48,
@@ -1145,6 +1172,34 @@
       }
     },
     {
+      "id": "hook-engine",
+      "source": "eps:plugins/content-engines/skills/hook-engine/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "scroll-stopping hooks and headlines",
+      "renderNote": null,
+      "layout": {
+        "x": 84.5,
+        "y": 5085,
+        "width": 194,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "scroll-stopping hooks and",
+          "headlines"
+        ]
+      }
+    },
+    {
       "id": "hook-generator",
       "source": "eps:plugins/real-estate-agent-toolkit/skills/hook-generator/SKILL.md",
       "repo": "eps",
@@ -1159,7 +1214,7 @@
       "renderNote": null,
       "layout": {
         "x": 87.5,
-        "y": 4998,
+        "y": 7024,
         "width": 188,
         "height": 63,
         "rectHeight": 48,
@@ -1184,7 +1239,7 @@
       "renderNote": null,
       "layout": {
         "x": 81.5,
-        "y": 4824,
+        "y": 4810,
         "width": 200,
         "height": 63,
         "rectHeight": 48,
@@ -1295,7 +1350,7 @@
       "renderNote": null,
       "layout": {
         "x": 59.5,
-        "y": 6432,
+        "y": 4535,
         "width": 244,
         "height": 63,
         "rectHeight": 48,
@@ -1320,7 +1375,7 @@
       "renderNote": null,
       "layout": {
         "x": 78.5,
-        "y": 4535,
+        "y": 4723,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -1345,7 +1400,7 @@
       "renderNote": null,
       "layout": {
         "x": 55.5,
-        "y": 4260,
+        "y": 4897,
         "width": 252,
         "height": 63,
         "rectHeight": 48,
@@ -1370,7 +1425,7 @@
       "renderNote": null,
       "layout": {
         "x": 81.5,
-        "y": 4448,
+        "y": 5475,
         "width": 200,
         "height": 63,
         "rectHeight": 48,
@@ -1395,7 +1450,7 @@
       "renderNote": null,
       "layout": {
         "x": 66.5,
-        "y": 4622,
+        "y": 6749,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -1421,7 +1476,7 @@
       "renderNote": null,
       "layout": {
         "x": 74,
-        "y": 5186,
+        "y": 4173,
         "width": 215,
         "height": 63,
         "rectHeight": 48,
@@ -1471,7 +1526,7 @@
       "renderNote": null,
       "layout": {
         "x": 78.5,
-        "y": 6171,
+        "y": 5649,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -1500,7 +1555,7 @@
       "renderNote": null,
       "layout": {
         "x": 33.5,
-        "y": 6070,
+        "y": 6648,
         "width": 296,
         "height": 77,
         "rectHeight": 62,
@@ -1525,8 +1580,8 @@
       "subtitle": "posts queued as Metricool drafts",
       "renderNote": null,
       "layout": {
-        "x": 938,
-        "y": 1956,
+        "x": 962,
+        "y": 1465,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -1612,7 +1667,7 @@
       "renderNote": null,
       "layout": {
         "x": 78.5,
-        "y": 3912,
+        "y": 6373,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -1636,8 +1691,8 @@
       "subtitle": "content board built in Notion",
       "renderNote": null,
       "layout": {
-        "x": 930,
-        "y": 2635,
+        "x": 954,
+        "y": 2332,
         "width": 252,
         "height": 63,
         "rectHeight": 48,
@@ -1662,7 +1717,7 @@
       "renderNote": null,
       "layout": {
         "x": 67,
-        "y": 5273,
+        "y": 5823,
         "width": 229,
         "height": 77,
         "rectHeight": 62,
@@ -1688,7 +1743,7 @@
       "renderNote": null,
       "layout": {
         "x": 93.5,
-        "y": 5896,
+        "y": 6011,
         "width": 176,
         "height": 63,
         "rectHeight": 48,
@@ -1713,7 +1768,7 @@
       "renderNote": null,
       "layout": {
         "x": 66.5,
-        "y": 5461,
+        "y": 4086,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -1807,6 +1862,90 @@
       }
     },
     {
+      "id": "post-grader",
+      "source": "eps:plugins/content-engines/skills/post-grader/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "grade a post for virality and brand fit",
+      "renderNote": null,
+      "layout": {
+        "x": 72.5,
+        "y": 4434,
+        "width": 218,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "grade a post for virality and",
+          "brand fit"
+        ]
+      }
+    },
+    {
+      "id": "post-scheduler",
+      "source": "eps:plugins/content-engines/skills/post-scheduler/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "publish and schedule posts through Blotato",
+      "renderNote": null,
+      "layout": {
+        "x": 81.5,
+        "y": 6272,
+        "width": 200,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "publish and schedule posts",
+          "through Blotato"
+        ]
+      }
+    },
+    {
+      "id": "post-value-filter",
+      "source": "eps:plugins/content-engines/skills/post-value-filter/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "seven-filter quality gate for posts",
+      "renderNote": null,
+      "layout": {
+        "x": 72.5,
+        "y": 4984,
+        "width": 218,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "seven-filter quality gate for",
+          "posts"
+        ]
+      }
+    },
+    {
       "id": "pre-listing-package-writer",
       "source": "eps:plugins/real-estate-agent-toolkit/skills/pre-listing-package-writer/SKILL.md",
       "repo": "eps",
@@ -1821,7 +1960,7 @@
       "renderNote": null,
       "layout": {
         "x": 63,
-        "y": 5635,
+        "y": 5924,
         "width": 237,
         "height": 63,
         "rectHeight": 48,
@@ -1906,7 +2045,7 @@
       "renderNote": null,
       "layout": {
         "x": 89,
-        "y": 3825,
+        "y": 4260,
         "width": 185,
         "height": 63,
         "rectHeight": 48,
@@ -1931,7 +2070,7 @@
       "renderNote": null,
       "layout": {
         "x": 59.5,
-        "y": 4173,
+        "y": 6850,
         "width": 244,
         "height": 63,
         "rectHeight": 48,
@@ -1956,7 +2095,7 @@
       "renderNote": null,
       "layout": {
         "x": 66.5,
-        "y": 5809,
+        "y": 6098,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -1968,9 +2107,9 @@
     },
     {
       "id": "remember-this",
-      "source": "eps:skills/remember-this/SKILL.md",
+      "source": "eps:plugins/operating-doctrine/skills/remember-this/SKILL.md",
       "repo": "eps",
-      "tier": "organization",
+      "tier": "plugin",
       "zone": "brain",
       "status": "live",
       "inherits": [
@@ -1996,9 +2135,9 @@
     },
     {
       "id": "repo-standards",
-      "source": "eps:skills/repo-standards/SKILL.md",
+      "source": "eps:plugins/operating-doctrine/skills/repo-standards/SKILL.md",
       "repo": "eps",
-      "tier": "organization",
+      "tier": "plugin",
       "zone": "hands",
       "status": "live",
       "inherits": [
@@ -2024,9 +2163,9 @@
     },
     {
       "id": "research-intake",
-      "source": "eps:skills/research-intake/SKILL.md",
+      "source": "eps:plugins/research-ops/skills/research-intake/SKILL.md",
       "repo": "eps",
-      "tier": "user",
+      "tier": "plugin",
       "zone": "cataloging",
       "status": "live",
       "inherits": [
@@ -2092,7 +2231,7 @@
       "renderNote": null,
       "layout": {
         "x": 66.5,
-        "y": 4723,
+        "y": 5186,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -2250,9 +2389,9 @@
     },
     {
       "id": "session-wrap",
-      "source": "eps:skills/session-wrap/SKILL.md",
+      "source": "eps:plugins/operating-doctrine/skills/session-wrap/SKILL.md",
       "repo": "eps",
-      "tier": "organization",
+      "tier": "plugin",
       "zone": "routing",
       "status": "live",
       "inherits": [
@@ -2277,6 +2416,34 @@
       }
     },
     {
+      "id": "social-analyzer",
+      "source": "eps:plugins/content-engines/skills/social-analyzer/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "90-day Instagram audit into post formulas",
+      "renderNote": null,
+      "layout": {
+        "x": 63.5,
+        "y": 6460,
+        "width": 236,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "90-day Instagram audit into post",
+          "formulas"
+        ]
+      }
+    },
+    {
       "id": "social-brand-brief",
       "source": "aura:project-knowledge/operations/blotato-social-automation/skills-staging/social-brand-brief/SKILL.md",
       "repo": "aura",
@@ -2293,7 +2460,7 @@
       "renderNote": null,
       "layout": {
         "x": 369.5,
-        "y": 5068.9,
+        "y": 5357.9,
         "width": 200,
         "height": 63,
         "rectHeight": 48,
@@ -2325,7 +2492,7 @@
       "renderNote": null,
       "layout": {
         "x": 117.5,
-        "y": 5085,
+        "y": 5374,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -2355,7 +2522,7 @@
       "renderNote": null,
       "layout": {
         "x": 607.5,
-        "y": 5157.7,
+        "y": 5446.7,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -2383,7 +2550,7 @@
       "renderNote": null,
       "layout": {
         "x": 369.5,
-        "y": 5242.9,
+        "y": 5531.9,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -2413,7 +2580,7 @@
       "renderNote": null,
       "layout": {
         "x": 369.5,
-        "y": 5155.9,
+        "y": 5444.9,
         "width": 218,
         "height": 63,
         "rectHeight": 48,
@@ -2495,13 +2662,96 @@
       "renderNote": null,
       "layout": {
         "x": 70.5,
-        "y": 5548,
+        "y": 3825,
         "width": 222,
         "height": 63,
         "rectHeight": 48,
         "annotationHeight": 15,
         "subtitleLines": [
           "weekly local roundup post"
+        ]
+      }
+    },
+    {
+      "id": "tub-students-competitive-intelligence-analyst-v1",
+      "source": "eps:plugins/research-ops/skills/tub-students-competitive-intelligence-analyst-v1/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "competitive intelligence briefing",
+      "renderNote": null,
+      "layout": {
+        "x": 930,
+        "y": 1740,
+        "width": 300,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "competitive intelligence",
+          "briefing"
+        ]
+      }
+    },
+    {
+      "id": "tub-students-customer-research-analyst-v1",
+      "source": "eps:plugins/research-ops/skills/tub-students-customer-research-analyst-v1/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "voice of customer research report",
+      "renderNote": null,
+      "layout": {
+        "x": 930,
+        "y": 2419,
+        "width": 300,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "voice of customer research",
+          "report"
+        ]
+      }
+    },
+    {
+      "id": "tub-students-geo-seo-ranking-auditor-v1",
+      "source": "eps:plugins/research-ops/skills/tub-students-geo-seo-ranking-auditor-v1/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "GEO and SEO ranking audit",
+      "renderNote": null,
+      "layout": {
+        "x": 930,
+        "y": 2144,
+        "width": 300,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "GEO and SEO ranking audit"
         ]
       }
     },
@@ -2547,7 +2797,7 @@
       "renderNote": null,
       "layout": {
         "x": 78,
-        "y": 3999,
+        "y": 3912,
         "width": 207,
         "height": 63,
         "rectHeight": 48,
@@ -2574,7 +2824,7 @@
       "renderNote": null,
       "layout": {
         "x": 78,
-        "y": 6258,
+        "y": 6561,
         "width": 207,
         "height": 63,
         "rectHeight": 48,
@@ -2601,7 +2851,7 @@
       "renderNote": null,
       "layout": {
         "x": 369.5,
-        "y": 6077,
+        "y": 6655,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -2626,7 +2876,7 @@
       "renderNote": null,
       "layout": {
         "x": 59.5,
-        "y": 5722,
+        "y": 5562,
         "width": 244,
         "height": 63,
         "rectHeight": 48,
@@ -2651,7 +2901,7 @@
       "renderNote": null,
       "layout": {
         "x": 93.5,
-        "y": 4911,
+        "y": 3999,
         "width": 176,
         "height": 63,
         "rectHeight": 48,
@@ -2676,7 +2926,7 @@
       "renderNote": null,
       "layout": {
         "x": 67,
-        "y": 5983,
+        "y": 6185,
         "width": 229,
         "height": 63,
         "rectHeight": 48,
@@ -2992,6 +3242,12 @@
       "points": null
     },
     {
+      "from": "content-coach",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
       "from": "cowork-direct-execution",
       "to": "code-block-routing",
       "type": "defers-to",
@@ -3087,20 +3343,20 @@
       "type": "calls",
       "points": [
         {
-          "x": 1182,
-          "y": 2370.5
+          "x": 1230,
+          "y": 1879.5
         },
         {
-          "x": 1192,
-          "y": 2370.5
+          "x": 1240,
+          "y": 1879.5
         },
         {
-          "x": 1192,
-          "y": 2194.2
+          "x": 1240,
+          "y": 1703.2
         },
         {
-          "x": 1202,
-          "y": 2194.2
+          "x": 1250,
+          "y": 1703.2
         }
       ]
     },
@@ -3122,12 +3378,12 @@
       "type": "calls",
       "points": [
         {
-          "x": 1182,
-          "y": 2168.5
+          "x": 1230,
+          "y": 1677.5
         },
         {
-          "x": 1202,
-          "y": 2168.5
+          "x": 1250,
+          "y": 1677.5
         }
       ]
     },
@@ -3139,6 +3395,12 @@
     },
     {
       "from": "handoff",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "hook-engine",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -3214,11 +3476,11 @@
       "points": [
         {
           "x": 329.5,
-          "y": 6108.5
+          "y": 6686.5
         },
         {
           "x": 369.5,
-          "y": 6108.5
+          "y": 6686.5
         }
       ]
     },
@@ -3294,6 +3556,24 @@
     },
     {
       "from": "pin",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "post-grader",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "post-scheduler",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "post-value-filter",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -3491,6 +3771,12 @@
       "points": null
     },
     {
+      "from": "social-analyzer",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
       "from": "social-brand-brief",
       "to": "operating-doctrine",
       "type": "inherits",
@@ -3503,11 +3789,11 @@
       "points": [
         {
           "x": 329.5,
-          "y": 5100.4
+          "y": 5389.4
         },
         {
           "x": 369.5,
-          "y": 5100.4
+          "y": 5389.4
         }
       ]
     },
@@ -3518,27 +3804,27 @@
       "points": [
         {
           "x": 329.5,
-          "y": 5146.6
+          "y": 5435.6
         },
         {
           "x": 339.5,
-          "y": 5146.6
+          "y": 5435.6
         },
         {
           "x": 339.5,
-          "y": 5329.9
+          "y": 5618.9
         },
         {
           "x": 597.5,
-          "y": 5329.9
+          "y": 5618.9
         },
         {
           "x": 597.5,
-          "y": 5215.4
+          "y": 5504.4
         },
         {
           "x": 607.5,
-          "y": 5215.4
+          "y": 5504.4
         }
       ]
     },
@@ -3549,19 +3835,19 @@
       "points": [
         {
           "x": 329.5,
-          "y": 5131.2
+          "y": 5420.2
         },
         {
           "x": 349.5,
-          "y": 5131.2
+          "y": 5420.2
         },
         {
           "x": 349.5,
-          "y": 5281.4
+          "y": 5570.4
         },
         {
           "x": 369.5,
-          "y": 5281.4
+          "y": 5570.4
         }
       ]
     },
@@ -3572,19 +3858,19 @@
       "points": [
         {
           "x": 329.5,
-          "y": 5115.8
+          "y": 5404.8
         },
         {
           "x": 359.5,
-          "y": 5115.8
+          "y": 5404.8
         },
         {
           "x": 359.5,
-          "y": 5187.4
+          "y": 5476.4
         },
         {
           "x": 369.5,
-          "y": 5187.4
+          "y": 5476.4
         }
       ]
     },
@@ -3601,19 +3887,19 @@
       "points": [
         {
           "x": 607.5,
-          "y": 5196.2
+          "y": 5485.2
         },
         {
           "x": 597.5,
-          "y": 5196.2
+          "y": 5485.2
         },
         {
           "x": 597.5,
-          "y": 5197.9
+          "y": 5486.9
         },
         {
           "x": 587.5,
-          "y": 5197.9
+          "y": 5486.9
         }
       ]
     },
@@ -3636,11 +3922,11 @@
       "points": [
         {
           "x": 587.5,
-          "y": 5176.9
+          "y": 5465.9
         },
         {
           "x": 607.5,
-          "y": 5176.9
+          "y": 5465.9
         }
       ]
     },
@@ -3658,6 +3944,24 @@
     },
     {
       "from": "the-strong-ones-brand",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "tub-students-competitive-intelligence-analyst-v1",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "tub-students-customer-research-analyst-v1",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "tub-students-geo-seo-ranking-auditor-v1",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -3705,7 +4009,7 @@
       {
         "path": "aura:.agents/skills/estate-memory-router/SKILL.md",
         "id": "estate-memory-router",
-        "canonical": "eps:skills/estate-memory-router/SKILL.md",
+        "canonical": "eps:plugins/operating-doctrine/skills/estate-memory-router/SKILL.md",
         "deployedAt": "2026-10-08",
         "stamp": "v1.1",
         "mount": "aura:.agents/skills/",
@@ -3733,7 +4037,7 @@
       {
         "path": "aura:.agents/skills/remember-this/SKILL.md",
         "id": "remember-this",
-        "canonical": "eps:skills/remember-this/SKILL.md",
+        "canonical": "eps:plugins/operating-doctrine/skills/remember-this/SKILL.md",
         "deployedAt": "2026-10-08",
         "stamp": "v1.1",
         "mount": "aura:.agents/skills/",
@@ -3745,7 +4049,7 @@
       {
         "path": "aura:.agents/skills/repo-standards/SKILL.md",
         "id": "repo-standards",
-        "canonical": "eps:skills/repo-standards/SKILL.md",
+        "canonical": "eps:plugins/operating-doctrine/skills/repo-standards/SKILL.md",
         "deployedAt": "2026-09-27",
         "stamp": "v1.6",
         "mount": "aura:.agents/skills/",
@@ -3757,7 +4061,7 @@
       {
         "path": "aura:.agents/skills/research-intake/SKILL.md",
         "id": "research-intake",
-        "canonical": "eps:skills/research-intake/SKILL.md",
+        "canonical": "eps:plugins/research-ops/skills/research-intake/SKILL.md",
         "deployedAt": "2026-09-04",
         "stamp": "tree sha256 7c8710c18d31",
         "mount": "aura:.agents/skills/",
@@ -3785,7 +4089,7 @@
       {
         "path": "aura:.agents/skills/session-wrap/SKILL.md",
         "id": "session-wrap",
-        "canonical": "eps:skills/session-wrap/SKILL.md",
+        "canonical": "eps:plugins/operating-doctrine/skills/session-wrap/SKILL.md",
         "deployedAt": "2026-10-12",
         "stamp": "v1.18",
         "mount": "aura:.agents/skills/",
@@ -3797,7 +4101,7 @@
       {
         "path": "aura:.claude/skills/estate-memory-router/SKILL.md",
         "id": "estate-memory-router",
-        "canonical": "eps:skills/estate-memory-router/SKILL.md",
+        "canonical": "eps:plugins/operating-doctrine/skills/estate-memory-router/SKILL.md",
         "deployedAt": "2026-10-08",
         "stamp": "v1.1",
         "mount": null,
@@ -3809,7 +4113,7 @@
       {
         "path": "aura:.claude/skills/remember-this/SKILL.md",
         "id": "remember-this",
-        "canonical": "eps:skills/remember-this/SKILL.md",
+        "canonical": "eps:plugins/operating-doctrine/skills/remember-this/SKILL.md",
         "deployedAt": "2026-10-08",
         "stamp": "v1.1",
         "mount": null,
@@ -3821,7 +4125,7 @@
       {
         "path": "aura:.claude/skills/repo-standards/SKILL.md",
         "id": "repo-standards",
-        "canonical": "eps:skills/repo-standards/SKILL.md",
+        "canonical": "eps:plugins/operating-doctrine/skills/repo-standards/SKILL.md",
         "deployedAt": "2026-09-27",
         "stamp": "v1.6",
         "mount": null,
@@ -3833,7 +4137,7 @@
       {
         "path": "aura:.claude/skills/research-intake/SKILL.md",
         "id": "research-intake",
-        "canonical": "eps:skills/research-intake/SKILL.md",
+        "canonical": "eps:plugins/research-ops/skills/research-intake/SKILL.md",
         "deployedAt": "2026-09-04",
         "stamp": "tree sha256 7c8710c18d31",
         "mount": null,
@@ -3845,7 +4149,7 @@
       {
         "path": "aura:.claude/skills/session-wrap/SKILL.md",
         "id": "session-wrap",
-        "canonical": "eps:skills/session-wrap/SKILL.md",
+        "canonical": "eps:plugins/operating-doctrine/skills/session-wrap/SKILL.md",
         "deployedAt": "2026-10-12",
         "stamp": "v1.18",
         "mount": null,
@@ -3861,8 +4165,8 @@
   ],
   "layout": {
     "engine": "elkjs layered, single INCLUDE_CHILDREN hierarchy over zones and brand rooms, build-time only",
-    "width": 1456,
-    "height": 6887,
+    "width": 1504,
+    "height": 7479,
     "zones": [
       {
         "id": "brain",
@@ -3977,7 +4281,7 @@
         "x": 11.5,
         "y": 3777,
         "width": 842,
-        "height": 3102,
+        "height": 3694,
         "rooms": []
       },
       {
@@ -3985,9 +4289,9 @@
         "label": "The hands",
         "caption": "funnel work and account operations",
         "x": 908,
-        "y": 1619,
-        "width": 540,
-        "height": 1275,
+        "y": 1128,
+        "width": 588,
+        "height": 1564,
         "rooms": []
       },
       {
