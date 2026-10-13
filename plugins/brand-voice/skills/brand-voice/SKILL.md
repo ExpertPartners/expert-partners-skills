@@ -18,7 +18,7 @@ defers-to:
 subtitle: "canonical brand context, registry per ADR 0045"
 ---
 
-# Brand Voice — canonical brand context
+# Brand Voice -- canonical brand context
 
 The brand registry is canonical in aura ADR 0045 (resynced from the ADR as it read on 2026-08-05). The active brands,
 
@@ -51,7 +51,7 @@ This skill also bundles three legacy brand context documents,
 1. Identify which brand the work is for. If unclear, ask.
 2. Read the relevant `brand-context-*.md` from this folder before drafting.
 3. Apply the brand's voice rules verbatim. Note any tension between brands and surface it.
-4. After drafting, validate against the brand-context doc — every claim about audience, differentiator, voice, visual identity must match.
+4. After drafting, validate against the brand-context doc -- every claim about audience, differentiator, voice, visual identity must match.
 
 ## Authoritative source
 

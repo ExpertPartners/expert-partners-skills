@@ -47,6 +47,6 @@ Do NOT use this skill for Expert Partners program sales, FAM recruiting copy, EP
 
 ## Naming
 
-- Allison Gaddy: two Ls (never Alison or Allyson)
+- Allison Gaddy: Allison has two L's, always
 - @TheAllisonGaddy: always with the @ when referencing the YouTube handle
 - eXp: lowercase e, uppercase XP if referenced
