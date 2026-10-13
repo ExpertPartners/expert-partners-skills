@@ -15,6 +15,11 @@
 # alerts through the check's own cron schedule (0 7 1,15 * * America/Chicago,
 # 3h grace).
 #
+# Dry run: CAPABILITY_CURRENCY_DRY_RUN=1 skips the heartbeat and the sweep. It
+# proves two things a headless run needs: the service account can read the
+# Capability Watch Doc and add an entry to the Capability Refresh Changelog Doc,
+# and claude -p can authenticate. Exit 0 only when both pass.
+#
 # Kill switches:
 #   ~/.claude/backup-recovery-mode   estate-wide freeze (ADR 0003)
 #   ~/.claude/capability-currency-off  this job only
@@ -30,6 +35,7 @@ set -uo pipefail
 [[ -f "$HOME/.claude/backup-recovery-mode" ]] && exit 0
 [[ -f "$HOME/.claude/capability-currency-off" ]] && exit 0
 
+DRY_RUN="${CAPABILITY_CURRENCY_DRY_RUN:-}"
 HEARTBEAT_OP_REF="op://Automation/capability-currency-heartbeat/ping_url"
 SKILLS_HOME="$HOME/Claude/projects/ExpertPartnersSkills"
 LOG_DIR="$HOME/Library/Logs/capability-currency"
@@ -44,6 +50,7 @@ ping_url() {
 }
 
 ping_hc() { # $1 = "" | "/start" | "/fail"; $2 = body
+  [[ -n "$DRY_RUN" ]] && return 0
   local url
   url="$(ping_url)"
   if [[ "$url" != https://* ]]; then
@@ -74,11 +81,41 @@ CLAUDE_BIN="$(resolve_claude)" || {
   exit 1
 }
 
+# Long-lived claude -p login (claude setup-token, one year). Lives in 1Password
+# only and is read at call time. When the item does not exist yet, the saved
+# login is used instead, which can expire between runs.
+TOKEN_REF="op://Automation/capability-currency-claude-token/credential"
+tok="$(/bin/zsh -c "source ~/.zshenv 2>/dev/null; op read $TOKEN_REF" 2>/dev/null)"
+[[ -n "$tok" ]] && export CLAUDE_CODE_OAUTH_TOKEN="$tok"
+unset tok
+
+WATCH_DOC="1aaWBVTySyMPfW9XFTiDRTy_Z3TnJKAXcc1BHJ1Nl09k"
+CHANGELOG_DOC="1fGNxd_hsAIdnmKe7z677VYBuaR_szhSM9bbztbWEVQQ"
+HERE="$(cd "$(dirname "$0")" && pwd)"
+DRIVE="python3 $HERE/drive_docs.py"
+
+dry_run() {
+  local entry out
+  entry="$(mktemp)"
+  printf '## %s dry run\nHeadless dry run of the moved runner reached this Doc through the service account.\n' "$RUN_STAMP" >"$entry"
+  $DRIVE read "$WATCH_DOC" | head -1 || { echo "DRY RUN FAILED: cannot read the Capability Watch Doc"; return 1; }
+  $DRIVE prepend "$CHANGELOG_DOC" "$entry" || { echo "DRY RUN FAILED: cannot write the changelog Doc"; return 1; }
+  $DRIVE read "$CHANGELOG_DOC" | grep -q "$RUN_STAMP dry run" || { echo "DRY RUN FAILED: entry not found on read-back"; return 1; }
+  echo "DRIVE OK: read watch Doc, wrote and read back the changelog entry"
+  out="$("$(resolve_claude)" -p "Reply with exactly: ok" --max-turns 1 --max-budget-usd 0.5 </dev/null 2>&1 | grep -v SEP-2352 | tail -3)"
+  echo "CLAUDE: $out"
+  [[ "$out" == *ok* && "$out" != *"Failed to authenticate"* ]] && { echo "DRY RUN OK"; return 0; }
+  echo "DRY RUN FAILED: claude -p could not authenticate"; return 1
+}
+[[ -n "$DRY_RUN" ]] && { dry_run; exit $?; }
+
 PROMPT="Run the capability-currency skill now. This is the scheduled twice-monthly \
 capability sweep on the M4 (launchd com.expertpartners.capability-currency, run of \
 $RUN_STAMP). Execute the full sweep per the skill: all five heads, all five outputs, \
 Firecrawl primary. Write the Capability Watch and Capability Refresh Changelog Docs \
-and the run record in HQ Business Brain, Company Core. Do not touch the \
+and the run record in HQ Business Brain, Company Core. Use the Google Docs connector \
+if you have it. If you do not (a long-lived token cannot reach connectors), use \
+$HERE/drive_docs.py (read, prepend, replace) instead. Do not touch the \
 capability-refresh skill. Nothing texts Allison \
 unless she has an action to take, and any message honors the CI Alert Redesign three \
 message rules."

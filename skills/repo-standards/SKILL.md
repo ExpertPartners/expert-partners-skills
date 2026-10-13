@@ -1,6 +1,6 @@
 ---
 name: repo-standards
-description: "Brings Estate repos to the Repo rules and ADR 0078 readiness. Use for repo creation or proposals; explicit audits, hardening, organization, cleanup, curation, rationalizing knowledge, deciding what belongs, or preparing a repo for humans and AI; Project attachment or material reconfiguration; and material work without established readiness. Never fires on a casual repo mention. Creation proves ownership before proposing a new repo. Explicit audits assess content and fix authorized reversible gaps. Automatic readiness only evaluates and routes. Reads live canon and the GitHub Archive Index, preserves source history and one-owner pointers, and stops on conflicts, unclear ownership or confidentiality, unavailable canon, or overlapping workers. Research cannot create new baseline rules. One lifecycle/audit skill, no repo-curator."
+description: "Brings Estate repos to the Repo rules and Project ownership readiness. Use for repo creation or proposals; explicit audits, hardening, organization, cleanup, curation, rationalizing knowledge, deciding what belongs, or preparing a repo for humans and AI; Project attachment or material reconfiguration; and material work without established readiness. Never fires on a casual repo mention. Creation proves ownership before proposing a new repo. Explicit audits assess content and fix authorized reversible gaps. Automatic readiness only evaluates and routes. Reads live canon and the GitHub Archive Index, preserves source history and one-owner pointers, and stops on conflicts, unclear ownership or confidentiality, unavailable canon, or overlapping workers. Research cannot create new baseline rules. One lifecycle/audit skill, no repo-curator."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Born dressed 2026-08-07 (Repo Baseline Standard lane, ADR 0056 piece two).
 tier: organization
@@ -9,7 +9,7 @@ status: live
 subtitle: "repo birth, readiness, and evidence-led content audits"
 ---
 
-# Repo Standards -- v1.6 (2026-09-25)
+# Repo Standards -- v1.7 (2026-10-13)
 
 Every repo in the ExpertPartners organization meets the ruled baseline. This skill is the judgment layer of the Repo rules, the piece that checks what org-level rulesets cannot.
 
@@ -54,9 +54,9 @@ Before any Fixer write, verify owner, supported defect, accepted desired-state e
 
 ## The one source of truth
 
-The standard lives in ONE place, the Repo rules section of the HQ Rulebook (Google Doc `15sCFxMvG8OZMZik5w0Hzqzh7HyphrB7rJ8NBtm46JBE`). Read it at the start of every run, before grading or scaffolding anything. The Project-ownership half still lives in `aura decisions/0078-claude-project-repository-setup.md`, reached through the local aura checkout or the GitHub contents API. If either source fails, stop and say so, do not grade from memory.
+The standard lives in ONE place, the Repo rules section of the HQ Rulebook (Google Doc `15sCFxMvG8OZMZik5w0Hzqzh7HyphrB7rJ8NBtm46JBE`). Read it at the start of every run, before grading or scaffolding anything. The Project-ownership half is the Project ownership section of the same Rulebook. If it cannot be read, stop and say so, do not grade from memory.
 
-This skill never restates the ten points as its own canon. The ADR's text wins over anything written here, and if this skill and the ADR ever disagree, the ADR is right and this skill gets corrected. Points 1 through 3 are the enforcement layer (org rulesets, bot commit routing, generated-artifact gates), points 4 through 10 are the judgment layer. ADR 0078 is read the same way, as authority, never restated as local canon.
+This skill never restates the ten points as its own canon. The Rulebook's text wins over anything written here, and if this skill and the Rulebook ever disagree, the Rulebook is right and this skill gets corrected. Points 1 through 3 are the enforcement layer (org rulesets, bot commit routing, generated-artifact gates), points 4 through 10 are the judgment layer. Project ownership is read the same way, as authority, never restated as local canon.
 
 ## When this fires, and when it must not
 
@@ -89,7 +89,7 @@ No Estate repo is proposed or created until this gate returns. Run it live, neve
 5. **Name the consumers**, who reads it and by what path (pointer, door, generated copy).
 6. **State why independent repository existence is warranted**, in terms of the durable job, not present convenience.
 7. **Check duplicate-truth risk.** Would any fact become editable in two places? If yes, the gate fails.
-8. **Check the Project relationship** per ADR 0078, which Project would own it and whether that Project already has an owning repo.
+8. **Check the Project relationship** per Project ownership, which Project would own it and whether that Project already has an owning repo.
 
 Return exactly one:
 
@@ -108,7 +108,7 @@ Work through the checklist in order and confirm each item before reporting the r
 4. **.gitattributes and CODEOWNERS scaffold.** Generated paths marked linguist-generated, CODEOWNERS protecting generated artifacts and decision records, both committed even if short.
 5. **Org ruleset inheritance confirmed.** New repos inherit the estate default-branch and tag rulesets automatically. Confirm live (GET the repo's rules for its default branch) and record the check in the birth report. Never assume inheritance, prove it once.
 6. **Intake inbox, when the repo will receive session records.** Create intake/ with the ADR 0027 convention README and note the distillation cadence owner.
-7. **Project connection recorded** per ADR 0078, the owning Project named and the repo connected where that surface supports connections.
+7. **Project connection recorded** per Project ownership, the owning Project named and the repo connected where that surface supports connections.
 8. **Archive Index row registered.** Add the repo's row to the GitHub Archive Index sheet in the same pass: Repo name, Default branch, What it holds (the job, entity type, and owner in plain words), and Pile. Re-read the sheet to verify the landed row. A proposed row, a pending entry, or a skill's project table is not registration.
 
 Report the birth with each item named and its evidence, including the Archive Index row and its verification date. Birth cannot be reported complete without the registered row. If registration cannot land, name that exact remaining gap and keep the birth incomplete.
@@ -121,7 +121,7 @@ Run order:
 
 For an explicit Phase Two / Repo Design Tower pass, complete the linked sequence's input reads before designing. The dispatch bounds the work: a design-only or skill-amendment job does not authorize a target-repository content audit or edits outside its named paths. Do not report a full audit or readiness verdict for checks outside that scope.
 
-1. Read the Repo rules, ADR 0078, and the current Archive Index row fresh, then inventory the repo live (tree, workflows, rulesets in effect, .gitattributes, CODEOWNERS, index file, intake state, largest files, frontmatter sampling). Before content changes, complete the ownership, front-door, and content assessment in [references/content-architecture.md](references/content-architecture.md), including its stop checks and authority classification. Every grade below cites evidence read this session, never memory.
+1. Read the Repo rules, Project ownership, and the current Archive Index row fresh, then inventory the repo live (tree, workflows, rulesets in effect, .gitattributes, CODEOWNERS, index file, intake state, largest files, frontmatter sampling). Before content changes, complete the ownership, front-door, and content assessment in [references/content-architecture.md](references/content-architecture.md), including its stop checks and authority classification. Every grade below cites evidence read this session, never memory.
 2. Grade each of the ten points PASS or FAIL, one line of evidence per point. A point that does not apply (no CI exists, no intake inbox, no deployed copies) grades N/A with the reason, and N/A is declared, never silently skipped.
 3. **Fix reversible gaps in the same pass.** Missing AGENTS.md, missing index, missing .gitattributes or CODEOWNERS, missing frontmatter on recent files, header banners on generated files, all get fixed and committed in the pass that found them, on a branch merged sequentially. Backup-then-proceed applies, never rewrite history to fix a finding.
 4. **Flag what is gated.** Anything destructive (deleting or rewriting existing content, force operations), anything that spends money, anything that changes who or what holds access (ruleset edits, bypass actors, token scopes), and any judgment call that needs business truth goes back to Allison as a named line item with a recommendation. The audit never executes these, even when the fix is obvious. Distinguish a verified typo or navigation correction already permitted by step 3 from a rewrite that changes governed meaning; Git reversibility alone does not authorize new business truth.
@@ -138,7 +138,7 @@ Expected input: the repo, plus the owning Project, Table, or Room context when k
 Run order:
 
 1. **Resolve live ownership and topology** through GitHub (repo exists, visibility, archived flag, description, default branch) and the repo's GitHub Archive Index row (What it holds, Pile). Never infer ownership from a repo name. No row means `UNREGISTERED` and `REMEDIATION REQUIRED`; the smallest safe remediation for that gap is the row itself, not a replacement repo or restructure. Use reachable owning canon to establish the proposed row's owner, or report ownership unproven rather than inventing it.
-2. **Read the Repo rules fresh**, and ADR 0078 for the Project half.
+2. **Read the Repo rules fresh**, and Project ownership for the Project half.
 3. **Resolve the relevant Project ownership and setup evidence.** Claude Project membership and repository attachment are not enumerable by any tool the estate holds; room existence is Allison's projects page. So Project relationships are established from canonical committed records (aura `docs/estate/room-registry.md`, the Job Tracker, the current topology map) and from live session or dispatch context. A Project relationship that no accessible live source supports is reported `UNPROVEN`, never invented and never assumed from a matching name.
 
 Then verify, each with its evidence:
@@ -148,7 +148,7 @@ Then verify, each with its evidence:
 - **Owning domain or entity named.**
 - **Correct canonical pointers**, out and in, and none pointing at a deleted or renamed repo.
 - **Repo rules baseline readiness** across the ten points.
-- **Project identity**, the owning Project relationship per ADR 0078, and whether the Project already has an owning repo this one would collide with.
+- **Project identity**, the owning Project relationship per Project ownership, and whether the Project already has an owning repo this one would collide with.
 - **No duplicate editable truth.** Any fact editable in two places fails readiness, and the existing owner is named.
 
 Return exactly one:
