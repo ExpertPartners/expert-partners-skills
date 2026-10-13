@@ -1,3 +1,13 @@
+## 2.56.1 - 2026-10-13
+
+ChatGPT import fix. batch-first-execution carried an agents/openai.yaml that
+listed policy.products as chatgpt, codex, api and atlas. OpenAI's plugin
+validation allows only CHAT, CODEX or both in that field, so ChatGPT rejected
+the whole operating-doctrine plugin while the other seven imported. The products
+line is removed (every product still sees the skill), the icon paths now start
+with ./ and the icon is 48 by 48. Claude Code and Codex read the same files and
+are unaffected.
+
 ## 2.56.0 - 2026-10-13
 
 Standalone skills move into marketplace plugins so every surface gets them by sync and none depends on a hand upload. operating-doctrine now carries session-wrap, remember-this, estate-memory-router, batch-first-execution, canon-sync-protocol and repo-standards. canon-sync-protocol is rewritten for the Drive brain (v2.0): one Drive home, the Decision Log, and the marketplace as the only road for skills, no zips. content-engines 0.6.0 adds content-coach, hook-engine, post-grader, post-scheduler, post-value-filter and social-analyzer, imported verbatim from the claude.ai Organization library. research-ops 0.1.0 is new and carries capability-currency, research-intake and the three TUB analysts, also imported verbatim. business-plan-builder and video-transcript-relay already live in plugins, so no second copy was added. ai-brain-builder duplicates agent-brain-builder in real-estate-agent-toolkit and is preserved in archive/ rather than loaded.
