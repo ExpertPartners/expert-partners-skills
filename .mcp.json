@@ -1,9 +1,3 @@
 {
-  "mcpServers": {
-    "estate-brain": {
-      "type": "http",
-      "url": "https://mcp.expertpartners.com/mcp",
-      "headersHelper": "python3 $HOME/.claude/estate-brain-auth.py"
-    }
-  }
+  "mcpServers": {}
 }

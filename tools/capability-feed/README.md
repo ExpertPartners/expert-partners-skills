@@ -7,7 +7,7 @@ Expert Partners HQ shows people. It is generated output. Never edit it by hand.
 canonical GitHub truth (this repo)
   -> generate-feed.mjs (validated, public-safe, deterministic)
   -> tools/capability-feed/ai-workforce-feed.json on main
-  -> Estate Brain MCP fetch (read-only, OAuth client_credentials)
+  -> GitHub contents API, raw media type (read-only token)
   -> HQ server (src/lib/ai-workforce-feed.server.ts), never the browser
 ```
 
@@ -60,8 +60,9 @@ token or key, a credential assignment, a JWT, a private GitHub URL, an email add
 phone number, or a private host. A refused run writes nothing and the workflow fails,
 so the last good feed stays in place.
 
-The feed is also refused above 900 KiB. The Estate Brain fetch tool reads files through
-GitHub's contents API, which returns no content for files over 1 MB.
+The feed is also refused above 900 KiB. HQ reads it in one request, and the default
+GitHub contents API response returns no content for files over 1 MB, so the cap keeps
+the file well inside that.
 
 ## Run it
 
@@ -88,21 +89,18 @@ skill change through the existing repository dispatch.
 
 ## HQ wiring
 
-HQ's server reads these values. The secrets live only in approved secret storage and in
-HQ's server environment, never in this repo or the browser.
+HQ's server reads the committed file straight from GitHub. The token lives only in
+approved secret storage and in HQ's server environment, never in this repo or the browser.
 
-| Variable | Value |
-|---|---|
-| `ESTATE_BRAIN_CAPABILITY_FEED_REPO` | `expert-partners-skills` |
-| `ESTATE_BRAIN_CAPABILITY_FEED_PATH` | `tools/capability-feed/ai-workforce-feed.json` |
-| `ESTATE_BRAIN_MCP_URL` | `https://mcp.expertpartners.com/mcp` |
-| `ESTATE_BRAIN_TOKEN_URL` | `https://estate-brain-825765429270.auth.us-east-1.amazoncognito.com/oauth2/token` |
-| `ESTATE_BRAIN_HQ_CLIENT_ID`, `ESTATE_BRAIN_HQ_CLIENT_SECRET` | the dedicated read-only `hq-estate-brain` client |
+```
+GET https://api.github.com/repos/ExpertPartners/expert-partners-skills/contents/tools/capability-feed/ai-workforce-feed.json?ref=main
+Accept: application/vnd.github.raw+json
+Authorization: Bearer <read-only token for this repo>
+```
 
-The Estate Brain fetch tool returns the file behind a one-line header,
-`# <repo>/<path> (<size> KB)` and a blank line. HQ must remove that header before it
-parses the JSON. `lib/estate-brain-framing.mjs` holds the reference unwrap, and the
-tests prove it against the real feed.
+The raw media type returns the JSON itself, with no header or wrapper, so HQ parses the
+response body directly. The repo is private, so the token needs read access to contents
+on this repo only. HQ's reader is a separate change in the HQ app repo, not here.
 
 ## Capability records (AI Capability Curator)
 
@@ -155,5 +153,5 @@ Each JSON file in a source directory has this shape.
 8. Marketplace and skill-graph changes produce exactly the expected feed change.
 
 They also prove the envelope passes HQ's own schema (mirrored in `lib/hq-contract.mjs`
-from HQ commit `5cc9811`), that the Estate Brain framing is handled, and that the real
+from HQ commit `5cc9811`), and that the real
 Real Estate Agent Toolkit stays one collection of 40 portable skills.
