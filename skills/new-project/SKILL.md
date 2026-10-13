@@ -4,7 +4,7 @@ description: >
   Run a new Expert Partners project through repo-standards before bootstrapping.
   Uses live creation Stage A, creates nothing on USE EXISTING REPO, and proceeds
   only on NEW REPO JUSTIFIED. After creation, runs Stage B and registers the
-  Estate Manifest Entity row before reporting birth complete. Use when Allison
+  GitHub Archive Index row before reporting birth complete. Use when Allison
   says /new-project followed by a name, "new project: NAME", "bootstrap a new
   project called NAME", or the session-wrap new-project variant fires.
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
@@ -21,7 +21,7 @@ subtitle: "run the repo-standards gate, then bootstrap a justified project"
 # New-Project Skill
 
 Runs `repo-standards`, the one repository standard implementation. This skill
-supplies bootstrap mechanics; ADR 0056 and ADR 0078 remain the authorities.
+supplies bootstrap mechanics; the Repo rules and ADR 0078 remain the authorities.
 Load current canonical `expert-partners-skills skills/repo-standards/SKILL.md`
 for every run. If it cannot be reached live, create nothing and name the failed
 source. A local script or an older deployed skill never substitutes for the gate.
@@ -38,9 +38,9 @@ source. A local script or an older deployed skill never substitutes for the gate
    the Manifest's entity type. Identify the durable job and Project context.
 
 2. **Run repo-standards creation Stage A live.** Read its authorities and the
-   current Estate Manifest Entity index, then complete the ownership gate.
+   GitHub Archive Index sheet, then complete the ownership gate.
    Proceed only on `NEW REPO JUSTIFIED`. On `USE EXISTING REPO`, stop, report
-   the owner and supporting Entity row, and create nothing: no repo, local home,
+   the owner and supporting Archive Index row, and create nothing: no repo, local home,
    bootstrap commit, or pending registration. An archived owner is a revival
    candidate, not permission to create a duplicate or unarchive it. If the gate
    cannot return a verdict, stop before bootstrap and name the missing evidence.
@@ -60,12 +60,12 @@ source. A local script or an older deployed skill never substitutes for the gate
    Stage B completion. Do not modify unrelated host scripts in this run.
 
 4. **Run repo-standards Stage B on the new repo.** Bring the scaffold to the live
-   ADR 0056 baseline, replace placeholder identity with the verified job, record
-   the Project relationship under ADR 0078, and register the Manifest Entity row
+   Repo rules baseline, replace placeholder identity with the verified job, record
+   the Project relationship under ADR 0078, and add the Archive Index row
    through Stage B item 8. The birth report is the Stage B report. Until the row
-   is committed to aura main and independently read back, birth is incomplete.
+   is on the sheet and independently read back, birth is incomplete.
 
-5. **Reconcile downstream routing.** The Manifest Entity row is topology
+5. **Reconcile downstream routing.** The Archive Index row is topology
    registration. Check the row's scan profile and declared consumers. The
    Estate Brain door is retiring (Decision Log 2026-10-13), so no door
    registration is requested for a new repo.
@@ -82,7 +82,7 @@ source. A local script or an older deployed skill never substitutes for the gate
    that a retired worker or queue will index the repo automatically.
 
    If intake routing needs a new brain mapping, update its canonical skill
-   source (`expert-partners-skills skills/intake/SKILL.md`) from the Entity row,
+   source (`expert-partners-skills skills/intake/SKILL.md`) from the Archive Index row,
    then use the deployment pipeline under the current rollout scope. Never
    hand-edit `~/.claude/skills/intake/SKILL.md`. Routing tables remain
    downstream consumers of topology.
@@ -91,7 +91,7 @@ source. A local script or an older deployed skill never substitutes for the gate
    repo URL, local home, baseline evidence, Project relationship, landed Entity
    row commit and readback, and routing status.
    Name remaining gaps explicitly. A pending queue entry, script success, or
-   repo URL without the Entity row cannot be reported as a completed birth.
+   repo URL without the Archive Index row cannot be reported as a completed birth.
 
 ## Rules
 

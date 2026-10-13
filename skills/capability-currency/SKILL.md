@@ -1,6 +1,6 @@
 ---
 name: capability-currency
-description: "Twice-monthly staying-current sweep for the Expert Partners AI Operating System, built on capability-refresh, extending never replacing it. Fires the 1st and 15th, 7 AM CDT, from launchd job com.expertpartners.capability-currency on the M4, and whenever Allison asks whether estate capability knowledge is current, whether anything moved at Anthropic, in the MCP spec, the pinned Python SDK lines, the AWS serverless stack under the Estate Brain door and memory spine, or in estate-relevant AI developments. Sweeps five heads against live sources, Firecrawl primary, overwrites aura reference/capability-watch.md, appends a dated entry with a source URL per claim to reference/capability-refresh-changelog.md, files the run record as a Google Doc in HQ Business Brain, and classifies findings first, preserving unactivated ones with RETURN WHEN issues, carding only what Allison activates. Use it even unnamed, whenever the ask is whether the AI operating layer's knowledge is stale. Inherits the operating-doctrine."
+description: "Twice-monthly staying-current sweep for the Expert Partners AI Operating System, built on capability-refresh, extending never replacing it. Fires the 1st and 15th, 7 AM CDT, from launchd job com.expertpartners.capability-currency on the M4, and whenever Allison asks whether estate capability knowledge is current, whether anything moved at Anthropic, in the MCP spec, the pinned Python SDK lines, the AWS serverless stack under the Estate Brain door and memory spine, or in estate-relevant AI developments. Sweeps five heads against live sources, Firecrawl primary, overwrites the Capability Watch Doc, adds a dated entry with a source URL per claim to the Capability Refresh Changelog Doc, files the run record as a Google Doc in HQ Business Brain, and classifies findings first, preserving unactivated ones as Job Tracker rows with RETURN WHEN, carding only what Allison activates. Use it even unnamed, whenever the ask is whether the AI operating layer's knowledge is stale. Inherits the operating-doctrine."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Born dressed 2026-08-05 (Capability Currency Build lane, per the locked
 # Capability Currency plan). Zone hands per the acn-currency-check precedent.
@@ -34,7 +34,7 @@ Firecrawl is primary for every source check (the Code lane reaches mcp.firecrawl
 
 ## The five sweep heads
 
-Sweep every head every run. For each head, compare live state against the baseline recorded in reference/capability-watch.md, and read every pinned line fresh from the repo, never from this skill's text. Baselines written here are as of 2026-08-05 and exist so the first runs have a floor, the watch file is the living baseline.
+Sweep every head every run. For each head, compare live state against the baseline recorded in the Capability Watch Doc, and read every pinned line fresh from the repo, never from this skill's text. Baselines written here are as of 2026-08-05 and exist so the first runs have a floor, the watch file is the living baseline.
 
 1. MCP spec and deprecation clocks. Sources, modelcontextprotocol.io/specification/versioning for the current spec revision (2026-07-28 as of this writing), the deprecated features registry at modelcontextprotocol.io/specification/2026-07-28/deprecated (re-resolve the path against the current revision each run), and the feature lifecycle policy at modelcontextprotocol.io/community/feature-lifecycle. Watch for new revisions, newly deprecated features, and removal-eligibility dates. The Estate Brain door is dual-era (SDK 2.0.0 on Lambda serving both the 2026 negotiation style and the legacy initialize handshake), so any clock on either era matters, the known long clock is the legacy-handshake deprecation window landing around July 2027.
 
@@ -48,15 +48,15 @@ Sweep every head every run. For each head, compare live state against the baseli
 
 ## Outputs per run, all five, every run
 
-1. Overwrite aura reference/capability-watch.md with the current-state snapshot, updating the Last refreshed date. The watch file is current state, the changelog is history.
+1. Overwrite the Capability Watch Doc (Google Doc `1aaWBVTySyMPfW9XFTiDRTy_Z3TnJKAXcc1BHJ1Nl09k`, Company Core [HQ-BB]) with the current-state snapshot, updating the Last refreshed date. The watch Doc is current state, the changelog is history.
 
-2. Append one dated entry to aura reference/capability-refresh-changelog.md covering the window since the last entry, what changed, what it means for this estate, and what to act on. Every claim carries its live source URL and retrieval date. Never edit prior entries, the file is append-only.
+2. Add one dated entry at the top of the Capability Refresh Changelog Doc (Google Doc `1fGNxd_hsAIdnmKe7z677VYBuaR_szhSM9bbztbWEVQQ`) covering the window since the last entry, what changed, what it means for this estate, and what to act on. Every claim carries its live source URL and retrieval date. Never edit prior entries, the Doc is append-only.
 
 3. File the run record as a Google Doc in HQ Business Brain, Company Core [HQ-BB], so the run is readable from every surface.
 
-4. Classify every finding first, before any activation output fires, under the operating-doctrine's Decide Now disposition seam. Contained cleanup within existing authority may happen in lane as part of the run. A blocking finding surfaces immediately. A meaningful non-blocking finding is preserved in its owning repo, detailed context in the smallest appropriate existing artifact, and, when guaranteed mechanical resurfacing is required, one open GitHub issue in the owning repo carrying RETURN WHEN and the condition as the wake token, pointing at the owning artifact rather than duplicating it. A Founder Active Work card is created only when Allison deliberately activates the finding as an initiative through the intake ritual. The existing duplicate check is preserved and applies to wake-token issues exactly as it applied to cards, search the owning repo's open issues first, never mint a duplicate, feed the existing issue instead. (This supersedes the 2026-08-05 propose-with-override flag-to-card rule for sweep findings, per Allison's 2026-08-30 correction of record.)
+4. Classify every finding first, before any activation output fires, under the operating-doctrine's Decide Now disposition seam. Contained cleanup within existing authority may happen in lane as part of the run. A blocking finding surfaces immediately. A meaningful non-blocking finding is preserved as one Job Tracker row, with the come-back condition written in Waiting on as RETURN WHEN, pointing at the owning Doc rather than duplicating it. A Founder Active Work card is created only when Allison deliberately activates the finding as an initiative through the intake ritual. The existing duplicate check is preserved and applies to Job Tracker rows exactly as it applied to cards, read the Job Tracker first, never mint a duplicate, feed the existing row instead. (This supersedes the 2026-08-05 propose-with-override flag-to-card rule for sweep findings, per Allison's 2026-08-30 correction of record.)
 
-5. Reference-file writes land under ADR 0047 standing write authority and commit to aura main with a Push-Policy trailer. Anything touching doctrine is a proposed diff for Allison, never auto-applied.
+5. The two Docs are the only standing-authority writes. Anything touching doctrine is a proposed diff for Allison, never auto-applied.
 
 If any output rail is unreachable, say so in the run record and finish the others, a partial run that names its gaps beats a silent skip.
 
@@ -66,7 +66,7 @@ Nothing texts Allison unless she has an action to take. Any message that does go
 
 ## Schedule and health
 
-The launchd job com.expertpartners.capability-currency fires the runner script (aura tools/capability-currency/run-capability-currency.sh) on the 1st and 15th at 7:00 AM CDT. The runner pings the dedicated healthchecks check (1Password item op://Automation/capability-currency-heartbeat, ping_url field) on success only, and pings /fail on a crash, so a run that fails to fire or dies mid-sweep alerts instead of dying silently. The check is capability-currency-m4, it is not the session janitor's check, never touch session-janitor-m4 from this skill. Kill switch, touch ~/.claude/capability-currency-off to skip runs, remove it to resume.
+The launchd job com.expertpartners.capability-currency fires the runner script (expert-partners-skills tools/capability-currency/run-capability-currency.sh) on the 1st and 15th at 7:00 AM CDT. The runner pings the dedicated healthchecks check (1Password item op://Automation/capability-currency-heartbeat, ping_url field) on success only, and pings /fail on a crash, so a run that fails to fire or dies mid-sweep alerts instead of dying silently. The check is capability-currency-m4, it is not the session janitor's check, never touch session-janitor-m4 from this skill. Kill switch, touch ~/.claude/capability-currency-off to skip runs, remove it to resume.
 
 ## Rules that never bend
 
@@ -75,7 +75,7 @@ The launchd job com.expertpartners.capability-currency fires the runner script (
 - A monitor hit or a headline is a lead, never a conclusion. Fetch the underlying live source before reporting a change as real.
 - Every claim carries a source URL, unverifiable claims are labeled unverified or left out.
 - No self-attestation. The session that runs the sweep never certifies its own build, and the builder never grades the first run.
-- No duplicate cards, no duplicate wake-token issues, no duplicate healthchecks checks, no duplicate reference files. Check first.
+- No duplicate cards, no duplicate Job Tracker rows, no duplicate healthchecks checks, no duplicate reference files. Check first.
 - Doctrine changes are proposed diffs for Allison. Reference files are the only standing-authority writes.
 
 ## Formatting

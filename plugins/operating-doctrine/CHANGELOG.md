@@ -1,3 +1,16 @@
+## 2.55.0 - 2026-10-13
+
+Corrections to the batch 1 cutover. Decision Log entries drop numbered IDs and
+read as date, what was decided, why, and a Replaces note. Reminders become one
+Job Tracker row with the come-back condition in Waiting on (remember-this,
+estate-memory-router, capability-currency). repo-standards reads the new Repo
+rules section of the HQ Rulebook and registers repos in the GitHub Archive
+Index sheet. session-model-advisor reads the new Model chart section of the HQ
+Rulebook. capability-currency writes the Capability Watch and Capability
+Refresh Changelog Docs in Company Core, and its runner script and launchd plist
+now live in tools/capability-currency/. systems-map 0.6.1 adds two plain
+definitions (business brain, repo).
+
 ## 2.54.0 - 2026-10-13
 
 Step 1 of the clean-slate cutover, batch 1. code-block-routing, session-steward

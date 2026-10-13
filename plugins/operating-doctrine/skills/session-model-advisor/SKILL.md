@@ -22,7 +22,7 @@ When NORTH prepares a new technical handoff, this skill recommends one current
 surface/model/effort combination and explains the fit briefly, under decisions
 0057 and 0072.
 
-This skill carries no copy of ADR 0057's decision matrix. It fetches the ADR live, every time it fires. If a model or effort default in the ADR changes, this file does not need to change. If you ever find the matrix text pasted into this file, that is a doctrine violation, delete it and re-point to Step 3.
+This skill carries no copy of the Model chart. It reads the chart live, every time it fires. If a model or effort default in the chart changes, this file does not need to change. If you ever find the matrix text pasted into this file, that is a doctrine violation, delete it and re-point to Step 3.
 
 A companion SessionStart hook (Claude Code only, lives outside this skill package, see "Companion hook" below) prints the currently configured model and effort as a banner line at session start. The hook only prints. This skill does the reading, the fetching, the classifying, and the recommending. Keep the two jobs separate.
 
@@ -71,36 +71,35 @@ Because there is no introspection path, this skill's job on these two surfaces i
 
 Try in this order, and stop at the first success.
 
-1. Read the HQ Rulebook (Google Doc `15sCFxMvG8OZMZik5w0Hzqzh7HyphrB7rJ8NBtm46JBE`) through the Drive or Docs connector, then search the GitHub Archive folder in HQ Business Brain for ADR 0057 (`decisions/0057-model-and-effort-operating-standard.md`) and read it. The Rulebook governs; the archived ADR is reference only until Allison decides it again. This is the primary path on any surface with the Drive connector attached, including a claude.ai Project or Chat and Claude Code.
-2. (Claude Code only) If no brain-fetch tool is available, read the local canonical clone directly at `~/Claude/projects/Aura/decisions/0057-model-and-effort-operating-standard.md`. This clone is pulled fresh at every session start by the `pull-canonical-repos.sh` SessionStart hook, so a direct read counts as reading the live canonical source, not a stale cached copy.
-3. (Claude Code only, brain unreachable and no local clone) `gh api repos/ExpertPartners/aura/contents/decisions/0057-model-and-effort-operating-standard.md --jq '.content' | base64 -d`.
-4. If all of the above fail, most likely on a bare Claude Chat or Project conversation with no Drive connector attached and no repo access, say so plainly, along these lines -- "I can't reach the HQ Rulebook or ADR 0057 from here. No Drive connector, no repo access on this surface. I'm proceeding without a standard to check against. Add the Google Drive connector to this Project if you want this check to run here." Do not fabricate, paraphrase from memory, or reuse a matrix seen in an earlier conversation. The ADR is explicitly a living document (its own text names the risk, model names attached to categories will not outlast a generation even though the categories should) and a remembered copy is exactly the drift this skill exists to prevent.
+1. Read the Model chart section of the HQ Rulebook (Google Doc `15sCFxMvG8OZMZik5w0Hzqzh7HyphrB7rJ8NBtm46JBE`) through the Drive or Docs connector. The chart is the standard. This is the primary path on any surface with the Drive connector attached, including a claude.ai Project or Chat and Claude Code.
+2. (Claude Code only, no Drive connector) Read the same Doc through the service-account path (SA+DWD).
+3. If both fail, most likely on a bare Claude Chat or Project conversation with no Drive connector attached, say so plainly, along these lines -- "I can't reach the Model chart from here. No Drive connector on this surface. I'm proceeding without a standard to check against. Add the Google Drive connector to this Project if you want this check to run here." Do not fabricate, paraphrase from memory, or reuse a matrix seen in an earlier conversation. The chart is explicitly a living section (the model names attached to categories will not outlast a generation even though the categories should) and a remembered copy is exactly the drift this skill exists to prevent.
 
-Never paste ADR 0057's decision matrix into this file. If a future session finds the matrix text living here, that's a doctrine violation, delete it and re-point to step 3.
+Never paste the Model chart's decision matrix into this file. If a future session finds the matrix text living here, that's a doctrine violation, delete it and re-point to step 3.
 
 ## Step 4 -- Classify the incoming task
 
-Read the ADR 0057 content fetched in Step 3, specifically the "Model and effort default by task category" section and, if operating as a named agent/persona rather than a bare session, "Model assignment by agent role." Match the current first message against the categories using their actual wording as fetched this run, not a memory of a prior run's categories, since the wording itself can change.
+Read the Model chart fetched in Step 3, specifically the task categories and, if operating as a named agent/persona rather than a bare session, the "By agent role" paragraph. Match the current first message against the categories using their actual wording as fetched this run, not a memory of a prior run's categories, since the wording itself can change.
 
 If the task spans two categories, name the relevant demands and choose effort
 from the actual complexity, ambiguity, risk, dependency breadth and
 verification burden. Do not automatically choose the maximum level. Preserve
 usage awareness without weakening a setting that the task materially needs.
 
-Also check the following, from the ADR text as fetched, not from memory.
+Also check the following, from the chart text as read, not from memory.
 
-- Silent downgrade watch language (an "Opus limit reached" notice or an equivalent signal). If live and relevant this turn, surface it per the ADR's own instruction.
+- Silent downgrade watch language (an "Opus limit reached" notice or an equivalent signal). If live and relevant this turn, surface it per the chart's own instruction.
 - Refusal instrumentation language. Same treatment.
 
 ## Step 5 -- State the triggered check plainly
 
 After Steps 3 and 4 are required, open the response with the applicable line below. The matching-Worker fast path in decision 0093 does not trigger these steps or a new opening line.
 
-- **Stay** -- "Model/effort check -- staying on `<model>` at `<effort>`. This reads as `<category from ADR 0057>`, which calls for this level. Proceeding."
-- **Switch** -- "Model/effort check -- this reads as `<category from ADR 0057>`, which the standard puts at `<recommended model/effort>`. You're currently on `<current model/effort>`. Recommend switching before I continue, `<one-line why>`."
-- **No introspection (Chat/Projects)** -- "Model/effort check -- I can't read your current selection on this surface. Based on the task (`<category>`), ADR 0057 calls for `<recommended>`. If that's not what's selected, switch via the model menu next to the send button before I continue."
-- **No ADR access** -- "Model/effort check -- can't reach ADR 0057 from this surface right now (`<reason>`). Proceeding on the current model/effort without a standard to check against."
-- **Dispatch** -- classify the job being handed off against current ADR 0057,
+- **Stay** -- "Model/effort check -- staying on `<model>` at `<effort>`. This reads as `<category from the Model chart>`, which calls for this level. Proceeding."
+- **Switch** -- "Model/effort check -- this reads as `<category from the Model chart>`, which the standard puts at `<recommended model/effort>`. You're currently on `<current model/effort>`. Recommend switching before I continue, `<one-line why>`."
+- **No introspection (Chat/Projects)** -- "Model/effort check -- I can't read your current selection on this surface. Based on the task (`<category>`), the Model chart calls for `<recommended>`. If that's not what's selected, switch via the model menu next to the send button before I continue."
+- **No chart access** -- "Model/effort check -- can't reach the Model chart from this surface right now (`<reason>`). Proceeding on the current model/effort without a standard to check against."
+- **Dispatch** -- classify the job being handed off against the current Model chart,
   not the current conversation. Apply decision 0072 when selecting an
   implementation engine. Check the current surface, model and exact effort or
   speed options through [capability evidence](reference/handoff-capability.md).
@@ -122,11 +121,11 @@ A separate SessionStart hook, `session-model-effort-banner.sh`, prints the curre
 
 ## Anti-patterns (don't do these)
 
-- Don't hardcode ADR 0057's matrix into this file, ever, even "just this once" or "as a fallback for when the fetch fails." A failed fetch is Step 3's last bullet, not a reason to paste the matrix here.
+- Don't hardcode the Model chart's matrix into this file, ever, even "just this once" or "as a fallback for when the fetch fails." A failed fetch is Step 3's last bullet, not a reason to paste the matrix here.
 - Don't guess at Chat's or a Project's current model/effort and state the guess as fact.
 - Don't let the model/effort check become a wall of text. One to three lines, then the actual response.
-- Don't skip a triggered check because the task "looks simple." Simple-looking, format-locked work is exactly where ADR 0057 says lower effort holds tighter and higher effort drifts. A matching dispatched Worker follows decision 0093 instead of repeating the check.
-- Don't re-fetch ADR 0057 on every turn of a long conversation. Once per conversation, at the first message, is the trigger. Re-check mid-conversation only if the model/effort is changed or the task shape changes dramatically.
+- Don't skip a triggered check because the task "looks simple." Simple-looking, format-locked work is exactly where the Model chart says lower effort holds tighter and higher effort drifts. A matching dispatched Worker follows decision 0093 instead of repeating the check.
+- Don't re-read the Model chart on every turn of a long conversation. Once per conversation, at the first message, is the trigger. Re-check mid-conversation only if the model/effort is changed or the task shape changes dramatically.
 - Don't claim Cowork/Projects introspection works "because Code has a way." The two surfaces are unrelated. Verify each on its own terms every time this skill or its documentation is revised.
 - Don't trust a remembered model/effort vocabulary mapping twice, even within the same day. The 2026-08-10 finding is why: the strong-end setting on the `/effort` picker (broken spelling `Ultra-code`, see code.claude.com/docs/en/workflows for the exact canonical spelling) looks like a sibling of `max` but is a session-only Claude Code setting (`xhigh` plus workflow orchestration), not an effort level, and the persisted `effortLevel` setting does not even accept it. A mapping that was correct at 9 AM is not evidence for 2 PM. Re-verify against current Claude Code documentation every time, not from memory of the last check today.
 - Don't ever write that setting's name bare and contiguous in a skill file, a dispatch block, or any prose a Claude Code session will read as a live prompt. Live-confirmed 2026-08-10, this lane's own incident: the bare word fires the real activation instead of describing it, even inside a quoted worked example. Write it broken (`Ultra-code`).

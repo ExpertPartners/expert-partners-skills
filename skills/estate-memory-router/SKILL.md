@@ -56,7 +56,7 @@ Classify into exactly one. When an item genuinely has two natures, route each pa
 
 ### 1. Future obligation -> `remember-this`
 
-An action still owed, that must wait. Hand it to the `remember-this` skill, which resolves the owner live and writes one open issue in the owning repo carrying a mechanical `RETURN WHEN` line. That skill owns the whole mechanism, including its advisor-detected gate and its duplicate refusal. This router does not restate it and does not write the issue itself.
+An action still owed, that must wait. Hand it to the `remember-this` skill, which resolves the room live and writes one Job Tracker row with a mechanical `RETURN WHEN` line in Waiting on. That skill owns the whole mechanism, including its advisor-detected gate and its duplicate refusal. This router does not restate it and does not write the row itself.
 
 ### 2. Evidence or working knowledge -> owning brain
 

@@ -63,10 +63,10 @@ ask, or suggest `/new-project` if it is genuinely new. NEVER write to ag-vault.
 
 5. **Record decisions.** For each clear decision in the content, add an entry at
    the top of the Decision Log (Google Doc `1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc`)
-   under today's date: `D-YYYY-MM-DD-##`, what was decided, why, `Replaces:` the
-   older decision it supersedes (or none), and the Doc link.
+   under today's date: what was decided, why in a sentence or two, a `Replaces:`
+   note naming the older decision it supersedes (or none), and the Doc link.
 
-6. **Report** the Doc as a markdown link, plus the Decision Log entry ID if any.
+6. **Report** the Doc as a markdown link, plus a note if a Decision Log entry was added.
 
 ## Rules
 - Never use em dashes in any content this skill writes (org standard). Convert to

@@ -16,6 +16,10 @@ subtitle: "where every system lives and what Claude can reach"
 
 This is the operative map of where things live and what Claude can reach. The HQ Rulebook (Drive) is the first read and wins wherever the two differ. Business knowledge, rules, and decisions live in Google Drive, in the business brains: HQ Business Brain serves both companies, AGRE Business Brain is AG Luxury, EP Business Brain is Expert Partners. GitHub holds only what tools run from.
 
+## Two words that are not the same
+
+A business brain is a Google shared drive that holds knowledge. A repo is a GitHub folder that holds code. They are not the same thing, and the list of repos is just the code list.
+
 ## The one rule
 
 Each system has exactly one job. Discrepancies happen when a system is asked to carry something that belongs somewhere else. When in doubt, match the thing to the one job below, not to whatever is closest at hand.

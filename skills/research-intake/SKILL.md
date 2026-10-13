@@ -81,7 +81,7 @@ When the file already lived in Drive, leave it untouched and give the same
 entry in the reply. If Allison ruled on the paper in the same breath she
 showed it to you ("yeah, park that" / "let's build this"), record that ruling
 in Disposition rather than defaulting to awaiting ruling, and add a Decision
-Log entry for it (`D-YYYY-MM-DD-##`, newest at the top, with a Replaces note).
+Log entry for it (newest at the top, with a Replaces note).
 
 ## 5. Track it only if still unruled
 

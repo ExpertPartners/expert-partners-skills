@@ -8,7 +8,7 @@ Session record and continuity note: a Google Doc in the owning brain's home fold
 
 ## Decision Log
 
-Google Doc `1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc`, Company Core [HQ-BB]. Add each decision at the top under today's date heading (create the heading if today's is missing): `D-YYYY-MM-DD-##`, what was decided, why in one or two sentences, `Replaces:` the older decision's ID or aura decision number (or none), and a link to the full record. Re-read the Doc after the write to confirm the entry landed and nothing else changed.
+Google Doc `1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc`, Company Core [HQ-BB]. Add each decision at the top under today's date heading (create the heading if today's is missing): what was decided, why in one or two sentences, a `Replaces:` note naming the older decision it supersedes (or none), and a link to the full record. Re-read the Doc after the write to confirm the entry landed and nothing else changed.
 
 ## Job Tracker
 
