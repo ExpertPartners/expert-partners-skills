@@ -12,9 +12,13 @@ subtitle: "Don’s personal brand voice"
 
 # Don Hobbs Brand Voice (personal authority brand under Expert Partners)
 
+## Load the canon Doc first
+
+Read V1 - Company Core - Don Hobbs Brand Canon (EP Business Brain, Company Core [EP-BB]), https://docs.google.com/document/d/1yLCeKPCWhx3Ndx5j_o_H0Yo8UBprWTKtrpU3wLZLHK4/edit , with the Google Docs or Drive connector before drafting. The Doc is authoritative and the inline content below is a fallback. Estate-wide rules live in V1 - Company Core - Shared Writing Rules (HQ Business Brain), https://docs.google.com/document/d/103y7LzzahVmGmUgCQukvwH2V7VKu3nhFEDteFrQBKqE/edit.
+
 ## Canon and registry position
 
-Per aura ADR 0043 and ADR 0045, Don Hobbs is a distinct personal brand operating under the Expert Partners company brand. His content lives in the `expert-partners` repo for now and MUST remain distinguishable from Expert Partners company voice so it can split to its own canon at a future point. That is why the mode rule below is non-negotiable. Primary voice source is Don-Hobbs-Authentic-Voice-Profile (2026-08-03, derived from 12 Fireflies recordings, Jan 16 to Apr 16 2026, verbatim speaker-isolated quotes); it supersedes the Dec 2025 voiceprint v1 on every point of conflict. Full quote bank, do / do-not tables, reusable AI prompt, and the twelve-meeting source list live in [reference.md](reference.md).
+Per aura ADR 0043 and ADR 0045, Don Hobbs is a distinct personal brand operating under the Expert Partners company brand. His canon lives in Drive (see below) and MUST remain distinguishable from Expert Partners company voice so it can split to its own canon at a future point. That is why the mode rule below is non-negotiable. Primary voice source is Don-Hobbs-Authentic-Voice-Profile (2026-08-03, derived from 12 Fireflies recordings, Jan 16 to Apr 16 2026, verbatim speaker-isolated quotes); it supersedes the Dec 2025 voiceprint v1 on every point of conflict. Full quote bank, do / do-not tables, reusable AI prompt, and the twelve-meeting source list live in [reference.md](reference.md).
 
 ## Mode declaration rule (ruling, 2026-08-03, never skip)
 

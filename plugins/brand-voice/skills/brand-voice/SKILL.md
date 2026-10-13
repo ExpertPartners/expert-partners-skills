@@ -55,6 +55,17 @@ This skill also bundles three legacy brand context documents,
 
 ## Authoritative source
 
+Brand canon Docs in Drive are authoritative and read through the Google Docs or Drive connector:
+- V1 - Company Core - Expert Partners Brand Canon, https://docs.google.com/document/d/1XSiBzCLCHS_9_BXUrvV_Ysl2aBVY_I_kq_s5d25oY_4/edit
+- V1 - Company Core - EPIC Brand Canon, https://docs.google.com/document/d/1W2QxjC_2iVY_-kWZLPEHRcztvEbpht5xcueWduOCdMU/edit
+- V1 - Company Core - Free Agent Movement Brand Canon, https://docs.google.com/document/d/1t79nKkyml4db1Cq7hr2ApvOrEogqhuD2x12oOba3bQk/edit
+- V1 - Company Core - Don Hobbs Brand Canon, https://docs.google.com/document/d/1yLCeKPCWhx3Ndx5j_o_H0Yo8UBprWTKtrpU3wLZLHK4/edit
+- V1 - Company Core - Allison Gaddy Personal Brand Canon, https://docs.google.com/document/d/1_tDaCMO1LDT7gOKCB-TcYbWGlzQ0fcslFlrxXWydQO0/edit
+- V1 - Company Core - AG Luxury Brand Canon, https://docs.google.com/document/d/1IHjcFV7Bv023GIwgNxV5d4p_bu2R5l7yUW5F4VE_-yM/edit
+- V1 - Company Core - Shared Writing Rules, https://docs.google.com/document/d/103y7LzzahVmGmUgCQukvwH2V7VKu3nhFEDteFrQBKqE/edit
+
+The brand-context files in this folder are the fallback summary.
+
 - Drive (live editing surface): per Allison's GitHub-everywhere principle, brand context lives in both Drive and GitHub. Drive is the editing canonical.
 - GitHub canonical (this folder): `ExpertPartners/expert-partners-skills/plugins/brand-voice/skills/brand-voice/`
 - The old Aura local mirror at `~/Claude/projects/Aura/skills/` was retired 2026-08-05; read canonical instead

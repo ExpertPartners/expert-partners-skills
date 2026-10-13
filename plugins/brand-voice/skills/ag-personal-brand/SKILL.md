@@ -12,15 +12,13 @@ subtitle: "Allison’s first person voice"
 
 # AG Personal Brand System
 
-## Load live brand context first
+## Load the canon Doc first
 
-When this skill triggers in a Claude Code session with estate-brain MCP access, call:
+Brand canon lives in Google Drive. Before drafting, read these Docs with the Google Docs or Drive connector (`read_doc`, or `read_file_content` on the Doc ID in the link). Apply what they say as the authoritative source. This one Doc is Allison's personal voice and includes The Strong Ones as a section (ruled October 13, 2026). AG Luxury is her business voice for real estate clients, a separate Doc.
 
-```
-get_brand_context("ag-personal-brand")
-```
+- V1 - Company Core - Allison Gaddy Personal Brand Canon (EP Business Brain, Company Core [EP-BB]), https://docs.google.com/document/d/1_tDaCMO1LDT7gOKCB-TcYbWGlzQ0fcslFlrxXWydQO0/edit
 
-This returns the live brand context from the canonical `ExpertPartners/ag-personal-brand` repo. Apply that content as the authoritative source. The inline content below is a fallback for sessions without MCP access.
+The inline content below is a fallback for sessions where the Drive connector is unavailable. If the Doc and the inline text disagree, the Doc wins. Estate-wide spelling, exclusion, and identifier rules live in V1 - Company Core - Shared Writing Rules (HQ Business Brain, Company Core [HQ-BB]), https://docs.google.com/document/d/103y7LzzahVmGmUgCQukvwH2V7VKu3nhFEDteFrQBKqE/edit.
 
 ## Identity
 

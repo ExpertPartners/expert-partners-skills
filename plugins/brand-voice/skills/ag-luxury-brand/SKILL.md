@@ -14,7 +14,13 @@ subtitle: "luxury real estate voice under Allison’s name"
 
 ## Canon and live context
 
-Canonical repo: `ExpertPartners/ag-luxury`. `docs/DECISION-LOG.md` is the append-only ruling record and wins over this skill wherever they conflict. `docs/governance/` holds the approved claim set. The estate-brain does not index ag-luxury (verified 2026-08-02), so this skill is the working reference for sessions without the repo.
+Brand canon lives in Google Drive. Before drafting, read these Docs with the Google Docs or Drive connector (`read_doc`, or `read_file_content` on the Doc ID in the link). Apply what they say as the authoritative source.
+
+- V1 - Company Core - AG Luxury Brand Canon (AGRE Business Brain, Company Core [AGRE-BB]), https://docs.google.com/document/d/1IHjcFV7Bv023GIwgNxV5d4p_bu2R5l7yUW5F4VE_-yM/edit
+
+The inline content below is a fallback for sessions where the Drive connector is unavailable. If the Doc and the inline text disagree, the Doc wins. Estate-wide spelling, exclusion, and identifier rules live in V1 - Company Core - Shared Writing Rules (HQ Business Brain, Company Core [HQ-BB]), https://docs.google.com/document/d/103y7LzzahVmGmUgCQukvwH2V7VKu3nhFEDteFrQBKqE/edit.
+
+The ag-luxury repo `docs/DECISION-LOG.md` stays the append-only ruling record and wins over this skill wherever they conflict. `docs/governance/` holds the approved claim set.
 
 The live brand guide at https://brand.agluxurytx.com/ is the current source of brand truth and owns the visual tokens (color, type, spacing), per ag-luxury DECISION-LOG D036 and D037. Do not restate or improvise visual tokens here or anywhere; read the guide. Its governing idea carries into copy: restraint is the luxury signal, and photography brings the living color, never decoration.
 

@@ -12,15 +12,14 @@ subtitle: "Expert Partners parent voice"
 
 # Expert Partners Brand System
 
-## Load live brand context first
+## Load the canon Doc first
 
-When this skill triggers in a Claude Code session with estate-brain MCP access, call:
+Brand canon lives in Google Drive. Before drafting, read these Docs with the Google Docs or Drive connector (`read_doc`, or `read_file_content` on the Doc ID in the link). Apply what they say as the authoritative source. Expert Partners is the parent company, EPIC is a program inside it.
 
-```
-get_brand_context("expert-partners")
-```
+- V1 - Company Core - Expert Partners Brand Canon (EP Business Brain, Company Core [EP-BB]), https://docs.google.com/document/d/1XSiBzCLCHS_9_BXUrvV_Ysl2aBVY_I_kq_s5d25oY_4/edit
+- V1 - Company Core - EPIC Brand Canon (EP Business Brain, Company Core [EP-BB]), https://docs.google.com/document/d/1W2QxjC_2iVY_-kWZLPEHRcztvEbpht5xcueWduOCdMU/edit
 
-This returns the live `doctrine/mission.md`, `doctrine/voice.md`, `brand/identity.md`, and `brand/naming.md` from the canonical `ExpertPartners/expert-partners` repo. Apply that content as the authoritative source. The inline content below is a fallback for sessions without MCP access.
+The inline content below is a fallback for sessions where the Drive connector is unavailable. If the Doc and the inline text disagree, the Doc wins. Estate-wide spelling, exclusion, and identifier rules live in V1 - Company Core - Shared Writing Rules (HQ Business Brain, Company Core [HQ-BB]), https://docs.google.com/document/d/103y7LzzahVmGmUgCQukvwH2V7VKu3nhFEDteFrQBKqE/edit.
 
 ## Identity
 
