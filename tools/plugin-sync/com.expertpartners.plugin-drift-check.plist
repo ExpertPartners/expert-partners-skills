@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>HOME</key>
+		<string>/Users/allisongaddy</string>
+		<key>PATH</key>
+		<string>/Users/allisongaddy/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+	</dict>
+	<key>Label</key>
+	<string>com.expertpartners.plugin-drift-check</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/bash</string>
+		<string>-c</string>
+		<string>cd "$HOME/Claude/projects/ExpertPartnersSkills" &amp;&amp; { git pull -q --ff-only origin main || true; } ; exec python3 tools/plugin-sync/drift-check.py</string>
+	</array>
+	<key>StandardErrorPath</key>
+	<string>/Users/allisongaddy/Library/Logs/plugin-sync/launchd-drift-check.err.log</string>
+	<key>StandardOutPath</key>
+	<string>/Users/allisongaddy/Library/Logs/plugin-sync/launchd-drift-check.log</string>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>8</integer>
+		<key>Minute</key>
+		<integer>0</integer>
+	</dict>
+</dict>
+</plist>
