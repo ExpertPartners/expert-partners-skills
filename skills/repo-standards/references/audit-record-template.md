@@ -38,7 +38,7 @@ read live, never memory.
 Verdict: READY / REMEDIATION REQUIRED (not a new ADR grade).
 Action recommendation: ORGANIZE EXISTING REPO / none.
 Scope: <authorized paths; excluded surfaces; baseline commit>.
-Canon reads: <Repo rules, ADR 0078, metadata/handling rules, Archive Index and applicable
+Canon reads: <Repo rules, Project ownership, metadata/handling rules, Archive Index and applicable
 owner decisions, each with revision or fetch time>.
 
 For an explicit Phase Two / Repo Design Tower pass, read the digest before

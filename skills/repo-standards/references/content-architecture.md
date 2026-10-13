@@ -39,7 +39,7 @@ Read in that order. Do not silently promote a research recommendation, an existi
 
 ## Establish authority before content changes
 
-Read the Repo rules, ADR 0078 and the applicable durable-decision boundary in ADR 0060, the Archive Index sheet, the owning repo's instructions, index, and applicable decisions live. Read ADR 0025 for metadata/handling, ADR 0027 for intake, and applicable ADR 0022 taxonomy plus recorded successors where relevant. Resolve pointers by direct fetch at a named commit or fetch time. Search discovers candidates; it does not establish current truth. If a source fails, try the other authorized live access paths; if none works, report `cannot verify` and stop dependent work. Memory, cached excerpts, generated human views, and research cannot substitute for unavailable canon.
+Read the Repo rules, Project ownership and the applicable durable-decision boundary in ADR 0060, the Archive Index sheet, the owning repo's instructions, index, and applicable decisions live. Read ADR 0025 for metadata/handling, ADR 0027 for intake, and applicable ADR 0022 taxonomy plus recorded successors where relevant. Resolve pointers by direct fetch at a named commit or fetch time. Search discovers candidates; it does not establish current truth. If a source fails, try the other authorized live access paths; if none works, report `cannot verify` and stop dependent work. Memory, cached excerpts, generated human views, and research cannot substitute for unavailable canon.
 
 For every proposed addition or disposition, record one of these assessment labels and a source pointer:
 

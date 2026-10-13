@@ -14,8 +14,7 @@
 	<key>ProgramArguments</key>
 	<array>
 		<string>/bin/bash</string>
-		<string>-c</string>
-		<string>S="$HOME/Claude/projects/ExpertPartnersSkills/tools/capability-currency/run-capability-currency.sh"; [ -f "$S" ] || S="$HOME/Claude/projects/Aura/tools/capability-currency/run-capability-currency.sh"; exec /bin/bash "$S"</string>
+		<string>/Users/allisongaddy/Claude/projects/ExpertPartnersSkills/tools/capability-currency/run-capability-currency.sh</string>
 	</array>
 	<key>StandardErrorPath</key>
 	<string>/Users/allisongaddy/Library/Logs/capability-currency/launchd.err.log</string>

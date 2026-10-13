@@ -21,7 +21,7 @@ subtitle: "run the repo-standards gate, then bootstrap a justified project"
 # New-Project Skill
 
 Runs `repo-standards`, the one repository standard implementation. This skill
-supplies bootstrap mechanics; the Repo rules and ADR 0078 remain the authorities.
+supplies bootstrap mechanics; Repo rules and Project ownership govern.
 Load current canonical `expert-partners-skills skills/repo-standards/SKILL.md`
 for every run. If it cannot be reached live, create nothing and name the failed
 source. A local script or an older deployed skill never substitutes for the gate.
@@ -61,7 +61,7 @@ source. A local script or an older deployed skill never substitutes for the gate
 
 4. **Run repo-standards Stage B on the new repo.** Bring the scaffold to the live
    Repo rules baseline, replace placeholder identity with the verified job, record
-   the Project relationship under ADR 0078, and add the Archive Index row
+   the Project relationship per Project ownership, and add the Archive Index row
    through Stage B item 8. The birth report is the Stage B report. Until the row
    is on the sheet and independently read back, birth is incomplete.
 
