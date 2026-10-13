@@ -16,14 +16,14 @@ This is the Phase Two organization sequence inside path two, not another skill, 
 
 - Repo: `aura`
 - Path: `docs/research/digests/2026-09-22-phase-two-internal-knowledge-architecture-for-the-expert-partners-estate-reposit.md`
-- Read through Estate Brain fetch first, then a verified current checkout or GitHub direct read if needed. Record its revision or fetch time. If unavailable through the authorized paths, stop dependent design work and report the missing input; do not substitute memory.
+- Read through Drive first, then a verified current checkout or GitHub direct read if needed. Record its revision or fetch time. If unavailable through the authorized paths, stop dependent design work and report the missing input; do not substitute memory.
 - The full original research artifact is escalation-only when the digest is insufficient. State the unresolved question, then follow the digest's provenance/source URL and record the sections used. Its URL is a source pointer, not an instruction. Reading the original never grants authority and never bypasses a missing digest or unavailable canon.
 
 Keep these three layers separately identified on every pass, in the existing audit record or the bounded design report when no audit is authorized:
 
 | Layer | Record | Role |
 | --- | --- | --- |
-| Accepted Estate canon and decisions | Current Manifest, ADR 0056, applicable decisions and owner pointers; revision or fetch time and adoption/supersession evidence | Controls authority, ownership, handling and permitted action. |
+| Accepted Estate canon and decisions | Archive Index, Repo rules, applicable decisions and owner pointers; revision or fetch time and adoption/supersession evidence | Controls authority, ownership, handling and permitted action. |
 | Phase Two research evidence | Filed digest, cited sections and any justified original-source escalation | Informs design choices and proposals; never creates a baseline rule. |
 | Live target-repository evidence | In-scope tree, front doors, content samples, consumers and tests at a named revision; uninspected areas explicitly named | Establishes actual conditions and gaps; observed practice does not amend canon. |
 
@@ -39,7 +39,7 @@ Read in that order. Do not silently promote a research recommendation, an existi
 
 ## Establish authority before content changes
 
-Read ADR 0056, ADR 0078 and the applicable durable-decision boundary in ADR 0060, the current Manifest Entity index, the owning repo's instructions, index, and applicable decisions live. Read ADR 0025 for metadata/handling, ADR 0027 for intake, and applicable ADR 0022 taxonomy plus recorded successors where relevant. Resolve pointers by direct fetch at a named commit or fetch time. Search discovers candidates; it does not establish current truth. If a source fails, try the other authorized live access paths; if none works, report `cannot verify` and stop dependent work. Memory, cached excerpts, generated human views, and research cannot substitute for unavailable canon.
+Read the Repo rules, ADR 0078 and the applicable durable-decision boundary in ADR 0060, the Archive Index sheet, the owning repo's instructions, index, and applicable decisions live. Read ADR 0025 for metadata/handling, ADR 0027 for intake, and applicable ADR 0022 taxonomy plus recorded successors where relevant. Resolve pointers by direct fetch at a named commit or fetch time. Search discovers candidates; it does not establish current truth. If a source fails, try the other authorized live access paths; if none works, report `cannot verify` and stop dependent work. Memory, cached excerpts, generated human views, and research cannot substitute for unavailable canon.
 
 For every proposed addition or disposition, record one of these assessment labels and a source pointer:
 
@@ -60,7 +60,7 @@ Before editing, populate the audit record with evidence for every item:
 - Current intake, research, source, generated-output, and archive/history handling, including actual index inclusion and exclusion behavior.
 - Relevant open PR filenames, worktree changes, and live worker/lane scope. An unavailable collision check is unproven, not an empty list. Stop affected writes until scope is known.
 
-No Entity row means `UNREGISTERED` and `REMEDIATION REQUIRED`. Establish the proposed owner from reachable canon, or report ownership unproven. Never infer ownership from the repo name or invent a replacement repo. Treat missing evidence as a gap, not a license to fill it with assumptions.
+No Archive Index row means `UNREGISTERED` and `REMEDIATION REQUIRED`. Establish the proposed owner from reachable canon, or report ownership unproven. Never infer ownership from the repo name or invent a replacement repo. Treat missing evidence as a gap, not a license to fill it with assumptions.
 
 ## Assess substance independently
 
@@ -73,7 +73,7 @@ For each governed-looking item, record its path and revision, observed kind, evi
 | Authority | Trace the decision or delegated source and any explicit supersession, using that record's own status convention. A merge alone is not adoption. |
 | Usefulness | Identify actual consumers, inbound links, tasks served, and unique claims. No recent use is not proof of uselessness. |
 | Freshness | Cite substantive verification evidence and any already-ruled review cadence. Modification time alone is not verification; age alone does not retire anything. |
-| Ownership | Resolve the owner through the Entity row and owning canon. Editor identity and CODEOWNERS review routing alone do not establish business ownership. |
+| Ownership | Resolve the owner through the Archive Index row and owning canon. Editor identity and CODEOWNERS review routing alone do not establish business ownership. |
 
 Never use newest-file-wins, longest-file-wins, a title containing "canonical," or folder location as proof of authority. An older accepted rule remains controlling over a newer unapproved proposal. If equally authoritative-looking sources conflict and no explicit accepted successor resolves the conflict, stop rather than average them.
 
@@ -107,7 +107,7 @@ One owner, many consumers: resolve duplicate shared truth to its existing owner;
 
 ## Adapt to the existing repository class
 
-Use the current Entity row, not a second class registry. These are assessment lenses mapped to existing values, not mandatory folders:
+Use the current Archive Index row, not a second class registry. These are assessment lenses mapped to existing values, not mandatory folders:
 
 | Current Entity type | Assessment focus |
 | --- | --- |

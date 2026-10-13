@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>HOME</key>
+		<string>/Users/allisongaddy</string>
+		<key>PATH</key>
+		<string>/Users/allisongaddy/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+	</dict>
+	<key>Label</key>
+	<string>com.expertpartners.capability-currency</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/bash</string>
+		<string>-c</string>
+		<string>S="$HOME/Claude/projects/ExpertPartnersSkills/tools/capability-currency/run-capability-currency.sh"; [ -f "$S" ] || S="$HOME/Claude/projects/Aura/tools/capability-currency/run-capability-currency.sh"; exec /bin/bash "$S"</string>
+	</array>
+	<key>StandardErrorPath</key>
+	<string>/Users/allisongaddy/Library/Logs/capability-currency/launchd.err.log</string>
+	<key>StandardOutPath</key>
+	<string>/Users/allisongaddy/Library/Logs/capability-currency/launchd.log</string>
+	<key>StartCalendarInterval</key>
+	<array>
+		<dict>
+			<key>Day</key>
+			<integer>1</integer>
+			<key>Hour</key>
+			<integer>7</integer>
+			<key>Minute</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>Day</key>
+			<integer>15</integer>
+			<key>Hour</key>
+			<integer>7</integer>
+			<key>Minute</key>
+			<integer>0</integer>
+		</dict>
+	</array>
+</dict>
+</plist>

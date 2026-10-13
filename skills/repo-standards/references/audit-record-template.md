@@ -1,7 +1,7 @@
 # Repo Standards audit record template
 
-File as `intake/YYYY-MM-DD-repo-standards-audit-<repo>.md` in the audited repo
-(aura intake/ when the repo has no inbox). Frontmatter per ADR 0025.
+File as a Google Doc titled `repo-standards-audit-<repo>` in the owning brain's
+home folder in Drive (HQ Business Brain if none).
 
 ```markdown
 ---
@@ -16,7 +16,7 @@ captured_at: <ISO 8601 UTC>
 ---
 # repo-standards-audit-<repo>
 
-Audited against aura decisions/0056-repo-baseline-standard.md, read this
+Audited against the Repo rules section of the HQ Rulebook, read this
 session at <commit or fetch time>. One repo per pass. Grades cite evidence
 read live, never memory.
 
@@ -38,7 +38,7 @@ read live, never memory.
 Verdict: READY / REMEDIATION REQUIRED (not a new ADR grade).
 Action recommendation: ORGANIZE EXISTING REPO / none.
 Scope: <authorized paths; excluded surfaces; baseline commit>.
-Canon reads: <ADR 0056, 0078, metadata/handling rules, Manifest and applicable
+Canon reads: <Repo rules, ADR 0078, metadata/handling rules, Archive Index and applicable
 owner decisions, each with revision or fetch time>.
 
 For an explicit Phase Two / Repo Design Tower pass, read the digest before
@@ -53,7 +53,7 @@ report may reuse this section without claiming an audit or baseline grades.
 
 | Boundary | Evidence / unresolved gap |
 | --- | --- |
-| Durable job and Entity row | |
+| Durable job and Archive Index row | |
 | Owner and current Entity type | |
 | Owns | |
 | Consumes by pointer | |

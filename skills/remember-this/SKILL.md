@@ -1,6 +1,6 @@
 ---
 name: remember-this
-description: "Turns a future obligation into a durable, self-resurfacing commitment so Allison stops carrying it mentally. Fires when she says remember this or clearly asks to preserve a follow-up, and fires on its own when an advisor notices an important non-blocking item that would cost real drift, rework, or lost leverage if forgotten but would hijack the current mission if pursued now. Resolves the owning repo LIVE, writes ONE open GitHub issue in that repo carrying a mechanical RETURN WHEN condition, refuses duplicates, verifies the write before claiming it, and reports in one short line. Proactive capture is allowed; proactive activation is not. Distinct from saving a decision (decision 0101: a clear decision is saved as made in its owning repo), from pin (a lightweight current-position bookmark), from intake (evidence and working knowledge), and from operational state. It inherits the operating-doctrine and never overrides it."
+description: "Turns a future obligation into a durable, self-resurfacing commitment so Allison stops carrying it mentally. Fires when she says remember this or clearly asks to preserve a follow-up, and fires on its own when an advisor notices an important non-blocking item that would cost real drift, rework, or lost leverage if forgotten but would hijack the current mission if pursued now. Resolves the owning room LIVE, writes ONE Job Tracker row with a mechanical RETURN WHEN condition in Waiting on, refuses duplicates, verifies the write before claiming it, and reports in one short line. Proactive capture is allowed; proactive activation is not. Distinct from saving a decision (decision 0101: a clear decision is saved as made in its owning repo), from pin (a lightweight current-position bookmark), from intake (evidence and working knowledge), and from operational state. It inherits the operating-doctrine and never overrides it."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Born dressed 2026-09-04 (Immediate Pain Controls campaign, issue #15).
 # Canonical home is this file. It is homed under skills/ and carried by no plugin,
@@ -22,16 +22,16 @@ Source of record: `expert-partners-skills` issue #15, whose RETURN WHEN fired 20
 
 ## What this is, in one line
 
-A future obligation gets ONE open GitHub issue in the repo that owns the work, carrying a literal `RETURN WHEN:` line, verified to exist before anyone says it was saved.
+A future obligation gets ONE Job Tracker row for the room that owns the work, with a literal `RETURN WHEN:` line in Waiting on, verified to exist before anyone says it was saved.
 
 ## What this is not
 
 These four boundaries are load-bearing. Blurring any of them is the failure this skill exists to prevent.
 
-- **Not a decision save.** A clear decision from Allison is saved as made in its owning repo under decision 0101, with no phrase required and a readback in the same response cycle. Remembering an obligation is a different act. It never promotes a decision, never ratifies a recommendation, and never turns a candidate into canon. A captured item may say a decision is pending; it may never say a decision is made.
+- **Not a decision save.** A clear decision from Allison is saved as made in the Decision Log, with no phrase required and a readback in the same response cycle. Remembering an obligation is a different act. It never promotes a decision, never ratifies a recommendation, and never turns a candidate into canon. A captured item may say a decision is pending; it may never say a decision is made.
 - **Not pin.** Pin is a lightweight bookmark of the current position between surfaces. It is a place-keeper for right now, it expires with the moment, and it is never durable memory.
 - **Not intake.** Intake preserves evidence and working knowledge a cold future reader would need. Remember This preserves an ACTION still owed. Knowledge that has no action attached goes to intake, not here.
-- **Not operational state.** Lane rows, board cards, and work-state records are deterministic machinery with their own contracts. A wait that already has a home in the lane ledger's waiting-on column with a named condition and a stale date is already remembered, and duplicating it here is memory spam.
+- **Not operational state.** Job Tracker rows, board cards, and work-state records are deterministic machinery with their own contracts. A wait that already has a home in the Job Tracker's Waiting on column with a named condition and a stale date is already remembered, and duplicating it here is memory spam.
 
 ## Trigger one, explicit
 
@@ -55,58 +55,35 @@ If the five gates do not all clear, say nothing. Silence is the correct output f
 
 ## The flow, zero freedom
 
-### 1. Resolve the owner, live
+### 1. Resolve the room, live
 
-Never guess a repo from topic similarity, and never create one. Read the live estate before writing:
-
-- Estate Brain `list_repos` and `search` for the subject, and the Estate manifest for the durable owner of that job.
-- The `intake` skill's project map for the local home and GitHub repo of a named project.
-- `gh api orgs/ExpertPartners/repos` when the candidate set is genuinely unclear.
-
-The owner is the repo that owns the durable JOB, not the repo the conversation happened to be near. If the obligation is about a rule or doctrine, the owner is the repo holding that rule. If it spans several, pick the one that would have to act first, and name the others in the body.
-
-If no existing repo can own it, that is a repo-ownership question and it goes to the `repo-standards` creation gate, which proves no existing repo can own the job before any repo is proposed. Never open the issue against a repo that does not own the work just to have somewhere to put it.
+Never guess a room from topic similarity. Read the HQ Rulebook and the owning brain's `00 START HERE` live to name the room or lane that owns the durable JOB, not the one the conversation happened to be near. If it spans several, pick the one that would have to act first and name the others in Next step. If nothing can own it, say so and ask where it belongs. Never park it in a row that does not own the work just to have somewhere to put it.
 
 ### 2. Refuse duplicates before writing
 
-Search the resolved repo's OPEN issues for the same obligation before creating anything:
-
-```bash
-gh issue list --repo ExpertPartners/<repo> --state open --search "<distinctive terms>" --json number,title,body
-```
-
-Match on the obligation, not on wording. If an open issue already carries this obligation, do NOT create a second one. Either leave it exactly as it is, or, when this moment genuinely adds new evidence, add one comment to the existing issue and say that is what happened. One obligation, one durable entry, for its whole life.
+Read the Job Tracker values and look for the same obligation. Match on the obligation, not on wording. If a row already carries it, do NOT add a second one. Leave it as it is, or, when this moment genuinely adds new evidence, add that evidence to its Next step and say so. One obligation, one row, for its whole life.
 
 ### 3. Write it durably
 
-Create ONE issue in the owning repo. Required shape, because the wake token is mechanical and a prose paraphrase does not fire:
+Add ONE row to the Job Tracker (Google Sheet `1FniEwCaZ89cViQxUcPkycxAmvvM47cnjRzQQyzpEk5c`) through the Sheets connector. The come-back condition is written in Waiting on, as a literal `RETURN WHEN:` line, because the wake token is mechanical and a prose paraphrase does not fire:
 
 ```
-Title: <the obligation, stated as the thing still owed>
-
-REMEMBER THIS
-OWNER: ExpertPartners/<repo>
-SOURCE: <the exact surface and table or session that captured it>
-CAPTURED: <YYYY-MM-DD>
-WHY: <what it costs if this is forgotten, in concrete terms>
-
-RETURN WHEN: <the mechanical condition that makes this ripe>
-RETURN CONDITION STATUS: NOT FIRED
+Job: <the obligation, stated as the thing still owed>
+Room or lane: <the owning room>
+Who is doing it: Nobody yet
+Status: Not started
+Waiting on: RETURN WHEN: <the mechanical condition that makes this ripe>
+Next step: <the first action once ripe, with the short why and the capturing session>
+Opened / Last updated: <today>
 ```
 
-`RETURN WHEN:` is a literal line, spelled exactly that way, because it is the token repos are checked for when their work wakes (operating-doctrine, bias-to-action). A condition is mechanical when a reader can tell whether it has happened without judgment: a named merge, a named lane closing, a named date, a named dependency resolving. "When we have time" is not a condition.
+A condition is mechanical when a reader can tell whether it has happened without judgment: a named merge, a named job closing, a named date, a named dependency resolving. "When we have time" is not a condition.
 
-**Never write a secret.** No key, token, password, credential, or credential-bearing material ever enters an issue body, a title, or a comment. Secrets live in 1Password only. If the obligation is about a credential, name the 1Password item reference and nothing else.
+**Never write a secret.** No key, token, password, or credential-bearing material ever enters a row. Secrets live in 1Password only. If the obligation is about a credential, name the 1Password item reference and nothing else.
 
 ### 4. Verify before claiming
 
-Read the issue back from GitHub after creating it, and confirm the number and the `RETURN WHEN` line are actually present:
-
-```bash
-gh issue view <n> --repo ExpertPartners/<repo> --json number,title,body,state
-```
-
-Only a successful read-back earns the receipt. A create call that returned without error is not proof; the read is.
+Re-read the sheet after writing and confirm the row and its `RETURN WHEN` text are actually present. Only a successful read-back earns the receipt. A write call that returned without error is not proof; the read is.
 
 ### 5. Report, tiny
 
@@ -122,24 +99,24 @@ Do not explain the routing. Do not open a side discussion. Do not ask whether sh
 
 If the durable write cannot be made or cannot be verified, **never say it was remembered.** Chat is not a memory store, and a false receipt is worse than no capture because she will stop carrying it herself.
 
-Say plainly, in the same turn: what the obligation is, verbatim, so it is at least on screen; that the durable write failed and the actual error; and the smallest recovery, which is normally the repo and the exact issue body ready to be created once access works. Never substitute a note in conversation and call it done. Never quietly downgrade to a lane row or a board card that the obligation does not belong in.
+Say plainly, in the same turn: what the obligation is, verbatim, so it is at least on screen; that the durable write failed and the actual error; and the smallest recovery, which is normally the exact row ready to be added once access works. Never substitute a note in conversation and call it done. Never quietly downgrade to a board card the obligation does not belong in.
 
 ## Waking
 
 A captured obligation resurfaces two ways, both already existing, neither a new watcher:
 
-1. **On owner wake.** When work in the owning repo wakes, that repo is checked for open issues carrying `RETURN WHEN` whose condition has fired (operating-doctrine, bias-to-action; the `repo-standards` readiness path reaches the same repos).
-2. **On the named condition.** When the named merge, lane close, date, or dependency actually lands, the surface that sees it lands flips `RETURN CONDITION STATUS` to `FIRED <date>` with one comment, and the obligation becomes ordinary ripe work under Decide Now.
+1. **On room wake.** When work in the owning room wakes, the Job Tracker is checked for Not started rows whose `RETURN WHEN` condition has fired (operating-doctrine, bias-to-action).
+2. **On the named condition.** When the named merge, lane close, date, or dependency actually lands, the surface that sees it land marks Waiting on `FIRED <date>`, and the obligation becomes ordinary ripe work under Decide Now.
 
-No daemon, no sweeper, no cron, no queue, no dashboard, no second registry. If a wake mechanism does not already exist for a repo, that is a finding to report, never a reason to build one here.
+No daemon, no sweeper, no cron, no queue, no dashboard, no second registry. If a wake mechanism does not already exist for a room, that is a finding to report, never a reason to build one here.
 
 ## Never
 
-- Never capture without a live-resolved owner.
+- Never capture without a live-resolved room.
 - Never create a second durable entry for an obligation that already has one.
-- Never create a repo, or route to a repo that does not own the work, to have a destination.
+- Never route to a room that does not own the work to have a destination.
 - Never promote a captured item into canon. A decision is saved only when Allison clearly decides it, under decision 0101, never because this skill captured something.
-- Never write a secret into an issue.
+- Never write a secret into a row.
 - Never claim a capture that was not read back.
 - Never turn a capture into a side quest, a lane, or a re-scope of the open mission.
 - Never use em dashes in anything this skill writes.

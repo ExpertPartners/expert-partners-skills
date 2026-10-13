@@ -1,48 +1,41 @@
 ---
 name: intake
 description: >
-  File a session summary or any captured content into a canonical brand/project repo's intake/
-  inbox, then commit and push so the estate-brain indexes it. Use when the user pastes a
+  File a session summary or any captured content into the owning brain's home folder in
+  Google Drive as a Google Doc, so every surface can read it. Use when the user pastes a
   claude.ai session summary with /intake followed by a project name, or says "intake this to
-  PROJECT", "save this session to PROJECT", "file this into REPO". Implements the ADR 0027
-  session-intake convention (the Claude Code half; the brain write tool save_to_session_intake
-  is the claude.ai half, and both MUST produce identical file shape).
+  PROJECT", "save this session to PROJECT", "file this into BRAIN". Replaces the old repo
+  intake/ inbox. Any decision inside the content also gets a Decision Log entry.
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Adopted into canonical 2026-08-05 (Skill Map Rulings lane, flags item 9);
 # the machine copy at ~/.claude/skills is a deployed copy.
 tier: user
 zone: routing
 status: live
-subtitle: "file content into a repo intake inbox"
+subtitle: "file content into the owning brain in Drive"
 ---
 
 # Intake Skill
 
-Files captured content into `<repo>/intake/` per ADR 0027, commits, and pushes.
+Files captured content as a Google Doc in the owning brain's home folder in Drive.
+Decisions inside it go to the Decision Log.
 
-## Project -> home/repo map
+## Project -> brain map
 
-| Project keyword | Local home | GitHub repo | Branch protected? |
-|---|---|---|---|
-| FAM / free agent / Free Agent Nation | ~/Claude/projects/FAM | ExpertPartners/free-agent-nation (renamed from fam 2026-09-04) | yes (PR) |
-| Moxie (BENCHED 2026-07-30, ADR 0045: repo archived, do NOT intake; route consumer RE content to AG Luxury) | ~/Claude/projects/MoxieSignatureGroup | ExpertPartners/moxie (archived) | n/a |
-| AG Luxury / luxury | ~/Claude/projects/allisongaddy-com (clone of ag-luxury) | ExpertPartners/ag-luxury | yes (PR) |
-| Expert Partners / EP | ~/Claude/projects/ExpertPartners | ExpertPartners/expert-partners | yes (PR) |
-| EPIC | ~/Claude/projects/EPIC | ExpertPartners/epic | no (direct) |
-| AG / personal brand | ~/Claude/projects/AGPersonalBrand | ExpertPartners/ag-personal-brand | yes (PR) |
-| Azulio | ~/Claude/projects/AzulioPartnership | ExpertPartners/azulio | no (direct) |
-| The Strong Ones (independent body of work that feeds AG Personal Brand per aura ADR 0069; private repo) | ~/Claude/projects/TheStrongOnes | ExpertPartners/the-strong-ones | no (direct) |
-| book / You've Got a Friend | ~/Claude/projects/book | ExpertPartners/youve-got-a-friend-book (renamed from book 2026-09-04) | no (direct) |
-| HeyGen | ~/Claude/projects/HeyGen | ExpertPartners/heygen | no (direct) |
-| PartnerSync | ~/Claude/projects/PartnerSync | ExpertPartners/partnersync | no (direct) |
-| ghl / automation (ghl-automation split and retired 2026-09-08; GHL reference and doctrine intake goes to PartnerSync) | ~/Claude/projects/PartnerSync | ExpertPartners/partnersync | no (direct) |
-| Tonic / Tonic Build Studio | ~/Claude/projects/TonicBuildStudio | ExpertPartners/tonic-build-studio | no (direct) |
-| Aura | ~/Claude/projects/Aura | ExpertPartners/aura | no (direct) |
-| Founder Command Center / EOS | ~/Claude/projects/FounderCommandCenter | ExpertPartners/allison-founder-command-center | no (direct) |
-| Email Deliverability Command Center / email deliverability | ~/Claude/projects/EmailDeliverabilityCommandCenter | ExpertPartners/email-deliverability-command-center | no (direct) |
+| Project keyword | Brain |
+|---|---|
+| FAM / free agent / Free Agent Nation | EP Business Brain |
+| Moxie (BENCHED 2026-07-30, ADR 0045: do NOT intake; route consumer RE content to AG Luxury) | none |
+| AG Luxury / luxury | AGRE Business Brain |
+| Expert Partners / EP | EP Business Brain |
+| EPIC | EP Business Brain |
+| AG / personal brand | EP Business Brain for the industry side, AGRE Business Brain for the consumer side |
+| Anything shared by both companies | HQ Business Brain, Company Core [HQ-BB] (folder `1Za4sU2YQ3UP2E-ujxVNtvH-2sQ-zndjw`) |
 
-If the project is not in this table, ask the user which home, or suggest
-`/new-project` if it is genuinely new. NEVER write to ag-vault.
+Azulio, The Strong Ones, book / You've Got a Friend, HeyGen, PartnerSync, Tonic,
+Aura, Founder Command Center / EOS, and Email Deliverability have no brain assigned
+in the Business Brain spec yet. Ask which brain. If the project is not in this table,
+ask, or suggest `/new-project` if it is genuinely new. NEVER write to ag-vault.
 
 ## Steps
 
@@ -50,39 +43,33 @@ If the project is not in this table, ask the user which home, or suggest
    project. Everything after is the content body (markdown). If no body, ask
    for it or offer to capture the current conversation.
 
-2. **Resolve the home** from the map. Confirm the local clone exists at the home
-   path. If it does not, `git clone` it first (or use `gh api` to write directly).
+2. **Resolve the brain** from the map. Open that brain's `00 START HERE` Doc
+   through the Drive connector and file into the folder it names for this kind
+   of content.
 
-3. **Build the file.** Path: `<home>/intake/YYYY-MM-DD-<slug>.md` where slug is a
-   short kebab-case title (derive from the first heading or ask). If the file
-   exists, append `-2`, `-3`, etc. Never overwrite. Prepend frontmatter EXACTLY:
+3. **Build the Doc.** Plain title, no date prefix. If the title exists, add
+   `-2`, `-3`. Never overwrite. Put this header block first:
    ```
-   ---
-   classification: internal
-   classification_owner: allison
-   classification_date: <today YYYY-MM-DD>
-   source: claude-code
-   project: <project>
-   captured_at: <today, 12-hour AM/PM CDT>
-   ---
+   Classification: internal
+   Captured: <today YYYY-MM-DD, 12-hour AM/PM CDT>
+   Source: claude-code
+   Project: <project>
    ```
-   Then the body. This shape MUST match the brain's save_to_session_intake tool.
+   Then the body.
 
-4. **Create intake/ if missing** (with a .gitkeep). 
+4. **Create it** with the Google Docs or Drive connector. If the connector
+   refuses the write, use the service-account path (SA+DWD) for the same
+   folder. Open the Doc from Drive to verify it landed.
 
-5. **Commit + push.**
-   - Unprotected repo: `git add intake/<file>` + commit (message
-     `docs(intake): capture <slug> from <source>`, trailer `Push-Policy: docs`)
-     + push to main.
-   - Protected repo (fam/moxie/expert-partners/ag-personal-brand): create branch
-     `intake/<date>-<slug>`, commit, push, open a PR.
+5. **Record decisions.** For each clear decision in the content, add an entry at
+   the top of the Decision Log (Google Doc `1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc`)
+   under today's date: what was decided, why in a sentence or two, a `Replaces:`
+   note naming the older decision it supersedes (or none), and the Doc link.
 
-6. **Report** the file path and the commit hash or PR URL. Note that the brain
-   will index it within a few minutes.
+6. **Report** the Doc as a markdown link, plus a note if a Decision Log entry was added.
 
 ## Rules
 - Never use em dashes in any content this skill writes (org standard). Convert to
   double hyphens or commas.
-- Never write outside `intake/`.
+- Never write outside the brains' folders.
 - Never touch ag-vault.
-- Run the sibling-session visibility check before committing to a shared repo.

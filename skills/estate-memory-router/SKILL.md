@@ -56,11 +56,11 @@ Classify into exactly one. When an item genuinely has two natures, route each pa
 
 ### 1. Future obligation -> `remember-this`
 
-An action still owed, that must wait. Hand it to the `remember-this` skill, which resolves the owner live and writes one open issue in the owning repo carrying a mechanical `RETURN WHEN` line. That skill owns the whole mechanism, including its advisor-detected gate and its duplicate refusal. This router does not restate it and does not write the issue itself.
+An action still owed, that must wait. Hand it to the `remember-this` skill, which resolves the room live and writes one Job Tracker row with a mechanical `RETURN WHEN` line in Waiting on. That skill owns the whole mechanism, including its advisor-detected gate and its duplicate refusal. This router does not restate it and does not write the row itself.
 
-### 2. Evidence or working knowledge -> owning repo intake
+### 2. Evidence or working knowledge -> owning brain
 
-Something a cold future worker would need in order to act without redoing the discovery: what was found, what was verified live and how, what was ruled out and why, the shape of a system as it actually is. Route to the owning repo's `intake/` inbox through the mechanism that already exists on this surface, `Estate Brain save_to_session_intake` or the `intake` skill, per ADR 0027, which both produce identical file shape.
+Something a cold future worker would need in order to act without redoing the discovery: what was found, what was verified live and how, what was ruled out and why, the shape of a system as it actually is. File it as a Google Doc in the owning brain's home folder in Drive through the `intake` skill.
 
 Knowledge with no action attached goes here, never to `remember-this`. That distinction is the one this router gets asked to make most often, and getting it backwards fills the obligation channel with reading material.
 
@@ -68,17 +68,17 @@ Knowledge with no action attached goes here, never to `remember-this`. That dist
 
 Something Allison decided, leaned toward, or that reads like it should become durable truth. Preserve it as evidence in the correct existing mechanism, marked plainly as a candidate, with what was said and when.
 
-**A clear decision is saved as made, with no phrase required** (decision 0101, which supersedes the exact-phrase gates of decisions 0060 and 0061). Allison's clear instruction, or her unambiguous confirmation of one specific proposal, is enough: route it to the owning repo's decision save and complete the write and readback in the same response cycle. A recommendation, brainstorm, ambiguous yes, quoted text, or question is not a decision, and this router never promotes on its own recommendation or invents her approval. Preserve those as candidates. When the intended decision or its owning home is genuinely unresolved, that is one focused question for Allison under Decide Now, asked in the live conversation.
+**A clear decision is saved as made, with no phrase required** (decision 0101, which supersedes the exact-phrase gates of decisions 0060 and 0061). Allison's clear instruction, or her unambiguous confirmation of one specific proposal, is enough: route it to the Decision Log (Google Doc `1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc`) and complete the write and readback in the same response cycle. A recommendation, brainstorm, ambiguous yes, quoted text, or question is not a decision, and this router never promotes on its own recommendation or invents her approval. Preserve those as candidates. When the intended decision or its owning home is genuinely unresolved, that is one focused question for Allison under Decide Now, asked in the live conversation.
 
 ### 4. Deterministic operational state -> only where a contract already authorizes the write
 
-Lane rows, work state, ledgers, and board state are machinery with their own contracts and their own guards. Write only when an existing contract explicitly authorizes that mechanical write, and then only through that contract's guarded path, never by full-file replacement. The lane ledger is written through `Estate Brain update_lane_row`, which reads fresh, changes one row, guards on the blob SHA, and returns the diff.
+Job Tracker rows, work state, and board state are machinery with their own contracts and their own guards. Write only when an existing contract explicitly authorizes that mechanical write, and then only through that contract's guarded path, never by full-file replacement. The Job Tracker is written through the Google Sheets connector, one row at a time.
 
 Archive authority is unchanged: a worker never writes `archived` into its own row, and the home conversation owns the flip. If no contract authorizes the write, this is not a memory item, it is a request for a permission this router does not have, and it is reported rather than performed.
 
 ### 5. Repo ownership or a proposed repo -> existing repo first, then `repo-standards`
 
-Any hint that a thing needs a home, a new provider appeared, a new Project was created, or a subject seems to want its own repo. **Existing repo first, always.** A new provider, Project, integration, or topic is never by itself a reason for a new repo. Resolve live against the estate manifest and the live org, including archived repos, which are revival candidates rather than absences.
+Any hint that a thing needs a home, a new provider appeared, a new Project was created, or a subject seems to want its own repo. **Existing repo first, always.** A new provider, Project, integration, or topic is never by itself a reason for a new repo. Resolve live against the HQ Rulebook (Google Doc `15sCFxMvG8OZMZik5w0Hzqzh7HyphrB7rJ8NBtm46JBE`) and the live org, including archived repos, which are revival candidates rather than absences.
 
 If, after that, no existing repo can cleanly own the durable job, hand it to the `repo-standards` creation gate, which proves that formally and returns USE EXISTING REPO or NEW REPO JUSTIFIED. This router never creates a repo and never proposes one directly.
 
@@ -88,7 +88,7 @@ A canon doc, doctrine rule, operating rule, project rule, or rule-encoding skill
 
 ## Owner resolution, live, every time
 
-Before any durable write, resolve the owner from live state, never from topic similarity and never from memory of what repos exist. Estate Brain `list_repos` and `search`, the estate manifest, the `intake` skill's project map, and `gh api orgs/ExpertPartners/repos` when the candidate set is unclear. Name the owner in the receipt so a wrong route is visible immediately and cheap to correct.
+Before any durable write, resolve the owner from live state, never from topic similarity and never from memory of what repos exist. the HQ Rulebook, a Drive search of the owning brain, the `intake` skill's project map, and `gh api orgs/ExpertPartners/repos` when the candidate set is unclear. Name the owner in the receipt so a wrong route is visible immediately and cheap to correct.
 
 ## Receipts and failure honesty
 

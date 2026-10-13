@@ -1,46 +1,18 @@
-# Wrap mechanics: MCP writes, ledger, dashboard mark
+# Wrap mechanics: Drive writes, Job Tracker, dashboard mark
 
 Volatile mechanics live here, dated, verified at use time. Nothing in SKILL.md depends on them.
 
-## Intake push
+## Drive records
 
-Tool, fully qualified: `Estate Brain:save_to_session_intake`
-Args: `project` (canonical repo name, normally `aura`), `content` (the full markdown), `title` (slug source, e.g. `session-record-[lane]` / `continuity-[lane]`), `classification` (`internal` unless ruled otherwise, ADR 0025).
-Behavior: append-only, writes `<repo>/intake/YYYY-MM-DD-<slug>.md`, never overwrites (ADR 0027). The returned path is a write receipt, not proof of publication. Independently read the record from the authoritative published `main` branch and test retrieval through the continuation path. Echo the exact published path in the confirmation. If the write or publication fails, use the existing authorized Git path where available. Otherwise preserve the unpublished material in the owning repo's approved private recovery or staging location, identify the blocked action and owner, and leave the closeout obligation uncleared. Never create a routine Desktop or Downloads copy, including after successful publication. The governing owner rule is `~/.claude/rules/file-delivery.md` in allison-claude-doctrine.
+Session record and continuity note: a Google Doc in the owning brain's home folder, found through that brain's 00 START HERE index (Company Core [HQ-BB] when no one company owns it). Plain title, no date prefix. Create it with the Google Docs or Drive connector; if the connector refuses the write, use the service-account path (SA+DWD, impersonating allison@) for the same folder. The returned link is a write receipt, not proof: open the Doc from Drive to verify.
 
-## Lane ledger
+## Decision Log
 
-File: aura `docs/estate/lanes.md`. Update this lane's row with the closeout state per the code-block-routing skill's ledger rules.
+Google Doc `1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc`, Company Core [HQ-BB]. Add each decision at the top under today's date heading (create the heading if today's is missing): what was decided, why in one or two sentences, a `Replaces:` note naming the older decision it supersedes (or none), and a link to the full record. Re-read the Doc after the write to confirm the entry landed and nothing else changed.
 
-Preferred path as of 2026-08-07, the Estate Brain door tool `Estate Brain:update_lane_row` (door tool eight). It retires whole-file writes: fresh read every attempt, single-row edit on that fresh base, compare-and-swap on the blob SHA, bounded rebase-retry that re-reads instead of forcing, post-write re-read from origin returning the exact diff, foreign edits in the same window reported rather than hidden, and on exhaustion it writes nothing and routes the row per Rule 2. It refuses rather than guesses on ambiguous duplicates, malformed rows, resurrecting a completed lane, a new row with no named home, and no-op writes. A refusal is a correct outcome, not a failure to work around; a malformed row gets repaired by a git-based writer first, then the tool runs.
+## Job Tracker
 
-Without the door: from Claude Code, commit directly (still preferred for this hot file over any contents-API write). From Chat or Cowork with no door reach, use the GitHub connector file write (whole-file write on main, reversible under ADR 0047) under the full collision guard below.
-
-Collision guard, mandatory (incident 2026-08-04, first live wrap): the ledger is a shared concurrent-writer file, and a whole-file write can silently revert or drop sibling rows written between your read and your write. So, in order: (1) read the ledger IMMEDIATELY before writing, never from an earlier point in the session; (2) after the write, fetch the commit's full patch and verify it contains ONLY this lane's row change; (3) any reverted or dropped sibling line gets restored in a corrective commit BEFORE the wrap continues, and the incident is named in this lane's row and in the confirmation. Never report the ledger step done on the push alone.
-
-Directive binding, added 2026-08-05 (Allison's ruling of 2026-08-04 after the second regression incident): the shared-canonical-file-writes directive (aura `docs/directives/shared-canonical-file-writes.md`) governs every ledger write and wins if this section ever lags it. Three additions beyond the guard above. Any contents-API write MUST pass the current blob SHA (compare-and-swap) so a stale write bounces instead of landing. After two SHA-guard bounces in one wrap, the writer stops racing and routes the row verbatim through an intake handoff note for the next git-based writer to fold in, and a routed row plus a plain statement is a correct wrap. Corrective commits restore only from a FRESH read taken at repair time, never from a copy held earlier in the session, because the held copy may be missing newer healing by the owning lanes (this exact near-miss happened 2026-08-04 and only the SHA guard stopped it).
-
-### Reaching the door from a Code session (connection, not auth model)
-
-Diagnosed 2026-08-07 (Fix estate-brain-door MCP auth error lane) after `update_lane_row` failed four times live from this repo's Plugin GitHub Sync Setup lane with `Incompatible auth server: does not support dynamic client registration` (task_87b02a77). The door's auth model never changed and was never down: `mcp.expertpartners.com/mcp` answered `initialize` with 200 on the first live retest. The failure was a missing project-scoped MCP registration for `estate-brain` in this repo, so the session fell back to Claude Code's default OAuth-discovery flow, which cannot work against the door's Cognito app client (`ukph8epl3baqjajcift1mhhej`, a `USER_PASSWORD_AUTH` client with no Dynamic Client Registration support) -- exactly the documented trigger for that error at code.claude.com/docs/en/mcp ("Use pre-configured OAuth credentials").
-
-The door has never used interactive OAuth for Code sessions and does not need to: it authenticates Code callers via a `headersHelper` (`~/.claude/estate-brain-auth.py`) that runs Cognito `USER_PASSWORD_AUTH` directly and hands back a Bearer token, bypassing OAuth discovery entirely. (Separately, claude.ai's chat connector uses a *different* Cognito app client with pre-configured Client ID/Secret under Advanced settings, per ADR 0051 -- that path is for chat surfaces only and is not relevant to Code sessions.)
-
-Fix shipped as a project-scoped `.mcp.json` at this repo's root (`32417d0`):
-
-```json
-{
-  "mcpServers": {
-    "estate-brain": {
-      "type": "http",
-      "url": "https://mcp.expertpartners.com/mcp",
-      "headersHelper": "python3 $HOME/.claude/estate-brain-auth.py"
-    }
-  }
-}
-```
-
-Any repo whose Code sessions need door tools (`update_lane_row`, `save_to_session_intake`, `get_manifest`, etc.) should carry this same block rather than relying on the door being added ad hoc via `claude mcp add <url>` with no headers -- a bare add defaults to the OAuth flow and reproduces this exact failure. If a session ever sees "Incompatible auth server: does not support dynamic client registration" against this door, the fix is this file, not a credential rotation.
+Google Sheet `1FniEwCaZ89cViQxUcPkycxAmvvM47cnjRzQQyzpEk5c`. Columns A to H: Job, Room or lane, Who is doing it, Status, Waiting on, Next step, Opened, Last updated. Read the values, change only this lane's row (or append one at the bottom), then re-read to verify. After two failed writes, stop and route the row verbatim in the wrap note for home to enter.
 
 ## Dashboard wrap mark (hq.allisongaddy.com)
 
