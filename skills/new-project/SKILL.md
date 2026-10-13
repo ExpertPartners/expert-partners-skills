@@ -22,7 +22,7 @@ subtitle: "run the repo-standards gate, then bootstrap a justified project"
 
 Runs `repo-standards`, the one repository standard implementation. This skill
 supplies bootstrap mechanics; Repo rules and Project ownership govern.
-Load current canonical `expert-partners-skills skills/repo-standards/SKILL.md`
+Load current canonical `expert-partners-skills plugins/operating-doctrine/skills/repo-standards/SKILL.md`
 for every run. If it cannot be reached live, create nothing and name the failed
 source. A local script or an older deployed skill never substitutes for the gate.
 

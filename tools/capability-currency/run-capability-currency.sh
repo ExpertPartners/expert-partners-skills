@@ -4,7 +4,7 @@
 # Fired by ~/Library/LaunchAgents/com.expertpartners.capability-currency.plist
 # on the 1st and 15th at 7:00 AM CDT (after the 6:15 AM session janitor).
 # The sweep itself is the capability-currency skill, canonical at
-# expert-partners-skills skills/capability-currency/SKILL.md (deployed copy
+# expert-partners-skills plugins/research-ops/skills/capability-currency/SKILL.md (deployed copy
 # at ~/.claude/skills/capability-currency/). This script only frames the run:
 # heartbeat, kill switches, headless Claude invocation, logging.
 #

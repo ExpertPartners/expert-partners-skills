@@ -8,7 +8,7 @@
     {
       "name": "operating-doctrine",
       "source": "./plugins/operating-doctrine",
-      "version": "2.55.0",
+      "version": "2.56.0",
       "description": "The non-negotiable operating standard. Loads at every session."
     },
     {
@@ -20,14 +20,20 @@
     {
       "name": "content-engines",
       "source": "./plugins/content-engines",
-      "version": "0.5.0",
-      "description": "Allison Gaddy content and marketing engines (master-marketer-free-agent-builder, rare-content-engine, xavier-offer-builder, dm-to-dollars, video-transcript-relay)."
+      "version": "0.6.0",
+      "description": "Allison Gaddy content and marketing engines (master-marketer-free-agent-builder, rare-content-engine, xavier-offer-builder, dm-to-dollars, video-transcript-relay, content-coach, hook-engine, post-grader, post-scheduler, post-value-filter, social-analyzer)."
     },
     {
       "name": "funnel-operations",
       "source": "./plugins/funnel-operations",
       "version": "0.2.0",
       "description": "Build, migrate, and document funnels for Expert Partners and EPIC, with Notion as the single source of truth."
+    },
+    {
+      "name": "research-ops",
+      "source": "./plugins/research-ops",
+      "version": "0.1.0",
+      "description": "Research skills: capability-currency, research-intake, and the three TUB analysts (competitive intelligence, voice of customer, GEO and SEO ranking audit)."
     },
     {
       "name": "systems-map",

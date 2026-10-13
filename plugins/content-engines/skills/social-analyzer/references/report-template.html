@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Social Analyzer</title>
+<!--
+  SOCIAL ANALYZER REPORT TEMPLATE
+  Instructions for Claude: copy this file exactly. Replace ONLY the REPORT object
+  inside the <script> tag near the bottom. Keep every key; use [] or null for
+  sections with no data (the section then hides itself or shows a short note).
+  Do not edit the CSS or the render code.
+-->
+<style>
+:root{
+  --bg:#f7f6f3; --card:#ffffff; --ink:#1d1d1f; --muted:#6b6b70; --line:#e4e2dc;
+  --accent:#3b5bdb; --accent-soft:#e7ecff; --good:#2b8a3e; --good-soft:#e6f4ea;
+  --bad:#c92a2a; --bad-soft:#fdecec; --warn:#b76e00; --warn-soft:#fff4e0;
+  --bar:#3b5bdb; --bar-dim:#c5cdf0;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#131316; --card:#1d1d22; --ink:#ececf1; --muted:#9a9aa3; --line:#2e2e36;
+    --accent:#8ea2ff; --accent-soft:#242a45; --good:#69c47f; --good-soft:#1c2e22;
+    --bad:#ff8a8a; --bad-soft:#3a1f22; --warn:#f0b55a; --warn-soft:#3a2d17;
+    --bar:#8ea2ff; --bar-dim:#3a4270;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:960px;margin:0 auto;padding:32px 16px 64px}
+header{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-end;margin-bottom:28px}
+h1{font-size:32px;line-height:1.15;margin:0 0 6px;letter-spacing:-.02em}
+h2{font-size:21px;margin:0 0 14px;letter-spacing:-.01em}
+h3{font-size:16px;margin:0 0 8px}
+.meta{color:var(--muted);font-size:14px}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;border-radius:8px;cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.hint{font-size:12px;color:var(--muted);margin-top:6px;max-width:320px}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:18px;break-inside:avoid}
+.one{background:var(--accent-soft);border-color:transparent}
+.one .label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.one p.big{font-size:21px;line-height:1.35;margin:6px 0 14px;font-weight:600}
+.one ul{margin:0;padding-left:20px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.stat{border:1px solid var(--line);border-radius:10px;padding:14px}
+.stat .v{font-size:26px;font-weight:700;letter-spacing:-.02em}
+.stat .l{font-size:13px;color:var(--muted)}
+.stat .n{font-size:12px;color:var(--muted);margin-top:4px}
+.delta{font-size:13px;font-weight:600;margin-left:6px}
+.up{color:var(--good)} .down{color:var(--bad)} .flat{color:var(--muted)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.chart .row{display:grid;grid-template-columns:minmax(90px,34%) 1fr 64px;gap:10px;align-items:center;margin:7px 0;font-size:14px}
+.chart .track{position:relative;height:14px;background:var(--line);border-radius:7px;overflow:visible}
+.chart .fill{height:100%;border-radius:7px;background:var(--bar-dim)}
+.chart .fill.hi{background:var(--bar)}
+.chart .med{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink);opacity:.55}
+.chart .val{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.chart .sub{font-size:12px;color:var(--muted)}
+.chart .note{font-size:13px;color:var(--muted);margin-top:8px}
+.post{border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;break-inside:avoid}
+.post .top{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.post blockquote{margin:8px 0;font-size:15px;font-weight:600;border-left:3px solid var(--accent);padding-left:10px}
+.post .stats{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.post .why{font-size:14px;margin-top:6px}
+.score{font-weight:700;color:var(--ink)}
+.find{padding:12px 0;border-top:1px solid var(--line)}
+.find:first-of-type{border-top:0;padding-top:0}
+.badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle}
+.b-strong{background:var(--good-soft);color:var(--good)}
+.b-early{background:var(--warn-soft);color:var(--warn)}
+.find .ev{font-size:14px;color:var(--muted);margin:4px 0}
+.find .act{font-size:14px}
+.find .act b{color:var(--accent)}
+.stop h2{color:var(--bad)} .go h2{color:var(--good)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.tag{display:inline-block;font-size:12px;padding:1px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.tag.fix{background:var(--warn-soft);color:var(--warn)} .tag.exp{background:var(--good-soft);color:var(--good)}
+.tablewrap{overflow-x:auto}
+pre{white-space:pre-wrap;word-break:break-word;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;margin:0 0 10px}
+ul.plain{margin:0;padding-left:20px} ul.plain li{margin:4px 0}
+.pop{background:var(--warn-soft);border-color:transparent}
+.muted{color:var(--muted)}
+.formula{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px;break-inside:avoid}
+.formula .ftitle{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.formula .ftitle h3{margin:0}
+.fx{font:600 15px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--accent-soft)!important;color:var(--ink)}
+.ex{font-size:14px;margin:4px 0;padding-left:10px;border-left:3px solid var(--line)}
+.ex .st{color:var(--muted);font-size:12px}
+.sub2{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:12px 0 6px}
+.hookrow{display:flex;gap:8px;align-items:flex-start;margin:6px 0}
+.hookrow .htext{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px}
+button.mini{font-size:12px;padding:6px 10px;white-space:nowrap}
+.rule{font-size:19px;font-weight:600;line-height:1.4;margin:0 0 14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;padding:4px 10px;border-radius:99px;border:1px solid var(--line)}
+.chip.win{background:var(--good-soft);color:var(--good);border-color:transparent}
+.chip.lose{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.ba{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:10px}
+.ba div{border-radius:8px;padding:10px 12px;font-size:14px}
+.ba .b{background:var(--bad-soft)} .ba .a{background:var(--good-soft)}
+.planitem{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px;break-inside:avoid}
+.planitem .ptop{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:13px;color:var(--muted);margin-bottom:8px}
+.planitem pre{margin:6px 0 8px}
+footer{font-size:12px;color:var(--muted);text-align:center;margin-top:24px}
+@media (max-width:560px){h1{font-size:26px}.chart .row{grid-template-columns:1fr 54px}.chart .row .track{grid-column:1/-1;grid-row:2}}
+@media print{
+  :root{--bg:#fff;--card:#fff;--ink:#000;--muted:#555;--line:#ddd;--accent:#2f4ac0;--accent-soft:#eef1ff;--bar:#2f4ac0;--bar-dim:#c5cdf0}
+  body{background:#fff;font-size:12.5px}
+  .wrap{max-width:none;padding:0}
+  .btns,.hint,.copy{display:none!important}
+  section{border-color:#ddd;padding:14px;margin-bottom:12px}
+  .tablewrap{overflow:visible}
+  a{color:inherit;text-decoration:none}
+  @page{margin:14mm}
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+/* ============ FILL IN THIS OBJECT ONLY ============ */
+const REPORT = {
+  account: {
+    handle: "@yourhandle",
+    followers: 4820,
+    range: "Jun 28 to Sep 25, 2026",
+    goal: "Get leads",
+    postsAnalyzed: 38,
+    generated: "Sep 26, 2026",
+    source: "Meta Business Suite content table + post review (Reels, carousels, feed posts only)"
+  },
+  oneThing: "Name your reader in the first 5 words of every post, the way your 5 best posts do, and use the Mistake List formula for your main weekly post.",
+  headlines: [
+    "Posts that named the reader in the first 5 words scored 2.3x higher (9 posts vs 29).",
+    "Your Mistake List posts earned 3.1x your median save rate across 6 posts.",
+    "\"Comment CHECKLIST\" drove 2.4x more profile visits than any other CTA."
+  ],
+  progress: null,
+  /* progress example (re-runs only):
+  progress: {
+    previousRange: "Mar 30 to Jun 27, 2026",
+    rows: [ { metric: "Median saves per 1K", before: "15.1", after: "18.4", change: "+22%", trend: "up" } ],
+    planFollowThrough: "9 of 14 plan posts went live. They scored 31% above your median."
+  },
+  */
+  formulas: [
+    {
+      name: "The Mistake List",
+      formula: "[Number] [topic] mistakes that [bad result your reader wants to avoid]",
+      confidence: "Strong",
+      why: "Names the reader's pain in the first 5 words and promises a countable list they can save.",
+      evidence: "6 posts · 3.1x median save rate · 2.2x profile visits",
+      examples: [
+        { date: "Aug 12", text: "3 invoicing mistakes that make clients pay late", stat: "142 saves · 88 profile visits" },
+        { date: "Sep 09", text: "5 pricing mistakes that keep you stuck at $5K months", stat: "118 saves · 61 profile visits" }
+      ],
+      newHooks: [
+        "3 onboarding mistakes that make new clients go quiet",
+        "4 proposal mistakes that make buyers pick your cheapest package",
+        "The 3 follow-up mistakes that cost you the second sale"
+      ]
+    },
+    {
+      name: "The Role Callout",
+      formula: "[Reader's role], [the thing they're doing wrong] is why [the result they hate]",
+      confidence: "Early signal",
+      why: "The role in the first word tells the right person this post is for them.",
+      evidence: "4 posts · 1.8x median goal score",
+      examples: [
+        { date: "Jul 22", text: "Coaches, discounting your first call is why nobody books the second", stat: "74 saves · 40 profile visits" }
+      ],
+      newHooks: [
+        "Coaches, answering DMs at 10pm is why your week feels endless",
+        "Consultants, a 9-page proposal is why they go quiet",
+        "Coaches, a free trial month is why [your real result]"
+      ]
+    }
+  ],
+  retire: {
+    pattern: "Warm-up openers (\"Happy Monday!\", \"So...\", \"Quick update\")",
+    evidence: "7 posts · median goal score 14 vs your median of 50",
+    before: "Happy Wednesday! Here's a little update from the studio",
+    after: "3 studio mistakes I made this month, so you don't have to"
+  },
+  firstWordsRule: "Name who it's for in your first 5 words. Your posts that did this scored 2.3x higher.",
+  wordsWin: [ { word: "mistakes", posts: 6 }, { word: "Coaches", posts: 5 }, { word: "stop", posts: 4 }, { word: "clients", posts: 7 } ],
+  wordsLose: [ { word: "update", posts: 4 }, { word: "excited", posts: 3 }, { word: "Happy", posts: 5 } ],
+  captionBlueprint: "[Hook: use a winning formula]\n[One line naming the problem, in your reader's words]\n[3 to 5 short steps, one per line]\n[One line on what changes when they do it]\nComment CHECKLIST and I'll send you the full list",
+  ctaScripts: [
+    { text: "Comment CHECKLIST and I'll send you the full list", result: "24.2 profile visits per 1K reach", posts: 8 },
+    { text: "Save this for your next client call", result: "31 saves per 1K reach", posts: 5 },
+    { text: "Link in bio", result: "7.9 profile visits per 1K reach", posts: 10 }
+  ],
+  plan: [
+    { week: "Week 1", format: "Carousel", type: "double", angle: "Client mistakes", formula: "The Mistake List",
+      hook: "4 proposal mistakes that make buyers pick your cheapest package",
+      caption: "Your proposal might be talking them into the cheap option.\n1. [mistake 1 + the fix]\n2. [mistake 2 + the fix]\n3. [mistake 3 + the fix]\n4. [mistake 4 + the fix]\nFix these and your middle package starts selling itself.",
+      cta: "Comment CHECKLIST and I'll send you the full list",
+      why: "Your top formula plus your top CTA." },
+    { week: "Week 1", format: "Reel", type: "fix", angle: "Step-by-step how-to", formula: "The Role Callout",
+      hook: "On screen: \"Coaches, do this before you send the next invoice\"",
+      caption: "Late payments usually start before the invoice goes out.\n[step 1]\n[step 2]\n[step 3]\nTry it on your next invoice.",
+      cta: "Save this for your next client call",
+      why: "Good saves, high skip rate. Adds a text hook in the first frame." }
+  ],
+  swipeFile: "MY WINNING FORMULAS (Social Analyzer, Jun 28 to Sep 25, 2026)\n1. The Mistake List: [Number] [topic] mistakes that [bad result]\n   e.g. \"3 invoicing mistakes that make clients pay late\"\n2. The Role Callout: [Role], [what they're doing wrong] is why [result they hate]\n   e.g. \"Coaches, discounting your first call is why nobody books the second\"\nFIRST-WORDS RULE: Name who it's for in the first 5 words.\nWORDS THAT WORK: mistakes, Coaches, stop, clients\nWORDS TO DROP: update, excited, Happy\nBEST CTA: \"Comment CHECKLIST and I'll send you the full list\"\nCAPTION BLUEPRINT: hook / problem in their words / 3-5 steps / what changes / CTA",
+  working: [
+    { title: "Client-mistake carousels", confidence: "Strong", evidence: "6 posts, 3.1x median save rate, 2.2x profile visits. Best: Aug 12, Sep 09.", action: "Post one every week using the Mistake List formula." }
+  ],
+  notWorking: [
+    { title: "Reels that open without on-screen text", confidence: "Strong", evidence: "11 posts. Skip rate 58% vs 29% for Reels with a text hook.", action: "Put the hook on screen in the first frame of every Reel." }
+  ],
+  breakdowns: [
+    { title: "By first words", metric: "Median goal score", median: 50,
+      rows: [ { label: "Audience identifier", value: 81, posts: 9, highlight: true }, { label: "Number or list", value: 72, posts: 8 }, { label: "Me-first", value: 38, posts: 10 }, { label: "Warm-up", value: 14, posts: 7 } ],
+      note: "Opening with who it's for beats opening with yourself." },
+    { title: "By format", metric: "Median goal score", median: 50,
+      rows: [ { label: "Carousel", value: 71, posts: 14, highlight: true }, { label: "Reel", value: 48, posts: 19 }, { label: "Image", value: 29, posts: 5 } ],
+      note: "" },
+    { title: "By hook pattern", metric: "Median goal score", median: 50,
+      rows: [ { label: "Mistake Warning", value: 74, posts: 7, highlight: true }, { label: "Her Exact Words", value: 66, posts: 4 }, { label: "No hook", value: 20, posts: 6 } ],
+      note: "" },
+    { title: "By CTA", metric: "Profile visits per 1K", median: 11.7,
+      rows: [ { label: "Comment a keyword", value: 24.2, posts: 8, highlight: true }, { label: "Link in bio", value: 12.0, posts: 10 }, { label: "None", value: 7.9, posts: 14 } ],
+      note: "" }
+  ],
+  scoreboard: [
+    { label: "Median saves per 1K reach", value: "18.4", note: "Account-wide", delta: null, trend: null },
+    { label: "Median shares per 1K reach", value: "6.1", note: "Includes DM sends", delta: null, trend: null },
+    { label: "Median follows per 1K reach", value: "2.3", note: "", delta: null, trend: null },
+    { label: "Median profile visits per 1K", value: "11.7", note: "Lead signal", delta: null, trend: null }
+  ],
+  topPosts: [
+    { date: "Aug 12", format: "Carousel", hook: "3 invoicing mistakes that make clients pay late", url: "", score: 96, stats: "Reach 3,410 · Saves 142 · Shares 38 · Follows 21 · Profile visits 88", why: "Mistake List formula, a checklist the reader can save, and a keyword CTA." }
+  ],
+  bottomPosts: [
+    { date: "Jul 03", format: "Image", hook: "Happy Wednesday! Here's a little update from the studio", url: "", score: 6, stats: "Reach 890 · Saves 0 · Shares 1 · Follows 0 · Profile visits 2", why: "Warm-up opener, no takeaway, no CTA." }
+  ],
+  outliers: [],
+  audience: {
+    questions: [ "How do I raise prices without losing clients? (asked 5 times)" ],
+    buyingSignals: [ "\"Is the template available?\" on 3 carousel posts" ],
+    note: ""
+  },
+  profileUpdate: "What works for me\n- Formula 1, The Mistake List: [Number] [topic] mistakes that [bad result]. e.g. \"3 invoicing mistakes that make clients pay late\"\n- Formula 2, The Role Callout: [Role], [what they're doing wrong] is why [result they hate]\n- First-words rule: name who it's for in the first 5 words\n- Words that work: mistakes, Coaches, stop. Drop: update, excited, Happy\n- Best CTA: \"Comment CHECKLIST and I'll send you the full list\"\n- Best format: carousels. Reels need on-screen text in the first frame.",
+  snapshot: "SOCIAL ANALYZER SNAPSHOT\nAccount: @yourhandle · Range: Jun 28 to Sep 25, 2026 · Goal: Get leads · Posts: 38\n...",
+  caveats: [
+    "Stories are not included. This report covers Reels, carousels, and feed posts only.",
+    "2 boosted posts were excluded from comparisons."
+  ]
+};
+/* ============ END OF DATA ============ */
+
+(function(){
+  const R = REPORT;
+  const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+  const has = a => Array.isArray(a) && a.length > 0;
+  const trendCls = t => t === "up" ? "up" : t === "down" ? "down" : "flat";
+  const arrow = t => t === "up" ? "▲" : t === "down" ? "▼" : "";
+  const badge = c => `<span class="badge ${String(c).toLowerCase().startsWith("strong") ? "b-strong" : "b-early"}">${esc(c)}</span>`;
+  let n = 0;
+  const cp = (text, label) => { const id = "c" + (++n); return { id, btn: `<button class="copy mini" data-copy="${id}">${label || "Copy"}</button>`, text }; };
+  let h = "";
+
+  const a = R.account || {};
+  h += `<header><div><h1>Social Analyzer</h1>
+    <div class="meta">${esc(a.handle)} · ${esc(a.range)} · ${esc(a.postsAnalyzed)} posts · ${a.followers != null ? esc(Number(a.followers).toLocaleString()) + " followers · " : ""}Goal: <b>${esc(a.goal)}</b></div>
+    <div class="meta">Generated ${esc(a.generated)}${a.source ? " · Source: " + esc(a.source) : ""}</div></div>
+    <div><div class="btns"><button class="primary" id="pdf">Save as PDF</button><button id="copySwipe" class="copy">Copy swipe file</button></div>
+    <div class="hint">If Save as PDF does nothing here, download this file, open it in your browser, press Ctrl+P (Cmd+P on a Mac), and choose "Save as PDF."</div></div></header>`;
+
+  if (R.oneThing || has(R.headlines)) {
+    h += `<section class="one"><div class="label">Do this first</div><p class="big">${esc(R.oneThing)}</p>`;
+    if (has(R.headlines)) h += `<ul>${R.headlines.map(x => `<li>${esc(x)}</li>`).join("")}</ul>`;
+    h += `</section>`;
+  }
+
+  if (R.progress && has(R.progress.rows)) {
+    const p = R.progress;
+    h += `<section><h2>Progress since last report</h2><p class="muted">Compared with ${esc(p.previousRange)}</p><div class="tablewrap"><table><thead><tr><th>Metric</th><th>Before</th><th>Now</th><th>Change</th></tr></thead><tbody>
+      ${p.rows.map(r => `<tr><td>${esc(r.metric)}</td><td>${esc(r.before)}</td><td>${esc(r.after)}</td><td class="${trendCls(r.trend)}">${arrow(r.trend)} ${esc(r.change)}</td></tr>`).join("")}
+      </tbody></table></div>${p.planFollowThrough ? `<p><b>Plan follow-through:</b> ${esc(p.planFollowThrough)}</p>` : ""}</section>`;
+  }
+
+  if (has(R.formulas)) {
+    h += `<section><h2>Your winning hook formulas</h2><p class="muted">Built from your own best posts. Fill in the brackets and post.</p>`;
+    R.formulas.forEach(f => {
+      const fx = cp(f.formula, "Copy formula");
+      h += `<div class="formula"><div class="ftitle"><h3>${esc(f.name)}</h3>${badge(f.confidence)}</div>
+        <div class="hookrow"><div class="fx htext" id="${fx.id}">${esc(f.formula)}</div>${fx.btn}</div>
+        <div class="muted" style="font-size:14px">${esc(f.why)}${f.evidence ? " · " + esc(f.evidence) : ""}</div>`;
+      if (has(f.examples)) h += `<div class="sub2">Your proof</div>${f.examples.map(e => `<div class="ex">"${esc(e.text)}" <span class="st">${esc(e.date)} · ${esc(e.stat)}</span></div>`).join("")}`;
+      if (has(f.newHooks)) h += `<div class="sub2">Ready to use</div>${f.newHooks.map(t => { const c = cp(t); return `<div class="hookrow"><div class="htext" id="${c.id}">${esc(t)}</div>${c.btn}</div>`; }).join("")}`;
+      h += `</div>`;
+    });
+    h += `</section>`;
+  }
+
+  if (R.retire) {
+    const r = R.retire;
+    h += `<section class="stop"><h2>The opening to retire</h2><h3>${esc(r.pattern)}</h3><div class="muted" style="font-size:14px">${esc(r.evidence)}</div>
+      <div class="ba"><div class="b"><b>Before</b><br>"${esc(r.before)}"</div><div class="a"><b>After</b><br>"${esc(r.after)}"</div></div></section>`;
+  }
+
+  if (R.firstWordsRule || has(R.wordsWin) || has(R.wordsLose)) {
+    h += `<section><h2>Your first words</h2>${R.firstWordsRule ? `<p class="rule">${esc(R.firstWordsRule)}</p>` : ""}<div class="grid2">`;
+    if (has(R.wordsWin)) h += `<div><h3>Words that win</h3><div class="chips">${R.wordsWin.map(w => `<span class="chip win">${esc(w.word)} · ${esc(w.posts)} posts</span>`).join("")}</div></div>`;
+    if (has(R.wordsLose)) h += `<div><h3>Words to drop</h3><div class="chips">${R.wordsLose.map(w => `<span class="chip lose">${esc(w.word)} · ${esc(w.posts)} posts</span>`).join("")}</div></div>`;
+    h += `</div></section>`;
+  }
+
+  if (R.captionBlueprint || has(R.ctaScripts)) {
+    h += `<section><h2>Your caption blueprint</h2><div class="grid2">`;
+    if (R.captionBlueprint) { const c = cp(R.captionBlueprint, "Copy blueprint"); h += `<div><h3>Copy this shape</h3><pre id="${c.id}">${esc(R.captionBlueprint)}</pre>${c.btn}</div>`; }
+    if (has(R.ctaScripts)) h += `<div><h3>Your best CTAs, word for word</h3>${R.ctaScripts.map(t => { const c = cp(t.text); return `<div class="hookrow"><div class="htext"><span id="${c.id}">${esc(t.text)}</span><div class="st muted" style="font-size:12px">${esc(t.result)} · ${esc(t.posts)} posts</div></div>${c.btn}</div>`; }).join("")}</div>`;
+    h += `</div></section>`;
+  }
+
+  if (has(R.plan)) {
+    const lab = t => t === "fix" ? `<span class="tag fix">Fix + retry</span>` : t === "experiment" ? `<span class="tag exp">Experiment</span>` : `<span class="tag">Double down</span>`;
+    h += `<section><h2>Your next 30 days, ready to post</h2><p class="muted">Copy each post, fill in the brackets with your real details, and share.</p>`;
+    R.plan.forEach(p => {
+      const full = [p.hook, p.caption, p.cta].filter(Boolean).join("\n\n");
+      const c = cp(full, "Copy post");
+      h += `<div class="planitem"><div class="ptop"><span><b>${esc(p.week)}</b> · ${esc(p.format)} · ${esc(p.angle)}${p.formula ? " · " + esc(p.formula) : ""}</span>${lab(p.type)}</div>
+        <pre id="${c.id}">${esc(full)}</pre>${c.btn}<div class="muted" style="font-size:13px;margin-top:6px">Why: ${esc(p.why)}</div></div>`;
+    });
+    h += `</section>`;
+  }
+
+  if (R.swipeFile) h += `<section class="one"><div class="label">Your swipe file</div><p class="muted" style="margin:4px 0 10px">Paste this into your notes or your Content Profile. Hook Engine and Post Value Filter will use it.</p><pre id="swipe">${esc(R.swipeFile)}</pre><button class="copy" data-copy="swipe">Copy swipe file</button></section>`;
+
+  const finds = (cls, title, list) => has(list) ? `<section class="${cls}"><h2>${title}</h2>${list.map(f => `
+    <div class="find"><h3>${esc(f.title)}${badge(f.confidence)}</h3>
+    <div class="ev">${esc(f.evidence)}</div><div class="act"><b>Do this:</b> ${esc(f.action)}</div></div>`).join("")}</section>` : "";
+  h += finds("go", "Double down", R.working);
+  h += finds("stop", "Stop or fix", R.notWorking);
+
+  if (has(R.breakdowns)) {
+    h += `<section><h2>The numbers behind it</h2><div class="grid2">`;
+    R.breakdowns.forEach(b => {
+      if (!has(b.rows)) return;
+      const max = Math.max(...b.rows.map(r => Number(r.value) || 0), Number(b.median) || 0) || 1;
+      h += `<div class="chart"><h3>${esc(b.title)}</h3><div class="sub">${esc(b.metric)}${b.median != null ? ` · line = your median (${esc(b.median)})` : ""}</div>`;
+      b.rows.forEach(r => {
+        const w = Math.max(2, (Number(r.value) || 0) / max * 100);
+        const m = b.median != null ? (Number(b.median) / max * 100) : null;
+        h += `<div class="row"><div>${esc(r.label)} <span class="sub">(${esc(r.posts)})</span></div>
+          <div class="track"><div class="fill${r.highlight ? " hi" : ""}" style="width:${w}%"></div>${m != null ? `<div class="med" style="left:${m}%"></div>` : ""}</div>
+          <div class="val">${esc(r.value)}</div></div>`;
+      });
+      if (b.note) h += `<div class="note">${esc(b.note)}</div>`;
+      h += `</div>`;
+    });
+    h += `</div></section>`;
+  }
+
+  if (has(R.scoreboard)) {
+    h += `<section><h2>Scoreboard</h2><div class="cards">${R.scoreboard.map(s => `
+      <div class="stat"><div class="v">${esc(s.value)}${s.delta ? `<span class="delta ${trendCls(s.trend)}">${arrow(s.trend)} ${esc(s.delta)}</span>` : ""}</div>
+      <div class="l">${esc(s.label)}</div>${s.note ? `<div class="n">${esc(s.note)}</div>` : ""}</div>`).join("")}</div></section>`;
+  }
+
+  const posts = (title, list) => has(list) ? `<section><h2>${title}</h2>${list.map(p => `
+    <div class="post"><div class="top"><span>${esc(p.date)} · ${esc(p.format)}</span><span>Goal score <span class="score">${esc(p.score)}</span>/100${p.url ? ` · <a href="${esc(p.url)}" target="_blank" rel="noopener">Open post</a>` : ""}</span></div>
+    ${p.hook ? `<blockquote>${esc(p.hook)}</blockquote>` : ""}<div class="stats">${esc(p.stats)}</div><div class="why">${esc(p.why)}</div></div>`).join("")}</section>` : "";
+  h += `<div class="grid2">${posts("Top posts", R.topPosts)}${posts("Bottom posts", R.bottomPosts)}</div>`;
+
+  if (has(R.outliers)) {
+    h += `<section class="pop"><h2>What made these pop</h2>${R.outliers.map(o => `<p><b>${esc(o.date)} · ${esc(o.format)}</b>${o.hook ? ` · "${esc(o.hook)}"` : ""}<br>${esc(o.why)}</p>`).join("")}</section>`;
+  }
+
+  const au = R.audience || {};
+  if (has(au.questions) || has(au.buyingSignals)) {
+    h += `<section><h2>What your audience is telling you</h2><div class="grid2">`;
+    if (has(au.questions)) h += `<div><h3>Questions they keep asking</h3><ul class="plain">${au.questions.map(q => `<li>${esc(q)}</li>`).join("")}</ul></div>`;
+    if (has(au.buyingSignals)) h += `<div><h3>Buying signals</h3><ul class="plain">${au.buyingSignals.map(q => `<li>${esc(q)}</li>`).join("")}</ul></div>`;
+    h += `</div>${au.note ? `<p class="muted">${esc(au.note)}</p>` : ""}</section>`;
+  }
+
+  if (R.profileUpdate || R.snapshot) {
+    h += `<section><h2>Save these</h2>`;
+    if (R.profileUpdate) h += `<h3>Add to your Content Profile</h3><pre id="prof">${esc(R.profileUpdate)}</pre><button class="copy" data-copy="prof">Copy profile update</button>`;
+    if (R.snapshot) h += `<h3 style="margin-top:18px">Snapshot for your next audit</h3><pre id="snap">${esc(R.snapshot)}</pre><button class="copy" data-copy="snap">Copy snapshot</button>`;
+    h += `</section>`;
+  }
+
+  if (has(R.caveats)) h += `<section><h2>Data notes</h2><ul class="plain">${R.caveats.map(c => `<li>${esc(c)}</li>`).join("")}</ul></section>`;
+  h += `<footer>Social Analyzer · built from your own Instagram insights (Reels, carousels, and feed posts). Rates are per 1,000 accounts reached, and comparisons use medians.</footer>`;
+
+  document.getElementById("app").innerHTML = h;
+
+  document.getElementById("pdf").addEventListener("click", () => { try { window.print(); } catch (e) {} });
+  const sel = el => { const r = document.createRange(); r.selectNodeContents(el); const s = window.getSelection(); s.removeAllRanges(); s.addRange(r); };
+  const copy = (id, btn) => {
+    const el = document.getElementById(id); if (!el) return;
+    const done = () => { const t = btn.textContent; btn.textContent = "Copied"; setTimeout(() => btn.textContent = t, 1500); };
+    try { navigator.clipboard.writeText(el.textContent).then(done, () => sel(el)); } catch (e) { sel(el); }
+  };
+  document.querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", () => copy(b.dataset.copy, b)));
+  const cs = document.getElementById("copySwipe");
+  if (cs) { if (!R.swipeFile) cs.style.display = "none"; else cs.addEventListener("click", () => copy("swipe", cs)); }
+})();
+</script>
+</body>
+</html>

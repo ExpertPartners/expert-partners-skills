@@ -2,12 +2,12 @@ name: repo-standards
 on:
   pull_request:
     paths:
-      - 'skills/repo-standards/**'
+      - 'plugins/operating-doctrine/skills/repo-standards/**'
       - '.github/workflows/repo-standards.yml'
   push:
     branches: [main]
     paths:
-      - 'skills/repo-standards/**'
+      - 'plugins/operating-doctrine/skills/repo-standards/**'
       - '.github/workflows/repo-standards.yml'
   workflow_dispatch:
 permissions:
@@ -21,4 +21,4 @@ jobs:
         with:
           python-version: '3.12'
       - name: Move verification against synthetic repositories
-        run: python3 -m unittest discover -s skills/repo-standards/tests -p 'test_*.py' -v
+        run: python3 -m unittest discover -s plugins/operating-doctrine/skills/repo-standards/tests -p 'test_*.py' -v

@@ -16,7 +16,7 @@ tooling**, and the routing context as **NORTH governance**.
 | [Standalone skills](skills/) | Canonical skills distributed independently of a plugin. |
 | [Plugin sources](plugins/) | Plugin-carried skills, manifests and supporting assets. |
 | [Operating Doctrine](plugins/operating-doctrine/skills/operating-doctrine/SKILL.md) | The canonical operating instructions inherited by the skills. |
-| [Repo Standards](skills/repo-standards/SKILL.md) | The existing repository baseline and audit workflow, linked to its governing Aura decisions. |
+| [Repo Standards](plugins/operating-doctrine/skills/repo-standards/SKILL.md) | The existing repository baseline and audit workflow, linked to its governing Aura decisions. |
 | [Agent instructions](AGENTS.md) | The lean AI entry point; [CLAUDE.md](CLAUDE.md) imports it. |
 
 These are navigation links, not a second skill catalog. Follow a skill's source
