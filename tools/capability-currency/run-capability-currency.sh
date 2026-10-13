@@ -102,10 +102,11 @@ dry_run() {
   $DRIVE prepend "$CHANGELOG_DOC" "$entry" || { echo "DRY RUN FAILED: cannot write the changelog Doc"; return 1; }
   $DRIVE read "$CHANGELOG_DOC" | grep -q "$RUN_STAMP dry run" || { echo "DRY RUN FAILED: entry not found on read-back"; return 1; }
   echo "DRIVE OK: read watch Doc, wrote and read back the changelog entry"
-  out="$("$(resolve_claude)" -p "Reply with exactly: ok" --max-turns 1 --max-budget-usd 0.5 </dev/null 2>&1 | grep -v SEP-2352 | tail -3)"
+  out="$("$(resolve_claude)" -p "Reply with exactly: ok" --max-turns 1 --max-budget-usd 3 </dev/null 2>&1 | grep -v SEP-2352 | tail -3)"
   echo "CLAUDE: $out"
-  [[ "$out" == *ok* && "$out" != *"Failed to authenticate"* ]] && { echo "DRY RUN OK"; return 0; }
-  echo "DRY RUN FAILED: claude -p could not authenticate"; return 1
+  [[ "$out" == *"Failed to authenticate"* || "$out" == *"Exceeded USD budget"* || "$out" != *ok* ]] \
+    && { echo "DRY RUN FAILED: claude -p did not return ok"; return 1; }
+  echo "DRY RUN OK"; return 0
 }
 [[ -n "$DRY_RUN" ]] && { dry_run; exit $?; }
 
