@@ -55,7 +55,7 @@ This skill also bundles three legacy brand context documents,
 
 ## Authoritative source
 
-Brand canon Docs in Drive are authoritative and read through the Google Docs or Drive connector:
+Brand canon Docs in Drive are authoritative and read with the Drive connector's `read_file_content` (plain text, not `read_doc`):
 - V1 - Company Core - Expert Partners Brand Canon, https://docs.google.com/document/d/1XSiBzCLCHS_9_BXUrvV_Ysl2aBVY_I_kq_s5d25oY_4/edit
 - V1 - Company Core - EPIC Brand Canon, https://docs.google.com/document/d/1W2QxjC_2iVY_-kWZLPEHRcztvEbpht5xcueWduOCdMU/edit
 - V1 - Company Core - Free Agent Movement Brand Canon, https://docs.google.com/document/d/1t79nKkyml4db1Cq7hr2ApvOrEogqhuD2x12oOba3bQk/edit
