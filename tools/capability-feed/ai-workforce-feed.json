@@ -1,8 +1,8 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-10-12T22:04:34Z",
-  "verifiedAt": "2026-10-12T22:04:34Z",
+  "generatedAt": "2026-10-13T21:10:26Z",
+  "verifiedAt": "2026-10-13T21:10:26Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
@@ -309,11 +309,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the operating-doctrine plugin, version 2.53.0, in the expert-partners plugin marketplace.",
+        "Packaged as the operating-doctrine plugin, version 2.55.0, in the expert-partners plugin marketplace.",
         "Contains 11 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 2.53.0.",
+      "lastVerified": "Not yet verified on any platform. Package version 2.55.0.",
       "containsSkillIds": [
         "code-block-routing",
         "connection-first-implementation",
@@ -331,7 +331,7 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/operating-doctrine",
-        "packageVersion": "2.53.0",
+        "packageVersion": "2.55.0",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
         "skillCount": "11"
@@ -367,11 +367,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the systems-map plugin, version 0.5.2, in the expert-partners plugin marketplace.",
+        "Packaged as the systems-map plugin, version 0.6.1, in the expert-partners plugin marketplace.",
         "Contains 1 skill. It activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.5.2.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.6.1.",
       "containsSkillIds": [
         "expert-partners-systems-map"
       ],
@@ -379,7 +379,7 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/systems-map",
-        "packageVersion": "0.5.2",
+        "packageVersion": "0.6.1",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
         "skillCount": "1"
@@ -1512,7 +1512,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.53.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.55.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1528,7 +1528,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.53.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.55.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "pin"
       },
@@ -1542,16 +1542,16 @@
         "doctrine",
         "fires",
         "implementation",
-        "lane",
-        "ledger",
+        "job",
         "machinery",
         "operating",
         "paste",
         "routing",
-        "session"
+        "session",
+        "tracker"
       ],
       "bestFor": [
-        "paste block routing and the lane ledger"
+        "paste block routing and the Job Tracker"
       ],
       "useCases": [],
       "askExamples": [],
@@ -1643,7 +1643,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.53.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.55.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1658,7 +1658,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.53.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.55.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -1789,7 +1789,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.53.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.55.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1805,7 +1805,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.53.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.55.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "code-block-routing"
       },
@@ -1921,7 +1921,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.53.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.55.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1936,7 +1936,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.53.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.55.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -2042,7 +2042,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.53.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.55.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2058,7 +2058,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.53.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.55.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "deliverable-link"
       },
@@ -2347,7 +2347,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Systems Map plugin, version 0.5.2.",
+        "Packaged in the Systems Map plugin, version 0.6.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2362,7 +2362,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brain",
-        "packaging": "systems-map plugin v0.5.2 (expert-partners marketplace)",
+        "packaging": "systems-map plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -3059,7 +3059,7 @@
       "id": "intake",
       "humanName": "Intake Skill",
       "kind": "skill",
-      "summary": "File a session summary or any captured content into a canonical brand/project repo's intake/ inbox, then commit and push so the estate-brain indexes it.",
+      "summary": "File a session summary or any captured content into the owning brain's home folder in Google Drive as a Google Doc, so every surface can read it.",
       "status": "Unknown",
       "collectionIds": [],
       "categories": [
@@ -3086,29 +3086,28 @@
       },
       "keywords": [
         "brain",
-        "brand",
-        "canonical",
+        "can",
         "captured",
-        "commit",
         "content",
-        "estate",
+        "doc",
+        "drive",
         "file",
-        "inbox",
-        "indexes",
+        "folder",
+        "google",
+        "home",
         "intake",
         "machinery",
-        "project",
-        "push",
-        "repo",
+        "owning",
+        "read",
         "session",
         "summary",
-        "then"
+        "surface"
       ],
       "bestFor": [
-        "file content into a repo intake inbox"
+        "file content into the owning brain in Drive"
       ],
       "useCases": [
-        "Use when the user pastes a claude.ai session summary with /intake followed by a project name, or says \"intake this to PROJECT\", \"save this session to PROJECT\", \"file this into REPO\"."
+        "Use when the user pastes a claude.ai session summary with /intake followed by a project name, or says \"intake this to PROJECT\", \"save this session to PROJECT\", \"file this into BRAIN\"."
       ],
       "askExamples": [],
       "example": false
@@ -3127,7 +3126,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.53.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.55.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3142,7 +3141,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.53.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.55.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -3180,7 +3179,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.53.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.55.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3197,7 +3196,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.53.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.55.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "code-block-routing, pin"
       },
@@ -4435,7 +4434,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.53.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.55.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4450,7 +4449,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brain",
-        "packaging": "operating-doctrine plugin v2.53.0 (expert-partners marketplace)"
+        "packaging": "operating-doctrine plugin v2.55.0 (expert-partners marketplace)"
       },
       "keywords": [
         "brain",
@@ -4529,7 +4528,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.53.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.55.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4545,7 +4544,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.53.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.55.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "code-block-routing"
       },
@@ -5019,7 +5018,7 @@
       "id": "repo-standards",
       "humanName": "Repo Standards",
       "kind": "skill",
-      "summary": "Brings Estate repos to ADR 0056 and ADR 0078 readiness.",
+      "summary": "Brings Estate repos to the Repo rules and ADR 0078 readiness.",
       "status": "Unknown",
       "collectionIds": [],
       "categories": [
@@ -5045,7 +5044,6 @@
         "inherits": "operating-doctrine"
       },
       "keywords": [
-        "0056",
         "0078",
         "adr",
         "audits",
@@ -5059,6 +5057,7 @@
         "readiness",
         "repo",
         "repos",
+        "rules",
         "standards"
       ],
       "bestFor": [
@@ -5072,7 +5071,7 @@
       "id": "research-intake",
       "humanName": "Research Intake Skill",
       "kind": "skill",
-      "summary": "Files a research report that surfaces in ANY conversation, pasted, uploaded, or linked, into the aura repo's docs/research/INDEX.md as one new dated entry (title, subject, informs lane, disposition awaiting ruling).",
+      "summary": "Files a research report that surfaces in ANY conversation, pasted, uploaded, or linked, into the Deep Research folder in Drive, in the topic subfolder for the lane it informs, with a short header (subject, informs lane, disposition awaiting ruling).",
       "status": "Unknown",
       "collectionIds": [],
       "categories": [
@@ -5098,34 +5097,33 @@
         "inherits": "operating-doctrine"
       },
       "keywords": [
-        "aura",
         "awaiting",
         "conversation",
-        "dated",
+        "deep",
         "disposition",
-        "docs",
-        "entry",
+        "drive",
         "file",
         "files",
-        "index",
+        "folder",
+        "header",
         "informs",
         "intake",
         "lane",
         "librarians",
         "linked",
-        "new",
         "pasted",
-        "repo",
         "report",
         "research",
         "ruling",
+        "short",
+        "subfolder",
         "subject",
         "surfaces",
-        "title",
+        "topic",
         "uploaded"
       ],
       "bestFor": [
-        "file a research report into the aura research index"
+        "file a research report into the Deep Research folder"
       ],
       "useCases": [
         "Use whenever a research report, deep-research output, or external analysis appears in conversation with intent to use it, not just intent to read it once and discard it."
@@ -5418,7 +5416,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.53.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.55.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -5433,7 +5431,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.53.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.55.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -5474,7 +5472,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.53.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.55.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -5491,7 +5489,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.53.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.55.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "code-block-routing, pin"
       },
