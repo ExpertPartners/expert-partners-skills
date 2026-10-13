@@ -7,7 +7,7 @@ Silent when everything matches. When something is behind, adds or updates ONE
 row in the Job Tracker. When it all matches again, closes that row quietly.
 
 Surfaces:
-  claude-code  the expert-partners marketplace clone and the plugins installed from it
+  claude-code  the expert-partners marketplace clone and every plugin installed from it
   codex        the Codex marketplace snapshot and its installed plugins
   claude.ai    the synced plugin copies Claude Code downloads from claude.ai
                (what Cowork and chat carry); only judged once the repo head is
@@ -133,6 +133,11 @@ def short(sha):
     return (sha or "unknown")[:7]
 
 
+def missing_in_claude_code(head_versions, installed):
+    """Plugins in the repo that Claude Code has not installed from the marketplace."""
+    return sorted(n for n in head_versions if n not in installed)
+
+
 def find_behind(head_sha, head_epoch, head_versions, now=None):
     """Return a list of plain-words lines, empty when every surface matches."""
     now = now or time.time()
@@ -145,6 +150,8 @@ def find_behind(head_sha, head_epoch, head_versions, now=None):
         want = head_versions.get(name)
         if want and v != want:
             behind.append(f"Claude Code has {name} {v}, repo has {want}")
+    for name in missing_in_claude_code(head_versions, cc_installed):
+        behind.append(f"Claude Code does not have {name} {head_versions[name]}")
 
     cx_sha, cx_list = codex_state()
     if cx_sha != head_sha:
