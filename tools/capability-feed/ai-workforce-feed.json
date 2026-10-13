@@ -1,8 +1,8 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-10-13T21:10:26Z",
-  "verifiedAt": "2026-10-13T21:10:26Z",
+  "generatedAt": "2026-10-13T21:12:18Z",
+  "verifiedAt": "2026-10-13T21:12:18Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
@@ -5018,7 +5018,7 @@
       "id": "repo-standards",
       "humanName": "Repo Standards",
       "kind": "skill",
-      "summary": "Brings Estate repos to the Repo rules and ADR 0078 readiness.",
+      "summary": "Brings Estate repos to the Repo rules and Project ownership readiness.",
       "status": "Unknown",
       "collectionIds": [],
       "categories": [
@@ -5044,8 +5044,6 @@
         "inherits": "operating-doctrine"
       },
       "keywords": [
-        "0078",
-        "adr",
         "audits",
         "birth",
         "brings",
@@ -5054,6 +5052,8 @@
         "evidence",
         "hands",
         "led",
+        "ownership",
+        "project",
         "readiness",
         "repo",
         "repos",
