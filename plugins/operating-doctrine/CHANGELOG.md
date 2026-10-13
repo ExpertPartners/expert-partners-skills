@@ -1,3 +1,14 @@
+## 2.54.0 - 2026-10-13
+
+Step 1 of the clean-slate cutover, batch 1. code-block-routing, session-steward
+and session-model-advisor now use the Job Tracker (Drive sheet), the Decision
+Log and the HQ Rulebook in place of aura lanes.md, update_lane_row and Estate
+Brain reads. Worktree, model and effort, closeout and verdict rules are
+unchanged. Companion changes in the standalone skills (session-wrap,
+estate-memory-router, intake, research-intake, capability-currency,
+remember-this, new-project, repo-standards, batch-first-execution) and the
+systems-map plugin 0.6.0 ship in the same pull request.
+
 ## 2.53.0 - 2026-10-12
 
 Removes the remaining routing naming text from pin, code-block-routing,

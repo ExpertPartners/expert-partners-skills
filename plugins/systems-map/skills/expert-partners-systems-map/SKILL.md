@@ -14,7 +14,7 @@ subtitle: "where every system lives and what Claude can reach"
 
 # Expert Partners Systems Map and Access Map
 
-This is the bible of where things live and what Claude can reach. The full version is in GitHub canonical, in the expert-partners doctrine area (`doctrine/expert-partners-systems-map.md`). This skill is the operative version that loads everywhere so nobody has to repeat it. When this skill and the full bible ever diverge, the bible wins and this skill is re-synced from it.
+This is the operative map of where things live and what Claude can reach. The HQ Rulebook (Drive) is the first read and wins wherever the two differ. Business knowledge, rules, and decisions live in Google Drive, in the business brains: HQ Business Brain serves both companies, AGRE Business Brain is AG Luxury, EP Business Brain is Expert Partners. GitHub holds only what tools run from.
 
 ## The one rule
 
@@ -22,7 +22,7 @@ Each system has exactly one job. Discrepancies happen when a system is asked to 
 
 ## First read for every cold session
 
-The estate manifest is the brain's table of contents: `aura/docs/estate/estate-manifest.md`. It indexes every canonical source with a last-verified date and evidence. A cold session reads it first, then the lane ledger (`aura/docs/estate/lanes.md`) for what is in flight and what each lane awaits. Pointers, never copies; the manifest carries its own maintenance rules.
+The HQ Rulebook (Google Doc `15sCFxMvG8OZMZik5w0Hzqzh7HyphrB7rJ8NBtm46JBE`) first, then the Job Tracker (Google Sheet `1FniEwCaZ89cViQxUcPkycxAmvvM47cnjRzQQyzpEk5c`) for what is in flight and what each job awaits, then the owning brain's `00 START HERE` Doc. Pointers, never copies.
 
 ## The entity and the platform
 
@@ -36,13 +36,13 @@ PartnerSync is the white-labeled GoHighLevel platform layer, the agency containe
 
 | System | Its one job | What goes here | What never goes here |
 | --- | --- | --- | --- |
-| Notion | Single source of truth for funnel records and human logging. A funnel is not done until it lives here. | Funnel records (Funnels and Funnel Messages), status, human-readable logs, regenerated-from-canon human views | Doctrine, technical reference, secrets. Nothing authored in Notion competes with git canon |
-| GitHub canonical (`aura`, `expert-partners`, `partnersync`, `partnersync-automation-backend`, `expert-partners-skills`; `ghl-automation` split into partnersync and the backend and retired 2026-09-08) | Single source of truth for doctrine, decisions, and technical reference. `aura` is the seat of the operating system; its `decisions/` directory is canonical for ADRs and rulings (queue clean 0001 through 0055, verified by live enumeration 2026-08-06; renumber evidence in `aura/decisions/README.md`). Per-repo decisions directories that predate this remain as historical records. | Doctrine, decisions (ADRs), references, project knowledge, every n8n workflow's design doc. Commit AND push | Funnel records, secrets or tokens |
+| Notion | Single source of truth for funnel records and human logging. A funnel is not done until it lives here. | Funnel records (Funnels and Funnel Messages), status, human-readable logs, regenerated-from-canon human views | Doctrine, technical reference, secrets. Nothing authored in Notion competes with Drive canon |
+| GitHub (`expert-partners-skills`, `partnersync-automation-backend`, and the other code repos) | Home for what tools run from: code, the skills marketplace, connected apps | Code, skills, automation source, a short AGENTS.md per repo | Knowledge, rules, decisions (those live in Drive) |
 | Memory (Claude) | Claude cross-session recall, auto-loads each session | Short structured facts a future session must know, plus pointers to canonical docs | Human-facing content, secrets, anything long |
 | 1Password | Secrets and tokens vault | Tokens, API keys, PITs, client secrets, passwords | Anything that belongs in GitHub or Notion. Secrets never go in GitHub or Notion |
 | AWS | Compute and hosting, not a document store | Backend services, runtime token storage, scripts | Documentation, anything you go to read |
 | n8n | Execution layer only: runs workflows, stores nothing canonical | Workflow runtime for automation logic that GHL's API cannot build (see the platform-selection rule below) | Design docs, doctrine, records. Every workflow's design doc lives in GitHub |
-| Google Workspace | Delivery and collaboration only, never canonical | Documents delivered to humans, collaboration surfaces, transcripts and formal docs for reference | Canonical doctrine, decisions, records of truth |
+| Google Drive and Workspace | Home of the business brains: canonical knowledge, rules, and decisions as native Google Docs, plus the Job Tracker sheet | Docs, Sheets, collaboration surfaces | Secrets, code |
 | Airtable | Migration tracker only, temporary (retires after the migrations) | Migration status during the move | Permanent records, doctrine |
 | Claude Code (M4) | Implementation engine: git push and live GHL reads and writes | Git commits and pushes, GHL API reads and writes via the Marketplace app token, scripts. Tokens live here | The source of truth itself, open-ended brainstorming |
 | Cowork | Orchestration, connector work, and verification | Planning, Notion / Airtable / Drive via connectors, data-layer writes, verification, handing Code exact bridge blocks | Direct GHL token work (that runs in Code) |
@@ -59,9 +59,9 @@ The brains, their seats, machines, one jobs, SOULs, and liveness rules live in B
 
 Ember has her own shared Google Drive, and it is her filing home at wake, she files her documents there when she wakes; the CI watchman is not Ember and keeps filing to the Aura Docs folder per document-formatting-standard (ruled 2026-08-05, robot delivery standards ruling, aura intake 3973c2b). Amended 2026-08-06 per the Ember Voice and Your Move Queue ruling (aura intake/2026-08-06-ruling-ember-voice-and-your-move-queue.md, ee86601). Every robot message to Allison speaks as Ember in first person (R2). Drive docs are for genuine reading material only, the your-move instruction lives on the board rendered at hq.allisongaddy.com, and robot texts link hq.allisongaddy.com only (R3, rail spec aura docs/estate/your-move-queue.md).
 
-## The Estate Brain MCP: live and connected on every surface
+## Where canon is read from
 
-The Estate Brain MCP at mcp.expertpartners.com/mcp is LIVE. Six tools (fetch, search, get_brand_context, list_repos, list_topics, save_to_session_intake), Streamable HTTP, Cognito auth with individual sign-in. Proven from Claude Code 2026-08-03 (`aura/docs/estate/estate-brain-live-evidence-2026-08-03.md`), live from claude.ai chat and Cowork via the custom connector since 2026-08-04, re-proven from the chat surface 2026-08-07 (`aura/intake/2026-08-07-estate-brain-chat-surface-proof-2026-08-04.md`). Estate canon loads through this connector first; the GitHub connector and local clones remain the fallback road. Known drift flags stay with the Estate Brain lane in the ledger (get_brand_context lacks ag-luxury and don-hobbs, still exposes benched moxie). The prior version of this section ("does NOT exist yet," v2.2) was itself a phantom in the opposite direction, a locked front door recorded as an empty lot; retirement evidence lives in the estate manifest's Retired section.
+Google Drive, through the Drive, Docs, and Sheets connectors. The Estate Brain MCP is retiring (Decision Log 2026-10-13), so do not read canon through it. Decisions are saved to the Decision Log (Google Doc `1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc`), newest at the top.
 
 ## What Claude can already reach (the access map)
 
@@ -76,7 +76,7 @@ Claude already holds broad access across this stack. Do not claim access is miss
 | Web data (scraping, crawling, page monitoring) | Firecrawl, two lanes: Cowork / Claude app via the account-wide OAuth connector (`https://mcp.firecrawl.dev/v2/mcp-oauth`); Claude Code via the unattended lane (`https://mcp.firecrawl.dev/v2/mcp`) with a Bearer key read from `op://Automation/FIRECRAWL-API-KEY`, never plaintext | Call the Firecrawl MCP tools directly |
 | Connectors (read and act) | Airtable, Canva, ClickUp, Cloudflare, Coupler, Fireflies, Gamma, Gmail, GoDaddy, Google Calendar, Google Drive, Granola, Make, Mercury, Miro, n8n, Notion, Slack | Call the connector tool directly |
 | Compute and backend | AWS | Reach the service directly |
-| Estate canon | Estate Brain MCP connector, first road on every surface (chat, Cowork, Code). GitHub connector against ExpertPartners repos and local clones are the fallback road. First read: the estate manifest | Call the Estate Brain tools directly (list_repos, then fetch the manifest) |
+| Estate canon | Google Drive, Docs, and Sheets connectors against the business brains, first road on every surface (chat, Cowork, Code). First read: the HQ Rulebook | Read the HQ Rulebook through the Drive connector |
 
 Warning line, ordered by Chapter 3: the Windsor GHL connector points at a foreign GHL company (`wVd3gUNItq6OXcVVS9xL`, not the PartnerSync agency) and must never be treated as a PartnerSync source.
 
@@ -128,9 +128,9 @@ Two lanes, matched to the surface:
 
 ## Quick decision guide
 
-- A cold session orienting? The estate manifest first, `aura/docs/estate/estate-manifest.md`, then the lane ledger. Both load through the Estate Brain connector, first road.
+- A cold session orienting? The HQ Rulebook first, then the Job Tracker. Both load through the Drive connector.
 - A funnel record or a human log? Notion. A funnel is not done until it lives there.
-- Doctrine, a decision, or technical reference? GitHub canonical, commit and push. New ADRs and rulings land in `aura/decisions/`.
+- A decision? The Decision Log in Drive, newest at the top. Rules and knowledge? The owning brain in Drive. Code the tools run from? GitHub.
 - A fact a future session must recall? Memory.
 - A secret or token? 1Password. Never GitHub or Notion.
 - Running code or a backend service? AWS.
@@ -145,10 +145,10 @@ Two lanes, matched to the surface:
 
 ## Where this skill lives
 
-- Full bible: GitHub canonical, expert-partners doctrine area. Authoritative, version-controlled.
+- Full rules: the HQ Rulebook in Drive. Authoritative.
 - This skill: provisioned org-wide in Organization settings, Skills. Loads in chat, Cowork, and Code.
 - Memory: a one-line mirror that points here.
 
 ## Version
 
-v2.5. Synchronized 2026-09-19 from the authoritative Expert Partners Systems Map bible v2.5 (expert-partners commit 6eabe3b): retired `ghl-automation` is retained only as split-and-retirement history; `partnersync` owns GHL reference, doctrine, and operating knowledge; `partnersync-automation-backend` owns provider-neutral executable automation source; and the automation-platform-selection pointer now resolves to `partnersync/doctrine/automation-platform-selection.md`. The two prior wording drifts in the substantive body are also reconciled verbatim to the bible. Skill-map frontmatter metadata preserved per ruling 14. Authored by Allison Gaddy.
+v3.0. Repointed 2026-10-13 to the Drive brain (Decision Log 2026-10-13); the GitHub systems map bible is retired as the first read. Prior v2.5 sync 2026-09-19

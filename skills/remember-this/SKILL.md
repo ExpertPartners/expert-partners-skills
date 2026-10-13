@@ -31,7 +31,7 @@ These four boundaries are load-bearing. Blurring any of them is the failure this
 - **Not a decision save.** A clear decision from Allison is saved as made in its owning repo under decision 0101, with no phrase required and a readback in the same response cycle. Remembering an obligation is a different act. It never promotes a decision, never ratifies a recommendation, and never turns a candidate into canon. A captured item may say a decision is pending; it may never say a decision is made.
 - **Not pin.** Pin is a lightweight bookmark of the current position between surfaces. It is a place-keeper for right now, it expires with the moment, and it is never durable memory.
 - **Not intake.** Intake preserves evidence and working knowledge a cold future reader would need. Remember This preserves an ACTION still owed. Knowledge that has no action attached goes to intake, not here.
-- **Not operational state.** Lane rows, board cards, and work-state records are deterministic machinery with their own contracts. A wait that already has a home in the lane ledger's waiting-on column with a named condition and a stale date is already remembered, and duplicating it here is memory spam.
+- **Not operational state.** Job Tracker rows, board cards, and work-state records are deterministic machinery with their own contracts. A wait that already has a home in the Job Tracker's Waiting on column with a named condition and a stale date is already remembered, and duplicating it here is memory spam.
 
 ## Trigger one, explicit
 
@@ -59,7 +59,7 @@ If the five gates do not all clear, say nothing. Silence is the correct output f
 
 Never guess a repo from topic similarity, and never create one. Read the live estate before writing:
 
-- Estate Brain `list_repos` and `search` for the subject, and the Estate manifest for the durable owner of that job.
+- The HQ Rulebook, then a Drive search of the owning brain, for the durable owner of that job.
 - The `intake` skill's project map for the local home and GitHub repo of a named project.
 - `gh api orgs/ExpertPartners/repos` when the candidate set is genuinely unclear.
 

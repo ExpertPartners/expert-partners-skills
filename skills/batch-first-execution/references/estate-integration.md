@@ -2,10 +2,10 @@
 
 ## Preserve existing ownership
 
-For Estate work, use Estate Brain retrieval and compose with the installed
+For Estate work, use Drive retrieval and compose with the installed
 `connection-first-implementation` and applicable task skills. That skill owns
-the current browser execution ladder. Read the live Estate Manifest through
-Estate Brain first, then retrieve narrowly. Do not infer current state from
+the current browser execution ladder. Read the HQ Rulebook through the
+Drive connector first, then the owning brain, narrowly. Do not infer current state from
 this bundle or chat history.
 
 The Manifest and repository entry point retrieved on 2026-09-23 identify
@@ -63,8 +63,8 @@ archived worker, modify another active lane, or manufacture a title-verification
 ritual for this skill. Apply existing lifecycle requirements where they truly
 apply; this skill does not replace them.
 
-Use the existing Aura ledger and current task evidence for durable status.
-Do not create a second ledger or silently overwrite concurrent state. Keep
+Use the Job Tracker and current task evidence for durable status.
+Do not create a second tracker or silently overwrite concurrent state. Keep
 implementation-specific checkpoints scoped and point the owning ledger at them.
 
 ## Access and approvals

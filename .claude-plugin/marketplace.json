@@ -8,7 +8,7 @@
     {
       "name": "operating-doctrine",
       "source": "./plugins/operating-doctrine",
-      "version": "2.53.0",
+      "version": "2.54.0",
       "description": "The non-negotiable operating standard. Loads at every session."
     },
     {
@@ -32,7 +32,7 @@
     {
       "name": "systems-map",
       "source": "./plugins/systems-map",
-      "version": "0.5.2",
+      "version": "0.6.0",
       "description": "The canonical map of where every Expert Partners system lives. Loads at session start; inherits operating-doctrine."
     },
     {

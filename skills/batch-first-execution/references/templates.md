@@ -144,7 +144,7 @@ Return destination:
 ```
 
 Working checkpoints are operational state, not new business canon. Use the
-owning ledger for durable status when one already exists.
+Job Tracker for durable status when one already exists.
 
 ## E. Consolidated return
 

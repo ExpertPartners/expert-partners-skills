@@ -1,6 +1,6 @@
 ---
 name: "code-block-routing"
-description: "Fires on Claude Code paste blocks and implementation briefs for Allison. Requires a routing line naming the destination surface, WORKTREE and MODEL AND EFFORT lines on any block that spawns a Code session (missing either, the block bounces home), a waiting-on statement per hand-off, a lane ledger row at dispatch and carry-back, one block per response, nothing fenced but terminal or Code, versions read from canonical, the pin only after Allison confirms the paste, and an earned archive verdict on every carry-back."
+description: "Fires on Claude Code paste blocks and implementation briefs for Allison. Requires a routing line naming the destination surface, WORKTREE and MODEL AND EFFORT lines on any block that spawns a Code session (missing either, the block bounces home), a waiting-on statement per hand-off, a Job Tracker row at dispatch and carry-back, one block per response, nothing fenced but terminal or Code, versions read from canonical, the pin only after Allison confirms the paste, and an earned archive verdict on every carry-back."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -9,7 +9,7 @@ inherits: operating-doctrine
 defers-to:
   - pin
 brand-scope: null
-subtitle: "paste block routing and the lane ledger"
+subtitle: "paste block routing and the Job Tracker"
 ---
 
 # Code Block Routing
@@ -35,11 +35,11 @@ Rules for the routing line:
 5. An actual execution-scope collision blocks.
 
 
-## Dispatch Dedupe: Read The Ledger For A Standing Owner First
+## Dispatch Dedupe: Read The Job Tracker For A Standing Owner First
 
 Ruled by Allison 2026-08-07; born the night of 2026-08-06 when one ordered dispatch reached two lanes from two governing conversations and neither knew of the other. Door Tools Build and the Estate Brain Write Tools lane's Ledger Guard Build both built a working ledger tool. The second lane caught the collision at deploy pre-flight, when the live image and origin/main both already carried `update_lane_row`, and dropped its duplicate unmerged. Nothing was overwritten, and that was luck plus one careful pre-flight, not design. The duplicate was invisible until pre-flight because the second lane's worktree was cut from a stale remote ref.
 
-Before dispatching ANY build, the dispatcher reads the Active lanes table in aura `docs/estate/lanes.md` for a standing owner of that tool class. Not that exact tool, that tool CLASS: door tools, ledger writers, CI watchers, board publishers, brain readers, and so on. A lane already holding the class is its owner.
+Before dispatching ANY build, the dispatcher reads the running rows of the Job Tracker (Google Sheet `1FniEwCaZ89cViQxUcPkycxAmvvM47cnjRzQQyzpEk5c`) for a standing owner of that tool class. Not that exact tool, that tool CLASS: door tools, ledger writers, CI watchers, board publishers, brain readers, and so on. A lane already holding the class is its owner.
 
 The three outcomes, and there is no fourth:
 
@@ -65,7 +65,7 @@ Mechanics:
 2. **A dispatch block that spawns a Code session and arrives WITHOUT a `WORKTREE` line is malformed and bounces home, same as a block missing its routing line.** The receiving session does not execute it; it replies naming what is missing so the dispatcher reships the block whole.
 3. A session NEVER writes in a repo's main working tree when another lane may hold uncommitted state in it. Check before writing: `git worktree list`, then `git status` in the main tree. Uncommitted changes belonging to someone else mean isolate, always.
 4. Serializing is a legitimate answer when the work genuinely cannot split, and it is stated, never assumed: the dispatch replaces the `WORKTREE` line with an explicit serialization statement naming the order, and the second lane's row records that it waits on the first. Silence is never serialization.
-5. The worktree is named in the lane's ledger row at dispatch, so the next dispatcher can see which trees are occupied.
+5. The worktree is named in the job's Job Tracker row at dispatch, so the next dispatcher can see which trees are occupied.
 6. This rule binds the dispatcher AND the dispatched session. The dispatcher ships the line; the session enforces it by bouncing a spawning block that lacks one, and confirms its tree's absolute path before touching anything else.
 7. Continuation blocks routed to an EXISTING session inherit that session's established worktree and need not restate it. A pre-rule session with no isolated tree that receives new work isolates itself at that point and says so in its carry-back.
 
@@ -116,7 +116,7 @@ Re-ruled by Allison 2026-08-07 evening in the Estate Brain Door Phase B Code ses
 
 **NOT safe means the session diagnoses AND prescribes.** It names exactly what is open and the single move that closes it: /session-wrap when chat-only decisions or flags are unrecorded, /session-closeout when shipped work has no handoff note on main, or the named open action otherwise. Never leave Allison to work out which close a session needs.
 
-**What stays with the home conversation:** the archive click itself, and the ledger flip. Home may still verify a verdict's claims against commits, and a hold still names its next block ("hold it open just in case" is not a call; it is a lane leaking). When home archives, it flips that lane's row to `archived` in aura `docs/estate/lanes.md` BEFORE dispatching anything further, and no dispatch block is ever written against a session whose row reads `archived`; that lane is gone, spawn a new one.
+**What stays with the home conversation:** the archive click itself, and the Job Tracker flip. Home may still verify a verdict's claims against commits, and a hold still names its next block ("hold it open just in case" is not a call; it is a lane leaking). When home archives, it flips that job's row to `archived` in the Job Tracker BEFORE dispatching anything further, and no dispatch block is ever written against a session whose row reads `archived`; that lane is gone, spawn a new one.
 
 **Default is archive.** Sessions are cheap, so spawn freely rather than hoarding a session because it might be useful later. A stale open lane is not free, and the verdict rule exists precisely so stale open lanes stop accumulating.
 
@@ -146,23 +146,23 @@ Every carry-back reports BUILD BLOCKERS and OUTCOME BLOCKERS as two separate lin
 
 The worker's verdict speaks only to its own surface-specific job, never to the home table's objective. A worker closes when its job is finished and successor work is durably handed off; whether the home table's mission is achieved is judged only by the home table's own closeout (the session-wrap close-or-continue verdict), never imported from a worker's verdict. A worker carry-back that pronounces on the home objective is malformed on that line, exactly as a table verdict spoken in worker vocabulary is void under decision 0075.
 
-## The Lane Ledger: Row At Dispatch, Update At Carry-Back
+## The Job Tracker: Row At Dispatch, Update At Carry-Back
 
-Added 2026-08-03. The estate-wide lane ledger lives at `docs/estate/lanes.md` in the aura repo. It is the single file that answers "what Claude Code sessions exist, what does each belong to, and what is each waiting on" from any surface; any project reads it through its aura connection.
+The Job Tracker (Google Sheet `1FniEwCaZ89cViQxUcPkycxAmvvM47cnjRzQQyzpEk5c`) in Company Core [HQ-BB], HQ Business Brain, is the one place that answers "what Claude Code sessions exist, what does each belong to, and what is each waiting on" from any surface (Drive connector, Sheets connector). One row per running job; columns Job, Room or lane, Who is doing it, Status, Waiting on, Next step, Opened, Last updated. It replaces the aura lane ledger (Decision Log 2026-10-13). Where this skill says lane ledger or ledger, read Job Tracker.
 
 The habit, every hand-off:
 
-1. At dispatch, when a paste block is handed to Allison, the issuing Cowork chat's block-writer appends or updates the lane's row in the ledger: a short label in the first cell, the stable session id when known in the second cell, the return home (Claude project / conversation), machine, the worktree named in the dispatch (per Worktree Isolation above, so the next dispatcher can see which trees are occupied), status, waiting-on, last-updated date. The waiting-on statement this skill already requires with every hand-off is the same text that goes in the row -- write it once, use it in both places. A dispatch that creates a CLOUD worker records the owning table and available stable identifier in the row at creation time, unconditionally (decision 0074, cloud registration): cloud sessions are invisible to local Desktop session lists, so an unregistered cloud worker is unrecoverable later.
-2. At carry-back receipt, the row updates to the new status (running / waiting-on-Allison / waiting-on-carry-back / archived / owned-elsewhere). `complete-safe-to-archive` is retired as of 2026-08-07; only the home conversation writes `archived`, as one motion with its archive call.
-3. Append and update rows, never delete. Completed lanes move to the ledger's Completed section rather than vanishing, so the archive decision stays visible.
+1. At dispatch, when a paste block is handed to Allison, the issuing block-writer adds or updates the job's row: a short label in Job, the return home (Claude project / conversation) in Room or lane, and in Who is doing it the worker, machine, stable session id when known, and the worktree named in the dispatch (per Worktree Isolation above, so the next dispatcher can see which trees are occupied), then Status, Waiting on, Next step, Opened, Last updated. The waiting-on statement this skill already requires with every hand-off is the same text that goes in the row, written once. A dispatch that creates a CLOUD worker records the owning room and available stable identifier in the row at creation time, unconditionally: cloud sessions are invisible to local Desktop session lists, so an unregistered cloud worker is unrecoverable later.
+2. At carry-back receipt, the row updates to the new status (running / waiting-on-Allison / waiting-on-carry-back / archived / owned-elsewhere). `complete-safe-to-archive` is retired; only the home conversation writes `archived`, as one motion with its archive call.
+3. Append and update rows, never delete. Finished jobs stay in the sheet with a terminal Status rather than vanishing, so the archive decision stays visible.
 4. Rule 5 applies: rows are only as certain as their evidence. A lane whose home nobody has named stays needs-Allison; never invent a home for it.
 
-A Code session that completes its carry-back updates its own row to `waiting-on-carry-back`, with the full report, in the same push when it already has aura write access; otherwise the home updates it on receipt (root CLAUDE.md delivery protocol). It never writes `archived` into its own row: that is the home conversation's call and the home conversation's write.
+A Code session that completes its carry-back updates its own row to `waiting-on-carry-back`, with the full report, in the same turn when it can write the sheet through the Google Sheets connector; otherwise the home updates it on receipt (root CLAUDE.md delivery protocol). It never writes `archived` into its own row: that is the home conversation's call and the home conversation's write.
 
 <!-- RULED-BY: aura/intake/2026-09-01-ruling-table-and-worker-lifecycle-terminality.md date:2026-09-01 -->
 **The archive and the flip are one motion, added 2026-09-03** (ruling of record aura intake/2026-09-01-ruling-table-and-worker-lifecycle-terminality.md, on live evidence that finished workers stayed machine-visible as `waiting-on-carry-back`, one of them after Allison had physically archived the session). Home does not archive and then flip the row later; the flip completes the same close. A carry-back recommending archive says plainly that its row still reads its pre-archive status and will be flipped with the click, so the owed write is visible rather than assumed. **A row that keeps advertising an active wait for a worker known to be finished is a lie the ledger is telling**, and it is reconciled on proven evidence at the next touch of that lane under session-steward v1.3 section 7, never by a sweeper and never by leaving it for Allison to spot.
 
-Write mechanics for the ledger file itself, added 2026-08-05 per Allison's ruling of 2026-08-04 after the second ledger regression (a stale-base full-file write erased three rows of newer state before the owning lanes healed it): every write to `docs/estate/lanes.md` obeys the shared-canonical-file-writes directive, canonical at aura `docs/directives/shared-canonical-file-writes.md`. In one breath, fresh read immediately before the write, blob-SHA compare-and-swap on any contents-API write, post-write diff check that no other lane's rows changed, git-based writers (Claude Code) preferred for this hot file, and a chat-surface writer that bounces twice on the SHA guard stops racing and routes the row verbatim through an intake handoff note for the next git-based writer to fold in. The directive also carries Allison's ordered build of the Estate Brain ledger-row tool, which retires whole-file writes once it ships.
+Write mechanics: update only this job's row in place through the Google Sheets connector. Read the sheet immediately before writing, never clear or rewrite other rows, and re-read after to confirm no other row changed. If the write fails twice, stop and route the row verbatim in the carry-back for home to enter.
 
 ## One Block Per Response
 

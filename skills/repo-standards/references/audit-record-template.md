@@ -1,7 +1,7 @@
 # Repo Standards audit record template
 
-File as `intake/YYYY-MM-DD-repo-standards-audit-<repo>.md` in the audited repo
-(aura intake/ when the repo has no inbox). Frontmatter per ADR 0025.
+File as a Google Doc titled `repo-standards-audit-<repo>` in the owning brain's
+home folder in Drive (HQ Business Brain if none).
 
 ```markdown
 ---

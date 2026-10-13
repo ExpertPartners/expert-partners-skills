@@ -65,14 +65,10 @@ source. A local script or an older deployed skill never substitutes for the gate
    through Stage B item 8. The birth report is the Stage B report. Until the row
    is committed to aura main and independently read back, birth is incomplete.
 
-5. **Reconcile downstream routing and door registration.** The Manifest Entity
-   row is topology registration. Door serving scope is a separate consumer:
-   check the row's scan profile and declared consumers before requesting it.
-   For a repo intended for the Estate Brain door, verify the live door list and
-   the current canonical registration mechanism. If it is not served, file a
-   pending door-registration handoff with the owning door lane and report it as
-   pending, never live. A topology-only application does not automatically need
-   door indexing. Do not edit the door implementation or change access here.
+5. **Reconcile downstream routing.** The Manifest Entity row is topology
+   registration. Check the row's scan profile and declared consumers. The
+   Estate Brain door is retiring (Decision Log 2026-10-13), so no door
+   registration is requested for a new repo.
 
    The inspected legacy script appends to
    `aura project-knowledge/pending-canonical-repos.md`. Inspect and preserve any
@@ -85,15 +81,15 @@ source. A local script or an older deployed skill never substitutes for the gate
    `project-knowledge/pending-canonical-repos.md`, read 2026-09-20. Never promise
    that a retired worker or queue will index the repo automatically.
 
-   If intake routing needs a new home mapping, update its canonical skill source
-   (`expert-partners-skills skills/intake/SKILL.md`) from the Entity row and live
-   branch rules, then use the deployment pipeline under the current rollout
-   scope. Never hand-edit `~/.claude/skills/intake/SKILL.md` or hardcode a
-   protection verdict. Routing tables remain downstream consumers of topology.
+   If intake routing needs a new brain mapping, update its canonical skill
+   source (`expert-partners-skills skills/intake/SKILL.md`) from the Entity row,
+   then use the deployment pipeline under the current rollout scope. Never
+   hand-edit `~/.claude/skills/intake/SKILL.md`. Routing tables remain
+   downstream consumers of topology.
 
 6. **Report the Stage B result with evidence.** Include the Stage A verdict,
    repo URL, local home, baseline evidence, Project relationship, landed Entity
-   row commit and readback, and door status (live, pending, or not required).
+   row commit and readback, and routing status.
    Name remaining gaps explicitly. A pending queue entry, script success, or
    repo URL without the Entity row cannot be reported as a completed birth.
 
