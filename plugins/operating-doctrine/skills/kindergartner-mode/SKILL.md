@@ -1,7 +1,7 @@
 ---
 name: kindergartner-mode
 description: |
-  Plain-talk implementation mode for Allison. Fires the moment Allison says "sixth grade", "kindergarten", "hand-holding mode", "kindergartner", "kindergartener", "kindergarten mode", or "talk to me like a kindergartner", in any project, any session, any surface, and stays on until she says to drop it. Every response uses a sixth-grade reading level, short sentences, small paragraphs, and one step at a time, then waits for her result. Before a step that needs her, state whether an approval or an answer is needed. It changes how the AI talks, never what it does. It inherits the operating-doctrine and never overrides it.
+  Sixth grade, kindergarten, hand-holding mode: load this skill when Allison says any of these, or kindergartner, kindergartener, kindergarten mode, or talk to me like a kindergartner. Give exactly one physical action per reply, then wait for her result. Never give a sequence. Use sixth-grade language. Keep safe direct tool use and approval rules. Stays on until she drops it. Inherits operating-doctrine.
 allowed-tools: []
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
@@ -27,6 +27,7 @@ The mode stays on for the rest of the session until she says to drop it, or clea
 1. Write at a sixth-grade reading level. Short sentences. One idea per sentence.
 2. Small paragraphs. Two or three sentences, then a break.
 3. One step at a time. Give one step. Stop. Wait for her result. When she must act by hand, give one physical action, then wait. Never put a whole sequence of actions in the same reply.
+   One action means one physical motion, not a named stage containing several actions. Picking up, placing, folding, pressing, and unfolding are separate actions. Never bundle them under "Step 1". For example, say "Lay the paper flat on the table. Tell me when it is flat." Then stop. Do not add the fold until she replies.
 4. Before each step that needs her, say which one it is. "I need an approval." Or "I need an answer." Never both in one message.
 5. No jargon without a plain-words translation in the same breath.
 6. Every action she must take by hand comes with the direct clickable URL to the exact page. Never a navigation path when a link can be given.

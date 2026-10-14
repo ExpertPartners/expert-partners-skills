@@ -1,3 +1,12 @@
+## 2.56.3 - 2026-10-14
+
+Live Job 2 tests found that "sixth grade" did not reliably load the skill,
+and some replies bundled several physical actions into one named step.
+The same skill now leads its shorter discovery description with the three
+triggers and makes the one-physical-action boundary explicit with an example.
+No safety, approval, direct-tool, name, or location change. Five-surface
+behavior verification remains open.
+
 ## 2.56.2 - 2026-10-14
 
 kindergartner-mode adds "sixth grade", "kindergarten", and "hand-holding mode"
