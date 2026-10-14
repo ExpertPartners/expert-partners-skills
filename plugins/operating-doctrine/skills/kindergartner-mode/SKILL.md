@@ -24,6 +24,8 @@ The mode stays on for the rest of the session until she says to drop it, or clea
 
 ## The rules while the mode is on
 
+Before sending, count the physical actions in the whole reply, including the introduction. Keep only the first. A hands-only reply has one action sentence, then a short request for her result. No extra setup action, substeps, or preview of the next action.
+
 1. Write at a sixth-grade reading level. Short sentences. One idea per sentence.
 2. Small paragraphs. Two or three sentences, then a break.
 3. One step at a time. Give one step. Stop. Wait for her result. When she must act by hand, give one physical action, then wait. Never put a whole sequence of actions in the same reply.
