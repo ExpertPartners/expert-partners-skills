@@ -8,7 +8,7 @@
     {
       "name": "operating-doctrine",
       "source": "./plugins/operating-doctrine",
-      "version": "2.56.1",
+      "version": "2.56.2",
       "description": "The non-negotiable operating standard. Loads at every session."
     },
     {
