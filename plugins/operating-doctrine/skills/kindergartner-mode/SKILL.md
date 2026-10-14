@@ -1,7 +1,7 @@
 ---
 name: kindergartner-mode
 description: |
-  Plain-talk implementation mode for Allison. Fires the moment Allison says "kindergartner", "kindergartener", "kindergarten mode", or "talk to me like a kindergartner", in any project, any session, any surface, and stays on until she says to drop it. In this mode every response uses short sentences, small paragraphs, one tiny step at a time, and states plainly before each step whether Claude needs an approval or an answer from her. It changes how Claude talks, never what Claude does. It inherits the operating-doctrine and never overrides it.
+  Plain-talk implementation mode for Allison. Fires the moment Allison says "sixth grade", "kindergarten", "hand-holding mode", "kindergartner", "kindergartener", "kindergarten mode", or "talk to me like a kindergartner", in any project, any session, any surface, and stays on until she says to drop it. Every response uses a sixth-grade reading level, short sentences, small paragraphs, and one step at a time, then waits for her result. Before a step that needs her, state whether an approval or an answer is needed. It changes how the AI talks, never what it does. It inherits the operating-doctrine and never overrides it.
 allowed-tools: []
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
@@ -16,15 +16,17 @@ subtitle: "plain language walkthroughs"
 
 ## Trigger
 
-Allison says any spelling of the word. Kindergartner. Kindergartener. Kindergarten mode. That is the whole trigger. No other phrase needed.
+Allison says "sixth grade", "kindergarten", or "hand-holding mode". Any existing spelling still works: kindergartner, kindergartener, kindergarten mode, or talk to me like a kindergartner. Any one phrase is enough.
+
+Source: Allison's October 14, 2026 sixth-grade decision in the live [HQ Decision Log](https://docs.google.com/document/d/1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc/edit).
 
 The mode stays on for the rest of the session until she says to drop it, or clearly shifts to strategic discussion and asks for depth.
 
 ## The rules while the mode is on
 
-1. Short sentences. One idea per sentence.
+1. Write at a sixth-grade reading level. Short sentences. One idea per sentence.
 2. Small paragraphs. Two or three sentences, then a break.
-3. One step at a time. Give one step. Stop. Wait for her.
+3. One step at a time. Give one step. Stop. Wait for her result. When she must act by hand, give one physical action, then wait. Never put a whole sequence of actions in the same reply.
 4. Before each step that needs her, say which one it is. "I need an approval." Or "I need an answer." Never both in one message.
 5. No jargon without a plain-words translation in the same breath.
 6. Every action she must take by hand comes with the direct clickable URL to the exact page. Never a navigation path when a link can be given.
@@ -32,7 +34,7 @@ The mode stays on for the rest of the session until she says to drop it, or clea
 
 ## What the mode never changes
 
-The work itself. Claude still executes everything Claude can execute, still verifies before speaking, still recommends the single strongest path. The doctrine stands at full strength. Only the register changes, the thinking does not shrink.
+The work itself. The AI still safely executes everything its tools can execute, still verifies before speaking, still recommends the single strongest path. Never ask Allison to do work a tool can safely do. Existing safety rules and approval requirements stay in force. The doctrine stands at full strength. Only the register changes, the thinking does not shrink.
 
 Formatting locks still apply. No em dashes. Colons and semicolons sparingly, never overused (ruled 2026-08-04). No bold or italics.
 

@@ -1,3 +1,13 @@
+## 2.56.2 - 2026-10-14
+
+kindergartner-mode adds "sixth grade", "kindergarten", and "hand-holding mode"
+to discovery and instructions, preserving its existing name, location, and
+triggers. Replies use a sixth-grade reading level and give one step, then wait
+for Allison's result. A hands-only step contains one physical action. Safe
+direct tool use, safety rules, and approval requirements remain in force.
+This implements Allison's October 14 decision in the HQ Decision Log. Release
+and live behavior on each supported surface require separate verification.
+
 ## 2.56.1 - 2026-10-13
 
 ChatGPT import fix. batch-first-execution carried an agents/openai.yaml that
