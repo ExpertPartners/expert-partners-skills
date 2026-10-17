@@ -1,3 +1,16 @@
+## 2.57.0 - 2026-10-16
+
+Adds wordpress-implementation-routing to operating-doctrine. WordPress work now
+classifies the owning live-state layer before choosing a tool, prefers native
+WordPress abilities or APIs and REST for routine reversible content/state
+changes, uses repository code only when the requested outcome is genuinely
+code-owned, reserves WP-CLI/server tools for operational and bulk work, and
+keeps browser automation last. The skill adds an explicit anti-overcoding
+check so link, copy, metadata, media, menu, and ordinary setting changes do not
+turn into unnecessary release-engineering projects. Live-state inspection,
+rollback, visitor-facing verification, 1Password-first access, existing-owner
+reuse, and normal HQ approval gates remain required.
+
 ## 2.56.3 - 2026-10-14
 
 Live Job 2 tests found that "sixth grade" did not reliably load the skill,
