@@ -30,6 +30,60 @@ Never attach to, click, type in, navigate, foreground, or move the cursor on All
 4. Continue without asking Allison whether the M2 is available merely because other tabs, windows, tasks, or sessions are visible.
 5. Preserve pre-existing tabs and anything owned by another session. Close only temporary tabs/windows created by the current session when no longer needed.
 
+## Existing authenticated Chrome attachment
+
+Use the registered `mcp__cua_ember__js` route. The standalone
+`playwright_ember` launcher with `--user-data-dir .../ember-codex` starts a
+separate automation profile; it does not attach to the signed-in Chrome app.
+A lock on that directory is evidence about that automation process, not proof
+that the authenticated browser is unavailable. Do not use `--isolated`, remove
+locks, restart Chrome, copy authentication, or create another profile to bypass it.
+
+On first use, execute exactly one discovery call:
+
+```javascript
+await cua.getState();
+```
+
+Inspect the returned M2 browser/profile metadata and existing task URL. Select
+that exact browser ID, never the first Chrome result. Browser IDs and profile
+names are live observations, not permanent constants. If multiple profiles
+match and the correct one cannot be established, stop on that ambiguity.
+
+```javascript
+let estateBrowser = await cua.getBrowser({id: verifiedBrowserId});
+```
+
+Read the returned API documentation. Name the session and create a task-owned
+tab in that selected existing profile with `cua.createBrowserTab`, using a
+unique `sessionName`. Preserve existing tabs, including another task's tab at
+the same URL. Keep the returned tab handle and ID for every subsequent action.
+Where the selected provider exposes `tab.playwright`, its locators and frame
+inspection control that same authenticated tab; a second Playwright launcher
+is unnecessary. Never assume a loopback listener is CDP: verify the endpoint
+before configuring any attachment, and do not expose a new debugging listener.
+
+If browser-provider enumeration fails or returns no usable target, attempt the
+existing native app route before declaring browser access blocked:
+
+```javascript
+let emberChrome = await cua.getApp('com.google.Chrome');
+```
+
+Inspect fresh window, profile, URL and task ownership before input. Native app
+input is not a substitute for exact tab isolation: if another task owns the
+window or focus cannot be safely established, stop on that specific conflict.
+Do not reset a runtime owned by another task. This fallback follows Aura
+[decision 0104](https://github.com/ExpertPartners/aura/blob/main/decisions/0104-ember-native-browser-control-before-screen-sharing.md).
+
+Treat attachment and app rendering as separate checks. First verify the
+expected location/account in the authenticated browser. Then inspect the
+requested app surface, including iframe content and read-only console errors.
+A rendered shell with an empty workflow iframe does not prove missing login,
+working workflows, or a ready workflow editor. Report each result separately;
+never change cookies, extensions, credentials or business data to troubleshoot
+without task authorization.
+
 ## Availability rule
 
 Treat Ember's M2 as the designated browser computer and assume it is available unless the browser-control layer itself proves otherwise.
