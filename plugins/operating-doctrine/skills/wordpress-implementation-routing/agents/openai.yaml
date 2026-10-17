@@ -1,0 +1,3 @@
+interface:
+  display_name: "WordPress Implementation Routing"
+  short_description: "Choose the smallest safe WordPress execution path and prevent overcoding."
