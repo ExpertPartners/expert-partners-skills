@@ -20,3 +20,5 @@ Historical system-specific routes in the old skill are removed under the explici
 The filename difference from Cal's bracketed examples, a Drive home for the standard, universal fixed row height, and date display remain Allison's open decisions. This change does not decide them. Evidence from the course ledger is paraphrased in the carry-back only. Research reports are supporting evidence and supply no new policy.
 
 The skill has no separate checksum list to update. Source hashes can be recorded in the carry-back. The canonical producer remains responsible for any later authorized generated package and checksum list.
+
+Proposal amendment on October 18, 2026. The proposed release is 3.1.0 in the skill and both manifests. This advances the old v3 description as well as the v2 heading and the 2.57.0 package. The earlier 2.58.0 candidate is withdrawn before merge. Scope and policy sources are unchanged.

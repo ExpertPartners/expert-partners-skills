@@ -1,7 +1,7 @@
 ---
 name: "document-formatting-standard"
-description: "Allison's formatting and delivery standard (2.58.0) for new company working documents in Google Docs, Sheets, Word, and Excel. Use Poppins, native document heading styles, 1.5 document line spacing, Ranger's spreadsheet rules, V# - Department - Name filenames, one home in the owning business brain, view-only link sharing with privacy exceptions, and saved-file measurement and readback before completion. Apply when creating or delivering a new working document. Brand typography governs public and client-facing design. Existing documents stay as they are."
-version: "2.58.0"
+description: "Allison's formatting and delivery standard (3.1.0) for new company working documents in Google Docs, Sheets, Word, and Excel. Use Poppins, native document heading styles, 1.5 document line spacing, Ranger's spreadsheet rules, V# - Department - Name filenames, one home in the owning business brain, view-only link sharing with privacy exceptions, and saved-file measurement and readback before completion. Apply when creating or delivering a new working document. Brand typography governs public and client-facing design. Existing documents stay as they are."
+version: "3.1.0"
 date: 2026-10-18
 source: "HQ Rulebook and Decision Log, read live 2026-10-18"
 topic: "New company working document formatting and delivery"
@@ -16,7 +16,7 @@ brand-scope: null
 subtitle: "Poppins working documents, measured before delivery"
 ---
 
-# Document Formatting Standard (2.58.0)
+# Document Formatting Standard (3.1.0)
 
 Apply this standard to new company working documents in Google Docs, Sheets, Word, and Excel, including AG Luxury internal documents. Existing documents, including the Job Tracker, stay as they are. Measure an existing file only for information during a formatting check. Do not propose or apply formatting fixes to it under this skill.
 
