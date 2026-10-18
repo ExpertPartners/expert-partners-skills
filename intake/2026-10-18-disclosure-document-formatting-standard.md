@@ -22,3 +22,5 @@ The filename difference from Cal's bracketed examples, a Drive home for the stan
 The skill has no separate checksum list to update. Source hashes can be recorded in the carry-back. The canonical producer remains responsible for any later authorized generated package and checksum list.
 
 Proposal amendment on October 18, 2026. The proposed release is 3.1.0 in the skill and both manifests. This advances the old v3 description as well as the v2 heading and the 2.57.0 package. The earlier 2.58.0 candidate is withdrawn before merge. Scope and policy sources are unchanged.
+
+Sharing amendment on October 18, 2026. Allison directly instructed in this task: "all documents that are created by any AI must be created in sharing settings. Permissions should be: anyone can share with a link and view." The proposal now requires Anyone with the link, Viewer for every newly created AI document and its new document folder, with saved-permission verification. This later instruction supersedes the earlier privacy exceptions for new AI documents in this proposal. Existing business files remain outside the authorized change scope. The owning Decision Log has not been edited.

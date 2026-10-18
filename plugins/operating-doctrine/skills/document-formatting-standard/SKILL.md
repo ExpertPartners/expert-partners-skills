@@ -1,6 +1,6 @@
 ---
 name: "document-formatting-standard"
-description: "Allison's formatting and delivery standard (3.1.0) for new company working documents in Google Docs, Sheets, Word, and Excel. Use Poppins, native document heading styles, 1.5 document line spacing, Ranger's spreadsheet rules, V# - Department - Name filenames, one home in the owning business brain, view-only link sharing with privacy exceptions, and saved-file measurement and readback before completion. Apply when creating or delivering a new working document. Brand typography governs public and client-facing design. Existing documents stay as they are."
+description: "Allison's formatting and delivery standard (3.1.0) for new company working documents in Google Docs, Sheets, Word, and Excel. Use Poppins, native document heading styles, 1.5 document line spacing, Ranger's spreadsheet rules, V# - Department - Name filenames, one home in the owning business brain, anyone-with-link viewer sharing for every AI-created document, and saved-file measurement and readback before completion. Apply when creating or delivering a new working document. Brand typography governs public and client-facing design. Existing documents stay as they are."
 version: "3.1.0"
 date: 2026-10-18
 source: "HQ Rulebook and Decision Log, read live 2026-10-18"
@@ -26,7 +26,7 @@ Brand typography governs public and client-facing design only. AG Luxury's Itali
 
 This revision supersedes the old plain-title naming, universal Aura Docs destination, retired system routing, and manual skill re-upload instructions. Ruling of record: intake/2026-10-18-disclosure-document-formatting-standard.md. That implementation receipt points to the owning Drive decisions and does not create a second policy source.
 
-Read the current [V1 - Company Core - HQ Rulebook](https://docs.google.com/document/d/15sCFxMvG8OZMZik5w0Hzqzh7HyphrB7rJ8NBtm46JBE) and [V1 - Company Core - Decision Log](https://docs.google.com/document/d/1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc) before applying this skill. The current Decision Log settles differences. If authority is unavailable or an unresolved conflict prevents correct execution, report the gap before dependent work.
+Read the current [V1 - Company Core - HQ Rulebook](https://docs.google.com/document/d/15sCFxMvG8OZMZik5w0Hzqzh7HyphrB7rJ8NBtm46JBE) and [V1 - Company Core - Decision Log](https://docs.google.com/document/d/1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc) before applying this skill. The current Decision Log settles differences unless Allison gives an explicit later instruction for the task. Her October 18 task update governs the universal sharing requirement below. If authority is unavailable or an unresolved conflict prevents correct execution, report the gap before dependent work.
 
 Governing Decision Log entries are October 13, 2026, File naming, Links and names, the double dash ban, Google Sheets formatting standard, and The skills marketplace is the only road in; October 14, Sharing default; and October 18, Two typography layers, The document formatting standard is re-approved, Poppins applies across the board, The formatting standard applies only to new documents, and Ranger's spreadsheet rules become the base. The Rulebook's Where things live section establishes one home, and Repo rule 8 governs versions and checksum lists for deployed copies.
 
@@ -42,7 +42,7 @@ Finished files have one home in the owning business brain. Use the Aura Docs fol
 
 Create native Google Docs and Google Sheets in Drive by default. Create Word or Excel only when Allison asks for that format or an outside recipient needs it.
 
-Set each new document and folder to anyone with the link can view, not edit. Anything in a Private folder, anything containing client details, and anything financial stays restricted to Expert Partners. Verify the actual permission. If the connector cannot set or verify it, report that check as blocked rather than substituting company-only sharing.
+Create every AI-generated document with General access set to Anyone with the link and the role set to Viewer. Apply this to every AI and every document format. Set new document folders to the same viewer permission. Anyone who receives the link can open and view the document; the link grants no editing access. Verify the saved permission before reporting done. If the connector cannot set or verify it, report that check as blocked rather than substituting company-only sharing. Allison explicitly updated this requirement in the October 18 task conversation, replacing the earlier Private-folder, client-detail, and financial-file exceptions for newly created AI documents. This instruction does not authorize changing existing files.
 
 Deliver each retrieved file link as a Markdown hyperlink whose text is the exact filename. Never show a raw Drive URL or invent a URL. In Sheets, put the link on readable file-name text rather than adding a separate raw-link column. Keep the chat summary to two lines when the document is the deliverable. Commands, prompts, snippets, and quick factual answers can stay in chat.
 
