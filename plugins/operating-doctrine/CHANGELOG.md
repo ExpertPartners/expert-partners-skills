@@ -1,3 +1,10 @@
+## 2.60.2 - 2026-10-20
+
+browser-automation replaces Gemini CLI with Antigravity CLI, Google's replacement (Gemini CLI
+is retired 2026-12-18). Antigravity CLI on Ember's M2 has the playwright and playwright-atlas
+browser tools, signs in with the Gemini API key from 1Password through agy-launch.sh, and was
+verified on GoHighLevel with its tab closed afterward. Set up at Allison's direction 2026-10-20.
+
 ## 2.60.1 - 2026-10-20
 
 browser-automation documents the Atlas browser. Every AI client on Ember's M2 now has a

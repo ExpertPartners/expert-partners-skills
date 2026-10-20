@@ -9,7 +9,7 @@ description: >
   the shared Playwright Extension connector, which never raises Chrome's debugging prompt,
   never opens a fresh or signed-out browser, assumes Chrome and 1Password access until a
   real failure, picks the most durable and fastest path, and closes every tab it opens.
-  Same setup for Claude Code, Claude desktop, Codex and Gemini CLI. Defers to
+  Same setup for Claude Code, Claude desktop, Codex and Antigravity CLI. Defers to
   ember-browser-routing on which machine runs browser work. It inherits the
   operating-doctrine and never overrides it.
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
@@ -100,9 +100,10 @@ sessions.
 | Shared connector | `~/maintenance/chrome-signed-in-mcp.sh` (Playwright MCP 0.0.83, pinned, `--extension`) |
 | Job runner | `~/maintenance/pw-run.py` (also `~/bin/pw-run`) |
 | Extension tokens | 1Password, Automation vault, two items titled `Playwright MCP Extension Token`, told apart by username (ember@ and atlas@); the connector reads them by item ID |
+| Antigravity CLI | `agy` (alias for `~/maintenance/agy-launch.sh`), Gemini API key from 1Password, browser tools allowed in `~/.gemini/antigravity-cli/settings.json` |
 | Python environment | `~/.venvs/playwright` (Playwright 1.56.0) for local work that needs no browser |
 
-Every AI client on the M2 (Claude Code, Claude desktop, Codex, Gemini CLI) has two MCP
+Every AI client on the M2 (Claude Code, Claude desktop, Codex, Antigravity CLI) has two MCP
 servers that run the shared connector.
 
 - `playwright` drives the Ember browser (`Default` profile). Use it unless told otherwise.
@@ -199,7 +200,7 @@ expired, sign back in with the matching 1Password item before reporting anything
 ## Every AI on the M2
 
 This skill ships in the operating-doctrine plugin of the expert-partners marketplace, which
-Claude Code, Claude surfaces, and Codex load. Gemini CLI and the Claude desktop app reach
+Claude Code, Claude surfaces, and Codex load. Antigravity CLI and the Claude desktop app reach
 the same browser through their `playwright` MCP server. Tab groups are what let several AIs
 share the M2 at once without stepping on each other.
 
