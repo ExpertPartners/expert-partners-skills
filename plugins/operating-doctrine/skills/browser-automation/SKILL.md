@@ -153,10 +153,11 @@ Expect `{"signedIn":true}` and `pw-run: closed 1 tab(s) from this run`.
 Each Chrome profile can carry its own Playwright Extension with its own token, which lets
 separate AI lanes work in separate signed-in profiles (for example Atlas for Don's work).
 Install the extension in that profile, save its token in 1Password under its own item name,
-and launch the connector with both set (`pw-run` passes them through too).
+and launch the connector with both set (`pw-run` passes them through too). The Atlas item ID is in the `playwright-atlas` server
+settings, for example `claude mcp get playwright-atlas`.
 
 ```bash
-CHROME_PROFILE_DIR="Profile 3" PW_TOKEN_ITEM=xg3oiph4x4v6u64you2iue5h5u \
+CHROME_PROFILE_DIR="Profile 3" PW_TOKEN_ITEM="<Atlas token item ID>" \
   ~/maintenance/chrome-signed-in-mcp.sh
 ```
 
