@@ -1,3 +1,10 @@
+## 2.60.1 - 2026-10-20
+
+browser-automation documents the Atlas browser. Every AI client on Ember's M2 now has a
+`playwright-atlas` MCP server (Profile 3, atlas@ token) beside `playwright` (Default,
+ember@), approved by Allison 2026-10-20. Adds when to pick each browser, that several AIs
+can share one browser in separate tab groups, and that the two token items are read by ID.
+
 ## 2.60.0 - 2026-10-20
 
 browser-automation now reaches the signed-in Chrome through the Playwright Extension
