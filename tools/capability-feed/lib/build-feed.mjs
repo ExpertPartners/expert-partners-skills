@@ -449,7 +449,7 @@ function applyCapabilityRecords(records, sources, explicitStatus, problems) {
   }
 }
 
-// HQ reads the feed from GitHub's repository contents API, which returns an empty
+// A reader gets the feed from GitHub's repository contents API, which returns an empty
 // `content` field for files over 1 MB unless a raw media type is requested
 // (docs.github.com/en/rest/repos/contents, read 2026-10-03). Refuse a feed well before
 // that size so a reader on the default media type never gets an empty body.

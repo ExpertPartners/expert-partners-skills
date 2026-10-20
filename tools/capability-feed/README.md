@@ -8,7 +8,7 @@ canonical GitHub truth (this repo)
   -> generate-feed.mjs (validated, public-safe, deterministic)
   -> tools/capability-feed/ai-workforce-feed.json on main
   -> GitHub contents API, raw media type (read-only token)
-  -> HQ server (src/lib/ai-workforce-feed.server.ts), never the browser
+  -> a server-side reader, never the browser (the HQ app has none yet, checked Oct 19, 2026)
 ```
 
 A capability change takes one canonical change in GitHub. The skills-graph workflow
@@ -60,7 +60,7 @@ token or key, a credential assignment, a JWT, a private GitHub URL, an email add
 phone number, or a private host. A refused run writes nothing and the workflow fails,
 so the last good feed stays in place.
 
-The feed is also refused above 900 KiB. HQ reads it in one request, and the default
+The feed is also refused above 900 KiB. A reader gets it in one request, and the default
 GitHub contents API response returns no content for files over 1 MB, so the cap keeps
 the file well inside that.
 
@@ -89,7 +89,7 @@ skill change through the existing repository dispatch.
 
 ## HQ wiring
 
-HQ's server reads the committed file straight from GitHub. The token lives only in
+A server-side reader should read the committed file straight from GitHub, the way the HQ app already reads skills-graph.json. The token lives only in
 approved secret storage and in HQ's server environment, never in this repo or the browser.
 
 ```
@@ -100,7 +100,7 @@ Authorization: Bearer <read-only token for this repo>
 
 The raw media type returns the JSON itself, with no header or wrapper, so HQ parses the
 response body directly. The repo is private, so the token needs read access to contents
-on this repo only. HQ's reader is a separate change in the HQ app repo, not here.
+on this repo only. Building a reader in the HQ app is a separate change in that repo, not here.
 
 ## Capability records (AI Capability Curator)
 
