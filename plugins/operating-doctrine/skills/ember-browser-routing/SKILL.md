@@ -39,6 +39,22 @@ A lock on that directory is evidence about that automation process, not proof
 that the authenticated browser is unavailable. Do not use `--isolated`, remove
 locks, restart Chrome, copy authentication, or create another profile to bypass it.
 
+<!-- RULED-BY: HQ Business Brain, V1 - Company Core - Decision Log, 2026-10-20 entry "Browser automation runs only in the signed-in Chrome on Ember's M2" date:2026-10-20 -->
+
+Never open a fresh, signed-out, or separate-profile browser for any browser
+work. Always use the signed-in Chrome, and assume it and 1Password are
+available until a real failure proves otherwise.
+
+Scripted, repeatable, or unattended jobs (GoHighLevel workflows, contact
+merges, bulk UI work) follow [browser-automation](../../../../skills/browser-automation/SKILL.md).
+It attaches Playwright to this same signed-in Chrome through the debugging
+connection Chrome already exposes (verified live 2026-10-20), so it is the
+same browser and not a second launcher. Every rule in this skill still applies
+to it, including exact tab ownership, closing only its own tabs, and never
+using Allison's M4.
+
+Interactive work uses the `cua_ember` route below.
+
 On first use, execute exactly one discovery call:
 
 ```javascript
