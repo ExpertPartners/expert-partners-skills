@@ -8,14 +8,14 @@
     {
       "name": "operating-doctrine",
       "source": "./plugins/operating-doctrine",
-      "version": "2.57.0",
+      "version": "2.58.0",
       "description": "The non-negotiable operating standard. Loads at every session."
     },
     {
       "name": "brand-voice",
       "source": "./plugins/brand-voice",
-      "description": "Canonical brand context for the aura ADR 0045 brand registry (Expert Partners, EPIC, AG Personal Brand, AG Luxury, FAM, Don Hobbs; Moxie benched)",
-      "version": "0.6.0"
+      "description": "Canonical brand context for the Estate brand registry (Expert Partners, EPIC, AG Personal Brand, AG Luxury, FAM, Don Hobbs; Moxie benched)",
+      "version": "0.6.1"
     },
     {
       "name": "content-engines",
@@ -32,13 +32,13 @@
     {
       "name": "research-ops",
       "source": "./plugins/research-ops",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "description": "Research skills: capability-currency, research-intake, and the three TUB analysts (competitive intelligence, voice of customer, GEO and SEO ranking audit)."
     },
     {
       "name": "systems-map",
       "source": "./plugins/systems-map",
-      "version": "0.6.1",
+      "version": "0.6.2",
       "description": "The canonical map of where every Expert Partners system lives. Loads at session start; inherits operating-doctrine."
     },
     {

@@ -18,7 +18,7 @@ Same opening move, different verdict. 'Model/effort check, this reads as dense a
 
 **[Cut to -- 'Where did that come from?']**
 
-Here's the part that doesn't show on screen but matters most, that categorization, 'fast iterative drafting,' 'dense analytical reasoning,' isn't memorized. Every single time this fires, it goes and reads ADR 0057 fresh, live, off the aura repo. If Allison changes the standard tomorrow, a new model comes out, a category gets redefined, this skill's behavior changes with it, automatically, with nobody touching this skill's own file. That's deliberate. A copy of the rules baked into the skill would drift the first time the real rules changed and nobody would notice until the two disagreed.
+Here's the part that doesn't show on screen but matters most, that categorization, 'fast iterative drafting,' 'dense analytical reasoning,' isn't memorized. Every single time this fires, it goes and reads the Model chart in the HQ Rulebook fresh, live, from Drive. If Allison changes the standard tomorrow, a new model comes out, a category gets redefined, this skill's behavior changes with it, automatically, with nobody touching this skill's own file. That's deliberate. A copy of the rules baked into the skill would drift the first time the real rules changed and nobody would notice until the two disagreed.
 
 **[Cut to a claude.ai Project, a plain browser tab]**
 

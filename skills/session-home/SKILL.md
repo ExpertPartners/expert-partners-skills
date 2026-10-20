@@ -26,11 +26,11 @@ You are enforcing the session-routing doctrine so no work ends up in the wrong f
 
 ## Routing table
 
-Read `~/Claude/projects/Aura/doctrine/session-routing.md` first. That file is the authoritative source. The table below is a quick-reference copy; the doctrine file wins if there is any discrepancy.
+Read the live [V1 - Company Core - HQ Rulebook](https://docs.google.com/document/d/15sCFxMvG8OZMZik5w0Hzqzh7HyphrB7rJ8NBtm46JBE/edit) (Where things live, Project ownership) first, then the project's row in the GitHub Archive Index sheet and its [V1 - Company Core - Job Tracker](https://docs.google.com/spreadsheets/d/1FniEwCaZ89cViQxUcPkycxAmvvM47cnjRzQQyzpEk5c/edit) row. Those Drive sources are authoritative. The retired aura `doctrine/session-routing.md` is history, never a source. The table below is a quick-reference copy; the Drive sources win if there is any discrepancy. There is no default home folder: Claude Code opens in the repo the work lives in.
 
 | Topic | Project home | GitHub repo |
 |---|---|---|
-| Cross-brand strategy, ADRs, Aura doctrine | `~/Claude/projects/Aura/` | `ExpertPartners/aura` |
+| Cross-brand strategy, rules, decisions | No project home. These live in the Drive business brains (HQ Rulebook, Decision Log). | none, Drive only |
 | AG personal brand, YouTube, speaking | `~/Claude/projects/AGPersonalBrand/` | `ExpertPartners/ag-personal-brand` |
 | Free Agent Movement, Free Agent Nation, FAM keynotes, cohorts | `~/Claude/projects/FAM/` | `ExpertPartners/free-agent-nation` |
 | Expert Partners, EPIC, coaching programs | `~/Claude/projects/ExpertPartners/` | `ExpertPartners/expert-partners` |
@@ -47,7 +47,7 @@ Read `~/Claude/projects/Aura/doctrine/session-routing.md` first. That file is th
 
 If the user passed a topic as args, use it. If not, ask one short question: "What is this session going to work on?"
 
-Match the topic against the routing table. If a topic spans multiple projects (rare), split into separate sessions or anchor in Aura only if the output is truly cross-brand doctrine.
+Match the topic against the routing table. If a topic spans multiple projects (rare), split into separate sessions or anchor in the HQ Business Brain in Drive if the output is truly cross-brand.
 
 ## Step 2 -- Check current location
 
@@ -92,7 +92,7 @@ Mismatch detected:
 ```
 
 **3. Why this matters:**
-Explain briefly: work committed in the wrong folder goes into the wrong GitHub repo. Doctrine, ADRs, and project-knowledge files in the wrong place break the cross-brain sync chain (Ember, Aura, Cowork).
+Explain briefly: work committed in the wrong folder goes into the wrong GitHub repo. Rules, decisions, and knowledge files in the wrong place break the one-home rule, because each thing has one home, in the Drive business brains or the owning repo.
 
 ## Step 3 -- Pre-session routing (before any work starts)
 
@@ -114,6 +114,6 @@ Keep the output tight. No explanation beyond what is listed above.
 
 ## Edge cases
 
-- **Aura as default (wrong):** If someone opens Aura for per-project work because "Aura is the main project," that is a routing error. Aura is only correct for cross-brand advisory and doctrine work.
-- **"I don't know where this belongs":** Apply the borderline-case rules from the doctrine file. When genuinely ambiguous (new project type never seen before), default to Aura temporarily AND note it as a routing decision to formalize in the doctrine file.
-- **New project with no existing folder:** Check `gh repo list ExpertPartners` to see if a repo exists. If not, this needs an ADR before creating new repos. Flag it; do not create folders or repos on the fly.
+- **Aura as a home (wrong):** Aura is retired and locked read-only. It is never a session home, never a knowledge source, and never a fallback. Cross-brand rules and decisions live in the Drive business brains.
+- **"I don't know where this belongs":** Check existing ownership first in the GitHub Archive Index sheet, the Job Tracker, and the owning brain's index. When genuinely ambiguous (new project type never seen before), ask Allison one question and record her answer in the Decision Log.
+- **New project with no existing folder:** Check `gh repo list ExpertPartners` to see if a repo exists. If not, it needs the repo-standards ownership gate and Allison's yes before creating new repos. Flag it; do not create folders or repos on the fly.

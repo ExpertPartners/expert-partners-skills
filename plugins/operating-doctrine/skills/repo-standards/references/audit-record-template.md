@@ -115,5 +115,5 @@ No test can replace semantic verification.>
 - <one named line item each, with a recommendation>
 
 ## Known open findings carried, not blocking
-- <e.g. aura lane ledger breakup, its own lane per the ADR carve-out>
+- <e.g. a known open finding that has its own lane per the ADR carve-out>
 ```

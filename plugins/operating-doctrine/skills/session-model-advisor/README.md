@@ -6,11 +6,11 @@ Every implementation conversation runs on some model (Haiku, Sonnet, Opus, Fable
 
 ## What it does, in one sentence
 
-At conversation start or on a fit question, it checks the current selection against ADR 0057. When NORTH prepares a new technical handoff, it also recommends one verified surface, model and effort under ADR 0072. A correctly dispatched Worker whose selection matches its banner follows ADR 0093 and proceeds without repeating the whole fit check.
+At conversation start or on a fit question, it checks the current selection against the Model chart in the HQ Rulebook (which replaced ADR 0057). When NORTH prepares a new technical handoff, it also recommends one verified surface, model and effort under ADR 0072. A correctly dispatched Worker whose selection matches its banner follows ADR 0093 and proceeds without repeating the whole fit check.
 
 ## Why it fetches the ADR live instead of just knowing the rules
 
-Because the rules will change. ADR 0057 says so itself -- the model names attached to its categories (Opus 5, Sonnet 5, Haiku 4.5, Fable 5 as of 2026-08-08) are a fact of the moment, not a fact for all time. If this skill had the matrix typed into it, every time the estate's model lineup shifts, someone would have to remember to come back and edit this file, and the two copies would eventually disagree without anyone noticing. Instead, this skill always goes and reads the ADR fresh. Change the ADR, and the skill's behavior changes automatically, with zero edits here.
+Because the rules will change. The Model chart says so itself -- the model names attached to its categories (Opus 5, Sonnet 5, Haiku 4.5, Fable 5 as of 2026-08-08) are a fact of the moment, not a fact for all time. If this skill had the matrix typed into it, every time the estate's model lineup shifts, someone would have to remember to come back and edit this file, and the two copies would eventually disagree without anyone noticing. Instead, this skill always goes and reads the Model chart fresh from Drive. Change the ADR, and the skill's behavior changes automatically, with zero edits here.
 
 ## Why it's honest about not knowing, sometimes
 

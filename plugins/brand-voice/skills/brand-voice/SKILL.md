@@ -1,6 +1,6 @@
 ---
 name: brand-voice
-description: Canonical brand context for the brands in the aura ADR 0045 registry operated by Allison Gaddy and Don Hobbs. Expert Partners is the parent organization brand, EPIC is the inner-circle program inside it and never a synonym for it, AG Personal Brand is Allison's master personal brand with The Strong Ones inside it, AG Luxury is her consumer-facing real estate brand, Free Agent Movement stands on its own canon, Don Hobbs operates as a sub-label under Expert Partners, and Moxie Signature Group is benched with consumer real estate routing to AG Luxury. Use this skill when writing, editing, or reviewing any brand-facing content to ground voice, tone, audience, differentiator, and visual identity decisions in the canonical positioning, then defer to the per-brand voice card. It inherits the operating-doctrine and never overrides it.
+description: Canonical brand context for the brands in the Estate brand registry operated by Allison Gaddy and Don Hobbs. Expert Partners is the parent organization brand, EPIC is the inner-circle program inside it and never a synonym for it, AG Personal Brand is Allison's master personal brand with The Strong Ones inside it, AG Luxury is her consumer-facing real estate brand, Free Agent Movement stands on its own canon, Don Hobbs operates as a sub-label under Expert Partners, and Moxie Signature Group is benched with consumer real estate routing to AG Luxury. Use this skill when writing, editing, or reviewing any brand-facing content to ground voice, tone, audience, differentiator, and visual identity decisions in the canonical positioning, then defer to the per-brand voice card. It inherits the operating-doctrine and never overrides it.
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: brands
@@ -20,7 +20,7 @@ subtitle: "canonical brand context, registry per ADR 0045"
 
 # Brand Voice -- canonical brand context
 
-The brand registry is canonical in aura ADR 0045 (resynced from the ADR as it read on 2026-08-05). The active brands,
+The brand registry's original record is aura ADR 0045 (resynced from the ADR as it read on 2026-08-05), kept as history. aura is retired, so the Drive brand canon Docs listed below are the live sources, and the HQ Rulebook and Decision Log govern if anything conflicts. The active brands,
 
 - **Expert Partners**, the parent organization brand. EPIC and Expert Partners Coaching operate inside it, and Don Hobbs resolves under Expert Partners LLC as a sub-label.
 - **EPIC**, the inner-circle program for the eXp vertical inside Expert Partners. Never a synonym for the parent.
@@ -76,5 +76,5 @@ The brand-context files in this folder are the fallback summary.
 Brand context evolves. When updating:
 1. Edit on Drive first.
 2. Export to markdown, place in this folder, commit + push.
-3. Verify Aura local picks up the change.
+3. Verify the marketplace plugin shows the new version.
 4. Verify Ember pulls the change.

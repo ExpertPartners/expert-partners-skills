@@ -1,8 +1,8 @@
 # Handoff capability evidence
 
 This reference is a refreshable evidence procedure, not another model policy.
-The task categories and decision authority live in aura decisions 0057, 0071,
-0072 and 0093. Batch-First Execution checks delivery completeness.
+The task categories live in the HQ Rulebook Model chart, which replaced ADR 0057.
+Decisions 0071, 0072 and 0093 are kept in GitHub Archive as history. Batch-First Execution checks delivery completeness.
 
 For a new implementation handoff, identify the exact product surface and mode.
 Read available models and the selected model's effort/speed choices from the
@@ -18,7 +18,7 @@ doc-check rules for whichever provider is being recommended. Never transfer
 an effort label across products or models by analogy. Internal runtime IDs and
 visible picker labels remain distinct until a supported mapping is verified.
 
-Match the task against the categories in the live ADR 0057. Consider bounded
+Match the task against the categories in the live HQ Rulebook Model chart. Consider bounded
 implementation, long multi-step builds, architecture, difficult debugging,
 high-risk migration, fast edits, format-constrained work and deep synthesis.
 Choose a verified option proportionate to ambiguity, risk, dependencies and
@@ -30,6 +30,6 @@ and do not guess. Keep the current running Worker unchanged when the only
 reason to interrupt is a settings recommendation.
 
 Decision 0093 shortens a receiving Worker's normal path. A complete dispatch
-line matching its SessionStart banner needs no repeated ADR 0057 read or fresh
+line matching its SessionStart banner needs no repeated Model chart read or fresh
 provider-doc fetch. Reopen classification only on a missing line, mismatch or
 material job change.

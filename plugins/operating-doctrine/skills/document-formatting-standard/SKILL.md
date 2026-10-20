@@ -36,7 +36,7 @@ Quoted or message-style content: indent left 360 DXA, body size, so it reads as 
 
 Page: US Letter (12240 x 15840 DXA), 1 inch margins all around.
 
-Filenames: the document's title, no date prefix (ruled 2026-08-05, amending the earlier `YYYY-MM-DD <Title>` rule). The platform (Drive, GitHub) carries the dates; the names do not need them. Caveat from the same ruling: aura intake inbox filenames are stamped by the Estate Brain save tool itself (append-only convention), so intake files keep their stamps until that tool changes.
+Filenames: the document's title, no date prefix (ruled 2026-08-05, amending the earlier `YYYY-MM-DD <Title>` rule). The platform (Drive, GitHub) carries the dates; the names do not need them. The old aura intake inbox and its stamped filenames are retired, so intake docs in Drive follow the same plain-title rule.
 
 ## Punctuation rule (v3, ruled by Allison 2026-08-04)
 

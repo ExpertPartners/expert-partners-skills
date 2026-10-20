@@ -53,7 +53,7 @@ SAFE TO ARCHIVE is a verified claim, never a phrase. It is issued only after all
 
 NOT safe means the session diagnoses AND prescribes: it names exactly what is open and the single move that closes it, /session-wrap when chat-only decisions or flags are unrecorded, /session-closeout when shipped work has no handoff note on main, or the named open action otherwise. Never leave Allison to work out which.
 
-What stays with the home conversation: the actual archive click, and the ledger flip. Home flips the lane's row to `archived` in aura `docs/estate/lanes.md` as one motion with the archive, and no dispatch block is ever written against a row reading `archived`. Sessions born before v4.5 follow the lifecycle rule from their next response.
+What stays with the home conversation: the actual archive click, and the ledger flip. Home flips the lane's row to `archived` in the Job Tracker as one motion with the archive, and no dispatch block is ever written against a row reading `archived`. Sessions born before v4.5 follow the lifecycle rule from their next response.
 
 ### The earned verdict line (v4.7, ruled by Allison 2026-08-07, Aura / Code Rule Fix lane)
 
@@ -79,7 +79,7 @@ Pinned -- come back here after you {the next thing she does in {Claude project} 
 
 No other commentary, confirmation prose, or questions ride with a pin. Never emit a pin in the same message as a report or block; it makes her lose her place when copying.
 
-Doctrine note (added 2026-08-03): the pin confirms the paste; it is not the lane record. The lane ledger row (aura `docs/estate/lanes.md`) is written at dispatch and updated at carry-back, per the code-block-routing skill. A pin never substitutes for a ledger update, and a ledger update never substitutes for a pin.
+Doctrine note (added 2026-08-03): the pin confirms the paste; it is not the lane record. The Job Tracker row (which replaced the aura lane ledger) is written at dispatch and updated at carry-back, per the code-block-routing skill. A pin never substitutes for a ledger update, and a ledger update never substitutes for a pin.
 
 ## 3. Pin format
 

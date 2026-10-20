@@ -3,9 +3,8 @@ name: remember-this
 description: "Turns a future obligation into a durable, self-resurfacing commitment so Allison stops carrying it mentally. Fires when she says remember this or clearly asks to preserve a follow-up, and fires on its own when an advisor notices an important non-blocking item that would cost real drift, rework, or lost leverage if forgotten but would hijack the current mission if pursued now. Resolves the owning room LIVE, writes ONE Job Tracker row with a mechanical RETURN WHEN condition in Waiting on, refuses duplicates, verifies the write before claiming it, and reports in one short line. Proactive capture is allowed; proactive activation is not. Distinct from saving a decision (decision 0101: a clear decision is saved as made in its owning repo), from pin (a lightweight current-position bookmark), from intake (evidence and working knowledge), and from operational state. It inherits the operating-doctrine and never overrides it."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Born dressed 2026-09-04 (Immediate Pain Controls campaign, issue #15).
-# Canonical home is this file. It is homed under skills/ and carried by no plugin,
-# so it owes exactly one shelf, the claude.ai organization Skills upload, plus the
-# aura deployed copy and that copy's Codex mirror.
+# Canonical home is this file. It ships only through the expert-partners
+# marketplace plugin. No uploaded, hand-made, or platform-only copy exists.
 tier: plugin
 zone: brain
 status: live
@@ -39,7 +38,7 @@ Allison says `remember this`, or clearly asks that a follow-up be preserved: "do
 
 ## Trigger two, advisor-detected
 
-NORTH or Aura may capture an important non-blocking item without being asked. This is the half that removes Allison as the Estate's detection mechanism, and it is also the half that can flood her with junk, so it is gated hard.
+North or an advisor session may capture an important non-blocking item without being asked. This is the half that removes Allison as the Estate's detection mechanism, and it is also the half that can flood her with junk, so it is gated hard.
 
 Capture proactively only when ALL FIVE are true:
 
@@ -123,4 +122,4 @@ No daemon, no sweeper, no cron, no queue, no dashboard, no second registry. If a
 
 ## Canonical home and deployed copies
 
-This skill practices ADR 0056 point 8 on itself. The canonical home is `expert-partners-skills skills/remember-this/SKILL.md`. It is homed under `skills/` and carried by no plugin, so it owes exactly one shelf, the claude.ai organization Skills upload, plus the aura deployed copy at `.claude/skills/remember-this/` and that copy's Codex mirror at `.agents/skills/remember-this/`. Deployed copies carry the DEPLOYED COPY header naming the canonical home, a version stamp, and a SHA-256 checksum manifest. `tools/skill-deploy/deploy-skill.sh` is the sole producer of deployed copies and upload zips. Hand-editing a deployed copy is a violation; fixes flow through canonical source and redeploy.
+This skill practices the Repo rules on itself (no hand-edited copies). The canonical home is `expert-partners-skills plugins/operating-doctrine/skills/remember-this/SKILL.md`, and it reaches every surface only through the GitHub skills marketplace. Per the HQ Rulebook and the Decision Log entry "No skill exceptions" (2026-10-19), there is no uploaded, hand-made, or platform-only copy, and the old aura deployed copy and its Codex mirror are retired. Fixes flow through this source and the marketplace, never through a copy.
