@@ -99,12 +99,20 @@ sessions.
 | Chrome profile | `Default` (ember@expertpartners.com), Playwright Extension installed |
 | Shared connector | `~/maintenance/chrome-signed-in-mcp.sh` (Playwright MCP 0.0.83, pinned, `--extension`) |
 | Job runner | `~/maintenance/pw-run.py` (also `~/bin/pw-run`) |
-| Extension token | 1Password, Automation vault, `Playwright MCP Extension Token` |
+| Extension tokens | 1Password, Automation vault, two items titled `Playwright MCP Extension Token`, told apart by username (ember@ and atlas@); the connector reads them by item ID |
 | Python environment | `~/.venvs/playwright` (Playwright 1.56.0) for local work that needs no browser |
 
-Every AI client on the M2 has an MCP server named `playwright` that runs the shared
-connector: Claude Code (user scope), Claude desktop, Codex, and Gemini CLI. They all drive
-the same signed-in Chrome, each in its own tab group.
+Every AI client on the M2 (Claude Code, Claude desktop, Codex, Gemini CLI) has two MCP
+servers that run the shared connector.
+
+- `playwright` drives the Ember browser (`Default` profile). Use it unless told otherwise.
+- `playwright-atlas` drives the Atlas browser (`Profile 3`). Use it when Allison says "use
+  the Atlas browser" or the job needs the logins signed in there.
+
+Several AIs can share one browser at once, each in its own tab group. Pick the browser by
+the logins the job needs, not to avoid overlap. Tab groups do not stop two AIs from
+changing the same record at the same time, so give each job to one AI. The AI acts as
+whoever is signed in, and changes show under that person's name.
 
 ### Running a job
 
@@ -145,10 +153,10 @@ Expect `{"signedIn":true}` and `pw-run: closed 1 tab(s) from this run`.
 Each Chrome profile can carry its own Playwright Extension with its own token, which lets
 separate AI lanes work in separate signed-in profiles (for example Atlas for Don's work).
 Install the extension in that profile, save its token in 1Password under its own item name,
-and launch the connector with both set.
+and launch the connector with both set (`pw-run` passes them through too).
 
 ```bash
-CHROME_PROFILE_DIR="Profile 3" PW_TOKEN_ITEM="Playwright MCP Extension Token - Atlas" \
+CHROME_PROFILE_DIR="Profile 3" PW_TOKEN_ITEM=xg3oiph4x4v6u64you2iue5h5u \
   ~/maintenance/chrome-signed-in-mcp.sh
 ```
 
