@@ -13,7 +13,7 @@ description: >
   operating-doctrine and never overrides it.
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Approved by Allison 2026-10-20 (session on Ember's M2).
-tier: user
+tier: plugin
 zone: hands
 status: live
 inherits: operating-doctrine
@@ -197,8 +197,8 @@ expired, sign back in with the matching 1Password item before reporting anything
 
 ## Claude Code and Codex
 
-This skill is the same for both. It is delivered to Claude surfaces through the
-marketplace and to Codex through the deploy producer's `.agents/skills` mount. Both run the
+This skill is the same for both. It ships in the operating-doctrine plugin of the
+expert-partners marketplace, which Claude Code, Claude surfaces, and Codex all load. Both run the
 same scripts with the same Python on the same signed-in Chrome, and the tab-ownership rule
 is what lets them share the M2 without stepping on each other.
 

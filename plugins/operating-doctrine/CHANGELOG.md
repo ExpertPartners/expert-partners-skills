@@ -1,3 +1,18 @@
+## 2.59.0 - 2026-10-20
+
+Adds browser-automation to operating-doctrine and updates ember-browser-routing,
+per Allison's 2026-10-20 Decision Log entry "Browser automation runs only in the
+signed-in Chrome on Ember's M2". Browser work always attaches to the signed-in
+Chrome on Ember's M2 and never opens a fresh or signed-out browser. It assumes
+Chrome and 1Password access until a real failure, picks the most durable and
+fastest path rather than the easiest, and closes every tab it opens.
+browser-automation covers scripted and unattended jobs, GoHighLevel first
+(workflows, contact merges, UI-only settings), using Playwright 1.56.0 in
+~/.venvs/playwright attached over Chrome's existing debugging connection.
+ember-browser-routing now carries the same ruling and points scripted jobs to
+browser-automation, while interactive work keeps the cua_ember route. Shipping
+in this plugin is what delivers it to Claude Code, Claude surfaces and Codex.
+
 ## 2.58.0 - 2026-10-19
 
 Repoints skills from the retired aura repo and the Estate Brain connector to

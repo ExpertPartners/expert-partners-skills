@@ -46,7 +46,7 @@ work. Always use the signed-in Chrome, and assume it and 1Password are
 available until a real failure proves otherwise.
 
 Scripted, repeatable, or unattended jobs (GoHighLevel workflows, contact
-merges, bulk UI work) follow [browser-automation](../../../../skills/browser-automation/SKILL.md).
+merges, bulk UI work) follow [browser-automation](../browser-automation/SKILL.md).
 It attaches Playwright to this same signed-in Chrome through the debugging
 connection Chrome already exposes (verified live 2026-10-20), so it is the
 same browser and not a second launcher. Every rule in this skill still applies
