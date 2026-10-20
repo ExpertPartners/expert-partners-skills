@@ -47,9 +47,9 @@ available until a real failure proves otherwise.
 
 Scripted, repeatable, or unattended jobs (GoHighLevel workflows, contact
 merges, bulk UI work) follow [browser-automation](../browser-automation/SKILL.md).
-It attaches Playwright to this same signed-in Chrome through the debugging
-connection Chrome already exposes (verified live 2026-10-20), so it is the
-same browser and not a second launcher. Every rule in this skill still applies
+It reaches this same signed-in Chrome through the Playwright Extension and the
+shared connector (verified live 2026-10-20, no "Allow remote debugging?"
+prompt), so it is the same browser and not a second launcher. Every rule in this skill still applies
 to it, including exact tab ownership, closing only its own tabs, and never
 using Allison's M4.
 
