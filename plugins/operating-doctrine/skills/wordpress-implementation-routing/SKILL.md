@@ -1,6 +1,13 @@
 ---
 name: wordpress-implementation-routing
 description: "Use whenever Allison asks to change, configure, troubleshoot, publish, verify, or operate a WordPress website, especially AG Luxury or AllisonGaddy.com. Classify the requested outcome by the layer that owns the live state, then choose the narrowest reliable execution path. Prefer native WordPress abilities or APIs for reversible content and site-state changes, then REST, site-owned code only when code is actually required, WP-CLI or server tools for operational work, vendor APIs or MCP, and controlled browser automation only when no reliable machine interface exists. Prevent routine content edits such as link, copy, metadata, media, menu, and setting changes from becoming unnecessary code-release projects."
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
+tier: plugin
+zone: routing
+status: live
+inherits: operating-doctrine
+brand-scope: null
+subtitle: "pick the layer that owns the WordPress result"
 ---
 
 # WordPress Implementation Routing
