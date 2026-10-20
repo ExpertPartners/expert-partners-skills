@@ -22,3 +22,12 @@ paths = [
   # The verified-docs cache quotes OAuth SCOPE strings and example client-id shapes for
   # documentation; these are not live secrets. Add narrower entries here only with a reason.
 ]
+
+# 1Password item IDs (26 lowercase alphanumerics) name WHICH vault item holds a secret;
+# they are not secrets. browser-automation (operating-doctrine 2.60.1, PR #74) shows one
+# after PW_TOKEN_ITEM=, which the generic-api-key rule flagged. Line-scoped to that form only.
+regexTarget = "line"
+regexes = [
+  '''PW_TOKEN_ITEM=[a-z0-9]{26}\b''',
+]
+
