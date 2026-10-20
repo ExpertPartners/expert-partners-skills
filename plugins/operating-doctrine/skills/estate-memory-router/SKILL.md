@@ -1,11 +1,10 @@
 ---
 name: estate-memory-router
-description: "The thin classifier that decides where a newly learned thing belongs, so Allison is never the Estate's detection mechanism for what deserves to survive. Sweeps at four moments that already happen -- a meaningful topic change, immediately before a dispatch, after a carry-back is accepted, and at session or table wrap -- and routes each durable candidate into a mechanism that already exists: future obligation to remember-this, evidence and working knowledge to the owning repo's intake, founder decisions Allison has clearly made saved as made under decision 0101 and anything not yet clearly decided preserved as a candidate, deterministic operational state only where a contract already authorizes the write, repo-ownership questions to repo-standards, canon and rule changes to canon-sync-protocol. Resolves owners live, refuses duplicates, writes no secrets, and stays silent when nothing qualifies. It creates NO new memory store and NO new control plane. It inherits the operating-doctrine and never overrides it."
+description: "The thin classifier that decides where a newly learned thing belongs, so Allison is never the Estate's detection mechanism for what deserves to survive. Sweeps at four moments that already happen -- a meaningful topic change, immediately before a dispatch, after a carry-back is accepted, and at session or table wrap -- and routes each durable candidate into a mechanism that already exists: future obligation to remember-this, evidence and working knowledge to the owning brain in Drive, founder decisions Allison has clearly made saved as made under decision 0101 and anything not yet clearly decided preserved as a candidate, deterministic operational state only where a contract already authorizes the write, repo-ownership questions to repo-standards, canon and rule changes to canon-sync-protocol. Resolves owners live, refuses duplicates, writes no secrets, and stays silent when nothing qualifies. It creates NO new memory store and NO new control plane. It inherits the operating-doctrine and never overrides it."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Born dressed 2026-09-04 (Immediate Pain Controls campaign, issue #16).
-# Canonical home is this file. It is homed under skills/ and carried by no plugin,
-# so it owes exactly one shelf, the claude.ai organization Skills upload, plus the
-# aura deployed copy and that copy's Codex mirror.
+# Canonical home is this file. It ships only through the expert-partners
+# marketplace plugin. No uploaded, hand-made, or platform-only copy exists.
 tier: plugin
 zone: routing
 status: live
@@ -117,4 +116,4 @@ If a destination is unavailable or a write cannot be verified, **never report th
 
 ## Canonical home and deployed copies
 
-This skill practices ADR 0056 point 8 on itself. The canonical home is `expert-partners-skills skills/estate-memory-router/SKILL.md`. It is homed under `skills/` and carried by no plugin, so it owes exactly one shelf, the claude.ai organization Skills upload, plus the aura deployed copy at `.claude/skills/estate-memory-router/` and that copy's Codex mirror at `.agents/skills/estate-memory-router/`. Deployed copies carry the DEPLOYED COPY header naming the canonical home, a version stamp, and a SHA-256 checksum manifest. `tools/skill-deploy/deploy-skill.sh` is the sole producer of deployed copies and upload zips. Hand-editing a deployed copy is a violation; fixes flow through canonical source and redeploy.
+This skill practices the Repo rules on itself (no hand-edited copies). The canonical home is `expert-partners-skills plugins/operating-doctrine/skills/estate-memory-router/SKILL.md`, and it reaches every surface only through the GitHub skills marketplace. Per the HQ Rulebook and the Decision Log entry "No skill exceptions" (2026-10-19), there is no uploaded, hand-made, or platform-only copy, and the old aura deployed copy and its Codex mirror are retired. An AI that cannot install from the marketplace works from the HQ Rulebook, Decision Log, and its plan in Drive. Fixes flow through this source and the marketplace, never through a copy.

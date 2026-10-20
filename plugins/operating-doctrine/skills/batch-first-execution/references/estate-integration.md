@@ -79,7 +79,7 @@ and supervision pattern, not the authority envelope.
 
 ## Sources retrieved live during authoring
 
-- aura/docs/estate/estate-manifest.md (v1.21)
+- aura/docs/estate/estate-manifest.md (v1.21, retired repo, provenance only)
 - expert-partners/doctrine/expert-partners-systems-map.md
 - expert-partners-skills/README.md
 - expert-partners-skills/AGENTS.md

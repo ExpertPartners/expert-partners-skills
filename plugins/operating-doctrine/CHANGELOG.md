@@ -1,3 +1,20 @@
+## 2.58.0 - 2026-10-19
+
+Repoints skills from the retired aura repo and the Estate Brain connector to
+the Google Drive business brains. This implements Aura Retirement Plan step 2
+and the Decision Log entries "Repointing the skills starts now" and "No skill
+exceptions" (2026-10-19). Only where a skill reads or writes changed. Each
+skill's job and triggers stay the same. Live reads of aura rules, ADRs and
+the lane ledger now point to the HQ Rulebook, the Decision Log and the Job
+Tracker (Handoffs tab for messages). Deployed-copy and upload-shelf wording
+in estate-memory-router, remember-this and repo-standards now says skills
+reach every surface only through the GitHub skills marketplace. session-home,
+new-project, session-model-advisor, grok-auditor, grok-fixer, pin,
+connection-first-implementation and operating-doctrine are repointed in the
+same way. Mentions of aura as history, including RULED-BY citations, are
+kept. brand-voice 0.6.1, research-ops 0.1.1 and systems-map 0.6.2 carry
+matching edits. Merge and per-surface verification remain separate steps.
+
 ## 2.57.0 - 2026-10-16
 
 Adds wordpress-implementation-routing to operating-doctrine. WordPress work now

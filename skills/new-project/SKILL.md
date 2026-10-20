@@ -70,16 +70,13 @@ source. A local script or an older deployed skill never substitutes for the gate
    Estate Brain door is retiring (Decision Log 2026-10-13), so no door
    registration is requested for a new repo.
 
-   The inspected legacy script appends to
-   `aura project-knowledge/pending-canonical-repos.md`. Inspect and preserve any
-   such side effect; reconcile it with the justified row and actual serving need
-   before committing it through the applicable reviewed path. That file is a
-   historical handoff queue, never proof of registration or an active automatic
-   sync. The old "S1 CANONICAL_REPOS sync" wording referred to the completed
-   Synapse worker lane, not a Make scenario. Evidence: aura
-   `project-knowledge/planning/synapse-sprint-control-tower.md` and
-   `project-knowledge/pending-canonical-repos.md`, read 2026-09-20. Never promise
-   that a retired worker or queue will index the repo automatically.
+   The inspected legacy script appends to the retired aura repo's
+   `project-knowledge/pending-canonical-repos.md`. aura is read-only history, so
+   treat any such write as a stray side effect. Report it, do not commit it, and
+   never treat it as registration or an active automatic sync. The Archive Index
+   row is the only registration. The old "S1 CANONICAL_REPOS sync" wording
+   referred to a completed Synapse worker lane, not a Make scenario. Never
+   promise that a retired worker or queue will index the repo automatically.
 
    If intake routing needs a new brain mapping, update its canonical skill
    source (`expert-partners-skills skills/intake/SKILL.md`) from the Archive Index row,
