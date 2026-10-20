@@ -1,3 +1,14 @@
+## 2.60.0 - 2026-10-20
+
+browser-automation now reaches the signed-in Chrome through the Playwright Extension
+instead of Chrome's remote-debugging port. The port route made Chrome ask "Allow remote
+debugging?" on every new connection, which stopped unattended work. A shared connector
+(~/maintenance/chrome-signed-in-mcp.sh, token from 1Password) now backs a `playwright`
+MCP server in Claude Code, Claude desktop, Codex and Gemini CLI, and a job runner
+(~/maintenance/pw-run.py) runs scripted jobs and closes every tab from the run. Adds tab
+group cleanup rules, per-profile lanes, token rotation, and the missing-tool rule from
+Allison's 2026-10-20 direction. Verified live on Ember's M2, GHL signed in with no prompt.
+
 ## 2.59.0 - 2026-10-20
 
 Adds browser-automation to operating-doctrine and updates ember-browser-routing,
