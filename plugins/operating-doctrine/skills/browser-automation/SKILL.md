@@ -115,6 +115,19 @@ the logins the job needs, not to avoid overlap. Tab groups do not stop two AIs f
 changing the same record at the same time, so give each job to one AI. The AI acts as
 whoever is signed in, and changes show under that person's name.
 
+### Chrome settings that keep the M2 clean
+
+- Chrome runs with `--silent-debugger-extension-api`, which hides the "Playwright Extension
+  started debugging this browser" bar. The login item
+  `~/Library/LaunchAgents/com.expertpartners.chrome-ai.plist` starts Chrome that way at login.
+  If Chrome must be restarted, quit it normally and reopen it with
+  `open -a "Google Chrome" --args --silent-debugger-extension-api`, after noting any open
+  tabs, because Chrome is not set to restore them. Confirm the flag with `ps`.
+- In both profiles, Settings, Appearance, "Automatically pin new tab groups to the bookmarks
+  bar" and "Show tab groups in bookmarks bar" are off, so AI tab groups never pile up on the
+  bar. If buttons ever reappear, turning "Show tab groups in bookmarks bar" off clears them
+  all at once.
+
 ### Running a job
 
 Write the job as one JavaScript function that receives a Playwright `page`, then run it.

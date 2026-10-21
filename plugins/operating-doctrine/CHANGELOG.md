@@ -1,3 +1,10 @@
+## 2.60.3 - 2026-10-20
+
+browser-automation records the Chrome settings that keep Ember's M2 clean. Chrome starts with
+--silent-debugger-extension-api through a login item, so the extension debugging bar never
+shows, and both profiles stop pinning and showing tab groups on the bookmarks bar. Done with
+Allison on 2026-10-20 after the bar and the pinned AI tab groups were getting in the way.
+
 ## 2.60.2 - 2026-10-20
 
 browser-automation replaces Gemini CLI with Antigravity CLI, Google's replacement (Gemini CLI
