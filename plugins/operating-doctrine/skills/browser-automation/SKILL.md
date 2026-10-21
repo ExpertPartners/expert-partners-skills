@@ -59,6 +59,23 @@ When blocked, leave the exact screen open on the M2, tell Allison the one thing 
 to do and where, and pick up again when she says done. If a tool or access she needs is
 missing, say so and name the better tool. She may not know it exists yet.
 
+## Rule 2a. Follow the trail before you ask
+
+Allison leaves a trail. The Ember Chrome on the M2 is already signed in to the business
+tools, its bookmarks bar goes straight to them, and 1Password holds every login. Asking her
+about access before following that trail is the most common way AI stalls her work.
+
+1. Use the API or connector if one covers the job.
+2. Otherwise open the page with the `playwright` tool. You are almost always already signed
+   in. Look before you assume you are not.
+3. Only on a real login page, sign in with the matching 1Password item through `op`.
+4. Only if all of that truly fails, tell Allison the one thing she must do.
+
+Never ask her which browser to use, whether you are signed in, or to click or approve
+anything before steps 1 to 3. Do not use the Claude in Chrome extension for this work. It
+is connected on the M4 as well, so it cannot tell the computers apart. `playwright` and
+`playwright-atlas` reach only the M2.
+
 ## Rule 3. Most durable and fastest, not easiest
 
 Choose the path that finishes the whole job reliably and quickly.
