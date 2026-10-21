@@ -1,3 +1,11 @@
+## 2.60.4 - 2026-10-21
+
+browser-automation adds Rule 2a, follow the trail before you ask. Sessions must try the API,
+then the signed-in Ember browser through playwright, then a 1Password login, before asking
+Allison anything about access, and must not use the Claude in Chrome extension for this work
+because it is also connected on the M4. Added after a session stalled asking Allison to
+identify browsers for a site that was already signed in. Allison's direction 2026-10-21.
+
 ## 2.60.3 - 2026-10-20
 
 browser-automation records the Chrome settings that keep Ember's M2 clean. Chrome starts with
