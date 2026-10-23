@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "17a6ef148f89aaec92d8aae349c2b9fae0c598d7",
-    "aura": "e0493df39c7e7f46859f981e8b545cf158b63ef5"
+    "eps": "2c2fd7e201ee2f3c7b648c55884162a503503ca7",
+    "aura": "0ed105853fa102e998b9bd9111d7bdc7e03850c2"
   },
   "zones": [
     "surfaces",
@@ -828,7 +828,7 @@
         "deliverable-link"
       ],
       "brandScope": [],
-      "subtitle": "Poppins everywhere, hierarchy by size and color",
+      "subtitle": "the Rulebook sets the look, this skill applies it",
       "renderNote": null,
       "layout": {
         "x": 74,
@@ -838,8 +838,8 @@
         "rectHeight": 62,
         "annotationHeight": 15,
         "subtitleLines": [
-          "Poppins everywhere, hierarchy by",
-          "size and color"
+          "the Rulebook sets the look, this",
+          "skill applies it"
         ]
       }
     },
