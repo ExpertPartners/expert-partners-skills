@@ -136,6 +136,14 @@ def parse_cdx(text):
     return rows, tail
 
 
+ARCHIVE_TIMEOUT = 90
+
+
+def canonical(url):
+    """Compare archived captures by page: scheme and a leading www do not make a different target."""
+    return re.sub(r'^https?://(?:www\.)?', 'https://', url)
+
+
 def full_archives(inv):
     """Inventory every returned row; follow resume keys within explicit hard caps."""
     supplied = [normalize_url('https://' + inv.root + '/'), normalize_url(inv.args.vimeo)]
@@ -144,7 +152,8 @@ def full_archives(inv):
     if re.fullmatch(r'[A-Za-z0-9_-]+', slug):
         supplied += ['https://vimeo.com/' + slug, 'https://vimeo.com/api/v2/' + slug + '/']
     supplied += inv.args.archive_target
-    targets = list(dict.fromkeys(supplied))
+    # The most specific paths go first, so a page asked for by name claims its capture before a broad prefix does.
+    targets = sorted(dict.fromkeys(supplied), key=lambda t: -len(urlsplit(t).path.strip('/')))
     permitted = {inv.root, domain(inv.args.youtube), domain(inv.args.vimeo)}
     for target in targets:
         if normalize_url(target) != target or domain(target) not in permitted:
@@ -154,58 +163,78 @@ def full_archives(inv):
     inventory = []
     captures = set()
     snapshot_count = 0
-    for target in targets:
-        resume = ''
-        seen_keys = set()
-        exhausted = False
-        index_pages = 0
-        for _ in range(max(1, min(inv.args.archive_index_pages, 100))):
-            params = dict(url=target, matchType='prefix', output='json', limit=1000, showResumeKey='true')
-            if resume:
-                params['resumeKey'] = resume
-            url = 'https://web.archive.org/cdx/search/cdx?' + urlencode(params)
-            response = inv.http.fetch(url)
-            if response.result != 'ok':
-                inv.notes.append(dict(source=url, result=response.result, method='wayback_full_index'))
-                break
-            index_pages += 1
-            try:
-                rows, next_key = parse_cdx(response.text)
-            except (ValueError, TypeError) as exc:
-                inv.notes.append(dict(source=url, result='invalid_cdx', reason=str(exc)))
-                break
-            for row in rows:
-                item = dict(row, query=target, index_evidence=response.evidence, disposition='index_only')
-                original = normalize_url(row.get('original', ''))
-                timestamp = row.get('timestamp', '')
-                # A returned row never widens the requested prefix or domain.
-                if not original.startswith(target) or domain(original) not in permitted or not re.fullmatch(r'\d{14}', timestamp):
-                    item['disposition'] = 'outside_target_or_invalid'
-                elif row.get('statuscode') != '200':
-                    item['disposition'] = 'non_success_index_only'
-                elif row.get('mimetype') not in {'text/html', 'application/xhtml+xml', 'application/json', 'text/xml', 'application/xml'} or MEDIA_EXT.search(original) or BINARY_EXT.search(original):
-                    item['disposition'] = 'non_page_index_only'
-                elif (timestamp, original) in captures:
-                    item['disposition'] = 'duplicate_capture'
-                elif snapshot_count >= max(0, min(inv.args.archive_pages, 100)):
-                    item['disposition'] = 'snapshot_limit'
-                else:
-                    captures.add((timestamp, original))
-                    snapshot_count += 1
-                    snapshot = f'https://web.archive.org/web/{timestamp}id_/{original}'
-                    result = inv.http.fetch(snapshot)
-                    item.update(disposition=result.result, snapshot=snapshot, evidence=result.evidence)
-                    if result.result == 'ok':
-                        inv.scan(result.text, snapshot, 'wayback_snapshot')
-                inventory.append(item)
-            if not next_key:
-                exhausted = True
-                break
-            if next_key in seen_keys:
-                inv.notes.append(dict(source=target, result='repeated_resume_key'))
-                break
-            seen_keys.add(next_key)
-            resume = next_key
-        inv.notes.append(dict(source=target, method='wayback_full_index', index_pages=index_pages,
-                              index_exhausted=exhausted, snapshot_limit=inv.args.archive_pages))
+    queues = []
+    # Wayback prefix queries are slow; keep the same budget but allow a longer read timeout.
+    base_timeout = inv.http.timeout
+    inv.http.timeout = max(base_timeout, ARCHIVE_TIMEOUT)
+    try:
+        for target in targets:
+            resume = ''
+            seen_keys = set()
+            exhausted = False
+            index_pages = 0
+            queue = []
+            for _ in range(max(1, min(inv.args.archive_index_pages, 100))):
+                params = dict(url=target, matchType='prefix', output='json', limit=1000, showResumeKey='true')
+                if resume:
+                    params['resumeKey'] = resume
+                url = 'https://web.archive.org/cdx/search/cdx?' + urlencode(params)
+                response = inv.http.fetch(url)
+                if response.result != 'ok':
+                    inv.notes.append(dict(source=url, result=response.result, method='wayback_full_index'))
+                    break
+                index_pages += 1
+                try:
+                    rows, next_key = parse_cdx(response.text)
+                except (ValueError, TypeError) as exc:
+                    inv.notes.append(dict(source=url, result='invalid_cdx', reason=str(exc)))
+                    break
+                for row in rows:
+                    item = dict(row, query=target, index_evidence=response.evidence, disposition='index_only')
+                    original = normalize_url(row.get('original', ''))
+                    timestamp = row.get('timestamp', '')
+                    # A returned row never widens the requested prefix or domain. Archived http and
+                    # www captures of the same page still count as that page.
+                    if (not canonical(original).startswith(canonical(target)) or domain(original) not in permitted
+                            or not re.fullmatch(r'\d{14}', timestamp)):
+                        item['disposition'] = 'outside_target_or_invalid'
+                    elif row.get('statuscode') != '200':
+                        item['disposition'] = 'non_success_index_only'
+                    elif row.get('mimetype') not in {'text/html', 'application/xhtml+xml', 'application/json', 'text/xml', 'application/xml'} or MEDIA_EXT.search(original) or BINARY_EXT.search(original):
+                        item['disposition'] = 'non_page_index_only'
+                    elif (timestamp, original) in captures:
+                        item['disposition'] = 'duplicate_capture'
+                    else:
+                        captures.add((timestamp, original))
+                        item.update(disposition='snapshot_limit', _original=original)
+                        queue.append(item)
+                    inventory.append(item)
+                if not next_key:
+                    exhausted = True
+                    break
+                if next_key in seen_keys:
+                    inv.notes.append(dict(source=target, result='repeated_resume_key'))
+                    break
+                seen_keys.add(next_key)
+                resume = next_key
+            queues.append(queue)
+            inv.notes.append(dict(source=target, method='wayback_full_index', index_pages=index_pages,
+                                  index_exhausted=exhausted, snapshot_limit=inv.args.archive_pages))
+        # Snapshots are read round robin across targets so one large site cannot use the whole limit.
+        limit = max(0, min(inv.args.archive_pages, 100))
+        while snapshot_count < limit and any(queues):
+            for queue in queues:
+                if not queue or snapshot_count >= limit:
+                    continue
+                item = queue.pop(0)
+                snapshot_count += 1
+                snapshot = f"https://web.archive.org/web/{item['timestamp']}id_/{item['_original']}"
+                result = inv.http.fetch(snapshot)
+                item.update(disposition=result.result, snapshot=snapshot, evidence=result.evidence)
+                if result.result == 'ok':
+                    inv.scan(result.text, snapshot, 'wayback_snapshot')
+    finally:
+        inv.http.timeout = base_timeout
+    for item in inventory:
+        item.pop('_original', None)
     (Path(inv.args.output) / 'archive-inventory.json').write_text(json.dumps(inventory, indent=2) + '\n')

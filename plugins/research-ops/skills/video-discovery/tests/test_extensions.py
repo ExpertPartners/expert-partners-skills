@@ -153,3 +153,59 @@ def test_empty_public_site_produces_empty_catalog(inv,monkeypatch):
     inv.run()
     result=json.loads((Path(inv.args.output)/'catalog.json').read_text())
     assert result['records']==[] and result['summary']['candidates']==0
+
+
+def test_archived_http_and_www_captures_count_as_the_target_page(inv,monkeypatch):
+    inv.args.archive_pages=5
+    def fetch(url):
+        if '/cdx/' not in url:
+            return Fetch(url,'ok',200,'<iframe src="https://youtube.com/embed/AbCdEf123_-"></iframe>')
+        if parse_qs(urlsplit(url).query)['url']==['https://example.com/']:
+            return Fetch(url,'ok',200,cdx([['20260101000000','http://www.example.com/a','200','text/html'],
+                                           ['20260101000000','https://other.example/x','200','text/html']]))
+        return Fetch(url,'ok',200,cdx([]))
+    monkeypatch.setattr(inv.http,'fetch',fetch)
+    ext.full_archives(inv)
+    inventory=json.loads((Path(inv.args.output)/'archive-inventory.json').read_text())
+    assert {r['original']:r['disposition'] for r in inventory}=={'http://www.example.com/a':'ok','https://other.example/x':'outside_target_or_invalid'}
+    assert all('_original' not in r for r in inventory)
+
+
+def test_snapshot_limit_is_shared_round_robin_across_targets(inv,monkeypatch):
+    inv.args.archive_pages=2;snapshots=[]
+    def fetch(url):
+        if '/cdx/' not in url:
+            snapshots.append(url);return Fetch(url,'ok',200,'<html></html>')
+        target=parse_qs(urlsplit(url).query)['url'][0]
+        if target in {'https://example.com/','https://vimeo.com/example'}:
+            host=target.rstrip('/')
+            return Fetch(url,'ok',200,cdx([['2026010%d000000'%i,f'{host}/p{i}','200','text/html'] for i in range(1,4)]))
+        return Fetch(url,'ok',200,cdx([]))
+    monkeypatch.setattr(inv.http,'fetch',fetch)
+    ext.full_archives(inv)
+    assert len(snapshots)==2
+    assert any('example.com/p1' in s for s in snapshots) and any('vimeo.com/example/p1' in s for s in snapshots)
+
+
+def test_archive_index_gets_a_longer_timeout_and_restores_it(inv,monkeypatch):
+    seen=[]
+    def fetch(url):
+        seen.append(inv.http.timeout);return Fetch(url,'ok',200,cdx([]))
+    monkeypatch.setattr(inv.http,'fetch',fetch)
+    before=inv.http.timeout
+    ext.full_archives(inv)
+    assert before==20 and set(seen)=={ext.ARCHIVE_TIMEOUT} and inv.http.timeout==before
+
+
+def test_explicit_page_target_claims_its_capture_under_a_tight_limit(inv,monkeypatch):
+    inv.args.archive_pages=1;inv.args.archive_target=['https://example.com/deep/page'];snapshots=[]
+    def fetch(url):
+        if '/cdx/' not in url:
+            snapshots.append(url);return Fetch(url,'ok',200,'<html></html>')
+        if parse_qs(urlsplit(url).query)['url'][0] in {'https://example.com/','https://example.com/deep/page'}:
+            return Fetch(url,'ok',200,cdx([['20260101000000','https://example.com/a','200','text/html'],
+                                           ['20260102000000','https://example.com/deep/page','200','text/html']]))
+        return Fetch(url,'ok',200,cdx([]))
+    monkeypatch.setattr(inv.http,'fetch',fetch)
+    ext.full_archives(inv)
+    assert len(snapshots)==1 and snapshots[0].endswith('/20260102000000id_/https://example.com/deep/page')
