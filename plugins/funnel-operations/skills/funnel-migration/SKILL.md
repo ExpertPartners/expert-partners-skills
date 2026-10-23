@@ -25,7 +25,7 @@ subtitle: "per-funnel walk from old location to clean location"
 
 # Funnel Migration
 
-STATUS (2026-07-27): STALE, retirement pending. The migration this skill served is over: EPIC went clean-in-place on its live location (partnersync ADR 0006) and the "EPIC New" build location became AG Personal Brand. Do not run this skill against the current estate without first reading the canonical registry (partnersync/reference/ghl-location-registry.md) and confirming with Allison that a genuine funnel move is in play.
+STATUS (2026-07-27): STALE, retirement pending. The migration this skill served is over: EPIC went clean-in-place on its live location (partnersync ADR 0006) and the "EPIC New" build location became AG Personal Brand. Do not run this skill against the current estate without first reading section 7.1 of the PartnerSync Identity Canon in Drive (02 - Identity Canon, Google Doc ID 1utPoaO5AdN56kUguQ9ehsPwAM2cw7Ztv6UF04KMmC_w), locations by ID never by name, and confirming with Allison that a genuine funnel move is in play.
 
 This is the per-funnel walk for moving one funnel from the old PartnerSync location (legacy Expert Partners GHL) into a clean location, EPIC or Expert Partners. It verifies every object-model element, certifies the cutover with a live test, then hands off to Funnel Documentation so the funnel is born documented in the same pass. This skill is temporary. It retires after both migrations are complete.
 
