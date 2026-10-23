@@ -20,7 +20,7 @@ Brand canon lives in Google Drive. Before drafting, read these Docs with the Goo
 
 The inline content below is a fallback for sessions where the Drive connector is unavailable. If the Doc and the inline text disagree, the Doc wins. Also read the estate-wide spelling, exclusion, and identifier rules in V1 - Company Core - Shared Writing Rules (HQ Business Brain, Company Core [HQ-BB]), https://docs.google.com/document/d/103y7LzzahVmGmUgCQukvwH2V7VKu3nhFEDteFrQBKqE/edit.
 
-The ag-luxury repo `docs/DECISION-LOG.md` stays the append-only ruling record and wins over this skill wherever they conflict. `docs/governance/` holds the approved claim set.
+The V1 - Company Core - AG Luxury Brand Canon in AG Business Brain, Company Core is the live brand canon and wins over this skill wherever they conflict. The former ag-luxury repo `docs/DECISION-LOG.md` (the append-only ruling record behind the D0nn references below) and `docs/governance/` (the approved claim set) are boxed in the Drive GitHub Archive as ag-luxury-full-2026-10-23.zip.
 
 The live brand guide at https://brand.agluxurytx.com/ is the current source of brand truth and owns the visual tokens (color, type, spacing), per ag-luxury DECISION-LOG D036 and D037. Do not restate or improvise visual tokens here or anywhere; read the guide. Its governing idea carries into copy: restraint is the luxury signal, and photography brings the living color, never decoration.
 
