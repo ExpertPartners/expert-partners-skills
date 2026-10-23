@@ -1,6 +1,6 @@
 ---
 name: "document-formatting-standard"
-description: "Allison's default formatting and delivery standard (v3) for every document Claude creates: Poppins throughout, 1.5 line spacing, size-and-color headers with Brand Blue H2s, no bold or italics, no em dashes, colons and semicolons only sparingly, plain title filenames with no date prefix, and delivery as a styled Google Doc into the Aura Docs Drive folder with only a two-line summary in chat. Apply whenever creating, restyling, or delivering a document unless a brand skill's typography explicitly governs that deliverable."
+description: "Allison's formatting and delivery standard (v4) for every document an AI makes. The live HQ Rulebook's Document formatting section owns every number: Google Docs, Poppins for Expert Partners and HQ, the AG Luxury brand guide for AG Luxury, the Rulebook's current line spacing, no blank lines between paragraphs, short paragraphs, and no bold, italics, em dashes, or dividers. Files take Cal's naming and go to their brain home, delivered as a link named for the document. Read the Rulebook live, then apply it with the tool notes here. Use whenever creating, restyling, or delivering a document."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -9,75 +9,55 @@ inherits: operating-doctrine
 defers-to:
   - deliverable-link
 brand-scope: null
-subtitle: "Poppins everywhere, hierarchy by size and color"
+subtitle: "the Rulebook sets the look, this skill applies it"
 ---
 
-# Document Formatting Standard (v2)
+# Document Formatting Standard (v4, 2026-10-22)
 
-Ruled by Allison Gaddy, July 27, 2026, after the Wave 1 message review doc. Upgraded to v2 the same day with the punctuation rule and the delivery rule. Destination rule added August 4, 2026. This is the default look and delivery path for every document Claude produces in Cowork or Claude Code: Word docs, PDFs, Google Docs, review docs, reports, SOPs rendered as deliverables, anything styled. It applies unless a brand skill's visual identity explicitly governs the deliverable (a Moxie listing piece, a FAM lead magnet, an EP-branded sales page keep their brand typography; internal and working documents use this standard).
+<!-- RULED-BY: intake/2026-10-22-disclosure-rulebook-sync-formatting-tabs-session-wrap.md date:2026-10-22 -->
 
-## The standard
+This version supersedes the hard-coded values, plain-title filenames, Aura Docs folder, and re-upload note of v3. Disclosure of record: intake/2026-10-22-disclosure-rulebook-sync-formatting-tabs-session-wrap.md.
 
-Typeface: Poppins for everything. Title, headers, body, labels. No font mixing in working documents.
+## The source is the Rulebook
 
-Line spacing: 1.5 throughout (in docx-js: spacing line 360).
+The Document formatting section of [V1 - Company Core - HQ Rulebook](https://docs.google.com/document/d/15sCFxMvG8OZMZik5w0Hzqzh7HyphrB7rJ8NBtm46JBE/edit) sets every number for company documents. That covers fonts, sizes, colors, line spacing, and paragraph spacing. [V1 - Company Core - Decision Log](https://docs.google.com/document/d/1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc/edit) records each change.
 
-Hierarchy by size and color, never by bold or italics:
+Read that section live before you make or restyle a document. Never use a remembered value. Line spacing alone moved from 1.5 to 1.15 and back to 1.5 during October 2026.
 
-- Title: Poppins 22pt, black #000000 (docx-js size 44)
-- H1 section headers: Poppins 17pt, black #000000 (size 34)
-- H2 subheaders: Poppins 13pt, Brand Blue #2757CF (size 26)
-- Body: Poppins 11pt, black #000000 (size 22)
-- Labels and meta text: Poppins 9pt, gray #555555 (size 18)
+If this skill and the Rulebook ever differ, the Rulebook wins. Report the difference to [HQ 🧠] - Chief HR Officer in the Handoffs tab of the Job Tracker.
 
-Spacing rhythm (docx-js values): H1 before 320 after 160; H2 before 280 after 120; body after 160; labels after 60. Title after 80 with a gray subtitle line after 280.
+## What the Rulebook asks for, in short
 
-Quoted or message-style content: indent left 360 DXA, body size, so it reads as a block without borders or boxes.
+This list only says what to look up. The numbers live in the Rulebook.
 
-Page: US Letter (12240 x 15840 DXA), 1 inch margins all around.
+- Every document an AI makes is a Google Doc.
+- Expert Partners and HQ documents use Poppins throughout, with the Rulebook's title, heading, and body sizes and its Brand Blue for Heading 2.
+- AG Luxury documents follow the AG Luxury brand guide as the Rulebook states it, Italiana for titles and headings, Manrope for body, black and white, with Rich Gold only for small details.
+- Line spacing is whatever the Rulebook says today.
+- No empty line sits between paragraphs. Line spacing and a small space after each paragraph do the separating, and headings keep their own spacing.
+- Paragraphs stay short, one or two sentences that carry one idea.
+- No bold, no italics, no em dashes, and no horizontal dividers.
 
-Filenames: the document's title, no date prefix (ruled 2026-08-05, amending the earlier `YYYY-MM-DD <Title>` rule). The platform (Drive, GitHub) carries the dates; the names do not need them. The old aura intake inbox and its stamped filenames are retired, so intake docs in Drive follow the same plain-title rule.
+## Names, home, sharing, and delivery
 
-## Punctuation rule (v3, ruled by Allison 2026-08-04)
+- Name the file the way the Rulebook's naming rule says, which follows Cal's convention.
+- Save it in its one home in the owning business brain, per the Rulebook's Where things live section.
+- Set sharing the way the Rulebook's Sharing section says.
+- Hand it over as a link whose text is the exact document name, never a raw URL (see the deliverable-link skill). Chat carries a short summary, and the document is the deliverable.
 
-Colons and semicolons are allowed in drafted prose, sparingly, never overused. Periods and commas stay preferred. Em dashes remain banned.
+Claude Code paste blocks, commands, snippets, and quick factual answers stay in chat. They are not documents.
 
-This applies to every document, email draft, message draft, and deliverable written for Allison or her team. It covers body text, headers, subtitles, and captions inside the deliverable.
+## Applying it with tools
 
-Exempt: code blocks, technical references (file paths, URLs, config values, API syntax, timestamps), and data tables. The rule governs prose, not notation.
+These notes translate the Rulebook's values. They never replace them.
 
-## Delivery rule (v2, ruled by Allison 2026-07-27; destination ruled 2026-08-04)
-
-Anything drafted for Allison to read, send, or keep lands as a styled Google Doc:
-
-- Created via the SA+DWD path impersonating allison@expertpartners.com where that path is reachable, otherwise via a write-capable Drive connector, so ownership is native. Never the read-only Google connectors.
-- Saved into the Aura Docs folder in Drive, folder ID 1awtAUORC9PAspfIoIoM5YlkwfDOvG-rx, set as the parent on every document create. Every deliverable lands in this one folder unless Allison names a different destination for a specific document.
-- Real Poppins and 1.5 line spacing applied through the Google Docs API (batchUpdate text and paragraph styles) or HTML-conversion equivalent, not left as defaults.
-- Filename is the document's title with no date prefix, per the filename rule above.
-- Link handed to Allison in chat as a markdown hyperlink whose link text is the document's exact name, never a raw URL (see the deliverable-link skill).
-- Chat carries only a two-line summary of the document. The document is the deliverable; chat is the pointer.
-
-Stays in chat: Claude Code paste blocks (commands, prompts, snippets bound for another surface) and quick factual answers. Those are not documents and do not get wrapped in one.
-
-Rider, 2026-08-05 (Allison's robot delivery standards ruling, aura intake 3973c2b): this standard extends to every automated sender (robots); every document a robot creates for Allison is a Google Doc in Poppins with 1.5 line spacing per this skill, including the CI watchman and Ember at wake. Amended 2026-08-06 per the Ember Voice and Your Move Queue ruling (aura intake/2026-08-06-ruling-ember-voice-and-your-move-queue.md, ee86601). Poppins 1.5 Google Docs are for genuine reading material only. The your-move instruction itself lives on the board rendered at hq.allisongaddy.com, never a per-task doc, robot texts link hq.allisongaddy.com only, and every robot message to Allison speaks as Ember in first person (rail spec, aura docs/estate/your-move-queue.md).
-
-## Hard rules (inherit Allison's voice rules)
-
-- Never bold, never italics. Hierarchy comes from size and color only.
-- Never an em dash, anywhere, including headers.
-- Colons and semicolons sparingly, never overused (see punctuation rule above).
-- Never horizontal rules, dividers, or decorative lines.
-- No emoji in documents.
-- Subtitle and provenance lines (date, audience, draft status) in gray meta style under the title.
-
-## Implementation notes
-
-In docx-js, set the default document style to Poppins size 22 and build helpers: title, h1, h2, body, label, and an indented msg block, using the values above. Verify output by converting to PDF and rendering a page image before delivering. In HTML or PDF pipelines, mirror the same values: Poppins via font stack 'Poppins, sans-serif', line-height 1.5, H2 color #2757CF.
-
-In the Google Docs API, insert the text first, then apply updateTextStyle with weightedFontFamily Poppins and the sizes above, and updateParagraphStyle with lineSpacing 150. Set named-range or heading styles explicitly; do not rely on the doc's default font.
-
-Poppins must be installed on the machine that opens a docx for it to render; it is part of the Expert Partners brand stack and present on Allison's machines. Name it explicitly in every run so it renders correctly there, whatever the fallback elsewhere. Google Docs serves Poppins natively from Google Fonts.
+- Create the Doc through the service account impersonating allison@expertpartners.com where that path is reachable, otherwise through a write-capable Drive or Docs connector, so ownership is native.
+- In the Google Docs API, insert the text, then apply updateTextStyle with weightedFontFamily and the Rulebook's sizes, and updateParagraphStyle with lineSpacing set to the Rulebook value times 100 (1.5 becomes 150).
+- Use the native named styles (TITLE, HEADING_1, HEADING_2, NORMAL_TEXT) so the outline works. A visually enlarged paragraph is not a heading.
+- Never insert empty paragraphs to make space. Use spaceBelow on body paragraphs instead.
+- In docx-js, line spacing is the Rulebook value times 240 and font sizes are in half points.
+- Before you report done, read the saved document back. Check the font, the line spacing, the heading styles, and that no empty paragraphs sit between paragraphs.
 
 ## Where this standard lives
 
-This file, in expert-partners-skills (plugins/operating-doctrine/skills/document-formatting-standard/), is the canonical copy. Cowork loads its saved operative copy of the same skill; Claude Code applies the same standard via the user CLAUDE.md pointer and the expert-partners plugin marketplace mirror. If the standard changes, Allison rules it, and every copy updates together. The org-provisioned copy in Cowork does not auto-sync; after any change here, Allison re-uploads it per the skills sync ADR.
+This file in expert-partners-skills, plugins/operating-doctrine/skills/document-formatting-standard/, is the canonical copy. Claude Code, Claude surfaces, and Codex receive it through the expert-partners plugin marketplace.

@@ -28,7 +28,7 @@ Never attach to, click, type in, navigate, foreground, or move the cursor on All
 2. When browser/UI work is required, connect to Ember's M2 through the available Ember/CUA/browser integration.
 3. Enumerate the M2 browser targets and select the exact tab/window needed for the current assignment.
 4. Continue without asking Allison whether the M2 is available merely because other tabs, windows, tasks, or sessions are visible.
-5. Preserve pre-existing tabs and anything owned by another session. Close only temporary tabs/windows created by the current session when no longer needed.
+5. Keep one working tab per task and reuse it by navigating in place. Open a second tab only when two pages must sit side by side, and close it right after. Preserve pre-existing tabs and anything owned by another session or by Allison.
 
 ## Existing authenticated Chrome attachment
 
@@ -129,7 +129,7 @@ When stopped for one of those reasons, report the exact blocker. **Never fall ba
 Multiple sessions may coexist on Ember's M2.
 
 - Control only the tab/window belonging to the current assignment.
-- Do not close, repurpose, or navigate another session's tabs.
+- Do not close, repurpose, or navigate another session's tabs or Allison's.
 - Use exact tab selection when the integration supports it.
 - If exact targeting genuinely cannot be established without risking another session, stop on that specific conflict rather than asking whether the whole M2 is available.
 
@@ -155,12 +155,14 @@ If Allison must complete login, MFA, CAPTCHA, approval, or another human-only ac
 
 ## Housekeeping
 
-Before ending browser work:
+This follows the HQ Rulebook's Browser tabs stay clean section (Decision Log 2026-10-22, Browser tabs stay clean), which wins if the two ever differ.
 
-- keep only the M2 tabs needed for continuing work;
-- close temporary M2 tabs created by this session when safe;
-- preserve all pre-existing or other-session tabs;
-- never leave Allison's M4 browser or cursor altered.
+- Keep one working tab per task and reuse it by navigating in place.
+- Close a second tab right after the side-by-side step that needed it.
+- Close every tab this session opened before you report or end your turn.
+- After a crash or reconnect, close your own leftover tabs before starting again.
+- Never close another AI's tabs or Allison's, and preserve every pre-existing tab.
+- Never leave Allison's M4 browser or cursor altered.
 
 ## Dispatch wording
 

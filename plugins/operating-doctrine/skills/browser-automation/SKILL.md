@@ -8,7 +8,8 @@ description: >
   checks, screenshots, or data pulls. Always works in the already signed-in Chrome through
   the shared Playwright Extension connector, which never raises Chrome's debugging prompt,
   never opens a fresh or signed-out browser, assumes Chrome and 1Password access until a
-  real failure, picks the most durable and fastest path, and closes every tab it opens.
+  real failure, picks the most durable and fastest path, keeps one working tab per task,
+  and closes every tab it opens before it reports.
   Same setup for Claude Code, Claude desktop, Codex and Antigravity CLI. Defers to
   ember-browser-routing on which machine runs browser work. It inherits the
   operating-doctrine and never overrides it.
@@ -94,18 +95,24 @@ labels to find things, not fragile CSS paths. Wait for the page to be ready inst
 using fixed sleeps. GHL draws much of its app inside iframes, so look inside frames before
 deciding an element is missing.
 
-## Rule 4. Clean up every tab
+## Rule 4. Browser tabs stay clean
 
 The M2 is shared by every project and agent. Leftover tabs slow it down and confuse other
-sessions.
+sessions. This rule follows the HQ Rulebook's Browser tabs stay clean section (Decision Log
+2026-10-22, Browser tabs stay clean), which wins if the two ever differ.
 
-- The extension gives each connection its own tab group and shows it only those tabs, so
-  cleaning up your group can never touch anyone else's work.
+- One working tab per task. Reuse it by navigating in place instead of opening a new tab
+  for each page.
+- Open a second tab only when you truly need two pages side by side, and close it right
+  after.
 - Each connection starts with a "Welcome" connect tab. Navigate it to your first page so
-  it becomes your work tab, rather than leaving it behind.
-- Close every tab in your group before you finish. `pw-run` does this automatically. In an
-  MCP session, end with `browser_tabs` close on each of your tabs. `browser_close` alone
-  leaves the tab open in extension mode.
+  it becomes your working tab, rather than leaving it behind.
+- Close every tab you opened before you report or end your turn. `pw-run` does this
+  automatically. In an MCP session, end with `browser_tabs` close on each of your tabs.
+  `browser_close` alone leaves the tab open in extension mode.
+- After a crash or reconnect, close your own leftover tabs before starting again.
+- Never close another AI's tabs or Allison's. The extension gives each connection its own
+  tab group and shows it only those tabs, so work only inside your own group.
 - Never close the window or the browser.
 
 ## The setup on Ember's M2

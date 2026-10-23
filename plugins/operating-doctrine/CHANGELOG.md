@@ -1,3 +1,16 @@
+## 2.61.0 - 2026-10-22
+
+Five skills follow the live HQ Rulebook. document-formatting-standard v4 points to the
+Rulebook's Document formatting section for every number (1.5 line spacing as of 2026-10-22,
+no blank lines between paragraphs, short paragraphs, AG Luxury fonts kept) and keeps only
+how to apply it with tools. browser-automation and ember-browser-routing adopt Browser tabs
+stay clean, one working tab per task reused in place, every opened tab closed before
+reporting, never another AI's or Allison's. session-wrap v1.19 adds section 5A and
+session-steward v1.4 follows it, finished Claude Code and Codex sessions archive themselves
+where the app allows and never ask Allison, otherwise they end on WRAP, safe to archive for
+the steward's archive pass. Disclosure intake/2026-10-22-disclosure-rulebook-sync-formatting-tabs-session-wrap.md.
+Assigned by HQ, confirmed by Allison in the session that made it.
+
 ## 2.60.4 - 2026-10-21
 
 browser-automation adds Rule 2a, follow the trail before you ask. Sessions must try the API,
