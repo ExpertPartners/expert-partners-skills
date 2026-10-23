@@ -15,7 +15,7 @@
       "name": "brand-voice",
       "source": "./plugins/brand-voice",
       "description": "Canonical brand context for the Estate brand registry (Expert Partners, EPIC, AG Personal Brand, AG Luxury, FAM, Don Hobbs; Moxie benched)",
-      "version": "0.6.2"
+      "version": "0.6.3"
     },
     {
       "name": "content-engines",
@@ -38,7 +38,7 @@
     {
       "name": "systems-map",
       "source": "./plugins/systems-map",
-      "version": "0.6.2",
+      "version": "0.6.3",
       "description": "The canonical map of where every Expert Partners system lives. Loads at session start; inherits operating-doctrine."
     },
     {

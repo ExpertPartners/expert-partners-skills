@@ -16,7 +16,7 @@ subtitle: "The Strong Ones voice inside AG Personal Brand"
 
 Brand canon lives in Google Drive. Before drafting, read these Docs with the Google Docs or Drive connector (`read_file_content` on the Doc ID in the link, which returns plain text; do not use `read_doc`, its JSON overflows on a Doc this size). Apply what they say as the authoritative source. The Strong Ones is the heart of Allison's personal voice and lives as the section named The Strong Ones inside the one Doc below, not as a separate brand (ruled October 13, 2026). Read the whole Doc, then lean on that section.
 
-- V1 - Company Core - Allison Gaddy Personal Brand Canon (AGRE Business Brain, Company Core [AGRE-BB]), https://docs.google.com/document/d/1lZy1Wu2q5k4NErJdNhAhtdUVkC_bXh_ddcUJgZUNxUU/edit
+- V1 - Company Core - Allison Gaddy Personal Brand Canon (AG Business Brain, Company Core [AG-BB]), https://docs.google.com/document/d/1lZy1Wu2q5k4NErJdNhAhtdUVkC_bXh_ddcUJgZUNxUU/edit
 
 The inline content below is a fallback for sessions where the Drive connector is unavailable. If the Doc and the inline text disagree, the Doc wins. Also read the estate-wide spelling, exclusion, and identifier rules in V1 - Company Core - Shared Writing Rules (HQ Business Brain, Company Core [HQ-BB]), https://docs.google.com/document/d/103y7LzzahVmGmUgCQukvwH2V7VKu3nhFEDteFrQBKqE/edit.
 

@@ -16,7 +16,7 @@ subtitle: "luxury real estate voice under Allison’s name"
 
 Brand canon lives in Google Drive. Before drafting, read these Docs with the Google Docs or Drive connector (`read_file_content` on the Doc ID in the link, which returns plain text; do not use `read_doc`, its JSON overflows on a Doc this size). Apply what they say as the authoritative source.
 
-- V1 - Company Core - AG Luxury Brand Canon (AGRE Business Brain, Company Core [AGRE-BB]), https://docs.google.com/document/d/1IHjcFV7Bv023GIwgNxV5d4p_bu2R5l7yUW5F4VE_-yM/edit
+- V1 - Company Core - AG Luxury Brand Canon (AG Business Brain, Company Core [AG-BB]), https://docs.google.com/document/d/1IHjcFV7Bv023GIwgNxV5d4p_bu2R5l7yUW5F4VE_-yM/edit
 
 The inline content below is a fallback for sessions where the Drive connector is unavailable. If the Doc and the inline text disagree, the Doc wins. Also read the estate-wide spelling, exclusion, and identifier rules in V1 - Company Core - Shared Writing Rules (HQ Business Brain, Company Core [HQ-BB]), https://docs.google.com/document/d/103y7LzzahVmGmUgCQukvwH2V7VKu3nhFEDteFrQBKqE/edit.
 

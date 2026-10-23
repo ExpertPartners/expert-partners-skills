@@ -14,7 +14,7 @@ subtitle: "where every system lives and what Claude can reach"
 
 # Expert Partners Systems Map and Access Map
 
-This is the operative map of where things live and what Claude can reach. The HQ Rulebook (Drive) is the first read and wins wherever the two differ. Business knowledge, rules, and decisions live in Google Drive, in the business brains: HQ Business Brain serves both companies, AGRE Business Brain is AG Luxury, EP Business Brain is Expert Partners. GitHub holds only what tools run from.
+This is the operative map of where things live and what Claude can reach. The HQ Rulebook (Drive) is the first read and wins wherever the two differ. Business knowledge, rules, and decisions live in Google Drive, in the business brains: HQ Business Brain serves both companies, AG Business Brain is AG Luxury, EP Business Brain is Expert Partners. GitHub holds only what tools run from.
 
 ## Two words that are not the same
 
