@@ -60,7 +60,7 @@ Brand canon Docs in Drive are authoritative and read with the Drive connector's 
 - V1 - Company Core - EPIC Brand Canon, https://docs.google.com/document/d/1W2QxjC_2iVY_-kWZLPEHRcztvEbpht5xcueWduOCdMU/edit
 - V1 - Company Core - Free Agent Movement Brand Canon, https://docs.google.com/document/d/1t79nKkyml4db1Cq7hr2ApvOrEogqhuD2x12oOba3bQk/edit
 - V1 - Company Core - Don Hobbs Brand Canon, https://docs.google.com/document/d/1yLCeKPCWhx3Ndx5j_o_H0Yo8UBprWTKtrpU3wLZLHK4/edit
-- V1 - Company Core - Allison Gaddy Personal Brand Canon, https://docs.google.com/document/d/1_tDaCMO1LDT7gOKCB-TcYbWGlzQ0fcslFlrxXWydQO0/edit
+- V1 - Company Core - Allison Gaddy Personal Brand Canon (AGRE Business Brain, Company Core [AGRE-BB]), https://docs.google.com/document/d/1lZy1Wu2q5k4NErJdNhAhtdUVkC_bXh_ddcUJgZUNxUU/edit
 - V1 - Company Core - AG Luxury Brand Canon, https://docs.google.com/document/d/1IHjcFV7Bv023GIwgNxV5d4p_bu2R5l7yUW5F4VE_-yM/edit
 - V1 - Company Core - Shared Writing Rules, https://docs.google.com/document/d/103y7LzzahVmGmUgCQukvwH2V7VKu3nhFEDteFrQBKqE/edit
 
