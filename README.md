@@ -10,6 +10,7 @@ This repository holds the skills marketplace and the tools that package, deploy 
 | [Plugin sources](plugins/) | Plugin-carried skills, manifests and supporting assets. |
 | [Operating Doctrine](plugins/operating-doctrine/skills/operating-doctrine/SKILL.md) | The canonical operating instructions inherited by the skills. |
 | [Repo Standards](plugins/operating-doctrine/skills/repo-standards/SKILL.md) | The repository baseline and audit workflow. |
+| [Video Discovery](plugins/research-ops/skills/video-discovery/SKILL.md) | Bounded public video discovery, ownership review and partial playback checks in research-ops. |
 | [Agent instructions](AGENTS.md) | The lean AI entry point. CLAUDE.md imports it. |
 
 Edit a skill in its declared canonical home. The [deployment tool](tools/skill-deploy/deploy-skill.sh) produces deployed copies, checksum manifests and upload ZIPs. The [skill-map tools](tools/skill-map/) generate the graph from canonical skill sources. Correct the sources, never the generated output. The root [operating-doctrine/](operating-doctrine/SKILL.md) file is a pointer to the canonical plugin skill.
