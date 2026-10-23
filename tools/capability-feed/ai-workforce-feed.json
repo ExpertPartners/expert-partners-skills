@@ -1,8 +1,8 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-10-23T16:35:00Z",
-  "verifiedAt": "2026-10-23T16:35:00Z",
+  "generatedAt": "2026-10-23T17:19:58Z",
+  "verifiedAt": "2026-10-23T17:19:58Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
@@ -266,11 +266,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the funnel-operations plugin, version 0.2.0, in the expert-partners plugin marketplace.",
+        "Packaged as the funnel-operations plugin, version 0.2.1, in the expert-partners plugin marketplace.",
         "Contains 3 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.2.0.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.2.1.",
       "containsSkillIds": [
         "funnel-build",
         "funnel-documentation",
@@ -280,7 +280,7 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/funnel-operations",
-        "packageVersion": "0.2.0",
+        "packageVersion": "0.2.1",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
         "skillCount": "3"
@@ -453,11 +453,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the systems-map plugin, version 0.6.3, in the expert-partners plugin marketplace.",
+        "Packaged as the systems-map plugin, version 0.6.4, in the expert-partners plugin marketplace.",
         "Contains 1 skill. It activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.6.3.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.6.4.",
       "containsSkillIds": [
         "expert-partners-systems-map"
       ],
@@ -465,7 +465,7 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/systems-map",
-        "packageVersion": "0.6.3",
+        "packageVersion": "0.6.4",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
         "skillCount": "1"
@@ -2588,7 +2588,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Systems Map plugin, version 0.6.3.",
+        "Packaged in the Systems Map plugin, version 0.6.4.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2603,7 +2603,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brain",
-        "packaging": "systems-map plugin v0.6.3 (expert-partners marketplace)",
+        "packaging": "systems-map plugin v0.6.4 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -2696,7 +2696,7 @@
       "id": "funnel-build",
       "humanName": "Funnel Build",
       "kind": "skill",
-      "summary": "Build a brand new funnel in the funnel's brand location, read live from the canonical GHL location registry (partnersync/reference/ghl-location-registry.md, four permanent brand locations, and the registry wins over any disagreeing doc), then document it so it is born documented.",
+      "summary": "Build a brand new funnel in the funnel's brand location, read live from the GoHighLevel location list (section 7.1 of the PartnerSync Identity Canon in Drive, five entries, and the Identity Canon wins over any disagreeing doc), then document it so it is born documented.",
       "status": "Unknown",
       "maintainer": "Allison Gaddy",
       "collectionIds": [],
@@ -2706,7 +2706,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Funnel Operations plugin, version 0.2.0.",
+        "Packaged in the Funnel Operations plugin, version 0.2.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2722,7 +2722,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "funnel-operations plugin v0.2.0 (expert-partners marketplace)",
+        "packaging": "funnel-operations plugin v0.2.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "funnel-documentation"
       },
@@ -2730,28 +2730,29 @@
         "born",
         "brand",
         "build",
-        "canonical",
+        "canon",
         "disagreeing",
         "doc",
         "document",
         "documented",
         "does",
+        "drive",
+        "entries",
         "exist",
-        "four",
+        "five",
         "funnel",
-        "ghl",
+        "gohighlevel",
         "hands",
+        "identity",
+        "list",
         "live",
         "location",
-        "locations",
         "new",
         "operations",
         "over",
         "partnersync",
-        "permanent",
         "read",
-        "reference",
-        "registry",
+        "section",
         "then",
         "wins",
         "yet"
@@ -2779,7 +2780,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Funnel Operations plugin, version 0.2.0.",
+        "Packaged in the Funnel Operations plugin, version 0.2.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2794,7 +2795,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "funnel-operations plugin v0.2.0 (expert-partners marketplace)",
+        "packaging": "funnel-operations plugin v0.2.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -2839,7 +2840,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Funnel Operations plugin, version 0.2.0.",
+        "Packaged in the Funnel Operations plugin, version 0.2.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2855,7 +2856,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "funnel-operations plugin v0.2.0 (expert-partners marketplace)",
+        "packaging": "funnel-operations plugin v0.2.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "funnel-documentation"
       },
