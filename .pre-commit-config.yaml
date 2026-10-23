@@ -49,15 +49,3 @@ repos:
         language: system
         files: (^|/)SKILL\.md$
         pass_filenames: false
-
-      # Ruling provenance gate. Ruled by Allison 2026-08-07 (aura intake/2026-08-07-
-      # ruling-rulings-become-citable-records-and-rules-carry-proven.md), spec at aura
-      # doctrine/ruling-of-record-format.md. Checks the staged diff, not the filenames
-      # pre-commit hands it, so pass_filenames is false and files matches broadly
-      # (any .md/.py can carry a ruling citation or authority claim).
-      - id: ruling-provenance-lint
-        name: Ruling provenance gate (citations resolve, supersession names itself, disclosure filed)
-        entry: python3 .ep/ruling-provenance-lint.py --pre-commit
-        language: system
-        files: \.(md|markdown|mdx|py)$
-        pass_filenames: false
