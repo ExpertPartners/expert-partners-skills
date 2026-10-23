@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "03dd8c2722e4c955864977b15b7444a34138e4ee",
-    "aura": "5304ea467b0cc82a7add88fefe8492081afe8690"
+    "eps": "8322aaf55e10e268952dc6d3b0d282485a61586e",
+    "aura": "bcbcc9d8c8220155bc0e554445cb0f6522363cef"
   },
   "zones": [
     "surfaces",
@@ -58,7 +58,7 @@
       "renderNote": null,
       "layout": {
         "x": 999,
-        "y": 5311,
+        "y": 5527,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -86,7 +86,7 @@
       "renderNote": null,
       "layout": {
         "x": 984,
-        "y": 4430,
+        "y": 4531,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -317,7 +317,7 @@
       "renderNote": null,
       "layout": {
         "x": 1272,
-        "y": 5135.8,
+        "y": 5351.8,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -343,7 +343,7 @@
       "renderNote": null,
       "layout": {
         "x": 999,
-        "y": 4517,
+        "y": 4618,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -427,7 +427,7 @@
       "renderNote": null,
       "layout": {
         "x": 996,
-        "y": 5861,
+        "y": 6077,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -454,7 +454,7 @@
       "renderNote": null,
       "layout": {
         "x": 987,
-        "y": 4618,
+        "y": 4820,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -747,7 +747,7 @@
       "renderNote": null,
       "layout": {
         "x": 996,
-        "y": 5673,
+        "y": 5889,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1059,7 +1059,7 @@
       "renderNote": null,
       "layout": {
         "x": 1040,
-        "y": 5210,
+        "y": 5426,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1087,7 +1087,7 @@
       "renderNote": null,
       "layout": {
         "x": 1272,
-        "y": 5034.8,
+        "y": 5250.8,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -1117,7 +1117,7 @@
       "renderNote": null,
       "layout": {
         "x": 1052,
-        "y": 5022,
+        "y": 5238,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -1143,7 +1143,7 @@
       "renderNote": null,
       "layout": {
         "x": 983.5,
-        "y": 5123,
+        "y": 5339,
         "width": 237,
         "height": 63,
         "rectHeight": 48,
@@ -1168,7 +1168,7 @@
       "renderNote": null,
       "layout": {
         "x": 987,
-        "y": 5774,
+        "y": 5990,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -1640,7 +1640,7 @@
       "renderNote": null,
       "layout": {
         "x": 984,
-        "y": 5412,
+        "y": 5628,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -1751,7 +1751,7 @@
       "renderNote": null,
       "layout": {
         "x": 976,
-        "y": 5586,
+        "y": 5802,
         "width": 252,
         "height": 63,
         "rectHeight": 48,
@@ -2601,7 +2601,7 @@
       "renderNote": null,
       "layout": {
         "x": 952,
-        "y": 4921,
+        "y": 5137,
         "width": 300,
         "height": 77,
         "rectHeight": 62,
@@ -2629,7 +2629,7 @@
       "renderNote": null,
       "layout": {
         "x": 952,
-        "y": 4820,
+        "y": 5036,
         "width": 300,
         "height": 77,
         "rectHeight": 62,
@@ -2657,7 +2657,7 @@
       "renderNote": null,
       "layout": {
         "x": 952,
-        "y": 5499,
+        "y": 5715,
         "width": 300,
         "height": 63,
         "rectHeight": 48,
@@ -2691,6 +2691,35 @@
         "annotationHeight": 15,
         "subtitleLines": [
           "live-doc check before building"
+        ]
+      }
+    },
+    {
+      "id": "video-discovery",
+      "source": "eps:plugins/research-ops/skills/video-discovery/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "public video discovery with evidence and bounded playback checks",
+      "renderNote": null,
+      "layout": {
+        "x": 993,
+        "y": 4921,
+        "width": 218,
+        "height": 91,
+        "rectHeight": 76,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "public video discovery with",
+          "evidence and bounded playback",
+          "checks"
         ]
       }
     },
@@ -3112,11 +3141,11 @@
       "points": [
         {
           "x": 1496,
-          "y": 5161.5
+          "y": 5377.5
         },
         {
           "x": 1533,
-          "y": 5161.5
+          "y": 5377.5
         },
         {
           "x": 1533,
@@ -3143,11 +3172,11 @@
       "points": [
         {
           "x": 1496,
-          "y": 5187.2
+          "y": 5403.2
         },
         {
           "x": 1533,
-          "y": 5187.2
+          "y": 5403.2
         },
         {
           "x": 1533,
@@ -3358,19 +3387,19 @@
       "points": [
         {
           "x": 1252,
-          "y": 5248.5
+          "y": 5464.5
         },
         {
           "x": 1262,
-          "y": 5248.5
+          "y": 5464.5
         },
         {
           "x": 1262,
-          "y": 5086.2
+          "y": 5302.2
         },
         {
           "x": 1272,
-          "y": 5086.2
+          "y": 5302.2
         }
       ]
     },
@@ -3393,11 +3422,11 @@
       "points": [
         {
           "x": 1252,
-          "y": 5060.5
+          "y": 5276.5
         },
         {
           "x": 1272,
-          "y": 5060.5
+          "y": 5276.5
         }
       ]
     },
@@ -3827,6 +3856,12 @@
       "points": null
     },
     {
+      "from": "video-discovery",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
       "from": "video-transcript-relay",
       "to": "operating-doctrine",
       "type": "inherits",
@@ -4027,9 +4062,9 @@
         "label": "The hands",
         "caption": "funnel work and account operations",
         "x": 930,
-        "y": 4382,
+        "y": 4483,
         "width": 588,
-        "height": 1564,
+        "height": 1679,
         "rooms": []
       },
       {

@@ -1,8 +1,8 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-10-23T20:08:10Z",
-  "verifiedAt": "2026-10-23T20:08:10Z",
+  "generatedAt": "2026-10-23T21:08:33Z",
+  "verifiedAt": "2026-10-23T21:08:33Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
@@ -381,7 +381,7 @@
       "id": "research-ops-plugin",
       "humanName": "Research Ops Plugin",
       "kind": "plugin",
-      "summary": "Research skills: capability-currency, research-intake, and the three TUB analysts (competitive intelligence, voice of customer, GEO and SEO ranking audit).",
+      "summary": "Research skills: capability-currency, research-intake, the three TUB analysts (competitive intelligence, voice of customer, GEO and SEO ranking audit), and video-discovery (bounded public video discovery and verification).",
       "status": "Unknown",
       "maintainer": "Allison Gaddy",
       "collectionIds": [],
@@ -392,34 +392,37 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the research-ops plugin, version 0.1.1, in the expert-partners plugin marketplace.",
-        "Contains 5 skills. Each one activates when a request matches its purpose."
+        "Packaged as the research-ops plugin, version 0.2.0, in the expert-partners plugin marketplace.",
+        "Contains 6 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.1.1.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.2.0.",
       "containsSkillIds": [
         "capability-currency",
         "research-intake",
         "tub-students-competitive-intelligence-analyst-v1",
         "tub-students-customer-research-analyst-v1",
-        "tub-students-geo-seo-ranking-auditor-v1"
+        "tub-students-geo-seo-ranking-auditor-v1",
+        "video-discovery"
       ],
       "relatedIds": [],
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/research-ops",
-        "packageVersion": "0.1.1",
+        "packageVersion": "0.2.0",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
-        "skillCount": "5"
+        "skillCount": "6"
       },
       "keywords": [
         "analysts",
         "audit",
+        "bounded",
         "capability",
         "competitive",
         "currency",
         "customer",
+        "discovery",
         "geo",
         "hands",
         "intake",
@@ -427,11 +430,14 @@
         "librarians",
         "ops",
         "plugin",
+        "public",
         "ranking",
         "research",
         "seo",
         "three",
         "tub",
+        "verification",
+        "video",
         "voice"
       ],
       "bestFor": [],
@@ -1314,7 +1320,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.1.1.",
+        "Packaged in the Research Ops plugin, version 0.2.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1329,7 +1335,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.1.1 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.2.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -5590,7 +5596,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.1.1.",
+        "Packaged in the Research Ops plugin, version 0.2.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -5605,7 +5611,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "cataloging",
-        "packaging": "research-ops plugin v0.1.1 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.2.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6335,7 +6341,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.1.1.",
+        "Packaged in the Research Ops plugin, version 0.2.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6350,7 +6356,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.1.1 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.2.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6405,7 +6411,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.1.1.",
+        "Packaged in the Research Ops plugin, version 0.2.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6420,7 +6426,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.1.1 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.2.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6457,7 +6463,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.1.1.",
+        "Packaged in the Research Ops plugin, version 0.2.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6472,7 +6478,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.1.1 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.2.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6566,6 +6572,68 @@
       "useCases": [
         "Use whenever a new tool/software/integration enters the working context (HeyGen, GoHighLevel, Make.com, Notion, Cloudflare, Higgsfield, eXp APIs, Fireflies, Gamma, Stripe, OpenAI/Anthropic SDKs, etc.) or before recommending any code or config that depends on third-party docs."
       ],
+      "askExamples": [],
+      "example": false
+    },
+    {
+      "id": "video-discovery",
+      "humanName": "Video discovery",
+      "kind": "skill",
+      "summary": "Discover publicly referenced individual videos associated with a creator on YouTube, Vimeo, websites and public archives.",
+      "status": "Unknown",
+      "maintainer": "Allison Gaddy",
+      "collectionIds": [],
+      "categories": [
+        "The hands"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Research Ops plugin, version 0.2.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "research-ops-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/research-ops/skills/video-discovery/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "hands",
+        "packaging": "research-ops plugin v0.2.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine"
+      },
+      "keywords": [
+        "archives",
+        "associated",
+        "bounded",
+        "checks",
+        "creator",
+        "discover",
+        "discovery",
+        "evidence",
+        "hands",
+        "individual",
+        "ops",
+        "playback",
+        "public",
+        "publicly",
+        "referenced",
+        "research",
+        "video",
+        "videos",
+        "vimeo",
+        "websites",
+        "youtube"
+      ],
+      "bestFor": [
+        "public video discovery with evidence and bounded playback checks"
+      ],
+      "useCases": [],
       "askExamples": [],
       "example": false
     },
