@@ -1,0 +1,171 @@
+{
+  "fixture_note": "Pilot 2 from the 2026-09-28 research benchmark (Wikimedia Commons, all CC BY-SA 4.0 by Michael.Rihani, 2014-2015). The official monument match is still pending, so the evidence supports PROBABLE only. Evidence pointers are the Commons file pages. Updated 2026-09-28 from the AG Luxury website's own provenance record (ag-luxury-site docs/neighborhood-source-register.md at f2f9095): the water tower's embedded metadata lists a different copyright owner and All Rights Reserved despite the upload-page license claim, and the entrance sign reads LIGHT FARMS. The Commons dimensions are originals.",
+  "as_of": "2026-09-28",
+  "request": {
+    "subject": "Light Farms, Celina TX",
+    "place_key": "light-farms-celina-tx",
+    "represents_named_place": true,
+    "intended_use": "website community hero",
+    "use_contexts": [
+      "website"
+    ],
+    "brand": "ag-luxury",
+    "profile": "ag-luxury-community-hero",
+    "modifications": [
+      "16:9 crop",
+      "30% dark overlay",
+      "heading text"
+    ],
+    "commercial": true,
+    "known_owner_sources": [
+      "https://lightfarms.com/"
+    ]
+  },
+  "register_check": {
+    "status": "checked",
+    "note": "no approved record for light-farms-celina-tx"
+  },
+  "search_log": [
+    {
+      "source": "Wikimedia Commons API",
+      "query": "Light Farms Celina",
+      "results": 3
+    },
+    {
+      "source": "Openverse API",
+      "query": "Light Farms Celina",
+      "results": 0
+    }
+  ],
+  "candidates": [
+    {
+      "candidate_id": "lf-entrance",
+      "subject": "Light Farms entrance monument",
+      "source": "Wikimedia Commons",
+      "source_class": "open_license",
+      "creator": "Michael.Rihani",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Light_Farms_Entrance.jpg",
+      "dimensions": {
+        "w": 1893,
+        "h": 1262
+      },
+      "capture_date": "2014-04-12",
+      "location": {
+        "evidence": [
+          {
+            "type": "source_metadata",
+            "detail": "Commons title plus Category:Celina, Texas; visible sign reads LIGHT FARMS; official-site monument comparison not yet recorded",
+            "pointer": "https://commons.wikimedia.org/wiki/File:Light_Farms_Entrance.jpg"
+          }
+        ]
+      },
+      "rights": {
+        "basis": "creative_commons",
+        "license_id": "CC-BY-SA-4.0",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "license_evidence_pointer": "https://commons.wikimedia.org/wiki/File:Light_Farms_Entrance.jpg",
+        "commercial_use": "allowed",
+        "modification": "share_alike",
+        "conditions": [
+          "attribution",
+          "share_alike"
+        ]
+      },
+      "third_party_flags": [
+        {
+          "flag": "trademark_logo",
+          "resolved": false,
+          "note": "community monument sign in frame"
+        }
+      ],
+      "owner_contact_route": "creator",
+      "dimensions_basis": "original"
+    },
+    {
+      "candidate_id": "lf-water-tower",
+      "subject": "Light Farms water tower",
+      "source": "Wikimedia Commons",
+      "source_class": "open_license",
+      "creator": "Michael.Rihani",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Light_Farms_Water_Tower.jpg",
+      "dimensions": {
+        "w": 3250,
+        "h": 4907
+      },
+      "capture_date": "2015",
+      "location": {
+        "evidence": [
+          {
+            "type": "source_metadata",
+            "detail": "Commons title plus Category:Celina, Texas; water tower is a distinctive landmark, official match pending",
+            "pointer": "https://commons.wikimedia.org/wiki/File:Light_Farms_Water_Tower.jpg"
+          }
+        ]
+      },
+      "rights": {
+        "basis": "creative_commons",
+        "license_id": "CC-BY-SA-4.0",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "license_evidence_pointer": "https://commons.wikimedia.org/wiki/File:Light_Farms_Water_Tower.jpg",
+        "commercial_use": "allowed",
+        "modification": "share_alike",
+        "conditions": [
+          "attribution",
+          "share_alike"
+        ],
+        "conflicts": [
+          "embedded metadata lists a different copyright owner and All Rights Reserved despite the upload-page CC BY-SA claim (ag-luxury-site docs/neighborhood-source-register.md at f2f9095)"
+        ]
+      },
+      "third_party_flags": [],
+      "owner_contact_route": "creator",
+      "dimensions_basis": "original"
+    },
+    {
+      "candidate_id": "lf-fitness",
+      "subject": "Light Farms fitness center",
+      "source": "Wikimedia Commons",
+      "source_class": "open_license",
+      "creator": "Michael.Rihani",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Light_Farms_Fitness_Center.jpg",
+      "dimensions": {
+        "w": 1663,
+        "h": 1178
+      },
+      "capture_date": "2015",
+      "location": {
+        "evidence": [
+          {
+            "type": "source_metadata",
+            "detail": "Commons title plus Category:Celina, Texas",
+            "pointer": "https://commons.wikimedia.org/wiki/File:Light_Farms_Fitness_Center.jpg"
+          }
+        ]
+      },
+      "rights": {
+        "basis": "creative_commons",
+        "license_id": "CC-BY-SA-4.0",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "license_evidence_pointer": "https://commons.wikimedia.org/wiki/File:Light_Farms_Fitness_Center.jpg",
+        "commercial_use": "allowed",
+        "modification": "share_alike",
+        "conditions": [
+          "attribution",
+          "share_alike"
+        ]
+      },
+      "third_party_flags": [],
+      "owner_contact_route": "creator",
+      "dimensions_basis": "original"
+    }
+  ],
+  "expected": {
+    "defensible_count": 1,
+    "empty_route": null,
+    "actions": {
+      "lf-entrance": "REJECT",
+      "lf-water-tower": "REQUEST PERMISSION",
+      "lf-fitness": "REJECT"
+    }
+  }
+}

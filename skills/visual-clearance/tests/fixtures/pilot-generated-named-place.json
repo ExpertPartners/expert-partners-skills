@@ -1,0 +1,35 @@
+{
+  "fixture_note": "Pilot 4. An AI-generated image offered as a depiction of a real named community. Synthetic.",
+  "as_of": "2026-09-28",
+  "request": {
+    "subject": "Windsong Ranch, Prosper TX",
+    "place_key": "windsong-ranch-prosper-tx",
+    "represents_named_place": true,
+    "intended_use": "website community hero",
+    "use_contexts": ["website"],
+    "brand": "ag-luxury",
+    "profile": "ag-luxury-community-hero",
+    "modifications": ["16:9 crop", "30% dark overlay", "heading text"],
+    "commercial": true,
+    "known_owner_sources": ["https://windsongranchliving.com/media_asset/the-commons/"]
+  },
+  "register_check": {"status": "checked", "note": "no approved record for windsong-ranch-prosper-tx"},
+  "search_log": [],
+  "candidates": [
+    {
+      "candidate_id": "generated-windsong",
+      "subject": "Windsong Ranch lagoon at golden hour (generated)",
+      "source": "image generator",
+      "source_class": "ai_generated",
+      "creator": null,
+      "source_url": null,
+      "dimensions": {"w": 3840, "h": 2160},
+      "capture_date": null,
+      "location": {"claimed_grade": "VERIFIED", "evidence": [{"type": "ai_inference", "detail": "prompted as Windsong Ranch"}]},
+      "rights": {"basis": "owned_or_work_for_hire", "license_evidence_pointer": "drive:synthetic-generation-log", "commercial_use": "allowed", "modification": "allowed", "conditions": [], "scope_covers_use": true},
+      "third_party_flags": [],
+      "visual_review": {"calm_center": "pass", "overlay_tolerance": "pass", "mobile_subject": "pass"}
+    }
+  ],
+  "expected": {"defensible_count": 0, "empty_route": "REQUEST PERMISSION", "actions": {"generated-windsong": "REJECT"}}
+}

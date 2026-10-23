@@ -1,0 +1,51 @@
+# SYNTHETIC FIXTURE. Not a real clearance, not a register record, never filed.
+# It exists only so the tests can prove register-first reuse and the validator.
+schema_version: "1.0"
+asset_id: VA-2026-0001
+status: approved
+subject: Light Farms, Celina TX
+place_key: light-farms-celina-tx
+brand_scope: [ag-luxury]
+source_class: owner_permission
+location_confidence: VERIFIED
+location_evidence:
+  - type: source_metadata
+    detail: Developer media library caption names the Light Farms entrance
+    pointer: https://lightfarms.example/media
+  - type: landmark_match_official
+    detail: Water tower and monument match the official community site
+    pointer: drive:fixture-landmark-capture
+source_url: https://lightfarms.example/media/hero
+original_file_pointer: drive:fixture-master-file
+creator: Fixture Photographer
+creator_contact_pointer: https://photographer.example/contact
+capture_date: "2026-05"
+original_filename: light-farms-hero.jpg
+dimensions: {w: 6000, h: 3375}
+sha256: "0000000000000000000000000000000000000000000000000000000000000001"
+license: PERMISSION
+license_url: null
+license_evidence_pointer: gmail:fixture-thread
+attribution_required: true
+attribution_text: "Photo courtesy of Light Farms (fixture)"
+permission_type: email
+permission_scope:
+  uses: [website, social]
+  brands: [ag-luxury]
+  modifications_allowed: true
+  notes: Crop, overlay and heading text permitted with credit line
+permission_expires: null
+release_state: {model: not_applicable, property: not_applicable, pointer: null}
+third_party_flags:
+  - {flag: trademark_logo, resolved: true, note: Developer granted use of the monument in frame}
+verified_on: 2026-09-28
+verified_by: visual-clearance skill run (fixture)
+approval:
+  approved_by: Fixture Human Approver
+  approved_on: 2026-09-28
+  approval_pointer: repo:ExpertPartners/visual-assets/approvals/fixture
+modifications: ["16:9 crop", "30% dark overlay", "heading text"]
+derivatives: []
+usages:
+  - {where: "https://agluxurytx.example/communities/light-farms", use: website, brand: ag-luxury, since: 2026-10-01, until: null, represents_named_place: true}
+review_due: 2027-09-28

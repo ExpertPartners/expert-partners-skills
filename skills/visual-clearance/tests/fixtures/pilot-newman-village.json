@@ -1,0 +1,66 @@
+{
+  "fixture_note": "Pilot 1 from the 2026-09-28 research benchmark. Newman Village returned no Commons or Openverse community image; a separate Newman Village apartment complex (newmanfrisco.com) is a known mislabeling trap. The stock gate URL is synthetic.",
+  "as_of": "2026-09-28",
+  "request": {
+    "subject": "Newman Village, Frisco TX",
+    "place_key": "newman-village-frisco-tx",
+    "represents_named_place": true,
+    "intended_use": "website community hero",
+    "use_contexts": ["website"],
+    "brand": "ag-luxury",
+    "profile": "ag-luxury-community-hero",
+    "modifications": ["16:9 crop", "30% dark overlay", "heading text"],
+    "commercial": true,
+    "visual_direction": "golden hour, water, no signage",
+    "known_owner_sources": []
+  },
+  "register_check": {"status": "checked", "note": "no approved record for newman-village-frisco-tx"},
+  "search_log": [
+    {"source": "Wikimedia Commons API", "query": "Newman Village Frisco", "results": 0},
+    {"source": "Openverse API", "query": "Newman Village Frisco", "results": 0},
+    {"source": "web search", "query": "Newman Village Frisco photos", "results": 2}
+  ],
+  "candidates": [
+    {
+      "candidate_id": "newman-apartments",
+      "subject": "Newman Village apartments exterior",
+      "source": "newmanfrisco.com",
+      "source_class": "owner_permission",
+      "creator": null,
+      "source_url": "https://newmanfrisco.com/",
+      "dimensions": {"w": 2400, "h": 1350},
+      "capture_date": null,
+      "location": {
+        "claimed_grade": "VERIFIED",
+        "evidence": [
+          {"type": "search_label", "detail": "result titled Newman Village"},
+          {"type": "contradiction", "detail": "newmanfrisco.com is a separate Newman Village apartment complex, not the Newman Village community", "pointer": "https://newmanfrisco.com/"}
+        ]
+      },
+      "rights": {"basis": "visible_online", "commercial_use": "unknown", "modification": "unknown", "conditions": [], "scope_covers_use": "unknown"},
+      "third_party_flags": [],
+      "owner_contact_route": "developer"
+    },
+    {
+      "candidate_id": "generic-gate",
+      "subject": "Luxury community entry gate",
+      "source": "stock search (synthetic)",
+      "source_class": "paid_stock",
+      "creator": "Stock contributor",
+      "source_url": "https://stock.example/luxury-gate-123",
+      "dimensions": {"w": 6000, "h": 4000},
+      "capture_date": "2024",
+      "location": {
+        "claimed_grade": "PROBABLE",
+        "evidence": [
+          {"type": "search_label", "detail": "result tagged Frisco gated community"},
+          {"type": "ai_inference", "detail": "the gate resembles a Frisco entry"}
+        ]
+      },
+      "rights": {"basis": "visible_online", "commercial_use": "unknown", "modification": "unknown", "conditions": [], "scope_covers_use": "unknown"},
+      "third_party_flags": [],
+      "license_purchase": {"available": true, "vendor": "stock (synthetic)", "covers_use": true}
+    }
+  ],
+  "expected": {"defensible_count": 0, "empty_route": "COMMISSION", "actions": {"newman-apartments": "REJECT", "generic-gate": "REJECT"}}
+}

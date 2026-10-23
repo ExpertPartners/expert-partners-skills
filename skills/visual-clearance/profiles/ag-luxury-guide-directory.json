@@ -1,0 +1,14 @@
+{
+  "profile_id": "ag-luxury-guide-directory",
+  "profile_version": "1.0.0",
+  "surface": "AG Luxury website neighborhood directory card",
+  "owner": "ExpertPartners/ag-luxury-site (website placements and size requirements)",
+  "provenance": "Consumer copy of targetCrops.directory in docs/evidence/community-photo-candidates-2026-09-28.json and docs/visual-photo-replacements-2026-09-28.md line 7, read at ag-luxury-site f2f9095696284114c10686a9f40e5a7992795b59 on 2026-09-28. The owner record wins; scripts/evaluate_site_record.py fails on drift.",
+  "orientation": "landscape",
+  "aspect_ratio": { "w": 4, "h": 3 },
+  "aspect_mode": "exact",
+  "min_crop_px": { "w": 1200, "h": 900 },
+  "visual_review_items": [
+    "card_subject: the identifying subject still reads at directory-card size"
+  ]
+}

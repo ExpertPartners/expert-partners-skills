@@ -1,0 +1,26 @@
+name: visual-clearance
+on:
+  pull_request:
+    paths:
+      - 'skills/visual-clearance/**'
+      - '.github/workflows/visual-clearance.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'skills/visual-clearance/**'
+      - '.github/workflows/visual-clearance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  helpers-and-guards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Install PyYAML for YAML record fixtures
+        run: python3 -m pip install --quiet pyyaml
+      - name: Helper, pilot and guard tests
+        run: python3 -m unittest discover -s skills/visual-clearance/tests -p 'test_*.py' -v

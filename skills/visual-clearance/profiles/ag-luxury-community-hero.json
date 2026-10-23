@@ -1,0 +1,19 @@
+{
+  "profile_id": "ag-luxury-community-hero",
+  "profile_version": "1.1.0",
+  "surface": "AG Luxury website neighborhood guide hero",
+  "owner": "ExpertPartners/ag-luxury-site (website placements and size requirements)",
+  "provenance": "Consumer copy of the owner's documented hero requirement: docs/visual-photo-replacements-2026-09-28.md line 7 and targetCrops.hero in docs/evidence/community-photo-candidates-2026-09-28.json, read at ag-luxury-site f2f9095696284114c10686a9f40e5a7992795b59 on 2026-09-28. The owner record wins on any difference; scripts/evaluate_site_record.py fails on drift. The 30 percent dark overlay review item comes from the Visual Clearance v1 dispatch, not the site record.",
+  "orientation": "landscape",
+  "aspect_ratio": { "w": 16, "h": 9 },
+  "aspect_mode": "exact",
+  "min_crop_px": { "w": 2000, "h": 1200 },
+  "heading_safe_zone": { "x": 0.2, "y": 0.3, "w": 0.6, "h": 0.4 },
+  "overlay": { "type": "dark", "opacity": 0.3 },
+  "mobile": { "viewport": { "w": 390, "h": 844 }, "min_density": 1.0, "report_densities": [2, 3] },
+  "visual_review_items": [
+    "calm_center: the heading safe zone is low-detail and free of signage, faces, house numbers and busy texture",
+    "overlay_tolerance: the image still reads as the named place under the dark overlay",
+    "mobile_subject: the identifying subject stays inside the 390 x 844 mobile slice"
+  ]
+}

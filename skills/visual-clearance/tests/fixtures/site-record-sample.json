@@ -1,0 +1,48 @@
+{
+  "fixture_note": "SYNTHETIC. Same shape as the AG Luxury website's community-photo candidate record, with invented values, so the adapter can be tested without copying the owner's record.",
+  "recordedAt": "2026-09-28",
+  "candidates": [
+    {
+      "slug": "sample-labeled",
+      "title": "Sample Labeled Estates",
+      "sourcePage": "https://developer.example/gallery",
+      "identityEvidence": "Developer gallery labels this Sample Labeled Estates Entry.",
+      "subject": "Entry and landscaping",
+      "sourceKind": "developer",
+      "targetCrops": {"directory": "4:3, at least 1200x900", "hero": "16:9, at least 2000x1200", "midGuide": "3:2 or wider, at least 2000x1300"},
+      "observedPixelDimensions": {"width": 1200, "height": 675},
+      "sourcePublisher": "Sample Developer",
+      "photographer": "Not credited on the reviewed source page",
+      "marketingContact": "https://developer.example/contact",
+      "reuseRights": "No AG Luxury website reuse permission verified"
+    },
+    {
+      "slug": "sample-page-only",
+      "title": "Sample Page Only Park",
+      "sourcePage": "https://agent.example/neighborhood",
+      "identityEvidence": "Agent page groups this photograph under the exact community; scene and address are not independently captioned.",
+      "subject": "Streetscape",
+      "sourceKind": "agent",
+      "targetCrops": {"directory": "4:3, at least 1200x900", "hero": "16:9, at least 2000x1200", "midGuide": "3:2 or wider, at least 2000x1300"},
+      "observedPixelDimensions": {"width": 3000, "height": 2000},
+      "sourcePublisher": "Sample Agent",
+      "photographer": "Not credited on the reviewed source page",
+      "marketingContact": "https://agent.example/contact",
+      "reuseRights": "No AG Luxury website reuse permission verified"
+    },
+    {
+      "slug": "sample-listing",
+      "title": "Sample Listing Hills",
+      "sourcePage": "https://listing.example/1",
+      "identityEvidence": "MLS 0000001 listing explicitly identifies Sample Listing Hills; MLS photography reuse rights are unverified.",
+      "subject": "Residence exterior",
+      "sourceKind": "listing",
+      "targetCrops": {"directory": "4:3, at least 1200x900", "hero": "16:9, at least 2000x1200", "midGuide": "3:2 or wider, at least 2000x1300"},
+      "observedPixelDimensions": {"width": 2400, "height": 1600},
+      "sourcePublisher": "Sample Listing Publisher",
+      "photographer": "Not credited on the listing",
+      "marketingContact": "https://listing.example/agent",
+      "reuseRights": "No AG Luxury website reuse permission verified"
+    }
+  ]
+}
