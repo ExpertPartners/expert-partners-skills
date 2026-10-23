@@ -1,0 +1,20 @@
+[
+  {
+    "id": "named-board-luxury-bio",
+    "request": "Run a shadow board on my luxury bio. Use this board exactly, Marty Neumeier, Robert McKee, Jean-Noël Kapferer, Daniel Kahneman and William Zinsser. The bio is the 2026-10-09 version of Allison Gaddy Luxury Real Estate Bio, Google Doc 1uWtEK9p6E-A0MaDZsy7YagyjlgKntKyNOUtNcnNXFo8, supplied in this folder as bio.md. It belongs to AG Luxury, whose voice canon is in this folder as voice.md. It is my long third-person bio, and its job is to make a luxury seller or buyer in North Texas trust me with a high-value sale.",
+    "fixture": {
+      "bio.md": "Text of Google Doc 1uWtEK9p6E-A0MaDZsy7YagyjlgKntKyNOUtNcnNXFo8, exported read-only at run time. Never committed here.",
+      "voice.md": "ag-luxury canon/voice.md at main (the owner copy, not the frozen aura pointer), copied at run time. Never committed here."
+    }
+  },
+  {
+    "id": "fresh-board-sales-email",
+    "request": "Pressure test this email before I send it. It's for Northlight Media, a small listing photography studio, going cold to agents who just listed a home. Subject: Quick question about your listing photos. Body: Hi Dana, I noticed your new listing on Maple Street went live last week. Our team shoots twilight and drone photos for agents in your area, and homes with twilight shots tend to get more showings. We have openings next Tuesday and Thursday. Would you like me to hold one for you? Thanks, Sam",
+    "fixture": {}
+  },
+  {
+    "id": "typo-does-not-trigger",
+    "request": "Fix the typo in this sentence. We look foward to working with you on the sale.",
+    "fixture": {}
+  }
+]
