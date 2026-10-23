@@ -112,7 +112,7 @@ describe('3. secrets and private-only fields cannot leak', () => {
   const leaks = {
     '1Password reference': 'Reads op://Automation/Some Item/credential before running.',
     'email address': 'Sends a summary to someone@example.com every day.',
-    'private repo URL': 'Source at https://github.com/ExpertPartners/aura/blob/main/x.md today.',
+    'private repo URL': 'Source at https://github.com/ExpertPartners/Development/blob/main/x.md today.',
     // Assembled at runtime so the repo's own secret scanner does not flag the fixture.
     'credential assignment': `Calls the API with ${['api', 'key'].join('_')}=${'xyz'.repeat(4)} each time.`,
     'phone number': 'Texts 214-555-0199 when done.',

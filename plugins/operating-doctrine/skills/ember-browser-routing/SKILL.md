@@ -90,7 +90,7 @@ Inspect fresh window, profile, URL and task ownership before input. Native app
 input is not a substitute for exact tab isolation: if another task owns the
 window or focus cannot be safely established, stop on that specific conflict.
 Do not reset a runtime owned by another task. This fallback follows Aura
-[decision 0104](https://github.com/ExpertPartners/aura/blob/main/decisions/0104-ember-native-browser-control-before-screen-sharing.md).
+[decision 0104](https://github.com/ExpertPartners/Development/blob/main/decisions/0104-ember-native-browser-control-before-screen-sharing.md).
 
 Treat attachment and app rendering as separate checks. First verify the
 expected location/account in the authenticated browser. Then inspect the

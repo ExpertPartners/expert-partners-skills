@@ -3,7 +3,7 @@
 This repository is the Estate's home for canonical skills and the tools that
 package, deploy and index them. Skills supply reusable operating instructions
 to the Estate's AI surfaces. The
-[Estate Manifest](https://github.com/ExpertPartners/aura/blob/main/docs/estate/estate-manifest.md#entity-index)
+[Estate Manifest](https://github.com/ExpertPartners/Development/blob/main/docs/estate/estate-manifest.md#entity-index)
 records the owner as **Estate**, the job as **Canonical skills and deployment
 tooling**, and the routing context as **NORTH governance**.
 
