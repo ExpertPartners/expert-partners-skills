@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "2c2fd7e201ee2f3c7b648c55884162a503503ca7",
-    "aura": "0ed105853fa102e998b9bd9111d7bdc7e03850c2"
+    "eps": "642977f2c61c0dc6f81ad1003401b88746deebc6",
+    "aura": "a99fde96407e3b6d6ea3e34b435bba26631aff4d"
   },
   "zones": [
     "surfaces",
@@ -4174,18 +4174,6 @@
         "mount": "aura:.agents/skills/"
       },
       {
-        "path": "aura:.agents/skills/estate-memory-router/SKILL.md",
-        "id": "estate-memory-router",
-        "canonical": "eps:plugins/operating-doctrine/skills/estate-memory-router/SKILL.md",
-        "deployedAt": "2026-10-08",
-        "stamp": "v1.1",
-        "mount": "aura:.agents/skills/",
-        "status": "VERIFIED STALE",
-        "awaitingRedeploy": true,
-        "verifiedCanonicalCommit": "def595a5363c3d464bbba6f6db7f2cf5b4ebffd6",
-        "verifiedCanonicalBlob": "2f6c8bbf43ad1a9092f0e0b3ae32a5456f49c59d"
-      },
-      {
         "path": "aura:.agents/skills/project-architect/SKILL.md",
         "id": "project-architect",
         "canonical": "aura:.claude/skills/project-architect/SKILL.md",
@@ -4202,42 +4190,6 @@
         "mount": "aura:.agents/skills/"
       },
       {
-        "path": "aura:.agents/skills/remember-this/SKILL.md",
-        "id": "remember-this",
-        "canonical": "eps:plugins/operating-doctrine/skills/remember-this/SKILL.md",
-        "deployedAt": "2026-10-08",
-        "stamp": "v1.1",
-        "mount": "aura:.agents/skills/",
-        "status": "VERIFIED STALE",
-        "awaitingRedeploy": true,
-        "verifiedCanonicalCommit": "def595a5363c3d464bbba6f6db7f2cf5b4ebffd6",
-        "verifiedCanonicalBlob": "c6c3c14be1f3d3e293b230d98d1597c1a5d2c0ea"
-      },
-      {
-        "path": "aura:.agents/skills/repo-standards/SKILL.md",
-        "id": "repo-standards",
-        "canonical": "eps:plugins/operating-doctrine/skills/repo-standards/SKILL.md",
-        "deployedAt": "2026-09-27",
-        "stamp": "v1.6",
-        "mount": "aura:.agents/skills/",
-        "status": "VERIFIED STALE",
-        "awaitingRedeploy": true,
-        "verifiedCanonicalCommit": "b4ff58e77b2a8fe1c2def11fba55e593019020a3",
-        "verifiedCanonicalBlob": "e52f67deca0cefb03c7128a650e25f3c3e85e65f"
-      },
-      {
-        "path": "aura:.agents/skills/research-intake/SKILL.md",
-        "id": "research-intake",
-        "canonical": "eps:plugins/research-ops/skills/research-intake/SKILL.md",
-        "deployedAt": "2026-09-04",
-        "stamp": "tree sha256 7c8710c18d31",
-        "mount": "aura:.agents/skills/",
-        "status": "VERIFIED STALE",
-        "awaitingRedeploy": true,
-        "verifiedCanonicalCommit": "aac7b48fcab7ceaf4b14c34da4eb441896a0e664",
-        "verifiedCanonicalBlob": "e0bde0f794a56bae9d136d5617daec11f3105431"
-      },
-      {
         "path": "aura:.agents/skills/session-audit/SKILL.md",
         "id": "session-audit",
         "canonical": "aura:.claude/skills/session-audit/SKILL.md",
@@ -4252,78 +4204,6 @@
         "deployedAt": "2026-10-12",
         "stamp": "tree sha256 99e025ff3c34",
         "mount": "aura:.agents/skills/"
-      },
-      {
-        "path": "aura:.agents/skills/session-wrap/SKILL.md",
-        "id": "session-wrap",
-        "canonical": "eps:plugins/operating-doctrine/skills/session-wrap/SKILL.md",
-        "deployedAt": "2026-10-12",
-        "stamp": "v1.18",
-        "mount": "aura:.agents/skills/",
-        "status": "VERIFIED STALE",
-        "awaitingRedeploy": true,
-        "verifiedCanonicalCommit": "43c8a51fa449bdb31b3c9ab5fb93192f80506c4d",
-        "verifiedCanonicalBlob": "0a7dc412d023c351274d80d87184c63ffaf78431"
-      },
-      {
-        "path": "aura:.claude/skills/estate-memory-router/SKILL.md",
-        "id": "estate-memory-router",
-        "canonical": "eps:plugins/operating-doctrine/skills/estate-memory-router/SKILL.md",
-        "deployedAt": "2026-10-08",
-        "stamp": "v1.1",
-        "mount": null,
-        "status": "VERIFIED STALE",
-        "awaitingRedeploy": true,
-        "verifiedCanonicalCommit": "def595a5363c3d464bbba6f6db7f2cf5b4ebffd6",
-        "verifiedCanonicalBlob": "2f6c8bbf43ad1a9092f0e0b3ae32a5456f49c59d"
-      },
-      {
-        "path": "aura:.claude/skills/remember-this/SKILL.md",
-        "id": "remember-this",
-        "canonical": "eps:plugins/operating-doctrine/skills/remember-this/SKILL.md",
-        "deployedAt": "2026-10-08",
-        "stamp": "v1.1",
-        "mount": null,
-        "status": "VERIFIED STALE",
-        "awaitingRedeploy": true,
-        "verifiedCanonicalCommit": "def595a5363c3d464bbba6f6db7f2cf5b4ebffd6",
-        "verifiedCanonicalBlob": "c6c3c14be1f3d3e293b230d98d1597c1a5d2c0ea"
-      },
-      {
-        "path": "aura:.claude/skills/repo-standards/SKILL.md",
-        "id": "repo-standards",
-        "canonical": "eps:plugins/operating-doctrine/skills/repo-standards/SKILL.md",
-        "deployedAt": "2026-09-27",
-        "stamp": "v1.6",
-        "mount": null,
-        "status": "VERIFIED STALE",
-        "awaitingRedeploy": true,
-        "verifiedCanonicalCommit": "b4ff58e77b2a8fe1c2def11fba55e593019020a3",
-        "verifiedCanonicalBlob": "e52f67deca0cefb03c7128a650e25f3c3e85e65f"
-      },
-      {
-        "path": "aura:.claude/skills/research-intake/SKILL.md",
-        "id": "research-intake",
-        "canonical": "eps:plugins/research-ops/skills/research-intake/SKILL.md",
-        "deployedAt": "2026-09-04",
-        "stamp": "tree sha256 7c8710c18d31",
-        "mount": null,
-        "status": "VERIFIED STALE",
-        "awaitingRedeploy": true,
-        "verifiedCanonicalCommit": "aac7b48fcab7ceaf4b14c34da4eb441896a0e664",
-        "verifiedCanonicalBlob": "e0bde0f794a56bae9d136d5617daec11f3105431"
-      },
-      {
-        "path": "aura:.claude/skills/session-wrap/SKILL.md",
-        "id": "session-wrap",
-        "canonical": "eps:plugins/operating-doctrine/skills/session-wrap/SKILL.md",
-        "deployedAt": "2026-10-12",
-        "stamp": "v1.18",
-        "mount": null,
-        "status": "VERIFIED STALE",
-        "awaitingRedeploy": true,
-        "verifiedCanonicalCommit": "43c8a51fa449bdb31b3c9ab5fb93192f80506c4d",
-        "verifiedCanonicalBlob": "0a7dc412d023c351274d80d87184c63ffaf78431"
       }
     ]
   },
