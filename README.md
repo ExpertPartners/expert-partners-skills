@@ -1,52 +1,17 @@
 # Expert Partners AI Operating System Skills
 
-This repository is the Estate's home for canonical skills and the tools that
-package, deploy and index them. Skills supply reusable operating instructions
-to the Estate's AI surfaces. The
-[Estate Manifest](https://github.com/ExpertPartners/Development/blob/main/docs/estate/estate-manifest.md#entity-index)
-records the owner as **Estate**, the job as **Canonical skills and deployment
-tooling**, and the routing context as **NORTH governance**.
-
-## Find the right source
+This repository holds the skills marketplace and the tools that package, deploy and index skills. Business knowledge, rules, and decisions live in the business brains in Google Drive, starting with the HQ Rulebook and Decision Log in HQ Business Brain, Company Core. Read AGENTS.md before changing anything.
 
 | Start here | What it provides |
 | --- | --- |
 | [Plugin marketplace](.claude-plugin/marketplace.json) | Plugin descriptions and paths to their source packages. |
-| [Skill graph](tools/skill-map/skills-graph.json) | Individual skills, descriptions, relationships and canonical source paths across this repo (`eps:`) and Aura (`aura:`). |
+| [Skill graph](tools/skill-map/skills-graph.json) | Individual skills, descriptions, relationships and canonical source paths. |
 | [Standalone skills](skills/) | Canonical skills distributed independently of a plugin. |
 | [Plugin sources](plugins/) | Plugin-carried skills, manifests and supporting assets. |
 | [Operating Doctrine](plugins/operating-doctrine/skills/operating-doctrine/SKILL.md) | The canonical operating instructions inherited by the skills. |
-| [Repo Standards](plugins/operating-doctrine/skills/repo-standards/SKILL.md) | The existing repository baseline and audit workflow, linked to its governing Aura decisions. |
-| [Agent instructions](AGENTS.md) | The lean AI entry point; [CLAUDE.md](CLAUDE.md) imports it. |
+| [Repo Standards](plugins/operating-doctrine/skills/repo-standards/SKILL.md) | The repository baseline and audit workflow. |
+| [Agent instructions](AGENTS.md) | The lean AI entry point. CLAUDE.md imports it. |
 
-These are navigation links, not a second skill catalog. Follow a skill's source
-path to read its current instructions. Aura-native skills remain canonical in
-Aura. Brand and business facts remain in their owning repositories; use the
-Manifest and the applicable skill to reach them.
+Edit a skill in its declared canonical home. The [deployment tool](tools/skill-deploy/deploy-skill.sh) produces deployed copies, checksum manifests and upload ZIPs. The [skill-map tools](tools/skill-map/) generate the graph from canonical skill sources. Correct the sources, never the generated output. The root [operating-doctrine/](operating-doctrine/SKILL.md) file is a pointer to the canonical plugin skill.
 
-## Sources, generated copies and history
-
-Edit a skill in its declared canonical home. The existing
-[deployment tool](tools/skill-deploy/deploy-skill.sh) produces deployed copies,
-checksum manifests and upload ZIPs. Installed copies and caches consume those
-sources; they are not independent places to correct a skill.
-
-The [skill-map tools](tools/skill-map/) generate the graph from canonical skill
-sources. Correct those sources rather than hand-editing the generated index.
-The root [operating-doctrine/](operating-doctrine/SKILL.md) file is a legacy
-pointer to the canonical plugin skill, not a competing instruction body.
-
-[Decisions](decisions/), [doctrine](doctrine/) and [reference material](reference/)
-provide supporting records. The [intake inbox](intake/README.md) captures session
-evidence; [archive/](archive/) preserves history. A capture, proposal or old
-record is not automatically current guidance. Trace the owning decision and
-any supersession before treating it as authority.
-
-## Make a correction
-
-Use the source path in the graph or marketplace to locate the owner. Follow
-[AGENTS.md](AGENTS.md), the applicable skill's update instructions and the
-existing [repository checks](.github/workflows/ci.yml). Keep the correction
-within its authorized scope and use the existing producer for any authorized
-delivery to other surfaces. Changes to another repository's canon belong with
-that owner, not in a duplicate skill here.
+To make a correction, find the skill's source path in the graph or marketplace, follow AGENTS.md and the checks in [ci.yml](.github/workflows/ci.yml), and open a pull request.
