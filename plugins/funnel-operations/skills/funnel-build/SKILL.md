@@ -2,9 +2,9 @@
 name: funnel-build
 description: >-
   Build a brand new funnel in the funnel's brand location, read live from the
-  canonical GHL location registry
-  (partnersync/reference/ghl-location-registry.md, four permanent brand
-  locations, and the registry wins over any disagreeing doc), then document it
+  GoHighLevel location list
+  (section 7.1 of the PartnerSync Identity Canon in Drive, five entries, and
+  the Identity Canon wins over any disagreeing doc), then document it
   so it is born documented. Use this whenever someone wants to build a new
   funnel, create a
   funnel, stand up a funnel, launch a new funnel, or spin up a funnel from
@@ -27,7 +27,7 @@ subtitle: "build a funnel that does not exist yet"
 
 # Funnel Build
 
-This walks the build of a new funnel in the funnel's brand location and then runs Funnel Documentation so the funnel is born documented. Locations come from the canonical registry (partnersync/reference/ghl-location-registry.md). Read it live every time, never work from remembered location names. If any doc disagrees with the registry, the registry wins. No new funnel exists undocumented. That is the whole point.
+This walks the build of a new funnel in the funnel's brand location and then runs Funnel Documentation so the funnel is born documented. Locations come from section 7.1 of the PartnerSync Identity Canon in Drive (02 - Identity Canon, Google Doc ID 1utPoaO5AdN56kUguQ9ehsPwAM2cw7Ztv6UF04KMmC_w), which lists five entries (Expert Partners, EPIC, AG Luxury, AG Influencer, and the PartnerSync agency). Read it live every time and identify locations by ID, never by name and never from remembered location names. If any doc disagrees with the Identity Canon, the Identity Canon wins. No new funnel exists undocumented. That is the whole point.
 
 ## Who you are talking to
 
@@ -55,7 +55,7 @@ A funnel is never just its pages. Plan and build against the full model from the
 
 ## Where things live
 
-- Build location: the brand location per the canonical registry.
+- Build location: the brand location per section 7.1 of the Identity Canon, by location ID.
 - System of record: Notion, the Funnels and Funnel Messages databases. Nothing is done until it lives in Notion.
 - Airtable is the migration tracker only and is not used for new builds.
 
@@ -73,7 +73,7 @@ One step at a time, confirming as you go.
 
 ### Step 1: Confirm the funnel and location
 
-Ask what the funnel is for, what it should accomplish, and which brand location it belongs in (per the canonical registry). Confirm back before doing anything.
+Ask what the funnel is for, what it should accomplish, and which brand location it belongs in (per section 7.1 of the Identity Canon). Confirm back before doing anything.
 
 ### Step 2: Check for duplicates
 
@@ -115,4 +115,4 @@ Then the exact block to paste. Then the instruction to come back. Make it imposs
 
 Use this in Step 7. Fill in the location, funnel name, and public entry link.
 
-"Run a behavioral test-audit on the live GHL funnel for [funnel name] in the [brand location, per the canonical registry] at [public entry link]. Submit a contained test identity: a non-deliverable example.com email, marked do-not-disturb, clearly tagged as a test. Then read the resulting contact and opportunity and confirm four things: the form fired, the expected tags applied, the expected workflow enrolled, and the opportunity landed in the right pipeline and stage. Print the contact ID, today's date, and a clear PASS or FAIL for each of the four checks, then print DONE."
+"Run a behavioral test-audit on the live GHL funnel for [funnel name] in the [brand location, per section 7.1 of the Identity Canon] at [public entry link]. Submit a contained test identity: a non-deliverable example.com email, marked do-not-disturb, clearly tagged as a test. Then read the resulting contact and opportunity and confirm four things: the form fired, the expected tags applied, the expected workflow enrolled, and the opportunity landed in the right pipeline and stage. Print the contact ID, today's date, and a clear PASS or FAIL for each of the four checks, then print DONE."

@@ -26,7 +26,7 @@
     {
       "name": "funnel-operations",
       "source": "./plugins/funnel-operations",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "description": "Build, migrate, and document funnels for Expert Partners and EPIC, with Notion as the single source of truth."
     },
     {
@@ -38,7 +38,7 @@
     {
       "name": "systems-map",
       "source": "./plugins/systems-map",
-      "version": "0.6.3",
+      "version": "0.6.4",
       "description": "The canonical map of where every Expert Partners system lives. Loads at session start; inherits operating-doctrine."
     },
     {
