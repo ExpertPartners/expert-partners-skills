@@ -188,6 +188,7 @@ class Record:
     references: list = field(default_factory=list)
     metadata: list = field(default_factory=list)
     checks: list = field(default_factory=list)
+    captions: list = field(default_factory=list)
 
 class Catalog:
     def __init__(self):
@@ -521,6 +522,10 @@ class Investigation:
             if len(data)<20:break
 
     def archives(self):
+        if getattr(self.args, 'archive_mode', 'sampled') == 'full':
+            from discovery_extensions import full_archives
+            full_archives(self)
+            return
         query=urlencode({'url':'*.'+self.root+'/*','output':'json','filter':'mimetype:text/html','collapse':'urlkey','limit':100})
         url='https://web.archive.org/cdx/search/cdx?'+query
         f=self.http.fetch(url)
@@ -602,6 +607,9 @@ class Investigation:
                 r.checks.append(dict(time=now(),source=r.url,method='media_head',result='media_endpoint_accessible' if good else f.result,status=f.status,headers=f.headers))
             if self.args.yt_dlp and r.platform not in {'direct','vimeo'}:
                 self.ytdlp(r)
+            if getattr(self.args, 'captions', False):
+                from discovery_extensions import read_captions
+                read_captions(self, r, self.args.caption_language or ['en'])
             r.accessibility=classify(r.checks,bool(r.metadata))
             print(f'Validate {r.platform}:{r.video_id}: {r.accessibility}',flush=True)
 
@@ -659,6 +667,9 @@ class Investigation:
                 if ref:self.catalog.add(ref,'user_supplied_seed','seed',seed=True)
         entries=['https://'+self.root+'/','https://'+self.root+'/sitemap.xml']+self.args.site
         for path in self.args.search_json:entries+=self.import_search(path)
+        for path in getattr(self.args, 'youtube_details_json', []):
+            from discovery_extensions import import_youtube_details
+            import_youtube_details(self, path)
         if self.args.legacy_vimeo:self.vimeo_legacy()
         self.crawl(entries)
         for url in self.args.render:self.render(url)
@@ -714,6 +725,12 @@ def parser():
     p.add_argument('--depth',type=int,default=3);p.add_argument('--delay',type=float,default=1.5)
     p.add_argument('--scripts',action=argparse.BooleanOptionalAction,default=True)
     p.add_argument('--legacy-vimeo',action='store_true');p.add_argument('--archives',action='store_true');p.add_argument('--archive-pages',type=int,default=15)
+    p.add_argument('--captions', action='store_true', help='Text-only YouTube captions selected by guarded yt-dlp; no video/audio')
+    p.add_argument('--caption-language', action='append', default=[])
+    p.add_argument('--youtube-details-json', action='append', default=[], help='Import saved Firecrawl details without network requests')
+    p.add_argument('--archive-mode', choices=['sampled', 'full'], default='sampled')
+    p.add_argument('--archive-target', action='append', default=[], help='Explicit public page/feed prefix for full CDX mode')
+    p.add_argument('--archive-index-pages', type=int, default=10)
     p.add_argument('--yt-dlp',action='store_true',help='Optional guarded metadata extraction, never playback proof')
     p.add_argument('--render',action='append',default=[],help='Optional creator page rendering; media/third-party requests disabled')
     p.add_argument('--blocked-domain',action='append',default=[],help='Carry an earlier blocking response into this run')

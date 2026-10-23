@@ -75,3 +75,16 @@ case-specific updater. It accepts documented public credits and already-produced
 decoder evidence; it performs no new discovery. The packaged synthetic suite and
 repository checks are recorded in the PR description separately from the original
 live exercise. No new creator search was performed during skill packaging.
+
+## Follow-up implementation: three additional capabilities
+
+The original exercise above remains unchanged. These additions were implemented
+in the follow-up release and checked with synthetic offline fixtures. A separate
+bounded source check re-extracted preserved creator-page/feed responses and
+retrieved one already-supplied archive snapshot; it did not restart discovery.
+
+| Method | Follow-up evidence and limit |
+| --- | --- |
+| Caption-only transcript reads | Guarded yt-dlp track selection plus JSON3/WebVTT text retrieval is implemented and regression-tested. The current environment's existing YouTube block remains in force; no successful new live caption retrieval is claimed. A separate research worker's reported successful caption run is external evidence, not this CLI's own live proof. |
+| Full bounded per-path CDX inventory | Resume-key pagination, specific website/profile/feed targets, per-row dispositions and configurable caps are regression-tested. A known archived source was retrieved successfully during the bounded source check. This does not claim a new full live CDX crawl or exhaustion of all source archives. |
+| Saved Firecrawl YouTube details import | Offline import, exact ID/owner matching, explicit unlisted state, provenance and preservation of blocks are regression-tested. Provider playability OK remains unobserved playback. No live connector calls were made and no missing provider response was fabricated. |
