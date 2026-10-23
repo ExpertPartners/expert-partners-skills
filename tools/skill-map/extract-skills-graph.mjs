@@ -133,9 +133,7 @@ const DEPLOYED_HEADER = /^# DEPLOYED COPY \((\d{4}-\d{2}-\d{2}), skill-deploy pi
 const DEPLOYED_HEADER_BLOCK = /^# DEPLOYED COPY \(\d{4}-\d{2}-\d{2}, skill-deploy pipeline\): the canonical home is\n# \S+ \S+?SKILL\.md\. Deployed at .+?\.\n# Edit the canonical copy first, then redeploy via tools\/skill-deploy\.\n/m;
 // Header repo names -> walk keys. A header naming a repo this walk does not cover
 // cannot be verified and fails the build.
-// aura was renamed to ExpertPartners/Development on GitHub (2026-10). deploy-skill.sh takes the
-// label from the origin remote, so new aura deploys say "development"; older copies say "aura".
-const REPO_NAME_TO_KEY = { 'expert-partners-skills': 'eps', 'aura': 'aura', 'development': 'aura' };
+const REPO_NAME_TO_KEY = { 'expert-partners-skills': 'eps', 'aura': 'aura' };
 
 // ---------- schema ----------
 

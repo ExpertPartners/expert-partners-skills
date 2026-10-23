@@ -516,6 +516,10 @@ canonical_label_external() {
   url=$(git -C "$dir" remote get-url origin 2>/dev/null || true)
   if [ -n "$url" ]; then repo="$(basename "${url%.git}")"; else repo="$(basename "$top")"; fi
   repo="$(printf '%s' "$repo" | tr '[:upper:]' '[:lower:]')"
+  # aura was renamed to ExpertPartners/Development on GitHub (2026-10). Keep the
+  # established "aura" label so existing deployed headers, --verify, and the
+  # skill-map's aura key stay valid across the rename.
+  [ "$repo" = "development" ] && repo="aura"
   prefix="$(git -C "$dir" rev-parse --show-prefix)"; prefix="${prefix%/}"
   [ -n "$prefix" ] || { echo "FATAL: --from $dir is a repository root, not a skill directory" >&2; return 1; }
   echo "$repo $prefix/SKILL.md"
