@@ -1,0 +1,289 @@
+[
+  {
+    "capability": "Ordinary public HTTP",
+    "route": "PublicHTTP.fetch",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_transient_retry_exactly_once",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Robots checks",
+    "route": "PublicHTTP.allowed",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_robots_wildcards_stop_query",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Sitemaps",
+    "route": "Investigation.crawl",
+    "test_file": "tests/test_extensions.py",
+    "test": "test_empty_public_site_produces_empty_catalog",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Bounded creator-site crawl",
+    "route": "Investigation.crawl",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_shared_domain_budget",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Page and embed extraction",
+    "route": "extract_references",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_relative_media_and_no_numeric_guessing",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Inline JavaScript and structured source",
+    "route": "decode_text",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_escaped_inline_javascript",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "External JavaScript",
+    "route": "Investigation.crawl",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_serialized_marketing_fixture",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Platform/direct URL recognition",
+    "route": "identify_url",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_youtube_forms",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Search indexes",
+    "route": "Investigation.import_search",
+    "test_file": "tests/test_verification.py",
+    "test": "test_exact_id_evidence_rejects_unrelated_search_results",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Exact-ID corroboration",
+    "route": "review_catalog.matching_hits",
+    "test_file": "tests/test_verification.py",
+    "test": "test_exact_id_evidence_rejects_unrelated_search_results",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Vimeo supported oEmbed",
+    "route": "Investigation.validate",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_partial_oembed_not_playback",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Deprecated Vimeo Simple API",
+    "route": "Investigation.vimeo_legacy",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_name_is_not_identity",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Identity matching",
+    "route": "apply_metadata",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_name_is_not_identity",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Wayback CDX and snapshots",
+    "route": "Investigation.archives",
+    "test_file": "tests/test_extensions.py",
+    "test": "test_full_cdx_paginates_platform_paths_and_accounts_all_rows",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Conflicting source review",
+    "route": "review_catalog.review",
+    "test_file": "tests/test_review.py",
+    "test": "test_third_party_credit_is_not_platform_verification",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Common Crawl collection discovery",
+    "route": "Investigation.archives",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_robots_wildcards_stop_query",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Direct-media HEAD",
+    "route": "Investigation.validate",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_uncertain_classification",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Prefix range sampling",
+    "route": "probe_media.sample",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_range_ignored_never_reads_body",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Seekable bounded decoding",
+    "route": "verify_candidates.verify_one",
+    "test_file": "tests/test_verification.py",
+    "test": "test_seeks_and_cache",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Still inspection",
+    "route": "verify_candidates.verify_one",
+    "test_file": "tests/test_verification.py",
+    "test": "test_sample_does_not_claim_full_duration_playback",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Fresh publication check",
+    "route": "Investigation.scan",
+    "test_file": "tests/test_review.py",
+    "test": "test_review_preserves_sources_seeds_and_keys",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Content-addressed evidence",
+    "route": "PublicHTTP.record",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_resume_preserves_budget_cache_and_block",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Resume/offline replay",
+    "route": "PublicHTTP.restore",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_offline_replay_cannot_make_requests",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Deduplication and exports",
+    "route": "Investigation.export",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_dedupe_keeps_provenance_and_seed_and_hash",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Baseline preservation",
+    "route": "review_catalog.review",
+    "test_file": "tests/test_review.py",
+    "test": "test_review_preserves_sources_seeds_and_keys",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Automated and independent checks",
+    "route": "tests/",
+    "test_file": "tests/test_extensions.py",
+    "test": "test_empty_public_site_produces_empty_catalog",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Workspace/repository inspection",
+    "route": "README.md",
+    "test_file": "tests/test_review.py",
+    "test": "test_existing_and_nested_outputs_refused",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "[yt-dlp](https://github.com/yt-dlp/yt-dlp)",
+    "route": "Investigation.ytdlp",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_media_body_never_read",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "[baba20o/filmot-cli](https://github.com/baba20o/filmot-cli)",
+    "route": "references/methods-used.md",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_robots_wildcards_stop_query",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Filmot web search",
+    "route": "Investigation.platform_discovery",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_403_circuit_breaker_covers_subdomains",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "YouTube channel, playlists, feeds, oEmbed, player",
+    "route": "Investigation.platform_discovery",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_proxy_403_not_retried",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Vimeo general website scraping",
+    "route": "PublicHTTP.allowed",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_uncertain_classification",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Official authenticated platform APIs",
+    "route": "references/methods-used.md",
+    "test_file": "tests/test_verification.py",
+    "test": "test_no_implicit_netrc_credentials",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Connected YouTube metadata provider",
+    "route": "discovery_extensions.import_youtube_details",
+    "test_file": "tests/test_extensions.py",
+    "test": "test_import_metadata_preserves_block_and_does_not_claim_playback",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Browser/Playwright rendering",
+    "route": "Investigation.render",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_media_body_never_read",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Wistia/Loom recognition",
+    "route": "identify_url",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_reject_false_ids",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Full video/audio verification",
+    "route": "verify_candidates.BoundedRangeReader",
+    "test_file": "tests/test_verification.py",
+    "test": "test_refuse_full_file_response_without_read",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Private/unlisted enumeration",
+    "route": "README.md",
+    "test_file": "tests/test_discovery.py",
+    "test": "test_uncertain_classification",
+    "status": "original_exercise_or_explicit_limitation"
+  },
+  {
+    "capability": "Caption-only transcript reads",
+    "route": "discovery_extensions.read_captions",
+    "test_file": "tests/test_extensions.py",
+    "test": "test_captions_text_only_and_no_playback_promotion",
+    "status": "implemented_offline_tested_live_scope_limited"
+  },
+  {
+    "capability": "Full bounded per-path CDX inventory",
+    "route": "discovery_extensions.full_archives",
+    "test_file": "tests/test_extensions.py",
+    "test": "test_full_cdx_paginates_platform_paths_and_accounts_all_rows",
+    "status": "implemented_offline_tested_live_scope_limited"
+  },
+  {
+    "capability": "Saved Firecrawl YouTube details import",
+    "route": "discovery_extensions.import_youtube_details",
+    "test_file": "tests/test_extensions.py",
+    "test": "test_import_metadata_preserves_block_and_does_not_claim_playback",
+    "status": "implemented_offline_tested_live_scope_limited"
+  }
+]

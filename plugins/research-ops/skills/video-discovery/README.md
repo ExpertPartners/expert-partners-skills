@@ -128,3 +128,65 @@ separate original live exercise. Review third-party endpoints and terms before a
 new live run. Keep output, caches, virtual environments and captured media out of
 version control. The original case-specific catalogs and reports are intentionally
 not shipped in this public plugin.
+
+## Caption text, deeper archive inventory, and saved YouTube details
+
+Add `--captions --caption-language en` to discovery to request subtitle text only.
+The guarded yt-dlp adapter selects human/automatic tracks with the equivalent of
+`--skip-download --write-subs --write-auto-subs`; text retrieval goes through the
+same HTTP client, robots checks and persistent budgets. JSON3 or WebVTT text is
+stored in evidence, with language and source in each record's `captions` array.
+Up to five selected language tracks are read. Missing captions stay unconfirmed.
+Retrieving a track does not mean its words were reviewed or its visuals watched.
+Known platform blocks prevent caption extraction, including alternate live clients.
+
+Use `--archives --archive-mode full --archive-pages 50 --archive-index-pages 10`
+for a complete inventory of the CDX rows returned within the requested caps.
+This queries the website and supplied marketing paths plus Vimeo profile/feed
+prefixes. Add a specific public platform path with repeatable `--archive-target`,
+for example `--archive-target https://vimeo.com/api/v2/examplecreator/`.
+Only supplied creator/platform domains are accepted. No profile IDs are guessed.
+
+Unlike sampled mode, full mode follows CDX resume keys, retains every returned
+row in `archive-inventory.json`, and records non-page assets, errors, duplicates
+and bodies skipped at the snapshot cap. It reports `index_exhausted` for each
+target. Full means this inventory mode, not an unlimited or exhaustive Internet
+search: the 100-request shared archive.org cap still includes robots, indexes,
+snapshots, redirects and retries. Common Crawl remains in sampled archive mode.
+
+`--youtube-details-json saved-details.json` imports saved Firecrawl metadata with
+zero connector calls. Use a JSON array of envelopes in this explicit format:
+
+```json
+[
+  {
+    "provider": "firecrawl",
+    "retrieved_at": "2026-10-23T12:00:00Z",
+    "source_url": "https://www.youtube.com/watch?v=AbCdEf123_-",
+    "data": {
+      "video_id": "AbCdEf123_-",
+      "title": "Example video",
+      "channel_id": "UC_EXACT_PUBLIC_CHANNEL_ID",
+      "channel": "Example Creator",
+      "is_unlisted": true,
+      "playability_status": {"status": "OK"}
+    }
+  }
+]
+```
+
+Normalize a saved provider response into this envelope while retaining its raw
+response separately. No arbitrary nested connector shape is guessed. The video ID
+must match the source URL. Ownership uses the exact channel ID; unlisted requires
+a literal boolean `true`. Provider playability OK is stored as
+`provider_reports_playability_ok`, never `confirmed_playable`. The original saved
+bytes, retrieval date and import date stay in evidence. Importing an older result
+does not clear a platform block or prove current availability. Imported fields
+must come from actual saved responses, never a summary or invented placeholder.
+
+[Capability parity](references/parity.md) maps the original methods and these
+three additions to code or explicit limitations and named regression tests.
+The test suite fails if an inventory capability loses its mapping or route.
+Archivarix, PublicWWW and the official Vimeo API Playground remain explicitly
+outside this CLI's live-tested integrations. No deployment to another AI surface
+is implied by a passing local test or a merged PR.
