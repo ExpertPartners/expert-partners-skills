@@ -12,9 +12,11 @@ status: live
 subtitle: "the one canonical session close-out"
 ---
 
-# Session Wrap -- v1.18 (2026-10-12)
+# Session Wrap -- v1.19 (2026-10-22)
 
 <!-- RULED-BY: aura/decisions/0107-retire-routing-naming-ceremony.md date:2026-10-12 superseded naming text removed -->
+
+v1.19 amendment 2026-10-22 (HQ Rulebook Session lifecycle section and Decision Log 2026-10-22, Code sessions wrap and archive themselves, never ask Allison, confirmed by Allison in this change's own session; disclosure of record intake/2026-10-22-disclosure-rulebook-sync-formatting-tabs-session-wrap.md): a finished Claude Code or Codex session wraps and archives itself where the app allows and never asks Allison whether it is ready. New section 5A. This supersedes any wording here or in session-steward that waits on Allison's agreement before a finished code session archives. The live Rulebook wins wherever this skill differs.
 
 
 
@@ -163,6 +165,28 @@ Amended 2026-08-30 (v1.9 amendment above): the verdict carries BUILD BLOCKERS an
 - Mission not achieved. Say plainly, all things have not been accomplished. List exactly what is unfinished. Then hand Allison the standing opening prompt from reference/opening-prompt.md with this lane's name filled in, ready to paste into the continuing conversation, in the same wrap turn.
 
 This verdict covers THIS lane's own continuation. Flags that belong in other lanes still ship as staged kickoffs under step 4 and never substitute for the verdict. A wrap with no verdict is a partial wrap, the failure condition.
+
+## 5A. Code sessions wrap and archive themselves (v1.19)
+
+<!-- RULED-BY: intake/2026-10-22-disclosure-rulebook-sync-formatting-tabs-session-wrap.md date:2026-10-22 -->
+
+Source, the HQ Rulebook's Session lifecycle section and Decision Log 2026-10-22, Code sessions wrap and archive themselves, never ask Allison. The live Rulebook wins wherever this section differs.
+
+When a Claude Code or Codex session finishes, it closes itself. Finished means three things are true.
+
+- Its outputs are saved where they belong.
+- Its report is written in the Handoffs tab and read back.
+- Nothing is owed either way, no open question, no undelivered 📬 note, and nothing it still runs (session-steward section 7A).
+
+Then it wraps and archives itself where the app allows, and it never asks Allison whether it is ready.
+
+- Claude Code desktop. Call `archive_session` with `session_id` set to `self` as the very last action, after the final reply text. In Auto and Bypass permissions modes no approval card appears, and in other modes the app shows its own card (code.claude.com/docs/en/desktop, Work across sessions, checked 2026-10-22). A pinned session, a session still working, or one open on screen is refused by the app, so treat that refusal as the cannot-archive case below.
+- Codex. `codex archive <SESSION>` archives a saved session by ID or name, and the app server has `thread/archive` (learn.chatgpt.com, Developer commands and App Server, checked 2026-10-22). The docs do not say whether a session can archive itself while it is still running, so use it only where it works and fall back otherwise.
+- Cloud sessions are not archived this way. They use the cannot-archive case.
+
+If it cannot archive itself, its last line is exactly `WRAP, safe to archive`. The session steward and Star's nightly check list those sessions for one archive pass.
+
+Asking Allison "ready to wrap?" or "can I archive?" is the failure condition. A session that still owes something is not finished. It stays ACTIVE or WAITING under the Rulebook's Session lifecycle states and says which.
 
 ## 6. Session open (the other half)
 
