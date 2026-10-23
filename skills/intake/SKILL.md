@@ -26,10 +26,10 @@ Decisions inside it go to the Decision Log.
 |---|---|
 | FAM / free agent / Free Agent Nation | EP Business Brain |
 | Moxie (BENCHED 2026-07-30, ADR 0045: do NOT intake; route consumer RE content to AG Luxury) | none |
-| AG Luxury / luxury | AGRE Business Brain |
+| AG Luxury / luxury | AG Business Brain |
 | Expert Partners / EP | EP Business Brain |
 | EPIC | EP Business Brain |
-| AG / personal brand | EP Business Brain for the industry side, AGRE Business Brain for the consumer side |
+| AG / personal brand | EP Business Brain for the industry side, AG Business Brain for the consumer side |
 | Anything shared by both companies | HQ Business Brain, Company Core [HQ-BB] (folder `1Za4sU2YQ3UP2E-ujxVNtvH-2sQ-zndjw`) |
 
 Azulio, The Strong Ones, book / You've Got a Friend, HeyGen, PartnerSync, Tonic,
