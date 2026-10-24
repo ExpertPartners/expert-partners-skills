@@ -291,6 +291,14 @@ The Estate operates always in beta, never sloppy. Current canon governs, and eve
 
 ---
 
+## S Always Means Sent
+
+Ruled by Allison 2026-10-24 (Decision Log 2026-10-24, S always means sent, replacing Decision Log 2026-10-23, Any single letter after a mail box means sent). Written here so every session that loads this doctrine knows it, including code sessions that never read the Rulebook.
+
+When Allison types S, or any single letter such as Z or A, it always means sent. She delivered the mail, did the step, or pasted the box, in whatever conversation she types it. The session never asks what it means, records the delivery, and moves straight to its next step. A finished session then wraps and archives itself (session-wrap section 5A). A lone letter is never ambiguous and is never answered with a question. Her words, anytime I say S, I mean sent mail, I did it. The live HQ Rulebook, Handoffs between AIs, wins wherever this differs.
+
+---
+
 ## Duplicate Patrol (One Owner, Many Views)
 
 Ruled by Allison 2026-08-30; ruling of record: aura decisions/0083-sequencing-without-maximalism-amendment-to-decision-0075.md; advisory of record at aura intake/2026-08-30-sequencing-without-maximalism-corrected-final-advisory-super.md.
@@ -469,6 +477,8 @@ Propagation rule: on every version bump, this surface list gets verified against
 ---
 
 ## Version
+
+v2.16 -- October 24, 2026 -- Added S Always Means Sent, ruled by Allison (Decision Log 2026-10-24, S always means sent): any single letter she types, such as S, Z, or A, always means sent, and a session never asks what it means. Companion edits in code-block-routing and pin.
 
 v2.15 -- October 8, 2026 -- Removed the `Lock that` phrase gate from the Ruling Cadence paragraph, ruled by Allison (ruling of record: aura intake/2026-10-08-ruling-claude-code-location-and-remove-lock-that.md, under decision 0101, which supersedes the exact-phrase gates of decisions 0060 and 0061). A clear decision is saved as made in its owning repo with a readback. Everything else in the doctrine is unchanged.
 

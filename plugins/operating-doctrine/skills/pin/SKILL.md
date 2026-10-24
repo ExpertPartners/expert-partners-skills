@@ -53,7 +53,7 @@ SAFE TO ARCHIVE is a verified claim, never a phrase. It is issued only after all
 
 NOT safe means the session diagnoses AND prescribes: it names exactly what is open and the single move that closes it, /session-wrap when chat-only decisions or flags are unrecorded, /session-closeout when shipped work has no handoff note on main, or the named open action otherwise. Never leave Allison to work out which.
 
-What stays with the home conversation: the actual archive click, and the ledger flip. Home flips the lane's row to `archived` in the Job Tracker as one motion with the archive, and no dispatch block is ever written against a row reading `archived`. Sessions born before v4.5 follow the lifecycle rule from their next response.
+What stays with the home conversation: the ledger flip. The archive itself is the session's own, since a finished code session wraps and archives itself without waiting for Allison (session-wrap section 5A, Decision Log 2026-10-24, Finished code sessions wrap and archive themselves), and the Steward sweeps any that cannot. Home flips the lane's row to `archived` in the Job Tracker as one motion with that archive, and no dispatch block is ever written against a row reading `archived`. Sessions born before v4.5 follow the lifecycle rule from their next response.
 
 ### The earned verdict line (v4.7, ruled by Allison 2026-08-07, Aura / Code Rule Fix lane)
 
@@ -64,11 +64,13 @@ Amends v4.5; does not replace it. The standing SESSION STATUS line stays, and ev
 - `VERDICT: RECOMMEND ARCHIVE -- all pushed, nothing pending on Allison's side.` Permitted ONLY when the session verifies its checklist live in the same turn: every commit pushed, the whole brief executed, nothing gated or held open, no deliverable still owed. A bare safe-to-archive with no checklist behind it stays banned.
 - `VERDICT: RECOMMEND HOLD OPEN, waiting on <the one named thing>.` Every other state earns this one. One named thing, never a list.
 
-Archive authority stays with the home conversation and home's GitHub grading remains the backstop, but Allison may archive on the spot on a RECOMMEND ARCHIVE without waiting for home. Sessions born before v4.7 follow it from their next carry-back.
+Archive authority, as of Decision Log 2026-10-24, Finished code sessions wrap and archive themselves, is the finished code session's own: it archives itself and Allison is never the gate. Home's GitHub grading remains the backstop, and Allison may still archive on the spot on a RECOMMEND ARCHIVE. Sessions born before v4.7 follow it from their next carry-back.
 
 ## 2. Pin timing and the come-back close (v4)
 
-Pin ONLY after Allison confirms the paste ("pasted", "done", or similar). Exception: she types "pin" unprompted (bare or with a note), pin immediately. The confirmation is always hers to volunteer: since v4.2 the carry-back never asks for it, so if she says nothing, no pin fires and that is correct. If she supplies her own text, it becomes the in-flight content preserved exactly as typed; still write the awaited part.
+**S always means sent (2026-10-24).** When Allison types S, or any single letter such as Z or A, it always means sent. She delivered the mail, did the step, or pasted the box, in whatever conversation she types it. The session never asks what it means, records the delivery, and moves straight to its next step. A finished session then wraps and archives itself (session-wrap section 5A). A lone letter is never ambiguous and is never answered with a question. Her words, anytime I say S, I mean sent mail, I did it. In this skill a lone letter is a paste confirmation, so the pin fires on it exactly as it would on pasted or done.
+
+Pin ONLY after Allison confirms the paste ("pasted", "done", or similar, and any single letter such as S, Z, or A always counts as sent, per Decision Log 2026-10-24, S always means sent; a session never asks what a lone letter means). Exception: she types "pin" unprompted (bare or with a note), pin immediately. The confirmation is always hers to volunteer: since v4.2 the carry-back never asks for it, so if she says nothing, no pin fires and that is correct. If she supplies her own text, it becomes the in-flight content preserved exactly as typed; still write the awaited part.
 
 The pin response is the bar plus exactly one orientation line pointing her back:
 
