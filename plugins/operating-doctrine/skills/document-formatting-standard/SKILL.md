@@ -20,7 +20,7 @@ This version supersedes the hard-coded values, plain-title filenames, Aura Docs 
 
 ## The source is the Rulebook
 
-The Document formatting section of [V1 - Company Core - HQ Rulebook](https://docs.google.com/document/d/15sCFxMvG8OZMZik5w0Hzqzh7HyphrB7rJ8NBtm46JBE/edit) sets every number for company documents. That covers fonts, sizes, colors, line spacing, and paragraph spacing. [V1 - Company Core - Decision Log](https://docs.google.com/document/d/1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc/edit) records each change.
+The Document formatting section of [[HQ][V1.0] HQ Rulebook](https://docs.google.com/document/d/15sCFxMvG8OZMZik5w0Hzqzh7HyphrB7rJ8NBtm46JBE/edit) sets every number for company documents. That covers fonts, sizes, colors, line spacing, and paragraph spacing. [[HQ][V1.0] Decision Log](https://docs.google.com/document/d/1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc/edit) records each change.
 
 Read that section live before you make or restyle a document. Never use a remembered value. Line spacing alone moved from 1.5 to 1.15 and back to 1.5 during October 2026.
 

@@ -39,7 +39,7 @@ A lock on that directory is evidence about that automation process, not proof
 that the authenticated browser is unavailable. Do not use `--isolated`, remove
 locks, restart Chrome, copy authentication, or create another profile to bypass it.
 
-<!-- RULED-BY: HQ Business Brain, V1 - Company Core - Decision Log, 2026-10-20 entry "Browser automation runs only in the signed-in Chrome on Ember's M2" date:2026-10-20 -->
+<!-- RULED-BY: HQ Business Brain, [HQ][V1.0] Decision Log, 2026-10-20 entry "Browser automation runs only in the signed-in Chrome on Ember's M2" date:2026-10-20 -->
 
 Never open a fresh, signed-out, or separate-profile browser for any browser
 work. Always use the signed-in Chrome, and assume it and 1Password are
