@@ -3,12 +3,13 @@ name: video-discovery
 description: >
   Discover publicly referenced individual videos associated with a creator on
   YouTube, Vimeo, websites and public archives. Use for bounded public video
-  research, finding embeds or omitted listings, or independently verifying an
+  research, "find hidden videos", "unlisted videos for", "find replays",
+  "scan a creator's site for videos", or independently verifying an
   existing candidate catalog. Runs a local Python CLI, preserves provenance,
   separates ownership from publication and playback, and exports CSV, JSON and
   Markdown. Does not enumerate every unlisted video or bypass access controls.
 metadata:
-  version: 1.0.0
+  version: 1.1.0
 classification: public
 tier: plugin
 zone: hands
@@ -22,8 +23,10 @@ subtitle: "public video discovery with evidence and bounded playback checks"
 
 Use the packaged Python tool for public, read-only investigations. Read
 [the running instructions](README.md) and [the actual methods inventory](references/methods-used.md)
-before claiming coverage. The inventory separates methods used, failed attempts,
+and [the capability parity table](references/parity.md) before claiming coverage. The inventory separates methods used, failed attempts,
 and implemented but unexercised adapters.
+
+Team guide: [[HQ-Skills][V1.0] Video Discovery Team Guide](https://docs.google.com/document/d/1Q5gcUICXV_7eqoJjTnf3quLT960hFxSeDEBc_O4-bvY/edit), in HQ Business Brain Skills Vault.
 
 ## Inputs and scope
 
@@ -47,26 +50,31 @@ budgets, or use another client to evade a recorded block.
    Import permitted search-index results with their actual source URLs. Archives
    and deprecated Vimeo Simple API are optional. Browser rendering is optional
    and only justified when ordinary source lacks the needed references.
-3. Inspect metadata and exact platform identities. A name match, creator-site
+3. Use `--captions` for text-only subtitle tracks, `--archives --archive-mode full`
+   for per-path CDX inventory with explicit caps, and `--youtube-details-json`
+   for saved Firecrawl detail imports. These reuse policy/budget guards. Never
+   issue a live connector request to route around a known block. Imported
+   playability OK remains a dated provider claim, not observed playback.
+4. Inspect metadata and exact platform identities. A name match, creator-site
    embed, interview appearance or testimonial establishes neither uploader
    ownership nor unlisted status. Successful oEmbed, formats or HEAD responses
    establish no playback claim. An inaccessible response alone proves neither
    deletion nor privacy.
-4. For existing direct MP4 candidates, optionally run `verify_candidates.py`.
+5. For existing direct MP4 candidates, optionally run `verify_candidates.py`.
    It uses strict HTTP 206 byte ranges and an offline decoder, never complete
    files. Require two seconds of distinct, noncorrupt decoded frames to report
    a viewable sample. Preserve the distinction from full-duration, audio and
    browser playback. Platform playback remains unconfirmed unless legitimate
    platform evidence independently supports it; this tool does not implement a
    general platform player playback test.
-5. Apply fixed-catalog review using `review_catalog.py` into a fresh directory.
+6. Apply fixed-catalog review using `review_catalog.py` into a fresh directory.
    Supply documented public credits/publication decisions and bounded decoder
    results. Ownership must already be supported by exact public platform metadata.
    Report four groups: creator-owned playable samples, creator-owned with
    unconfirmed playback, third-party or unrelated, unresolved. Conflicting
    ownership evidence stays unresolved. Keep creator-published viewable assets
    separate from creator-owned videos. Seed records remain unchanged.
-6. Verify JSON/CSV/Markdown counts, source evidence, candidate-set invariants,
+7. Verify JSON/CSV/Markdown counts, source evidence, candidate-set invariants,
    preserved seeds, byte/request limits and test results. Return actual links,
    source and status for each, the additional attributable-and-viewable count,
    failures and output locations. Never replace an unknown with a positive claim.
