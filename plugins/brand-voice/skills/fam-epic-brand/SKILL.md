@@ -1,6 +1,6 @@
 ---
 name: fam-epic-brand
-description: "Apply Free Agent Movement (FAM) and Expert Partners (EPIC) brand standards to all written and visual outputs. Use this skill whenever Allison Gaddy is creating content for Expert Partners, Inner Circle Resources, the Free Agent Movement, Funnel Pilot, G2M (Gateway to Mastery), the YouTube channel @TheAllisonGaddy, or any coaching/training deliverable. Triggers for emails, social posts, slides, web pages, HTML mockups, marketing copy, scripts, frameworks, lead magnets, brand documents, or any output that represents EPIC, FAM, or Allison's coaching brand. Locks brand tokens per brand, enforces Allison's voice rules (no em dashes ever, voice memo energy, banned phrases list, no bold or italics), applies the truth hook then tension then framework then CTA structure, and enforces canonical brand spellings. Apply this skill any time the work is for the EPIC or FAM brand, even if the user does not explicitly say so. It inherits the operating-doctrine and never overrides it."
+description: "Apply Free Agent Movement (FAM) and EPIC (Expert Partners Inner Circle) brand standards to all written and visual outputs. Use this skill whenever Allison Gaddy is creating content for Expert Partners, Inner Circle Resources, the Free Agent Movement, Funnel Pilot, G2M (Gateway to Mastery), the YouTube channel @theallisongaddy, or any coaching/training deliverable. Triggers for emails, social posts, slides, web pages, HTML mockups, marketing copy, scripts, frameworks, lead magnets, brand documents, or any output that represents EPIC, FAM, or Allison's coaching brand. Locks brand tokens per brand, enforces Allison's voice rules (no em dashes ever, voice memo energy, banned phrases list, no bold or italics), applies the truth hook then tension then framework then CTA structure, and enforces canonical brand spellings. Apply this skill any time the work is for the EPIC or FAM brand, even if the user does not explicitly say so. It inherits the operating-doctrine and never overrides it."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: brands
@@ -16,13 +16,13 @@ subtitle: "FAM and EPIC voice"
 
 Read the canon for the brand the work is for with the Drive connector's `read_file_content` (plain text, not `read_doc`) before drafting: V1 - Company Core - Free Agent Movement Brand Canon (https://docs.google.com/document/d/1t79nKkyml4db1Cq7hr2ApvOrEogqhuD2x12oOba3bQk/edit) for Free Agent Movement, and V1 - Company Core - EPIC Brand Canon (https://docs.google.com/document/d/1W2QxjC_2iVY_-kWZLPEHRcztvEbpht5xcueWduOCdMU/edit) for EPIC, both in EP Business Brain, Company Core [EP-BB]. The Docs win over anything below. Also read the estate-wide rules in V1 - Company Core - Shared Writing Rules (HQ Business Brain), https://docs.google.com/document/d/103y7LzzahVmGmUgCQukvwH2V7VKu3nhFEDteFrQBKqE/edit.
 
-This skill applies the Free Agent Movement and Expert Partners (EPIC) brand standards to any output Allison Gaddy creates or co-creates with Claude.
+This skill applies the Free Agent Movement and EPIC (Expert Partners Inner Circle) brand standards to any output Allison Gaddy creates or co-creates with Claude.
 
 When this skill triggers, you are operating as a brand-keeper for two interconnected brands:
-- **Expert Partners (EPIC)**: Real estate coaching, training, and events company co-founded by Allison Gaddy and Don Hobbs.
+- **EPIC (Expert Partners Inner Circle)**: The inner-circle program for the eXp vertical inside Expert Partners. Expert Partners is the parent organization, never another name for EPIC.
 - **Free Agent Movement (FAM)**: The umbrella content and coaching brand. Includes Free Agent Nation, Free Agent Formula.
 
-These brands share **voice, spelling, structure, and positioning** -- treat those as one system. But as of Visual Identity System v3.1 (2026-06-13) they have **separate visual systems**: EPIC/Expert Partners keeps Black + Brand Blue (#2757CF) accent with Overpass/Poppins; FAM is accent-less (Black/White/Warm Bone, Neue Swiss, IBM Plex Mono) so it can layer over each member's personal brand. Always pick the visual system that matches the brand of the asset. See `references/tokens.md`.
+These brands share **voice, spelling, structure, and positioning** -- treat those as one system. But as of Visual Identity System v3.1 (2026-06-13) they have **separate visual systems**: EPIC keeps Black + Brand Blue (#2757CF) accent with Overpass/Poppins; FAM is accent-less (Black/White/Warm Bone, Neue Swiss, IBM Plex Mono) so it can layer over each member's personal brand. Always pick the visual system that matches the brand of the asset. See `references/tokens.md`.
 
 ## Quick reference
 
@@ -40,9 +40,9 @@ Read both reference files before generating any non-trivial deliverable. For sho
 - eXcelerate (never "accelerate").
 - Don (D-O-N). Never "Dawn".
 - Allison Gaddy. Never "Alison" or "Allyson". <!-- brand-lint: ignore -->
-- Expert Partners or EPIC (both acceptable).
+- Expert Partners names the parent organization. EPIC names Expert Partners Inner Circle, its inner-circle program for the eXp vertical. Never use them interchangeably.
 - Free Agent Movement, Free Agent Nation, Free Agent Formula (capitalize when referring to the brand).
-- YouTube handle: @TheAllisonGaddy.
+- YouTube handle: @theallisongaddy.
 
 ### Formatting (zero exceptions)
 
@@ -86,7 +86,7 @@ Amazing. Incredible. Mind-blowing. Just crush it. Go get em. I am so proud of yo
 
 Pick the system that matches the brand of the asset. Do not mix them.
 
-**EPIC / Expert Partners** (unchanged):
+**EPIC** (unchanged):
 - Black (#000000) dominant; Brand Blue (#2757CF) accent only.
 - PT Serif headlines, Overpass subheads, Poppins Light/Medium body.
 
@@ -100,7 +100,7 @@ Never deviate from the correct system's tokens. For full visual specs (sizing, s
 
 These names and concepts do not need re-explanation. Use them naturally:
 
-- Moxie Signature Group (separate brand, see Moxie skill if relevant)
+- Moxie Signature Group is retired and never routes to a Moxie skill.
 - EPIC, Expert Partners
 - Free Agent Movement, Free Agent Nation, Free Agent Formula
 - Inner Circle Resources, innercircleresources.com

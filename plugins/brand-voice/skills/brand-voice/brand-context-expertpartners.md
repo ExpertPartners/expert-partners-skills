@@ -1,8 +1,8 @@
-# Brand Context -- Expert Partners (EPIC)
+# Brand Context -- Expert Partners and EPIC
 
 ## Brand Identity
 
-- Brand Name: Expert Partners (community / inner circle: EPIC, Expert Partners Inner Circle)
+- Brand Name: Expert Partners, the parent organization. EPIC (Expert Partners Inner Circle) is its inner-circle program for the eXp vertical, never a synonym for the parent.
 - Tagline: "Think Big. Build Smart." for Expert Partners; "Empowering Dreams, Elevating Success" for EPIC (the tagline flip, ruled 2026-08-05)
 - Co-Founders: Allison Gaddy and Don Hobbs
 - Category: Real Estate Coaching, Mastermind, and Operator Education

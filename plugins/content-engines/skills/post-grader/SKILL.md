@@ -51,7 +51,7 @@ This is not weighted. Any single failure means the post does not pass, regardles
 - No banned phrases: amazing, incredible, mind-blowing, crush it, go get em, hustle harder, grind mode, you've got this, game changer, unlock, dive in, in today's fast-paced world, and any empty validation.
 - No hype, no urgency tactics, no fake scarcity.
 - Active voice. Contractions allowed and encouraged.
-- Spelling locks, never deviate: eXp, eXcelerate, Don, Melony, Allison Gaddy, Expert Partners, EPIC, Free Agent Movement, Free Agent Nation, Free Agent Formula, @TheAllisonGaddy.
+- Spelling locks, never deviate: eXp, eXcelerate, Don, Nicole Rouseau, Allison Gaddy, Expert Partners, EPIC, Free Agent Movement, Free Agent Nation, Free Agent Formula, @theallisongaddy.
 - Under the platform character limit.
 
 ## Step 3: Iterate
