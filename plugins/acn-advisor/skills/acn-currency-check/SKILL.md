@@ -52,8 +52,6 @@ Structure the report in this order.
 - The Back Office controls. Every public finding stays labeled unverified until a controlling document or written ACN case response confirms it.
 - A monitor hit, a social post, an upline deck, or a secondary-hosted PDF is never controlling.
 - Never conflate the three thresholds. Active account status, Customer Qualified, and Fast Start bonus tiers are different things and get reported separately.
-- Don's Medicare arrangement is never modified for ACN purposes, and no currency finding changes that.
-- Impact Health Sharing is never called insurance. It is not insurance and does not guarantee payment of medical bills.
 - DingoBlu stays on the watchlist until final legal terms publish. No deposits, no fund movement, never called a bank, never described as FDIC insured.
 - No purchase recommendation exists to produce points or bonuses. Switches must save money or hold cost neutral on their own.
 - Income language stays inside ACN compliance. Income is not guaranteed and IBOs may lose money.

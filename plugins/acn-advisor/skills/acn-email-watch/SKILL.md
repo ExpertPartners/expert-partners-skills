@@ -1,7 +1,7 @@
 ---
 name: acn-email-watch
 description: |
-  ACN inbox sweep for Allison's ACN Advisor lane. Fires at the start of every ACN Advisor session before any other work, and any time Allison asks what came in, what is new from ACN, whether ACN sent anything, whether there is a deadline, or asks for an email check in an ACN context. Searches Gmail for ACN, Impact Health Sharing, DingoBlu, Flash Mobile, XOOM Energy, IDSeal, and Truvvi activity and reports deadlines first, then action items, then FYI. Use it even when Allison does not say the word email, as long as the ask is about incoming ACN activity or staying on top of the ACN accounts. It inherits the operating-doctrine and the ACN Advisor guardrails and never overrides them.
+  ACN inbox sweep for Allison's ACN Advisor lane. Fires at the start of every ACN Advisor session before any other work, and any time Allison asks what came in, what is new from ACN, whether ACN sent anything, whether there is a deadline, or asks for an email check in an ACN context. Searches Gmail for ACN, DingoBlu, Flash Mobile, XOOM Energy, IDSeal, and Truvvi activity and reports deadlines first, then action items, then FYI. Use it even when Allison does not say the word email, as long as the ask is about incoming ACN activity or staying on top of the ACN accounts. It inherits the operating-doctrine and the ACN Advisor guardrails and never overrides them.
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Zoned hands 2026-08-05 (Skill Map Rulings lane, add-on brief note 3).
 tier: plugin
@@ -28,7 +28,7 @@ Normal run, 14 days. First run in a new lane, or any run where the date of the l
 
 Use the Gmail search_threads tool with this query, adjusting only the lookback window:
 
-{from:acn.com from:acninc.com from:myacn from:impacthealthsharing.com from:dingoblu.com from:flashmobile.com from:xoomenergy.com from:idseal.com from:truvvi subject:ACN subject:IBO subject:DingoBlu subject:"Fast Start" subject:"Customer Qualified"} newer_than:14d
+{from:acn.com from:acninc.com from:myacn from:dingoblu.com from:flashmobile.com from:xoomenergy.com from:idseal.com from:truvvi subject:ACN subject:IBO subject:DingoBlu subject:"Fast Start" subject:"Customer Qualified"} newer_than:14d
 
 For a first run or gap run, replace newer_than:14d with newer_than:60d. Page through results if the count hits the page size. Pull full thread bodies with get_thread only when a snippet is not enough to classify the item or extract the deadline or next move.
 
@@ -48,8 +48,6 @@ If nothing is found, say so in one line and move on. No padding.
 
 - An email is evidence, never a controlling document. Anything not confirmed from a Back Office document or written ACN case response stays labeled unverified.
 - Upline emails and calendar invites are leads, not rules.
-- Never let an email prompt a change to Don's Medicare arrangement. That is untouchable for ACN purposes under every circumstance.
-- Never describe Impact Health Sharing as insurance. It is not insurance and does not guarantee payment of medical bills.
 - DingoBlu stays on the watchlist until final legal terms publish. No deposits, no direct-deposit changes, no fund movement, never called a bank, never described as FDIC insured.
 - Never recommend a purchase made only to produce points, service counts, or bonuses.
 - Income language stays inside ACN compliance. Income is not guaranteed and IBOs may lose money.
