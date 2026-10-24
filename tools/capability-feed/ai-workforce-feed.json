@@ -1,8 +1,8 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-10-24T15:53:09Z",
-  "verifiedAt": "2026-10-24T15:53:09Z",
+  "generatedAt": "2026-10-24T18:04:22Z",
+  "verifiedAt": "2026-10-24T18:04:22Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
@@ -117,7 +117,7 @@
       "id": "brand-voice-plugin",
       "humanName": "Brand Voice Plugin",
       "kind": "plugin",
-      "summary": "Canonical brand context for the Estate brand registry (Expert Partners, EPIC, AG Personal Brand, AG Luxury, FAM, Don Hobbs; Moxie benched).",
+      "summary": "Canonical brand context for the Estate brand registry (Expert Partners, EPIC, AG Personal Brand, AG Luxury, FAM, Don Hobbs).",
       "status": "Unknown",
       "maintainer": "ExpertPartners",
       "collectionIds": [],
@@ -127,11 +127,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the brand-voice plugin, version 0.6.4, in the expert-partners plugin marketplace.",
-        "Contains 8 skills. Each one activates when a request matches its purpose."
+        "Packaged as the brand-voice plugin, version 0.6.5, in the expert-partners plugin marketplace.",
+        "Contains 7 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.6.4.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.6.5.",
       "containsSkillIds": [
         "ag-luxury-brand",
         "ag-personal-brand",
@@ -139,20 +139,18 @@
         "don-hobbs-brand",
         "ep-brand",
         "fam-epic-brand",
-        "moxie-signature-group-brand",
         "the-strong-ones-brand"
       ],
       "relatedIds": [],
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/brand-voice",
-        "packageVersion": "0.6.4",
+        "packageVersion": "0.6.5",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
-        "skillCount": "8"
+        "skillCount": "7"
       },
       "keywords": [
-        "benched",
         "brand",
         "canonical",
         "context",
@@ -163,7 +161,6 @@
         "fam",
         "hobbs",
         "luxury",
-        "moxie",
         "partners",
         "personal",
         "plugin",
@@ -190,11 +187,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the content-engines plugin, version 0.6.0, in the expert-partners plugin marketplace.",
+        "Packaged as the content-engines plugin, version 0.6.1, in the expert-partners plugin marketplace.",
         "Contains 11 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.6.0.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.6.1.",
       "containsSkillIds": [
         "content-coach",
         "dm-to-dollars",
@@ -212,7 +209,7 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/content-engines",
-        "packageVersion": "0.6.0",
+        "packageVersion": "0.6.1",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
         "skillCount": "11"
@@ -513,7 +510,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.4.",
+        "Packaged in the Brand Voice plugin, version 0.6.5.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -528,7 +525,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.4 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.6.5 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "ag-luxury"
       },
@@ -591,7 +588,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.4.",
+        "Packaged in the Brand Voice plugin, version 0.6.5.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -606,7 +603,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.4 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.6.5 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "ag-personal-brand"
       },
@@ -627,7 +624,7 @@
         "Allison’s first person voice"
       ],
       "useCases": [
-        "Use when creating content for Allison's YouTube channel (@TheAllisonGaddy), speaking engagements, keynotes, thought leadership pieces, personal essays, LinkedIn, personal social posts, or any content that represents Allison as an individual founder, educator, and public figure -- NOT as Expert Partners, FAM, or Moxie."
+        "Use when creating content for Allison's YouTube channel (@theallisongaddy), speaking engagements, keynotes, thought leadership pieces, personal essays, LinkedIn, personal social posts, or any content that represents Allison as an individual founder, educator, and public figure -- NOT as Expert Partners, FAM, or Moxie."
       ],
       "askExamples": [],
       "example": false
@@ -934,7 +931,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.4.",
+        "Packaged in the Brand Voice plugin, version 0.6.5.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -947,7 +944,6 @@
         "don-hobbs-brand",
         "ep-brand",
         "fam-epic-brand",
-        "moxie-signature-group-brand",
         "the-strong-ones-brand"
       ],
       "accessNote": "Where this is available has not been verified yet.",
@@ -956,9 +952,9 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.4 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.6.5 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
-        "defersTo": "ep-brand, fam-epic-brand, ag-personal-brand, ag-luxury-brand, don-hobbs-brand, the-strong-ones-brand, moxie-signature-group-brand"
+        "defersTo": "ep-brand, fam-epic-brand, ag-personal-brand, ag-luxury-brand, don-hobbs-brand, the-strong-ones-brand"
       },
       "keywords": [
         "0045",
@@ -1878,7 +1874,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.6.0.",
+        "Packaged in the Content Engines plugin, version 0.6.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1893,7 +1889,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -2194,7 +2190,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.6.0.",
+        "Packaged in the Content Engines plugin, version 0.6.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2209,7 +2205,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -2310,7 +2306,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.4.",
+        "Packaged in the Brand Voice plugin, version 0.6.5.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2325,7 +2321,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.4 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.6.5 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "don-hobbs"
       },
@@ -2471,7 +2467,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.4.",
+        "Packaged in the Brand Voice plugin, version 0.6.5.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2486,7 +2482,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.4 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.6.5 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "expert-partners"
       },
@@ -2644,7 +2640,7 @@
       "id": "fam-epic-brand",
       "humanName": "FAM / EPIC Brand System",
       "kind": "skill",
-      "summary": "Apply Free Agent Movement (FAM) and Expert Partners (EPIC) brand standards to all written and visual outputs.",
+      "summary": "Apply Free Agent Movement (FAM) and EPIC (Expert Partners Inner Circle) brand standards to all written and visual outputs.",
       "status": "Unknown",
       "maintainer": "ExpertPartners",
       "collectionIds": [],
@@ -2654,7 +2650,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.4.",
+        "Packaged in the Brand Voice plugin, version 0.6.5.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2669,7 +2665,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.4 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.6.5 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "fam, epic"
       },
@@ -2677,10 +2673,12 @@
         "agent",
         "apply",
         "brand",
+        "circle",
         "epic",
         "expert",
         "fam",
         "free",
+        "inner",
         "movement",
         "outputs",
         "partners",
@@ -3176,7 +3174,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.6.0.",
+        "Packaged in the Content Engines plugin, version 0.6.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3191,7 +3189,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -4135,7 +4133,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.6.0.",
+        "Packaged in the Content Engines plugin, version 0.6.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4151,7 +4149,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "xavier-offer-builder"
       },
@@ -4261,67 +4259,6 @@
       "useCases": [
         "Use when the agent says schedule this post, send this to Metricool, queue this up, or schedule this for tomorrow."
       ],
-      "askExamples": [],
-      "example": false
-    },
-    {
-      "id": "moxie-signature-group-brand",
-      "humanName": "Moxie Signature Group Brand System",
-      "kind": "skill",
-      "summary": "BENCHED 2026-07-30 (aura ADR 0045, Allison's ruling).",
-      "status": "Deprecated",
-      "maintainer": "ExpertPartners",
-      "collectionIds": [],
-      "categories": [
-        "The voices"
-      ],
-      "portable": "unknown",
-      "verifiedSurfaces": [],
-      "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.4.",
-        "Do not use for new work."
-      ],
-      "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: benched.",
-      "containsSkillIds": [],
-      "relatedIds": [
-        "brand-voice-plugin"
-      ],
-      "accessNote": "Not for new work.",
-      "technicalDetail": {
-        "canonicalSource": "expert-partners-skills/plugins/brand-voice/skills/moxie-signature-group-brand/SKILL.md",
-        "lifecycle": "benched",
-        "tier": "plugin",
-        "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.4 (expert-partners marketplace)",
-        "inherits": "operating-doctrine",
-        "brandScope": "moxie"
-      },
-      "keywords": [
-        "0045",
-        "2026",
-        "adr",
-        "allison",
-        "aura",
-        "benched",
-        "brand",
-        "consumer",
-        "estate",
-        "group",
-        "luxury",
-        "moxie",
-        "real",
-        "routes",
-        "ruling",
-        "signature",
-        "system",
-        "voice",
-        "voices"
-      ],
-      "bestFor": [
-        "benched, consumer real estate routes to AG Luxury"
-      ],
-      "useCases": [],
       "askExamples": [],
       "example": false
     },
@@ -4913,7 +4850,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.6.0.",
+        "Packaged in the Content Engines plugin, version 0.6.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4928,7 +4865,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -4976,7 +4913,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.6.0.",
+        "Packaged in the Content Engines plugin, version 0.6.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4991,7 +4928,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -5039,7 +4976,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.6.0.",
+        "Packaged in the Content Engines plugin, version 0.6.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -5054,7 +4991,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -5261,7 +5198,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.6.0.",
+        "Packaged in the Content Engines plugin, version 0.6.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -5276,7 +5213,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6101,7 +6038,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.6.0.",
+        "Packaged in the Content Engines plugin, version 0.6.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6116,7 +6053,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6209,7 +6146,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.4.",
+        "Packaged in the Brand Voice plugin, version 0.6.5.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6224,7 +6161,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.4 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.6.5 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "the-strong-ones"
       },
@@ -6718,7 +6655,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.6.0.",
+        "Packaged in the Content Engines plugin, version 0.6.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6733,7 +6670,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6849,7 +6786,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.6.0.",
+        "Packaged in the Content Engines plugin, version 0.6.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6864,7 +6801,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
