@@ -14,7 +14,7 @@ subtitle: "FAM and EPIC voice"
 
 ## Load the canon Docs first
 
-Read the canon for the brand the work is for with the Drive connector's `read_file_content` (plain text, not `read_doc`) before drafting: V1 - Company Core - Free Agent Movement Brand Canon (https://docs.google.com/document/d/1t79nKkyml4db1Cq7hr2ApvOrEogqhuD2x12oOba3bQk/edit) for Free Agent Movement, and V1 - Company Core - EPIC Brand Canon (https://docs.google.com/document/d/1W2QxjC_2iVY_-kWZLPEHRcztvEbpht5xcueWduOCdMU/edit) for EPIC, both in EP Business Brain, Company Core [EP-BB]. The Docs win over anything below. Also read the estate-wide rules in V1 - Company Core - Shared Writing Rules (HQ Business Brain), https://docs.google.com/document/d/103y7LzzahVmGmUgCQukvwH2V7VKu3nhFEDteFrQBKqE/edit.
+Read the canon for the brand the work is for with the Drive connector's `read_file_content` (plain text, not `read_doc`) before drafting: [EP][V1.0] Free Agent Movement Brand Canon (https://docs.google.com/document/d/1t79nKkyml4db1Cq7hr2ApvOrEogqhuD2x12oOba3bQk/edit) for Free Agent Movement, and [EP][V1.0] EPIC Brand Canon (https://docs.google.com/document/d/1W2QxjC_2iVY_-kWZLPEHRcztvEbpht5xcueWduOCdMU/edit) for EPIC, both in EP Business Brain, Company Core [EP-BB]. The Docs win over anything below. Also read the estate-wide rules in [HQ][V1.0] Shared Writing Rules (HQ Business Brain), https://docs.google.com/document/d/103y7LzzahVmGmUgCQukvwH2V7VKu3nhFEDteFrQBKqE/edit.
 
 This skill applies the Free Agent Movement and Expert Partners (EPIC) brand standards to any output Allison Gaddy creates or co-creates with Claude.
 
