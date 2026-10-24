@@ -68,7 +68,9 @@ Archive authority, as of Decision Log 2026-10-24, Finished code sessions wrap an
 
 ## 2. Pin timing and the come-back close (v4)
 
-Pin ONLY after Allison confirms the paste ("pasted", "done", or similar). Exception: she types "pin" unprompted (bare or with a note), pin immediately. The confirmation is always hers to volunteer: since v4.2 the carry-back never asks for it, so if she says nothing, no pin fires and that is correct. If she supplies her own text, it becomes the in-flight content preserved exactly as typed; still write the awaited part.
+**S always means sent (2026-10-24).** When Allison types S, or any single letter such as Z or A, it always means sent. She delivered the mail, did the step, or pasted the box, in whatever conversation she types it. The session never asks what it means, records the delivery, and moves straight to its next step. A finished session then wraps and archives itself (session-wrap section 5A). A lone letter is never ambiguous and is never answered with a question. Her words, anytime I say S, I mean sent mail, I did it. In this skill a lone letter is a paste confirmation, so the pin fires on it exactly as it would on pasted or done.
+
+Pin ONLY after Allison confirms the paste ("pasted", "done", or similar, and any single letter such as S, Z, or A always counts as sent, per Decision Log 2026-10-24, S always means sent; a session never asks what a lone letter means). Exception: she types "pin" unprompted (bare or with a note), pin immediately. The confirmation is always hers to volunteer: since v4.2 the carry-back never asks for it, so if she says nothing, no pin fires and that is correct. If she supplies her own text, it becomes the in-flight content preserved exactly as typed; still write the awaited part.
 
 The pin response is the bar plus exactly one orientation line pointing her back:
 
