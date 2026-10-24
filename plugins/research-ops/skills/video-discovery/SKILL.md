@@ -9,7 +9,7 @@ description: >
   separates ownership from publication and playback, and exports CSV, JSON and
   Markdown. Does not enumerate every unlisted video or bypass access controls.
 metadata:
-  version: 1.1.0
+  version: 1.1.1
 classification: public
 tier: plugin
 zone: hands

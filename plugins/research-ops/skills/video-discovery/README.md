@@ -154,6 +154,15 @@ target. Full means this inventory mode, not an unlimited or exhaustive Internet
 search: the 100-request shared archive.org cap still includes robots, indexes,
 snapshots, redirects and retries. Common Crawl remains in sampled archive mode.
 
+The snapshot cap is shared round robin across targets, and the most specific
+paths are read first, so name the page you care about with `--archive-target`.
+A broad site prefix lists captures alphabetically and a small cap will not reach
+every page. Archived `http` and `www` captures count as the same page. Archive
+index requests wait up to 90 seconds, because Wayback prefix queries are slow and
+a 20 second wait failed on a live run. The live run on a creator site found two
+of three expected YouTube videos with the default targets, and the third only
+after naming its page path.
+
 `--youtube-details-json saved-details.json` imports saved Firecrawl metadata with
 zero connector calls. Use a JSON array of envelopes in this explicit format:
 
