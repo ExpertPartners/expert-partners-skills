@@ -299,6 +299,16 @@ When Allison types S, or any single letter such as Z or A, it always means sent.
 
 ---
 
+## The Archive Gate And The Orphan Sweep
+
+Ruled by Allison 2026-10-24 (Decision Log 2026-10-24, Archiving is gated on the paper trail, and an orphan sweep catches what slips, her words, love this whole thing, yes, let's go). Written here so every session that loads this doctrine knows it, including code sessions that never read the Rulebook. It adds to S Always Means Sent and to Decision Log 2026-10-24, Finished code sessions wrap and archive themselves.
+
+The archive gate comes first. A Claude Code or Codex session archives itself only after two things are true. Its report row is written in the Handoffs tab and read back, and its incoming row is marked Done with a pointer to that report. The mail box in chat is only the bell, never the record. A report that exists only in chat is not a report, and a session whose only carry-back is a chat box is not finished. A session that cannot reach the Handoffs tab stays open and says so in plain words. It does not archive.
+
+The orphan sweep catches what slips. The two Session Stewards, Claude Code, Session Steward and Codex, Session Steward, and Star's nightly check each list every Handoffs row still Sent or Read whose session is archived or missing, and every pull request or commit with no report row. HQ then closes each from the evidence or restarts it. A session never closes a row it did not write. The live HQ Rulebook, Session lifecycle, wins wherever this differs.
+
+---
+
 ## Duplicate Patrol (One Owner, Many Views)
 
 Ruled by Allison 2026-08-30; ruling of record: aura decisions/0083-sequencing-without-maximalism-amendment-to-decision-0075.md; advisory of record at aura intake/2026-08-30-sequencing-without-maximalism-corrected-final-advisory-super.md.
@@ -477,6 +487,8 @@ Propagation rule: on every version bump, this surface list gets verified against
 ---
 
 ## Version
+
+v2.17 -- October 24, 2026 -- Added The Archive Gate And The Orphan Sweep, ruled by Allison (Decision Log 2026-10-24, Archiving is gated on the paper trail, and an orphan sweep catches what slips): a session archives itself only after its report row is written in Handoffs and read back and its incoming row is marked Done with a pointer to that report, the mail box in chat is only the bell, and the Session Stewards sweep for rows and pull requests that slipped. Companion edits in session-wrap, code-block-routing, pin, and session-steward.
 
 v2.16 -- October 24, 2026 -- Added S Always Means Sent, ruled by Allison (Decision Log 2026-10-24, S always means sent): any single letter she types, such as S, Z, or A, always means sent, and a session never asks what it means. Companion edits in code-block-routing and pin.
 

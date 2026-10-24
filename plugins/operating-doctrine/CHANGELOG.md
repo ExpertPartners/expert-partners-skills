@@ -1,3 +1,24 @@
+## 2.64.1 - 2026-10-24
+
+document-formatting-standard v4.1 follows the live HQ Rulebook. Every document an AI makes in
+work with Allison uses Poppins throughout, for every brand and every room, AG Luxury included
+(Decision Log 2026-10-24, Every document made in work with Allison uses Poppins). The skill no
+longer tells AG Luxury documents to use Italiana and Manrope. Those are the allisongaddy.com
+website fonts and belong only to public, client-facing design. Assigned by HQ.
+
+## 2.64.0 - 2026-10-24
+
+The archive gate and the orphan sweep (Decision Log 2026-10-24, Archiving is gated on the paper
+trail, and an orphan sweep catches what slips). A Claude Code or Codex session archives itself
+only after its report row is written in Handoffs and read back and its incoming row is marked
+Done with a pointer to that report. The mail box in chat is only the bell, never the record, and
+a session that cannot reach the tab stays open and says so. operating-doctrine v2.17 adds the
+rule for every session, session-wrap v1.21 amends section 5A, code-block-routing and pin v4.8
+make the Handoffs row the carry-back and the chat message the bell, and session-steward v1.6
+adds section 10, the orphan sweep, for both the Claude Code and Codex stewards. It lists every
+row still Sent or Read whose session is archived or missing and every pull request or commit
+with no report row, in one row to HQ. Assigned by HQ in Handoffs row 725.
+
 ## 2.61.0 - 2026-10-22
 
 Five skills follow the live HQ Rulebook. document-formatting-standard v4 points to the

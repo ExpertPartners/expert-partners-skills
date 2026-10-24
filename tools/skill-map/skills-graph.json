@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "b41632eb7fdebfe845a3f27b6ed75ac0d636f1ff",
+    "eps": "fbe194c698cb2500d22532e811c6f26325e61683",
     "aura": "bcbcc9d8c8220155bc0e554445cb0f6522363cef"
   },
   "zones": [
@@ -58,7 +58,7 @@
       "renderNote": null,
       "layout": {
         "x": 999,
-        "y": 5527,
+        "y": 5499,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -316,7 +316,7 @@
       "renderNote": null,
       "layout": {
         "x": 1272,
-        "y": 5351.8,
+        "y": 5323.8,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -426,7 +426,7 @@
       "renderNote": null,
       "layout": {
         "x": 996,
-        "y": 6077,
+        "y": 6049,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -746,7 +746,7 @@
       "renderNote": null,
       "layout": {
         "x": 996,
-        "y": 5889,
+        "y": 5861,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1058,7 +1058,7 @@
       "renderNote": null,
       "layout": {
         "x": 1040,
-        "y": 5426,
+        "y": 5398,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1086,7 +1086,7 @@
       "renderNote": null,
       "layout": {
         "x": 1272,
-        "y": 5250.8,
+        "y": 5222.8,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -1116,7 +1116,7 @@
       "renderNote": null,
       "layout": {
         "x": 1052,
-        "y": 5238,
+        "y": 5210,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -1142,7 +1142,7 @@
       "renderNote": null,
       "layout": {
         "x": 983.5,
-        "y": 5339,
+        "y": 5311,
         "width": 237,
         "height": 63,
         "rectHeight": 48,
@@ -1167,7 +1167,7 @@
       "renderNote": null,
       "layout": {
         "x": 987,
-        "y": 5990,
+        "y": 5962,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -1639,7 +1639,7 @@
       "renderNote": null,
       "layout": {
         "x": 984,
-        "y": 5628,
+        "y": 5600,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -1720,7 +1720,7 @@
       "renderNote": null,
       "layout": {
         "x": 976,
-        "y": 5802,
+        "y": 5774,
         "width": 252,
         "height": 63,
         "rectHeight": 48,
@@ -2559,25 +2559,24 @@
       "repo": "eps",
       "tier": "plugin",
       "zone": "hands",
-      "status": "live",
+      "status": "retired",
       "inherits": [
         "operating-doctrine"
       ],
       "calls": [],
       "defersTo": [],
       "brandScope": [],
-      "subtitle": "competitive intelligence briefing",
+      "subtitle": "retired imported research prompt",
       "renderNote": null,
       "layout": {
         "x": 952,
-        "y": 5137,
+        "y": 5123,
         "width": 300,
-        "height": 77,
-        "rectHeight": 62,
+        "height": 63,
+        "rectHeight": 48,
         "annotationHeight": 15,
         "subtitleLines": [
-          "competitive intelligence",
-          "briefing"
+          "retired imported research prompt"
         ]
       }
     },
@@ -2587,25 +2586,24 @@
       "repo": "eps",
       "tier": "plugin",
       "zone": "hands",
-      "status": "live",
+      "status": "retired",
       "inherits": [
         "operating-doctrine"
       ],
       "calls": [],
       "defersTo": [],
       "brandScope": [],
-      "subtitle": "voice of customer research report",
+      "subtitle": "retired imported research prompt",
       "renderNote": null,
       "layout": {
         "x": 952,
         "y": 5036,
         "width": 300,
-        "height": 77,
-        "rectHeight": 62,
+        "height": 63,
+        "rectHeight": 48,
         "annotationHeight": 15,
         "subtitleLines": [
-          "voice of customer research",
-          "report"
+          "retired imported research prompt"
         ]
       }
     },
@@ -2615,24 +2613,24 @@
       "repo": "eps",
       "tier": "plugin",
       "zone": "hands",
-      "status": "live",
+      "status": "retired",
       "inherits": [
         "operating-doctrine"
       ],
       "calls": [],
       "defersTo": [],
       "brandScope": [],
-      "subtitle": "GEO and SEO ranking audit",
+      "subtitle": "retired imported research prompt",
       "renderNote": null,
       "layout": {
         "x": 952,
-        "y": 5715,
+        "y": 5687,
         "width": 300,
         "height": 63,
         "rectHeight": 48,
         "annotationHeight": 15,
         "subtitleLines": [
-          "GEO and SEO ranking audit"
+          "retired imported research prompt"
         ]
       }
     },
@@ -3087,11 +3085,11 @@
       "points": [
         {
           "x": 1496,
-          "y": 5377.5
+          "y": 5349.5
         },
         {
           "x": 1533,
-          "y": 5377.5
+          "y": 5349.5
         },
         {
           "x": 1533,
@@ -3118,11 +3116,11 @@
       "points": [
         {
           "x": 1496,
-          "y": 5403.2
+          "y": 5375.2
         },
         {
           "x": 1533,
-          "y": 5403.2
+          "y": 5375.2
         },
         {
           "x": 1533,
@@ -3333,19 +3331,19 @@
       "points": [
         {
           "x": 1252,
-          "y": 5464.5
+          "y": 5436.5
         },
         {
           "x": 1262,
-          "y": 5464.5
+          "y": 5436.5
         },
         {
           "x": 1262,
-          "y": 5302.2
+          "y": 5274.2
         },
         {
           "x": 1272,
-          "y": 5302.2
+          "y": 5274.2
         }
       ]
     },
@@ -3368,11 +3366,11 @@
       "points": [
         {
           "x": 1252,
-          "y": 5276.5
+          "y": 5248.5
         },
         {
           "x": 1272,
-          "y": 5276.5
+          "y": 5248.5
         }
       ]
     },
@@ -3992,7 +3990,7 @@
         "x": 930,
         "y": 4483,
         "width": 588,
-        "height": 1679,
+        "height": 1651,
         "rooms": []
       },
       {

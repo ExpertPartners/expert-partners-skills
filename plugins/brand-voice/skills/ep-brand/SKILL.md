@@ -16,10 +16,10 @@ subtitle: "Expert Partners parent voice"
 
 Brand canon lives in Google Drive. Before drafting, read these Docs with the Google Docs or Drive connector (`read_file_content` on the Doc ID in the link, which returns plain text; do not use `read_doc`, its JSON overflows on a Doc this size). Apply what they say as the authoritative source. Expert Partners is the parent company, EPIC is a program inside it.
 
-- V1 - Company Core - Expert Partners Brand Canon (EP Business Brain, Company Core [EP-BB]), https://docs.google.com/document/d/1XSiBzCLCHS_9_BXUrvV_Ysl2aBVY_I_kq_s5d25oY_4/edit
-- V1 - Company Core - EPIC Brand Canon (EP Business Brain, Company Core [EP-BB]), https://docs.google.com/document/d/1W2QxjC_2iVY_-kWZLPEHRcztvEbpht5xcueWduOCdMU/edit
+- [EP][V1.0] Expert Partners Brand Canon (EP Business Brain, Company Core [EP-BB]), https://docs.google.com/document/d/1XSiBzCLCHS_9_BXUrvV_Ysl2aBVY_I_kq_s5d25oY_4/edit
+- [EP][V1.0] EPIC Brand Canon (EP Business Brain, Company Core [EP-BB]), https://docs.google.com/document/d/1W2QxjC_2iVY_-kWZLPEHRcztvEbpht5xcueWduOCdMU/edit
 
-The inline content below is a fallback for sessions where the Drive connector is unavailable. If the Doc and the inline text disagree, the Doc wins. Also read the estate-wide spelling, exclusion, and identifier rules in V1 - Company Core - Shared Writing Rules (HQ Business Brain, Company Core [HQ-BB]), https://docs.google.com/document/d/103y7LzzahVmGmUgCQukvwH2V7VKu3nhFEDteFrQBKqE/edit.
+The inline content below is a fallback for sessions where the Drive connector is unavailable. If the Doc and the inline text disagree, the Doc wins. Also read the estate-wide spelling, exclusion, and identifier rules in [HQ][V1.0] Shared Writing Rules (HQ Business Brain, Company Core [HQ-BB]), https://docs.google.com/document/d/103y7LzzahVmGmUgCQukvwH2V7VKu3nhFEDteFrQBKqE/edit.
 
 ## Identity
 

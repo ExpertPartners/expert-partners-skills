@@ -21,8 +21,9 @@ Every task names its lane before any writing starts. Never blend lanes.
 
 - AG Personal Brand. Voice is "I." Use the ag-personal-brand voice.
 - Free Agent Movement. Voice is "we." Use the fam-epic-brand voice, FAM side.
-- Expert Partners / EPIC. Voice is "we." Use the fam-epic-brand or ep-brand voice.
-- Moxie Signature Group. Use the moxie-signature-group-brand voice.
+- Expert Partners. Voice is "we." Use ep-brand.
+- EPIC, the inner-circle vertical inside Expert Partners. Voice is "we." Use fam-epic-brand for EPIC work.
+- AG Luxury. Use ag-luxury-brand. Moxie Signature Group is retired and never routes to a skill.
 
 If the lane is unclear, ask. One question, then move.
 

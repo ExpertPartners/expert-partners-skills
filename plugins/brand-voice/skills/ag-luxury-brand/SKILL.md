@@ -16,11 +16,11 @@ subtitle: "luxury real estate voice under Allison’s name"
 
 Brand canon lives in Google Drive. Before drafting, read these Docs with the Google Docs or Drive connector (`read_file_content` on the Doc ID in the link, which returns plain text; do not use `read_doc`, its JSON overflows on a Doc this size). Apply what they say as the authoritative source.
 
-- V1 - Company Core - AG Luxury Brand Canon (AG Business Brain, Company Core [AG-BB]), https://docs.google.com/document/d/1IHjcFV7Bv023GIwgNxV5d4p_bu2R5l7yUW5F4VE_-yM/edit
+- [AG][V1.0] AG Luxury Brand Canon (AG Business Brain, Company Core [AG-BB]), https://docs.google.com/document/d/1IHjcFV7Bv023GIwgNxV5d4p_bu2R5l7yUW5F4VE_-yM/edit
 
-The inline content below is a fallback for sessions where the Drive connector is unavailable. If the Doc and the inline text disagree, the Doc wins. Also read the estate-wide spelling, exclusion, and identifier rules in V1 - Company Core - Shared Writing Rules (HQ Business Brain, Company Core [HQ-BB]), https://docs.google.com/document/d/103y7LzzahVmGmUgCQukvwH2V7VKu3nhFEDteFrQBKqE/edit.
+The inline content below is a fallback for sessions where the Drive connector is unavailable. If the Doc and the inline text disagree, the Doc wins. Also read the estate-wide spelling, exclusion, and identifier rules in [HQ][V1.0] Shared Writing Rules (HQ Business Brain, Company Core [HQ-BB]), https://docs.google.com/document/d/103y7LzzahVmGmUgCQukvwH2V7VKu3nhFEDteFrQBKqE/edit.
 
-The V1 - Company Core - AG Luxury Brand Canon in AG Business Brain, Company Core is the live brand canon and wins over this skill wherever they conflict. The former ag-luxury repo `docs/DECISION-LOG.md` (the append-only ruling record behind the D0nn references below) and `docs/governance/` (the approved claim set) are boxed in the Drive GitHub Archive as ag-luxury-full-2026-10-23.zip.
+The [AG][V1.0] AG Luxury Brand Canon in AG Business Brain, Company Core is the live brand canon and wins over this skill wherever they conflict. The former ag-luxury repo `docs/DECISION-LOG.md` (the append-only ruling record behind the D0nn references below) and `docs/governance/` (the approved claim set) are boxed in the Drive GitHub Archive as ag-luxury-full-2026-10-23.zip.
 
 The live brand guide at https://brand.agluxurytx.com/ is the current source of brand truth and owns the visual tokens (color, type, spacing), per ag-luxury DECISION-LOG D036 and D037. Do not restate or improvise visual tokens here or anywhere; read the guide. Its governing idea carries into copy: restraint is the luxury signal, and photography brings the living color, never decoration.
 

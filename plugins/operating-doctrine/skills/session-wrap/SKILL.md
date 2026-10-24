@@ -12,9 +12,11 @@ status: live
 subtitle: "the one canonical session close-out"
 ---
 
-# Session Wrap -- v1.20 (2026-10-24)
+# Session Wrap -- v1.21 (2026-10-24)
 
 <!-- RULED-BY: aura/decisions/0107-retire-routing-naming-ceremony.md date:2026-10-12 superseded naming text removed -->
+
+v1.21 amendment 2026-10-24 (Decision Log 2026-10-24, Archiving is gated on the paper trail, and an orphan sweep catches what slips, Allison's words, love this whole thing, yes, let's go; live HQ Rulebook Session lifecycle section): the archive gate. A finished Claude Code or Codex session archives itself only after its report row is written in Handoffs and read back, and its incoming row is marked Done with a pointer to that report. The mail box in chat is only the bell, never the record. A session that cannot reach the Handoffs tab stays open and says so. Section 5A is amended, and a report that lives only in chat no longer counts as finished. Adds to v1.20. The live Rulebook wins wherever this skill differs.
 
 v1.20 amendment 2026-10-24 (Decision Log 2026-10-24, Finished code sessions wrap and archive themselves, Allison's words, that's a big one, let's make that happen for sure; live HQ Rulebook Session lifecycle section): a finished Claude Code or Codex session runs its wrap duties on its own without waiting for Allison to say wrap, then says SAFE TO ARCHIVE and archives itself, silently. Both apps can archive their own sessions, Codex's confirmed by Codex, Session Steward on 2026-10-24, so the earlier hedge about Codex is removed. Section 0 and section 5A are amended. This replaces the wait for Allison's wrap in Decision Log 2026-10-23, Code session states are ACTIVE, WAITING, READY TO WRAP, and ARCHIVE, and in 2026-10-21, Definition of WRAP for coding sessions. Sessions still waiting on Allison or another AI stay open, and Allison only hears about a session when it is waiting on her. The live Rulebook wins wherever this skill differs.
 
@@ -85,7 +87,7 @@ No copy-paste on Allison's end. Tool mechanics, signatures, and the exact GraphQ
 
 1. Save the session record as a Google Doc in the owning brain's home folder in Drive (found through that brain's 00 START HERE index), and add one Decision Log entry per decision in it, at the top under today's date: what was decided, why in a sentence or two, and a Replaces note. Verify the Doc link and the Decision Log entry.
 2. Save the continuity note the same way. Verify the link.
-3. Update the Job Tracker row for this lane with the closeout state. Durable liveness (v1.11): the row must stop advertising anything that is actually finished. A worker whose archive motion has occurred is written to `archived` in the same lifecycle close as that motion, never left at `waiting-on-carry-back` for a later human to notice, and archive authority is unchanged: the home conversation still owns the flip and a worker never writes `archived` into its own row. A row found still advertising an active wait for a worker whose completion or archive is proven is reconciled here, on that evidence. Reconcile only what this wrap can prove; an unproven row stays exactly as it is (Rule 5), and no sweep of unrelated lanes rides along. Write only this lane's row through the Google Sheets connector and re-read it to verify. After two failed writes, stop and route the row verbatim in the wrap note for home to enter. A routed row plus a plain statement is a correct wrap; an unverified write is the violation. Where this skill says lane ledger or ledger row, read the Job Tracker.
+3. Update the Job Tracker row for this lane with the closeout state. Durable liveness (v1.11): the row must stop advertising anything that is actually finished. A worker whose archive motion has occurred is written to `archived` in the same lifecycle close as that motion, never left at `waiting-on-carry-back` for a later human to notice, and archive authority is unchanged: the home conversation still owns the flip and a worker never writes `archived` into its own row. A row found still advertising an active wait for a worker whose completion or archive is proven is reconciled here, on that evidence. Reconcile only what this wrap can prove; an unproven row stays exactly as it is (Rule 5), and no sweep of unrelated lanes rides along. Write only this lane's row through the Google Sheets connector and re-read it to verify. After two failed writes, stop. A Claude Code or Codex session stays open and says so under the archive gate (section 5A) and never archives behind a row that only lives in a note or in chat. On a surface that cannot archive itself, route the row verbatim in the wrap note for home to enter. A routed row plus a plain statement is a correct wrap there; an unverified write is the violation. Where this skill says lane ledger or ledger row, read the Job Tracker.
 Publication and retrieval check: a returned link or chat assertion alone does not prove filing. Independently open both Docs and the Decision Log entry from Drive, then verify the continuation path can fetch the required note without relying on this conversation. Give Allison the exact Drive links and a short summary. Routine copies of either record never go to `~/Desktop` or `~/Downloads`. Do not make Allison upload or carry the only copy.
 
 Fallback: if the Docs connector refuses a write after a live test, use the service-account path (SA+DWD) for the same Drive folder, then verify as above. If the write stays blocked, name the failed action and its owner, leave the closeout obligation uncleared, and never substitute a Desktop or Downloads file or claim the wrap filed until read-back succeeds.
@@ -168,17 +170,22 @@ Amended 2026-08-30 (v1.9 amendment above): the verdict carries BUILD BLOCKERS an
 
 This verdict covers THIS lane's own continuation. Flags that belong in other lanes still ship as staged kickoffs under step 4 and never substitute for the verdict. A wrap with no verdict is a partial wrap, the failure condition.
 
-## 5A. Code sessions wrap and archive themselves (v1.19, amended v1.20)
+## 5A. Code sessions wrap and archive themselves (v1.19, amended v1.20 and v1.21)
 
 <!-- RULED-BY: intake/2026-10-22-disclosure-rulebook-sync-formatting-tabs-session-wrap.md date:2026-10-22 -->
 
-Source, the HQ Rulebook's Session lifecycle section, Decision Log 2026-10-24, Finished code sessions wrap and archive themselves (2026-10-24), and Decision Log 2026-10-22, Code sessions wrap and archive themselves, never ask Allison. The live Rulebook wins wherever this section differs.
+Source, the HQ Rulebook's Session lifecycle section, Decision Log 2026-10-24, Archiving is gated on the paper trail, and an orphan sweep catches what slips, Decision Log 2026-10-24, Finished code sessions wrap and archive themselves (2026-10-24), and Decision Log 2026-10-22, Code sessions wrap and archive themselves, never ask Allison. The live Rulebook wins wherever this section differs.
 
-When a Claude Code or Codex session finishes, it closes itself. Finished means three things are true.
+When a Claude Code or Codex session finishes, it closes itself. Finished means four things are true.
 
 - Its outputs are saved where they belong.
-- Its report is written in the Handoffs tab and read back.
+- Its report row is written in the Handoffs tab and read back, meaning the session reads the row from the tab after writing it and confirms the text is there.
+- Its incoming row, the Handoffs row that assigned the work, is marked Done with a pointer to that report row.
 - Nothing is owed either way, no open question, no undelivered 📬 note, and nothing it still runs (session-steward section 7A).
+
+**The archive gate.** The first two items and the second item's pointer are the gate, and the gate comes first. No archive call, and no `WRAP, safe to archive` line, before the report row is written and read back and the incoming row is marked Done with its pointer. The 📬 box in chat is only the bell, never the record. It tells Allison and HQ that a row exists, and a report that lives only in the box is not a report. A session with no incoming row, because Allison assigned the work in chat, still files its report row to the Handoffs tab for HQ, and only the incoming-row step falls away.
+
+**A session that cannot reach the Handoffs tab stays open and says so.** If the sheet read or write fails twice, the session does not archive and does not paste the report into chat as a stand-in. It stays open, ends on `SESSION STATUS: NOT safe to archive -- cannot reach the Handoffs tab, report row not filed; waiting on the sheet connector.`, and keeps the full report text ready so the row can be filed the moment the tab answers.
 
 Then it runs its wrap duties on its own, without waiting for Allison to say wrap, says SAFE TO ARCHIVE with its evidence, and archives itself where the app allows. It never asks Allison whether it is ready, and a session that archives itself owes her no notice. She only hears about a session that is waiting on her.
 
@@ -186,7 +193,7 @@ Then it runs its wrap duties on its own, without waiting for Allison to say wrap
 - Codex. A Codex session archives itself too, confirmed by Codex, Session Steward on 2026-10-24 (Decision Log 2026-10-24). `codex archive <SESSION>` archives a saved session by ID or name, and the app server has `thread/archive` (learn.chatgpt.com, Developer commands and App Server, checked 2026-10-22). If the call is refused, use the cannot-archive case below.
 - Cloud sessions are not archived this way. They use the cannot-archive case.
 
-If it cannot archive itself, its last line is exactly `WRAP, safe to archive`. Claude Code, Session Steward or Codex, Session Steward sweeps those sessions on its next pass, and Star's nightly check lists them too.
+If it cannot archive itself because the app refuses, and the gate above is satisfied, its last line is exactly `WRAP, safe to archive`. Claude Code, Session Steward or Codex, Session Steward sweeps those sessions on its next pass, and Star's nightly check lists them too. Those same passes also run the orphan sweep (session-steward section 10) for rows still Sent or Read whose session is archived or missing, and for pull requests or commits with no report row, so a session that archived without the gate is caught and HQ closes or restarts the row from the evidence.
 
 Asking Allison "ready to wrap?" or "can I archive?" is the failure condition. A session that still owes something is not finished. It stays ACTIVE or WAITING under the Rulebook's Session lifecycle states and says which.
 

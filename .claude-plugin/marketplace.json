@@ -8,7 +8,7 @@
     {
       "name": "operating-doctrine",
       "source": "./plugins/operating-doctrine",
-      "version": "2.63.0",
+      "version": "2.64.1",
       "description": "The non-negotiable operating standard. Loads at every session."
     },
     {
@@ -32,8 +32,8 @@
     {
       "name": "research-ops",
       "source": "./plugins/research-ops",
-      "version": "0.3.1",
-      "description": "Research skills: capability-currency, research-intake, the three TUB analysts (competitive intelligence, voice of customer, GEO and SEO ranking audit), and video-discovery (bounded public video discovery and verification)."
+      "version": "0.3.2",
+      "description": "Research skills for capability currency, research intake and video discovery. Imported TUB analyst prompts are retired and disabled."
     },
     {
       "name": "systems-map",
