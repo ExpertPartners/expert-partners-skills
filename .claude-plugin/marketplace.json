@@ -32,7 +32,7 @@
     {
       "name": "research-ops",
       "source": "./plugins/research-ops",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "description": "Research skills: capability-currency, research-intake, the three TUB analysts (competitive intelligence, voice of customer, GEO and SEO ranking audit), and video-discovery (bounded public video discovery and verification)."
     },
     {
