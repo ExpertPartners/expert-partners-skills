@@ -1,6 +1,6 @@
 ---
 name: "document-formatting-standard"
-description: "Allison's formatting and delivery standard (v4) for every document an AI makes. The live HQ Rulebook's Document formatting section owns every number: Google Docs, Poppins for Expert Partners and HQ, the AG Luxury brand guide for AG Luxury, the Rulebook's current line spacing, no blank lines between paragraphs, short paragraphs, and no bold, italics, em dashes, or dividers. Files take Cal's naming and go to their brain home, delivered as a link named for the document. Read the Rulebook live, then apply it with the tool notes here. Use whenever creating, restyling, or delivering a document."
+description: "Allison's formatting and delivery standard (v4.1) for every document an AI makes. The live HQ Rulebook's Document formatting section owns every number: Google Docs, Poppins throughout for every brand and room, AG Luxury included, the Rulebook's current line spacing, no blank lines between paragraphs, short paragraphs, and no bold, italics, em dashes, or dividers. Files take Cal's naming and go to their brain home, delivered as a link named for the document. Read the Rulebook live, then apply it with the tool notes here. Use whenever creating, restyling, or delivering a document."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -12,11 +12,13 @@ brand-scope: null
 subtitle: "the Rulebook sets the look, this skill applies it"
 ---
 
-# Document Formatting Standard (v4, 2026-10-22)
+# Document Formatting Standard (v4.1, 2026-10-24)
 
 <!-- RULED-BY: intake/2026-10-22-disclosure-rulebook-sync-formatting-tabs-session-wrap.md date:2026-10-22 -->
 
 This version supersedes the hard-coded values, plain-title filenames, Aura Docs folder, and re-upload note of v3. Disclosure of record: intake/2026-10-22-disclosure-rulebook-sync-formatting-tabs-session-wrap.md.
+
+v4.1 follows Decision Log 2026-10-24, Every document made in work with Allison uses Poppins. AG Luxury documents no longer take Italiana and Manrope. Assigned by [HQ 🧠] - Chief HR Officer.
 
 ## The source is the Rulebook
 
@@ -31,8 +33,8 @@ If this skill and the Rulebook ever differ, the Rulebook wins. Report the differ
 This list only says what to look up. The numbers live in the Rulebook.
 
 - Every document an AI makes is a Google Doc.
-- Expert Partners and HQ documents use Poppins throughout, with the Rulebook's title, heading, and body sizes and its Brand Blue for Heading 2.
-- AG Luxury documents follow the AG Luxury brand guide as the Rulebook states it, Italiana for titles and headings, Manrope for body, black and white, with Rich Gold only for small details.
+- Every document uses Poppins throughout, for every brand and every room, AG Luxury included, with the Rulebook's title, heading, and body sizes. Expert Partners and HQ documents set Heading 2 in the Rulebook's Brand Blue.
+- AG Luxury documents stay black and white, with the Rulebook's Rich Gold only for small details. Italiana and Manrope are the allisongaddy.com website fonts and belong only to public, client-facing design, never to working documents.
 - Line spacing is whatever the Rulebook says today.
 - No empty line sits between paragraphs. Line spacing and a small space after each paragraph do the separating, and headings keep their own spacing.
 - Paragraphs stay short, one or two sentences that carry one idea.
