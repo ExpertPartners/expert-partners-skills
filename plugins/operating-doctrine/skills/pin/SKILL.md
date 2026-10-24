@@ -16,18 +16,20 @@ subtitle: "carry-back envelope and place-keeping baton"
 
 <!-- RULED-BY: aura/decisions/0107-retire-routing-naming-ceremony.md date:2026-10-12 superseded naming text removed -->
 
-A pin is a bookmark, not a task. It marks the exact spot where work handed off between Claude Code and the Claude project conversation that drives it. v4 (ruled by Allison 2026-08-03) makes the protocol surface-neutral: the home is a Claude PROJECT plus CONVERSATION, never assumed to be CoWork, and adds the "come back here" pin close. v4.2 (ruled by Allison 2026-08-03) deletes the closing line that solicited a paste confirmation. v4.5 (re-ruled by Allison 2026-08-07 evening) has the session give its own archive verdict. v4.6 (ruled by Allison 2026-08-07, ruling of record aura intake/2026-08-07-ruling-dispatch-blocks-must-name-worktrees.md) adds the WORKTREE line to spawning blocks. v4.7 (ruled by Allison 2026-08-07, Aura / Code Rule Fix lane) adds the earned verdict line.
+A pin is a bookmark, not a task. It marks the exact spot where work handed off between Claude Code and the Claude project conversation that drives it. v4 (ruled by Allison 2026-08-03) makes the protocol surface-neutral: the home is a Claude PROJECT plus CONVERSATION, never assumed to be CoWork, and adds the "come back here" pin close. v4.2 (ruled by Allison 2026-08-03) deletes the closing line that solicited a paste confirmation. v4.5 (re-ruled by Allison 2026-08-07 evening) has the session give its own archive verdict. v4.6 (ruled by Allison 2026-08-07, ruling of record aura intake/2026-08-07-ruling-dispatch-blocks-must-name-worktrees.md) adds the WORKTREE line to spawning blocks. v4.7 (ruled by Allison 2026-08-07, Aura / Code Rule Fix lane) adds the earned verdict line. v4.8 (ruled by Allison 2026-10-24, Decision Log 2026-10-24, Archiving is gated on the paper trail, and an orphan sweep catches what slips) makes the chat message the bell and the Handoffs report row the record, and gates the archive on that row.
 
 Pins persist to `~/.claude/baton.md`. Every surface reads the same baton file, so one pin trail spans all of them.
 
 ## 1. Carry-back template
+
+**The chat message is the bell, the Handoffs row is the record (v4.8).** The carry-back is the report row written in the Handoffs tab of the Job Tracker, addressed to the room the work returns to. The message below, with its CLAUDE HOME line, 📬 box, SESSION STATUS and VERDICT, only rings the bell. It gives the bottom line and points at the row, and it is never the record. A report that exists only in chat is not a carry-back, and a session archives itself only after its report row is written and read back and its incoming row is marked Done with a pointer to that report (code-block-routing, The Archive Gate; session-wrap section 5A). A session that cannot reach the tab stays open and says so.
 
 Every report or block bound back to a Claude project ends exactly like this:
 
 ```
 CLAUDE HOME: {Claude project name} / {conversation name}
 
-{the report}
+{the bottom line of the report, and the Handoffs row it was filed in}
 
 SESSION STATUS: {the standing status line, section below}
 VERDICT: {RECOMMEND ARCHIVE -- all pushed, nothing pending on Allison's side | RECOMMEND HOLD OPEN, waiting on <the one named thing>}
@@ -49,7 +51,7 @@ A carry-back ends with exactly one of the four SESSION STATUS lines from `behavi
 - `SESSION STATUS: SAFE TO ARCHIVE -- [evidence in one line].`
 - `SESSION STATUS: NOT safe to archive -- [what is open]; run [/session-wrap | /session-closeout | the named action].`
 
-SAFE TO ARCHIVE is a verified claim, never a phrase. It is issued only after all three verify live in the same turn: `git status` clean and pushed on every repo the session touched; the session record, wrap, or closeout note written and pushed when doctrine requires one; and every open wait re-lodged in the lane ledger's waiting-on column with its named condition and stale date, so nothing dies with the archive. The evidence goes in the line itself.
+SAFE TO ARCHIVE is a verified claim, never a phrase. It is issued only after all four verify live in the same turn: `git status` clean and pushed on every repo the session touched; the session record, wrap, or closeout note written and pushed when doctrine requires one; every open wait re-lodged in the lane ledger's waiting-on column with its named condition and stale date, so nothing dies with the archive; and the archive gate cleared, meaning the report row is written in Handoffs and read back and the incoming row is marked Done with a pointer to that report. The evidence goes in the line itself.
 
 NOT safe means the session diagnoses AND prescribes: it names exactly what is open and the single move that closes it, /session-wrap when chat-only decisions or flags are unrecorded, /session-closeout when shipped work has no handoff note on main, or the named open action otherwise. Never leave Allison to work out which.
 
@@ -61,7 +63,7 @@ What stays with the home conversation: the ledger flip. The archive itself is th
 
 Amends v4.5; does not replace it. The standing SESSION STATUS line stays, and every carry-back adds exactly one earned VERDICT line after it, the carry-back's true last line:
 
-- `VERDICT: RECOMMEND ARCHIVE -- all pushed, nothing pending on Allison's side.` Permitted ONLY when the session verifies its checklist live in the same turn: every commit pushed, the whole brief executed, nothing gated or held open, no deliverable still owed. A bare safe-to-archive with no checklist behind it stays banned.
+- `VERDICT: RECOMMEND ARCHIVE -- all pushed, nothing pending on Allison's side.` Permitted ONLY when the session verifies its checklist live in the same turn: every commit pushed, the whole brief executed, the Handoffs report row written and read back with the incoming row marked Done and pointing at it (v4.8), nothing gated or held open, no deliverable still owed. A bare safe-to-archive with no checklist behind it stays banned.
 - `VERDICT: RECOMMEND HOLD OPEN, waiting on <the one named thing>.` Every other state earns this one. One named thing, never a list.
 
 Archive authority, as of Decision Log 2026-10-24, Finished code sessions wrap and archive themselves, is the finished code session's own: it archives itself and Allison is never the gate. Home's GitHub grading remains the backstop, and Allison may still archive on the spot on a RECOMMEND ARCHIVE. Sessions born before v4.7 follow it from their next carry-back.
