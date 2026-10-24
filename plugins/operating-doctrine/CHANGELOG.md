@@ -1,3 +1,11 @@
+## 2.64.1 - 2026-10-24
+
+document-formatting-standard v4.1 follows the live HQ Rulebook. Every document an AI makes in
+work with Allison uses Poppins throughout, for every brand and every room, AG Luxury included
+(Decision Log 2026-10-24, Every document made in work with Allison uses Poppins). The skill no
+longer tells AG Luxury documents to use Italiana and Manrope. Those are the allisongaddy.com
+website fonts and belong only to public, client-facing design. Assigned by HQ.
+
 ## 2.64.0 - 2026-10-24
 
 The archive gate and the orphan sweep (Decision Log 2026-10-24, Archiving is gated on the paper
