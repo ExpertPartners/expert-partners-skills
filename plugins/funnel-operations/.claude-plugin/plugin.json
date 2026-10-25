@@ -1,6 +1,6 @@
 {
   "name": "funnel-operations",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Funnel operations skills for Expert Partners and EPIC: build new funnels, migrate funnels out of the legacy location, and document every funnel into Notion as the single source of truth. Built for non-technical teammates, hand-held one step at a time.",
   "author": {
     "name": "Allison Gaddy"

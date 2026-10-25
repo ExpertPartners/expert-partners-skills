@@ -48,9 +48,9 @@ Sweep every head every run. For each head, compare live state against the baseli
 
 ## Outputs per run, all five, every run
 
-1. Overwrite the Capability Watch Doc (Google Doc `1aaWBVTySyMPfW9XFTiDRTy_Z3TnJKAXcc1BHJ1Nl09k`, Company Core [HQ-BB]) with the current-state snapshot, updating the Last refreshed date. The watch Doc is current state, the changelog is history.
+1. Overwrite the Capability Watch Doc (Company Core [HQ-BB]) with the current-state snapshot, updating the Last refreshed date. The watch Doc is current state, the changelog is history.
 
-2. Add one dated entry at the top of the Capability Refresh Changelog Doc (Google Doc `1fGNxd_hsAIdnmKe7z677VYBuaR_szhSM9bbztbWEVQQ`) covering the window since the last entry, what changed, what it means for this estate, and what to act on. Every claim carries its live source URL and retrieval date. Never edit prior entries, the Doc is append-only.
+2. Add one dated entry at the top of the Capability Refresh Changelog Doc covering the window since the last entry, what changed, what it means for this estate, and what to act on. Every claim carries its live source URL and retrieval date. Never edit prior entries, the Doc is append-only.
 
 3. File the run record as a Google Doc in HQ Business Brain, Company Core [HQ-BB], so the run is readable from every surface.
 

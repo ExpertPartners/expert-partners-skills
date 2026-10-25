@@ -26,7 +26,7 @@ You are enforcing the session-routing doctrine so no work ends up in the wrong f
 
 ## Routing table
 
-Read the live [[HQ][V1.0] HQ Rulebook](https://docs.google.com/document/d/15sCFxMvG8OZMZik5w0Hzqzh7HyphrB7rJ8NBtm46JBE/edit) (Where things live, Project ownership) first, then the project's row in the GitHub Archive Index sheet and its [[HQ][V1.0] Job Tracker](https://docs.google.com/spreadsheets/d/1FniEwCaZ89cViQxUcPkycxAmvvM47cnjRzQQyzpEk5c/edit) row. Those Drive sources are authoritative. The retired aura `doctrine/session-routing.md` is history, never a source. The table below is a quick-reference copy; the Drive sources win if there is any discrepancy. There is no default home folder: Claude Code opens in the repo the work lives in.
+Read the live HQ Rulebook (Where things live, Project ownership) first, then the project's row in the GitHub Archive Index sheet and its Job Tracker row. Those Drive sources are authoritative. The retired aura `doctrine/session-routing.md` is history, never a source. The table below is a quick-reference copy; the Drive sources win if there is any discrepancy. There is no default home folder: Claude Code opens in the repo the work lives in.
 
 | Topic | Project home | GitHub repo |
 |---|---|---|

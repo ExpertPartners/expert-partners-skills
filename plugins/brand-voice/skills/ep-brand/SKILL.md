@@ -14,12 +14,12 @@ subtitle: "Expert Partners parent voice"
 
 ## Load the canon Doc first
 
-Brand canon lives in Google Drive. Before drafting, read these Docs with the Google Docs or Drive connector (`read_file_content` on the Doc ID in the link, which returns plain text; do not use `read_doc`, its JSON overflows on a Doc this size). Apply what they say as the authoritative source. Expert Partners is the parent company, EPIC is a program inside it.
+Brand canon lives in Google Drive. Before drafting, read these Docs with the Google Docs or Drive connector. Find each Doc by its title with the connector's search (search for the words, since the stored name carries a bracketed tag and version in front), then use `read_file_content` on it, which returns plain text. Do not use `read_doc`, its JSON overflows on a Doc this size. Apply what they say as the authoritative source. Expert Partners is the parent company, EPIC is a program inside it.
 
-- [EP][V1.0] Expert Partners Brand Canon (EP Business Brain, Company Core [EP-BB]), https://docs.google.com/document/d/1XSiBzCLCHS_9_BXUrvV_Ysl2aBVY_I_kq_s5d25oY_4/edit
-- [EP][V1.0] EPIC Brand Canon (EP Business Brain, Company Core [EP-BB]), https://docs.google.com/document/d/1W2QxjC_2iVY_-kWZLPEHRcztvEbpht5xcueWduOCdMU/edit
+- Expert Partners Brand Canon (EP Business Brain, Company Core [EP-BB])
+- EPIC Brand Canon (EP Business Brain, Company Core [EP-BB])
 
-The inline content below is a fallback for sessions where the Drive connector is unavailable. If the Doc and the inline text disagree, the Doc wins. Also read the estate-wide spelling, exclusion, and identifier rules in [HQ][V1.0] Shared Writing Rules (HQ Business Brain, Company Core [HQ-BB]), https://docs.google.com/document/d/103y7LzzahVmGmUgCQukvwH2V7VKu3nhFEDteFrQBKqE/edit.
+The inline content below is a fallback for sessions where the Drive connector is unavailable. If the Doc and the inline text disagree, the Doc wins. Also read the estate-wide spelling, exclusion, and identifier rules in Shared Writing Rules (HQ Business Brain, Company Core [HQ-BB]).
 
 ## Identity
 

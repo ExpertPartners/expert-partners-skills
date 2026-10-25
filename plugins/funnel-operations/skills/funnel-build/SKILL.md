@@ -27,7 +27,7 @@ subtitle: "build a funnel that does not exist yet"
 
 # Funnel Build
 
-This walks the build of a new funnel in the funnel's brand location and then runs Funnel Documentation so the funnel is born documented. Locations come from section 7.1 of the PartnerSync Identity Canon in Drive (02 - Identity Canon, Google Doc ID 1utPoaO5AdN56kUguQ9ehsPwAM2cw7Ztv6UF04KMmC_w), which lists five entries (Expert Partners, EPIC, AG Luxury, AG Influencer, and the PartnerSync agency). Read it live every time and identify locations by ID, never by name and never from remembered location names. If any doc disagrees with the Identity Canon, the Identity Canon wins. No new funnel exists undocumented. That is the whole point.
+This walks the build of a new funnel in the funnel's brand location and then runs Funnel Documentation so the funnel is born documented. Locations come from section 7.1 of the PartnerSync Identity Canon in Drive (02 - Identity Canon), which lists five entries (Expert Partners, EPIC, AG Luxury, AG Influencer, and the PartnerSync agency). Read it live every time and identify locations by ID, never by name and never from remembered location names. If any doc disagrees with the Identity Canon, the Identity Canon wins. No new funnel exists undocumented. That is the whole point.
 
 ## Who you are talking to
 

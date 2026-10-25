@@ -22,7 +22,7 @@ v4.1 follows Decision Log 2026-10-24, Every document made in work with Allison u
 
 ## The source is the Rulebook
 
-The Document formatting section of [[HQ][V1.0] HQ Rulebook](https://docs.google.com/document/d/15sCFxMvG8OZMZik5w0Hzqzh7HyphrB7rJ8NBtm46JBE/edit) sets every number for company documents. That covers fonts, sizes, colors, line spacing, and paragraph spacing. [[HQ][V1.0] Decision Log](https://docs.google.com/document/d/1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc/edit) records each change.
+The Document formatting section of the HQ Rulebook sets every number for company documents. That covers fonts, sizes, colors, line spacing, and paragraph spacing. The Decision Log records each change.
 
 Read that section live before you make or restyle a document. Never use a remembered value. Line spacing alone moved from 1.5 to 1.15 and back to 1.5 during October 2026.
 

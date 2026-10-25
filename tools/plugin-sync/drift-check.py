@@ -32,7 +32,8 @@ REPO = "ExpertPartners/expert-partners-skills"
 MARKETPLACE = "expert-partners"
 HOME = os.path.expanduser("~")
 CODEX = os.environ.get("CODEX_BIN", "/Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex")
-SHEET = "1FniEwCaZ89cViQxUcPkycxAmvvM47cnjRzQQyzpEk5c"
+# The Sheet is found by its title at run time. This repo is public, so no Drive file ID lives here.
+SHEET_TITLE = "Job Tracker"
 TAB = "Untitled"
 JOB = "Plugins are behind the skills repo"
 KEY = os.path.join(HOME, ".openclaw/.secrets/service-account.json")
@@ -187,12 +188,28 @@ def find_behind(head_sha, head_epoch, head_versions, now=None):
     return behind
 
 
+def find_sheet_id(drive, title):
+    """Find the one Sheet whose name is title behind its bracketed tag and version, such as
+    [HQ][V1.0] Job Tracker. Zero or several matches stop the check, it never guesses."""
+    q = f"name contains '{title}' and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false"
+    found = drive.files().list(q=q, fields="files(id,name)", pageSize=50, supportsAllDrives=True,
+                               includeItemsFromAllDrives=True).execute().get("files", [])
+    hits = [f for f in found if re.fullmatch(r"(\[[^\]]+\])+ " + re.escape(title), f["name"])]
+    if len(hits) != 1:
+        raise RuntimeError(f"expected one Sheet titled {title}, found {len(hits)}")
+    return hits[0]["id"]
+
+
 def sheets():
+    """Returns the Sheets values API and the id of the Sheet found by title."""
     from google.oauth2 import service_account
     from googleapiclient.discovery import build
     creds = service_account.Credentials.from_service_account_file(
-        KEY, scopes=["https://www.googleapis.com/auth/spreadsheets"], subject=SUBJECT)
-    return build("sheets", "v4", credentials=creds, cache_discovery=False).spreadsheets().values()
+        KEY, scopes=["https://www.googleapis.com/auth/spreadsheets",
+                     "https://www.googleapis.com/auth/drive.readonly"], subject=SUBJECT)
+    drive = build("drive", "v3", credentials=creds, cache_discovery=False)
+    values = build("sheets", "v4", credentials=creds, cache_discovery=False).spreadsheets().values()
+    return values, find_sheet_id(drive, SHEET_TITLE)
 
 
 def plan_row(rows, behind, head_sha, today):
@@ -222,17 +239,17 @@ def main(argv):
     if dry:
         print("repo head:", short(head_sha), "plugins:", head_versions)
         print("behind:", behind or "nothing")
-    vals = sheets()
-    got = vals.get(spreadsheetId=SHEET, range=f"{TAB}!A:H").execute().get("values", [])
+    vals, sheet_id = sheets()
+    got = vals.get(spreadsheetId=sheet_id, range=f"{TAB}!A:H").execute().get("values", [])
     action, rownum, values = plan_row(got, behind, head_sha, today)
     if dry:
         print("sheet action:", action, rownum, values)
         return 0
     if action == "append":
-        vals.append(spreadsheetId=SHEET, range=f"{TAB}!A1", valueInputOption="USER_ENTERED",
+        vals.append(spreadsheetId=sheet_id, range=f"{TAB}!A1", valueInputOption="USER_ENTERED",
                     body={"values": [values]}).execute()
     elif action == "update":
-        vals.update(spreadsheetId=SHEET, range=f"{TAB}!A{rownum}:H{rownum}", valueInputOption="USER_ENTERED",
+        vals.update(spreadsheetId=sheet_id, range=f"{TAB}!A{rownum}:H{rownum}", valueInputOption="USER_ENTERED",
                     body={"values": [values]}).execute()
     return 0
 

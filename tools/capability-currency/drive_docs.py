@@ -6,14 +6,19 @@ connectors (code.claude.com/docs/en/authentication, checked 2026-10-13), so the
 runner uses the service account with domain-wide delegation instead. Same Docs,
 same owner, no human session.
 
-  drive_docs.py read DOC_ID
-  drive_docs.py prepend DOC_ID FILE   insert FILE above the first ## heading
-  drive_docs.py replace DOC_ID FILE   replace the whole body with FILE
+  drive_docs.py read DOC_TITLE
+  drive_docs.py prepend DOC_TITLE FILE   insert FILE above the first ## heading
+  drive_docs.py replace DOC_TITLE FILE   replace the whole body with FILE
+
+DOC_TITLE is the Doc's name without its bracketed tag and version, such as
+"Capability Watch". The Doc is found by that title at run time, so no Drive file
+ID lives in this public repo. Zero or several matches stop the run.
 
 FILE is plain text. Lines starting with '# ', '## ' or '### ' become headings.
 The key stays where it is (never copied, never printed).
 """
 import os
+import re
 import sys
 
 from google.oauth2 import service_account
@@ -21,14 +26,26 @@ from googleapiclient.discovery import build
 
 KEY = os.path.expanduser("~/.openclaw/.secrets/service-account.json")
 SUBJECT = "allison@expertpartners.com"
-SCOPES = ["https://www.googleapis.com/auth/documents"]
+SCOPES = ["https://www.googleapis.com/auth/documents",
+          "https://www.googleapis.com/auth/drive.readonly"]
 STYLE = {"# ": "HEADING_1", "## ": "HEADING_2", "### ": "HEADING_3"}
 
 
-def docs():
+def clients():
     creds = service_account.Credentials.from_service_account_file(
         KEY, scopes=SCOPES, subject=SUBJECT)
-    return build("docs", "v1", credentials=creds, cache_discovery=False).documents()
+    return (build("docs", "v1", credentials=creds, cache_discovery=False).documents(),
+            build("drive", "v3", credentials=creds, cache_discovery=False))
+
+
+def find_doc_id(drive, title):
+    q = f"name contains '{title}' and mimeType='application/vnd.google-apps.document' and trashed=false"
+    found = drive.files().list(q=q, fields="files(id,name)", pageSize=50, supportsAllDrives=True,
+                               includeItemsFromAllDrives=True).execute().get("files", [])
+    hits = [f for f in found if re.fullmatch(r"(\[[^\]]+\])+ " + re.escape(title), f["name"])]
+    if len(hits) != 1:
+        sys.exit(f"expected one Doc titled {title}, found {len(hits)}")
+    return hits[0]["id"]
 
 
 def paragraphs(doc):
@@ -73,8 +90,9 @@ def build_insert(raw, at):
 def main(argv):
     if len(argv) < 3 or argv[1] not in ("read", "prepend", "replace"):
         sys.exit(__doc__)
-    cmd, doc_id = argv[1], argv[2]
-    d = docs()
+    cmd, title = argv[1], argv[2]
+    d, drive = clients()
+    doc_id = find_doc_id(drive, title)
     doc = d.get(documentId=doc_id).execute()
     if cmd == "read":
         sys.stdout.write(text_of(doc))
@@ -97,7 +115,7 @@ def main(argv):
                 "range": {"startIndex": 1, "endIndex": end_index}}})
         reqs += build_insert(raw, 1)
     d.batchUpdate(documentId=doc_id, body={"requests": reqs}).execute()
-    print(f"{cmd} ok: {doc_id}")
+    print(f"{cmd} ok: {title}")
 
 
 if __name__ == "__main__":

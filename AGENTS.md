@@ -15,7 +15,7 @@ Working here
 
 ## Company rules
 
-Read [[HQ][V1.0] Organization Instructions](https://docs.google.com/document/d/187gDKHkECjOwG766RcnJAToIU7oZp5Rnm2NPf9HL-4U/edit), Doc ID `187gDKHkECjOwG766RcnJAToIU7oZp5Rnm2NPf9HL-4U`, alongside the [HQ Rulebook](https://docs.google.com/document/d/15sCFxMvG8OZMZik5w0Hzqzh7HyphrB7rJ8NBtm46JBE/edit) and [Decision Log](https://docs.google.com/document/d/1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc/edit) before relying on company rules or decisions. Business knowledge lives in the owning Google Drive brain. If a required read fails, stop dependent work and report it. Do not copy the instructions here.
+Read Organization Instructions, the HQ Rulebook and the Decision Log, all in HQ Business Brain, Company Core, before relying on company rules or decisions. Find each Doc by its title in Google Drive, and never copy a Doc link or ID into this repository, because it is public. Business knowledge lives in the owning Google Drive brain. If a required read fails, stop dependent work and report it. Do not copy the instructions here.
 
 - When Allison types S or s, or any single letter, it means sent. Never ask what it means.
 - A session archives itself only after its report row is written in Handoffs and read back, its incoming row is marked Done with a pointer to that report, and it has no uncommitted or unpushed work of its own.

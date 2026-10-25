@@ -26,7 +26,7 @@ Each system has exactly one job. Discrepancies happen when a system is asked to 
 
 ## First read for every cold session
 
-The HQ Rulebook (Google Doc `15sCFxMvG8OZMZik5w0Hzqzh7HyphrB7rJ8NBtm46JBE`) first, then the Job Tracker (Google Sheet `1FniEwCaZ89cViQxUcPkycxAmvvM47cnjRzQQyzpEk5c`) for what is in flight and what each job awaits, then the owning brain's `00 START HERE` Doc. Pointers, never copies.
+The HQ Rulebook first, then the Job Tracker for what is in flight and what each job awaits, then the owning brain's `00 START HERE` Doc. Pointers, never copies.
 
 ## The entity and the platform
 
@@ -34,7 +34,7 @@ Expert Partners LLC is the legal and operating entity. Don Hobbs operates under 
 
 The brand registry's original record is aura ADR 0045 (ruled 2026-07-30), kept as history. Read current brand canon from the Drive brand canon Docs named in the brand-voice skill. The six active brands (Expert Partners, EPIC, Don Hobbs Personal Brand, AG Personal Brand, AG Luxury, Free Agent Movement), with Moxie Signature Group benched. No new Moxie work; consumer real estate routes to AG Luxury.
 
-PartnerSync is the white-labeled GoHighLevel platform layer, the agency container (company `FOz8PSvqj7aYASb3wDzm`, "Expert Partners LLC dba Partner Sync"). It is plumbing, not a legal entity and not a brand. It holds five brand locations: EPIC, Expert Partners, AG Personal Brand, Moxie Signature Group (location exists physically; the brand is benched per aura ADR 0045, route no new work there), and Free Agent Nation Circle Community. The location IDs live in section 7.1 of the PartnerSync Identity Canon in Drive (02 - Identity Canon, Google Doc ID 1utPoaO5AdN56kUguQ9ehsPwAM2cw7Ztv6UF04KMmC_w). The location a contact lives in IS the brand statement; the peer brand-tag vocabulary is retired as contact-routing architecture (ruled 2026-07-27; full rule in `partnersync/doctrine/cross-location-identity-rules.md`).
+PartnerSync is the white-labeled GoHighLevel platform layer, the agency container (company `FOz8PSvqj7aYASb3wDzm`, "Expert Partners LLC dba Partner Sync"). It is plumbing, not a legal entity and not a brand. It holds five brand locations: EPIC, Expert Partners, AG Personal Brand, Moxie Signature Group (location exists physically; the brand is benched per aura ADR 0045, route no new work there), and Free Agent Nation Circle Community. The location IDs live in section 7.1 of the PartnerSync Identity Canon in Drive (02 - Identity Canon). The location a contact lives in IS the brand statement; the peer brand-tag vocabulary is retired as contact-routing architecture (ruled 2026-07-27; full rule in `partnersync/doctrine/cross-location-identity-rules.md`).
 
 ## Storage map: what each system does, one job each
 
@@ -65,7 +65,7 @@ Ember has her own shared Google Drive, and it is her filing home at wake, she fi
 
 ## Where canon is read from
 
-Google Drive, through the Drive, Docs, and Sheets connectors. The Estate Brain MCP is retiring (Decision Log 2026-10-13), so do not read canon through it. Decisions are saved to the Decision Log (Google Doc `1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc`), newest at the top.
+Google Drive, through the Drive, Docs, and Sheets connectors. The Estate Brain MCP is retiring (Decision Log 2026-10-13), so do not read canon through it. Decisions are saved to the Decision Log, newest at the top.
 
 ## What Claude can already reach (the access map)
 

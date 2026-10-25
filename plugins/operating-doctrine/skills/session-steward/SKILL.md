@@ -29,7 +29,7 @@ v1.3 (ruled by Allison 2026-09-01, the founder-load worker-lifecycle amendment, 
 
 v1.2 (ruled by Allison 2026-08-30, ruling of record aura decisions/0082-registrar-model-amendment-to-decision-0074.md, implementing decision 0080 Section 28): the enforcement target moves with the rule it enforces. Concurrency itself is no longer the violation. A violation is an unregistered worker or a worker whose exact execution scope collides with another, proven from evidence. Bridge until cutover, decision 0082 and decision 0080 Section 24: the registrar and the table registry do not exist yet, so until Allison rules the one cutover the installed one-active-worker practice continues to bind and the Steward keeps checking it, as pre-cutover discipline rather than target-state law.
 
-This is a capability, not an agent. No new dashboard, database, registry, service, or system of record. The Job Tracker (Google Sheet `1FniEwCaZ89cViQxUcPkycxAmvvM47cnjRzQQyzpEk5c`) stays the only durable work state, unchanged in schema. Read lane ledger and lanes.md as the Job Tracker. The Steward reads and writes through the proven native ccd_session_mgmt tools plus the existing ledger path, and nothing else.
+This is a capability, not an agent. No new dashboard, database, registry, service, or system of record. The Job Tracker stays the only durable work state, unchanged in schema. Read lane ledger and lanes.md as the Job Tracker. The Steward reads and writes through the proven native ccd_session_mgmt tools plus the existing ledger path, and nothing else.
 
 ## 1. Session identification
 

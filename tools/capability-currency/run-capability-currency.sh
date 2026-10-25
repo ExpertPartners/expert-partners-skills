@@ -89,8 +89,9 @@ tok="$(/bin/zsh -c "source ~/.zshenv 2>/dev/null; op read $TOKEN_REF" 2>/dev/nul
 [[ -n "$tok" ]] && export CLAUDE_CODE_OAUTH_TOKEN="$tok"
 unset tok
 
-WATCH_DOC="1aaWBVTySyMPfW9XFTiDRTy_Z3TnJKAXcc1BHJ1Nl09k"
-CHANGELOG_DOC="1fGNxd_hsAIdnmKe7z677VYBuaR_szhSM9bbztbWEVQQ"
+# Docs are found by title in Drive. This repo is public, so no Drive file ID lives here.
+WATCH_DOC="Capability Watch"
+CHANGELOG_DOC="Capability Refresh Changelog"
 HERE="$(cd "$(dirname "$0")" && pwd)"
 DRIVE="python3 $HERE/drive_docs.py"
 

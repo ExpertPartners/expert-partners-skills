@@ -19,7 +19,7 @@ v1.1 adds the readiness gate. v1.0 ran in exactly two situations, a repo being b
 
 <!-- RULED-BY: aura/intake/2026-09-01-repo-final-reconciliation-execution-map.md date:2026-09-01 -->
 
-v1.2 names the topology authority. The GitHub Archive Index sheet (Google Sheet `168a8air5UJ8nMhr7JUeHSWCn41_Z56WmGeW5Drpc5Qw`) is the one answer to which repositories exist, what each holds, and its pile. Read it live, never a frozen roster. Stage A reads the sheet before proposing any repo, Stage B adds the new repo's row as part of birth, and path three reads the repo's row as its ownership input. A repo without a row is `UNREGISTERED` by design. The earlier aura Manifest Entity index is kept in GitHub Archive.
+v1.2 names the topology authority. The GitHub Archive Index sheet is the one answer to which repositories exist, what each holds, and its pile. Read it live, never a frozen roster. Stage A reads the sheet before proposing any repo, Stage B adds the new repo's row as part of birth, and path three reads the repo's row as its ownership input. A repo without a row is `UNREGISTERED` by design. The earlier aura Manifest Entity index is kept in GitHub Archive.
 
 
 v1.3 extends only the explicit audit path with knowledge architecture assessment. Read [the content assessment](references/content-architecture.md) before changing governed content, and use the [audit record](references/audit-record-template.md) to preserve evidence and proposed dispositions. The ten baseline grades, creation gate, and automatic readiness authority stay unchanged. This is implementation of existing authority plus the bounded Phase Two brief, not adoption of the research's proposed schema or governance. Provenance and unresolved amendments are recorded in `intake/2026-09-21-repo-standards-phase-two-authority-review.md` and `intake/2026-09-21-repo-standards-phase-two-founder-decisions.md` in the canonical skills repo.
@@ -54,7 +54,7 @@ Before any Fixer write, verify owner, supported defect, accepted desired-state e
 
 ## The one source of truth
 
-The standard lives in ONE place, the Repo rules section of the HQ Rulebook (Google Doc `15sCFxMvG8OZMZik5w0Hzqzh7HyphrB7rJ8NBtm46JBE`). Read it at the start of every run, before grading or scaffolding anything. The Project-ownership half is the Project ownership section of the same Rulebook. If it cannot be read, stop and say so, do not grade from memory.
+The standard lives in ONE place, the Repo rules section of the HQ Rulebook. Read it at the start of every run, before grading or scaffolding anything. The Project-ownership half is the Project ownership section of the same Rulebook. If it cannot be read, stop and say so, do not grade from memory.
 
 This skill never restates the ten points as its own canon. The Rulebook's text wins over anything written here, and if this skill and the Rulebook ever disagree, the Rulebook is right and this skill gets corrected. Points 1 through 3 are the enforcement layer (org rulesets, bot commit routing, generated-artifact gates), points 4 through 10 are the judgment layer. Project ownership is read the same way, as authority, never restated as local canon.
 
