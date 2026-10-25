@@ -1,3 +1,13 @@
+## 2.65.0 - 2026-10-25
+
+Teach Me v1.0, a new HQ skill. Every step of Cal's course opens with Next step, Teach Me and a
+CEO brief under 200 words for someone who has never watched Cal's videos. Every finished step
+gets a drafted HQ guide entry in four fixed parts, an SOP story when an SOP was written, and a
+60 to 90 second explainer scene list that ends on Stuck, ask Allison. It drafts only and never
+edits the Lovable app, Notion or Drive, and never renders video (Decision Log 2026-10-25,
+Every step starts in teach-me mode and nothing gets skipped, and The skill is called Teach Me
+and every step ends with a short AI video). Assigned by HQ in Handoffs.
+
 ## 2.64.1 - 2026-10-24
 
 document-formatting-standard v4.1 follows the live HQ Rulebook. Every document an AI makes in
