@@ -64,7 +64,7 @@ Read the Job Tracker values and look for the same obligation. Match on the oblig
 
 ### 3. Write it durably
 
-Add ONE row to the Job Tracker (Google Sheet `1FniEwCaZ89cViQxUcPkycxAmvvM47cnjRzQQyzpEk5c`) through the Sheets connector. The come-back condition is written in Waiting on, as a literal `RETURN WHEN:` line, because the wake token is mechanical and a prose paraphrase does not fire:
+Add ONE row to the Job Tracker through the Sheets connector. The come-back condition is written in Waiting on, as a literal `RETURN WHEN:` line, because the wake token is mechanical and a prose paraphrase does not fire:
 
 ```
 Job: <the obligation, stated as the thing still owed>

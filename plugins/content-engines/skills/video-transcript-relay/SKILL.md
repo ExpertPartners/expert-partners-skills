@@ -38,7 +38,7 @@ Leg four, Cowork. Read the transcript from Drive via the Google Drive connector,
 
 ## Where things land
 
-Transcripts go to Google Workspace, in Drive, at `Video Transcripts/`. The canonical folder exists as of 2026-07-31: folder ID `1XARRZWCTC4BJoHxBAL006ObLte3Mvz8D`, at My Drive root, owned by allison@expertpartners.com. Search for it by ID or exact title before uploading; never create a second folder with the same job. Per the systems map, Workspace is delivery and reference, and transcripts are named there explicitly as belonging in Workspace. Transcripts are never canonical, so they never go to GitHub.
+Transcripts go to Google Workspace, in Drive, at `Video Transcripts/`. The canonical folder exists as of 2026-07-31, at My Drive root, owned by allison@expertpartners.com. Search for it by its exact title before uploading; never create a second folder with the same job. Per the systems map, Workspace is delivery and reference, and transcripts are named there explicitly as belonging in Workspace. Transcripts are never canonical, so they never go to GitHub.
 
 Filename, per the document formatting standard, date-prefixed and readable.
 

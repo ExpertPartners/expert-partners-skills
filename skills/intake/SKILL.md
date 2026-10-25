@@ -30,7 +30,7 @@ Decisions inside it go to the Decision Log.
 | Expert Partners / EP | EP Business Brain |
 | EPIC | EP Business Brain |
 | AG / personal brand | EP Business Brain for the industry side, AG Business Brain for the consumer side |
-| Anything shared by both companies | HQ Business Brain, Company Core [HQ-BB] (folder `1Za4sU2YQ3UP2E-ujxVNtvH-2sQ-zndjw`) |
+| Anything shared by both companies | HQ Business Brain, Company Core [HQ-BB] |
 
 Azulio, The Strong Ones, book / You've Got a Friend, HeyGen, PartnerSync, Tonic,
 Aura, Founder Command Center / EOS, and Email Deliverability have no brain assigned
@@ -62,7 +62,7 @@ ask, or suggest `/new-project` if it is genuinely new. NEVER write to ag-vault.
    folder. Open the Doc from Drive to verify it landed.
 
 5. **Record decisions.** For each clear decision in the content, add an entry at
-   the top of the Decision Log (Google Doc `1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc`)
+   the top of the Decision Log
    under today's date: what was decided, why in a sentence or two, a `Replaces:`
    note naming the older decision it supersedes (or none), and the Doc link.
 

@@ -14,11 +14,11 @@ subtitle: "luxury real estate voice under Allison’s name"
 
 ## Canon and live context
 
-Brand canon lives in Google Drive. Before drafting, read these Docs with the Google Docs or Drive connector (`read_file_content` on the Doc ID in the link, which returns plain text; do not use `read_doc`, its JSON overflows on a Doc this size). Apply what they say as the authoritative source.
+Brand canon lives in Google Drive. Before drafting, read these Docs with the Google Docs or Drive connector. Find each Doc by its title with the connector's search (search for the words, since the stored name carries a bracketed tag and version in front), then use `read_file_content` on it, which returns plain text. Do not use `read_doc`, its JSON overflows on a Doc this size. Apply what they say as the authoritative source.
 
-- [AG][V1.0] AG Luxury Brand Canon (AG Business Brain, Company Core [AG-BB]), https://docs.google.com/document/d/1IHjcFV7Bv023GIwgNxV5d4p_bu2R5l7yUW5F4VE_-yM/edit
+- AG Luxury Brand Canon (AG Business Brain, Company Core [AG-BB])
 
-The inline content below is a fallback for sessions where the Drive connector is unavailable. If the Doc and the inline text disagree, the Doc wins. Also read the estate-wide spelling, exclusion, and identifier rules in [HQ][V1.0] Shared Writing Rules (HQ Business Brain, Company Core [HQ-BB]), https://docs.google.com/document/d/103y7LzzahVmGmUgCQukvwH2V7VKu3nhFEDteFrQBKqE/edit.
+The inline content below is a fallback for sessions where the Drive connector is unavailable. If the Doc and the inline text disagree, the Doc wins. Also read the estate-wide spelling, exclusion, and identifier rules in Shared Writing Rules (HQ Business Brain, Company Core [HQ-BB]).
 
 The [AG][V1.0] AG Luxury Brand Canon in AG Business Brain, Company Core is the live brand canon and wins over this skill wherever they conflict. The former ag-luxury repo `docs/DECISION-LOG.md` (the append-only ruling record behind the D0nn references below) and `docs/governance/` (the approved claim set) are boxed in the Drive GitHub Archive as ag-luxury-full-2026-10-23.zip.
 

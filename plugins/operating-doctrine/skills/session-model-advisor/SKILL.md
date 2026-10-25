@@ -71,7 +71,7 @@ Because there is no introspection path, this skill's job on these two surfaces i
 
 Try in this order, and stop at the first success.
 
-1. Read the Model chart section of the HQ Rulebook (Google Doc `15sCFxMvG8OZMZik5w0Hzqzh7HyphrB7rJ8NBtm46JBE`) through the Drive or Docs connector. The chart is the standard. This is the primary path on any surface with the Drive connector attached, including a claude.ai Project or Chat and Claude Code.
+1. Read the Model chart section of the HQ Rulebook through the Drive or Docs connector. The chart is the standard. This is the primary path on any surface with the Drive connector attached, including a claude.ai Project or Chat and Claude Code.
 2. (Claude Code only, no Drive connector) Read the same Doc through the service-account path (SA+DWD).
 3. If both fail, most likely on a bare Claude Chat or Project conversation with no Drive connector attached, say so plainly, along these lines -- "I can't reach the Model chart from here. No Drive connector on this surface. I'm proceeding without a standard to check against. Add the Google Drive connector to this Project if you want this check to run here." Do not fabricate, paraphrase from memory, or reuse a matrix seen in an earlier conversation. The chart is explicitly a living section (the model names attached to categories will not outlast a generation even though the categories should) and a remembered copy is exactly the drift this skill exists to prevent.
 

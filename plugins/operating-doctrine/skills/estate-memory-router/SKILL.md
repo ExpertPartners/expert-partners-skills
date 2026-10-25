@@ -67,7 +67,7 @@ Knowledge with no action attached goes here, never to `remember-this`. That dist
 
 Something Allison decided, leaned toward, or that reads like it should become durable truth. Preserve it as evidence in the correct existing mechanism, marked plainly as a candidate, with what was said and when.
 
-**A clear decision is saved as made, with no phrase required** (decision 0101, which supersedes the exact-phrase gates of decisions 0060 and 0061). Allison's clear instruction, or her unambiguous confirmation of one specific proposal, is enough: route it to the Decision Log (Google Doc `1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc`) and complete the write and readback in the same response cycle. A recommendation, brainstorm, ambiguous yes, quoted text, or question is not a decision, and this router never promotes on its own recommendation or invents her approval. Preserve those as candidates. When the intended decision or its owning home is genuinely unresolved, that is one focused question for Allison under Decide Now, asked in the live conversation.
+**A clear decision is saved as made, with no phrase required** (decision 0101, which supersedes the exact-phrase gates of decisions 0060 and 0061). Allison's clear instruction, or her unambiguous confirmation of one specific proposal, is enough: route it to the Decision Log and complete the write and readback in the same response cycle. A recommendation, brainstorm, ambiguous yes, quoted text, or question is not a decision, and this router never promotes on its own recommendation or invents her approval. Preserve those as candidates. When the intended decision or its owning home is genuinely unresolved, that is one focused question for Allison under Decide Now, asked in the live conversation.
 
 ### 4. Deterministic operational state -> only where a contract already authorizes the write
 
@@ -77,7 +77,7 @@ Archive authority is unchanged: a worker never writes `archived` into its own ro
 
 ### 5. Repo ownership or a proposed repo -> existing repo first, then `repo-standards`
 
-Any hint that a thing needs a home, a new provider appeared, a new Project was created, or a subject seems to want its own repo. **Existing repo first, always.** A new provider, Project, integration, or topic is never by itself a reason for a new repo. Resolve live against the HQ Rulebook (Google Doc `15sCFxMvG8OZMZik5w0Hzqzh7HyphrB7rJ8NBtm46JBE`) and the live org, including archived repos, which are revival candidates rather than absences.
+Any hint that a thing needs a home, a new provider appeared, a new Project was created, or a subject seems to want its own repo. **Existing repo first, always.** A new provider, Project, integration, or topic is never by itself a reason for a new repo. Resolve live against the HQ Rulebook and the live org, including archived repos, which are revival candidates rather than absences.
 
 If, after that, no existing repo can cleanly own the durable job, hand it to the `repo-standards` creation gate, which proves that formally and returns USE EXISTING REPO or NEW REPO JUSTIFIED. This router never creates a repo and never proposes one directly.
 

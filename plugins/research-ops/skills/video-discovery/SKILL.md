@@ -26,7 +26,7 @@ Use the packaged Python tool for public, read-only investigations. Read
 and [the capability parity table](references/parity.md) before claiming coverage. The inventory separates methods used, failed attempts,
 and implemented but unexercised adapters.
 
-Team guide: [[HQ-Skills][V1.0] Video Discovery Team Guide](https://docs.google.com/document/d/1Q5gcUICXV_7eqoJjTnf3quLT960hFxSeDEBc_O4-bvY/edit), in HQ Business Brain Skills Vault.
+Team guide: Video Discovery Team Guide, in HQ Business Brain Skills Vault.
 
 ## Inputs and scope
 

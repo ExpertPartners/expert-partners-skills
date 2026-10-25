@@ -39,7 +39,7 @@ Rules for the routing line:
 
 Ruled by Allison 2026-08-07; born the night of 2026-08-06 when one ordered dispatch reached two lanes from two governing conversations and neither knew of the other. Door Tools Build and the Estate Brain Write Tools lane's Ledger Guard Build both built a working ledger tool. The second lane caught the collision at deploy pre-flight, when the live image and origin/main both already carried `update_lane_row`, and dropped its duplicate unmerged. Nothing was overwritten, and that was luck plus one careful pre-flight, not design. The duplicate was invisible until pre-flight because the second lane's worktree was cut from a stale remote ref.
 
-Before dispatching ANY build, the dispatcher reads the running rows of the Job Tracker (Google Sheet `1FniEwCaZ89cViQxUcPkycxAmvvM47cnjRzQQyzpEk5c`) for a standing owner of that tool class. Not that exact tool, that tool CLASS: door tools, ledger writers, CI watchers, board publishers, brain readers, and so on. A lane already holding the class is its owner.
+Before dispatching ANY build, the dispatcher reads the running rows of the Job Tracker for a standing owner of that tool class. Not that exact tool, that tool CLASS: door tools, ledger writers, CI watchers, board publishers, brain readers, and so on. A lane already holding the class is its owner.
 
 The three outcomes, and there is no fourth:
 
@@ -164,7 +164,7 @@ Ruled by Allison 2026-10-24 (Decision Log 2026-10-24, Archiving is gated on the 
 
 ## The Job Tracker: Row At Dispatch, Update At Report Row
 
-The Job Tracker (Google Sheet `1FniEwCaZ89cViQxUcPkycxAmvvM47cnjRzQQyzpEk5c`) in Company Core [HQ-BB], HQ Business Brain, is the one place that answers "what Claude Code sessions exist, what does each belong to, and what is each waiting on" from any surface (Drive connector, Sheets connector). One row per running job; columns Job, Room or lane, Who is doing it, Status, Waiting on, Next step, Opened, Last updated. It replaces the aura lane ledger (Decision Log 2026-10-13). Where this skill says lane ledger or ledger, read Job Tracker.
+The Job Tracker in Company Core [HQ-BB], HQ Business Brain, is the one place that answers "what Claude Code sessions exist, what does each belong to, and what is each waiting on" from any surface (Drive connector, Sheets connector). One row per running job; columns Job, Room or lane, Who is doing it, Status, Waiting on, Next step, Opened, Last updated. It replaces the aura lane ledger (Decision Log 2026-10-13). Where this skill says lane ledger or ledger, read Job Tracker.
 
 The habit, every hand-off:
 

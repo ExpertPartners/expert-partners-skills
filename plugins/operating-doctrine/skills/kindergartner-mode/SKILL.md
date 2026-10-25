@@ -18,7 +18,7 @@ subtitle: "plain language walkthroughs"
 
 Allison says "sixth grade", "kindergarten", or "hand-holding mode". Any existing spelling still works: kindergartner, kindergartener, kindergarten mode, or talk to me like a kindergartner. Any one phrase is enough.
 
-Source: Allison's October 14, 2026 sixth-grade decision in the live [HQ Decision Log](https://docs.google.com/document/d/1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc/edit).
+Source: Allison's October 14, 2026 sixth-grade decision in the live HQ Decision Log.
 
 The mode stays on for the rest of the session until she says to drop it, or clearly shifts to strategic discussion and asks for depth.
 

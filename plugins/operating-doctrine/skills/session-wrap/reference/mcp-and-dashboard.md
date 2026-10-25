@@ -8,11 +8,11 @@ Session record and continuity note: a Google Doc in the owning brain's home fold
 
 ## Decision Log
 
-Google Doc `1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc`, Company Core [HQ-BB]. Add each decision at the top under today's date heading (create the heading if today's is missing): what was decided, why in one or two sentences, a `Replaces:` note naming the older decision it supersedes (or none), and a link to the full record. Re-read the Doc after the write to confirm the entry landed and nothing else changed.
+The Decision Log Doc, in Company Core [HQ-BB], found by its title. Add each decision at the top under today's date heading (create the heading if today's is missing): what was decided, why in one or two sentences, a `Replaces:` note naming the older decision it supersedes (or none), and a link to the full record. Re-read the Doc after the write to confirm the entry landed and nothing else changed.
 
 ## Job Tracker
 
-Google Sheet `1FniEwCaZ89cViQxUcPkycxAmvvM47cnjRzQQyzpEk5c`. Columns A to H: Job, Room or lane, Who is doing it, Status, Waiting on, Next step, Opened, Last updated. Read the values, change only this lane's row (or append one at the bottom), then re-read to verify. After two failed writes, stop and route the row verbatim in the wrap note for home to enter.
+The Job Tracker Sheet, in Company Core [HQ-BB], found by its title. Columns A to H: Job, Room or lane, Who is doing it, Status, Waiting on, Next step, Opened, Last updated. Read the values, change only this lane's row (or append one at the bottom), then re-read to verify. After two failed writes, stop and route the row verbatim in the wrap note for home to enter.
 
 ## Dashboard wrap mark (hq.allisongaddy.com)
 

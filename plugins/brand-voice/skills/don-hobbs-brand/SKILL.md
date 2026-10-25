@@ -14,7 +14,7 @@ subtitle: "Don’s personal brand voice"
 
 ## Load the canon Doc first
 
-Read [EP][V1.0] Don Hobbs Brand Canon (EP Business Brain, Company Core [EP-BB]), https://docs.google.com/document/d/1yLCeKPCWhx3Ndx5j_o_H0Yo8UBprWTKtrpU3wLZLHK4/edit , with the Drive connector's `read_file_content` (plain text, not `read_doc`) before drafting. The Doc is authoritative and the inline content below is a fallback. Also read the estate-wide rules in [HQ][V1.0] Shared Writing Rules (HQ Business Brain), https://docs.google.com/document/d/103y7LzzahVmGmUgCQukvwH2V7VKu3nhFEDteFrQBKqE/edit.
+Read Don Hobbs Brand Canon (EP Business Brain, Company Core [EP-BB]), with the Drive connector's `read_file_content` (plain text, not `read_doc`) before drafting. The Doc is authoritative and the inline content below is a fallback. Also read the estate-wide rules in Shared Writing Rules (HQ Business Brain).
 
 ## Canon and registry position
 

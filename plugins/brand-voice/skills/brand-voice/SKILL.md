@@ -53,14 +53,14 @@ This skill also bundles two legacy brand context documents,
 
 ## Authoritative source
 
-Brand canon Docs in Drive are authoritative and read with the Drive connector's `read_file_content` (plain text, not `read_doc`):
-- [EP][V1.0] Expert Partners Brand Canon, https://docs.google.com/document/d/1XSiBzCLCHS_9_BXUrvV_Ysl2aBVY_I_kq_s5d25oY_4/edit
-- [EP][V1.0] EPIC Brand Canon, https://docs.google.com/document/d/1W2QxjC_2iVY_-kWZLPEHRcztvEbpht5xcueWduOCdMU/edit
-- [EP][V1.0] Free Agent Movement Brand Canon, https://docs.google.com/document/d/1t79nKkyml4db1Cq7hr2ApvOrEogqhuD2x12oOba3bQk/edit
-- [EP][V1.0] Don Hobbs Brand Canon, https://docs.google.com/document/d/1yLCeKPCWhx3Ndx5j_o_H0Yo8UBprWTKtrpU3wLZLHK4/edit
-- [AG][V1.0] Allison Gaddy Personal Brand Canon (AG Business Brain, Company Core [AG-BB]), https://docs.google.com/document/d/1lZy1Wu2q5k4NErJdNhAhtdUVkC_bXh_ddcUJgZUNxUU/edit
-- [AG][V1.0] AG Luxury Brand Canon, https://docs.google.com/document/d/1IHjcFV7Bv023GIwgNxV5d4p_bu2R5l7yUW5F4VE_-yM/edit
-- [HQ][V1.0] Shared Writing Rules, https://docs.google.com/document/d/103y7LzzahVmGmUgCQukvwH2V7VKu3nhFEDteFrQBKqE/edit
+Brand canon Docs in Drive are authoritative. Find each Doc by its title with the Drive connector's search (search for the words, since the stored name carries a bracketed tag and version in front), then read it with `read_file_content` (plain text, not `read_doc`):
+- Expert Partners Brand Canon (EP Business Brain, Company Core [EP-BB])
+- EPIC Brand Canon (EP Business Brain, Company Core [EP-BB])
+- Free Agent Movement Brand Canon (EP Business Brain, Company Core [EP-BB])
+- Don Hobbs Brand Canon (EP Business Brain, Company Core [EP-BB])
+- Allison Gaddy Personal Brand Canon (AG Business Brain, Company Core [AG-BB])
+- AG Luxury Brand Canon (AG Business Brain, Company Core [AG-BB])
+- Shared Writing Rules (HQ Business Brain, Company Core [HQ-BB])
 
 The brand-context files in this folder are the fallback summary.
 

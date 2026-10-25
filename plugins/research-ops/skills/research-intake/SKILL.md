@@ -18,8 +18,7 @@ subtitle: "file a research report into the Deep Research folder"
 
 # Research Intake Skill
 
-Files a research report into the Deep Research folder in Drive
-(`197mXOs0T2cgGilRylwTQc0VFtx1CuUP7`), the single home of Allison's research
+Files a research report into the Deep Research folder in Drive, the single home of Allison's research
 corpus. The daily sweep (`tools/research-intake/sweep_drive.py`) catches
 everything this skill never saw filed from a live conversation, and both use
 the same lane-routing logic.
@@ -85,8 +84,7 @@ Log entry for it (newest at the top, with a Replaces note).
 
 ## 5. Track it only if still unruled
 
-If Disposition is still "awaiting ruling", add one row to the Job Tracker
-(Google Sheet `1FniEwCaZ89cViQxUcPkycxAmvvM47cnjRzQQyzpEk5c`): Job
+If Disposition is still "awaiting ruling", add one row to the Job Tracker: Job
 `Rule on <title>`, Waiting on `Allison`, Next step `Rule on the research`. If
 Allison already ruled in step 4, skip this step entirely.
 
