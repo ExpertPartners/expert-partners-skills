@@ -1,3 +1,14 @@
+## 2.66.0 - 2026-10-25
+
+Ask Me Questions v1.0, a new HQ skill, and S narrowed to S only. A message that is only Q or q,
+or ask me clarifying questions, makes any AI read what it has, then ask up to five clarifying
+questions one at a time, most important first, never asking what it already knows, then say back
+what it learned and do the work. A Q or the word question inside a sentence, like Q4, never fires
+it. Only S or s alone now means sent, no other single letter does, and operating-doctrine v2.18,
+code-block-routing, pin and the repo AGENTS.md follow the live Rulebook (Decision Log 2026-10-25,
+Q means ask me clarifying questions, and S means sent, and no other single letter does). Assigned
+by HQ in Handoffs.
+
 ## 2.65.0 - 2026-10-25
 
 Teach Me v1.0, a new HQ skill. Every step of Cal's course opens with Next step, Teach Me and a

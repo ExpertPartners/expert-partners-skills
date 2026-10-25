@@ -291,11 +291,11 @@ The Estate operates always in beta, never sloppy. Current canon governs, and eve
 
 ---
 
-## S Always Means Sent
+## S Always Means Sent, And No Other Single Letter Does
 
-Ruled by Allison 2026-10-24 (Decision Log 2026-10-24, S always means sent, replacing Decision Log 2026-10-23, Any single letter after a mail box means sent). Written here so every session that loads this doctrine knows it, including code sessions that never read the Rulebook.
+Ruled by Allison 2026-10-25 (Decision Log 2026-10-25, S means sent, and no other single letter does, narrowing Decision Log 2026-10-24, S always means sent, which replaced 2026-10-23, Any single letter after a mail box means sent). Written here so every session that loads this doctrine knows it, including code sessions that never read the Rulebook.
 
-When Allison types S, or any single letter such as Z or A, it always means sent. She delivered the mail, did the step, or pasted the box, in whatever conversation she types it. The session never asks what it means, records the delivery, and moves straight to its next step. A finished session then wraps and archives itself (session-wrap section 5A). A lone letter is never ambiguous and is never answered with a question. Her words, anytime I say S, I mean sent mail, I did it. The live HQ Rulebook, Handoffs between AIs, wins wherever this differs.
+When Allison types S or s, it always means sent. She delivered the mail, did the step, or pasted the box, in whatever conversation she types it. The session never asks what it means, records the delivery, and moves straight to its next step. A finished session then wraps and archives itself (session-wrap section 5A). A lone S is never ambiguous and is never answered with a question. Any other lone letter, such as Z or A, is not a sent signal. Q or q alone is the clarifying questions shortcut, handled by the ask-me-questions skill, and never means sent. Her words, anytime I say S, I mean sent mail, I did it. The live HQ Rulebook, Handoffs between AIs, wins wherever this differs.
 
 ---
 
@@ -487,6 +487,8 @@ Propagation rule: on every version bump, this surface list gets verified against
 ---
 
 ## Version
+
+v2.18 -- October 25, 2026 -- Narrowed S Always Means Sent so only S or s means sent and no other single letter does, and pointed bare Q to the new ask-me-questions skill, ruled by Allison (Decision Log 2026-10-25, S means sent, and no other single letter does, and Q means ask me clarifying questions). Companion edits in code-block-routing and pin.
 
 v2.17 -- October 24, 2026 -- Added The Archive Gate And The Orphan Sweep, ruled by Allison (Decision Log 2026-10-24, Archiving is gated on the paper trail, and an orphan sweep catches what slips): a session archives itself only after its report row is written in Handoffs and read back and its incoming row is marked Done with a pointer to that report, the mail box in chat is only the bell, and the Session Stewards sweep for rows and pull requests that slipped. Companion edits in session-wrap, code-block-routing, pin, and session-steward.
 
