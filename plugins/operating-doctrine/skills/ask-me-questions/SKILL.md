@@ -39,6 +39,7 @@ Q is never a sent signal and S is never a clarifying signal. S or s alone still 
 3. Never ask what you already know. Never invent a missing fact. When Allison does not know an answer, mark it as missing and move on.
 4. Say it back. After the last answer, write two or three plain lines on what you learned, then do the work. This step is HQ's addition to Cal's method.
 5. Nothing to ask. If nothing material is unclear, say so in one line and do the work. This exit is also HQ's addition.
+6. No task yet. If there is no task on the table at all, ask the one question, what do you want to work on, and wait. Then start at step 1.
 
 The mode ends after step 4 or 5. It does not stay on. A later bare Q starts it fresh.
 
