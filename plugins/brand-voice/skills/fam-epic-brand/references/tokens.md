@@ -6,13 +6,13 @@ Reference these whenever generating HTML, slides, web pages, marketing collatera
 
 ## Which system to use
 
-- Output for **Expert Partners or EPIC** (the company and its inner-circle program, Inner Circle Resources, Funnel Pilot, G2M, company-level coaching/training/events): use the **EPIC system** below (Brand Blue accent, Overpass/Poppins). Unchanged.
+- Output for **EPIC** (Expert Partners Inner Circle, the inner-circle program for the eXp vertical): use the **EPIC system** below (Brand Blue accent, Overpass/Poppins). Expert Partners is the parent organization and uses its own current Drive canon and ep-brand skill. Never substitute either name for the other.
 - Output for the **Free Agent Movement** (FAM, Free Agent Nation, Free Agent Formula, FAMOS, the movement's community/content/membership/events): use the **FAM v3.1 system** below (NO color accent, Neue Swiss, Warm Bone).
 - When a single asset must carry both brands, the surrounding brand context wins: an EPIC deck that mentions FAM stays EPIC; a FAM page that mentions EPIC stays FAM.
 
 ---
 
-# EXPERT PARTNERS / EPIC visual tokens (unchanged)
+# EPIC visual tokens (unchanged)
 
 ## Color palette
 

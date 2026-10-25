@@ -14,7 +14,6 @@ defers-to:
   - ag-luxury-brand
   - don-hobbs-brand
   - the-strong-ones-brand
-  - moxie-signature-group-brand
 subtitle: "canonical brand context, registry per ADR 0045"
 ---
 
@@ -28,15 +27,14 @@ The brand registry's original record is aura ADR 0045 (resynced from the ADR as 
 - **AG Luxury**, Allison's consumer-facing real estate sales brand.
 - **Free Agent Movement (FAM)**, its own brand on its own canon, never merged with the AG voice.
 
-Benched, **Moxie Signature Group**. Per ADR 0045 it never applies to new work, and consumer real estate routes to AG Luxury. Retained for revival only.
+Retired, **Moxie Signature Group**. It never applies to new work. Consumer real estate routes to the current AG Luxury Drive canon.
 
-Each brand's voice lives in its per-brand voice card, and this card defers to them, ep-brand, fam-epic-brand, ag-personal-brand, ag-luxury-brand, don-hobbs-brand, the-strong-ones-brand, and moxie-signature-group-brand (benched).
+Each brand's voice lives in its per-brand voice card, and this card defers to them, ep-brand, fam-epic-brand, ag-personal-brand, ag-luxury-brand, don-hobbs-brand, the-strong-ones-brand.
 
-This skill also bundles three legacy brand context documents,
+This skill also bundles two legacy brand context documents,
 
 - `brand-context-expertpartners.md`, Expert Partners / EPIC (real estate coaching, mastermind, Inner Circle)
 - `brand-context-freeagentmovement.md`, Free Agent Movement (the broader Free Agent Nation positioning)
-- `brand-context-moxie.md`, Moxie Signature Group (BENCHED per ADR 0045, retained for revival only)
 
 ## When to use
 

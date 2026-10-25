@@ -53,7 +53,7 @@ The vision is a movement of self-aware, system-driven, growth-focused agents who
 
 - Free Agent Movement social posts carry #BreakTheCycle and #FreeAgentMovement. #eXpProud never appears on FAM content (EPIC-only flag, ruled 2026-08-06; FAM is a movement for the whole real estate industry, not any one brokerage)
 - Tone of social: Think Big, identity first, system smart
-- YouTube channel handle: @TheAllisonGaddy
+- YouTube channel handle: @theallisongaddy
 
 ## Spelling and Style Rules
 

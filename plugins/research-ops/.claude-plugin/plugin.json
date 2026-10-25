@@ -1,7 +1,7 @@
 {
   "name": "research-ops",
-  "version": "0.3.1",
-  "description": "Research skills for Expert Partners and AG Real Estate: capability-currency (twice-monthly staying-current sweep), research-intake (file a research report into the Deep Research folder), and the three TUB analysts (competitive intelligence, voice of customer, GEO and SEO ranking audit). Includes video-discovery for bounded public video research and evidence-based verification.",
+  "version": "0.3.2",
+  "description": "Research skills for capability currency, research intake and bounded public video discovery. The three imported TUB analyst prompts are retired and disabled.",
   "author": {
     "name": "Allison Gaddy"
   }

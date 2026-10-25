@@ -14,13 +14,13 @@
     {
       "name": "brand-voice",
       "source": "./plugins/brand-voice",
-      "description": "Canonical brand context for the Estate brand registry (Expert Partners, EPIC, AG Personal Brand, AG Luxury, FAM, Don Hobbs; Moxie benched)",
-      "version": "0.6.4"
+      "description": "Canonical brand context for the Estate brand registry (Expert Partners, EPIC, AG Personal Brand, AG Luxury, FAM, Don Hobbs)",
+      "version": "0.6.5"
     },
     {
       "name": "content-engines",
       "source": "./plugins/content-engines",
-      "version": "0.6.0",
+      "version": "0.6.1",
       "description": "Allison Gaddy content and marketing engines (master-marketer-free-agent-builder, rare-content-engine, xavier-offer-builder, dm-to-dollars, video-transcript-relay, content-coach, hook-engine, post-grader, post-scheduler, post-value-filter, social-analyzer)."
     },
     {
@@ -32,8 +32,8 @@
     {
       "name": "research-ops",
       "source": "./plugins/research-ops",
-      "version": "0.3.1",
-      "description": "Research skills: capability-currency, research-intake, the three TUB analysts (competitive intelligence, voice of customer, GEO and SEO ranking audit), and video-discovery (bounded public video discovery and verification)."
+      "version": "0.3.2",
+      "description": "Research skills for capability currency, research intake and video discovery. Imported TUB analyst prompts are retired and disabled."
     },
     {
       "name": "systems-map",

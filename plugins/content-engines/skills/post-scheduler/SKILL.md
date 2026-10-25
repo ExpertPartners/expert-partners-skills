@@ -34,7 +34,7 @@ Re-check the gate one last time on the exact final text, per platform:
 - Zero em dashes, no bold, no italics, digits not spelled.
 - No hashtags except Instagram and TikTok.
 - No banned phrases, no hype, no urgency.
-- Spelling locks intact: eXp, eXcelerate, Don, Melony, Allison Gaddy, Expert Partners, EPIC, Free Agent Movement, @TheAllisonGaddy.
+- Spelling locks intact: eXp, eXcelerate, Don, Nicole Rouseau, Allison Gaddy, Expert Partners, EPIC, Free Agent Movement, @theallisongaddy.
 - Under the platform character limit.
 - Media URLs resolve, if media is attached.
 

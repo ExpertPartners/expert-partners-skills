@@ -88,7 +88,7 @@ Route by intent:
 - A training video, SOP walkthrough, or onboarding session, go to gemini-notebook-training-architect.
 - Raw material to be mined for hooks, posts, reels, or scripts, go to rare-content-engine.
 - Positioning, funnel, offer, or campaign strategy from a talk or interview, go to master-marketer-free-agent-builder.
-- A recording of Allison's own talk, keynote, or panel, go to the matching brand voice skill, ag-personal-brand for her own platform, fam-epic-brand for coaching and EPIC, moxie-signature-group-brand for Moxie.
+- A recording of Allison's own talk, keynote, or panel, go to the matching brand voice skill, ag-personal-brand for her own platform, fam-epic-brand for coaching and EPIC, ag-luxury-brand for consumer real estate. Moxie Signature Group is retired.
 
 If the intent is genuinely unknown, say so on the routing line and fetch anyway. The fetch is cheap and the transcript is reusable. Do not stall the relay waiting on a decision that can be made once the words are in hand.
 

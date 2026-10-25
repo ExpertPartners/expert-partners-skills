@@ -1,6 +1,6 @@
 ---
 name: ag-personal-brand
-description: "Apply Allison Gaddy's personal brand voice to all outputs. Use when creating content for Allison's YouTube channel (@TheAllisonGaddy), speaking engagements, keynotes, thought leadership pieces, personal essays, LinkedIn, personal social posts, or any content that represents Allison as an individual founder, educator, and public figure -- NOT as Expert Partners, FAM, or Moxie. This is Allison's personal authority platform voice: direct, earned, warm, first-person. Distinct from the \"we\" voice of EP/FAM brands. No hype, no hustle culture, no real estate jargon -- just Allison telling the truth about what she is building and what she has learned. It inherits the operating-doctrine and never overrides it."
+description: "Apply Allison Gaddy's personal brand voice to all outputs. Use when creating content for Allison's YouTube channel (@theallisongaddy), speaking engagements, keynotes, thought leadership pieces, personal essays, LinkedIn, personal social posts, or any content that represents Allison as an individual founder, educator, and public figure -- NOT as Expert Partners, FAM, or Moxie. This is Allison's personal authority platform voice: direct, earned, warm, first-person. Distinct from the \"we\" voice of EP/FAM brands. No hype, no hustle culture, no real estate jargon -- just Allison telling the truth about what she is building and what she has learned. It inherits the operating-doctrine and never overrides it."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: brands
@@ -22,7 +22,7 @@ The inline content below is a fallback for sessions where the Drive connector is
 
 ## Identity
 
-Allison Gaddy's personal authority platform. YouTube channel: @TheAllisonGaddy. Speaking, thought leadership, content, and brand assets that represent Allison as a public-facing founder and educator. This brand exists independently of any business she runs.
+Allison Gaddy's personal authority platform. YouTube channel: @theallisongaddy. Speaking, thought leadership, content, and brand assets that represent Allison as a public-facing founder and educator. This brand exists independently of any business she runs.
 
 **Critical distinction:** This is NOT Expert Partners, FAM, or Moxie. Do not apply those brands' voices here. This is Allison's personal voice.
 
@@ -38,7 +38,7 @@ Allison Gaddy's personal authority platform. YouTube channel: @TheAllisonGaddy. 
 
 ## Content scope
 
-- YouTube (@TheAllisonGaddy): educational AI + real estate content, personal process, transparent builds
+- YouTube (@theallisongaddy): educational AI + real estate content, personal process, transparent builds
 - Speaking and keynotes: personal authority, thought leadership
 - Thought leadership writing: personal essays, LinkedIn, public commentary
 - Brand assets representing Allison personally
@@ -48,5 +48,5 @@ Do NOT use this skill for Expert Partners program sales, FAM recruiting copy, EP
 ## Naming
 
 - Allison Gaddy: Allison has two L's, always
-- @TheAllisonGaddy: always with the @ when referencing the YouTube handle
+- @theallisongaddy: always with the @ when referencing the YouTube handle
 - eXp: lowercase e, uppercase XP if referenced

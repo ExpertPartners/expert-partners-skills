@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "a18dc7e4cc87a9c3ef6136b508ae376c56fb85ca",
+    "eps": "fbe194c698cb2500d22532e811c6f26325e61683",
     "aura": "bcbcc9d8c8220155bc0e554445cb0f6522363cef"
   },
   "zones": [
@@ -58,7 +58,7 @@
       "renderNote": null,
       "layout": {
         "x": 999,
-        "y": 5527,
+        "y": 5499,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -114,7 +114,7 @@
       "subtitle": "luxury real estate voice under Allison’s name",
       "renderNote": null,
       "layout": {
-        "x": 460,
+        "x": 455,
         "y": 6885,
         "width": 224,
         "height": 77,
@@ -144,7 +144,7 @@
       "subtitle": "Allison’s first person voice",
       "renderNote": null,
       "layout": {
-        "x": 465,
+        "x": 460,
         "y": 7036,
         "width": 212,
         "height": 63,
@@ -250,8 +250,8 @@
       "subtitle": "one-page brand direction",
       "renderNote": null,
       "layout": {
-        "x": 154,
-        "y": 6737.9,
+        "x": 159,
+        "y": 7198.5,
         "width": 215,
         "height": 63,
         "rectHeight": 48,
@@ -278,15 +278,14 @@
         "ag-personal-brand",
         "ag-luxury-brand",
         "don-hobbs-brand",
-        "the-strong-ones-brand",
-        "moxie-signature-group-brand"
+        "the-strong-ones-brand"
       ],
       "brandScope": [],
       "subtitle": "canonical brand context, registry per ADR 0045",
       "renderNote": null,
       "layout": {
-        "x": 181,
-        "y": 6636.9,
+        "x": 186,
+        "y": 7285.5,
         "width": 188,
         "height": 77,
         "rectHeight": 62,
@@ -317,7 +316,7 @@
       "renderNote": null,
       "layout": {
         "x": 1272,
-        "y": 5351.8,
+        "y": 5323.8,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -427,7 +426,7 @@
       "renderNote": null,
       "layout": {
         "x": 996,
-        "y": 6077,
+        "y": 6049,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -747,7 +746,7 @@
       "renderNote": null,
       "layout": {
         "x": 996,
-        "y": 5889,
+        "y": 5861,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -861,7 +860,7 @@
       "subtitle": "Don’s personal brand voice",
       "renderNote": null,
       "layout": {
-        "x": 481,
+        "x": 476,
         "y": 6732,
         "width": 200,
         "height": 63,
@@ -943,7 +942,7 @@
       "subtitle": "Expert Partners parent voice",
       "renderNote": null,
       "layout": {
-        "x": 465,
+        "x": 460,
         "y": 6615,
         "width": 212,
         "height": 63,
@@ -1029,7 +1028,7 @@
       "subtitle": "FAM and EPIC voice",
       "renderNote": null,
       "layout": {
-        "x": 460,
+        "x": 455,
         "y": 7320,
         "width": 152,
         "height": 63,
@@ -1059,7 +1058,7 @@
       "renderNote": null,
       "layout": {
         "x": 1040,
-        "y": 5426,
+        "y": 5398,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1087,7 +1086,7 @@
       "renderNote": null,
       "layout": {
         "x": 1272,
-        "y": 5250.8,
+        "y": 5222.8,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -1117,7 +1116,7 @@
       "renderNote": null,
       "layout": {
         "x": 1052,
-        "y": 5238,
+        "y": 5210,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -1143,7 +1142,7 @@
       "renderNote": null,
       "layout": {
         "x": 983.5,
-        "y": 5339,
+        "y": 5311,
         "width": 237,
         "height": 63,
         "rectHeight": 48,
@@ -1168,7 +1167,7 @@
       "renderNote": null,
       "layout": {
         "x": 987,
-        "y": 5990,
+        "y": 5962,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -1640,43 +1639,13 @@
       "renderNote": null,
       "layout": {
         "x": 984,
-        "y": 5628,
+        "y": 5600,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
         "annotationHeight": 15,
         "subtitleLines": [
           "posts queued as Metricool drafts"
-        ]
-      }
-    },
-    {
-      "id": "moxie-signature-group-brand",
-      "source": "eps:plugins/brand-voice/skills/moxie-signature-group-brand/SKILL.md",
-      "repo": "eps",
-      "tier": "plugin",
-      "zone": "brands",
-      "status": "benched",
-      "inherits": [
-        "operating-doctrine"
-      ],
-      "calls": [],
-      "defersTo": [],
-      "brandScope": [
-        "moxie"
-      ],
-      "subtitle": "benched, consumer real estate routes to AG Luxury",
-      "renderNote": null,
-      "layout": {
-        "x": 460,
-        "y": 7457,
-        "width": 244,
-        "height": 77,
-        "rectHeight": 62,
-        "annotationHeight": 15,
-        "subtitleLines": [
-          "benched, consumer real estate",
-          "routes to AG Luxury"
         ]
       }
     },
@@ -1751,7 +1720,7 @@
       "renderNote": null,
       "layout": {
         "x": 976,
-        "y": 5802,
+        "y": 5774,
         "width": 252,
         "height": 63,
         "rectHeight": 48,
@@ -2547,7 +2516,7 @@
       "subtitle": "The Strong Ones voice inside AG Personal Brand",
       "renderNote": null,
       "layout": {
-        "x": 481,
+        "x": 476,
         "y": 7153,
         "width": 230,
         "height": 77,
@@ -2590,25 +2559,24 @@
       "repo": "eps",
       "tier": "plugin",
       "zone": "hands",
-      "status": "live",
+      "status": "retired",
       "inherits": [
         "operating-doctrine"
       ],
       "calls": [],
       "defersTo": [],
       "brandScope": [],
-      "subtitle": "competitive intelligence briefing",
+      "subtitle": "retired imported research prompt",
       "renderNote": null,
       "layout": {
         "x": 952,
-        "y": 5137,
+        "y": 5123,
         "width": 300,
-        "height": 77,
-        "rectHeight": 62,
+        "height": 63,
+        "rectHeight": 48,
         "annotationHeight": 15,
         "subtitleLines": [
-          "competitive intelligence",
-          "briefing"
+          "retired imported research prompt"
         ]
       }
     },
@@ -2618,25 +2586,24 @@
       "repo": "eps",
       "tier": "plugin",
       "zone": "hands",
-      "status": "live",
+      "status": "retired",
       "inherits": [
         "operating-doctrine"
       ],
       "calls": [],
       "defersTo": [],
       "brandScope": [],
-      "subtitle": "voice of customer research report",
+      "subtitle": "retired imported research prompt",
       "renderNote": null,
       "layout": {
         "x": 952,
         "y": 5036,
         "width": 300,
-        "height": 77,
-        "rectHeight": 62,
+        "height": 63,
+        "rectHeight": 48,
         "annotationHeight": 15,
         "subtitleLines": [
-          "voice of customer research",
-          "report"
+          "retired imported research prompt"
         ]
       }
     },
@@ -2646,24 +2613,24 @@
       "repo": "eps",
       "tier": "plugin",
       "zone": "hands",
-      "status": "live",
+      "status": "retired",
       "inherits": [
         "operating-doctrine"
       ],
       "calls": [],
       "defersTo": [],
       "brandScope": [],
-      "subtitle": "GEO and SEO ranking audit",
+      "subtitle": "retired imported research prompt",
       "renderNote": null,
       "layout": {
         "x": 952,
-        "y": 5715,
+        "y": 5687,
         "width": 300,
         "height": 63,
         "rectHeight": 48,
         "annotationHeight": 15,
         "subtitleLines": [
-          "GEO and SEO ranking audit"
+          "retired imported research prompt"
         ]
       }
     },
@@ -2981,19 +2948,19 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 369,
-          "y": 6665.8
+          "x": 374,
+          "y": 7318.5
         },
         {
-          "x": 419,
-          "y": 6665.8
+          "x": 404,
+          "y": 7318.5
         },
         {
-          "x": 419,
+          "x": 404,
           "y": 6923.5
         },
         {
-          "x": 460,
+          "x": 455,
           "y": 6923.5
         }
       ]
@@ -3004,19 +2971,19 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 369,
-          "y": 6675.4
+          "x": 374,
+          "y": 7329.5
         },
         {
-          "x": 409,
-          "y": 6675.4
+          "x": 414,
+          "y": 7329.5
         },
         {
-          "x": 409,
+          "x": 414,
           "y": 7067.5
         },
         {
-          "x": 465,
+          "x": 460,
           "y": 7067.5
         }
       ]
@@ -3027,19 +2994,19 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 369,
-          "y": 6656.1
+          "x": 374,
+          "y": 7307.5
         },
         {
-          "x": 429,
-          "y": 6656.1
+          "x": 394,
+          "y": 7307.5
         },
         {
-          "x": 429,
+          "x": 394,
           "y": 6763.5
         },
         {
-          "x": 481,
+          "x": 476,
           "y": 6763.5
         }
       ]
@@ -3050,11 +3017,19 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 369,
+          "x": 374,
+          "y": 7296.5
+        },
+        {
+          "x": 384,
+          "y": 7296.5
+        },
+        {
+          "x": 384,
           "y": 6646.5
         },
         {
-          "x": 465,
+          "x": 460,
           "y": 6646.5
         }
       ]
@@ -3065,43 +3040,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 369,
-          "y": 6694.6
-        },
-        {
-          "x": 389,
-          "y": 6694.6
-        },
-        {
-          "x": 389,
+          "x": 374,
           "y": 7351.5
         },
         {
-          "x": 460,
+          "x": 455,
           "y": 7351.5
-        }
-      ]
-    },
-    {
-      "from": "brand-voice",
-      "to": "moxie-signature-group-brand",
-      "type": "defers-to",
-      "points": [
-        {
-          "x": 369,
-          "y": 6704.3
-        },
-        {
-          "x": 379,
-          "y": 6704.3
-        },
-        {
-          "x": 379,
-          "y": 7495.5
-        },
-        {
-          "x": 460,
-          "y": 7495.5
         }
       ]
     },
@@ -3111,19 +3055,19 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 369,
-          "y": 6685
+          "x": 374,
+          "y": 7340.5
         },
         {
-          "x": 399,
-          "y": 6685
+          "x": 424,
+          "y": 7340.5
         },
         {
-          "x": 399,
+          "x": 424,
           "y": 7191.5
         },
         {
-          "x": 481,
+          "x": 476,
           "y": 7191.5
         }
       ]
@@ -3141,11 +3085,11 @@
       "points": [
         {
           "x": 1496,
-          "y": 5377.5
+          "y": 5349.5
         },
         {
           "x": 1533,
-          "y": 5377.5
+          "y": 5349.5
         },
         {
           "x": 1533,
@@ -3172,11 +3116,11 @@
       "points": [
         {
           "x": 1496,
-          "y": 5403.2
+          "y": 5375.2
         },
         {
           "x": 1533,
-          "y": 5403.2
+          "y": 5375.2
         },
         {
           "x": 1533,
@@ -3387,19 +3331,19 @@
       "points": [
         {
           "x": 1252,
-          "y": 5464.5
+          "y": 5436.5
         },
         {
           "x": 1262,
-          "y": 5464.5
+          "y": 5436.5
         },
         {
           "x": 1262,
-          "y": 5302.2
+          "y": 5274.2
         },
         {
           "x": 1272,
-          "y": 5302.2
+          "y": 5274.2
         }
       ]
     },
@@ -3422,11 +3366,11 @@
       "points": [
         {
           "x": 1252,
-          "y": 5276.5
+          "y": 5248.5
         },
         {
           "x": 1272,
-          "y": 5276.5
+          "y": 5248.5
         }
       ]
     },
@@ -3529,12 +3473,6 @@
     },
     {
       "from": "master-marketer-free-agent-builder",
-      "to": "operating-doctrine",
-      "type": "inherits",
-      "points": null
-    },
-    {
-      "from": "moxie-signature-group-brand",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -3939,7 +3877,7 @@
   "layout": {
     "engine": "elkjs layered, single INCLUDE_CHILDREN hierarchy over zones and brand rooms, build-time only",
     "width": 1541,
-    "height": 7580,
+    "height": 7429,
     "zones": [
       {
         "id": "brain",
@@ -3955,10 +3893,10 @@
         "id": "brands",
         "label": "The voices",
         "caption": "one room per brand, registry per ADR 0045",
-        "x": 132,
+        "x": 137,
         "y": 6533,
-        "width": 633,
-        "height": 1039,
+        "width": 623,
+        "height": 888,
         "rooms": [
           {
             "key": "ag-luxury",
@@ -3967,7 +3905,7 @@
             ],
             "label": "AG Luxury",
             "parent": null,
-            "x": 444,
+            "x": 439,
             "y": 6851,
             "width": 256,
             "height": 127
@@ -3979,7 +3917,7 @@
             ],
             "label": "AG Personal Brand",
             "parent": null,
-            "x": 444,
+            "x": 439,
             "y": 7002,
             "width": 299,
             "height": 260
@@ -3991,7 +3929,7 @@
             ],
             "label": "The Strong Ones",
             "parent": "ag-personal-brand",
-            "x": 465,
+            "x": 460,
             "y": 7119,
             "width": 262,
             "height": 127
@@ -4003,7 +3941,7 @@
             ],
             "label": "Expert Partners",
             "parent": null,
-            "x": 444,
+            "x": 439,
             "y": 6581,
             "width": 269,
             "height": 246
@@ -4015,7 +3953,7 @@
             ],
             "label": "Don Hobbs",
             "parent": "expert-partners",
-            "x": 465,
+            "x": 460,
             "y": 6698,
             "width": 232,
             "height": 113
@@ -4028,22 +3966,10 @@
             ],
             "label": "FAM and EPIC",
             "parent": null,
-            "x": 444,
+            "x": 439,
             "y": 7286,
             "width": 184,
             "height": 113
-          },
-          {
-            "key": "moxie",
-            "brands": [
-              "moxie"
-            ],
-            "label": "Moxie",
-            "parent": null,
-            "x": 444,
-            "y": 7423,
-            "width": 276,
-            "height": 127
           }
         ]
       },
@@ -4064,7 +3990,7 @@
         "x": 930,
         "y": 4483,
         "width": 588,
-        "height": 1679,
+        "height": 1651,
         "rooms": []
       },
       {
