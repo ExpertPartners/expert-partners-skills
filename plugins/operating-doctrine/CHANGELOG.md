@@ -1,3 +1,14 @@
+## 2.67.0 - 2026-10-26
+
+Build Standard v1.0, a new HQ skill. Any builder on any surface follows one standard whenever it
+starts, changes or retests a skill, AI employee, prompt or tool. Build only from a spec Allison
+approved, trace every instruction to a spec line, replay every demonstration and test case three
+times with saved evidence, never edit a test to pass it, test alone then with everything
+upstream then one supervised run, draft the chain map update for HQ, report in one fixed
+format, and never certify your own work. Claude in HQ and Allison certify. Every change reruns
+the tool's tests and the tests of every downstream tool (Decision Log 2026-10-26, The HQ Build
+Standard becomes permanent and goes in before any Week 0 build). Assigned by HQ in Handoffs.
+
 ## 2.66.0 - 2026-10-25
 
 Ask Me Questions v1.0, a new HQ skill, and S narrowed to S only. A message that is only Q or q,
