@@ -1,6 +1,6 @@
 ---
 name: build-standard
-description: "The build standard. Every builder on every surface follows it whenever it starts, changes or retests a skill, AI employee, prompt or tool, and whenever someone says build standard, does this pass, certify or retest. It defines what passing means. Exact behavior (same input, same steps, same output, same save place, same updates). Build only from a spec Allison approved. Every instruction traces to a spec line. Replay every demonstration and every test case, three passes each, evidence saved. Never edit a test to pass it. Live where it belongs and verified on every surface. Test alone, then with everything upstream, then one supervised run. Read and update the chain map in Notion HQ. One fixed report. The builder never certifies its own work, Claude in HQ and Allison do. Retest after every change. Inherits operating-doctrine."
+description: "The build standard. Every builder on every surface follows it whenever it starts, changes or retests a skill, AI employee, prompt or tool, and whenever someone says build standard or asks whether a skill, AI employee, prompt or tool passes, needs certifying or needs a retest. It defines what passing means. Exact behavior (same input, same steps, same output, same save place, same updates). Build only from a spec Allison approved. Every instruction traces to a spec line. Replay every demonstration and every test case, three passes each, evidence saved. Never edit a test to pass it. Live where it belongs and verified on every surface. Test alone, then with everything upstream, then one supervised run. Read the chain map in Notion HQ and draft its update for HQ. One fixed report. The builder never certifies its own work, Claude in HQ and Allison do. Retest after every change. Inherits operating-doctrine."
 allowed-tools: []
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Born dressed 2026-10-26 (Build Standard Skill, Decision Log 2026-10-26, The HQ Build Standard becomes permanent and goes in before any Week 0 build).
@@ -20,12 +20,12 @@ Rulings behind it, all in the live Decision Log. The HQ Build Standard becomes p
 
 ## Check first
 
-1. Read the live HQ Rulebook (skills, the Model chart, writing rules) and the Decision Log entries above.
+1. Read the live Organization Instructions, the HQ Rulebook (skills, the Model chart, writing rules) and the Decision Log entries above, all in HQ Company Core.
 2. Find the approved spec. If there is none, stop and say so (rule 2).
 3. Look for an existing owner before creating anything. Check the expert-partners-skills marketplace and the Skills Vault for a skill that already does the job, and extend it instead of making a copy.
 4. Read the tool's record in the AI System Tracker and AI Employee Vault in Notion HQ for what feeds it and what it feeds (rule 9).
 5. Check 1Password before asking anyone for access.
-6. If a read fails, say which one and mark that line unverified. Never fill it from memory.
+6. If a required read fails, say which one and stop the work that depends on it. A failed chain map read blocks the chain check and the release. Never fill it from memory.
 
 ## The eleven rules
 
