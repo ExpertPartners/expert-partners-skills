@@ -89,12 +89,12 @@ Name the level in ADR 0057's own vocabulary (`low`, `medium`, `high`, `xhigh`, `
 
 Corrected 2026-07-28 after a live miss (the pin was fired alongside the block instead of after Allison's confirmation). This section now matches the operating-doctrine pin rule exactly; if they ever seem to disagree, the operating-doctrine pin rule wins.
 
-**S always means sent (2026-10-24).** When Allison types S, or any single letter such as Z or A, it always means sent. She delivered the mail, did the step, or pasted the box, in whatever conversation she types it. The session never asks what it means, records the delivery, and moves straight to its next step. A finished session then wraps and archives itself (session-wrap section 5A). A lone letter is never ambiguous and is never answered with a question. Her words, anytime I say S, I mean sent mail, I did it. The live HQ Rulebook, Handoffs between AIs, wins wherever this differs.
+**S always means sent, and no other single letter does (2026-10-25, narrowing 2026-10-24).** When Allison types S or s, it always means sent. She delivered the mail, did the step, or pasted the box, in whatever conversation she types it. The session never asks what it means, records the delivery, and moves straight to its next step. A finished session then wraps and archives itself (session-wrap section 5A). A lone S is never ambiguous and is never answered with a question. Any other lone letter, such as Z or A, is not a sent signal, and Q or q alone starts the ask-me-questions skill. Her words, anytime I say S, I mean sent mail, I did it. The live HQ Rulebook, Handoffs between AIs, wins wherever this differs.
 
 The order, every hand-off, every session, every project:
 
 1. The hand-off response carries: the routing line, the paste block, and one plain-prose sentence naming what we will be waiting for once she pastes. It does NOT solicit a paste confirmation (pin v4.2, ruled 2026-08-03: nothing ever asks her to say pasted). NO pin yet.
-2. Allison pastes and, if she chooses, volunteers a confirmation (pasted, done, OK, or similar, and any single letter such as S, Z, or A always means sent, per Decision Log 2026-10-24, S always means sent). If she says nothing, no pin fires and that is correct.
+2. Allison pastes and, if she chooses, volunteers a confirmation (pasted, done, OK, or similar, and S or s alone always means sent, per Decision Log 2026-10-25, S means sent, and no other single letter does). If she says nothing, no pin fires and that is correct.
 3. ONLY THEN the pin fires: the pin marker (pin skill format, fresh real timestamp from TZ=America/Chicago date "+%Y-%m-%d %H:%M %Z", never guessed or reused) plus one sentence restating what we are waiting for and what happens next.
 
 The pin is the bookmark of the moment the baton actually left her hands, which is why it cannot exist before her confirmation.
