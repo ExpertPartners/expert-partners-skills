@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "d4cda1d744b67ebbafd6cfccb380f0badfbd0766",
-    "aura": "bcbcc9d8c8220155bc0e554445cb0f6522363cef"
+    "eps": "0919fdffe1bcacd6949e70ce2e7cf716ec8d1a6a",
+    "aura": "e7213c624bcb9f25647de5465b2ca2b420c0bd96"
   },
   "zones": [
     "surfaces",
@@ -58,7 +58,7 @@
       "renderNote": null,
       "layout": {
         "x": 1009,
-        "y": 5590,
+        "y": 5475,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -86,7 +86,7 @@
       "renderNote": null,
       "layout": {
         "x": 994,
-        "y": 4622,
+        "y": 4420,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -343,7 +343,7 @@
       "renderNote": null,
       "layout": {
         "x": 1282,
-        "y": 5414.8,
+        "y": 5285.8,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -351,6 +351,34 @@
         "subtitleLines": [
           "signed-in Chrome automation on",
           "Ember's M2, GHL first"
+        ]
+      }
+    },
+    {
+      "id": "build-standard",
+      "source": "eps:plugins/operating-doctrine/skills/build-standard/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "how every skill and tool is built, changed and retested",
+      "renderNote": null,
+      "layout": {
+        "x": 1009,
+        "y": 4507,
+        "width": 206,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "how every skill and tool is",
+          "built, changed and retested"
         ]
       }
     },
@@ -369,7 +397,7 @@
       "renderNote": null,
       "layout": {
         "x": 1009,
-        "y": 4709,
+        "y": 6025,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -453,7 +481,7 @@
       "renderNote": null,
       "layout": {
         "x": 1006,
-        "y": 6140,
+        "y": 4723,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -480,7 +508,7 @@
       "renderNote": null,
       "layout": {
         "x": 997,
-        "y": 4911,
+        "y": 5837,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -773,7 +801,7 @@
       "renderNote": null,
       "layout": {
         "x": 1006,
-        "y": 5952,
+        "y": 5273,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1085,7 +1113,7 @@
       "renderNote": null,
       "layout": {
         "x": 1050,
-        "y": 5489,
+        "y": 5374,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1113,7 +1141,7 @@
       "renderNote": null,
       "layout": {
         "x": 1282,
-        "y": 5313.8,
+        "y": 5184.8,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -1143,7 +1171,7 @@
       "renderNote": null,
       "layout": {
         "x": 1062,
-        "y": 5301,
+        "y": 5172,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -1169,7 +1197,7 @@
       "renderNote": null,
       "layout": {
         "x": 993.5,
-        "y": 5402,
+        "y": 5938,
         "width": 237,
         "height": 63,
         "rectHeight": 48,
@@ -1194,7 +1222,7 @@
       "renderNote": null,
       "layout": {
         "x": 997,
-        "y": 6053,
+        "y": 5576,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -1666,7 +1694,7 @@
       "renderNote": null,
       "layout": {
         "x": 994,
-        "y": 5691,
+        "y": 5750,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -1747,7 +1775,7 @@
       "renderNote": null,
       "layout": {
         "x": 986,
-        "y": 5865,
+        "y": 5085,
         "width": 252,
         "height": 63,
         "rectHeight": 48,
@@ -2625,7 +2653,7 @@
       "renderNote": null,
       "layout": {
         "x": 962,
-        "y": 5214,
+        "y": 4998,
         "width": 300,
         "height": 63,
         "rectHeight": 48,
@@ -2652,7 +2680,7 @@
       "renderNote": null,
       "layout": {
         "x": 962,
-        "y": 5127,
+        "y": 5663,
         "width": 300,
         "height": 63,
         "rectHeight": 48,
@@ -2679,7 +2707,7 @@
       "renderNote": null,
       "layout": {
         "x": 962,
-        "y": 5778,
+        "y": 4911,
         "width": 300,
         "height": 63,
         "rectHeight": 48,
@@ -2733,7 +2761,7 @@
       "renderNote": null,
       "layout": {
         "x": 1003,
-        "y": 5012,
+        "y": 4608,
         "width": 218,
         "height": 91,
         "rectHeight": 76,
@@ -3146,11 +3174,11 @@
       "points": [
         {
           "x": 1506,
-          "y": 5440.5
+          "y": 5311.5
         },
         {
           "x": 1553,
-          "y": 5440.5
+          "y": 5311.5
         },
         {
           "x": 1553,
@@ -3177,11 +3205,11 @@
       "points": [
         {
           "x": 1506,
-          "y": 5466.2
+          "y": 5337.2
         },
         {
           "x": 1543,
-          "y": 5466.2
+          "y": 5337.2
         },
         {
           "x": 1543,
@@ -3203,6 +3231,12 @@
     },
     {
       "from": "browser-automation",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "build-standard",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -3392,19 +3426,19 @@
       "points": [
         {
           "x": 1262,
-          "y": 5527.5
+          "y": 5412.5
         },
         {
           "x": 1272,
-          "y": 5527.5
+          "y": 5412.5
         },
         {
           "x": 1272,
-          "y": 5365.2
+          "y": 5236.2
         },
         {
           "x": 1282,
-          "y": 5365.2
+          "y": 5236.2
         }
       ]
     },
@@ -3427,11 +3461,11 @@
       "points": [
         {
           "x": 1262,
-          "y": 5339.5
+          "y": 5210.5
         },
         {
           "x": 1282,
-          "y": 5339.5
+          "y": 5210.5
         }
       ]
     },
@@ -4055,9 +4089,9 @@
         "label": "The hands",
         "caption": "funnel work and account operations",
         "x": 940,
-        "y": 4574,
+        "y": 4372,
         "width": 588,
-        "height": 1651,
+        "height": 1752,
         "rooms": []
       },
       {
