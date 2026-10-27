@@ -4,7 +4,7 @@ description: Turns a speaker's bio, LinkedIn, speaker sheet, or website into a s
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: content
-status: draft
+status: live
 inherits: operating-doctrine
 brand-scope: null
 defers-to:
