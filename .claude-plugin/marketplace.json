@@ -20,8 +20,8 @@
     {
       "name": "content-engines",
       "source": "./plugins/content-engines",
-      "version": "0.6.2",
-      "description": "Allison Gaddy content and marketing engines (master-marketer-free-agent-builder, rare-content-engine, xavier-offer-builder, dm-to-dollars, video-transcript-relay, content-coach, hook-engine, post-grader, post-scheduler, post-value-filter, social-analyzer)."
+      "version": "0.7.0",
+      "description": "Allison Gaddy content and marketing engines (master-marketer-free-agent-builder, rare-content-engine, xavier-offer-builder, dm-to-dollars, video-transcript-relay, content-coach, hook-engine, post-grader, post-scheduler, post-value-filter, social-analyzer, speaker-introduction-writer)."
     },
     {
       "name": "funnel-operations",
