@@ -1,6 +1,6 @@
 ---
 name: speaker-introduction-writer
-description: Turns a speaker's bio, LinkedIn, speaker sheet, or website into a short introduction that makes the room want to hear them, for any Expert Partners, EPIC, Free Agent Movement, Allison Gaddy, AG Luxury, or Don Hobbs event, stage, panel, podcast, webinar, or program. Use whenever someone needs a speaker introduction, emcee intro, host script, panel intro, keynote intro, podcast or webinar guest intro, award or recognition intro, or a written program or conference bio. Triggers on "write an intro for," "introduce our speaker," "speaker bio," "emcee script," "how should I introduce," "intro for the panel," "program bio," or any time a speaker's background is pasted with an event attached. Selects the facts that matter for this topic and this audience and throws the rest away. Never a resume summary.
+description: Turns a speaker's bio, LinkedIn, speaker sheet, or website into a short introduction that makes the room want to hear them, for any Expert Partners, EPIC, Free Agent Movement, Allison Gaddy, AG Luxury, or Don Hobbs event, stage, panel, podcast, webinar, or program. Use whenever someone needs a speaker introduction, emcee intro, host script, panel intro, keynote intro, podcast or webinar guest intro, award or recognition intro, or a written program or conference bio. Triggers on "write an intro for," "introduce our speaker," "speaker bio," "emcee script," "how should I introduce," "intro for the panel," "program bio," or any time a speaker's background is pasted with an event attached. Asks who will read each intro out loud before drafting, then writes in that reader's voice. Selects the facts that matter for this topic and this audience and throws the rest away. Never a resume summary. For live events, hands the finished text to stage-cards for layout.
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: content
@@ -21,6 +21,14 @@ The introduction does not exist to prove the speaker is impressive. It exists to
 ## Step 0. Name the hosting brand
 
 The introduction is spoken in the voice of the event host, so the hosting brand sets the voice. Expert Partners, EPIC, Free Agent Movement, Allison Gaddy, AG Luxury, and Don Hobbs each have their own canon. Load brand-voice and the matching per-brand card. If the hosting brand is unclear, ask before drafting. Never blend two brands in one introduction.
+
+## Step 0b. Ask who is reading
+
+Every introduction is read out loud by a specific person, and it has to sound like that person. Before drafting, ask who will read each intro. Do not skip this, even when the bio is perfect and the topic is clear. Skip it only when the user has already said who reads (for example, I will read it, Nicole reads this one, the emcee is Allison).
+
+Ask once, in one short question. When there are several intros, ask who reads each in the same question, like who reads each of these, one person for all or different people. Do not draft until you have the answer. Do not guess from the hosting brand or the event.
+
+Then write in that reader's voice. Use how that person actually talks, the words they would use, and how they would refer to the speaker. If you have a voice card or brand voice for the reader, load it. If you do not, ask for one or two lines they have said on stage and match them. The reader may say only what is true for them. If the reader does not know the speaker, the intro cannot say they do. Never mix two readers' voices in one intro.
 
 ## Step 1. Determine the format
 
@@ -43,7 +51,7 @@ A stage intro is heard once. A program bio is scanned. A podcast intro starts a 
 
 ## Step 2. Ask only if it matters
 
-If a useful introduction can be written, write it. If one missing fact would materially change the result, ask only that one question. Usually it is the topic, or why this audience is hearing from this person. The same bio produces completely different introductions for different topics, so a missing topic is usually worth the question.
+Who is reading comes first, as Step 0b says. After that, if a useful introduction can be written, write it. If one missing fact would materially change the result, ask only that one question. Usually it is the topic, or why this audience is hearing from this person. The same bio produces completely different introductions for different topics, so a missing topic is usually worth the question. One question per message, most important first.
 
 ## Step 3. Analyze silently
 
@@ -89,6 +97,13 @@ Short and medium sentences. No stacked clauses. No jargon this room would not us
 
 House writing rules apply to every output. No em dashes or double dashes. No colons or semicolons in the introduction itself. No bold, italics, or all caps. None of amazing, incredible, mind-blowing, crush it, hustle, grind, game-changer, or next-level. Spelling locks hold, eXp, eXcelerate, Don, Allison Gaddy, Nicole Rouseau, Free Agent Movement, Free Agent Nation, Free Agent Formula, EPIC, Expert Partners, REALTOR®.
 
+Stage rules learned at Finish Strong.
+
+- First names in the body. A reader would say Wayne, not Wayne Salmans, so the body uses first names. The full name appears once, at the handoff line, where the room needs it to applaud.
+- No brokerage names at EXPNTX events. Do not name any speaker's brokerage or team brand in an EXPNTX intro, including eXp. The room is mixed. Other hosts decide for themselves. When the host has not said, ask.
+- A returning speaker gets a short bridge, not a second full intro. When a speaker comes back later in the same program, write two or three sentences that tie their second appearance to what the room just lived through, and hand off on the first name. Never repeat their credentials.
+- Live events go to stage-cards. When the intros are for a live event, give the finished text to the stage-cards skill for layout on 4x6 cards. Do not lay out cards here, and do not trim the words to fit a card. Layout is that skill's job and the words stay as written.
+
 ## Step 8. Accuracy is a gate, not a score
 
 Every fact traces to supplied or verified source material. Never invent achievements, stories, hardships, motivations, relationships, or an emotional journey. Never imply the host knows the speaker personally unless that is given. Never turn an ordinary fact into a superlative. No transformed, pioneered, revolutionized, or changed the industry unless the source supports that exact claim. "After nearly losing everything" appears only if the source says it. If sources conflict, flag the conflict instead of picking the version that makes better copy. The desire to make a speaker compelling never outranks truth.
@@ -119,6 +134,6 @@ Then ask. Could this intro have been written for 20 other accomplished people? I
 
 ## Output
 
-Return the finished introduction only, with the approximate spoken length in seconds. When useful, add one alternate with a meaningfully different emotional emphasis. Never five small rewrites. Show reasoning or the score only when asked. When something is missing or conflicting, add one short line naming it after the introduction.
+Return the finished introduction only, with the approximate spoken length in seconds. For a live event, finish with one line offering to put the intros on 4x6 cards through stage-cards. When useful, add one alternate with a meaningfully different emotional emphasis. Never five small rewrites. Show reasoning or the score only when asked. When something is missing or conflicting, add one short line naming it after the introduction.
 
 See references/examples.md for weak versus strong pairs, the same bio rewritten for two topics, and the accuracy trap.
