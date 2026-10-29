@@ -81,6 +81,10 @@ Rules for what you write.
 - People and speakers. The header's people field means everyone who was there, from the intake and from the labels the source carries. Name a speaker only when the source itself says who said what (G20, R33). Say in people_note how the people were identified.
 - Type is one or two plain words for the kind of source, such as transcript, interview, meeting, document, report or article (R15).
 - When the material has more than one part, also write nav.json with a summary of one or two paragraphs covering the whole, for the navigation page (G16).
+- Spell every name, brand and term exactly as the source spells it, even when it looks wrong. The source's spelling is a fact (G17, R10).
+- When a speaker corrects or takes back something, report what they settled on, never the words they took back (G17, G19).
+- An action or decision is something the source states as a commitment, a decision or a request still to be done. Something the source already treats as settled is not an action (R18, G19).
+- The intake's title, date and people may appear in the summary and takeaways. Nothing else from outside the source may (R07, G19).
 - Keep interpretation in the summary and takeaways. The Content section is the source itself (G17).
 - Check each file's shape before moving on, with python3 scripts/optimize.py validate --derived <file> (add --nav for nav.json, --combined for combined.json). It prints OK or says what to fix (R16, R17).
 
@@ -112,7 +116,7 @@ Combine only when the request asks for it, and only files on the same topic. Run
 ## What this tool never does
 
 - Invents a date, a name, an owner, a deadline, a number or a fact the source does not hold (G19).
-- Corrects, trims, reorders or paraphrases the source text in Content (G17, R10).
+- Corrects, trims, reorders or paraphrases the source text in Content, or respells a name or brand anywhere (G17, R10).
 - Assigns words to a speaker the source does not label (R11, G20, R33).
 - Guesses at a table, a scan or an unreadable region (G18).
 - Picks a winner between sources that disagree (G15).
