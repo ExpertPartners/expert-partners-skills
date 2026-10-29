@@ -1,3 +1,17 @@
+## 2.68.0 - 2026-10-29
+
+File to Knowledge Base Optimizer v1.0, a new skill built under the build standard from the approved
+spec, [HQ][V1.0] Spec - File to Knowledge Base Optimizer, revision 4. It turns a transcript, a PDF, a
+Word or Google Doc, a web page, a captions file or a recording into clean, structured Markdown for
+Claude Project or Custom GPT knowledge in six steps, take in the source, one or two intake questions,
+extract and clean without changing meaning, add a header, summary, takeaways and navigable sections,
+split past about 50,000 tokens into numbered parts with a navigation page, then save by the company
+file rules into the brain's Claude outputs folder and report. Nothing lost, nothing invented. Every
+instruction carries its spec line. The engine, scripts/optimize.py, does the deterministic work and
+the model does the judgment work (Decision Log 2026-10-27, The optimizer spec is approved at revision
+4, and The optimizer's six open behaviors are decided). Assigned by HQ in Handoffs. Waits for
+certification by Claude in HQ and Allison.
+
 ## 2.67.0 - 2026-10-26
 
 Build Standard v1.0, a new HQ skill. Any builder on any surface follows one standard whenever it
