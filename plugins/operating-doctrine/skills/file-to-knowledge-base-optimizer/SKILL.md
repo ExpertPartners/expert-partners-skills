@@ -83,6 +83,7 @@ Rules for what you write.
 - When the material has more than one part, also write nav.json with a summary of one or two paragraphs covering the whole, for the navigation page (G16).
 - Spell every name, brand and term exactly as the source spells it, even when it looks wrong. The source's spelling is a fact (G17, R10).
 - When a speaker corrects or takes back something, report what they settled on, never the words they took back (G17, G19).
+- Keep the strength of every claim as the source has it. A hedge such as sometimes, maybe, almost or I think stays in. Never raise a sometimes to an often or a guess to a fact (G17, G19).
 - An action or decision is something the source states as a commitment, a decision or a request still to be done. Something the source already treats as settled is not an action (R18, G19).
 - The intake's title, date and people may appear in the summary and takeaways. Nothing else from outside the source may (R07, G19).
 - Keep interpretation in the summary and takeaways. The Content section is the source itself (G17).
@@ -111,7 +112,7 @@ Read references/output-contract.md for the exact shape of every file.
 
 ## Combining related files (G15, R24, R25)
 
-Combine only when the request asks for it, and only files on the same topic. Run the extractor once per file into its own work folder. Then write one combined.json with the summary, takeaways, a sections list where each section names its source (A, B, and so on in the order given) and the line range in that source's part file, and a conflicts list for every point where the sources disagree, each claim with its source and date. Then assemble with --combine and every work folder. Every section keeps its source. A passage that appears word for word in two sources appears once and Source Notes say so. Disagreements keep both claims with their dates in a Conflicts between sources section, and no winner is chosen. The optimizer stays a single file tool otherwise. Collection wide knowledge base design is other work (R25, R26).
+Combine only when the request asks for it, and only files on the same topic. Run the extractor once per file into its own work folder. Then write one combined.json with the summary, takeaways, a sections list where each section names its source (A, B, and so on in the order given) and the line range in that source's part file, and a conflicts list for every point where the sources disagree, each claim with its source and date. Then assemble with --combine and every work folder. Every section keeps its source. A section is a passage of body text, so a source's own title and date lines belong to that source's first section, never to a section of their own. A passage that appears word for word in two sources appears once, a section that held only repeats is folded into the earlier copy, and Source Notes say so. Disagreements keep both claims with their dates in a Conflicts between sources section, and no winner is chosen. The optimizer stays a single file tool otherwise. Collection wide knowledge base design is other work (R25, R26).
 
 ## What this tool never does
 

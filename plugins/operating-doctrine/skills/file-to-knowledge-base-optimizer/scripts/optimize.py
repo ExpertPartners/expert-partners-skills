@@ -69,8 +69,13 @@ def est_tokens(text: str) -> int:
     return int(round(len(text) / TOKEN_CHARS))
 
 
+LIGATURES = {"\ufb00": "ff", "\ufb01": "fi", "\ufb02": "fl", "\ufb03": "ffi", "\ufb04": "ffl", "\ufb06": "st"}
+
+
 def clean_inline(text: str) -> str:
     """Whitespace and invisible-character cleanup only. Words are never changed (R10, G17)."""
+    for lig, plain in LIGATURES.items():
+        text = text.replace(lig, plain)
     text = unicodedata.normalize("NFC", text)
     text = text.replace(" ", " ").replace("​", "").replace("﻿", "").replace(" ", " ")
     text = text.replace("\x0b", " ").replace("\x0c", "")
@@ -442,6 +447,45 @@ def _lines_to_paras(lines, cleanup):
     return paras
 
 
+def _repair_glyphs(text: str, ref: str, notes, cleanup, page: int) -> str:
+    """A glyph the PDF font does not map (it arrives as a null character, often a ligature) is
+    restored from a second, independent read of the same page when exactly one reading fits the
+    letters around it. Otherwise it is marked unreadable, never guessed (G18, R10)."""
+    if "\x00" not in text:
+        return text
+    out = text
+    guard = 0
+    while "\x00" in out and guard < 200:
+        guard += 1
+        i = out.index("\x00")
+        j = i
+        while j < len(out) and out[j] == "\x00":
+            j += 1
+        pre = out[max(0, i - 8):i]
+        suf = out[j:j + 8]
+        found = set()
+        if ref and (pre.strip() or suf.strip()):
+            pat = re.escape(pre) + r"(\S{1,4})" + re.escape(suf)
+            found = {m.group(1) for m in re.finditer(pat, ref)}
+        if len(found) == 1:
+            out = out[:i] + found.pop() + out[j:]
+            cleanup.add("unmapped glyphs restored from a second read of the same page")
+        else:
+            out = out[:i] + "[unreadable character]" + out[j:]
+            notes.append("page %d holds a glyph the font does not map, it is marked unreadable" % page)
+    return out
+
+
+def _page_reference_text(path: Path, pno: int) -> str:
+    if not which("pdftotext"):
+        return ""
+    try:
+        res = subprocess.run(["pdftotext", "-f", str(pno), "-l", str(pno), str(path), "-"], capture_output=True, text=True, timeout=60)
+        return re.sub(r"\s+", " ", res.stdout)
+    except Exception:
+        return ""
+
+
 def _continues(prev: str, nxt: str) -> bool:
     """True when a page's first paragraph is the tail of the previous page's last one."""
     if not prev or not nxt:
@@ -541,8 +585,10 @@ def extract_pdf(path: Path, work: Path, notes, cleanup):
             if kind == "lines":
                 sizes.extend(ln["size"] for ln in payload if ln["size"])
     body_size = sorted(sizes)[len(sizes) // 2] if sizes else 0
-    for items in page_items:
+    for page_index, items in enumerate(page_items):
         fresh_page = True
+        pno = page_index + 1
+        ref = None
         for kind, payload in items:
             if kind == "lines":
                 kept = []
@@ -557,11 +603,14 @@ def extract_pdf(path: Path, work: Path, notes, cleanup):
                         continue
                     kept.append(ln)
                 for p in _lines_to_paras(kept, cleanup):
+                    if "\x00" in p["text"]:
+                        if ref is None:
+                            ref = _page_reference_text(path, pno)
+                        p["text"] = _repair_glyphs(p["text"], ref, notes, cleanup, pno)
                     is_heading = (p["lines"] == 1 and len(p["text"]) <= 90 and body_size and p["size"] >= body_size * 1.12
                                   and not p["text"].endswith((".", ",", ";")))
                     if is_heading:
-                        level = 1 if p["size"] >= body_size * 1.3 else 2
-                        blocks.append({"type": "heading", "level": level, "text": p["text"]})
+                        blocks.append({"type": "heading", "level": 2, "text": p["text"], "_size": round(p["size"], 1)})
                     elif fresh_page and blocks and blocks[-1]["type"] == "para" and _continues(blocks[-1]["text"], p["text"]):
                         # a paragraph that crosses the page break is one paragraph (R10)
                         prev = blocks[-1]["text"]
@@ -571,8 +620,20 @@ def extract_pdf(path: Path, work: Path, notes, cleanup):
                         blocks.append({"type": "para", "text": p["text"]})
                     fresh_page = False
             else:
+                if payload.get("type") == "table":
+                    for row in payload["rows"]:
+                        for ci, cell in enumerate(row):
+                            if cell and "\x00" in cell:
+                                if ref is None:
+                                    ref = _page_reference_text(path, pno)
+                                row[ci] = _repair_glyphs(cell, ref, notes, cleanup, pno)
                 blocks.append(payload)
                 fresh_page = False
+    # heading levels follow the distinct heading sizes, the largest is the top level (R17)
+    sizes = sorted({b["_size"] for b in blocks if b["type"] == "heading" and "_size" in b}, reverse=True)
+    for b in blocks:
+        if b["type"] == "heading" and "_size" in b:
+            b["level"] = min(3, sizes.index(b.pop("_size")) + 1)
     created = ""
     raw = (meta.get("CreationDate") or "") if isinstance(meta, dict) else ""
     m = re.search(r"D:(\d{4})(\d{2})(\d{2})", str(raw))
@@ -1335,15 +1396,14 @@ def assemble_combined(works: list, intake: dict, derived_dir: Path, out: Path, v
         src_dates.append((intake.get("source_dates") or {}).get(m["original_name"]) or m.get("date_from_name") or m.get("date_from_file") or "unknown")
     seen = {}
     repeats = []
+    folded = []
     body = ["## Content", ""]
     for s in d.get("sections") or []:
         si = labels.index(s["source"]) if s.get("source") in labels else int(s.get("source_index", 0))
         a = max(1, s["start_line"]) - 1
         b = min(len(src_lines[si]), s.get("end_line") or len(src_lines[si]))
-        body.append("## " + clean_inline(s["heading"]))
-        body.append("")
-        body.append("Source " + labels[si] + ", " + metas[si]["original_name"] + ", " + src_dates[si] + ".")
-        body.append("")
+        sec = []
+        kept_any = False
         para = []
         chunk = src_lines[si][a:b] + [""]
         for l in chunk:
@@ -1355,11 +1415,21 @@ def assemble_combined(works: list, intake: dict, derived_dir: Path, out: Path, v
                         repeats.append("A passage beginning '%s' appears in Source %s and Source %s and is kept once, under %s." % (text[:60], seen[key][0], labels[si], seen[key][1]))
                     else:
                         seen.setdefault(key, (labels[si], s["heading"]))
-                        body.extend(para)
-                        body.append("")
+                        sec.extend(para)
+                        sec.append("")
+                        if not re.match(r"^#+\s", para[0]):
+                            kept_any = True
                     para = []
             else:
                 para.append(l)
+        if not kept_any:
+            folded.append("The section '%s' from Source %s held only passages already kept elsewhere, so it was folded into the earlier copy." % (clean_inline(s["heading"]), labels[si]))
+            continue
+        body.append("## " + clean_inline(s["heading"]))
+        body.append("")
+        body.append("Source " + labels[si] + ", " + metas[si]["original_name"] + ", " + src_dates[si] + ".")
+        body.append("")
+        body.extend(sec)
     conflicts = d.get("conflicts") or []
     if conflicts:
         body += ["## Conflicts between sources", ""]
@@ -1390,7 +1460,7 @@ def assemble_combined(works: list, intake: dict, derived_dir: Path, out: Path, v
     for i, m in enumerate(metas):
         lines.append("- Source " + labels[i] + ": " + m["original_name"] + ", " + m["kind_label"] + ", dated " + src_dates[i] + ", fingerprint sha256 " + m["fingerprint"])
     lines.append("- Combined because the request asked for it, the sources are on the same topic")
-    lines.append("- Repeated passages: " + ("none" if not repeats else " ".join(repeats)))
+    lines.append("- Repeated passages: " + ("none" if not repeats else " ".join(repeats + folded)))
     lines.append("- Conflicts: " + ("none found" if not conflicts else "%d flagged above, both claims kept with their dates" % len(conflicts)))
     lines.append("- People: " + (d.get("people_note") or "as the sources and the intake give them"))
     lines.append("- Could not read: " + ("none" if not any(m.get("notes") for m in metas) else "; ".join(n for m in metas for n in m.get("notes", []))))
