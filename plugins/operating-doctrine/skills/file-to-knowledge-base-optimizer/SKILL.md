@@ -87,6 +87,7 @@ Rules for what you write.
 - An action or decision is something the source states as a commitment, a decision or a request still to be done. Something the source already treats as settled is not an action (R18, G19).
 - The intake's title, date and people may appear in the summary and takeaways. Nothing else from outside the source may (R07, G19).
 - Keep interpretation in the summary and takeaways. The Content section is the source itself (G17).
+- Check your own work before handing it in. Read every summary sentence and every takeaway again next to the passage it comes from. Count anything you counted, and state the count the text gives. Keep the source's own groupings, so two statements the source makes separately stay separate. Use words like first, last, closes with or opens with only when the text's order bears them out. Fix or remove anything the text does not say exactly (G17, G19, R16).
 - Check each file's shape before moving on, with python3 scripts/optimize.py validate --derived <file> (add --nav for nav.json, --combined for combined.json). It prints OK or says what to fix (R16, R17).
 
 ## Step 5, size and split (R12, G16)
