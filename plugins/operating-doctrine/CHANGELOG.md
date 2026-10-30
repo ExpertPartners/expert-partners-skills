@@ -19,7 +19,9 @@ any name, number or term in the summary, takeaways, headings or actions that the
 does not carry spelled the same way, and a navigation summary that names the file or strays from the
 parts' summaries and the source's headings. Captions without labels group into paragraphs that end at
 sentence ends, PDF heading levels are normalized, and unmapped glyphs are restored from a second read
-or marked unreadable.
+or marked unreadable. The navigation page's summary is built by the engine from the parts' summaries, and Step 4
+names people, keeps unlabeled passages apart, keeps qualifiers with their claims, places headings at
+topic changes and writes the shorter end of the spec's ranges.
 
 ## 2.67.0 - 2026-10-26
 

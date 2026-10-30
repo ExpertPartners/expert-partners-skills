@@ -1346,36 +1346,6 @@ def intake_words(intake: dict) -> str:
     return "\n".join(str(v) for v in vals if v)
 
 
-def validate_nav(nav: dict, derived_dir: Path, meta: dict, intake: dict):
-    """The navigation summary covers the whole in the words of the parts' summaries and the source's headings,
-    and never names the file, its format or its parts, which the header and the Parts list carry (G16, G19)."""
-    s = nav.get("summary")
-    if not isinstance(s, list) or not (1 <= len(s) <= 2) or not all(isinstance(x, str) and x.strip() for x in s):
-        raise RuntimeError("nav.json needs a summary of one or two paragraphs for the whole file (G16)")
-    joined = "\n".join(s)
-    if "[" in joined or "]" in joined or ".md" in joined:
-        raise RuntimeError("nav.json: the navigation summary names the file or its identity prefix. Describe the material instead, the header and the Parts list carry the file (G16, G19)")
-    pool = []
-    parts = sorted(derived_dir.glob("part-*.json"))
-    for pp in parts or [derived_dir / "derived.json"]:
-        if not pp.exists():
-            continue
-        d = read_json(pp)
-        pool += list(d.get("summary") or [])
-        pool += [takeaway_point(x) for x in (d.get("takeaways") or [])]
-        pool += [str(x.get("heading", "")) for x in (d.get("sections") or [])]
-    for p in (meta or {}).get("parts") or []:
-        pool += [str(h) for h in (p.get("headings") or [])]
-    hay = names_hay("\n".join(pool) + "\n" + intake_words(intake or {}))
-    problems = []
-    for i, para in enumerate(s, 1):
-        bad = unsourced_names(para, hay)
-        if bad:
-            problems.append("paragraph %d: %s" % (i, ", ".join(repr(b) for b in bad[:8])))
-    if problems:
-        raise RuntimeError("nav.json: the navigation summary uses words the parts' summaries and the source's headings do not. Draw it from them: " + "; ".join(problems) + " (G16, G19)")
-
-
 def validate_derived(d: dict, label: str, part_text: str = "", extra_text: str = ""):
     """The shape of a derived file, and the words behind every point (R16, G17, G19). Every takeaway
     and every action carries at least one support quote, the speaker's or the author's exact words,
@@ -1517,12 +1487,17 @@ def assemble_single(work: Path, intake: dict, derived_dir: Path, out: Path, vers
     files = []
     nav_sections = []
     first_header = None
+    part_firsts = []
+    first_people_note = None
     for p in parts:
         n = p["number"]
         label = "part-%d.json" % n if total_parts > 1 else None
         d = load_derived(derived_dir, label) if label else (load_derived(derived_dir, "part-1.json") if (derived_dir / "part-1.json").exists() else load_derived(derived_dir, "derived.json"))
         part_text = (work / "parts" / ("part-%d.md" % n)).read_text(encoding="utf-8")
         validate_derived(d, "part %d" % n, part_text, intake_words(intake))
+        part_firsts.append((n, str(d["summary"][0]).strip()))
+        if first_people_note is None:
+            first_people_note = d.get("people_note") or ""
         part_lines = part_text.splitlines()
         notes = []
         body = insert_sections(part_lines, d.get("sections") or [], notes)
@@ -1563,10 +1538,11 @@ def assemble_single(work: Path, intake: dict, derived_dir: Path, out: Path, vers
         files.append({"name": name, "part": n, "tokens_estimate": est_tokens(text), "sha256": sha256_text(text), "headings": _headings_in(body, 0, len(body))})
         nav_sections.append((n, name, est_tokens(text), _headings_in(body, 0, len(body))))
     if total_parts > 1:
-        nav = load_derived(derived_dir, "nav.json")
-        validate_nav(nav, derived_dir, meta, intake)
+        # The navigation summary is built here from each part's first summary paragraph, in order, so the
+        # navigation page claims nothing the parts do not (G16, G19).
+        nav = {"summary": ["Part %d of %d. %s" % (n, total_parts, first) for n, first in part_firsts], "people_note": first_people_note}
         header, extra = resolve_header(meta, intake, nav, title + ", Navigation")
-        extra["parts_note"] = "navigation page for %d parts" % total_parts
+        extra["parts_note"] = "navigation page for %d parts, its summary built from each part's first summary paragraph" % total_parts
         lines = build_header(header) + ["", "# " + header["title"], "", "## Summary", ""]
         for para in nav["summary"]:
             lines += [clean_inline(para), ""]
@@ -1971,20 +1947,15 @@ def cmd_validate(args):
     run_dir = derived_path.parent.parent
     intake_path = Path(args.intake) if args.intake else run_dir / "intake.json"
     intake = read_json(intake_path) if intake_path.exists() else {}
-    if args.nav:
-        meta_path = run_dir / "work" / "source.meta.json"
-        meta = read_json(meta_path) if meta_path.exists() else {}
-        validate_nav(d, derived_path.parent, meta, intake)
-    else:
-        part_text = "\n".join(Path(pp).read_text(encoding="utf-8") for pp in (args.part or []))
-        validate_derived(d, derived_path.name, part_text, intake_words(intake))
-        if args.combined:
-            for s in d.get("sections") or []:
-                if s.get("source") not in [chr(ord("A") + i) for i in range(26)] or not isinstance(s.get("end_line"), int):
-                    raise RuntimeError("each combined section needs source (A, B, ...) and an integer end_line")
-            for c in d.get("conflicts") or []:
-                if not c.get("about") or len(c.get("claims") or []) < 2:
-                    raise RuntimeError("each conflict needs about and at least two claims")
+    part_text = "\n".join(Path(pp).read_text(encoding="utf-8") for pp in (args.part or []))
+    validate_derived(d, derived_path.name, part_text, intake_words(intake))
+    if args.combined:
+        for s in d.get("sections") or []:
+            if s.get("source") not in [chr(ord("A") + i) for i in range(26)] or not isinstance(s.get("end_line"), int):
+                raise RuntimeError("each combined section needs source (A, B, ...) and an integer end_line")
+        for c in d.get("conflicts") or []:
+            if not c.get("about") or len(c.get("claims") or []) < 2:
+                raise RuntimeError("each conflict needs about and at least two claims")
     print("OK " + str(args.derived))
     return 0
 
@@ -2032,7 +2003,6 @@ def main(argv=None):
     v = sub.add_parser("validate")
     v.add_argument("--derived", required=True)
     v.add_argument("--part", action="append", default=[], help="the part text the quotes must appear in, repeat for several sources")
-    v.add_argument("--nav", action="store_true")
     v.add_argument("--combined", action="store_true")
     v.add_argument("--intake", default="", help="the intake file, found in the run folder when not given")
     args = ap.parse_args(argv)
