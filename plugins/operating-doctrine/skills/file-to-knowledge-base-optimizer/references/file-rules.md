@@ -6,7 +6,7 @@ The company wide file rules govern everything this tool produces (R31, R32, G13,
 
 [Company][Version] Descriptive Title.md for a company wide file, [Company-Department][Version] Descriptive Title.md for a department file, with the department as one whole word in title case. The identity comes from the source's own name when it carries one, otherwise from the intake. The descriptive title is the intake title, or the source's own title with any system characters replaced. Parts add , Part n of N. The navigation page adds , Navigation. The extension stays .md because that is the shown output type (R19).
 
-Examples. [EP-Product][V1.0] DH IP Bible Interview, Answers Working Copy, Part 2 of 4.md. [EP-Product][V1.0] DH IP Bible Interview, Answers Working Copy, Navigation.md.
+Examples. [EP-Operations][V1.0] Weekly Team Call, Part 2 of 4.md. [EP-Operations][V1.0] Weekly Team Call, Navigation.md.
 
 ## Versions (R31, G14)
 
