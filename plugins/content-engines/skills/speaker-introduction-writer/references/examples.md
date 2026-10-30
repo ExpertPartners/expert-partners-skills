@@ -82,3 +82,24 @@ Then one line after it. Ask Rachel's team whether there is a setback story she s
 - Speaker effects in language comprehension, PMC. https://pmc.ncbi.nlm.nih.gov/articles/PMC13079513/
 - Event Emcee, National Speakers Association. https://nsaspeaker.org/emcee/
 - Unconscious bias in speaker introductions, American Journal of Surgery. https://www.americanjournalofsurgery.com/article/S0002-9610(23)00615-3/fulltext
+
+## 5. Stage rules at work
+
+Fictional people again. The examples teach the rules, not the wording.
+
+Reader first. Request, write an intro for Pat Morgan on time management. Right answer, ask before drafting.
+
+> Who will read this one out loud, and is it the same person for every intro?
+
+First names in the body, full name at the handoff.
+
+> Raise your hand if December already feels full. Pat has spent twenty years helping busy agents win their calendars back. Pat does not preach it, Pat lives it. Please welcome Pat Morgan.
+
+Returning speaker, short bridge.
+
+> Pat told us this morning where the hours go. Now Pat is back to show us what to do with the ones we just got back. Welcome back, Pat.
+
+No brokerage names at EXPNTX events. Weak, the speaker line names a brokerage. Strong, the same fact dropped and the standing carried by the work.
+
+> Weak. Lee is a team leader at Example Realty.
+> Strong. Lee has led a team through three market cycles.
