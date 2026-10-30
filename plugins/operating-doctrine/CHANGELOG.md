@@ -1,3 +1,15 @@
+## 2.68.0 - 2026-10-30
+
+Session Wrap v1.22, the wrap and archive trigger. In a Claude Code or Codex session, Allison
+typing wrap and archive in any capitalization, or only the letter W or w, is her full okay. The
+session runs its wrap duties, files and reads back its report, closes its tabs, says SAFE TO
+ARCHIVE and archives itself with no second question. A W inside other words never triggers it,
+and S and Q keep their meanings. If anything is still owed or the archive is blocked it says
+exactly what in one line and does not archive, and the session steward archives it on its next
+pass. The existing session-wrap skill gets the trigger, so there is one home, plus a test case
+file (Decision Log 2026-10-30, Wrap and archive, or W, tells a code session to wrap and archive
+itself). Assigned by HQ in Handoffs.
+
 ## 2.67.0 - 2026-10-26
 
 Build Standard v1.0, a new HQ skill. Any builder on any surface follows one standard whenever it
