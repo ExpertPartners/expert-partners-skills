@@ -64,9 +64,9 @@ For each part in <run folder>/work/parts, read that part's text and write one JS
 {
   "type": "interview",
   "summary": ["One or two paragraphs that say what this part holds."],
-  "takeaways": ["Three to seven substantive points about claims, decisions, methods or numbers."],
+  "takeaways": [{"point": "One substantive point about a claim, decision, method or number.", "support": ["the exact words from the part that say it"]}],
   "sections": [{"heading": "The origin story", "start_line": 1}],
-  "actions_decisions": [{"item": "What was decided or must be done", "owner": "", "due": "", "source_line": 12}],
+  "actions_decisions": [{"item": "What was decided or must be done", "owner": "", "due": "", "source_line": 12, "support": ["the exact words that state it"]}],
   "people_note": "how the people in the header were identified",
   "could_not_read": [],
   "notes": ""
@@ -76,7 +76,9 @@ For each part in <run folder>/work/parts, read that part's text and write one JS
 Rules for what you write.
 
 - The summary is one or two paragraphs and the takeaways are three to seven points, each supported by the text of that part (R16). Nothing is stated that the source does not say (G19).
-- Sections. The body is divided with second level headings named for their topics (R17). When the source has its own headings, the extractor already carries them, so leave sections empty or add headings only inside long stretches that have none. When the source has no headings, such as a transcript, choose topic sections and give the line number in the part file where each begins. Headings are the only thing inserted. The text itself is never retyped, trimmed or reordered.
+- Every takeaway and every action carries the words behind it. Copy at least one passage from the part, word for word, into its support list. The engine checks each quote against the text and refuses a point that has none. Write the point from the quote, not from memory, and attribute it only to the speaker whose labeled words the quote comes from. Both say or they agree is written only when each speaker's own words are quoted (R16, G17, G19).
+- Join two facts with because, since or so only when the text gives that cause. Say nothing about the file itself, such as that it is complete or the full transcript, unless the source says so. Keep the source's category words, a guy stays a guy and never becomes an agent. Carry names, numbers and their punctuation exactly as written (G17, G19).
+- Sections. The body is divided with second level headings named for their topics (R17). When the source has its own headings, the extractor already carries them, so leave sections empty or add headings only inside long stretches that have none. When the source has no headings, such as a transcript, choose topic sections and give the line number in the part file where each begins. A heading sits on the first paragraph it describes, never on the paragraph before it. Headings are the only thing inserted. The text itself is never retyped, trimmed or reordered.
 - Actions and Decisions. Only for decision oriented material such as meetings. List each item with an owner and a due date only when the source gives them (R18).
 - People and speakers. The header's people field means everyone who was there, from the intake and from the labels the source carries. Name a speaker only when the source itself says who said what (G20, R33). Say in people_note how the people were identified.
 - Type is one or two plain words for the kind of source, such as transcript, interview, meeting, document, report or article (R15).
@@ -88,7 +90,8 @@ Rules for what you write.
 - The intake's title, date and people may appear in the summary and takeaways. Nothing else from outside the source may (R07, G19).
 - Keep interpretation in the summary and takeaways. The Content section is the source itself (G17).
 - Check your own work before handing it in. Read every summary sentence and every takeaway again next to the passage it comes from. Count anything you counted, and state the count the text gives. Keep the source's own groupings, so two statements the source makes separately stay separate. Use words like first, last, closes with or opens with only when the text's order bears them out. Fix or remove anything the text does not say exactly (G17, G19, R16).
-- Check each file's shape before moving on, with python3 scripts/optimize.py validate --derived <file> (add --nav for nav.json, --combined for combined.json). It prints OK or says what to fix (R16, R17).
+- Then check it with fresh eyes. Where the session can start a fresh context, such as Claude Code or Codex, hand the part text and the draft file to a fresh reader whose only job is to find every statement the text does not support, every attribution the labeled words do not carry, every hedge dropped and every word the source does not use, and fix what it finds. Elsewhere, read the part again from the top and run the same hunt yourself. Nothing is handed in until that read finds nothing (G17, G19).
+- Check each file's shape and its quotes before moving on, with python3 scripts/optimize.py validate --derived <file> --part <the part file> (add --nav for nav.json, --combined and one --part per source for combined.json). It prints OK or says what to fix (R16, R17, G19).
 
 ## Step 5, size and split (R12, G16)
 

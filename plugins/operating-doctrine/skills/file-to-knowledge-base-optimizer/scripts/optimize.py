@@ -26,7 +26,7 @@ Commands
   save      --out DIR --intake FILE --auth sa:PATH --impersonate EMAIL [--source-drive-id ID] [--dry-run]
   finish    (version check, assemble, save, report in one go)
   report    --out DIR
-  validate  --derived FILE [--nav] [--combined]
+  validate  --derived FILE [--part PART.md ...] [--nav] [--combined]
 """
 from __future__ import annotations
 
@@ -765,8 +765,13 @@ def extract_captions(path: Path, notes, cleanup):
                 blocks.append(cur)
             cleanup.add("caption fragments joined into speaker turns")
         else:
-            gap = _ts_seconds(c["start"]) - _ts_seconds(cur["cues"][-1][0]) if (cur and cur["type"] == "cues") else 99
-            if cur and cur["type"] == "cues" and gap <= 8.0 and len(cur["cues"]) < 12:
+            keep = False
+            if cur and cur["type"] == "cues":
+                gap = _ts_seconds(c["start"]) - _ts_seconds(cur["cues"][-1][0])
+                ends_sentence = bool(re.search(r"[.!?\u2026]['\")\]]?$", cur["cues"][-1][1]))
+                # a paragraph ends at a sentence end, never mid sentence (R10)
+                keep = (not ends_sentence and len(cur["cues"]) < 40) or (gap <= 8.0 and len(cur["cues"]) < 12)
+            if keep:
                 cur["cues"].append([c["start"], c["text"]])
             else:
                 cur = {"type": "cues", "cues": [[c["start"], c["text"]]]}
@@ -1206,19 +1211,47 @@ def load_derived(derived_dir: Path, name: str):
     return read_json(p)
 
 
-def validate_derived(d: dict, label: str):
+def _norm_quote(s: str) -> str:
+    s = unicodedata.normalize("NFKC", s)
+    s = s.replace("\u2019", "'").replace("\u2018", "'").replace("\u201c", '"').replace("\u201d", '"')
+    return re.sub(r"\s+", " ", s).strip().lower()
+
+
+def takeaway_point(x) -> str:
+    return x["point"] if isinstance(x, dict) else str(x)
+
+
+def validate_derived(d: dict, label: str, part_text: str = ""):
+    """The shape of a derived file, and the words behind every point (R16, G17, G19). Every takeaway
+    and every action carries at least one support quote, the speaker's or the author's exact words,
+    and when the part text is given each quote must appear in it word for word."""
     summary = d.get("summary")
     if not isinstance(summary, list) or not (1 <= len(summary) <= 2) or not all(isinstance(x, str) and x.strip() for x in summary):
         raise RuntimeError(label + ": summary must be a list of one or two paragraphs (R16)")
     tk = d.get("takeaways")
-    if not isinstance(tk, list) or not (3 <= len(tk) <= 7) or not all(isinstance(x, str) and x.strip() for x in tk):
+    if not isinstance(tk, list) or not (3 <= len(tk) <= 7):
         raise RuntimeError(label + ": takeaways must be three to seven points (R16)")
+    hay = _norm_quote(part_text) if part_text else ""
+    for i, x in enumerate(tk, 1):
+        if not isinstance(x, dict) or not str(x.get("point", "")).strip() or not isinstance(x.get("support"), list) or not x["support"]:
+            raise RuntimeError(label + ": takeaway %d must be {point, support} with at least one exact quote from the text (G17, G19)" % i)
+        for q in x["support"]:
+            if not isinstance(q, str) or len(q.strip()) < 8:
+                raise RuntimeError(label + ": takeaway %d has a support quote that is empty or too short to check" % i)
+            if hay and _norm_quote(q) not in hay:
+                raise RuntimeError(label + ": takeaway %d support quote is not in the text word for word: %r" % (i, q[:90]))
     for s in d.get("sections", []) or []:
         if not isinstance(s, dict) or not s.get("heading") or not isinstance(s.get("start_line"), int):
             raise RuntimeError(label + ": each section needs a heading and an integer start_line")
-    for a in d.get("actions_decisions", []) or []:
+    for i, a in enumerate(d.get("actions_decisions", []) or [], 1):
         if not isinstance(a, dict) or not a.get("item"):
             raise RuntimeError(label + ": each action or decision needs an item")
+        sup = a.get("support")
+        if not isinstance(sup, list) or not sup:
+            raise RuntimeError(label + ": action %d needs at least one exact support quote from the text (R18, G19)" % i)
+        for q in sup:
+            if hay and _norm_quote(str(q)) not in hay:
+                raise RuntimeError(label + ": action %d support quote is not in the text word for word: %r" % (i, str(q)[:90]))
 
 
 def insert_sections(part_lines: list, sections: list, notes: list) -> list:
@@ -1319,8 +1352,9 @@ def assemble_single(work: Path, intake: dict, derived_dir: Path, out: Path, vers
         n = p["number"]
         label = "part-%d.json" % n if total_parts > 1 else None
         d = load_derived(derived_dir, label) if label else (load_derived(derived_dir, "part-1.json") if (derived_dir / "part-1.json").exists() else load_derived(derived_dir, "derived.json"))
-        validate_derived(d, "part %d" % n)
-        part_lines = (work / "parts" / ("part-%d.md" % n)).read_text(encoding="utf-8").splitlines()
+        part_text = (work / "parts" / ("part-%d.md" % n)).read_text(encoding="utf-8")
+        validate_derived(d, "part %d" % n, part_text)
+        part_lines = part_text.splitlines()
         notes = []
         body = insert_sections(part_lines, d.get("sections") or [], notes)
         header, extra = resolve_header(meta, intake, d, title + (", Part %d of %d" % (n, total_parts) if total_parts > 1 else ""))
@@ -1338,7 +1372,7 @@ def assemble_single(work: Path, intake: dict, derived_dir: Path, out: Path, vers
             lines += [clean_inline(para), ""]
         lines += ["## Key Takeaways", ""]
         for t in d["takeaways"]:
-            lines.append("- " + clean_inline(t))
+            lines.append("- " + clean_inline(takeaway_point(t)))
         lines += ["", "## Content", ""]
         lines += body
         acts = d.get("actions_decisions") or []
@@ -1384,7 +1418,7 @@ def assemble_combined(works: list, intake: dict, derived_dir: Path, out: Path, v
     """Combine related files on the same topic, only when asked (G15, R24). Every section
     keeps its source, exact repeats appear once, disagreements keep both claims with dates."""
     d = load_derived(derived_dir, "combined.json")
-    validate_derived(d, "combined")
+    validate_derived(d, "combined", "\n".join((w / "source.md").read_text(encoding="utf-8") for w in works))
     metas = [read_json(w / "source.meta.json") for w in works]
     for m in metas:
         if m.get("status") != "ok":
@@ -1454,7 +1488,7 @@ def assemble_combined(works: list, intake: dict, derived_dir: Path, out: Path, v
         lines += [clean_inline(para), ""]
     lines += ["## Key Takeaways", ""]
     for t in d["takeaways"]:
-        lines.append("- " + clean_inline(t))
+        lines.append("- " + clean_inline(takeaway_point(t)))
     lines += [""] + body
     lines += ["## Source Notes", ""]
     for i, m in enumerate(metas):
@@ -1769,7 +1803,8 @@ def cmd_validate(args):
         if not isinstance(s, list) or not (1 <= len(s) <= 2) or not all(isinstance(x, str) and x.strip() for x in s):
             raise RuntimeError("nav.json needs a summary of one or two paragraphs")
     else:
-        validate_derived(d, Path(args.derived).name)
+        part_text = "\n".join(Path(pp).read_text(encoding="utf-8") for pp in (args.part or []))
+        validate_derived(d, Path(args.derived).name, part_text)
         if args.combined:
             for s in d.get("sections") or []:
                 if s.get("source") not in [chr(ord("A") + i) for i in range(26)] or not isinstance(s.get("end_line"), int):
@@ -1823,6 +1858,7 @@ def main(argv=None):
     r.add_argument("--out", required=True)
     v = sub.add_parser("validate")
     v.add_argument("--derived", required=True)
+    v.add_argument("--part", action="append", default=[], help="the part text the quotes must appear in, repeat for several sources")
     v.add_argument("--nav", action="store_true")
     v.add_argument("--combined", action="store_true")
     args = ap.parse_args(argv)
