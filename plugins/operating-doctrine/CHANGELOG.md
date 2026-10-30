@@ -12,6 +12,15 @@ the model does the judgment work (Decision Log 2026-10-27, The optimizer spec is
 4, and The optimizer's six open behaviors are decided). Assigned by HQ in Handoffs. Waits for
 certification by Claude in HQ and Allison.
 
+Amended during its test rounds (same release): Step 4 gained fidelity rules learned from the judges,
+support quotes the engine verifies word for word, a self-check and a fresh eyes read, one point one
+grouping, and a navigation summary drawn from the parts. The engine's validate step now also refuses
+any name, number or term in the summary, takeaways, headings or actions that the source (or the intake)
+does not carry spelled the same way, and a navigation summary that names the file or strays from the
+parts' summaries and the source's headings. Captions without labels group into paragraphs that end at
+sentence ends, PDF heading levels are normalized, and unmapped glyphs are restored from a second read
+or marked unreadable.
+
 ## 2.67.0 - 2026-10-26
 
 Build Standard v1.0, a new HQ skill. Any builder on any surface follows one standard whenever it

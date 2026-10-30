@@ -1221,7 +1221,162 @@ def takeaway_point(x) -> str:
     return x["point"] if isinstance(x, dict) else str(x)
 
 
-def validate_derived(d: dict, label: str, part_text: str = ""):
+NAME_STOP = set("""a an the and or of to in on at for from by with without under over after before between into through
+during about against among per via as is are was were be been being has have had do does did not no nor so yet but if
+then than that this these those it its he she they we you i his her their our your my me him them us one two three four
+five six seven eight nine ten first second third fourth fifth last next later earlier early late also only even still just
+both each every all any some several many most few more less much other another same such which what who whom whose when
+where why how here there now today part parts tab tabs section sections page pages chapter chapters summary content key
+takeaways source sources notes note actions decisions line lines paragraph paragraphs speaker speakers question questions
+answer answers step steps record records entry entries item items table tables list lists figure figures opening closing
+greetings introduction background overview discussion conclusion context wrap setup update updates""".split())
+_BOUND = ".,;:!?()[]{}\"'«»…*`_"
+_SENTENCE_END = ".!?:"
+
+
+def _nraw(t: str) -> str:
+    t = unicodedata.normalize("NFKC", t).replace("’", "'").replace("‘", "'").replace("“", '"').replace("”", '"')
+    return re.sub(r"[‐-―−]", "-", t)
+
+
+def _ntok(t: str) -> str:
+    return _nraw(t).strip(_BOUND)
+
+
+def names_hay(text: str) -> str:
+    """The words of a text one space apart, lower case, boundary punctuation and lone punctuation marks removed,
+    for the names check. The pieces of a slash joined token and the owner in a possessive are listed as well,
+    apart from each other, so a term inside a/b/c or before an 's counts as present while a slash dropped from
+    a name does not."""
+    toks = [_ntok(t).lower() for t in str(text).split()]
+    words = [t for t in toks if t and re.search(r"[0-9A-Za-zÀ-ɏ]", t)]
+    pieces = []
+    for t in words:
+        if "/" in t:
+            pieces += [x.strip(_BOUND) for x in t.split("/") if x.strip(_BOUND)]
+        if t.endswith("'s") and len(t) > 2:
+            pieces.append(t[:-2])
+    return " " + " ".join(words) + " | " + " | ".join(pieces) + " "
+
+
+def _digits_only(tok: str) -> bool:
+    return re.fullmatch(r"[\d.,%$€£]+", tok) is not None and any(ch.isdigit() for ch in tok)
+
+
+def _exempt(tok: str) -> bool:
+    low = tok.lower()
+    if low in NAME_STOP:
+        return True
+    if re.fullmatch(r"\d{1,3}(st|nd|rd|th)", low):
+        return True
+    return _digits_only(tok) and sum(ch.isdigit() for ch in tok) <= 3
+
+
+def _marked(tok: str) -> bool:
+    return bool(tok) and (tok[0].isupper() or any(ch.isdigit() for ch in tok))
+
+
+def unsourced_names(text: str, hay: str) -> list:
+    """Runs of names, numbers and terms (capitalized words and tokens carrying digits) in model written text
+    that the hay does not carry word for word (G17, G19). A run ends at punctuation or after a possessive, a bare
+    number stands alone, and a lone capitalized word that opens a sentence or heading passes as ordinary English
+    unless it looks like a name or a term."""
+    runs, cur = [], []
+    at_start = True
+
+    def close():
+        nonlocal cur
+        if cur:
+            runs.append(cur)
+        cur = []
+
+    for raw in str(text).split():
+        nraw = _nraw(raw)
+        if nraw[:1] in "([{\"'":
+            close()
+        tok = nraw.strip(_BOUND)
+        if not tok or not re.search(r"[0-9A-Za-zÀ-ɏ]", tok):
+            close()
+            at_start = True
+            continue
+        if _digits_only(tok):
+            close()
+            if not _exempt(tok):
+                runs.append([(tok, False)])
+        elif _marked(tok) and not _exempt(tok):
+            cur.append((tok, at_start and tok[0].isupper()))
+            if tok.lower().endswith("'s"):
+                close()
+        else:
+            close()
+        if nraw[-1:] in _BOUND:
+            close()
+        at_start = nraw[-1:] in _SENTENCE_END
+    close()
+    bad = []
+    for run in runs:
+        words = [t for t, _ in run]
+        phrase = " ".join(w.lower() for w in words)
+        cands = {phrase, re.sub(r"'s\b", "", phrase)}
+        if any((" " + c.strip() + " ") in hay for c in cands if c.strip()):
+            continue
+        if len(run) == 1 and run[0][1] and not _looks_like_term(words[0]):
+            continue
+        bad.append(" ".join(words))
+    return bad
+
+
+def _looks_like_term(tok: str) -> bool:
+    """A lone capitalized word opening a sentence is ordinary English unless it carries a digit, a slash or a
+    hyphen, is written in capitals, or has a capital inside it, the marks of a name or a term."""
+    core = re.sub(r"'s$", "", tok)
+    if any(ch.isdigit() for ch in core) or "/" in core or "-" in core:
+        return True
+    letters = [ch for ch in core if ch.isalpha()]
+    if len(letters) >= 2 and all(ch.isupper() for ch in letters):
+        return True
+    return any(ch.isupper() for ch in core[1:])
+
+
+def intake_words(intake: dict) -> str:
+    """The intake values the summary and takeaways may carry, the title, date, duration, people and source dates (R07)."""
+    vals = [intake.get("title") or "", intake.get("date") or "", intake.get("duration") or ""] + list(intake.get("people") or [])
+    sd = intake.get("source_dates") or {}
+    vals += [str(v) for v in (sd.values() if isinstance(sd, dict) else sd)]
+    return "\n".join(str(v) for v in vals if v)
+
+
+def validate_nav(nav: dict, derived_dir: Path, meta: dict, intake: dict):
+    """The navigation summary covers the whole in the words of the parts' summaries and the source's headings,
+    and never names the file, its format or its parts, which the header and the Parts list carry (G16, G19)."""
+    s = nav.get("summary")
+    if not isinstance(s, list) or not (1 <= len(s) <= 2) or not all(isinstance(x, str) and x.strip() for x in s):
+        raise RuntimeError("nav.json needs a summary of one or two paragraphs for the whole file (G16)")
+    joined = "\n".join(s)
+    if "[" in joined or "]" in joined or ".md" in joined:
+        raise RuntimeError("nav.json: the navigation summary names the file or its identity prefix. Describe the material instead, the header and the Parts list carry the file (G16, G19)")
+    pool = []
+    parts = sorted(derived_dir.glob("part-*.json"))
+    for pp in parts or [derived_dir / "derived.json"]:
+        if not pp.exists():
+            continue
+        d = read_json(pp)
+        pool += list(d.get("summary") or [])
+        pool += [takeaway_point(x) for x in (d.get("takeaways") or [])]
+        pool += [str(x.get("heading", "")) for x in (d.get("sections") or [])]
+    for p in (meta or {}).get("parts") or []:
+        pool += [str(h) for h in (p.get("headings") or [])]
+    hay = names_hay("\n".join(pool) + "\n" + intake_words(intake or {}))
+    problems = []
+    for i, para in enumerate(s, 1):
+        bad = unsourced_names(para, hay)
+        if bad:
+            problems.append("paragraph %d: %s" % (i, ", ".join(repr(b) for b in bad[:8])))
+    if problems:
+        raise RuntimeError("nav.json: the navigation summary uses words the parts' summaries and the source's headings do not. Draw it from them: " + "; ".join(problems) + " (G16, G19)")
+
+
+def validate_derived(d: dict, label: str, part_text: str = "", extra_text: str = ""):
     """The shape of a derived file, and the words behind every point (R16, G17, G19). Every takeaway
     and every action carries at least one support quote, the speaker's or the author's exact words,
     and when the part text is given each quote must appear in it word for word."""
@@ -1252,6 +1407,20 @@ def validate_derived(d: dict, label: str, part_text: str = ""):
         for q in sup:
             if hay and _norm_quote(str(q)) not in hay:
                 raise RuntimeError(label + ": action %d support quote is not in the text word for word: %r" % (i, str(q)[:90]))
+    if part_text:
+        # Every name, number and term the model wrote must be in the text, or the intake, spelled the same way (G17, G19).
+        names = names_hay(part_text + "\n" + (extra_text or ""))
+        fields = [("summary paragraph %d" % i, x) for i, x in enumerate(summary, 1)]
+        fields += [("takeaway %d" % i, takeaway_point(x)) for i, x in enumerate(tk, 1)]
+        fields += [("heading at line %s" % x.get("start_line"), x.get("heading", "")) for x in (d.get("sections") or [])]
+        fields += [("action %d" % i, a.get("item", "")) for i, a in enumerate(d.get("actions_decisions") or [], 1)]
+        problems = []
+        for where, text in fields:
+            bad = unsourced_names(text, names)
+            if bad:
+                problems.append("%s: %s" % (where, ", ".join(repr(b) for b in bad[:6])))
+        if problems:
+            raise RuntimeError(label + ": words the source does not carry, spell them as the text does or drop them. " + "; ".join(problems[:12]) + " (G17, G19)")
 
 
 def insert_sections(part_lines: list, sections: list, notes: list) -> list:
@@ -1353,7 +1522,7 @@ def assemble_single(work: Path, intake: dict, derived_dir: Path, out: Path, vers
         label = "part-%d.json" % n if total_parts > 1 else None
         d = load_derived(derived_dir, label) if label else (load_derived(derived_dir, "part-1.json") if (derived_dir / "part-1.json").exists() else load_derived(derived_dir, "derived.json"))
         part_text = (work / "parts" / ("part-%d.md" % n)).read_text(encoding="utf-8")
-        validate_derived(d, "part %d" % n, part_text)
+        validate_derived(d, "part %d" % n, part_text, intake_words(intake))
         part_lines = part_text.splitlines()
         notes = []
         body = insert_sections(part_lines, d.get("sections") or [], notes)
@@ -1395,8 +1564,7 @@ def assemble_single(work: Path, intake: dict, derived_dir: Path, out: Path, vers
         nav_sections.append((n, name, est_tokens(text), _headings_in(body, 0, len(body))))
     if total_parts > 1:
         nav = load_derived(derived_dir, "nav.json")
-        if not isinstance(nav.get("summary"), list) or not (1 <= len(nav["summary"]) <= 2):
-            raise RuntimeError("nav.json needs a summary of one or two paragraphs for the whole file")
+        validate_nav(nav, derived_dir, meta, intake)
         header, extra = resolve_header(meta, intake, nav, title + ", Navigation")
         extra["parts_note"] = "navigation page for %d parts" % total_parts
         lines = build_header(header) + ["", "# " + header["title"], "", "## Summary", ""]
@@ -1418,7 +1586,7 @@ def assemble_combined(works: list, intake: dict, derived_dir: Path, out: Path, v
     """Combine related files on the same topic, only when asked (G15, R24). Every section
     keeps its source, exact repeats appear once, disagreements keep both claims with dates."""
     d = load_derived(derived_dir, "combined.json")
-    validate_derived(d, "combined", "\n".join((w / "source.md").read_text(encoding="utf-8") for w in works))
+    validate_derived(d, "combined", "\n".join((w / "source.md").read_text(encoding="utf-8") for w in works), intake_words(intake))
     metas = [read_json(w / "source.meta.json") for w in works]
     for m in metas:
         if m.get("status") != "ok":
@@ -1796,15 +1964,20 @@ def cmd_finish(args):
 
 
 def cmd_validate(args):
-    """Check the shape of a derived JSON file before assembly (R16, R17)."""
-    d = read_json(Path(args.derived))
+    """Check the shape, the quotes and the words of a derived JSON file before assembly (R16, R17, G17, G19).
+    The run folder's intake.json supplies the title, date and people the summary may carry (R07)."""
+    derived_path = Path(args.derived)
+    d = read_json(derived_path)
+    run_dir = derived_path.parent.parent
+    intake_path = Path(args.intake) if args.intake else run_dir / "intake.json"
+    intake = read_json(intake_path) if intake_path.exists() else {}
     if args.nav:
-        s = d.get("summary")
-        if not isinstance(s, list) or not (1 <= len(s) <= 2) or not all(isinstance(x, str) and x.strip() for x in s):
-            raise RuntimeError("nav.json needs a summary of one or two paragraphs")
+        meta_path = run_dir / "work" / "source.meta.json"
+        meta = read_json(meta_path) if meta_path.exists() else {}
+        validate_nav(d, derived_path.parent, meta, intake)
     else:
         part_text = "\n".join(Path(pp).read_text(encoding="utf-8") for pp in (args.part or []))
-        validate_derived(d, Path(args.derived).name, part_text)
+        validate_derived(d, derived_path.name, part_text, intake_words(intake))
         if args.combined:
             for s in d.get("sections") or []:
                 if s.get("source") not in [chr(ord("A") + i) for i in range(26)] or not isinstance(s.get("end_line"), int):
@@ -1861,6 +2034,7 @@ def main(argv=None):
     v.add_argument("--part", action="append", default=[], help="the part text the quotes must appear in, repeat for several sources")
     v.add_argument("--nav", action="store_true")
     v.add_argument("--combined", action="store_true")
+    v.add_argument("--intake", default="", help="the intake file, found in the run folder when not given")
     args = ap.parse_args(argv)
     try:
         return {"extract": cmd_extract, "assemble": cmd_assemble, "save": cmd_save, "finish": cmd_finish, "report": cmd_report, "validate": cmd_validate}[args.cmd](args)

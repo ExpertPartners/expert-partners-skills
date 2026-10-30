@@ -38,7 +38,7 @@ First Speaker: [00:00:17.460] Good morning, everyone. [00:00:21.030] Let's start
 
 ## Long material (R12, G16)
 
-Past about 50,000 tokens (estimated as characters divided by four, no tokenizer, no exact rule) the material is split at section breaks into numbered parts. Each part is a complete file in the shape above, titled Title, Part n of N, with its own summary and takeaways. A navigation page, titled Title, Navigation, carries the header, a summary of the whole, and a Parts list naming each part file, its size and what it contains. When a stretch has no section breaks the split lands on a paragraph break and the navigation page says so.
+Past about 50,000 tokens (estimated as characters divided by four, no tokenizer, no exact rule) the material is split at section breaks into numbered parts. Each part is a complete file in the shape above, titled Title, Part n of N, with its own summary and takeaways. A navigation page, titled Title, Navigation, carries the header, a summary of the whole, and a Parts list naming each part file, its size and what it contains. The summary describes the material, drawn from the parts' summaries and the source's headings, never the file, its format or how it was split. When a stretch has no section breaks the split lands on a paragraph break and the navigation page says so.
 
 ## Combined files (G15, R24)
 
