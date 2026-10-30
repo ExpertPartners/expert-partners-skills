@@ -1,3 +1,15 @@
+## 2.69.0 - 2026-10-30
+
+Build Standard v1.1. Four fixes. A tool's record starts in EP Notion HQ's AI Employee Vault the day
+Allison approves its spec, and a missing record is reported while the chain check and release stay
+blocked. Where a tool's most recent version is silent, the gap is filled from older versions.
+Rule 7 lists Claude chat, Claude Code, Codex and ChatGPT, with Cowork now part of Claude. Every
+build carries four cost and quality rules, with a $300 wait-for-yes line. AI-written parts get a
+stated tolerance, judges run on the lowest model that can do the job, a cost estimate is posted
+before any test run and over $300 waits for Allison's yes, and a failed test round stops the build
+until it is reported (Decision Log 2026-10-30, Every build carries four cost and quality rules,
+with a $300 wait-for-yes line). Assigned by HQ in Handoffs rows 1364 and 1424.
+
 ## 2.67.0 - 2026-10-26
 
 Build Standard v1.0, a new HQ skill. Any builder on any surface follows one standard whenever it
