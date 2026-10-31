@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "a96c47d2ce1ad297b0040eec8632f849c8968918",
+    "eps": "3dae01e5854ee4400cfa25a213ac121b59ff1ed0",
     "aura": "bc607af874585bfe4a0810eb1701eb299483f497"
   },
   "zones": [
@@ -58,7 +58,7 @@
       "renderNote": null,
       "layout": {
         "x": 1009,
-        "y": 5113,
+        "y": 5026,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -86,7 +86,7 @@
       "renderNote": null,
       "layout": {
         "x": 994,
-        "y": 4058,
+        "y": 3884,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -343,7 +343,7 @@
       "renderNote": null,
       "layout": {
         "x": 1282,
-        "y": 4923.8,
+        "y": 4836.8,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -371,7 +371,7 @@
       "renderNote": null,
       "layout": {
         "x": 1009,
-        "y": 4145,
+        "y": 3971,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -397,7 +397,7 @@
       "renderNote": null,
       "layout": {
         "x": 1009,
-        "y": 5663,
+        "y": 5604,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -481,7 +481,7 @@
       "renderNote": null,
       "layout": {
         "x": 1006,
-        "y": 4361,
+        "y": 4159,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -508,7 +508,7 @@
       "renderNote": null,
       "layout": {
         "x": 997,
-        "y": 5475,
+        "y": 5388,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -801,7 +801,7 @@
       "renderNote": null,
       "layout": {
         "x": 1006,
-        "y": 4911,
+        "y": 4824,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1095,6 +1095,35 @@
       }
     },
     {
+      "id": "file-to-knowledge-base-optimizer",
+      "source": "eps:plugins/operating-doctrine/skills/file-to-knowledge-base-optimizer/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "turns any source file into clean, structured knowledge base Markdown",
+      "renderNote": null,
+      "layout": {
+        "x": 971.5,
+        "y": 5489,
+        "width": 281,
+        "height": 91,
+        "rectHeight": 76,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "turns any source file into",
+          "clean, structured knowledge base",
+          "Markdown"
+        ]
+      }
+    },
+    {
       "id": "funnel-build",
       "source": "eps:plugins/funnel-operations/skills/funnel-build/SKILL.md",
       "repo": "eps",
@@ -1113,7 +1142,7 @@
       "renderNote": null,
       "layout": {
         "x": 1050,
-        "y": 5012,
+        "y": 4925,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1141,7 +1170,7 @@
       "renderNote": null,
       "layout": {
         "x": 1282,
-        "y": 4822.8,
+        "y": 4735.8,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -1171,7 +1200,7 @@
       "renderNote": null,
       "layout": {
         "x": 1062,
-        "y": 4810,
+        "y": 4723,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -1197,7 +1226,7 @@
       "renderNote": null,
       "layout": {
         "x": 993.5,
-        "y": 5576,
+        "y": 5127,
         "width": 237,
         "height": 63,
         "rectHeight": 48,
@@ -1222,7 +1251,7 @@
       "renderNote": null,
       "layout": {
         "x": 997,
-        "y": 5214,
+        "y": 5301,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -1694,7 +1723,7 @@
       "renderNote": null,
       "layout": {
         "x": 994,
-        "y": 5388,
+        "y": 4636,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -1775,7 +1804,7 @@
       "renderNote": null,
       "layout": {
         "x": 986,
-        "y": 4723,
+        "y": 4549,
         "width": 252,
         "height": 63,
         "rectHeight": 48,
@@ -2711,7 +2740,7 @@
       "renderNote": null,
       "layout": {
         "x": 962,
-        "y": 4636,
+        "y": 5214,
         "width": 300,
         "height": 63,
         "rectHeight": 48,
@@ -2738,7 +2767,7 @@
       "renderNote": null,
       "layout": {
         "x": 962,
-        "y": 5301,
+        "y": 4361,
         "width": 300,
         "height": 63,
         "rectHeight": 48,
@@ -2765,7 +2794,7 @@
       "renderNote": null,
       "layout": {
         "x": 962,
-        "y": 4549,
+        "y": 4072,
         "width": 300,
         "height": 63,
         "rectHeight": 48,
@@ -3232,11 +3261,11 @@
       "points": [
         {
           "x": 1506,
-          "y": 4949.5
+          "y": 4862.5
         },
         {
           "x": 1583,
-          "y": 4949.5
+          "y": 4862.5
         },
         {
           "x": 1583,
@@ -3263,11 +3292,11 @@
       "points": [
         {
           "x": 1506,
-          "y": 4975.2
+          "y": 4888.2
         },
         {
           "x": 1573,
-          "y": 4975.2
+          "y": 4888.2
         },
         {
           "x": 1573,
@@ -3478,25 +3507,31 @@
       "points": null
     },
     {
+      "from": "file-to-knowledge-base-optimizer",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
       "from": "funnel-build",
       "to": "funnel-documentation",
       "type": "calls",
       "points": [
         {
           "x": 1262,
-          "y": 5050.5
+          "y": 4963.5
         },
         {
           "x": 1272,
-          "y": 5050.5
+          "y": 4963.5
         },
         {
           "x": 1272,
-          "y": 4874.2
+          "y": 4787.2
         },
         {
           "x": 1282,
-          "y": 4874.2
+          "y": 4787.2
         }
       ]
     },
@@ -3519,11 +3554,11 @@
       "points": [
         {
           "x": 1262,
-          "y": 4848.5
+          "y": 4761.5
         },
         {
           "x": 1282,
-          "y": 4848.5
+          "y": 4761.5
         }
       ]
     },
@@ -4174,9 +4209,9 @@
         "label": "The hands",
         "caption": "funnel work and account operations",
         "x": 940,
-        "y": 4010,
+        "y": 3836,
         "width": 588,
-        "height": 1752,
+        "height": 1867,
         "rooms": []
       },
       {
