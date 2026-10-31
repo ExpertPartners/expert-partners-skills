@@ -1,3 +1,28 @@
+## 2.70.0 - 2026-10-31
+
+File to Knowledge Base Optimizer v1.0, a new skill built under the build standard from the approved
+spec, [HQ][V1.0] Spec - File to Knowledge Base Optimizer, revision 4. It turns a transcript, a PDF, a
+Word or Google Doc, a web page, a captions file or a recording into clean, structured Markdown for
+Claude Project or Custom GPT knowledge in six steps, take in the source, one or two intake questions,
+extract and clean without changing meaning, add a header, summary, takeaways and navigable sections,
+split past about 50,000 tokens into numbered parts with a navigation page, then save by the company
+file rules into the brain's Claude outputs folder and report. Nothing lost, nothing invented. Every
+instruction carries its spec line. The engine, scripts/optimize.py, does the deterministic work and
+the model does the judgment work (Decision Log 2026-10-27, The optimizer spec is approved at revision
+4, and The optimizer's six open behaviors are decided). Assigned by HQ in Handoffs. Waits for
+certification by Claude in HQ and Allison.
+
+Amended during its test rounds (same release): Step 4 gained fidelity rules learned from the judges,
+support quotes the engine verifies word for word, a self-check and a fresh eyes read, one point one
+grouping, and a navigation summary drawn from the parts. The engine's validate step now also refuses
+any name, number or term in the summary, takeaways, headings or actions that the source (or the intake)
+does not carry spelled the same way, and a navigation summary that names the file or strays from the
+parts' summaries and the source's headings. Captions without labels group into paragraphs that end at
+sentence ends, PDF heading levels are normalized, and unmapped glyphs are restored from a second read
+or marked unreadable. The navigation page's summary is built by the engine from the parts' summaries
+in one or two paragraphs, and Step 4 names people, keeps unlabeled passages apart, keeps qualifiers
+with their claims, places headings at topic changes and writes the shorter end of the spec's ranges.
+
 ## 2.69.0 - 2026-10-30
 
 Build Standard v1.1. Four fixes. A tool's record starts in EP Notion HQ's AI Employee Vault the day
