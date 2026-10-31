@@ -297,7 +297,7 @@ Follow the current HQ Rulebook section Handoffs between AIs for passing work and
 
 ## The Job Report And Archive Readiness
 
-Use job_create or job_claim for the receiving AI's work, job_status for ownership and status, and job_finish for the summary and result link. Verify the saved result before claiming completion. If the job list cannot be reached, report the blocker and keep the reporting obligation open. Follow the current HQ Rulebook section Session lifecycle for archive consent and session-steward for unfinished work.
+Use job_create or job_claim for the receiving AI's work and job_status for ownership and status. Use job_finish with the summary and result link only when the assignment is genuinely completed. An unfinished wrap preserves progress and its nonterminal state in the same job through an authorized operation from the live tool schema, never job_finish. If that operation or the job list is unavailable, report the blocker and keep the reporting obligation open. Verify the saved result before claiming completion. Follow the current HQ Rulebook section Session lifecycle for archive consent and session-steward for unfinished work.
 
 ---
 

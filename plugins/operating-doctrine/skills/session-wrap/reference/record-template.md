@@ -1,7 +1,7 @@
 # Session record template
 
 Report title: `Session Record [PROJECT] [YYYY-MM-DD]`
-File the report as this job's job_finish summary with a result link, then verify it through job_status. Link substantive deliverables in their owning homes, not a duplicate work log. Any reply to another AI follows the current HQ Rulebook section Handoffs between AIs. Written for a reader with zero memory of the chat. Built from artifacts, the board, and repo state, never from chat scrollback.
+For a genuinely completed assignment, file the report as this job's job_finish summary with a result link, then verify it through job_status. For unfinished work, preserve the progress report and open state in the same job through a schema-supported nonterminal write; never call job_finish just because a session is wrapping. Link substantive deliverables in their owning homes, not a duplicate work log. Any reply to another AI follows the current HQ Rulebook section Handoffs between AIs. Written for a reader with zero memory of the chat. Built from artifacts, the board, and repo state, never from chat scrollback.
 
 ## Required sections, in order
 

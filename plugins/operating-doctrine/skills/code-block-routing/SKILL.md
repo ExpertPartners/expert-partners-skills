@@ -47,7 +47,7 @@ The three outcomes, and there is no fourth:
 
 1. A standing owner exists and is active. Route the work to that lane as an existing session. Do not open a second lane on the same class.
 2. A standing owner exists but is complete or archived. Say so on the routing line, name the prior job, and dispatch fresh. The prior lane's record is the new lane's inherited state.
-3. No owner exists. Dispatch fresh. The receiving AI uses job_create or job_claim before work, which makes the next dispatcher's ownership check work. Do not create a duplicate job.
+3. No owner exists. Before giving Allison the copy box, the dispatcher creates or reuses one Chat to Code job through the authorized job tools and verifies the pending assignment with job_status. Record its intended receiver, exact scope, worktree/branch and return destination without claiming the receiver has started. Include that existing job identity in the copy box; the receiver uses job_claim before work, not a duplicate job_create. For a direct assignment with no prior dispatch or job, the receiving AI uses job_create. If the pending assignment cannot be saved or its ownership is uncertain, stop the dispatch and report that blocker.
 
 Two hard riders. Every dispatched build cuts its worktree from a freshly fetched remote ref, never from whatever the local clone happens to hold, because a stale base hides an existing implementation until pre-flight. And every build runs a pre-flight that checks the live artifact and origin/main for the thing it is about to build; finding it already there is a successful pre-flight, and the correct move is to drop the duplicate unmerged and report, exactly as the second lane did.
 
@@ -67,7 +67,7 @@ Mechanics:
 2. **A dispatch block that spawns a Code session and arrives WITHOUT a `WORKTREE` line is malformed and bounces home, same as a block missing its routing line.** The receiving session does not execute it; it replies naming what is missing so the dispatcher reships the block whole.
 3. A session NEVER writes in a repo's main working tree when another lane may hold uncommitted state in it. Check before writing: `git worktree list`, then `git status` in the main tree. Uncommitted changes belonging to someone else mean isolate, always.
 4. Serializing is a legitimate answer when the work genuinely cannot split, and it is stated, never assumed: the dispatch replaces the `WORKTREE` line with an explicit serialization statement naming the order, and the second lane's existing job records that it waits on the first. Silence is never serialization.
-5. The receiving AI records the worktree in the existing Chat to Code job, so the next dispatcher can see which trees are occupied.
+5. The dispatcher records and verifies the assigned worktree/branch in that same job before dispatch, so the next dispatcher can see occupied scopes even while the copy box is unpasted. The receiver verifies the actual worktree on claim. No second reservation record.
 6. This rule binds the dispatcher AND the dispatched session. The dispatcher ships the line; the session enforces it by bouncing a spawning block that lacks one, and confirms its tree's absolute path before touching anything else.
 7. Continuation blocks routed to an EXISTING session inherit that session's established worktree and need not restate it. A pre-rule session with no isolated tree that receives new work isolates itself at that point and says so in its carry-back.
 

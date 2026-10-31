@@ -92,13 +92,13 @@ Ruled by Allison 2026-09-01, ruling of record aura intake/2026-09-01-ruling-tabl
 
 Follow the current HQ Rulebook section Session lifecycle for archive consent and session-wrap for the remaining closeout duties. A worker reports through job_finish, including its summary and result link, verified with job_status. Never archive speculatively or while the worker still owes work, has uncommitted or unpushed work of its own, or cannot verify its report. Other workers' changes are not its work.
 
-Use the existing native session evidence to list finished sessions awaiting Allison's archive instruction and ready, consented sessions whose native archive operation failed. A report saved only in chat does not clear readiness. Keep a blocked worker's reporting obligation with that worker; the steward reports the gap instead of inventing a completed report for it.
+Use the existing native session evidence to list finished sessions and native archive failures. Apply only the archive actions and consent permitted by the live HQ Rulebook section Session lifecycle, including its distinct scheduled-run rules; never infer permission from an old self-archive instruction. An unavailable or unauthorized archive action is listed for its authorized owner, not performed around that boundary. A report saved only in chat does not clear readiness. Keep a blocked worker's reporting obligation with that worker; the steward reports the gap instead of inventing a completed report for it.
 
 The job list must not advertise finished work as running. Reconcile only the job actually in hand and only from proven completion evidence. Never rewrite unrelated or historical work. Do not create a separate spreadsheet archive-status record or change Claude settings.
 
 ## 8. Cloud workers
 
-Cloud-dispatched code sessions may not appear in local Desktop lists. The receiving AI records its actual repository/worktree/branch, return destination and available stable session identifier in its existing Chat to Code job. A milestone or continuation retains that job identity rather than creating a duplicate. A missing worker identifier is reported as unknown, never invented.
+Cloud-dispatched code sessions may not appear in local Desktop lists. Before creation or dispatch, the dispatcher saves and verifies the pending assignment, intended repository/worktree/branch and return destination in the existing Chat to Code job, per code-block-routing. The receiving AI claims that same job and confirms its actual execution context and available stable session identifier. A milestone or continuation retains that job identity rather than creating a duplicate. A missing worker identifier is reported as unknown, never invented.
 
 ## 9. Job reporting
 

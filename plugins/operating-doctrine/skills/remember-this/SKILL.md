@@ -1,6 +1,6 @@
 ---
 name: remember-this
-description: "Turns a future obligation into a durable, self-resurfacing commitment so Allison stops carrying it mentally. Fires when she says remember this or clearly asks to preserve a follow-up, and fires on its own when an advisor notices an important non-blocking item that would cost real drift, rework, or lost leverage if forgotten but would hijack the current mission if pursued now. Resolves the owning room LIVE, writes ONE Job Tracker row with a mechanical RETURN WHEN condition in Waiting on, refuses duplicates, verifies the write before claiming it, and reports in one short line. Proactive capture is allowed; proactive activation is not. Distinct from saving a decision (decision 0101: a clear decision is saved as made in its owning repo), from pin (a lightweight current-position bookmark), from intake (evidence and working knowledge), and from operational state. It inherits the operating-doctrine and never overrides it."
+description: "Turns a future obligation into a durable commitment so Allison stops carrying it mentally. Fires on remember this or a clear request to preserve a follow-up, and when an advisor detects an important non-blocking item that would cause drift, rework or lost leverage if forgotten but would hijack the current mission now. Resolves the owning room live, reuses or creates one Chat to Code job with a mechanical RETURN WHEN condition, refuses duplicates, verifies it through job_status, and reports in one short line. Proactive capture is allowed; proactive activation is not. Distinct from saving a decision, pin, intake and arbitrary operational-state changes. Inherits operating-doctrine."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Born dressed 2026-09-04 (Immediate Pain Controls campaign, issue #15).
 # Canonical home is this file. It ships only through the expert-partners
@@ -21,7 +21,7 @@ Source of record: `expert-partners-skills` issue #15, whose RETURN WHEN fired 20
 
 ## What this is, in one line
 
-A future obligation gets ONE Job Tracker row for the room that owns the work, with a literal `RETURN WHEN:` line in Waiting on, verified to exist before anyone says it was saved.
+A future obligation stays in ONE Chat to Code job for the room that owns the work, with a literal `RETURN WHEN:` condition, verified through job_status before anyone says it was saved. Code obligations travel as GitHub issues labeled job. Follow the current HQ Rulebook section Handoffs between AIs for any message to its owner.
 
 ## What this is not
 
@@ -30,7 +30,7 @@ These four boundaries are load-bearing. Blurring any of them is the failure this
 - **Not a decision save.** A clear decision from Allison is saved as made in the Decision Log, with no phrase required and a readback in the same response cycle. Remembering an obligation is a different act. It never promotes a decision, never ratifies a recommendation, and never turns a candidate into canon. A captured item may say a decision is pending; it may never say a decision is made.
 - **Not pin.** Pin is a lightweight bookmark of the current position between surfaces. It is a place-keeper for right now, it expires with the moment, and it is never durable memory.
 - **Not intake.** Intake preserves evidence and working knowledge a cold future reader would need. Remember This preserves an ACTION still owed. Knowledge that has no action attached goes to intake, not here.
-- **Not operational state.** Job Tracker rows, board cards, and work-state records are deterministic machinery with their own contracts. A wait that already has a home in the Job Tracker's Waiting on column with a named condition and a stale date is already remembered, and duplicating it here is memory spam.
+- **Not arbitrary operational-state control.** Job and board state have their own contracts. A wait already held in its existing Chat to Code job with a named condition and a stale date is already remembered, and duplicating it here is memory spam.
 
 ## Trigger one, explicit
 
@@ -56,33 +56,31 @@ If the five gates do not all clear, say nothing. Silence is the correct output f
 
 ### 1. Resolve the room, live
 
-Never guess a room from topic similarity. Read the HQ Rulebook and the owning brain's `00 START HERE` live to name the room or lane that owns the durable JOB, not the one the conversation happened to be near. If it spans several, pick the one that would have to act first and name the others in Next step. If nothing can own it, say so and ask where it belongs. Never park it in a row that does not own the work just to have somewhere to put it.
+Never guess a room from topic similarity. Read the HQ Rulebook and the owning brain's `00 START HERE` live to name the room or lane that owns the durable JOB, not the one the conversation happened to be near. If it spans several, pick the one that would have to act first and name the other dependencies in that same job. If nothing can own it, say so and ask where it belongs. Never park it with an unrelated owner just to have somewhere to put it.
 
 ### 2. Refuse duplicates before writing
 
-Read the Job Tracker values and look for the same obligation. Match on the obligation, not on wording. If a row already carries it, do NOT add a second one. Leave it as it is, or, when this moment genuinely adds new evidence, add that evidence to its Next step and say so. One obligation, one row, for its whole life.
+Check job_status for the same obligation. Match on the obligation, not on wording. If a job already carries it, do NOT add a second one. Leave it as it is, or add genuinely new evidence only through a supported nonterminal operation from the live job-tool schema. One obligation, one job, for its whole life.
 
 ### 3. Write it durably
 
-Add ONE row to the Job Tracker through the Sheets connector. The come-back condition is written in Waiting on, as a literal `RETURN WHEN:` line, because the wake token is mechanical and a prose paraphrase does not fire:
+Reuse the existing job, or use job_create only when none exists. Inspect the live tool schema; the information below is required job content, not invented parameter names. Preserve its owner, first action and literal `RETURN WHEN:` condition in that same job, through an authorized nonterminal write. Code work is a GitHub issue labeled job. Never write a second Sheet row, and never call job_finish for an obligation that still waits:
 
 ```
-Job: <the obligation, stated as the thing still owed>
-Room or lane: <the owning room>
-Who is doing it: Nobody yet
-Status: Not started
-Waiting on: RETURN WHEN: <the mechanical condition that makes this ripe>
-Next step: <the first action once ripe, with the short why and the capturing session>
-Opened / Last updated: <today>
+Obligation: <the thing still owed>
+Owner: <the live-resolved room; do not invent a worker claim>
+RETURN WHEN: <the mechanical condition that makes this ripe>
+Next action: <the first action once ripe, with the short why and capturing session>
+Evidence: <the current source or result link>
 ```
 
 A condition is mechanical when a reader can tell whether it has happened without judgment: a named merge, a named job closing, a named date, a named dependency resolving. "When we have time" is not a condition.
 
-**Never write a secret.** No key, token, password, or credential-bearing material ever enters a row. Secrets live in 1Password only. If the obligation is about a credential, name the 1Password item reference and nothing else.
+**Never write a secret.** No key, token, password, or credential-bearing material ever enters a job. Secrets live in 1Password only. If the obligation is about a credential, name the 1Password item reference and nothing else.
 
 ### 4. Verify before claiming
 
-Re-read the sheet after writing and confirm the row and its `RETURN WHEN` text are actually present. Only a successful read-back earns the receipt. A write call that returned without error is not proof; the read is.
+Read the same job through job_status and confirm its owner, open state and literal `RETURN WHEN` text are actually present. Only a successful read-back earns the receipt. A write call that returned without error is not proof; the read is.
 
 ### 5. Report, tiny
 
@@ -98,14 +96,14 @@ Do not explain the routing. Do not open a side discussion. Do not ask whether sh
 
 If the durable write cannot be made or cannot be verified, **never say it was remembered.** Chat is not a memory store, and a false receipt is worse than no capture because she will stop carrying it herself.
 
-Say plainly, in the same turn: what the obligation is, verbatim, so it is at least on screen; that the durable write failed and the actual error; and the smallest recovery, which is normally the exact row ready to be added once access works. Never substitute a note in conversation and call it done. Never quietly downgrade to a board card the obligation does not belong in.
+Say plainly, in the same turn: what the obligation is, verbatim, so it is at least on screen; that the durable write failed and the actual error; and the smallest recovery, with the existing job identity and complete capture text ready for the authorized owner. If a required nonterminal write is unavailable, name that blocker rather than inventing a tool. Never substitute a note in conversation and call it done. Never quietly downgrade to a board card the obligation does not belong in.
 
 ## Waking
 
 A captured obligation resurfaces two ways, both already existing, neither a new watcher:
 
-1. **On room wake.** When work in the owning room wakes, the Job Tracker is checked for Not started rows whose `RETURN WHEN` condition has fired (operating-doctrine, bias-to-action).
-2. **On the named condition.** When the named merge, lane close, date, or dependency actually lands, the surface that sees it land marks Waiting on `FIRED <date>`, and the obligation becomes ordinary ripe work under Decide Now.
+1. **On room wake.** When work in the owning room wakes, check job_status for its existing open obligations whose `RETURN WHEN` condition has fired (operating-doctrine, bias-to-action).
+2. **On the named condition.** When the named merge, lane close, date, or dependency actually lands, record the firing evidence in that same job through a schema-supported nonterminal write. The authorized receiver uses job_claim before execution, and job_finish with a summary and result link only after completion. Capture alone never activates work.
 
 No daemon, no sweeper, no cron, no queue, no dashboard, no second registry. If a wake mechanism does not already exist for a room, that is a finding to report, never a reason to build one here.
 
@@ -115,7 +113,7 @@ No daemon, no sweeper, no cron, no queue, no dashboard, no second registry. If a
 - Never create a second durable entry for an obligation that already has one.
 - Never route to a room that does not own the work to have a destination.
 - Never promote a captured item into canon. A decision is saved only when Allison clearly decides it, under decision 0101, never because this skill captured something.
-- Never write a secret into a row.
+- Never write a secret into a job.
 - Never claim a capture that was not read back.
 - Never turn a capture into a side quest, a lane, or a re-scope of the open mission.
 - Never use em dashes in anything this skill writes.

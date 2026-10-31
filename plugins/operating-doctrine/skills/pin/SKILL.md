@@ -22,7 +22,7 @@ Pins persist to `~/.claude/baton.md`. Every surface reads the same baton file, s
 
 ## 1. Carry-back template
 
-Follow the current HQ Rulebook section Handoffs between AIs. File the outcome through job_finish with a summary and result link and verify it through job_status. The copy box carries the complete reply, with its sender, receiver, model and effort or speed, rather than pointing to another message record. A pin is not a job report.
+Follow the current HQ Rulebook section Handoffs between AIs. For a completed assignment, file the outcome through job_finish with a summary and result link and verify it through job_status. An unfinished carry-back preserves progress and the job's nonterminal state through a supported job operation; it never finishes the job merely to send a reply. The copy box carries the complete reply, with its sender, receiver, model and effort or speed, rather than pointing to another message record. A pin is not a job report.
 
 Every report or block bound back to a Claude project ends exactly like this:
 

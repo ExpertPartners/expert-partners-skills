@@ -56,7 +56,7 @@ A rule that lives in a doc AND in a skill travels both routes in the same pass.
 
 - One tiny step at a time, per Allison's delivery protocol. Claude holds the sequence; Allison only ever sees the current step.
 - Claude keeps a live checklist of the surfaces for every doc or skill in flight and states plainly which are done and which are open. No canon or rule change is reported as finished while any active surface is stale.
-- If a session ends mid-sync, the open surfaces go in the session record and in the Job Tracker row's Waiting on column, with a named condition and a stale date.
+- If a session ends mid-sync, preserve the open surfaces, owner, named condition and stale date in the existing Chat to Code job, verified with job_status. Keep the job nonterminal; job_finish is for completed work, not a paused session. Route any return under the current HQ Rulebook section Handoffs between AIs.
 
 ## Canonical home and deployed copies
 

@@ -16,7 +16,7 @@ subtitle: "the one canonical session close-out"
 
 <!-- RULED-BY: aura/decisions/0107-retire-routing-naming-ceremony.md date:2026-10-12 superseded naming text removed -->
 
-Current handoff and reporting authority: follow the HQ Rulebook section Handoffs between AIs. The receiving AI uses job_create or job_claim, job_status shows ownership, and this wrap files its report as a job_finish summary with a result link. Code jobs travel as GitHub issues labeled job. Section 5A's protected lines are reserved for PR #104 and require the listed post-merge follow-up; do not use them to create a second work record.
+Current handoff and reporting authority: follow the HQ Rulebook section Handoffs between AIs. The receiving AI uses job_create or job_claim and job_status shows ownership. A genuinely completed assignment files its job_finish summary with a result link; an unfinished assignment stays nonterminal in the same job. Code jobs travel as GitHub issues labeled job. Section 5A's protected lines are reserved for PR #104 and require the listed post-merge follow-up; do not use them to create a second work record. This release must not merge or ship before that protected conflict is reconciled.
 
 ## Historical amendments, not current handoff instructions
 
@@ -75,7 +75,7 @@ Ruled by Allison 2026-09-01. A finite mission can complete, but unless the syste
 
 ## 1. Session record (artifact) -- medium freedom on content, zero freedom on rules
 
-Prepare the full session report for this job_finish summary, with its result link and existing job identity. Structure and required sections live in `reference/record-template.md`. Do not create a second work log. Non-negotiable rules baked into that template:
+Prepare the full session report with its result link and existing job identity. A completed assignment uses job_finish; an unfinished one preserves a progress report and its open state through the job tool's supported nonterminal path. Structure and required sections live in `reference/record-template.md`. Do not create a second work log. Non-negotiable rules baked into that template:
 
 - Written for a reader with zero memory of this chat.
 - Decisions in ADR shape: the decision, the context, the alternatives rejected, the consequences. Each decision tagged canon-candidate yes or no.
@@ -93,8 +93,8 @@ No copy-paste on Allison's end. Tool mechanics, signatures, and the exact GraphQ
 
 1. Save substantive deliverables in their owning home, and add one Decision Log entry per clear decision under the existing decision-save workflow. Verify each saved artifact and entry; link them in the job report rather than copying their contents into a second work record.
 2. Save the continuity note the same way. Verify the link.
-3. File the session report through job_finish with a summary and result link. Verify the result with job_status. Preserve unfinished work and its owner, named condition and stale date in the existing job. A failed or uncertain write leaves the reporting obligation open; inspect job_status before retrying. A surface without the required job tools reports that blocker and routes the complete return under the HQ Rulebook section Handoffs between AIs, without claiming the report is saved.
-Publication and retrieval check: a returned link or chat assertion alone does not prove filing. Independently open saved deliverables, the continuity note and any Decision Log entry from their owning homes, and verify the job_finish summary through job_status. Verify the continuation path can fetch the required note without relying on this conversation. Give Allison the exact Drive links and a short summary. Routine copies of either record never go to `~/Desktop` or `~/Downloads`. Do not make Allison upload or carry the only copy.
+3. Completed assignment only: File the session report through job_finish with a summary and result link. Verify the result with job_status. For an unfinished assignment, including section 0A branch two, do not call job_finish. Keep the same job open with its owner, progress, named condition and stale date, using only a supported nonterminal write from the live tool schema. If no such operation is available, report that blocker and retain the open reporting obligation rather than finishing the job or inventing a tool. A failed or uncertain write leaves the reporting obligation open; inspect job_status before retrying. A surface without the required job tools reports that blocker and routes the complete return under the HQ Rulebook section Handoffs between AIs, without claiming the report is saved.
+Publication and retrieval check: a returned link or chat assertion alone does not prove filing. Independently open saved deliverables, the continuity note and any Decision Log entry from their owning homes, and verify the saved job report and correct terminal or nonterminal state through job_status. Verify the continuation path can fetch the required note without relying on this conversation. Give Allison the exact Drive links and a short summary. Routine copies of either record never go to `~/Desktop` or `~/Downloads`. Do not make Allison upload or carry the only copy.
 
 Fallback: if the Docs connector refuses a write after a live test, use the service-account path (SA+DWD) for the same Drive folder, then verify as above. If the write stays blocked, name the failed action and its owner, leave the closeout obligation uncleared, and never substitute a Desktop or Downloads file or claim the wrap filed until read-back succeeds.
 
@@ -106,7 +106,7 @@ Run the `estate-memory-router` gate once over the closing session, after the can
 
 What the sweep asks, exactly once, over the whole session: is there anything here a cold future worker would need, or whose loss would cause drift, rework, contradiction, or lost provenance, that has NOT been given a durable home by the record, the continuity note, the existing job, or a staged kickoff?
 
-Route each qualifying item to its existing destination under the router's six routes. A future obligation goes to `remember-this` and gets one open issue in the owning repo carrying a mechanical `RETURN WHEN` line. Evidence and working knowledge go to the owning repo's intake. A founder decision Allison clearly made is saved as made under decision 0101 and needs no phrase. One she has not clearly made is preserved as a candidate and is never promoted on the AI's own say-so. A canon or rule change fires `canon-sync-protocol`, which step 5's promotion gate already requires.
+Route each qualifying item to its existing destination under the router's six routes. A future obligation goes to `remember-this` and stays in its existing Chat to Code job with a mechanical `RETURN WHEN` condition. For code work that same job is a GitHub issue labeled job, not a second wake record. Evidence and working knowledge go to the owning repo's intake. A founder decision Allison clearly made is saved as made under decision 0101 and needs no phrase. One she has not clearly made is preserved as a candidate and is never promoted on the AI's own say-so. A canon or rule change fires `canon-sync-protocol`, which step 5's promotion gate already requires.
 
 Bounds, all load-bearing:
 

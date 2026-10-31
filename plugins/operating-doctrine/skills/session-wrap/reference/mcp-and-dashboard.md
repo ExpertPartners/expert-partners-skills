@@ -12,7 +12,7 @@ The Decision Log Doc, in Company Core [HQ-BB], found by its title. Add each deci
 
 ## Chat to Code job report
 
-Use job_create or job_claim for the receiving AI's assignment, then job_finish with the session summary and result link. Verify the saved result through job_status. Code work travels as a GitHub issue labeled job. Inspect the current tool schemas rather than inventing arguments. Follow the current HQ Rulebook section Handoffs between AIs for the complete return message. An unavailable write leaves the reporting obligation open; never claim completion from a copy box alone.
+Use job_create or job_claim for the receiving AI's assignment. Use job_finish with the summary and result link only when the assignment is genuinely completed. An unfinished wrap uses only a schema-supported nonterminal write in the same job; if none is available, report the blocker without finishing the job. Verify both the saved report and correct state through job_status. Code work travels as a GitHub issue labeled job. Inspect the current tool schemas rather than inventing arguments. Follow the current HQ Rulebook section Handoffs between AIs for the complete return message. An unavailable write leaves the reporting obligation open; never claim completion from a copy box alone.
 
 ## Dashboard wrap mark (hq.allisongaddy.com)
 

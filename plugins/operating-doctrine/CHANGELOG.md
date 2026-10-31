@@ -6,9 +6,12 @@ sender, receiver, model and effort or speed. Receiving AIs use the Chat to Code 
 list, job_create or job_claim, job_status, and job_finish with a summary and result
 link; code work travels as a GitHub issue labeled job. Session Steward checks
 job_inbox instead of message receipts, and Session Wrap files its job report.
-Related templates and references follow the same path. Historical entries and
-generated files remain untouched. The session-wrap lines changed by open PR #104
-remain reserved for its post-merge follow-up; no merge or deployment is included.
+Dispatchers verify the same pending job before a copy box leaves; receivers claim it.
+Partial wraps and future obligations stay nonterminal in that job. Related skills,
+templates and references follow the same path. Historical entries and generated
+files remain untouched. The session-wrap lines changed by open PR #104 remain
+reserved for its post-merge follow-up. Merge and release are blocked until that
+protected conflict is reconciled; no merge or deployment is included.
 
 ## 2.71.0 - 2026-10-31
 
