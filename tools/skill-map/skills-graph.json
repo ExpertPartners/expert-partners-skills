@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "3dae01e5854ee4400cfa25a213ac121b59ff1ed0",
+    "eps": "0336d74d29dee98787c7acaac5d6b2ea8f2d7214",
     "aura": "bc607af874585bfe4a0810eb1701eb299483f497"
   },
   "zones": [
@@ -58,7 +58,7 @@
       "renderNote": null,
       "layout": {
         "x": 1009,
-        "y": 5026,
+        "y": 4998,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -86,7 +86,7 @@
       "renderNote": null,
       "layout": {
         "x": 994,
-        "y": 3884,
+        "y": 3856,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -195,7 +195,7 @@
       "renderNote": null,
       "layout": {
         "x": 343.5,
-        "y": 6331,
+        "y": 6418,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -222,7 +222,7 @@
       "renderNote": null,
       "layout": {
         "x": 114,
-        "y": 4549,
+        "y": 4521,
         "width": 163,
         "height": 63,
         "rectHeight": 48,
@@ -252,7 +252,7 @@
       "renderNote": null,
       "layout": {
         "x": 356,
-        "y": 4637.2,
+        "y": 4609.2,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -343,7 +343,7 @@
       "renderNote": null,
       "layout": {
         "x": 1282,
-        "y": 4836.8,
+        "y": 4808.8,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -371,7 +371,7 @@
       "renderNote": null,
       "layout": {
         "x": 1009,
-        "y": 3971,
+        "y": 3943,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -397,7 +397,7 @@
       "renderNote": null,
       "layout": {
         "x": 1009,
-        "y": 5604,
+        "y": 5576,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -427,7 +427,7 @@
       "renderNote": null,
       "layout": {
         "x": 124,
-        "y": 5778,
+        "y": 5865,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -455,7 +455,7 @@
       "renderNote": null,
       "layout": {
         "x": 89.5,
-        "y": 4824,
+        "y": 4911,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -481,7 +481,7 @@
       "renderNote": null,
       "layout": {
         "x": 1006,
-        "y": 4159,
+        "y": 4131,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -508,7 +508,7 @@
       "renderNote": null,
       "layout": {
         "x": 997,
-        "y": 5388,
+        "y": 5360,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -640,7 +640,7 @@
       "renderNote": null,
       "layout": {
         "x": 632,
-        "y": 4765.2,
+        "y": 4751.2,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -666,7 +666,7 @@
       "renderNote": null,
       "layout": {
         "x": 343.5,
-        "y": 6519,
+        "y": 6606,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -693,7 +693,7 @@
       "renderNote": null,
       "layout": {
         "x": 55,
-        "y": 5952,
+        "y": 5461,
         "width": 274,
         "height": 77,
         "rectHeight": 62,
@@ -775,7 +775,7 @@
       "renderNote": null,
       "layout": {
         "x": 377,
-        "y": 4759.7,
+        "y": 4745.7,
         "width": 215,
         "height": 77,
         "rectHeight": 62,
@@ -801,7 +801,7 @@
       "renderNote": null,
       "layout": {
         "x": 1006,
-        "y": 4824,
+        "y": 4796,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -829,7 +829,7 @@
       "renderNote": null,
       "layout": {
         "x": 356,
-        "y": 6053,
+        "y": 6140,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -886,7 +886,7 @@
       "renderNote": null,
       "layout": {
         "x": 84,
-        "y": 6053,
+        "y": 6140,
         "width": 252,
         "height": 77,
         "rectHeight": 62,
@@ -943,7 +943,7 @@
       "renderNote": null,
       "layout": {
         "x": 55,
-        "y": 5374,
+        "y": 4810,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -971,7 +971,7 @@
       "renderNote": null,
       "layout": {
         "x": 114,
-        "y": 5879,
+        "y": 5966,
         "width": 163,
         "height": 49,
         "rectHeight": 34,
@@ -1053,7 +1053,7 @@
       "renderNote": null,
       "layout": {
         "x": 336.5,
-        "y": 6230,
+        "y": 6317,
         "width": 244,
         "height": 77,
         "rectHeight": 62,
@@ -1111,7 +1111,7 @@
       "renderNote": null,
       "layout": {
         "x": 971.5,
-        "y": 5489,
+        "y": 5461,
         "width": 281,
         "height": 91,
         "rectHeight": 76,
@@ -1142,7 +1142,7 @@
       "renderNote": null,
       "layout": {
         "x": 1050,
-        "y": 4925,
+        "y": 4897,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1170,7 +1170,7 @@
       "renderNote": null,
       "layout": {
         "x": 1282,
-        "y": 4735.8,
+        "y": 4707.8,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -1200,7 +1200,7 @@
       "renderNote": null,
       "layout": {
         "x": 1062,
-        "y": 4723,
+        "y": 4695,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -1226,7 +1226,7 @@
       "renderNote": null,
       "layout": {
         "x": 993.5,
-        "y": 5127,
+        "y": 5099,
         "width": 237,
         "height": 63,
         "rectHeight": 48,
@@ -1251,7 +1251,7 @@
       "renderNote": null,
       "layout": {
         "x": 997,
-        "y": 5301,
+        "y": 5273,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -1303,7 +1303,7 @@
       "renderNote": null,
       "layout": {
         "x": 89.5,
-        "y": 4925,
+        "y": 5012,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -1408,7 +1408,7 @@
       "renderNote": null,
       "layout": {
         "x": 89.5,
-        "y": 5677,
+        "y": 5764,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1436,7 +1436,7 @@
       "renderNote": null,
       "layout": {
         "x": 92.5,
-        "y": 5012,
+        "y": 5099,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -1466,7 +1466,7 @@
       "renderNote": null,
       "layout": {
         "x": 106,
-        "y": 5099,
+        "y": 5186,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -1643,7 +1643,7 @@
       "renderNote": null,
       "layout": {
         "x": 355.5,
-        "y": 6606,
+        "y": 6693,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -1723,7 +1723,7 @@
       "renderNote": null,
       "layout": {
         "x": 994,
-        "y": 4636,
+        "y": 4608,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -1752,7 +1752,7 @@
       "renderNote": null,
       "layout": {
         "x": 368,
-        "y": 4522.2,
+        "y": 4494.2,
         "width": 212,
         "height": 91,
         "rectHeight": 76,
@@ -1804,7 +1804,7 @@
       "renderNote": null,
       "layout": {
         "x": 986,
-        "y": 4549,
+        "y": 4521,
         "width": 252,
         "height": 63,
         "rectHeight": 48,
@@ -1905,7 +1905,7 @@
       "renderNote": "single faint anchor, inheritance edges collapsed",
       "layout": {
         "x": 364.5,
-        "y": 6693,
+        "y": 6780,
         "width": 188,
         "height": 77,
         "rectHeight": 62,
@@ -1933,7 +1933,7 @@
       "renderNote": null,
       "layout": {
         "x": 89.5,
-        "y": 5287,
+        "y": 5374,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -1962,7 +1962,7 @@
       "renderNote": null,
       "layout": {
         "x": 383,
-        "y": 5073.3,
+        "y": 5160.3,
         "width": 182,
         "height": 77,
         "rectHeight": 62,
@@ -2102,7 +2102,7 @@
       "renderNote": null,
       "layout": {
         "x": 124,
-        "y": 4448,
+        "y": 4420,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -2132,12 +2132,39 @@
       "renderNote": null,
       "layout": {
         "x": 396.5,
-        "y": 4449.2,
+        "y": 4421.2,
         "width": 155,
         "height": 49,
         "rectHeight": 34,
         "annotationHeight": 15,
         "subtitleLines": []
+      }
+    },
+    {
+      "id": "quick-update",
+      "source": "eps:plugins/operating-doctrine/skills/quick-update/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "three short lists",
+      "renderNote": null,
+      "layout": {
+        "x": 122.5,
+        "y": 4058,
+        "width": 146,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "three short lists"
+        ]
       }
     },
     {
@@ -2234,7 +2261,7 @@
       "renderNote": null,
       "layout": {
         "x": 340.5,
-        "y": 6418,
+        "y": 6505,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -2262,7 +2289,7 @@
       "renderNote": null,
       "layout": {
         "x": 962,
-        "y": 4448,
+        "y": 4420,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -2318,7 +2345,7 @@
       "renderNote": null,
       "layout": {
         "x": 77.5,
-        "y": 4058,
+        "y": 4333,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -2371,7 +2398,7 @@
       "renderNote": null,
       "layout": {
         "x": 356,
-        "y": 5487.8,
+        "y": 5574.8,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -2401,7 +2428,7 @@
       "renderNote": null,
       "layout": {
         "x": 130,
-        "y": 5475,
+        "y": 5562,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -2429,7 +2456,7 @@
       "renderNote": null,
       "layout": {
         "x": 80.5,
-        "y": 4347,
+        "y": 5663,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -2457,7 +2484,7 @@
       "renderNote": null,
       "layout": {
         "x": 632,
-        "y": 4624.3,
+        "y": 4596.3,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -2488,7 +2515,7 @@
       "renderNote": null,
       "layout": {
         "x": 100,
-        "y": 4723,
+        "y": 4709,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -2516,7 +2543,7 @@
       "renderNote": null,
       "layout": {
         "x": 98.5,
-        "y": 5576,
+        "y": 4608,
         "width": 194,
         "height": 77,
         "rectHeight": 62,
@@ -2602,7 +2629,7 @@
       "renderNote": null,
       "layout": {
         "x": 113.5,
-        "y": 4636,
+        "y": 5287,
         "width": 164,
         "height": 63,
         "rectHeight": 48,
@@ -2740,7 +2767,7 @@
       "renderNote": null,
       "layout": {
         "x": 962,
-        "y": 5214,
+        "y": 5186,
         "width": 300,
         "height": 63,
         "rectHeight": 48,
@@ -2767,7 +2794,7 @@
       "renderNote": null,
       "layout": {
         "x": 962,
-        "y": 4361,
+        "y": 4333,
         "width": 300,
         "height": 63,
         "rectHeight": 48,
@@ -2794,7 +2821,7 @@
       "renderNote": null,
       "layout": {
         "x": 962,
-        "y": 4072,
+        "y": 4044,
         "width": 300,
         "height": 63,
         "rectHeight": 48,
@@ -2821,7 +2848,7 @@
       "renderNote": null,
       "layout": {
         "x": 83.5,
-        "y": 5200,
+        "y": 4246,
         "width": 224,
         "height": 63,
         "rectHeight": 48,
@@ -2848,7 +2875,7 @@
       "renderNote": null,
       "layout": {
         "x": 1003,
-        "y": 4246,
+        "y": 4218,
         "width": 218,
         "height": 91,
         "rectHeight": 76,
@@ -2929,7 +2956,7 @@
       "renderNote": null,
       "layout": {
         "x": 55,
-        "y": 4246,
+        "y": 6039,
         "width": 281,
         "height": 77,
         "rectHeight": 62,
@@ -3081,19 +3108,19 @@
       "points": [
         {
           "x": 592,
-          "y": 4688.5
+          "y": 4660.5
         },
         {
           "x": 612,
-          "y": 4688.5
+          "y": 4660.5
         },
         {
           "x": 612,
-          "y": 4776.2
+          "y": 4762.2
         },
         {
           "x": 632,
-          "y": 4776.2
+          "y": 4762.2
         }
       ]
     },
@@ -3104,11 +3131,11 @@
       "points": [
         {
           "x": 592,
-          "y": 4662.8
+          "y": 4634.8
         },
         {
           "x": 632,
-          "y": 4662.8
+          "y": 4634.8
         }
       ]
     },
@@ -3261,27 +3288,27 @@
       "points": [
         {
           "x": 1506,
-          "y": 4862.5
+          "y": 4834.5
         },
         {
           "x": 1583,
-          "y": 4862.5
+          "y": 4834.5
         },
         {
           "x": 1583,
-          "y": 6812
+          "y": 6899
         },
         {
           "x": 18,
-          "y": 6812
+          "y": 6899
         },
         {
           "x": 18,
-          "y": 5990.5
+          "y": 5499.5
         },
         {
           "x": 55,
-          "y": 5990.5
+          "y": 5499.5
         }
       ]
     },
@@ -3292,27 +3319,27 @@
       "points": [
         {
           "x": 1506,
-          "y": 4888.2
+          "y": 4860.2
         },
         {
           "x": 1573,
-          "y": 4888.2
+          "y": 4860.2
         },
         {
           "x": 1573,
-          "y": 6802
+          "y": 6889
         },
         {
           "x": 8,
-          "y": 6802
+          "y": 6889
         },
         {
           "x": 8,
-          "y": 5412.5
+          "y": 4848.5
         },
         {
           "x": 55,
-          "y": 5412.5
+          "y": 4848.5
         }
       ]
     },
@@ -3335,19 +3362,19 @@
       "points": [
         {
           "x": 336,
-          "y": 5816.5
+          "y": 5903.5
         },
         {
           "x": 346,
-          "y": 5816.5
+          "y": 5903.5
         },
         {
           "x": 346,
-          "y": 5539.2
+          "y": 5626.2
         },
         {
           "x": 356,
-          "y": 5539.2
+          "y": 5626.2
         }
       ]
     },
@@ -3376,19 +3403,19 @@
       "points": [
         {
           "x": 632,
-          "y": 4809.2
+          "y": 4795.2
         },
         {
           "x": 602,
-          "y": 4809.2
+          "y": 4795.2
         },
         {
           "x": 602,
-          "y": 5099
+          "y": 5186
         },
         {
           "x": 565,
-          "y": 5099
+          "y": 5186
         }
       ]
     },
@@ -3417,11 +3444,11 @@
       "points": [
         {
           "x": 592,
-          "y": 4798.2
+          "y": 4784.2
         },
         {
           "x": 632,
-          "y": 4798.2
+          "y": 4784.2
         }
       ]
     },
@@ -3450,11 +3477,11 @@
       "points": [
         {
           "x": 336,
-          "y": 6091.5
+          "y": 6178.5
         },
         {
           "x": 356,
-          "y": 6091.5
+          "y": 6178.5
         }
       ]
     },
@@ -3519,19 +3546,19 @@
       "points": [
         {
           "x": 1262,
-          "y": 4963.5
+          "y": 4935.5
         },
         {
           "x": 1272,
-          "y": 4963.5
+          "y": 4935.5
         },
         {
           "x": 1272,
-          "y": 4787.2
+          "y": 4759.2
         },
         {
           "x": 1282,
-          "y": 4787.2
+          "y": 4759.2
         }
       ]
     },
@@ -3554,11 +3581,11 @@
       "points": [
         {
           "x": 1262,
-          "y": 4761.5
+          "y": 4733.5
         },
         {
           "x": 1282,
-          "y": 4761.5
+          "y": 4733.5
         }
       ]
     },
@@ -3599,27 +3626,27 @@
       "points": [
         {
           "x": 336,
-          "y": 5150.3
+          "y": 5237.3
         },
         {
           "x": 346,
-          "y": 5150.3
+          "y": 5237.3
         },
         {
           "x": 346,
-          "y": 5160.3
+          "y": 5247.3
         },
         {
           "x": 622,
-          "y": 5160.3
+          "y": 5247.3
         },
         {
           "x": 622,
-          "y": 4831.2
+          "y": 4817.2
         },
         {
           "x": 632,
-          "y": 4831.2
+          "y": 4817.2
         }
       ]
     },
@@ -3630,11 +3657,11 @@
       "points": [
         {
           "x": 336,
-          "y": 5124.7
+          "y": 5211.7
         },
         {
           "x": 383,
-          "y": 5124.7
+          "y": 5211.7
         }
       ]
     },
@@ -3672,19 +3699,19 @@
       "points": [
         {
           "x": 580,
-          "y": 4567.7
+          "y": 4539.7
         },
         {
           "x": 899,
-          "y": 4567.7
+          "y": 4539.7
         },
         {
           "x": 899,
-          "y": 4499.3
+          "y": 4471.3
         },
         {
           "x": 962,
-          "y": 4499.3
+          "y": 4471.3
         }
       ]
     },
@@ -3707,19 +3734,19 @@
       "points": [
         {
           "x": 565,
-          "y": 5124.7
+          "y": 5211.7
         },
         {
           "x": 612,
-          "y": 5124.7
+          "y": 5211.7
         },
         {
           "x": 612,
-          "y": 4820.2
+          "y": 4806.2
         },
         {
           "x": 632,
-          "y": 4820.2
+          "y": 4806.2
         }
       ]
     },
@@ -3754,19 +3781,19 @@
       "points": [
         {
           "x": 336,
-          "y": 4499.3
+          "y": 4471.3
         },
         {
           "x": 346,
-          "y": 4499.3
+          "y": 4471.3
         },
         {
           "x": 346,
-          "y": 4567.7
+          "y": 4539.7
         },
         {
           "x": 368,
-          "y": 4567.7
+          "y": 4539.7
         }
       ]
     },
@@ -3777,11 +3804,11 @@
       "points": [
         {
           "x": 336,
-          "y": 4473.7
+          "y": 4445.7
         },
         {
           "x": 396.5,
-          "y": 4473.7
+          "y": 4445.7
         }
       ]
     },
@@ -3798,16 +3825,22 @@
       "points": [
         {
           "x": 551.5,
-          "y": 4473.7
+          "y": 4445.7
         },
         {
           "x": 962,
-          "y": 4473.7
+          "y": 4445.7
         }
       ]
     },
     {
       "from": "project-builder",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "quick-update",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -3855,11 +3888,11 @@
       "points": [
         {
           "x": 336,
-          "y": 5513.5
+          "y": 5600.5
         },
         {
           "x": 356,
-          "y": 5513.5
+          "y": 5600.5
         }
       ]
     },
@@ -3888,19 +3921,19 @@
       "points": [
         {
           "x": 336,
-          "y": 4748.7
+          "y": 4734.7
         },
         {
           "x": 602,
-          "y": 4748.7
+          "y": 4734.7
         },
         {
           "x": 602,
-          "y": 4787.2
+          "y": 4773.2
         },
         {
           "x": 632,
-          "y": 4787.2
+          "y": 4773.2
         }
       ]
     },
@@ -3911,19 +3944,19 @@
       "points": [
         {
           "x": 336,
-          "y": 4774.3
+          "y": 4760.3
         },
         {
           "x": 346,
-          "y": 4774.3
+          "y": 4760.3
         },
         {
           "x": 346,
-          "y": 5099
+          "y": 5186
         },
         {
           "x": 383,
-          "y": 5099
+          "y": 5186
         }
       ]
     },
@@ -4098,14 +4131,14 @@
   "layout": {
     "engine": "elkjs layered, single INCLUDE_CHILDREN hierarchy over zones and brand rooms, build-time only",
     "width": 1591,
-    "height": 6820,
+    "height": 6907,
     "zones": [
       {
         "id": "brain",
         "label": "The brain",
         "caption": "the law and the map of the house",
         "x": 314.5,
-        "y": 6182,
+        "y": 6269,
         "width": 288,
         "height": 610,
         "rooms": []
@@ -4209,7 +4242,7 @@
         "label": "The hands",
         "caption": "funnel work and account operations",
         "x": 940,
-        "y": 3836,
+        "y": 3808,
         "width": 588,
         "height": 1867,
         "rooms": []
@@ -4221,7 +4254,7 @@
         "x": 33,
         "y": 4010,
         "width": 851,
-        "height": 2142,
+        "height": 2229,
         "rooms": []
       },
       {
