@@ -14,6 +14,7 @@ permissions:
   id-token: write
 jobs:
   run:
+    if: github.event_name == 'workflow_dispatch' || (github.event.label.name == 'job' && contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association))
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
