@@ -1,11 +1,14 @@
 # factory-automation: c4403a85-510b-4eab-86ba-14c2a90568cc
 name: Chat to Code Loop Builder - Skills
 "on":
-  workflow_dispatch: {}
-  pull_request:
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: Number of the job issue to build
+        required: true
+  issues:
     types:
       - labeled
-      - unlabeled
 permissions:
   contents: read
   id-token: write
