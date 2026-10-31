@@ -56,9 +56,20 @@ jobs:
     name: validate + regenerate skills-graph.json
     runs-on: ubuntu-latest
     steps:
+      # The regenerated graph is committed to main by this app, the one actor
+      # allowed past the pull request rule on main (Decision Log 2026-10-31).
+      # Client ID is a repository variable, the private key a repository secret.
+      - name: Mint skills-graph app token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.SKILLS_GRAPH_APP_CLIENT_ID }}
+          private-key: ${{ secrets.SKILLS_GRAPH_APP_PRIVATE_KEY }}
+
       - name: Checkout expert-partners-skills
         uses: actions/checkout@v6
         with:
+          token: ${{ steps.app-token.outputs.token }}
           path: eps
           fetch-depth: 0 # committed history is required to prove VERIFIED STALE copies
 
