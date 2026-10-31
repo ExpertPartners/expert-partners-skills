@@ -172,9 +172,9 @@ jobs:
             exit 0
           fi
           if git diff --cached --quiet -- "$FEED"; then
-            MSG="skills-graph: regenerate from SKILL.md sources"
+            MSG="skills-graph: regenerate from SKILL.md sources [skip ci]"
           else
-            MSG="skills-graph: regenerate graph and AI Workforce feed from canonical sources"
+            MSG="skills-graph: regenerate graph and AI Workforce feed from canonical sources [skip ci]"
           fi
           git config user.name "skills-graph-bot"
           git config user.email "actions@users.noreply.github.com"
