@@ -10,6 +10,7 @@ Working here
 - Use an isolated branch or worktree, inspect git state before editing, and open a pull request for every change. Never force-push or bypass required checks.
 - Correct the canonical skill source first. Generated files, deployed copies, and the skill graph come only from their producers in tools. Never hand-edit them.
 - Run the changed-file gates in .pre-commit-config.yaml and .github/workflows/ci.yml, plus the tests under tools, before pushing. Report real results.
+- Validation command for jobs from the Chat to Code Loop: run tools/validate-job.sh from the repo root. It runs the changed-file gates from ci.yml, the skill description cap and gitleaks, and exits 0 only when all pass. A job is not done until it prints validate-job: PASS.
 - Secrets live in 1Password only. They never appear in code, logs, config, or chat.
 - Do not deploy, publish, upload, or delete anything permanent without the applicable founder's explicit yes.
 
