@@ -1,3 +1,12 @@
+## 2.71.0 - 2026-10-31
+
+Quick Update v1.0, a new skill. A message that is only quick update, simple update or short version
+makes any AI check the live state, then answer in three short first grade lists, what's important,
+what's still outstanding, and what I recommend, followed by the one closing status line for the
+surface. Words like quick or update inside a normal sentence never fire it. CEO brief stays Teach
+Me's own step opener and is not a trigger. Requested by Allison in the Google Workspace access
+strategy audit session.
+
 ## 2.70.0 - 2026-10-31
 
 File to Knowledge Base Optimizer v1.0, a new skill built under the build standard from the approved
