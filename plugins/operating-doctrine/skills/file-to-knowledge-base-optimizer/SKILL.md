@@ -82,7 +82,7 @@ Rules for what you write.
 - Actions and Decisions. Only for decision oriented material such as meetings. List each item with an owner and a due date only when the source gives them (R18).
 - People and speakers. The header's people field means everyone who was there, from the intake and from the labels the source carries. Name a speaker only when the source itself says who said what (G20, R33). Labels inside passages a document quotes name the speakers of what is quoted, not the people of this file, so they stay in the Content and do not enter the header. Say in people_note how the people were identified.
 - Type is one or two plain words for the kind of source, such as transcript, interview, meeting, document, report or article (R15).
-- When the material has more than one part, the engine builds the navigation page's summary from each part's first summary paragraph, in order, so nothing is written for it and nothing new is claimed there (G16, G19).
+- When the material has more than one part, the engine builds the navigation page's summary from each part's first summary paragraph, in order and in one or two paragraphs, so nothing is written for it and nothing new is claimed there (G16, R16, G19).
 - Spell every name, brand and term exactly as the source spells it, even when it looks wrong. The source's spelling is a fact (G17, R10).
 - When a speaker corrects or takes back something, or gives up a label for something, report what they settled on, never the words they took back (G17, G19).
 - Keep the strength of every claim as the source has it. A hedge such as sometimes, maybe, almost or I think stays in. Never raise a sometimes to an often or a guess to a fact (G17, G19).

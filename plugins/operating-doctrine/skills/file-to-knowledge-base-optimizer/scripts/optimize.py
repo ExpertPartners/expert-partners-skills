@@ -1539,8 +1539,15 @@ def assemble_single(work: Path, intake: dict, derived_dir: Path, out: Path, vers
         nav_sections.append((n, name, est_tokens(text), _headings_in(body, 0, len(body))))
     if total_parts > 1:
         # The navigation summary is built here from each part's first summary paragraph, in order, so the
-        # navigation page claims nothing the parts do not (G16, G19).
-        nav = {"summary": ["Part %d of %d. %s" % (n, total_parts, first) for n, first in part_firsts], "people_note": first_people_note}
+        # navigation page claims nothing the parts do not (G16, G19), in one or two paragraphs (R16).
+        # One paragraph for up to two parts, two paragraphs past that, so the page keeps the spec's one or two (R16).
+        pieces = ["Part %d of %d. %s" % (n, total_parts, first) for n, first in part_firsts]
+        if len(pieces) <= 2:
+            nav_paras = [" ".join(pieces)]
+        else:
+            half = (len(pieces) + 1) // 2
+            nav_paras = [" ".join(pieces[:half]), " ".join(pieces[half:])]
+        nav = {"summary": nav_paras, "people_note": first_people_note}
         header, extra = resolve_header(meta, intake, nav, title + ", Navigation")
         extra["parts_note"] = "navigation page for %d parts, its summary built from each part's first summary paragraph" % total_parts
         lines = build_header(header) + ["", "# " + header["title"], "", "## Summary", ""]
