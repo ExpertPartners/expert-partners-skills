@@ -1,7 +1,7 @@
 # Session record template
 
-Title: `Session Record [PROJECT] [YYYY-MM-DD]`
-Filed as one standalone markdown document in the approved private repository intake, then independently read back from the authoritative published `main` branch. Give Allison its exact durable path, not a file to upload or carry. Written for a reader with zero memory of the chat. Built from artifacts, the board, and repo state, never from chat scrollback.
+Report title: `Session Record [PROJECT] [YYYY-MM-DD]`
+File the report as this job's job_finish summary with a result link, then verify it through job_status. Link substantive deliverables in their owning homes, not a duplicate work log. Any reply to another AI follows the current HQ Rulebook section Handoffs between AIs. Written for a reader with zero memory of the chat. Built from artifacts, the board, and repo state, never from chat scrollback.
 
 ## Required sections, in order
 
@@ -14,7 +14,7 @@ Filed as one standalone markdown document in the approved private repository int
    - Canon-candidate: yes or no. (Yes means the canon sync protocol fires at step 5 of the wrap.)
 3. Built, changed, created, deleted. What actually shipped or moved.
 4. Everything touched. Every file, asset, document, repo, base, location, scenario, or ID, with full paths and IDs. No shorthand, no nicknames.
-5. Open questions and flags. Every flag raised (UPDATE KNOWLEDGE DOCS, TEAM TRAINING NEEDED) with what still needs to happen and who or what it waits on. Each flag carries its classification, ripe or waiting (SKILL.md step 4). Ripe means the question goes to Allison in the live conversation now. Waiting means a named condition plus a stale date, recorded in the Job Tracker's Waiting on column. Every flag that survives the wrap leaves as a staged kickoff block in step 4; none becomes a board card.
+5. Open questions and flags. Every flag raised (UPDATE KNOWLEDGE DOCS, TEAM TRAINING NEEDED) with what still needs to happen and who or what it waits on. Each flag carries its classification, ripe or waiting (SKILL.md step 4). Ripe means the question goes to Allison in the live conversation now. Waiting means a named condition plus a stale date, preserved in the existing Chat to Code job. Every flag that survives the wrap leaves as a staged kickoff block in step 4; none becomes a board card.
 6. Partial work. Anything unfinished and exactly where it stopped.
 7. Exact end state. The state of the world right now, as pointers.
 

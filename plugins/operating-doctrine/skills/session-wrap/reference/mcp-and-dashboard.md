@@ -1,18 +1,18 @@
-# Wrap mechanics: Drive writes, Job Tracker, dashboard mark
+# Wrap mechanics: Drive writes, job reports, historical dashboard mark
 
 Volatile mechanics live here, dated, verified at use time. Nothing in SKILL.md depends on them.
 
 ## Drive records
 
-Session record and continuity note: a Google Doc in the owning brain's home folder, found through that brain's 00 START HERE index (Company Core [HQ-BB] when no one company owns it). Plain title, no date prefix. Create it with the Google Docs or Drive connector; if the connector refuses the write, use the service-account path (SA+DWD, impersonating allison@) for the same folder. The returned link is a write receipt, not proof: open the Doc from Drive to verify.
+The session report lives in the job_finish summary. Substantive deliverables and the continuity note: a Google Doc in the owning brain's home folder, found through that brain's 00 START HERE index (Company Core [HQ-BB] when no one company owns it). Plain title, no date prefix. Create it with the Google Docs or Drive connector; if the connector refuses the write, use the service-account path (SA+DWD, impersonating allison@) for the same folder. The returned link is a write receipt, not proof: open the Doc from Drive to verify.
 
 ## Decision Log
 
 The Decision Log Doc, in Company Core [HQ-BB], found by its title. Add each decision at the top under today's date heading (create the heading if today's is missing): what was decided, why in one or two sentences, a `Replaces:` note naming the older decision it supersedes (or none), and a link to the full record. Re-read the Doc after the write to confirm the entry landed and nothing else changed.
 
-## Job Tracker
+## Chat to Code job report
 
-The Job Tracker Sheet, in Company Core [HQ-BB], found by its title. Columns A to H: Job, Room or lane, Who is doing it, Status, Waiting on, Next step, Opened, Last updated. Read the values, change only this lane's row (or append one at the bottom), then re-read to verify. After two failed writes, stop and route the row verbatim in the wrap note for home to enter.
+Use job_create or job_claim for the receiving AI's assignment, then job_finish with the session summary and result link. Verify the saved result through job_status. Code work travels as a GitHub issue labeled job. Inspect the current tool schemas rather than inventing arguments. Follow the current HQ Rulebook section Handoffs between AIs for the complete return message. An unavailable write leaves the reporting obligation open; never claim completion from a copy box alone.
 
 ## Dashboard wrap mark (hq.allisongaddy.com)
 

@@ -26,7 +26,7 @@ The Document formatting section of the HQ Rulebook sets every number for company
 
 Read that section live before you make or restyle a document. Never use a remembered value. Line spacing alone moved from 1.5 to 1.15 and back to 1.5 during October 2026.
 
-If this skill and the Rulebook ever differ, the Rulebook wins. Report the difference to [HQ 🧠] - Chief HR Officer in the Handoffs tab of the Job Tracker.
+If this skill and the Rulebook ever differ, the Rulebook wins. Report the difference to [HQ 🧠] - Chief HR Officer under the current HQ Rulebook section Handoffs between AIs, with the result linked in the existing job.
 
 ## What the Rulebook asks for, in short
 

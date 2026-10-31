@@ -18,6 +18,6 @@ Working here
 
 Read Organization Instructions, the HQ Rulebook and the Decision Log, all in HQ Business Brain, Company Core, before relying on company rules or decisions. Find each Doc by its title in Google Drive, and never copy a Doc link or ID into this repository, because it is public. Business knowledge lives in the owning Google Drive brain. If a required read fails, stop dependent work and report it. Do not copy the instructions here.
 
-- When Allison types S or s, it means sent, and no other single letter does. Never ask what S means. When she types Q or q alone, or says ask me clarifying questions, ask before working, one question at a time, most important first, using the ask-me-questions skill.
-- A session archives itself only after its report row is written in Handoffs and read back, its incoming row is marked Done with a pointer to that report, and it has no uncommitted or unpushed work of its own.
+- For messages between AIs and delivery confirmations, follow the current HQ Rulebook section Handoffs between AIs. When Allison types Q or q alone, or says ask me clarifying questions, ask before working, one question at a time, most important first, using the ask-me-questions skill.
+- File this job's report with job_finish, including a summary and result link, and verify it with job_status. Preserve unfinished work in its existing Chat to Code job. Before archive readiness, leave no uncommitted or unpushed work of its own and follow the HQ Rulebook section Session lifecycle.
 - Never give legal, tax, or compliance advice, or suggest a professional, unless Allison asks.
