@@ -1,4 +1,4 @@
-## 2.68.0 - 2026-10-29
+## 2.70.0 - 2026-10-31
 
 File to Knowledge Base Optimizer v1.0, a new skill built under the build standard from the approved
 spec, [HQ][V1.0] Spec - File to Knowledge Base Optimizer, revision 4. It turns a transcript, a PDF, a
@@ -19,9 +19,21 @@ any name, number or term in the summary, takeaways, headings or actions that the
 does not carry spelled the same way, and a navigation summary that names the file or strays from the
 parts' summaries and the source's headings. Captions without labels group into paragraphs that end at
 sentence ends, PDF heading levels are normalized, and unmapped glyphs are restored from a second read
-or marked unreadable. The navigation page's summary is built by the engine from the parts' summaries, and Step 4
-names people, keeps unlabeled passages apart, keeps qualifiers with their claims, places headings at
-topic changes and writes the shorter end of the spec's ranges.
+or marked unreadable. The navigation page's summary is built by the engine from the parts' summaries
+in one or two paragraphs, and Step 4 names people, keeps unlabeled passages apart, keeps qualifiers
+with their claims, places headings at topic changes and writes the shorter end of the spec's ranges.
+
+## 2.69.0 - 2026-10-30
+
+Build Standard v1.1. Four fixes. A tool's record starts in EP Notion HQ's AI Employee Vault the day
+Allison approves its spec, and a missing record is reported while the chain check and release stay
+blocked. Where a tool's most recent version is silent, the gap is filled from older versions.
+Rule 7 lists Claude chat, Claude Code, Codex and ChatGPT, with Cowork now part of Claude. Every
+build carries four cost and quality rules, with a $300 wait-for-yes line. AI-written parts get a
+stated tolerance, judges run on the lowest model that can do the job, a cost estimate is posted
+before any test run and over $300 waits for Allison's yes, and a failed test round stops the build
+until it is reported (Decision Log 2026-10-30, Every build carries four cost and quality rules,
+with a $300 wait-for-yes line). Assigned by HQ in Handoffs rows 1364 and 1424.
 
 ## 2.67.0 - 2026-10-26
 
