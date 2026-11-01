@@ -8,7 +8,7 @@ with a summary and result link; code work travels as a GitHub issue labeled job.
 checks job_inbox instead of message receipts, and Session Wrap files its job report. Dispatchers
 verify the same pending job before a copy box leaves; receivers claim it. Partial wraps and future
 obligations stay nonterminal in that job. Related skills, templates and references follow the same
-path. Historical entries stay as history, and the three skill history lines that described the
+path. Quick Update, systems-map and session-home now read in-flight work and ownership from the job list through job_status, with the Job Tracker kept for older work. Historical entries stay as history, and the three skill history lines that described the
 Handoffs report row and mail box now say they are retired. Generated files remain untouched.
 
 Session Wrap v1.22, the wrap and archive trigger, folded in from PR 104 in the same release. In a

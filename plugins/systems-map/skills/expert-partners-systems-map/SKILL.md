@@ -26,7 +26,7 @@ Each system has exactly one job. Discrepancies happen when a system is asked to 
 
 ## First read for every cold session
 
-The HQ Rulebook first, then the Job Tracker for what is in flight and what each job awaits, then the owning brain's `00 START HERE` Doc. Pointers, never copies.
+The HQ Rulebook first, then the Chat to Code job list through job_status for what is in flight and what each job awaits (older work may still sit in the Job Tracker), then the owning brain's `00 START HERE` Doc. Pointers, never copies.
 
 ## The entity and the platform
 
@@ -132,7 +132,7 @@ Two lanes, matched to the surface:
 
 ## Quick decision guide
 
-- A cold session orienting? The HQ Rulebook first, then the Job Tracker. Both load through the Drive connector.
+- A cold session orienting? The HQ Rulebook first through the Drive connector, then the Chat to Code job list through job_status, then the Job Tracker for older work.
 - A funnel record or a human log? Notion. A funnel is not done until it lives there.
 - A decision? The Decision Log in Drive, newest at the top. Rules and knowledge? The owning brain in Drive. Code the tools run from? GitHub.
 - A fact a future session must recall? Memory.
