@@ -1,0 +1,95 @@
+# Auto-merge gate for finished Chat to Code jobs (Decision Log 2026-11-01, Finished code
+# merges itself, except in Ember's repo). tools/auto-merge-gate/README.md explains the rules.
+#
+# Pull request code is never checked out or run here. pull_request_target, schedule,
+# issue_comment and check_suite run this file as it is on main, and every event checks out
+# the gate script from main, so a pull request cannot loosen the gate that judges it.
+#
+# Two tokens, never mixed. The workflow token reads, comments and labels. The EP Skills
+# Graph Bot app token (the one actor allowed past the pull request rule on main) is minted
+# only after the plan step finds a pull request that passes, carries Contents write and
+# nothing else, and is used for the squash merge alone. Its push to main starts
+# skills-graph.yml and the marketplace webhook like any other merge.
+name: auto-merge-gate
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, ready_for_review]
+  pull_request_review:
+    types: [submitted]
+  issue_comment:
+    types: [created, edited]
+  check_suite:
+    types: [completed]
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: Pull request number to check (leave blank to check every open pull request)
+        required: false
+
+permissions:
+  contents: read
+  checks: read
+  statuses: read
+  issues: write
+  pull-requests: write
+
+# One gate at a time, so two runs never race to merge or comment on the same pull request.
+# A run that is replaced while waiting loses nothing: the next run sweeps again.
+concurrency:
+  group: auto-merge-gate
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    # The gate skips its own check run by this name (GATE_CHECK_NAME below).
+    name: auto-merge-gate
+    if: >-
+      github.repository == 'ExpertPartners/expert-partners-skills' &&
+      (github.event_name != 'issue_comment' || github.event.issue.pull_request)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout the gate from main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          persist-credentials: false
+          sparse-checkout: tools/auto-merge-gate
+
+      - name: Evaluate job pull requests
+        id: plan
+        env:
+          GATE_TOKEN: ${{ github.token }}
+          GATE_CHECK_NAME: auto-merge-gate
+          GATE_BASE_BRANCH: main
+          GATE_DISPATCH_PR: ${{ inputs.pr }}
+        run: |
+          set -euo pipefail
+          if [ ! -f tools/auto-merge-gate/gate.py ]; then
+            echo "::notice::The auto-merge gate is not on main yet; nothing to do."
+            echo "merge=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          python3 tools/auto-merge-gate/gate.py plan
+
+      - name: Mint EP Skills Graph Bot token
+        id: app-token
+        if: steps.plan.outputs.merge != ''
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.SKILLS_GRAPH_APP_CLIENT_ID }}
+          private-key: ${{ secrets.SKILLS_GRAPH_APP_PRIVATE_KEY }}
+          permission-contents: write
+
+      - name: Squash-merge as EP Skills Graph Bot
+        if: steps.plan.outputs.merge != ''
+        env:
+          GATE_TOKEN: ${{ github.token }}
+          MERGE_TOKEN: ${{ steps.app-token.outputs.token }}
+          GATE_CHECK_NAME: auto-merge-gate
+          GATE_BASE_BRANCH: main
+          GATE_MERGE_PRS: ${{ steps.plan.outputs.merge }}
+        run: python3 tools/auto-merge-gate/gate.py merge
