@@ -172,6 +172,11 @@ def stitch(frames: list[tuple[int, float, float, list[Line]]]) -> list[Screen]:
         else:
             earlier = next((s for s in screens[:-1] if _contained(s, lines)), None)
             if earlier is not None:
+                found = find_overlap(earlier.lines, lines)
+                if found is not None:
+                    i, j, t, _ = found
+                    for k in range(t):
+                        earlier.lines[i + k].add_variant(lines[j + k].text)
                 earlier.frames.append(index)
                 earlier.last_time = max(earlier.last_time, until)
                 continue

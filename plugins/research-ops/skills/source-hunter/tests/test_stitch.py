@@ -93,3 +93,13 @@ def test_a_short_line_is_not_swallowed_by_a_longer_one():
     texts = [l.text for s in screens for l in s.lines]
     assert "Goals" in texts
     assert "Goals and metrics for the first month" in texts
+
+
+def test_a_slide_shown_again_keeps_a_changed_reading():
+    first = ["Building the board", "Pick three advisors you trust", "Score each answer out loud"]
+    other = ["A different slide entirely", "with its own closing words"]
+    again = ["Building the board", "Pick two advisors you trust", "Score each answer out loud"]
+    screens = stitch([_frame(0, first), _frame(1, other), _frame(2, again)])
+    readings = {t for s in screens for l in s.lines for t in [l.text, *l.variants]}
+    for line in first + other + again:
+        assert line in readings
