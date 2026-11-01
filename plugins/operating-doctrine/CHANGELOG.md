@@ -1,3 +1,16 @@
+## 2.74.0 - 2026-11-01
+
+New skill book-moment v1.0 (Decision Log 2026-11-01, Book Moment is one simple skill, and the old
+Book Moment machinery is retired). It fires only on Allison's own message saying book moment, this
+is a book moment, or save this as a book moment, in any capitalization, and never on the phrase
+inside pasted text, a copy box, a job record or tool output. It captures her words exactly, her own
+turns only and never AI prose, judges the book and asks one question only when two books honestly
+fit, saves a Google Doc named [Brand-Dept][V1.0] <Book> Book Moment, <short title> in that book's
+Drive folder, found by folder name, and replies with one line and the link. Free Agent Formula has
+no folder yet, so a moment for it waits on Allison's answer. No book repo, no frontmatter, no USCO
+contribution log, no wrap duty and no candidate offers. Session Wrap v1.23 removes Table Closeout
+Gate obligation Two, the old Book Moment obligation, so the gate has five obligations, numbered One
+to Five, and every count of six now says five.
 ## 2.73.0 - 2026-11-01
 
 Build Standard v1.2. Testing goes back to Cal's way, one test on the real task before a change and
