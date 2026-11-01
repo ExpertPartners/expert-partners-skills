@@ -1,3 +1,20 @@
+## 2.75.0 - 2026-11-01
+
+Code Block Routing follows Decision Log 2026-11-01, Chat to Code moves forward on its own, as
+amended the same day, and the ruling that the GitHub connection always files job issues ready to
+build, with no labeling by Allison. A code job is filed as one GitHub issue whose title begins with
+Job:, with the body Mission, Objective, Files in scope, Acceptance checks and Decisions already
+made, and that issue starts the Builder on its own. It is never filed as a board job that someone
+copies into an issue, which is what happened to board jobs 100015 and 100016 on October 31.
+job_create is for non-code jobs only, research, document, decision, browser and report jobs.
+Ember will pick those up automatically once the Ember Rebuild room puts her live, and until then a
+copy box wakes the assigned chat. Alerts to Allison come through Ember, and the Chat to Code Text
+Ping is switched off. Everything else in the skill stays as it was, including one copy box per
+response, FROM, TO, MODEL AND EFFORT or SPEED, worktrees for spawned code sessions, and job_finish
+with a verified summary and result link (Decision Log 2026-10-31, the mail system is dissolved
+everywhere). In the same pull request the skills Builder workflow accepts job issues from
+expertpartners-aura, and when an allowlisted author opens an issue whose title begins with Job:,
+the workflow adds the job label itself with the Factory app token and builds it once.
 ## 2.74.0 - 2026-11-01
 
 New skill book-moment v1.0 (Decision Log 2026-11-01, Book Moment is one simple skill, and the old
