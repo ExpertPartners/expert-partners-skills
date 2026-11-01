@@ -1,3 +1,21 @@
+## 2.73.0 - 2026-11-01
+
+Build Standard v1.2. Testing goes back to Cal's way, one test on the real task before a change and
+one after, in place of repeated passes (Decision Log 2026-10-31, Testing goes back to Cal's way, one
+test on the real task before a change and one after). When a test fails, the builder first weighs
+what broke, how bad it is and what it affects against the time and cost of retesting. A cosmetic
+problem is fixed, confirmed once and watched on the tool's first real jobs. A wrong or broken result
+gets the full retest. Allison sees the weighing before anything is skipped. The build price estimate
+and the dollar wait line are gone from the rules, the report and the final checklist, and the report no longer carries a
+spend line (Decision Log 2026-10-31, the ruling that ends build price estimates and the dollar wait
+line, anywhere). A cosmetic problem Allison agrees to is the one named exception to the release
+rule, and a full retest includes the upstream test and the supervised run. Judges
+keep the two of three tolerance and the lowest model that can do the job, and on Factory work
+Factory picks the models (Decision Log 2026-10-31, Factory picks and manages the models on Factory
+work). Reports go in the Chat to Code job list. The stop and report after a failed round, never
+editing a test to pass it, the builder never certifying its own work, the chain map and exact
+behavior all stay as they were in v1.1.
+
 ## 2.72.0 - 2026-10-31
 
 Retire the AI mail system under Allison's October 31 ruling (Decision Log 2026-10-31, Mail
