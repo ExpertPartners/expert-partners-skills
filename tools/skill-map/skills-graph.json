@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "3697b73e5a5471cb7973246b3373498158554f78",
+    "eps": "42095e23af460e2d7395c42b9ab842d32776e37b",
     "aura": "627ce152dada2b6fd8f7fc7866dc670525dd62e5"
   },
   "zones": [
@@ -58,7 +58,7 @@
       "renderNote": null,
       "layout": {
         "x": 1009,
-        "y": 4998,
+        "y": 3494,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -86,7 +86,7 @@
       "renderNote": null,
       "layout": {
         "x": 994,
-        "y": 3856,
+        "y": 5228,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -343,7 +343,7 @@
       "renderNote": null,
       "layout": {
         "x": 1282,
-        "y": 4808.8,
+        "y": 4723,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -371,7 +371,7 @@
       "renderNote": null,
       "layout": {
         "x": 1009,
-        "y": 3943,
+        "y": 3682,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -397,7 +397,7 @@
       "renderNote": null,
       "layout": {
         "x": 1009,
-        "y": 5576,
+        "y": 5026,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -481,7 +481,7 @@
       "renderNote": null,
       "layout": {
         "x": 1006,
-        "y": 4131,
+        "y": 4521,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -508,7 +508,7 @@
       "renderNote": null,
       "layout": {
         "x": 997,
-        "y": 5360,
+        "y": 5127,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -801,7 +801,7 @@
       "renderNote": null,
       "layout": {
         "x": 1006,
-        "y": 4796,
+        "y": 4723,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1111,7 +1111,7 @@
       "renderNote": null,
       "layout": {
         "x": 971.5,
-        "y": 5461,
+        "y": 4911,
         "width": 281,
         "height": 91,
         "rectHeight": 76,
@@ -1142,7 +1142,7 @@
       "renderNote": null,
       "layout": {
         "x": 1050,
-        "y": 4897,
+        "y": 4319,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1170,7 +1170,7 @@
       "renderNote": null,
       "layout": {
         "x": 1282,
-        "y": 4707.8,
+        "y": 4056.8,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -1200,7 +1200,7 @@
       "renderNote": null,
       "layout": {
         "x": 1062,
-        "y": 4695,
+        "y": 4044,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -1226,7 +1226,7 @@
       "renderNote": null,
       "layout": {
         "x": 993.5,
-        "y": 5099,
+        "y": 4232,
         "width": 237,
         "height": 63,
         "rectHeight": 48,
@@ -1251,7 +1251,7 @@
       "renderNote": null,
       "layout": {
         "x": 997,
-        "y": 5273,
+        "y": 4145,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -1723,7 +1723,7 @@
       "renderNote": null,
       "layout": {
         "x": 994,
-        "y": 4608,
+        "y": 4824,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -1804,7 +1804,7 @@
       "renderNote": null,
       "layout": {
         "x": 986,
-        "y": 4521,
+        "y": 3870,
         "width": 252,
         "height": 63,
         "rectHeight": 48,
@@ -2583,6 +2583,37 @@
       }
     },
     {
+      "id": "source-hunter",
+      "source": "eps:plugins/research-ops/skills/source-hunter/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "video-discovery"
+      ],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "recovers on-screen and public course material into private evidence",
+      "renderNote": null,
+      "layout": {
+        "x": 1044,
+        "y": 4608,
+        "width": 218,
+        "height": 91,
+        "rectHeight": 76,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "recovers on-screen and public",
+          "course material into private",
+          "evidence"
+        ]
+      }
+    },
+    {
       "id": "speaker-introduction-writer",
       "source": "eps:plugins/content-engines/skills/speaker-introduction-writer/SKILL.md",
       "repo": "eps",
@@ -2767,7 +2798,7 @@
       "renderNote": null,
       "layout": {
         "x": 962,
-        "y": 5186,
+        "y": 3595,
         "width": 300,
         "height": 63,
         "rectHeight": 48,
@@ -2794,7 +2825,7 @@
       "renderNote": null,
       "layout": {
         "x": 962,
-        "y": 4333,
+        "y": 3783,
         "width": 300,
         "height": 63,
         "rectHeight": 48,
@@ -2821,7 +2852,7 @@
       "renderNote": null,
       "layout": {
         "x": 962,
-        "y": 4044,
+        "y": 3957,
         "width": 300,
         "height": 63,
         "rectHeight": 48,
@@ -2874,8 +2905,8 @@
       "subtitle": "public video discovery with evidence and bounded playback checks",
       "renderNote": null,
       "layout": {
-        "x": 1003,
-        "y": 4218,
+        "x": 1282,
+        "y": 4608,
         "width": 218,
         "height": 91,
         "rectHeight": 76,
@@ -3288,11 +3319,11 @@
       "points": [
         {
           "x": 1506,
-          "y": 4834.5
+          "y": 4748.7
         },
         {
           "x": 1583,
-          "y": 4834.5
+          "y": 4748.7
         },
         {
           "x": 1583,
@@ -3319,11 +3350,11 @@
       "points": [
         {
           "x": 1506,
-          "y": 4860.2
+          "y": 4774.3
         },
         {
           "x": 1573,
-          "y": 4860.2
+          "y": 4774.3
         },
         {
           "x": 1573,
@@ -3546,19 +3577,19 @@
       "points": [
         {
           "x": 1262,
-          "y": 4935.5
+          "y": 4357.5
         },
         {
           "x": 1272,
-          "y": 4935.5
+          "y": 4357.5
         },
         {
           "x": 1272,
-          "y": 4759.2
+          "y": 4108.2
         },
         {
           "x": 1282,
-          "y": 4759.2
+          "y": 4108.2
         }
       ]
     },
@@ -3581,11 +3612,11 @@
       "points": [
         {
           "x": 1262,
-          "y": 4733.5
+          "y": 4082.5
         },
         {
           "x": 1282,
-          "y": 4733.5
+          "y": 4082.5
         }
       ]
     },
@@ -3979,6 +4010,27 @@
       "points": null
     },
     {
+      "from": "source-hunter",
+      "to": "video-discovery",
+      "type": "calls",
+      "points": [
+        {
+          "x": 1262,
+          "y": 4653.5
+        },
+        {
+          "x": 1282,
+          "y": 4653.5
+        }
+      ]
+    },
+    {
+      "from": "source-hunter",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
       "from": "speaker-introduction-writer",
       "to": "brand-voice",
       "type": "defers-to",
@@ -4242,7 +4294,7 @@
         "label": "The hands",
         "caption": "funnel work and account operations",
         "x": 940,
-        "y": 3808,
+        "y": 3446,
         "width": 588,
         "height": 1867,
         "rooms": []
