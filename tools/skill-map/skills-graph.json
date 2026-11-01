@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "be81fb1fac36a890e195a580ca7ae9a90f7c72d8",
-    "aura": "bc607af874585bfe4a0810eb1701eb299483f497"
+    "eps": "2b05e913a59c4572fff237612065bbe34f60bca2",
+    "aura": "627ce152dada2b6fd8f7fc7866dc670525dd62e5"
   },
   "zones": [
     "surfaces",
@@ -636,7 +636,7 @@
         "pin"
       ],
       "brandScope": [],
-      "subtitle": "paste block routing and the Job Tracker",
+      "subtitle": "paste block routing and the job list",
       "renderNote": null,
       "layout": {
         "x": 632,
@@ -646,8 +646,8 @@
         "rectHeight": 62,
         "annotationHeight": 15,
         "subtitleLines": [
-          "paste block routing and the Job",
-          "Tracker"
+          "paste block routing and the job",
+          "list"
         ]
       }
     },
