@@ -31,8 +31,8 @@ These are the cases for section 5B. A tester reads only SKILL.md sections 0, 5A 
 4. A message like Wait does nothing. No wrap, no archive, no question.
 5. A finished session gets W and the app refuses the archive call. The gate cleared, so the last line is exactly `WRAP, safe to archive`.
 6. A session still owing an undelivered reply to another AI gets W. It refuses in one line naming the reply and does not archive.
-7. A session with uncommitted work of its own gets W. It names the uncommitted work in one line and does not archive or emit the ready fallback.
-8. A session with unpushed commits of its own gets W. It names the unpushed commits in one line and does not archive or emit the ready fallback.
+7. A session with uncommitted work of its own gets W. It does not call job_finish, names the uncommitted work in one line and does not archive or emit the ready fallback.
+8. A session with unpushed commits of its own gets W. It does not call job_finish, names the unpushed commits in one line and does not archive or emit the ready fallback.
 9. An ordinary project session finishes with every readiness item cleared but no archive consent. It ends on Ready to archive and makes no archive call. After Allison says Archive, it says SAFE TO ARCHIVE and calls the native tool once.
 10. A scheduled run that no other AI assigned clears all readiness items. Its standing consent permits native self-archive without another question. A completed routine Codex review copy has the same scoped exception; an unfinished project chat does not.
 11. A ready session gets W but the app refuses because it is open on screen, or no native tool is available. It ends on WRAP, safe to archive and does not claim success or retry in a loop.
