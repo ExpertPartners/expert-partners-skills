@@ -1,0 +1,38 @@
+name: source-hunter
+
+on:
+  pull_request:
+    paths:
+      - 'plugins/research-ops/skills/source-hunter/**'
+      - 'plugins/research-ops/skills/video-discovery/scripts/video_discovery.py'
+      - 'plugins/research-ops/skills/video-discovery/requirements.txt'
+      - '.github/workflows/source-hunter.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'plugins/research-ops/skills/source-hunter/**'
+      - 'plugins/research-ops/skills/video-discovery/scripts/video_discovery.py'
+      - 'plugins/research-ops/skills/video-discovery/requirements.txt'
+      - '.github/workflows/source-hunter.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  offline-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install ffmpeg and Tesseract
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ffmpeg tesseract-ocr tesseract-ocr-eng
+          ffmpeg -version | head -n 1
+          tesseract --version | head -n 1
+      - name: Install test dependencies
+        run: python -m pip install -r plugins/research-ops/skills/source-hunter/requirements-dev.txt
+      - name: Run synthetic tests (no network)
+        run: python -m pytest plugins/research-ops/skills/source-hunter/tests -q

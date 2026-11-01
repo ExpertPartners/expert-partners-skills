@@ -1,0 +1,2 @@
+-r ../video-discovery/requirements.txt
+Pillow>=10.1,<14
