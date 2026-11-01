@@ -115,6 +115,14 @@ class Hunt:
             number += 1
         return self.mkdir(f"{prefix}-{number:02d}")
 
+    def latest_dir(self, prefix: str) -> Path | None:
+        """Return the highest numbered folder made by fresh_dir, or None."""
+        number, latest = 1, None
+        while self.path(f"{prefix}-{number:02d}").is_dir():
+            latest = self.path(f"{prefix}-{number:02d}")
+            number += 1
+        return latest
+
     def write_text(self, relative: str | os.PathLike, content: str) -> Path:
         target = self.path(relative)
         target.parent.mkdir(parents=True, exist_ok=True)

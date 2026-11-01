@@ -11,6 +11,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import re
 import shutil
 import subprocess
 from dataclasses import dataclass
@@ -101,13 +102,31 @@ def probe_frame_rate(video: Path) -> float:
     raise FrameError(f"Cannot read the frame rate of {video.name}.")
 
 
-def _filters(options: FrameOptions) -> list[str]:
-    if not options.crop:
-        return []
-    parts = options.crop.replace("x", ":").split(":")
-    if len(parts) != 4 or not all(p.isdigit() for p in parts):
-        raise FrameError("Crop must be W:H:X:Y in pixels, for example 1280:600:0:120.")
-    return ["-vf", "crop=" + ":".join(parts)]
+SHOWINFO = re.compile(r"\bn:\s*(\d+)\s+pts:\s*\S+\s+pts_time:\s*(-?[0-9.]+)")
+
+
+def _filters(options: FrameOptions, showinfo: bool = False) -> list[str]:
+    chain = []
+    if options.crop:
+        parts = options.crop.replace("x", ":").split(":")
+        if len(parts) != 4 or not all(p.isdigit() for p in parts):
+            raise FrameError("Crop must be W:H:X:Y in pixels, for example 1280:600:0:120.")
+        chain.append("crop=" + ":".join(parts))
+    if showinfo:
+        # showinfo logs each frame's real presentation time, which matters for variable frame rate recordings.
+        chain.append("showinfo")
+    return ["-vf", ",".join(chain)] if chain else []
+
+
+def frame_times(log_text: str) -> dict[int, float]:
+    """Map frame number to presentation time from showinfo log lines."""
+    times = {}
+    for line in log_text.splitlines():
+        if "showinfo" in line:
+            match = SHOWINFO.search(line)
+            if match:
+                times[int(match.group(1))] = float(match.group(2))
+    return times
 
 
 def _first_frame_size(ffmpeg: str, video: Path, start: float, options: FrameOptions, work: Path) -> tuple[int, int]:
@@ -124,15 +143,20 @@ def _first_frame_size(ffmpeg: str, video: Path, start: float, options: FrameOpti
     return size
 
 
-def iter_gray_frames(video: Path, start: float, end: float, options: FrameOptions, work: Path):
-    """Yield every decoded frame in [start, end) as a grayscale image."""
+def iter_gray_frames(video: Path, start: float, end: float, options: FrameOptions, work: Path,
+                     times: dict[int, float] | None = None):
+    """Yield every decoded frame in [start, end) as a grayscale image.
+
+    When times is given, it is filled after decoding with each frame's
+    presentation time in seconds from the start of the window.
+    """
     ffmpeg = require_tool("ffmpeg")
     width, height = _first_frame_size(ffmpeg, video, start, options, work)
     frame_bytes = width * height
     log_path = work / "ffmpeg-stderr.txt"
-    base = [ffmpeg, "-hide_banner", "-loglevel", "error", "-ss", f"{start:.3f}", "-i", str(video),
+    base = [ffmpeg, "-hide_banner", "-nostats", "-loglevel", "info", "-ss", f"{start:.3f}", "-i", str(video),
             "-t", f"{end - start:.3f}", "-map", "0:v:0", "-an"]
-    tail = [*_filters(options), "-pix_fmt", "gray", "-f", "rawvideo", "-"]
+    tail = [*_filters(options, showinfo=True), "-pix_fmt", "gray", "-f", "rawvideo", "-"]
     for sync in (["-fps_mode", "passthrough"], ["-vsync", "passthrough"]):
         yielded = 0
         with log_path.open("w") as log:
@@ -147,9 +171,12 @@ def iter_gray_frames(video: Path, start: float, end: float, options: FrameOption
             finally:
                 proc.stdout.close()
                 code = proc.wait()
-        if code == 0:
-            return
         message = log_path.read_text(errors="replace")
+        if code == 0:
+            if times is not None:
+                times.update(frame_times(message))
+            return
+        message = "\n".join(l for l in message.splitlines() if "showinfo" not in l)
         if yielded == 0 and "fps_mode" in message:
             continue  # older ffmpeg without -fps_mode
         raise FrameError(f"ffmpeg failed while reading frames: {message.strip()[-400:]}")
@@ -251,11 +278,11 @@ def recover_frames(hunt: Hunt, video: str | Path, start: str | float, end: str |
     """Run frame recovery and record it as one route of the hunt."""
     options = options or FrameOptions()
     video = Path(video).expanduser()
-    start_s, end_s = parse_time(start), parse_time(end)
-    target = f"{video.name}, {format_time(start_s)} to {format_time(end_s)}"
-    route = {"route": "frame recovery", "target": target}
+    route = {"route": "frame recovery", "target": f"{video.name}, {start} to {end}"}
     work = None
     try:
+        start_s, end_s = parse_time(start), parse_time(end)
+        route["target"] = f"{video.name}, {format_time(start_s)} to {format_time(end_s)}"
         if not video.is_file():
             raise FrameError(f"The video file {video} does not exist. Download it locally first.")
         if end_s <= start_s:
@@ -283,12 +310,12 @@ def recover_frames(hunt: Hunt, video: str | Path, start: str | float, end: str |
             previous[1].save(image_path)
             record["kept"] = True
             record["image"] = hunt.rel(image_path)
-            record["first_seen"] = records[run_members[0]]["time"]
             for member in run_members[:-1]:
                 records[member]["duplicate_of"] = last_index
             kept.append(record)
 
-        for index, image in enumerate(iter_gray_frames(video, start_s, end_s, options, work)):
+        pts: dict[int, float] = {}
+        for index, image in enumerate(iter_gray_frames(video, start_s, end_s, options, work, pts)):
             records.append({"index": index, "time": round(start_s + index / fps, 3), "kept": False})
             if run_start is not None:
                 threshold = max(options.min_changed_pixels, options.change_fraction * image.width * image.height)
@@ -303,6 +330,12 @@ def recover_frames(hunt: Hunt, video: str | Path, start: str | float, end: str |
 
         if not records:
             raise FrameError("No frames were decoded in that window. Check the times against the video length.")
+        if len(pts) == len(records):
+            for record in records:
+                record["time"] = round(start_s + pts[record["index"]], 3)
+        for record in kept:
+            members = [r for r in records if r.get("duplicate_of") == record["index"]]
+            record["first_seen"] = members[0]["time"] if members else record["time"]
 
         frames_for_stitch = []
         for record in kept:

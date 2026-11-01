@@ -7,10 +7,8 @@ It points to the evidence files instead.
 
 from __future__ import annotations
 
-from difflib import SequenceMatcher
-
 from evidence import REPORT_FILE, Hunt, now_iso
-from stitch import normalize
+from stitch import normalize, similar
 
 
 def text_contains(want: str, text: str, threshold: float = 0.85) -> bool:
@@ -18,14 +16,14 @@ def text_contains(want: str, text: str, threshold: float = 0.85) -> bool:
     target = normalize(want)
     if not target:
         return False
-    if target in normalize(text):
+    if f" {target} " in f" {normalize(text)} ":
         return True
     size = len(target.split())
     for line in text.splitlines():
         words = normalize(line).split()
         for start in range(0, max(1, len(words) - size + 1)):
             window = " ".join(words[start:start + size])
-            if window and SequenceMatcher(None, target, window, autojunk=False).ratio() >= threshold:
+            if window and similar(target, window, threshold):
                 return True
     return False
 

@@ -8,6 +8,7 @@ FIRECRAWL_API_KEY environment variable when the sweep runs and is never saved.
 
 from __future__ import annotations
 
+import http.client
 import json
 import os
 import re
@@ -55,21 +56,28 @@ class FirecrawlClient:
                 body = json.loads(response.read().decode("utf-8") or "{}")
         except urllib.error.HTTPError as exc:
             raise SweepError(f"Firecrawl {path} returned HTTP {exc.code}") from None
-        except (urllib.error.URLError, TimeoutError, ValueError) as exc:
+        except (urllib.error.URLError, OSError, http.client.HTTPException, ValueError) as exc:
             raise SweepError(f"Firecrawl {path} failed: {exc.__class__.__name__}") from None
+        if not isinstance(body, dict):
+            raise SweepError(f"Firecrawl {path} returned an unexpected reply")
         if body.get("success") is False:
             raise SweepError(f"Firecrawl {path} reported failure: {str(body.get('error') or '')[:200]}")
         return body
 
     def search(self, query: str, limit: int = 5) -> list[dict]:
         data = self._post("search", {"query": query, "limit": limit}).get("data") or []
+        if not isinstance(data, (dict, list)):
+            raise SweepError("Firecrawl search returned an unexpected reply")
         if isinstance(data, dict):
             data = data.get("web") or []
         return [item for item in data if isinstance(item, dict) and item.get("url")]
 
     def scrape(self, url: str) -> dict:
         body = self._post("scrape", {"url": url, "formats": ["markdown"], "onlyMainContent": True})
-        return body.get("data") or {}
+        data = body.get("data") or {}
+        if not isinstance(data, dict):
+            raise SweepError("Firecrawl scrape returned an unexpected reply")
+        return data
 
 
 def is_url(target: str) -> bool:
@@ -119,6 +127,7 @@ def sweep(hunt: Hunt, targets: list[str], client=None, results_per_name: int = 5
     pages_dir.mkdir()
     seen: set[str] = set()
     saved_total = 0
+    fetched_total = 0
     index: list[dict] = []
     records = []
     for target in targets:
@@ -144,9 +153,10 @@ def sweep(hunt: Hunt, targets: list[str], client=None, results_per_name: int = 5
             if host_blocked(url, blocked):
                 missing.append(f"{url} was skipped, its domain is on the blocked list")
                 continue
-            if saved_total >= max_pages:
+            if fetched_total >= max_pages:
                 missing.append(f"{url} was not fetched, the {max_pages} page cap was reached")
                 continue
+            fetched_total += 1
             try:
                 data = client.scrape(url)
             except SweepError as exc:
@@ -156,6 +166,10 @@ def sweep(hunt: Hunt, targets: list[str], client=None, results_per_name: int = 5
             status = meta.get("statusCode")
             final_url = meta.get("url") or meta.get("sourceURL") or url
             markdown = data.get("markdown") or ""
+            landed = {final_url, meta.get("sourceURL") or final_url}
+            if any(host_blocked(address, blocked) for address in landed):
+                missing.append(f"{url} was not saved, it redirected to a blocked domain")
+                continue
             wall = login_wall(status, final_url, markdown)
             if wall:
                 missing.append(f"{url} was not saved, {wall}")

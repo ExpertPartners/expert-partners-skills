@@ -151,3 +151,37 @@ def test_login_wall_rules():
     assert login_wall(200, "https://x.org/a", "Log in\nPassword")
     assert login_wall(200, "https://x.org/blog/how-to-login-faster", "An essay") is None
     assert login_wall(200, "https://x.org/a", "Public text") is None
+
+
+def test_page_cap_counts_every_fetch(tmp_path):
+    hunt = Hunt(tmp_path / "evidence")
+    client = FakeClient(PAGES)
+    routes = sweep(hunt, ["https://example.org/members", "https://example.org/gone", "https://example.org/blog/advisor"],
+                   client=client, max_pages=2)
+    assert client.scraped == ["https://example.org/members", "https://example.org/gone"]
+    assert "page cap" in routes[2]["missing"][0]
+
+
+def test_redirect_to_blocked_domain_is_not_saved(tmp_path):
+    hunt = Hunt(tmp_path / "evidence")
+    pages = {"https://example.org/hop": _page("Landed somewhere blocked", url="https://www.blocked.example.net/x")}
+    routes = sweep(hunt, ["https://example.org/hop"], client=FakeClient(pages), blocked_domains=["blocked.example.net"])
+    assert routes[0]["status"] == "nothing found"
+    assert "redirected to a blocked domain" in routes[0]["missing"][0]
+    assert not list((hunt.root / routes[0]["output_dir"] / "pages").iterdir())
+
+
+def test_dropped_connection_and_odd_replies_become_sweep_errors(monkeypatch):
+    monkeypatch.setenv("FIRECRAWL_API_KEY", "k")
+
+    def reset(request, timeout):
+        raise ConnectionResetError("reset")
+
+    with pytest.raises(SweepError, match="ConnectionResetError"):
+        FirecrawlClient(opener=reset).scrape("https://example.org")
+
+    def odd(request, timeout):
+        return FakeResponse(b'["not", "an", "object"]')
+
+    with pytest.raises(SweepError, match="unexpected reply"):
+        FirecrawlClient(opener=odd).scrape("https://example.org")

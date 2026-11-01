@@ -91,3 +91,41 @@ def test_parse_time():
     assert parse_time("01:30") == 90
     assert parse_time("01:02:03.5") == 3723.5
     assert format_time(3723.5) == "01:02:03.500"
+
+
+def test_bad_time_is_a_failed_route(tmp_path):
+    from evidence import Hunt
+    from frames import recover_frames
+
+    hunt = Hunt(tmp_path / "evidence")
+    route = recover_frames(hunt, tmp_path / "absent.mp4", "1:2:3:4", "10")
+    assert route["status"] == "failed"
+    assert "Cannot read time" in route["problems"][0]
+    assert [r["number"] for r in hunt.routes()] == [1]
+
+
+def test_variable_frame_rate_uses_real_frame_times(tmp_path):
+    import shutil
+    import subprocess
+
+    from conftest import _slide
+    from evidence import Hunt
+    from frames import recover_frames
+
+    slides = [["Opening slide held for three seconds"], ["Second slide right after it"], ["Third slide shortly after"]]
+    durations = [3.0, 0.2, 0.2]
+    listing = []
+    for n, (lines, duration) in enumerate(zip(slides, durations)):
+        _slide(lines).save(tmp_path / f"s{n}.png")
+        listing += [f"file 's{n}.png'", f"duration {duration}"]
+    listing.append(f"file 's{len(slides) - 1}.png'")
+    (tmp_path / "list.txt").write_text("\n".join(listing) + "\n")
+    video = tmp_path / "vfr.mkv"
+    subprocess.run([shutil.which("ffmpeg"), "-hide_banner", "-loglevel", "error", "-y", "-f", "concat", "-safe", "0",
+                    "-i", str(tmp_path / "list.txt"), "-fps_mode", "vfr", "-c:v", "ffv1", "-pix_fmt", "yuv420p",
+                    str(video)], check=True)
+    hunt = Hunt(tmp_path / "evidence")
+    route = recover_frames(hunt, video, 0, 4)
+    data = json.loads((hunt.root / route["output_dir"] / "recovered.json").read_text())
+    starts = [round(screen["first_time"], 1) for screen in data["screens"]]
+    assert starts == [0.0, 3.0, 3.2], data["screens"]

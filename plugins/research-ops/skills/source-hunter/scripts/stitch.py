@@ -8,6 +8,7 @@ overlap are added, so the scroll comes back as one text with no repeats.
 from __future__ import annotations
 
 import re
+import unicodedata
 from dataclasses import asdict, dataclass, field
 from difflib import SequenceMatcher
 
@@ -39,7 +40,9 @@ class Screen:
 
 
 def normalize(text: str) -> str:
-    return re.sub(r"\s+", " ", re.sub(r"[^0-9a-z]+", " ", text.lower())).strip()
+    decomposed = unicodedata.normalize("NFKD", text).casefold()
+    stripped = "".join(ch for ch in decomposed if not unicodedata.combining(ch))
+    return re.sub(r"[\W_]+", " ", stripped).strip()
 
 
 def similar(a: str, b: str, threshold: float = SIMILARITY) -> bool:
@@ -48,6 +51,9 @@ def similar(a: str, b: str, threshold: float = SIMILARITY) -> bool:
         return False
     if na == nb:
         return True
+    # Numbered lines (Week 1, Week 2) score as near matches but are different lines.
+    if re.findall(r"\b\d+\b", na) != re.findall(r"\b\d+\b", nb):
+        return False
     return SequenceMatcher(None, na, nb, autojunk=False).ratio() >= threshold
 
 
@@ -108,7 +114,7 @@ def _contained(screen: Screen, new: list[Line]) -> bool:
 def _drop_consecutive_repeats(lines: list[Line]) -> list[Line]:
     out: list[Line] = []
     for line in lines:
-        if out and similar(out[-1].text, line.text, 0.95):
+        if out and normalize(out[-1].text) == normalize(line.text):
             if line.conf > out[-1].conf:
                 out[-1] = Line(line.text, line.conf, out[-1].frame, out[-1].time)
             continue

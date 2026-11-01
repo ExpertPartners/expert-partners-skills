@@ -37,3 +37,20 @@ def test_small_ocr_misread_still_overlaps():
     screens = stitch([_frame(0, DOC[:4]), _frame(1, noisy)])
     assert len(screens) == 1
     assert len(screens[0].lines) == 6
+
+
+def test_numbered_lines_are_kept_apart():
+    weeks = [f"Week {n} call recording link" for n in range(1, 9)]
+    static = stitch([_frame(0, weeks[:3])])
+    assert [l.text for l in static[0].lines] == weeks[:3]
+    scrolled = stitch([_frame(n, weeks[n:n + 5]) for n in range(0, 4)])
+    assert len(scrolled) == 1
+    assert [l.text for l in scrolled[0].lines] == weeks
+
+
+def test_non_latin_text_survives_normalizing():
+    from stitch import normalize, similar
+
+    assert normalize("Привет, мир") == "привет мир"
+    assert normalize("Café naïve") == "cafe naive"
+    assert similar("Привет мир", "привет, мир")

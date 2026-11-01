@@ -51,7 +51,15 @@ def run_video_discovery(hunt: Hunt, args: list[str], script: str | Path | None =
         route.update(status="failed", problems=[f"video-discovery command not found at {script}"],
                      missing=["Unlisted videos for this target"])
         return hunt.record_route(route)
-    out_dir = hunt.fresh_dir("videos/run")
+    if "--resume" in args:
+        # video-discovery resumes from the budgets and evidence in its earlier output folder.
+        out_dir = hunt.latest_dir("videos/run")
+        if out_dir is None:
+            route.update(status="failed", problems=["--resume was given but this hunt has no earlier video run"],
+                         missing=["Unlisted videos for this target"])
+            return hunt.record_route(route)
+    else:
+        out_dir = hunt.fresh_dir("videos/run")
     cmd = [python, str(script), *args, "--output", str(out_dir)]
     try:
         proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
@@ -67,8 +75,10 @@ def run_video_discovery(hunt: Hunt, args: list[str], script: str | Path | None =
     evidence = [hunt.rel(p) for p in (out_dir / "findings.md", out_dir / "catalog.json", summary_path) if p.exists()]
     evidence.append(hunt.rel(console))
     if code == 0:
-        status = "found" if summary.get("candidates") else "nothing found"
-        missing = [] if summary.get("candidates") else ["No candidate videos were found"]
+        # Seeds are videos we already had, so only records beyond them count as found.
+        new = summary.get("new_candidates", summary.get("candidates", 0))
+        status = "found" if new else "nothing found"
+        missing = [] if new else ["No candidate videos beyond the seeds were found"]
         problems = []
     else:
         status = "failed"
