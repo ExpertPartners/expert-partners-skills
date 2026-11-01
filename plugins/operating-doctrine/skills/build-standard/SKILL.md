@@ -33,20 +33,20 @@ Rulings behind it, all in the live Decision Log. The HQ Build Standard becomes p
 2. Start from an approved spec. No spec approved by Allison means no build. Build what the spec says and nothing more.
 3. Traceable. Every instruction in the tool points to the spec line it comes from. An instruction with no spec line is removed or sent back to be added to the spec.
 4. Tests. Replay every demonstration in the spec, plus the spec's test cases, which include real Expert Partners cases, missing information, conflicting information and a revised file. Save each input, output and comparison as evidence. Deterministic behavior keeps exact pass rules. AI-written parts of a tool's output get a stated tolerance in the test plan. A part fails only when two of three independent judges agree it is wrong against the source, meaning a wrong name, number, spelling, attribution or order, or a claim the source does not make. A lone judge's refutation or a wording note is logged in the report and fixed in the next version. Judges run on the lowest model that can do the job, per the Model chart in the HQ Rulebook, not the tool's own model (Decision Log 2026-10-30, Every build carries four cost and quality rules). On Factory work, Factory picks the models (Decision Log 2026-10-31, Factory picks and manages the models on Factory work).
-5. One test before, one test after. This is Cal's way. Each test runs once on the real task before a change, to show where things stand, and once on the same task after the change, to show the change works. A test passes when its after run matches the expected result. For a new tool, the before run is the source's own output or the spec's demonstration. After any failed test, the builder stops and reports in the existing Chat to Code job before spending more, and weighs the problem before any retest (Decision Log 2026-10-31, Testing goes back to Cal's way, one test on the real task before a change and one after).
+5. One test before, one test after. This is Cal's way. Each test runs once on the real task before a change, to show where things stand, and once on the same task after the change, to show the change works. A test passes when its after run matches the expected result (Decision Log 2026-10-31, Testing goes back to Cal's way, one test on the real task before a change and one after). For a new tool, the before run for each test is the source's own output or the spec's demonstration of that case, and where neither shows that case, it is the expected result written in the test plan. For a live tool brought back through with no change, the graded run is one run on the real task compared with the source's output or the saved evidence. After any failed test, the builder stops and reports in the existing Chat to Code job before spending more, and weighs the problem before any retest (Decision Log 2026-10-30, Every build carries four cost and quality rules).
 6. Never edit a test to pass it. Fix the tool or report the failure. A test changes only when the spec changes, and then Allison approves the spec change first and every test reruns.
 7. Live where it belongs. Skills live in the expert-partners-skills marketplace and are verified on every surface they are meant to reach, Claude chat, Claude Code, Codex and ChatGPT, through their marketplace routes. Cowork is now part of Claude. Knowledge lives in its owning home. No hand-made or platform-only copies.
 8. Chain. Test alone first. Then test with everything upstream of it, using the real outputs of the tools that feed it. When a tool changes, rerun its own tests and the tests of every tool downstream that it feeds, before the change is released. Then one supervised run on real work.
 9. Chain map. Before building, read the tool's record in Notion HQ for what feeds it and what it feeds. HQ starts that record the day Allison approves the spec. If it is missing, report it and continue from the spec's stated chain, and release stays blocked until HQ adds it. After testing, draft that record's update in the report, with feeds, fed by, last test date, result and evidence links. HQ writes it after certification. The builder does not write it.
 10. Report and certify. One report in the fixed format below. The builder never certifies its own work. Claude in HQ and Allison certify.
-11. Retest after every change. The same cases, one test on the real task before the change and one after, and nothing is released until every after run passes. When a test fails, weigh the problem first, as the next section says.
+11. Retest after every change. The same cases, one test on the real task before the change and one after, and nothing is released until every after run passes. The one exception is a problem Allison has agreed is cosmetic and fixed, as the next section says. When a test fails, weigh the problem first.
 
 ## Weigh the problem before retesting
 
 When a test fails, the builder does not rerun everything by reflex. It first writes down what broke, how bad it is and what it affects, and sets that against the time and cost of retesting.
 
-1. A cosmetic problem, such as a layout slip, a heading or a wording note that leaves every result right, gets fixed and confirmed once on the same task, and the build moves on. The tool is watched on its first real jobs.
-2. A wrong or broken result, such as a wrong name, number, step, save place or update, or a missing part of the job, gets the full retest. That means the tool's own tests and every downstream test the chain check names, before and after.
+1. A cosmetic problem leaves every result right and touches nothing rule 1 makes exact, so never a section, field, order, file name or save place. A layout slip is the usual example. It gets fixed and confirmed once on the same task, and once Allison agrees it is cosmetic, the build moves on without the downstream reruns. The tool is watched on its first real jobs. A lone judge's wording note is not a failed test. It stays under rule 4, logged and fixed in the next version.
+2. A wrong or broken result, such as a wrong name, number, step, save place or update, or a missing part of the job, gets the full retest. That means the tool's own tests, the upstream test with real upstream outputs, every downstream test the chain check names, and the supervised run on real work, before and after.
 3. Allison sees the weighing before anything is skipped. The builder logs it in the Chat to Code job list and waits for her before treating any problem as cosmetic.
 
 The weighing and Allison's answer go in the report.
@@ -67,7 +67,7 @@ When a tool is new or changes, produce this list before anything is released.
 Upstream tools, each with the real output it feeds in.
 Downstream tools, each with the tests that must rerun, named one by one.
 For each downstream tool, the result of its rerun, before and after.
-Anything that did not rerun and why. Anything that did not rerun blocks the release.
+Anything that did not rerun and why. Anything that did not rerun blocks the release, unless it was skipped under a cosmetic weighing Allison agreed to, which the report names.
 
 A change to an upstream tool always names the downstream tests to rerun, even when the change looks small.
 
@@ -77,7 +77,7 @@ The builder drafts the report and stops. It never writes certified, approved, pa
 
 ## The report
 
-One report, in this format, in this order.
+One report, in this format, in this order. The builder saves it where the tool's work lives and links it in the existing Chat to Code job, whether every test passed or not.
 
 What was built. One short paragraph with where it lives.
 Spec link. The approved spec and the date Allison approved it.
