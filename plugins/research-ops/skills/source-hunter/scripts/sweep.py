@@ -162,7 +162,8 @@ def sweep(hunt: Hunt, targets: list[str], client=None, results_per_name: int = 5
             except SweepError as exc:
                 problems.append(f"{url}: {exc}")
                 continue
-            meta = data.get("metadata") or {}
+            meta = data.get("metadata")
+            meta = meta if isinstance(meta, dict) else {}
             status = meta.get("statusCode")
             final_url = meta.get("url") or meta.get("sourceURL") or url
             markdown = data.get("markdown") or ""

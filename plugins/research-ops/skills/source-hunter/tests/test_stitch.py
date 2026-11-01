@@ -54,3 +54,24 @@ def test_non_latin_text_survives_normalizing():
     assert normalize("Привет, мир") == "привет мир"
     assert normalize("Café naïve") == "cafe naive"
     assert similar("Привет мир", "привет, мир")
+
+
+def test_slides_sharing_a_footer_stay_separate_and_keep_every_line():
+    footer = ["Expert Partners brand footer", "Page footer with the date"]
+    a = ["Title for slide A", "first point on slide A", "second point on slide A"] + footer
+    b = ["How pricing works", "Charge for the outcome, not the hours"] + footer
+    c = ["Scoring the board", "Each advisor gives one number"] + footer
+    screens = stitch([_frame(0, a), _frame(1, b), _frame(2, c)])
+    texts = [l.text for s in screens for l in s.lines]
+    for line in a + b + c:
+        assert line in texts
+    assert len(screens) == 3
+
+
+def test_slides_sharing_a_header_keep_the_earlier_last_line():
+    a = ["Module one overview", "Shadow board advisor setup", "Ask three advisors for input"]
+    b = ["Module one overview", "Shadow board advisor setup", "Score each answer out loud", "Pick the strongest answer"]
+    screens = stitch([_frame(0, a), _frame(1, b)])
+    texts = [l.text for s in screens for l in s.lines]
+    for line in a + b:
+        assert line in texts

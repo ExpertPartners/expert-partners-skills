@@ -87,12 +87,33 @@ def find_overlap(doc: list[Line], new: list[Line], max_head_skip: int = 2, max_t
     return None if best is None else best[1]
 
 
+def _resembles_any(line: Line, others: list[Line]) -> bool:
+    """True when line looks like a cut off or misread copy of one of others."""
+    nl = normalize(line.text)
+    if not nl:
+        return True
+    for other in others:
+        no = normalize(other.text)
+        if not no:
+            continue
+        if nl in no or no.startswith(nl) or similar(line.text, other.text, 0.6):
+            return True
+    return False
+
+
 def _merge(screen: Screen, new: list[Line]) -> bool:
     doc = screen.lines
     found = find_overlap(doc, new)
     if found is None:
         return False
     i, j, t, tail = found
+    if i > 0 and j > 0:
+        # The lines before the match in the new frame would be thrown away. That is a
+        # different slide sharing a header or footer, not a scroll.
+        return False
+    if j + t < len(new) and tail > 0 and not all(_resembles_any(l, new) for l in doc[i + t :]):
+        # Cutting the doc tail would lose real lines that never show up again.
+        return False
     for k in range(t):
         old, fresh = doc[i + k], new[j + k]
         if fresh.conf > old.conf:
@@ -108,7 +129,12 @@ def _merge(screen: Screen, new: list[Line]) -> bool:
 
 def _contained(screen: Screen, new: list[Line]) -> bool:
     found = find_overlap(screen.lines, new)
-    return found is not None and found[1] + found[2] == len(new)
+    if found is None:
+        return False
+    i, j, t, tail = found
+    # The whole new frame must sit inside the screen from its first line, so a
+    # shared header or footer alone never swallows a different slide.
+    return j == 0 and t == len(new)
 
 
 def _drop_consecutive_repeats(lines: list[Line]) -> list[Line]:

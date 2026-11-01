@@ -70,7 +70,15 @@ def run_video_discovery(hunt: Hunt, args: list[str], script: str | Path | None =
     console = hunt.write_text(out_dir / "source-hunter-console.txt",
                               f"exit code: {code}\n\n--- stdout ---\n{stdout}\n--- stderr ---\n{stderr}\n")
     summary_path = out_dir / "summary.json"
-    summary = json.loads(summary_path.read_text(encoding="utf-8")) if summary_path.exists() else {}
+    summary: dict = {}
+    summary_problems: list[str] = []
+    if summary_path.exists():
+        try:
+            loaded = json.loads(summary_path.read_text(encoding="utf-8"))
+        except ValueError:
+            loaded = None
+            summary_problems.append(f"{summary_path.name} could not be read as JSON")
+        summary = loaded if isinstance(loaded, dict) else {}
     found = [f"{summary[key]} {label}" for key, label in SUMMARY_FIELDS if key in summary]
     evidence = [hunt.rel(p) for p in (out_dir / "findings.md", out_dir / "catalog.json", summary_path) if p.exists()]
     evidence.append(hunt.rel(console))
@@ -85,7 +93,7 @@ def run_video_discovery(hunt: Hunt, args: list[str], script: str | Path | None =
         missing = ["Unlisted videos for this target"]
         last = (stderr or "").strip().splitlines()
         problems = [f"video-discovery exited with code {code}" + (f", {last[-1][:300]}" if last else "")]
-    route.update(status=status, found=found, missing=missing, problems=problems, evidence=evidence,
+    route.update(status=status, found=found, missing=missing, problems=problems + summary_problems, evidence=evidence,
                  text_files=[e for e in evidence if e.endswith("findings.md")], output_dir=hunt.rel(out_dir),
                  counts={k: summary[k] for k, _ in SUMMARY_FIELDS if k in summary})
     return hunt.record_route(route)
