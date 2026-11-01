@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "42095e23af460e2d7395c42b9ab842d32776e37b",
+    "eps": "3206e51d2215d6332bf83e6466186ddfd26f7321",
     "aura": "627ce152dada2b6fd8f7fc7866dc670525dd62e5"
   },
   "zones": [
@@ -195,7 +195,7 @@
       "renderNote": null,
       "layout": {
         "x": 343.5,
-        "y": 6418,
+        "y": 6404,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -260,6 +260,34 @@
         "subtitleLines": [
           "complete, ordered implementation",
           "handoffs"
+        ]
+      }
+    },
+    {
+      "id": "book-moment",
+      "source": "eps:plugins/operating-doctrine/skills/book-moment/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "brain",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "Allison's own words, saved to the right book",
+      "renderNote": null,
+      "layout": {
+        "x": 349.5,
+        "y": 6693,
+        "width": 218,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "Allison's own words, saved to",
+          "the right book"
         ]
       }
     },
@@ -666,7 +694,7 @@
       "renderNote": null,
       "layout": {
         "x": 343.5,
-        "y": 6606,
+        "y": 6317,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -1053,7 +1081,7 @@
       "renderNote": null,
       "layout": {
         "x": 336.5,
-        "y": 6317,
+        "y": 6794,
         "width": 244,
         "height": 77,
         "rectHeight": 62,
@@ -1643,7 +1671,7 @@
       "renderNote": null,
       "layout": {
         "x": 355.5,
-        "y": 6693,
+        "y": 6895,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -1905,7 +1933,7 @@
       "renderNote": "single faint anchor, inheritance edges collapsed",
       "layout": {
         "x": 364.5,
-        "y": 6780,
+        "y": 6491,
         "width": 188,
         "height": 77,
         "rectHeight": 62,
@@ -2261,7 +2289,7 @@
       "renderNote": null,
       "layout": {
         "x": 340.5,
-        "y": 6505,
+        "y": 6592,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -3177,6 +3205,12 @@
       "points": null
     },
     {
+      "from": "book-moment",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
       "from": "brand-voice",
       "to": "ag-luxury-brand",
       "type": "defers-to",
@@ -3327,11 +3361,11 @@
         },
         {
           "x": 1583,
-          "y": 6899
+          "y": 7000
         },
         {
           "x": 18,
-          "y": 6899
+          "y": 7000
         },
         {
           "x": 18,
@@ -3358,11 +3392,11 @@
         },
         {
           "x": 1573,
-          "y": 6889
+          "y": 6990
         },
         {
           "x": 8,
-          "y": 6889
+          "y": 6990
         },
         {
           "x": 8,
@@ -4183,7 +4217,7 @@
   "layout": {
     "engine": "elkjs layered, single INCLUDE_CHILDREN hierarchy over zones and brand rooms, build-time only",
     "width": 1591,
-    "height": 6907,
+    "height": 7008,
     "zones": [
       {
         "id": "brain",
@@ -4192,7 +4226,7 @@
         "x": 314.5,
         "y": 6269,
         "width": 288,
-        "height": 610,
+        "height": 711,
         "rooms": []
       },
       {
