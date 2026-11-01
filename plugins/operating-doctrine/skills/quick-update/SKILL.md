@@ -34,7 +34,7 @@ CEO brief is Teach Me's own step opener, so it never fires this skill. Q and ask
 
 ## What to do when it fires
 
-1. Verify first. Read the live state of what this session worked on, such as git status, the Job Tracker row, logs, test output, or the file itself. Never report from memory what a check can answer. If something cannot be checked, say it is not checked.
+1. Verify first. Read the live state of what this session worked on, such as git status, the job through job_status, logs, test output, or the file itself. Never report from memory what a check can answer. If something cannot be checked, say it is not checked.
 2. Write the heading, Quick update, super simple.
 3. Write the three lists below, in this order, each with its short heading on its own line.
 4. Write the closing status line for the surface (see below).
@@ -56,7 +56,7 @@ Do not soften or hide a problem to keep it simple. If something failed or is unv
 
 ## Closing line
 
-Claude Code and Codex. End with exactly one verified SESSION STATUS line, chosen by the standing tests in the Code close rule, Waiting on you, Still working, SAFE TO ARCHIVE, or NOT safe to archive. Verify it live in the same turn. If waits exist, say where they are lodged, such as the Job Tracker row number.
+Claude Code and Codex. End with exactly one verified SESSION STATUS line, chosen by the standing tests in the Code close rule, Waiting on you, Still working, SAFE TO ARCHIVE, or NOT safe to archive. Verify it live in the same turn. If waits exist, say where they are lodged, such as the Chat to Code job number.
 
 Cowork. Follow the Cowork close rule. Give an advance cue only when a next step exists. When nothing remains, say exactly We're done here. You can archive this session.
 

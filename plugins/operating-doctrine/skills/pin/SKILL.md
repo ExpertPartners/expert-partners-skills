@@ -16,20 +16,24 @@ subtitle: "carry-back envelope and place-keeping baton"
 
 <!-- RULED-BY: aura/decisions/0107-retire-routing-naming-ceremony.md date:2026-10-12 superseded naming text removed -->
 
-A pin is a bookmark, not a task. It marks the exact spot where work handed off between Claude Code and the Claude project conversation that drives it. v4 (ruled by Allison 2026-08-03) makes the protocol surface-neutral: the home is a Claude PROJECT plus CONVERSATION, never assumed to be CoWork, and adds the "come back here" pin close. v4.2 (ruled by Allison 2026-08-03) deletes the closing line that solicited a paste confirmation. v4.5 (re-ruled by Allison 2026-08-07 evening) has the session give its own archive verdict. v4.6 (ruled by Allison 2026-08-07, ruling of record aura intake/2026-08-07-ruling-dispatch-blocks-must-name-worktrees.md) adds the WORKTREE line to spawning blocks. v4.7 (ruled by Allison 2026-08-07, Aura / Code Rule Fix lane) adds the earned verdict line. v4.8 (ruled by Allison 2026-10-24, Decision Log 2026-10-24, Archiving is gated on the paper trail, and an orphan sweep catches what slips) makes the chat message the bell and the Handoffs report row the record, and gates the archive on that row.
+A pin is a bookmark, not a task. It marks the exact spot where work handed off between Claude Code and the Claude project conversation that drives it. Historical amendments, not current handoff instructions: v4 (ruled by Allison 2026-08-03) makes the protocol surface-neutral: the home is a Claude PROJECT plus CONVERSATION, never assumed to be CoWork, and adds the "come back here" pin close. v4.2 (ruled by Allison 2026-08-03) deletes the closing line that solicited a paste confirmation. v4.5 (re-ruled by Allison 2026-08-07 evening) has the session give its own archive verdict. v4.6 (ruled by Allison 2026-08-07, ruling of record aura intake/2026-08-07-ruling-dispatch-blocks-must-name-worktrees.md) adds the WORKTREE line to spawning blocks. v4.7 (ruled by Allison 2026-08-07, Aura / Code Rule Fix lane) adds the earned verdict line. v4.8 (ruled by Allison 2026-10-24, Decision Log 2026-10-24, Archiving is gated on the paper trail, and an orphan sweep catches what slips) makes the chat message the bell and the Handoffs report row the record, and gates the archive on that row. That v4.8 bell and Handoffs report row are retired by Decision Log 2026-10-31, Mail boxes and new Handoffs rows stop.
 
 Pins persist to `~/.claude/baton.md`. Every surface reads the same baton file, so one pin trail spans all of them.
 
 ## 1. Carry-back template
 
-**The chat message is the bell, the Handoffs row is the record (v4.8).** The carry-back is the report row written in the Handoffs tab of the Job Tracker, addressed to the room the work returns to. The message below, with its CLAUDE HOME line, 📬 box, SESSION STATUS and VERDICT, only rings the bell. It gives the bottom line and points at the row, and it is never the record. A report that exists only in chat is not a carry-back, and a session archives itself only after its report row is written and read back and its incoming row is marked Done with a pointer to that report (code-block-routing, The Archive Gate; session-wrap section 5A). A session that cannot reach the tab stays open and says so.
+Follow the current HQ Rulebook section Handoffs between AIs. For a completed assignment, file the outcome through job_finish with a summary and result link and verify it through job_status. An unfinished carry-back preserves progress and the job's nonterminal state through a supported job operation; it never finishes the job merely to send a reply. The copy box carries the complete reply, with its sender, receiver, model and effort or speed, rather than pointing to another message record. A pin is not a job report.
 
 Every report or block bound back to a Claude project ends exactly like this:
 
 ```
+FROM: {sending AI and conversation}
+TO: {receiving AI and conversation}
+MODEL: {model for the receiving chat}
+EFFORT/SPEED: {verified setting for the receiving chat}
 CLAUDE HOME: {Claude project name} / {conversation name}
 
-{the bottom line of the report, and the Handoffs row it was filed in}
+{the complete report, job identity and verified result link}
 
 SESSION STATUS: {the standing status line, section below}
 VERDICT: {RECOMMEND ARCHIVE -- all pushed, nothing pending on Allison's side | RECOMMEND HOLD OPEN, waiting on <the one named thing>}
@@ -51,11 +55,11 @@ A carry-back ends with exactly one of the four SESSION STATUS lines from `behavi
 - `SESSION STATUS: SAFE TO ARCHIVE -- [evidence in one line].`
 - `SESSION STATUS: NOT safe to archive -- [what is open]; run [/session-wrap | /session-closeout | the named action].`
 
-SAFE TO ARCHIVE is a verified claim, never a phrase. It is issued only after all four verify live in the same turn: `git status` clean and pushed on every repo the session touched; the session record, wrap, or closeout note written and pushed when doctrine requires one; every open wait re-lodged in the lane ledger's waiting-on column with its named condition and stale date, so nothing dies with the archive; and the archive gate cleared, meaning the report row is written in Handoffs and read back and the incoming row is marked Done with a pointer to that report. The evidence goes in the line itself.
+SAFE TO ARCHIVE is a verified claim, never a phrase. It is issued only after all four verify live in the same turn: `git status` clean and pushed on every repo the session touched; the session record, wrap, or closeout note written and pushed when doctrine requires one; every open wait preserved in its existing Chat to Code job with its named condition and stale date, so nothing dies with the archive; and the job report saved through job_finish with a summary and result link, verified through job_status. The evidence goes in the line itself.
 
 NOT safe means the session diagnoses AND prescribes: it names exactly what is open and the single move that closes it, /session-wrap when chat-only decisions or flags are unrecorded, /session-closeout when shipped work has no handoff note on main, or the named open action otherwise. Never leave Allison to work out which.
 
-What stays with the home conversation: the ledger flip. The archive itself is the session's own, since a finished code session wraps and archives itself without waiting for Allison (session-wrap section 5A, Decision Log 2026-10-24, Finished code sessions wrap and archive themselves), and the Steward sweeps any that cannot. Home flips the lane's row to `archived` in the Job Tracker as one motion with that archive, and no dispatch block is ever written against a row reading `archived`. Sessions born before v4.5 follow the lifecycle rule from their next response.
+What stays with the home conversation is acceptance of the returned evidence against its mission. The worker files its own job_finish report; the job list, not a pin or a separate ledger, holds current work state. Archive consent follows the current HQ Rulebook section Session lifecycle.
 
 ### The earned verdict line (v4.7, ruled by Allison 2026-08-07, Aura / Code Rule Fix lane)
 
@@ -63,16 +67,14 @@ What stays with the home conversation: the ledger flip. The archive itself is th
 
 Amends v4.5; does not replace it. The standing SESSION STATUS line stays, and every carry-back adds exactly one earned VERDICT line after it, the carry-back's true last line:
 
-- `VERDICT: RECOMMEND ARCHIVE -- all pushed, nothing pending on Allison's side.` Permitted ONLY when the session verifies its checklist live in the same turn: every commit pushed, the whole brief executed, the Handoffs report row written and read back with the incoming row marked Done and pointing at it (v4.8), nothing gated or held open, no deliverable still owed. A bare safe-to-archive with no checklist behind it stays banned.
+- `VERDICT: RECOMMEND ARCHIVE -- all pushed, nothing pending on Allison's side.` Permitted ONLY when the session verifies its checklist live in the same turn: every commit pushed, the whole brief executed, the job_finish summary and result link saved and verified with job_status, nothing gated or held open, no deliverable still owed. A bare safe-to-archive with no checklist behind it stays banned.
 - `VERDICT: RECOMMEND HOLD OPEN, waiting on <the one named thing>.` Every other state earns this one. One named thing, never a list.
 
-Archive authority, as of Decision Log 2026-10-24, Finished code sessions wrap and archive themselves, is the finished code session's own: it archives itself and Allison is never the gate. Home's GitHub grading remains the backstop, and Allison may still archive on the spot on a RECOMMEND ARCHIVE. Sessions born before v4.7 follow it from their next carry-back.
+Archive consent follows the current HQ Rulebook section Session lifecycle. Home's GitHub grading remains the backstop, and Allison may still archive on the spot on a RECOMMEND ARCHIVE. Sessions born before v4.7 follow it from their next carry-back.
 
 ## 2. Pin timing and the come-back close (v4)
 
-**S always means sent, and no other single letter does (2026-10-25, narrowing 2026-10-24).** When Allison types S or s, it always means sent. She delivered the mail, did the step, or pasted the box, in whatever conversation she types it. The session never asks what it means, records the delivery, and moves straight to its next step. A finished session then wraps and archives itself (session-wrap section 5A). A lone S is never ambiguous and is never answered with a question. Any other lone letter, such as Z or A, is not a sent signal. Q or q alone is the clarifying questions shortcut and starts the ask-me-questions skill. Her words, anytime I say S, I mean sent mail, I did it. In this skill a lone S is a paste confirmation, so the pin fires on it exactly as it would on pasted or done.
-
-Pin ONLY after Allison confirms the paste ("pasted", "done", or similar, and S or s alone always counts as sent, per Decision Log 2026-10-25, S means sent, and no other single letter does; a session never asks what a lone S means). Exception: she types "pin" unprompted (bare or with a note), pin immediately. The confirmation is always hers to volunteer: since v4.2 the carry-back never asks for it, so if she says nothing, no pin fires and that is correct. If she supplies her own text, it becomes the in-flight content preserved exactly as typed; still write the awaited part.
+For delivery confirmations, follow the current HQ Rulebook section Handoffs between AIs. Pin only after Allison confirms the paste. Exception: she types pin unprompted (bare or with a note), pin immediately. The confirmation is hers to volunteer; never solicit it. If she says nothing, no pin fires. If she supplies her own text, preserve it exactly as the in-flight content and still write the awaited part. A paste confirmation never proves the receiver claimed or completed the job.
 
 The pin response is the bar plus exactly one orientation line pointing her back:
 
@@ -83,7 +85,7 @@ Pinned -- come back here after you {the next thing she does in {Claude project} 
 
 No other commentary, confirmation prose, or questions ride with a pin. Never emit a pin in the same message as a report or block; it makes her lose her place when copying.
 
-Doctrine note (added 2026-08-03): the pin confirms the paste; it is not the lane record. The Job Tracker row (which replaced the aura lane ledger) is written at dispatch and updated at carry-back, per the code-block-routing skill. A pin never substitutes for a ledger update, and a ledger update never substitutes for a pin.
+Doctrine note (added 2026-08-03): the pin confirms the paste; it is not the lane record. The receiving AI uses job_create or job_claim and files its report with job_finish, per code-block-routing. A pin never substitutes for the job record, and the job record never substitutes for a pin.
 
 ## 3. Pin format
 

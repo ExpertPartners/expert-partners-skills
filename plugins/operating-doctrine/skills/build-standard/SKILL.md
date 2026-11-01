@@ -33,7 +33,7 @@ Rulings behind it, all in the live Decision Log. The HQ Build Standard becomes p
 2. Start from an approved spec. No spec approved by Allison means no build. Build what the spec says and nothing more.
 3. Traceable. Every instruction in the tool points to the spec line it comes from. An instruction with no spec line is removed or sent back to be added to the spec.
 4. Tests. Replay every demonstration in the spec, plus the spec's test cases, which include real Expert Partners cases, missing information, conflicting information and a revised file. Save each input, output and comparison as evidence. Deterministic behavior keeps exact pass rules. AI-written parts of a tool's output get a stated tolerance in the test plan. A part fails only when two of three independent judges agree it is wrong against the source, meaning a wrong name, number, spelling, attribution or order, or a claim the source does not make. A lone judge's refutation or a wording note is logged in the report and fixed in the next version. Judges run on the lowest model that can do the job, per the Model chart in the HQ Rulebook, not the tool's own model (Decision Log 2026-10-30, Every build carries four cost and quality rules, with a $300 wait-for-yes line).
-5. Three passes. Each test runs three times and passes all three. One failure in any pass fails the test. Before any test run, the builder posts a cost estimate for the whole build in a Handoffs row. Over $300, it waits for Allison's yes before launching. At or under $300, it launches. After any failed test round, the builder stops and reports before spending more (same Decision Log entry).
+5. Three passes. Each test runs three times and passes all three. One failure in any pass fails the test. Before any test run, the builder records a cost estimate for the whole build in the existing Chat to Code job and passes it to HQ under the current HQ Rulebook section Handoffs between AIs. Over $300, it waits for Allison's yes before launching. At or under $300, it launches. After any failed test round, the builder stops and reports before spending more (same Decision Log entry).
 6. Never edit a test to pass it. Fix the tool or report the failure. A test changes only when the spec changes, and then Allison approves the spec change first and every test reruns.
 7. Live where it belongs. Skills live in the expert-partners-skills marketplace and are verified on every surface they are meant to reach, Claude chat, Claude Code, Codex and ChatGPT, through their marketplace routes. Cowork is now part of Claude. Knowledge lives in its owning home. No hand-made or platform-only copies.
 8. Chain. Test alone first. Then test with everything upstream of it, using the real outputs of the tools that feed it. When a tool changes, rerun its own tests and the tests of every tool downstream that it feeds, before the change is released. Then one supervised run on real work.
@@ -75,7 +75,7 @@ Traceability. Each instruction with its spec line, and any instruction removed f
 Tests. For each test, its number, the evidence link and its pass count out of three, with every logged single-judge and wording note.
 Chain results. The upstream check, the downstream reruns with pass counts, and the supervised run on real work.
 Surface checks. Each surface, how it was reached and what was seen.
-Cost. The estimate row and the total spent.
+Cost. The estimate in the existing job and the total spent.
 Chain map update. The drafted record update for HQ, with feeds, fed by, last test date, result and evidence links.
 Unresolved. Anything open, with its owner. Say none when there is nothing.
 Waiting on. Certification by Claude in HQ and Allison.
@@ -101,6 +101,6 @@ Plain spoken words. No em dashes, no colons or semicolons in prose, no bold, no 
 2. Every instruction traces to a spec line.
 3. Every test passed three times and its evidence is saved.
 4. Chain results are in the report, upstream and downstream.
-5. The cost estimate row was posted before testing, and its total spent is in the report.
+5. The cost estimate was recorded in the existing job before testing, and its total spent is in the report.
 6. The chain map update is drafted for HQ, not written by the builder.
 7. The report says it waits on certification and does not call itself certified.

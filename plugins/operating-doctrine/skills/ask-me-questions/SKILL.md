@@ -30,7 +30,7 @@ The skill fires on these and nothing else.
 
 A Q or the word question inside a normal sentence. What were our Q3 numbers does not fire it. Q4 planning does not fire it. Quick question, is the listing live does not fire it. Answer those the normal way.
 
-Q is never a sent signal and S is never a clarifying signal. S or s alone still means sent, and only S or s does.
+Q is never a sent signal and S is never a clarifying signal. For delivery confirmations, follow the current HQ Rulebook section Handoffs between AIs.
 
 ## What to do when it fires
 

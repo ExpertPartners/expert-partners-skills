@@ -8,9 +8,14 @@ multi-step presentation in sections A and B: deliver only M01 or prompt 1,
 retain the plan in the checkpoint, and release the next block after verified
 predecessor evidence. The staged session-wrap exception remains scoped there.
 
+Follow the current HQ Rulebook section Handoffs between AIs. Each outgoing assignment and return is one complete copy box with sender, receiver, model and effort or speed. Before dispatch the sender verifies its pending job identity per code-block-routing; the receiver claims that same job. A direct assignment with no prior job uses job_create. Preserve the existing job on continuation, and file job_finish with a summary and result link only on completion. A blocked or partial return keeps the job nonterminal. Code jobs travel as GitHub issues labeled job.
+
 ## A. One-paste master assignment
 
 ```text
+FROM: [Sending AI and conversation]
+TO: [Receiving AI and conversation]
+JOB: [Verified existing job identity reserved before dispatch]
 MISSION: [One bounded outcome]
 WORKER/SURFACE: [Known intended execution surface]
 EXISTING HOME / RETURN TO: [Preserve established names; omit if none]
@@ -27,6 +32,9 @@ that only later steps can discover.
 
 FIRST
 Read applicable current instructions and the relevant source material.
+Check job_status for the existing owner, then job_claim the named job.
+Use job_create only for a direct assignment with no prior job.
+For code work, retain the GitHub issue labeled job.
 Verify the intended account, repository/branch or worktree, relevant access,
 and active ownership before a write. Reuse existing evidence where current.
 Keep unrelated work untouched. Do not create new infrastructure or expand
@@ -64,6 +72,9 @@ If new information requires a decision beyond scope, finish other authorized
 independent work, then return the one decision; do not guess permission.
 
 FINAL CARRY-BACK
+If the assignment is complete, file job_finish with a summary and result link.
+If unfinished, preserve a nonterminal progress report through a supported job operation.
+Verify both the saved report and correct job state with job_status.
 Give a plain-language outcome, verified milestone count, blocked/unverified
 items, evidence links/paths, actual changes, and the one next human action.
 Do not claim merge, deployment, activation, or live verification without proof.
@@ -92,6 +103,10 @@ acknowledgment when it can safely perform the first useful work.
 ### Every subsequent prompt
 
 ```text
+FROM: [Sending AI and conversation]
+TO: [Receiving AI and conversation]
+MODEL: [Verified model for the receiving chat]
+EFFORT/SPEED: [Verified setting for the receiving chat]
 PROMPT [i] OF [N] - [Mission identifier] / [Milestone ID]
 
 Treat this as the next ordered work item, not an instruction to interrupt.
@@ -120,7 +135,12 @@ Do not draft a supposedly unconditional ten-step execution queue when step 3
 requires Allison to choose an architecture. Group the known work:
 
 ```text
+FROM: [Sending AI and conversation]
+TO: [Receiving AI and conversation]
+MODEL: [Verified model for the receiving chat]
+EFFORT/SPEED: [Verified setting for the receiving chat]
 Run discovery, comparison and a recommendation as one authorized batch.
+Use job_create or job_claim, then job_finish with a summary and result link.
 You may do: [Scope]. You may not do: [Unapproved implementation].
 Return evidence, your recommended option, and the one decision required.
 Do not execute implementation phases until that decision is explicitly made.
@@ -144,11 +164,16 @@ Return destination:
 ```
 
 Working checkpoints are operational state, not new business canon. Use the
-Job Tracker for durable status when one already exists.
+existing Chat to Code job for durable status, checked with job_status.
 
 ## E. Consolidated return
 
 ```text
+FROM: [Sending AI and conversation]
+TO: [Receiving AI and conversation]
+MODEL: [Verified model for the receiving chat]
+EFFORT/SPEED: [Verified setting for the receiving chat]
+Job report: [Verified completed job_finish summary and result link, or nonterminal progress report]
 Outcome: [One sentence]
 Verified: [Count and names, against the stated scope]
 Blocked / failed / skipped / unverified: [Exact distinctions]

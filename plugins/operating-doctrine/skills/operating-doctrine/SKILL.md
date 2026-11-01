@@ -291,21 +291,15 @@ The Estate operates always in beta, never sloppy. Current canon governs, and eve
 
 ---
 
-## S Always Means Sent, And No Other Single Letter Does
+## Messages Between AIs
 
-Ruled by Allison 2026-10-25 (Decision Log 2026-10-25, S means sent, and no other single letter does, narrowing Decision Log 2026-10-24, S always means sent, which replaced 2026-10-23, Any single letter after a mail box means sent). Written here so every session that loads this doctrine knows it, including code sessions that never read the Rulebook.
+Follow the current HQ Rulebook section Handoffs between AIs for passing work and delivery confirmations. It supersedes the retired mail-system instructions. The receiving AI logs the work in the Chat to Code job list; code work travels as a GitHub issue labeled job. A pasted message is not evidence the receiver claimed or completed it.
 
-When Allison types S or s, it always means sent. She delivered the mail, did the step, or pasted the box, in whatever conversation she types it. The session never asks what it means, records the delivery, and moves straight to its next step. A finished session then wraps and archives itself (session-wrap section 5A). A lone S is never ambiguous and is never answered with a question. Any other lone letter, such as Z or A, is not a sent signal. Q or q alone is the clarifying questions shortcut, handled by the ask-me-questions skill, and never means sent. Her words, anytime I say S, I mean sent mail, I did it. The live HQ Rulebook, Handoffs between AIs, wins wherever this differs.
+When Allison types S or s alone, it means sent, and no other single letter does. Never ask what S means. Q or q alone means ask clarifying questions before working.
 
----
+## The Job Report And Archive Readiness
 
-## The Archive Gate And The Orphan Sweep
-
-Ruled by Allison 2026-10-24 (Decision Log 2026-10-24, Archiving is gated on the paper trail, and an orphan sweep catches what slips, her words, love this whole thing, yes, let's go). Written here so every session that loads this doctrine knows it, including code sessions that never read the Rulebook. It adds to S Always Means Sent and to Decision Log 2026-10-24, Finished code sessions wrap and archive themselves.
-
-The archive gate comes first. A Claude Code or Codex session archives itself only after two things are true. Its report row is written in the Handoffs tab and read back, and its incoming row is marked Done with a pointer to that report. The mail box in chat is only the bell, never the record. A report that exists only in chat is not a report, and a session whose only carry-back is a chat box is not finished. A session that cannot reach the Handoffs tab stays open and says so in plain words. It does not archive.
-
-The orphan sweep catches what slips. The two Session Stewards, Claude Code, Session Steward and Codex, Session Steward, and Star's nightly check each list every Handoffs row still Sent or Read whose session is archived or missing, and every pull request or commit with no report row. HQ then closes each from the evidence or restarts it. A session never closes a row it did not write. The live HQ Rulebook, Session lifecycle, wins wherever this differs.
+Use job_create or job_claim for the receiving AI's work and job_status for ownership and status. Use job_finish with the summary and result link only when the assignment is genuinely completed. An unfinished wrap preserves progress and its nonterminal state in the same job through an authorized operation from the live tool schema, never job_finish. If that operation or the job list is unavailable, report the blocker and keep the reporting obligation open. Verify the saved result before claiming completion. Follow the current HQ Rulebook section Session lifecycle for archive consent and session-steward for unfinished work.
 
 ---
 
@@ -323,13 +317,13 @@ Ruled by Allison 2026-08-06 at commandment tier; ruling of record at aura intake
 
 Part one. There is no later. When a session finds work its surface cannot finish itself, the hand-off block ships in the same conversation, in the same turn, before the session moves on. Deferring routed work to a next session is a failure condition.
 
-Part two. Nothing rides untracked. Genuinely blocked work means blocked on a third party, on elapsed time, on Allison's hands, or on a running process, nothing else. Everything else executes now. Every wait lives as a row in the Job Tracker in Drive (which replaced the aura lane ledger), the estate's waiting register, and every row carries three things, what it waits on, what moves next, and the date it goes stale. No reason, no wait. A row Allison has ruled paused carries her ruling instead of a date; the robot counts it healthy and never reports it; it wakes only on her word. The board holds missions and genuinely far-horizon markers only, work Allison chose. Blocked residue never lands on the board and no card is minted for routed work.
+Part two. Nothing rides untracked. Genuinely blocked work means blocked on a third party, on elapsed time, on Allison's hands, or on a running process, nothing else. Everything else executes now. Every wait stays in its existing Chat to Code job, with what it waits on, what moves next, and the date it goes stale. No reason, no wait. Work Allison has ruled paused carries her ruling instead of a date; the robot counts it healthy and never reports it; it wakes only on her word. The board holds missions and genuinely far-horizon markers only, work Allison chose. Blocked residue never lands on the board and no card is minted for routed work.
 
 Part two amended 2026-08-07 by the Follow-Through Engine recharter (ruling of record at aura intake/2026-08-07-ruling-follow-through-engine-rechartered-wraps-birth-convers.md), then corrected the same day in the Board Walk lane (ruling of record at aura intake/2026-08-07-ruling-engine-kept-not-on-robots-corrected.md). The recharter's "not on robots" wording was broader than what it meant and read as retiring the register sweep entirely. What is banned is stated positively here, and this is the operative text.
 
 Two things are banned, permanently. No card is minted for routed work or for any flag; the board holds missions and genuinely far-horizon markers only, and blocked residue never lands on it. No per-item alert, reminder, or nudge fires; daily nagging on many items trains alert deafness, which is the failure the ban exists to prevent.
 
-One thing is kept. The register sweep stays, as one exceptions-only pass inside the existing morning digest, never as its own robot and never as its own message. It reads the waiting register (the Job Tracker, plus the Handoffs tab for rows still marked Sent) and reports only rows past their stale date. Silence is the healthy state: when nothing is stale the pass emits nothing at all. It never mints a card, never pages per item, and never sends anything itself.
+One thing is kept. The register sweep stays, as one exceptions-only pass inside the existing morning digest, never as its own robot and never as its own message. It reads the existing job list through job_status and reports only work past its recorded stale date. Silence is the healthy state: when nothing is stale the pass emits nothing at all. It never mints a card, never pages per item, and never sends anything itself.
 
 The march and the machine are complements, not substitutes. The march is the discipline of reading the register at each session open, and it stays primary. The sweep is the backstop for the wait that goes stale between marches. Flags still travel by staged kickoff, session-wrap v1.3 step 4: every flag leaves its wrap as a ready-to-paste block that births its own conversation, and the open conversation IS the tracking. Allison pulls them at her own tempo, and she ruled that five flags opening five conversations is fine and manageable.
 
@@ -486,11 +480,11 @@ Propagation rule: on every version bump, this surface list gets verified against
 
 ---
 
-## Version
+## Historical versions
 
 v2.18 -- October 25, 2026 -- Narrowed S Always Means Sent so only S or s means sent and no other single letter does, and pointed bare Q to the new ask-me-questions skill, ruled by Allison (Decision Log 2026-10-25, S means sent, and no other single letter does, and Q means ask me clarifying questions). Companion edits in code-block-routing and pin.
 
-v2.17 -- October 24, 2026 -- Added The Archive Gate And The Orphan Sweep, ruled by Allison (Decision Log 2026-10-24, Archiving is gated on the paper trail, and an orphan sweep catches what slips): a session archives itself only after its report row is written in Handoffs and read back and its incoming row is marked Done with a pointer to that report, the mail box in chat is only the bell, and the Session Stewards sweep for rows and pull requests that slipped. Companion edits in session-wrap, code-block-routing, pin, and session-steward.
+v2.17 -- October 24, 2026 -- Added The Archive Gate And The Orphan Sweep, ruled by Allison (Decision Log 2026-10-24, Archiving is gated on the paper trail, and an orphan sweep catches what slips): a session archives itself only after its report row is written in Handoffs and read back and its incoming row is marked Done with a pointer to that report, the mail box in chat is only the bell, and the Session Stewards sweep for rows and pull requests that slipped. Companion edits in session-wrap, code-block-routing, pin, and session-steward. This Handoffs report row and mail box gate is retired by Decision Log 2026-10-31, Mail boxes and new Handoffs rows stop; the Chat to Code job list replaces it.
 
 v2.16 -- October 24, 2026 -- Added S Always Means Sent, ruled by Allison (Decision Log 2026-10-24, S always means sent): any single letter she types, such as S, Z, or A, always means sent, and a session never asks what it means. Companion edits in code-block-routing and pin.
 

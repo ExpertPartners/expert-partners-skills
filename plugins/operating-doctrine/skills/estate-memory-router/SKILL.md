@@ -55,7 +55,7 @@ Classify into exactly one. When an item genuinely has two natures, route each pa
 
 ### 1. Future obligation -> `remember-this`
 
-An action still owed, that must wait. Hand it to the `remember-this` skill, which resolves the room live and writes one Job Tracker row with a mechanical `RETURN WHEN` line in Waiting on. That skill owns the whole mechanism, including its advisor-detected gate and its duplicate refusal. This router does not restate it and does not write the row itself.
+An action still owed, that must wait. Hand it to the `remember-this` skill, which resolves the room live and preserves one existing Chat to Code job with its mechanical `RETURN WHEN` condition, verified with job_status. That skill owns the whole mechanism, including its advisor-detected gate and its duplicate refusal. This router does not restate it or create another work record.
 
 ### 2. Evidence or working knowledge -> owning brain
 
@@ -71,9 +71,9 @@ Something Allison decided, leaned toward, or that reads like it should become du
 
 ### 4. Deterministic operational state -> only where a contract already authorizes the write
 
-Job Tracker rows, work state, and board state are machinery with their own contracts and their own guards. Write only when an existing contract explicitly authorizes that mechanical write, and then only through that contract's guarded path, never by full-file replacement. The Job Tracker is written through the Google Sheets connector, one row at a time.
+Job state and board state are machinery with their own contracts and guards. Write only when an existing contract explicitly authorizes that mechanical write, and then only through that contract's guarded path, never by full-file replacement. Chat to Code work uses the existing job tools, with job_status for ownership and readback; no manual spreadsheet copy or second work log.
 
-Archive authority is unchanged: a worker never writes `archived` into its own row, and the home conversation owns the flip. If no contract authorizes the write, this is not a memory item, it is a request for a permission this router does not have, and it is reported rather than performed.
+Archive authority remains with the live HQ Rulebook section Session lifecycle. A job update never grants archive consent. If no contract authorizes the write, this is not a memory item, it is a request for a permission this router does not have, and it is reported rather than performed.
 
 ### 5. Repo ownership or a proposed repo -> existing repo first, then `repo-standards`
 

@@ -24,7 +24,7 @@ intermediate results between assistants when the worker can inspect them.
 
 Treat this as a workflow instruction, not a scheduler, permission grant,
 background service, guaranteed dependency engine, or promise of permanence.
-Use it in either role: advisor compiling a handoff, or worker executing one.
+Use it in either role: advisor compiling a handoff, or worker executing one. Follow the current HQ Rulebook section Handoffs between AIs. Each message is complete in one copy box with FROM, TO, MODEL and EFFORT/SPEED fields; the receiver uses job_create or job_claim and returns job_finish with a summary and result link. Code jobs travel as GitHub issues labeled job.
 
 ## Choose the smallest adequate delivery
 
@@ -101,8 +101,10 @@ assert that an unseen setting on Allison's machine has been configured.
 
 Use [templates.md](references/templates.md). Fill discoverable fields yourself;
 do not leave avoidable placeholders for Allison. For a technical Worker prompt,
-include the compact settings once near its envelope:
+include the sender, receiver and compact settings inside its one copy box:
 
+FROM: <sending AI and conversation>
+TO: <receiving AI and conversation>
 EXECUTION SETTINGS
 SURFACE: <resolved value>
 MODE: <resolved value>
@@ -110,7 +112,7 @@ MODEL: <resolved value>
 EFFORT/SPEED: <resolved value>
 
 Before giving Allison any paste block, perform the sending-side completeness
-check. Confirm that WHERE TO GO, SURFACE, MODE, MODEL, EFFORT/SPEED, WHY,
+check. Confirm FROM and TO, then confirm that WHERE TO GO, SURFACE, MODE, MODEL, EFFORT/SPEED, WHY,
 PASTE THIS and COME BACK WHEN each has a real value; the destination and return
 condition must be specific. For a new Code Worker, validate the routing envelope from `code-block-routing`: destination, repository, assigned isolated WORKTREE and branch, MODEL AND EFFORT, exact scope, return destination, and any other field required for that dispatch.
 For a continuation, name the actual existing Worker and preserve its identity.
@@ -176,7 +178,7 @@ build a new orchestration platform as an incidental part of this skill.
 
 ## Checkpoint and recover
 
-Use an existing appropriate task artifact or ledger, not a new database or
+Use the existing Chat to Code job and link its scoped checkpoint, not a new database or
 competing system of record. For a substantial run, keep a compact working
 checkpoint containing the goal, boundaries, milestone states, evidence paths,
 current branch/revision, unresolved decisions and exact next safe action.
@@ -210,7 +212,7 @@ status short; put detailed evidence in the work artifact.
 
 ## Finish honestly
 
-Return one readable carry-back: requested outcome, completed/verified work,
+File job_finish with a summary and result link and verify it with job_status. Return one complete copy-box carry-back under the current HQ Rulebook section Handoffs between AIs: requested outcome, completed/verified work,
 blocked or unverified work, evidence and artifacts, changes made, observed
 resource usage when available, and the single next human action, if any.
 Continue through already authorized steps without asking "shall I continue?"

@@ -63,7 +63,7 @@ archived worker, modify another active lane, or manufacture a title-verification
 ritual for this skill. Apply existing lifecycle requirements where they truly
 apply; this skill does not replace them.
 
-Use the Job Tracker and current task evidence for durable status.
+Follow the current HQ Rulebook section Handoffs between AIs for the complete message to the receiving chat. The receiving AI uses job_create or job_claim, then job_finish with a summary and result link. Use job_status and current task evidence for durable status; code work travels as a GitHub issue labeled job.
 Do not create a second tracker or silently overwrite concurrent state. Keep
 implementation-specific checkpoints scoped and point the owning ledger at them.
 

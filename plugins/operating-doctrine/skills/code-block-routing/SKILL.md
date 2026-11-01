@@ -1,6 +1,6 @@
 ---
 name: "code-block-routing"
-description: "Fires on Claude Code paste blocks and implementation briefs for Allison. Requires a routing line naming the destination surface, WORKTREE and MODEL AND EFFORT lines on any block that spawns a Code session (missing either, the block bounces home), a waiting-on statement per hand-off, a Job Tracker row at dispatch and carry-back, one block per response, nothing fenced but terminal or Code, versions read from canonical, the pin only after Allison confirms the paste, and an earned archive verdict on every carry-back, with the archive gated on the Handoffs report row (the chat box is only the bell)."
+description: "Routes complete messages between AIs under the current HQ Rulebook. Requires one copy box naming sender, receiver, model and effort or speed; isolated worktrees for spawning code sessions; job_status ownership checks; job_create or job_claim at receipt; and job_finish with a verified summary and result link at completion. Keeps pin timing, approval gates and evidence-based archive readiness."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -9,12 +9,14 @@ inherits: operating-doctrine
 defers-to:
   - pin
 brand-scope: null
-subtitle: "paste block routing and the Job Tracker"
+subtitle: "paste block routing and the job list"
 ---
 
 # Code Block Routing
 
 <!-- RULED-BY: aura/decisions/0107-retire-routing-naming-ceremony.md date:2026-10-12 superseded naming text removed -->
+
+Current authority: the HQ Rulebook section Handoffs between AIs and Decision Log 2026-10-31, The mail system is dissolved everywhere, and the job list stays as the one record. Every AI-to-AI message is one complete copy box with FROM, TO, MODEL and EFFORT/SPEED fields. Allison pastes it into the named chat. Include the whole assignment or reply, not a notice pointing to a separate message record.
 
 Rule authored by Allison, 2026-07-27. Every time a block is handed to Allison to paste into a Claude Code session (intake block, implementation brief, fix instruction, verification request, anything), the block must be preceded by exactly one routing line, outside the code fence.
 
@@ -35,17 +37,17 @@ Rules for the routing line:
 5. An actual execution-scope collision blocks.
 
 
-## Dispatch Dedupe: Read The Job Tracker For A Standing Owner First
+## Dispatch Dedupe: Check job_status For A Standing Owner First
 
 Ruled by Allison 2026-08-07; born the night of 2026-08-06 when one ordered dispatch reached two lanes from two governing conversations and neither knew of the other. Door Tools Build and the Estate Brain Write Tools lane's Ledger Guard Build both built a working ledger tool. The second lane caught the collision at deploy pre-flight, when the live image and origin/main both already carried `update_lane_row`, and dropped its duplicate unmerged. Nothing was overwritten, and that was luck plus one careful pre-flight, not design. The duplicate was invisible until pre-flight because the second lane's worktree was cut from a stale remote ref.
 
-Before dispatching ANY build, the dispatcher reads the running rows of the Job Tracker for a standing owner of that tool class. Not that exact tool, that tool CLASS: door tools, ledger writers, CI watchers, board publishers, brain readers, and so on. A lane already holding the class is its owner.
+Before dispatching ANY build, the dispatcher checks running work through job_status for a standing owner of that tool class. Not that exact tool, that tool CLASS: door tools, ledger writers, CI watchers, board publishers, brain readers, and so on. A lane already holding the class is its owner.
 
 The three outcomes, and there is no fourth:
 
 1. A standing owner exists and is active. Route the work to that lane as an existing session. Do not open a second lane on the same class.
-2. A standing owner exists but is complete or archived. Say so on the routing line, name the row, and dispatch fresh. The prior lane's record is the new lane's inherited state.
-3. No owner exists. Dispatch fresh and write the row at dispatch, which is what makes the next dispatcher's read work. A dispatch that skips its row is what causes the next collision.
+2. A standing owner exists but is complete or archived. Say so on the routing line, name the prior job, and dispatch fresh. The prior lane's record is the new lane's inherited state.
+3. No owner exists. Before giving Allison the copy box, the dispatcher creates or reuses one Chat to Code job through the authorized job tools and verifies the pending assignment with job_status. Record its intended receiver, exact scope, worktree/branch and return destination without claiming the receiver has started. Include that existing job identity in the copy box; the receiver uses job_claim before work, not a duplicate job_create. For a direct assignment with no prior dispatch or job, the receiving AI uses job_create. If the pending assignment cannot be saved or its ownership is uncertain, stop the dispatch and report that blocker.
 
 Two hard riders. Every dispatched build cuts its worktree from a freshly fetched remote ref, never from whatever the local clone happens to hold, because a stale base hides an existing implementation until pre-flight. And every build runs a pre-flight that checks the live artifact and origin/main for the thing it is about to build; finding it already there is a successful pre-flight, and the correct move is to drop the duplicate unmerged and report, exactly as the second lane did.
 
@@ -64,8 +66,8 @@ Mechanics:
 1. The `WORKTREE` line rides inside the block with the envelope, naming the tree and the branch (one name serves both when they match). The session's FIRST ACT is creating that worktree from a freshly fetched remote ref (`git worktree add ../worktrees/<name> -b <name>`, same fresh-ref rider as dispatch dedupe) and confirming the ABSOLUTE path in its first report. No work happens in the shared main tree.
 2. **A dispatch block that spawns a Code session and arrives WITHOUT a `WORKTREE` line is malformed and bounces home, same as a block missing its routing line.** The receiving session does not execute it; it replies naming what is missing so the dispatcher reships the block whole.
 3. A session NEVER writes in a repo's main working tree when another lane may hold uncommitted state in it. Check before writing: `git worktree list`, then `git status` in the main tree. Uncommitted changes belonging to someone else mean isolate, always.
-4. Serializing is a legitimate answer when the work genuinely cannot split, and it is stated, never assumed: the dispatch replaces the `WORKTREE` line with an explicit serialization statement naming the order, and the second lane's row records that it waits on the first. Silence is never serialization.
-5. The worktree is named in the job's Job Tracker row at dispatch, so the next dispatcher can see which trees are occupied.
+4. Serializing is a legitimate answer when the work genuinely cannot split, and it is stated, never assumed: the dispatch replaces the `WORKTREE` line with an explicit serialization statement naming the order, and the second lane's existing job records that it waits on the first. Silence is never serialization.
+5. The dispatcher records and verifies the assigned worktree/branch in that same job before dispatch, so the next dispatcher can see occupied scopes even while the copy box is unpasted. The receiver verifies the actual worktree on claim. No second reservation record.
 6. This rule binds the dispatcher AND the dispatched session. The dispatcher ships the line; the session enforces it by bouncing a spawning block that lacks one, and confirms its tree's absolute path before touching anything else.
 7. Continuation blocks routed to an EXISTING session inherit that session's established worktree and need not restate it. A pre-rule session with no isolated tree that receives new work isolates itself at that point and says so in its carry-back.
 
@@ -77,7 +79,7 @@ Ruled by Allison 2026-08-10, same enforcement shape as Worktree Isolation above:
 
 The line's content is not this skill's to derive. It comes from the session-model-advisor skill's existing Step 3 (fetch ADR 0057 live) and Step 4 (classify the task), run against the JOB THIS DISPATCH HANDS OFF rather than against the session drafting the dispatch. **This skill carries no copy of that logic and no copy of ADR 0057's decision matrix.** If either turns up duplicated here, that is a doctrine violation, delete it and re-point to session-model-advisor.
 
-Format, riding with the other envelope lines, above the fence:
+Format, riding inside the one copy box with FROM, TO and the other envelope lines:
 
 RUN THIS SESSION AT: <model>, effort <level>
 
@@ -89,12 +91,12 @@ Name the level in ADR 0057's own vocabulary (`low`, `medium`, `high`, `xhigh`, `
 
 Corrected 2026-07-28 after a live miss (the pin was fired alongside the block instead of after Allison's confirmation). This section now matches the operating-doctrine pin rule exactly; if they ever seem to disagree, the operating-doctrine pin rule wins.
 
-**S always means sent, and no other single letter does (2026-10-25, narrowing 2026-10-24).** When Allison types S or s, it always means sent. She delivered the mail, did the step, or pasted the box, in whatever conversation she types it. The session never asks what it means, records the delivery, and moves straight to its next step. A finished session then wraps and archives itself (session-wrap section 5A). A lone S is never ambiguous and is never answered with a question. Any other lone letter, such as Z or A, is not a sent signal, and Q or q alone starts the ask-me-questions skill. Her words, anytime I say S, I mean sent mail, I did it. The live HQ Rulebook, Handoffs between AIs, wins wherever this differs.
+For delivery confirmations, follow the current HQ Rulebook section Handoffs between AIs. Confirmation that Allison pasted a message is not a receiving AI's claim or completion receipt.
 
 The order, every hand-off, every session, every project:
 
 1. The hand-off response carries: the routing line, the paste block, and one plain-prose sentence naming what we will be waiting for once she pastes. It does NOT solicit a paste confirmation (pin v4.2, ruled 2026-08-03: nothing ever asks her to say pasted). NO pin yet.
-2. Allison pastes and, if she chooses, volunteers a confirmation (pasted, done, OK, or similar, and S or s alone always means sent, per Decision Log 2026-10-25, S means sent, and no other single letter does). If she says nothing, no pin fires and that is correct.
+2. Allison pastes and, if she chooses, volunteers a confirmation (the delivery confirmation recognized by the current HQ Rulebook). If she says nothing, no pin fires and that is correct.
 3. ONLY THEN the pin fires: the pin marker (pin skill format, fresh real timestamp from TZ=America/Chicago date "+%Y-%m-%d %H:%M %Z", never guessed or reused) plus one sentence restating what we are waiting for and what happens next.
 
 The pin is the bookmark of the moment the baton actually left her hands, which is why it cannot exist before her confirmation.
@@ -114,11 +116,11 @@ Re-ruled by Allison 2026-08-07 evening in the Estate Brain Door Phase B Code ses
 **`SESSION STATUS: carry-back delivered, awaiting verification at home.` is RETIRED and never written again.** Every carry-back ends with one of the four verdict lines from `behavior-defaults.md`: Waiting on you, Still working, SAFE TO ARCHIVE with evidence, or NOT safe to archive with the one closing move named.
 
 <!-- RULED-BY: aura/intake/2026-09-01-ruling-table-and-worker-lifecycle-terminality.md date:2026-09-01 -->
-**SAFE TO ARCHIVE is a verified claim, never a phrase.** Issued only after all FIVE verify live in the same turn: `git status` clean and pushed on every repo the session touched; the session record, wrap, or closeout note written and pushed when doctrine requires one; every open wait re-lodged in the lane ledger's waiting-on column with its named condition and stale date, so nothing dies with the archive; **the archive gate is cleared (added 2026-10-24, Decision Log 2026-10-24, Archiving is gated on the paper trail), meaning the report row is written in Handoffs and read back and the incoming row is marked Done with a pointer to that report (section The Archive Gate below)**; and, added 2026-09-03 (ruling of record aura intake/2026-09-01-ruling-table-and-worker-lifecycle-terminality.md, delivered in session-steward v1.3 section 7A), **no monitor, check-in, subscription, scheduled wakeup, or background agent the session owns is still running**, each one released and confirmed released rather than assumed finished. The evidence rides in the line itself, and background activity is stated explicitly as NONE, never implied by omission. A worker that cannot stop something it owns names it and earns NOT safe to archive instead. Anything it does not own, an estate rail or another lane's work, is left running and said so.
+**SAFE TO ARCHIVE is a verified claim, never a phrase.** Issued only after all FIVE verify live in the same turn: `git status` clean and pushed on every repo the session touched; the session record, wrap, or closeout note written and pushed when doctrine requires one; every open wait preserved in its existing Chat to Code job with its named condition and stale date, so nothing dies with the archive; **the job report is saved through job_finish with a summary and result link and verified through job_status (section The Job Report below)**; and, added 2026-09-03 (ruling of record aura intake/2026-09-01-ruling-table-and-worker-lifecycle-terminality.md, delivered in session-steward v1.3 section 7A), **no monitor, check-in, subscription, scheduled wakeup, or background agent the session owns is still running**, each one released and confirmed released rather than assumed finished. The evidence rides in the line itself, and background activity is stated explicitly as NONE, never implied by omission. A worker that cannot stop something it owns names it and earns NOT safe to archive instead. Anything it does not own, an estate rail or another lane's work, is left running and said so.
 
 **NOT safe means the session diagnoses AND prescribes.** It names exactly what is open and the single move that closes it: /session-wrap when chat-only decisions or flags are unrecorded, /session-closeout when shipped work has no handoff note on main, or the named open action otherwise. Never leave Allison to work out which close a session needs.
 
-**What stays with the home conversation:** the Job Tracker flip. The archive itself is the session's own: a finished code session wraps and archives itself without waiting for Allison to say wrap (session-wrap section 5A, Decision Log 2026-10-24, Finished code sessions wrap and archive themselves), and the Steward sweeps any that cannot. Home may still verify a verdict's claims against commits, and a hold still names its next block ("hold it open just in case" is not a call; it is a lane leaking). When home archives, it flips that job's row to `archived` in the Job Tracker BEFORE dispatching anything further, and no dispatch block is ever written against a session whose row reads `archived`; that lane is gone, spawn a new one.
+**What stays with the home conversation:** acceptance of the returned evidence against its mission. The worker files its own job_finish summary and result link; job_status is the ownership and status view. Follow the current HQ Rulebook section Session lifecycle for archive consent. Do not dispatch more work to an archived session.
 
 **Default is archive.** Sessions are cheap, so spawn freely rather than hoarding a session because it might be useful later. A stale open lane is not free, and the verdict rule exists precisely so stale open lanes stop accumulating.
 
@@ -135,7 +137,7 @@ Amended by Allison 2026-08-07 (Aura / Code Rule Fix lane). This amends the archi
 - `VERDICT: RECOMMEND ARCHIVE -- all pushed, nothing pending on Allison's side.` Permitted ONLY when the session verifies its checklist live in the same turn: every commit pushed, the whole brief executed, nothing gated or held open, no deliverable still owed. A bare safe-to-archive with no checklist behind it stays banned.
 - `VERDICT: RECOMMEND HOLD OPEN, waiting on <the one named thing>.` The verdict every other state earns. One named thing, never a list; if several things are open, name the one that unblocks the rest.
 
-Archive authority, as of Decision Log 2026-10-24, Finished code sessions wrap and archive themselves, is the finished code session's own: it archives itself and Allison is never the gate. Home's GitHub grading remains the backstop, and Allison may still archive on the spot on a RECOMMEND ARCHIVE. The verdict line is earned, never decorative: RECOMMEND ARCHIVE with an unverified checklist is the same failure the SAFE TO ARCHIVE evidence rule exists to prevent, stated at the moment Allison actually makes the call.
+Archive consent follows the current HQ Rulebook section Session lifecycle. Home's GitHub grading remains the backstop, and Allison may still archive on the spot on a RECOMMEND ARCHIVE. The verdict line is earned, never decorative: RECOMMEND ARCHIVE with an unverified checklist is the same failure the SAFE TO ARCHIVE evidence rule exists to prevent, stated at the moment Allison actually makes the call.
 
 ### BUILD BLOCKERS and OUTCOME BLOCKERS: Two Lines, Never One
 
@@ -148,37 +150,13 @@ Every carry-back reports BUILD BLOCKERS and OUTCOME BLOCKERS as two separate lin
 
 The worker's verdict speaks only to its own surface-specific job, never to the home table's objective. A worker closes when its job is finished and successor work is durably handed off; whether the home table's mission is achieved is judged only by the home table's own closeout (the session-wrap close-or-continue verdict), never imported from a worker's verdict. A worker carry-back that pronounces on the home objective is malformed on that line, exactly as a table verdict spoken in worker vocabulary is void under decision 0075.
 
-## The Archive Gate: The Report Row Is The Carry-Back, The Box Is The Bell
+## The Job Report: One Work Record
 
-<!-- RULED-BY: Decision Log 2026-10-24, Archiving is gated on the paper trail, and an orphan sweep catches what slips date:2026-10-24 -->
+The current rule lives in the HQ Rulebook section Handoffs between AIs. The receiving AI uses job_create or job_claim before starting, retains the existing job identity on continuation, and uses job_finish with the full outcome summary and result link when finished. Code jobs travel as a GitHub issue labeled job. Check job_status before dispatch to avoid duplicate ownership and after completion to verify the saved report.
 
-Ruled by Allison 2026-10-24 (Decision Log 2026-10-24, Archiving is gated on the paper trail, and an orphan sweep catches what slips, her words, love this whole thing, yes, let's go). Found the same day when a session opened and closed a pull request and archived with no report row, and another vanished with its row unread, because the chat box had been treated as the carry-back.
+Record the actual worker, repository/worktree/branch, return destination, evidence, and any named wait in the existing job. Never create a second spreadsheet record. The return message follows the same complete copy-box envelope as the assignment. A copy box alone is not a saved job report.
 
-**The record is the Handoffs row.** For every session that has a Handoffs row to file, the carry-back is the report row in the Handoffs tab of the Job Tracker, addressed to the room the work returns to. The chat message with the CLAUDE HOME line, the 📬 box, the SESSION STATUS line, and the VERDICT line is the bell. It tells Allison and the home conversation that a row exists and gives its bottom line. It is never the record, and a report that lives only in chat is not a carry-back. Wherever this skill or another says carry-back, read the Handoffs report row first and the chat bell second.
-
-**The gate.** A Claude Code or Codex session archives itself, or ends on `WRAP, safe to archive`, only after both are true: its report row is written in Handoffs and read back from the tab, and its incoming row is marked Done with a pointer to that report row. Read back means the session fetches the row after writing it and confirms the text landed. No `archive_session` call before both are true.
-
-**A session that cannot reach the tab stays open and says so.** If the sheet write or read fails twice, the session does not archive, does not paste the report into chat as a stand-in, and ends on `SESSION STATUS: NOT safe to archive -- cannot reach the Handoffs tab, report row not filed; waiting on the sheet connector.` with the full report held ready to file when the tab answers. The old fallback of routing the row verbatim in chat for home to enter is retired, because chat is the bell and not the record.
-
-**What catches the rest.** The orphan sweep, run on every pass by Claude Code, Session Steward and Codex, Session Steward and in Star's nightly check (session-steward section 10), lists every row still Sent or Read whose session is archived or missing and every pull request or commit with no report row. HQ closes each from the evidence or restarts it. The sweep is the backstop for the gate, never a substitute for it.
-
-## The Job Tracker: Row At Dispatch, Update At Report Row
-
-The Job Tracker in Company Core [HQ-BB], HQ Business Brain, is the one place that answers "what Claude Code sessions exist, what does each belong to, and what is each waiting on" from any surface (Drive connector, Sheets connector). One row per running job; columns Job, Room or lane, Who is doing it, Status, Waiting on, Next step, Opened, Last updated. It replaces the aura lane ledger (Decision Log 2026-10-13). Where this skill says lane ledger or ledger, read Job Tracker.
-
-The habit, every hand-off:
-
-1. At dispatch, when a paste block is handed to Allison, the issuing block-writer adds or updates the job's row: a short label in Job, the return home (Claude project / conversation) in Room or lane, and in Who is doing it the worker, machine, stable session id when known, and the worktree named in the dispatch (per Worktree Isolation above, so the next dispatcher can see which trees are occupied), then Status, Waiting on, Next step, Opened, Last updated. The waiting-on statement this skill already requires with every hand-off is the same text that goes in the row, written once. A dispatch that creates a CLOUD worker records the owning room and available stable identifier in the row at creation time, unconditionally: cloud sessions are invisible to local Desktop session lists, so an unregistered cloud worker is unrecoverable later.
-2. At carry-back receipt, the row updates to the new status (running / waiting-on-Allison / waiting-on-carry-back / archived / owned-elsewhere). `complete-safe-to-archive` is retired; only the home conversation writes `archived`, as one motion with the archive (the session's own self-archive or the Steward's pass).
-3. Append and update rows, never delete. Finished jobs stay in the sheet with a terminal Status rather than vanishing, so the archive decision stays visible.
-4. Rule 5 applies: rows are only as certain as their evidence. A lane whose home nobody has named stays needs-Allison; never invent a home for it.
-
-A Code session that completes its work files its report row in Handoffs and updates its own row to `waiting-on-carry-back`, with the full report, in the same turn through the Google Sheets connector, reads the report row back, and marks its incoming Handoffs row Done with a pointer to that report (the archive gate above). If it cannot reach the sheet it stays open. The home no longer enters a row on a session's behalf from a chat box. It never writes `archived` into its own row: that is the home conversation's call and the home conversation's write.
-
-<!-- RULED-BY: aura/intake/2026-09-01-ruling-table-and-worker-lifecycle-terminality.md date:2026-09-01 -->
-**The archive and the flip are one motion, added 2026-09-03** (ruling of record aura intake/2026-09-01-ruling-table-and-worker-lifecycle-terminality.md, on live evidence that finished workers stayed machine-visible as `waiting-on-carry-back`, one of them after Allison had physically archived the session). Home does not archive and then flip the row later; the flip completes the same close. A carry-back recommending archive says plainly that its row still reads its pre-archive status and will be flipped with the archive, so the owed write is visible rather than assumed. **A row that keeps advertising an active wait for a worker known to be finished is a lie the ledger is telling**, and it is reconciled on proven evidence at the next touch of that lane under session-steward v1.3 section 7, never by a sweeper and never by leaving it for Allison to spot.
-
-Write mechanics: update only this job's row in place through the Google Sheets connector. Read the sheet immediately before writing, never clear or rewrite other rows, and re-read after to confirm no other row changed. If the write fails twice, stop, stay open, and say so under the archive gate above. A row routed verbatim in chat is not filed, and a session never archives behind one.
+If a job write fails, inspect job_status before retrying an uncertain write. If the report remains unverified, keep the reporting obligation open and name the failed action. Follow the current HQ Rulebook section Session lifecycle for archive readiness and consent. Session-steward checks job_inbox for work awaiting an owner and reports gaps from job evidence, not message receipts.
 
 ## One Block Per Response
 
@@ -196,7 +174,7 @@ One named exception, added 2026-08-07 with the staged-kickoff ruling: a session 
 
 Added 2026-07-27 after a live failure: a connector URL was placed in a code fence and Allison pasted it into a terminal, where zsh threw "no such file or directory."
 
-In this workflow a code fence carries one meaning to Allison: paste this into Claude Code or a terminal. The only exception is the pin marker defined above. Nothing else may be fenced.
+In this workflow a code fence carries terminal input or a complete message for the AI chat named by the routing line. The pin marker defined above remains a bookmark, not a work message.
 
 Never fence:
 
@@ -206,7 +184,7 @@ Never fence:
 
 Write those inline in prose with the destination named first, for example: add it in claude.ai, Settings, Connectors, Add custom connector, using mcp.firecrawl.dev/v2/mcp-oauth
 
-Fence only what a terminal or a Claude Code session will actually consume, plus the pin marker. If it is not going into a shell or a Code session and it is not a pin, it does not get a fence.
+Fence only what a terminal or the named AI chat will actually consume, plus the pin marker. If it is not going into a shell or an AI chat and it is not a pin, it does not get a fence.
 
 ## Reading Versions From The Right Place
 

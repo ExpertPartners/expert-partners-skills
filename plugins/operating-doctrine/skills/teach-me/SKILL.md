@@ -74,7 +74,7 @@ A 60 to 90 second explainer as five to seven scenes. Each scene gives its number
 
 ## What it never does
 
-It drafts. It does not edit the Lovable app, Notion or Drive, and it does not render video. Where the room has Claude's Motion tool, the room makes the film from the scene list. The room hands the other drafts on through Handoffs to whoever owns the HQ guide, found live in the Job Tracker.
+It drafts. It does not edit the Lovable app, Notion or Drive, and it does not render video. Where the room has Claude's Motion tool, the room makes the film from the scene list. The room passes the other drafts to the current HQ guide owner, found through job_status, under the current HQ Rulebook section Handoffs between AIs.
 
 Anything bound for the HQ guide covers Expert Partners only, never AG Luxury, and is written for anyone who joins, so it does not name Don unless the room says otherwise.
 

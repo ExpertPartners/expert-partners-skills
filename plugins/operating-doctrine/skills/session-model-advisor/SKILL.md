@@ -105,7 +105,11 @@ After Steps 3 and 4 are required, open the response with the applicable line bel
   speed options through [capability evidence](reference/handoff-capability.md).
   Recommend one combination, with one short reason. For a new Claude Code
   session, also supply code-block-routing's required MODEL AND EFFORT envelope
-  line. Batch-First Execution checks that this line and the other routing
+  line inside the full copy box, together with sender and receiver, under the
+  current HQ Rulebook section Handoffs between AIs. The receiving AI logs its
+  work through job_create or job_claim, then job_finish with a summary and
+  result link; code jobs travel as GitHub issues labeled job. Batch-First
+  Execution checks that this line and the other routing
   fields are present before Allison receives the paste block. For a running
   Worker that need not be interrupted, keep its selection and place any new
   recommendation on the next run. Never use a Codex-specific label on Claude
