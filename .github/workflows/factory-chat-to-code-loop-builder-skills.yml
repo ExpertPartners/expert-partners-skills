@@ -9,12 +9,28 @@ name: Chat to Code Loop Builder - Skills
   issues:
     types:
       - labeled
+      - opened
 permissions:
   contents: read
   id-token: write
 jobs:
   run:
-    if: github.event_name == 'workflow_dispatch' || (github.event.label.name == 'job' && contains(fromJSON('["AllisonGaddy","expertpartners","expertpartners-ember"]'), github.event.issue.user.login))
+    # Three ways in, each building an issue once:
+    # 1. Manual dispatch.
+    # 2. The job label added to an issue from an allowlisted author. A job label the
+    #    Factory app adds to a "Job:" issue is skipped, because path 3 added it and is
+    #    already building that issue.
+    # 3. A "Job:" issue opened by an allowlisted author without the job label. This run
+    #    adds the label itself, then builds. An issue opened with the label already on it
+    #    is left to path 2, which GitHub starts for that label.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.action == 'labeled' && github.event.label.name == 'job' &&
+        contains(fromJSON('["AllisonGaddy","expertpartners","expertpartners-ember","expertpartners-aura"]'), github.event.issue.user.login) &&
+        !(github.event.sender.login == 'factory-droid[bot]' && startsWith(github.event.issue.title, 'Job:'))) ||
+      (github.event.action == 'opened' && startsWith(github.event.issue.title, 'Job:') &&
+        contains(fromJSON('["AllisonGaddy","expertpartners","expertpartners-ember","expertpartners-aura"]'), github.event.issue.user.login) &&
+        !contains(github.event.issue.labels.*.name, 'job'))
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -26,7 +42,7 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       - name: Write automation prompt
         env:
-          FACTORY_AUTOMATION_PROMPT: "You are the Builder for Expert Partners' Chat to Code Loop. Act only when this run was started by the label job being added to an issue, by a comment that begins with Factory, build this job on an issue that carries the label job, or by a manual dispatch whose issue input names such an issue; otherwise exit with no changes. The triggering GitHub event is in the JSON file named by the GITHUB_EVENT_PATH environment variable, read it to find the issue number (for a manual dispatch it is inputs.issue). Read the issue in full. Its body holds the mission, objective, files in scope, acceptance checks and decisions already made. Follow CLAUDE.md and AGENTS.md if present. Add the label in-progress to the issue. Work only inside the files in scope, run tools/validate-job.sh until it prints validate-job: PASS, push a branch named job/<issue number>-<short slug>, and open exactly one pull request into main whose body starts with the line Closes #<issue number> and then lists each acceptance check as PASS or FAIL with the command output as evidence. Never push to main or merge. If anything is unclear, open the pull request as a draft and say exactly what is unclear."
+          FACTORY_AUTOMATION_PROMPT: "You are the Builder for Expert Partners' Chat to Code Loop. Act only when this run was started by the label job being added to an issue, by a new issue whose title begins with Job: that this workflow labeled job when it opened, by a comment that begins with Factory, build this job on an issue that carries the label job, or by a manual dispatch whose issue input names such an issue; otherwise exit with no changes. The triggering GitHub event is in the JSON file named by the GITHUB_EVENT_PATH environment variable, read it to find the issue number (for a manual dispatch it is inputs.issue). Read the issue in full. Its body holds the mission, objective, files in scope, acceptance checks and decisions already made. Follow CLAUDE.md and AGENTS.md if present. Add the label in-progress to the issue. Work only inside the files in scope, run tools/validate-job.sh until it prints validate-job: PASS, push a branch named job/<issue number>-<short slug>, and open exactly one pull request into main whose body starts with the line Closes #<issue number> and then lists each acceptance check as PASS or FAIL with the command output as evidence. Never push to main or merge. If anything is unclear, open the pull request as a draft and say exactly what is unclear."
         run: |
           printf '%s' "$FACTORY_AUTOMATION_PROMPT" > "$RUNNER_TEMP/factory-automation-prompt.txt"
       - name: Get Factory GitHub App token
@@ -84,6 +100,16 @@ jobs:
           git config user.name >/dev/null || git config --local user.name 'factory-droid[bot]'
           git config user.email >/dev/null || git config --local user.email '138933559+factory-droid[bot]@users.noreply.github.com'
           echo "GitHub writes from this run are made as the Factory GitHub App."
+      - name: Label the new job issue
+        if: github.event_name == 'issues' && github.event.action == 'opened'
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          if [ -z "${GH_TOKEN:-}" ]; then
+            echo "::error::No Factory GitHub App token, so the job label cannot be added and the job cannot be built."
+            exit 1
+          fi
+          gh issue edit "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --add-label job
       - name: Run Factory Droid
         run: droid exec --auto high -m 'claude-opus-5-5' -f "$RUNNER_TEMP/factory-automation-prompt.txt"
         env:
