@@ -1,0 +1,189 @@
+"""Stitch OCR lines from successive frames into continuous screens.
+
+A scrolling screen shows overlapping windows of the same text. Each new frame
+is aligned against the end of the current screen, and only the lines past the
+overlap are added, so the scroll comes back as one text with no repeats.
+"""
+
+from __future__ import annotations
+
+import re
+import unicodedata
+from dataclasses import asdict, dataclass, field
+from difflib import SequenceMatcher
+
+SIMILARITY = 0.8
+
+
+@dataclass
+class Line:
+    text: str
+    conf: float = 0.0
+    frame: int = 0
+    time: float = 0.0
+    variants: list[str] = field(default_factory=list)
+
+    def add_variant(self, text: str) -> None:
+        """Keep another reading of this line when it differs after normalizing."""
+        seen = {normalize(self.text), *(normalize(v) for v in self.variants)}
+        if normalize(text) not in seen:
+            self.variants.append(text)
+
+
+@dataclass
+class Screen:
+    lines: list[Line]
+    frames: list[int] = field(default_factory=list)
+    first_time: float = 0.0
+    last_time: float = 0.0
+
+    def to_dict(self) -> dict:
+        return {
+            "first_time": self.first_time,
+            "last_time": self.last_time,
+            "frames": self.frames,
+            "lines": [asdict(line) for line in self.lines],
+        }
+
+
+def normalize(text: str) -> str:
+    decomposed = unicodedata.normalize("NFKD", text).casefold()
+    stripped = "".join(ch for ch in decomposed if not unicodedata.combining(ch))
+    return re.sub(r"[\W_]+", " ", stripped).strip()
+
+
+def similar(a: str, b: str, threshold: float = SIMILARITY) -> bool:
+    na, nb = normalize(a), normalize(b)
+    if not na or not nb:
+        return False
+    if na == nb:
+        return True
+    # Numbered lines (Week 1, Week 2) score as near matches but are different lines.
+    if re.findall(r"\b\d+\b", na) != re.findall(r"\b\d+\b", nb):
+        return False
+    return SequenceMatcher(None, na, nb, autojunk=False).ratio() >= threshold
+
+
+def find_overlap(doc: list[Line], new: list[Line], max_head_skip: int = 2, max_tail_skip: int = 2):
+    """Find where new continues doc.
+
+    Returns (i, j, t, tail) where doc[i:i+t] matches new[j:j+t], or None.
+    An alignment counts when the matched run reaches the end of doc (allowing
+    max_tail_skip unmatched lines, which are usually a cut off line at the
+    bottom of the previous frame) or when new is used up, meaning new is a
+    window already inside doc.
+    """
+    best = None
+    for j in range(min(max_head_skip, len(new) - 1) + 1):
+        for i in range(len(doc)):
+            t = 0
+            while i + t < len(doc) and j + t < len(new) and similar(doc[i + t].text, new[j + t].text):
+                t += 1
+            if t == 0:
+                continue
+            tail = len(doc) - (i + t)
+            consumed = j + t == len(new)
+            if tail > max_tail_skip and not consumed:
+                continue
+            min_overlap = min(2, len(new) - j, len(doc))
+            if t < min_overlap:
+                continue
+            key = (t, -j, -tail)
+            if best is None or key > best[0]:
+                best = (key, (i, j, t, tail))
+    return None if best is None else best[1]
+
+
+def _resembles_any(line: Line, others: list[Line]) -> bool:
+    """True when line reads as the same line as one of others.
+
+    Kept strict on purpose. When in doubt the stitcher starts a new screen, which
+    can repeat a line but never loses one.
+    """
+    if not normalize(line.text):
+        return True
+    return any(similar(line.text, other.text) for other in others)
+
+
+def _merge(screen: Screen, new: list[Line]) -> bool:
+    doc = screen.lines
+    found = find_overlap(doc, new)
+    if found is None:
+        return False
+    i, j, t, tail = found
+    if i > 0 and j > 0:
+        # The lines before the match in the new frame would be thrown away. That is a
+        # different slide sharing a header or footer, not a scroll.
+        return False
+    if j + t < len(new) and tail > 0 and not all(_resembles_any(l, new) for l in doc[i + t :]):
+        # Cutting the doc tail would lose real lines that never show up again.
+        return False
+    for k in range(t):
+        old, fresh = doc[i + k], new[j + k]
+        if fresh.conf > old.conf:
+            kept = Line(fresh.text, fresh.conf, old.frame, old.time, list(old.variants))
+            kept.add_variant(old.text)
+            doc[i + k] = kept
+        else:
+            old.add_variant(fresh.text)
+    if j + t < len(new):
+        # The doc tail past the overlap was a partial line in the earlier frame.
+        screen.lines = doc[: i + t] + new[j + t :]
+    if i == 0 and j > 0:
+        # Scrolled above the start of what we had, keep the lines revealed on top.
+        screen.lines = new[:j] + screen.lines
+    return True
+
+
+def _contained(screen: Screen, new: list[Line]) -> bool:
+    found = find_overlap(screen.lines, new)
+    if found is None:
+        return False
+    i, j, t, tail = found
+    # The whole new frame must sit inside the screen from its first line, so a
+    # shared header or footer alone never swallows a different slide.
+    return j == 0 and t == len(new)
+
+
+def _drop_consecutive_repeats(lines: list[Line]) -> list[Line]:
+    out: list[Line] = []
+    for line in lines:
+        if out and normalize(out[-1].text) == normalize(line.text):
+            if line.conf > out[-1].conf:
+                kept = Line(line.text, line.conf, out[-1].frame, out[-1].time, list(out[-1].variants))
+                kept.add_variant(out[-1].text)
+                out[-1] = kept
+            for variant in line.variants:
+                out[-1].add_variant(variant)
+            continue
+        out.append(line)
+    return out
+
+
+def stitch(frames: list[tuple[int, float, float, list[Line]]]) -> list[Screen]:
+    """Turn (frame index, first seen, last seen, lines) in time order into continuous screens."""
+    screens: list[Screen] = []
+    for index, time, until, lines in frames:
+        lines = [Line(l.text, l.conf, index, time) for l in lines if normalize(l.text)]
+        if not lines:
+            continue
+        if screens and _merge(screens[-1], lines):
+            current = screens[-1]
+        else:
+            earlier = next((s for s in screens[:-1] if _contained(s, lines)), None)
+            if earlier is not None:
+                found = find_overlap(earlier.lines, lines)
+                if found is not None:
+                    i, j, t, _ = found
+                    for k in range(t):
+                        earlier.lines[i + k].add_variant(lines[j + k].text)
+                earlier.frames.append(index)
+                earlier.last_time = max(earlier.last_time, until)
+                continue
+            current = Screen(lines=list(lines), first_time=time, last_time=time)
+            screens.append(current)
+        current.frames.append(index)
+        current.last_time = until
+    for screen in screens:
+        screen.lines = _drop_consecutive_repeats(screen.lines)
+    return screens
