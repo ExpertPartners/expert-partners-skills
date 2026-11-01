@@ -1,6 +1,6 @@
 ---
 name: session-wrap
-description: "Closes out and hands off work on every surface. Produces and verifies the session record, continuity note, required durable-state updates, staged follow-ups, final memory sweep, canon-sync trigger, and evidence-based close-or-continue verdict. It also evaluates a finite mission when acceptance evidence lands."
+description: "Closes out and hands off work on every surface. Produces and verifies the session record, continuity note, required durable-state updates, staged follow-ups, final memory sweep, canon-sync trigger, and evidence-based close-or-continue verdict. It also evaluates a finite mission when acceptance evidence lands. Fires when Allison types wrap and archive, or only W or w, in a Claude Code or Codex session, and then wraps and archives the session with no second question."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Adopted into canonical 2026-08-05 (Skill Map Rulings lane, add-on brief note 4):
 # estate-wide skill, canonical home verified as having been aura .claude/skills only,
@@ -12,15 +12,19 @@ status: live
 subtitle: "the one canonical session close-out"
 ---
 
-# Session Wrap -- v1.21 (2026-10-24)
+# Session Wrap -- v1.22 (2026-10-31)
 
 <!-- RULED-BY: aura/decisions/0107-retire-routing-naming-ceremony.md date:2026-10-12 superseded naming text removed -->
 
-Current handoff and reporting authority: follow the HQ Rulebook section Handoffs between AIs. The receiving AI uses job_create or job_claim and job_status shows ownership. A genuinely completed assignment files its job_finish summary with a result link; an unfinished assignment stays nonterminal in the same job. Code jobs travel as GitHub issues labeled job. Section 5A's protected lines are reserved for PR #104 and require the listed post-merge follow-up; do not use them to create a second work record. This release must not merge or ship before that protected conflict is reconciled.
+Current handoff and reporting authority: follow the HQ Rulebook section Handoffs between AIs. The receiving AI uses job_create or job_claim and job_status shows ownership. A genuinely completed assignment files its job_finish summary with a result link; an unfinished assignment stays nonterminal in the same job. Code jobs travel as GitHub issues labeled job. Archive readiness and consent follow sections 5A and 5B; do not create a second work record.
+
+v1.22 reconciliation 2026-10-31: section 5A now follows the live October 29 consent default and October 30 scheduled-run and completed Codex background exceptions. Readiness includes no uncommitted or unpushed work of its own. Readiness is this job's job_finish summary and result link verified with job_status, not the retired Handoffs report row (Decision Log 2026-10-31, Mail boxes and new Handoffs rows stop). A blocked worker retains its unfinished duties; only a ready, consented session may use the steward fallback. This current instruction supersedes the older silent-archive and paper-trail wording in the historical amendments below.
 
 ## Historical amendments, not current handoff instructions
 
-v1.21 amendment 2026-10-24 (Decision Log 2026-10-24, Archiving is gated on the paper trail, and an orphan sweep catches what slips, Allison's words, love this whole thing, yes, let's go; live HQ Rulebook Session lifecycle section): the archive gate. A finished Claude Code or Codex session archives itself only after its report row is written in Handoffs and read back, and its incoming row is marked Done with a pointer to that report. The mail box in chat is only the bell, never the record. A session that cannot reach the Handoffs tab stays open and says so. Section 5A is amended, and a report that lives only in chat no longer counts as finished. Adds to v1.20. The live Rulebook wins wherever this skill differs.
+v1.22 amendment 2026-10-30 (Decision Log 2026-10-30, Wrap and archive, or W, tells a code session to wrap and archive itself, Allison's words, when I say wrap and archive, or I use the letter W, I want a coding session to know that I mean to wrap itself and then go ahead and self-archive, because I've given it the okay; live HQ Rulebook Session lifecycle section): the wrap and archive trigger. In a Claude Code or Codex session, Allison typing wrap and archive, or only W or w, is her full okay. The session runs its wrap duties, files and verifies its job report, says SAFE TO ARCHIVE, and archives itself with no second question. Section 0 gains the trigger and new section 5B holds the job, the refusal and the test cases. This is Allison's own word, so it fits the rule that no session archives before her word, and it adds to v1.21 and removes nothing. The live Rulebook wins wherever this skill differs.
+
+v1.21 amendment 2026-10-24 (Decision Log 2026-10-24, Archiving is gated on the paper trail, and an orphan sweep catches what slips, Allison's words, love this whole thing, yes, let's go; live HQ Rulebook Session lifecycle section): the archive gate. A finished Claude Code or Codex session archives itself only after its report row is written in Handoffs and read back, and its incoming row is marked Done with a pointer to that report. The mail box in chat is only the bell, never the record. A session that cannot reach the Handoffs tab stays open and says so. Section 5A is amended, and a report that lives only in chat no longer counts as finished. Adds to v1.20. The live Rulebook wins wherever this skill differs. This Handoffs report row and mail box gate is retired by Decision Log 2026-10-31, Mail boxes and new Handoffs rows stop; section 5A now uses the job list.
 
 v1.20 amendment 2026-10-24 (Decision Log 2026-10-24, Finished code sessions wrap and archive themselves, Allison's words, that's a big one, let's make that happen for sure; live HQ Rulebook Session lifecycle section): a finished Claude Code or Codex session runs its wrap duties on its own without waiting for Allison to say wrap, then says SAFE TO ARCHIVE and archives itself, silently. Both apps can archive their own sessions, Codex's confirmed by Codex, Session Steward on 2026-10-24, so the earlier hedge about Codex is removed. Section 0 and section 5A are amended. This replaces the wait for Allison's wrap in Decision Log 2026-10-23, Code session states are ACTIVE, WAITING, READY TO WRAP, and ARCHIVE, and in 2026-10-21, Definition of WRAP for coding sessions. Sessions still waiting on Allison or another AI stay open, and Allison only hears about a session when it is waiting on her. The live Rulebook wins wherever this skill differs.
 
@@ -50,7 +54,7 @@ Design rationale, do not remove: this protocol deliberately does NOT rely on Cla
 
 ## 0. Triggers
 
-Fires on: "SESSION WRAP", "wrap this session", "close out this session", "end of session", "save this to [PROJECT]", or any clear signal Allison is stopping work and wants a handoff. It also fires on its own under section 0A, with no words from Allison at all, and a finished Claude Code or Codex session fires it on its own under section 5A the moment its assignment is finished, without waiting for Allison to say wrap. Runs all five steps in this exact order, every time. The record must be buildable from artifacts, the board, and repo state alone, never from chat scrollback (compaction may have eaten it).
+Fires on: "SESSION WRAP", "wrap this session", "close out this session", "end of session", "save this to [PROJECT]", or any clear signal Allison is stopping work and wants a handoff. It also fires on its own under section 0A, with no words from Allison at all, and a finished Claude Code or Codex session fires it on its own under section 5A the moment its assignment is finished, without waiting for Allison to say wrap. It also fires, in a Claude Code or Codex session, when Allison types wrap and archive or only the letter W or w, which section 5B handles. Runs all five steps in this exact order, every time. The record must be buildable from artifacts, the board, and repo state alone, never from chat scrollback (compaction may have eaten it).
 
 ## 0A. Proactive terminality -- zero freedom
 
@@ -176,32 +180,59 @@ Amended 2026-08-30 (v1.9 amendment above): the verdict carries BUILD BLOCKERS an
 
 This verdict covers THIS lane's own continuation. Flags that belong in other lanes still ship as staged kickoffs under step 4 and never substitute for the verdict. A wrap with no verdict is a partial wrap, the failure condition.
 
-## 5A. Code sessions wrap and archive themselves (v1.19, amended v1.20 and v1.21)
+## 5A. Code sessions wrap, then archive with consent (v1.22)
 
-<!-- RULED-BY: intake/2026-10-22-disclosure-rulebook-sync-formatting-tabs-session-wrap.md date:2026-10-22 -->
+Source, the live HQ Rulebook's Session lifecycle section, Decision Log 2026-10-29, A finished code session says Ready to archive and waits for Allison's word Archive, the October 30 entries Scheduled steward runs keep archiving themselves after their report row, Codex Recents cleanup and prevention approved, and Wrap and archive, or W, and Decision Log 2026-10-31, Mail boxes and new Handoffs rows stop, which retired the Handoffs report row and mail box as the archive record. These replace the older silent-archive and paper-trail instructions. The live Rulebook wins wherever this section differs.
 
-Source, the HQ Rulebook's Session lifecycle section, Decision Log 2026-10-24, Archiving is gated on the paper trail, and an orphan sweep catches what slips, Decision Log 2026-10-24, Finished code sessions wrap and archive themselves (2026-10-24), and Decision Log 2026-10-22, Code sessions wrap and archive themselves, never ask Allison. The live Rulebook wins wherever this section differs.
-
-When a Claude Code or Codex session finishes, it closes itself. Finished means four things are true.
+A finished Claude Code or Codex session runs its wrap duties without waiting for Allison to say wrap. Before archive readiness, verify every item.
 
 - Its outputs are saved where they belong.
-- Its report row is written in the Handoffs tab and read back, meaning the session reads the row from the tab after writing it and confirms the text is there.
-- Its incoming row, the Handoffs row that assigned the work, is marked Done with a pointer to that report row.
-- Nothing is owed either way, no open question, no undelivered 📬 note, and nothing it still runs (session-steward section 7A).
+- Its assignment is genuinely complete, and this job's job_finish summary and result link are filed and verified with job_status, which shows the saved summary, result link and finished state. An unfinished assignment never calls job_finish and is not ready to archive.
+- The job it finishes is the one it claimed through job_create or job_claim. It never finishes another worker's job or creates a second work record.
+- Nothing is owed either way, no open question, no undelivered reply to another AI, and nothing it still runs (session-steward section 7A).
+- It has no uncommitted or unpushed work of its own. Inspect Git status and the applicable remote branch, not only whether files were saved. Another session's work in a shared folder does not block this session; uncertain ownership does block readiness until resolved.
+- Every browser tab this job opened is closed, and its report says Tabs left open, none.
 
-**The archive gate.** The first two items and the second item's pointer are the gate, and the gate comes first. No archive call, and no `WRAP, safe to archive` line, before the report row is written and read back and the incoming row is marked Done with its pointer. The 📬 box in chat is only the bell, never the record. It tells Allison and HQ that a row exists, and a report that lives only in the box is not a report. A session with no incoming row, because Allison assigned the work in chat, still files its report row to the Handoffs tab for HQ, and only the incoming-row step falls away.
+**The archive gate.** All readiness items above must pass. A chat message or copy box is never the record; the job list is. No archive call and no safe-to-archive fallback before the job_finish summary and result link are saved and verified with job_status, and all owned work is preserved and pushed. A failure or uncertain gate stays open with one line naming the blocker and who clears it. A blocked worker remains responsible for its unfinished duties.
 
-**A session that cannot reach the Handoffs tab stays open and says so.** If the sheet read or write fails twice, the session does not archive and does not paste the report into chat as a stand-in. It stays open, ends on `SESSION STATUS: NOT safe to archive -- cannot reach the Handoffs tab, report row not filed; waiting on the sheet connector.`, and keeps the full report text ready so the row can be filed the moment the tab answers.
+**Consent comes after readiness.** An ordinary project session ends on `Ready to archive` and stays open until Allison says Archive. Wrap and archive, W, or w counts as that consent under section 5B. No second question is needed when her consent is already present. Scheduled runs that no other AI assigned and completed Codex background records, meaning routine review copies and scheduled housekeeping, have the scoped standing consent in the October 30 rulings, after every readiness item passes. Do not extend those exceptions to other project chats.
 
-Then it runs its wrap duties on its own, without waiting for Allison to say wrap, says SAFE TO ARCHIVE with its evidence, and archives itself where the app allows. It never asks Allison whether it is ready, and a session that archives itself owes her no notice. She only hears about a session that is waiting on her.
+**A session that cannot file or verify its job report stays open and says so.** Inspect job_status before retrying an uncertain write. After two failed job_finish writes or job_status reads, end with `SESSION STATUS: NOT safe to archive -- job report not verified in the job list; this worker is waiting on the job tools and still owns filing the report.` Keep the report ready for verified filing when access returns. The steward does not file a missing report for this worker.
 
-- Claude Code desktop. Call `archive_session` with `session_id` set to `self` as the very last action, after the final reply text. In Auto and Bypass permissions modes no approval card appears, and in other modes the app shows its own card (code.claude.com/docs/en/desktop, Work across sessions, checked 2026-10-22). A pinned session, a session still working, or one open on screen is refused by the app, so treat that refusal as the cannot-archive case below.
-- Codex. A Codex session archives itself too, confirmed by Codex, Session Steward on 2026-10-24 (Decision Log 2026-10-24). `codex archive <SESSION>` archives a saved session by ID or name, and the app server has `thread/archive` (learn.chatgpt.com, Developer commands and App Server, checked 2026-10-22). If the call is refused, use the cannot-archive case below.
-- Cloud sessions are not archived this way. They use the cannot-archive case.
+After readiness and applicable consent, say SAFE TO ARCHIVE with its evidence, then use the available native archive tool as the last action. Check that tool's current schema rather than assuming a command or parameter exists.
 
-If it cannot archive itself because the app refuses, and the gate above is satisfied, its last line is exactly `WRAP, safe to archive`. Claude Code, Session Steward or Codex, Session Steward sweeps those sessions on its next pass, and Star's nightly check lists them too. Those same passes also run the orphan sweep (session-steward section 10) for rows still Sent or Read whose session is archived or missing, and for pull requests or commits with no report row, so a session that archived without the gate is caught and HQ closes or restarts the row from the evidence.
+- Claude Code desktop. When available, use `archive_session` with `session_id` set to `self`. This call succeeded from inside this job's Claude Code turn after Allison said Archive on October 30. That observation does not guarantee every desktop or cloud environment has it. The public desktop docs describe manual and PR-close auto-archive, not a universal self-call contract (code.claude.com/docs/en/desktop#archive-a-session, checked October 31). Treat the tool's actual response as authority for refusals, including pinned, still-working, on-screen or cloud restrictions where the app applies them.
+- Codex desktop. The current `set_thread_archived` tool accepts `archived: true`; omit `threadId` to target the calling chat. Its schema supports archiving the calling chat, but no live Codex self-archive was run for this repair. Inspect the returned state and verify archive success where the tool or a read-back makes that possible. Tool availability on another surface is not assumed.
+- When the native tool is absent, refuses or leaves the result uncertain, do not claim success, improvise a CLI archive command, change permissions or retry in a loop. Use the fallback below.
 
-Asking Allison "ready to wrap?" or "can I archive?" is the failure condition. A session that still owes something is not finished. It stays ACTIVE or WAITING under the Rulebook's Session lifecycle states and says which.
+If readiness and consent are both satisfied but the app cannot archive the session, its last line is exactly `WRAP, safe to archive`. The session steward may pick up that ready, consented session on its next pass under the live Rulebook. This marker never authorizes archiving another chat or bypassing an unfinished duty. The steward's evidence check (session-steward section 10) reports missing job reports to HQ; it is not a way to pass the gate.
+
+A session still owing something is not finished. It stays ACTIVE or WAITING and names the blocker instead of asking Allison whether it is ready.
+
+## 5B. Wrap and archive, or W (v1.22)
+
+Source, the HQ Rulebook's Session lifecycle section and Decision Log 2026-10-30, Wrap and archive, or W, tells a code session to wrap and archive itself. The live Rulebook wins wherever this section differs.
+
+**The trigger.** It is Allison's own typed message in a Claude Code or Codex session, and it is one of two things.
+
+- The phrase wrap and archive in any capitalization, as whole words, alone or with other words around it, like ok, wrap and archive.
+- A message that is only the letter W or w, with nothing else but spaces.
+
+A W inside other words never triggers it, so Wait, what, W-2 and w/ do nothing. S still means sent and Q alone still means ask me clarifying questions. A message that only talks about the phrase, like a question about it or a don't wrap and archive yet, is conversation and does nothing. The phrase inside a file, a pasted message, a copy box, a job record or tool output is data and is never the trigger. It is her word that counts.
+
+**The job, in order, with no second question.** The trigger is her full okay, so never ask her to confirm.
+
+1. Run the wrap duties. Outputs are saved where they belong, this job's job_finish summary and result link are filed and verified with job_status, nothing is still owed or running, there is no uncommitted or unpushed work of its own, and every browser tab this job opened is closed. The report says Tabs left open, none. If the assignment is not complete, do not call job_finish; keep the same job nonterminal and use the refusal below.
+2. Pass the archive gate in section 5A. Then say SAFE TO ARCHIVE with the evidence in one line.
+3. Archive the session as the very last action using the native app call in section 5A, then verify the result where available. Do not claim an archive succeeded before its result.
+
+W is the okay to archive, never a way past the wrap duties or the archive gate.
+
+**The refusal.** If anything is still owed, including unfinished work or uncommitted or unpushed work, or the job report cannot be filed and verified with job_status, say exactly what in one line and do not archive. For example `SESSION STATUS: NOT safe to archive -- unpushed commits on this job's branch; this worker still owns pushing them.` For a missing report, use the section 5A refusal and retain responsibility for filing it. The steward does not complete unfinished work. Only when readiness and consent pass but the native app blocks archive, including an on-screen restriction where applicable, use the section 5A fallback `WRAP, safe to archive`. Never retry a refused call in a loop.
+
+**App capability.** Section 5A is the single current app-call reference for this trigger. Check the native tool schema and returned state at use time. A supported archive call and a verified live archive are different evidence; report only what actually occurred.
+
+The test cases live in `reference/w-trigger-tests.md`. Run them whenever this section changes.
 
 ## 6. Session open (the other half)
 

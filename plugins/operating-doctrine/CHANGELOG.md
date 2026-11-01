@@ -1,17 +1,31 @@
 ## 2.72.0 - 2026-10-31
 
-Retire the AI mail system under Allison's October 31 ruling. Live handoff instructions
-point to the HQ Rulebook section Handoffs between AIs. Complete copy boxes carry the
-sender, receiver, model and effort or speed. Receiving AIs use the Chat to Code job
-list, job_create or job_claim, job_status, and job_finish with a summary and result
-link; code work travels as a GitHub issue labeled job. Session Steward checks
-job_inbox instead of message receipts, and Session Wrap files its job report.
-Dispatchers verify the same pending job before a copy box leaves; receivers claim it.
-Partial wraps and future obligations stay nonterminal in that job. Related skills,
-templates and references follow the same path. Historical entries and generated
-files remain untouched. The session-wrap lines changed by open PR #104 remain
-reserved for its post-merge follow-up. Merge and release are blocked until that
-protected conflict is reconciled; no merge or deployment is included.
+Retire the AI mail system under Allison's October 31 ruling (Decision Log 2026-10-31, Mail
+boxes and new Handoffs rows stop). Live handoff instructions point to the HQ Rulebook section
+Handoffs between AIs. Complete copy boxes carry the sender, receiver, model and effort or speed.
+Receiving AIs use the Chat to Code job list, job_create or job_claim, job_status, and job_finish
+with a summary and result link; code work travels as a GitHub issue labeled job. Session Steward
+checks job_inbox instead of message receipts, and Session Wrap files its job report. Dispatchers
+verify the same pending job before a copy box leaves; receivers claim it. Partial wraps and future
+obligations stay nonterminal in that job. Related skills, templates and references follow the same
+path. Historical entries stay as history, and the three skill history lines that described the
+Handoffs report row and mail box now say they are retired. Generated files remain untouched.
+
+Session Wrap v1.22, the wrap and archive trigger, folded in from PR 104 in the same release. In a
+Claude Code or Codex session, Allison's own message wrap and archive in any capitalization, or
+only the letter W or w, is her full okay. The session runs its wrap duties, files this job's
+job_finish summary and result link and verifies them with job_status, closes its tabs, says SAFE
+TO ARCHIVE and archives itself with no second question. A W inside other words, such as Wait,
+never triggers it. Quoted or pasted text and questions about the phrase never trigger it, and S
+and Q keep their meanings. If anything is still owed, including unfinished, uncommitted or
+unpushed work of its own, it says exactly what in one line and does not archive. The worker
+retains unfinished duties; only an archive blocked after readiness and consent uses the steward
+fallback. Finished project sessions end on Ready to archive and wait for Allison's Archive
+instruction; W supplies that consent. Scheduled runs and completed Codex background records keep
+their scoped exceptions. Native app tools are checked at use time. Section 5A readiness uses the
+job list in place of the retired Handoffs report row. Adds reference/w-trigger-tests.md (Decision
+Log 2026-10-30, Wrap and archive, or W, tells a code session to wrap and archive itself). PR 104
+proposed this as 2.71.0; it ships here as 2.72.0 because 2.71.0 is Quick Update.
 
 ## 2.71.0 - 2026-10-31
 
@@ -21,7 +35,6 @@ what's still outstanding, and what I recommend, followed by the one closing stat
 surface. Words like quick or update inside a normal sentence never fire it. CEO brief stays Teach
 Me's own step opener and is not a trigger. Requested by Allison in the Google Workspace access
 strategy audit session.
-
 ## 2.70.0 - 2026-10-31
 
 File to Knowledge Base Optimizer v1.0, a new skill built under the build standard from the approved
