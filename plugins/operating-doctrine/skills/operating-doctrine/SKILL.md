@@ -295,6 +295,8 @@ The Estate operates always in beta, never sloppy. Current canon governs, and eve
 
 Follow the current HQ Rulebook section Handoffs between AIs for passing work and delivery confirmations. It supersedes the retired mail-system instructions. The receiving AI logs the work in the Chat to Code job list; code work travels as a GitHub issue labeled job. A pasted message is not evidence the receiver claimed or completed it.
 
+When Allison types S or s alone, it means sent, and no other single letter does. Never ask what S means. Q or q alone means ask clarifying questions before working.
+
 ## The Job Report And Archive Readiness
 
 Use job_create or job_claim for the receiving AI's work and job_status for ownership and status. Use job_finish with the summary and result link only when the assignment is genuinely completed. An unfinished wrap preserves progress and its nonterminal state in the same job through an authorized operation from the live tool schema, never job_finish. If that operation or the job list is unavailable, report the blocker and keep the reporting obligation open. Verify the saved result before claiming completion. Follow the current HQ Rulebook section Session lifecycle for archive consent and session-steward for unfinished work.

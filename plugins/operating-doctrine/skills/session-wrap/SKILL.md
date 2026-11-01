@@ -187,11 +187,11 @@ Source, the live HQ Rulebook's Session lifecycle section, Decision Log 2026-10-2
 A finished Claude Code or Codex session runs its wrap duties without waiting for Allison to say wrap. Before archive readiness, verify every item.
 
 - Its outputs are saved where they belong.
-- Its assignment is genuinely complete, and this job's job_finish summary and result link are filed and verified with job_status, which shows the saved summary, result link and finished state. An unfinished assignment never calls job_finish and is not ready to archive.
 - The job it finishes is the one it claimed through job_create or job_claim. It never finishes another worker's job or creates a second work record.
 - Nothing is owed either way, no open question, no undelivered reply to another AI, and nothing it still runs (session-steward section 7A).
 - It has no uncommitted or unpushed work of its own. Inspect Git status and the applicable remote branch, not only whether files were saved. Another session's work in a shared folder does not block this session; uncertain ownership does block readiness until resolved.
 - Every browser tab this job opened is closed, and its report says Tabs left open, none.
+- Last, once every item above passes, its assignment is genuinely complete and this job's job_finish summary and result link are filed and verified with job_status, which shows the saved summary, result link and finished state. An unfinished assignment never calls job_finish and is not ready to archive.
 
 **The archive gate.** All readiness items above must pass. A chat message or copy box is never the record; the job list is. No archive call and no safe-to-archive fallback before the job_finish summary and result link are saved and verified with job_status, and all owned work is preserved and pushed. A failure or uncertain gate stays open with one line naming the blocker and who clears it. A blocked worker remains responsible for its unfinished duties.
 
@@ -222,7 +222,7 @@ A W inside other words never triggers it, so Wait, what, W-2 and w/ do nothing. 
 
 **The job, in order, with no second question.** The trigger is her full okay, so never ask her to confirm.
 
-1. Run the wrap duties. Outputs are saved where they belong, this job's job_finish summary and result link are filed and verified with job_status, nothing is still owed or running, there is no uncommitted or unpushed work of its own, and every browser tab this job opened is closed. The report says Tabs left open, none. If the assignment is not complete, do not call job_finish; keep the same job nonterminal and use the refusal below.
+1. Run the wrap duties in this order. Outputs are saved where they belong, nothing is still owed or running, there is no uncommitted or unpushed work of its own, and every browser tab this job opened is closed. The report says Tabs left open, none. Only after all of those pass, file this job's job_finish summary and result link and verify them with job_status. If any of them fails or the assignment is not complete, do not call job_finish; keep the same job nonterminal and use the refusal below.
 2. Pass the archive gate in section 5A. Then say SAFE TO ARCHIVE with the evidence in one line.
 3. Archive the session as the very last action using the native app call in section 5A, then verify the result where available. Do not claim an archive succeeded before its result.
 
