@@ -21,6 +21,13 @@ class Line:
     conf: float = 0.0
     frame: int = 0
     time: float = 0.0
+    variants: list[str] = field(default_factory=list)
+
+    def add_variant(self, text: str) -> None:
+        """Keep another reading of this line when it differs after normalizing."""
+        seen = {normalize(self.text), *(normalize(v) for v in self.variants)}
+        if normalize(text) not in seen:
+            self.variants.append(text)
 
 
 @dataclass
@@ -88,17 +95,14 @@ def find_overlap(doc: list[Line], new: list[Line], max_head_skip: int = 2, max_t
 
 
 def _resembles_any(line: Line, others: list[Line]) -> bool:
-    """True when line looks like a cut off or misread copy of one of others."""
-    nl = normalize(line.text)
-    if not nl:
+    """True when line reads as the same line as one of others.
+
+    Kept strict on purpose. When in doubt the stitcher starts a new screen, which
+    can repeat a line but never loses one.
+    """
+    if not normalize(line.text):
         return True
-    for other in others:
-        no = normalize(other.text)
-        if not no:
-            continue
-        if nl in no or no.startswith(nl) or similar(line.text, other.text, 0.6):
-            return True
-    return False
+    return any(similar(line.text, other.text) for other in others)
 
 
 def _merge(screen: Screen, new: list[Line]) -> bool:
@@ -117,7 +121,11 @@ def _merge(screen: Screen, new: list[Line]) -> bool:
     for k in range(t):
         old, fresh = doc[i + k], new[j + k]
         if fresh.conf > old.conf:
-            doc[i + k] = Line(fresh.text, fresh.conf, old.frame, old.time)
+            kept = Line(fresh.text, fresh.conf, old.frame, old.time, list(old.variants))
+            kept.add_variant(old.text)
+            doc[i + k] = kept
+        else:
+            old.add_variant(fresh.text)
     if j + t < len(new):
         # The doc tail past the overlap was a partial line in the earlier frame.
         screen.lines = doc[: i + t] + new[j + t :]
@@ -142,7 +150,11 @@ def _drop_consecutive_repeats(lines: list[Line]) -> list[Line]:
     for line in lines:
         if out and normalize(out[-1].text) == normalize(line.text):
             if line.conf > out[-1].conf:
-                out[-1] = Line(line.text, line.conf, out[-1].frame, out[-1].time)
+                kept = Line(line.text, line.conf, out[-1].frame, out[-1].time, list(out[-1].variants))
+                kept.add_variant(out[-1].text)
+                out[-1] = kept
+            for variant in line.variants:
+                out[-1].add_variant(variant)
             continue
         out.append(line)
     return out

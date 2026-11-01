@@ -268,7 +268,8 @@ def _recovered_markdown(video_name: str, start: float, end: float, screens: list
         out.append("No text was recovered in this window.")
     for number, screen in enumerate(screens, start=1):
         out += [f"## Screen {number}, {format_time(screen.first_time)} to {format_time(screen.last_time)}", ""]
-        out += [line.text for line in screen.lines]
+        for line in screen.lines:
+            out.append(line.text + (f" (also read as {' / '.join(line.variants)})" if line.variants else ""))
         out.append("")
     return "\n".join(out).rstrip() + "\n"
 

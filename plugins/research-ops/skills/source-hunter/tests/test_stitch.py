@@ -75,3 +75,21 @@ def test_slides_sharing_a_header_keep_the_earlier_last_line():
     texts = [l.text for s in screens for l in s.lines]
     for line in a + b:
         assert line in texts
+
+
+def test_a_word_that_changes_between_frames_is_kept_as_a_variant():
+    a = ["Building the board", "Pick three advisors you trust", "Write the charter today"]
+    b = ["Building the board", "Pick two advisors you trust", "Write the charter tomorrow"]
+    screens = stitch([_frame(0, a), _frame(1, b)])
+    readings = {t for s in screens for l in s.lines for t in [l.text, *l.variants]}
+    for line in a + b:
+        assert line in readings
+
+
+def test_a_short_line_is_not_swallowed_by_a_longer_one():
+    a = ["Week zero plan", "Goals"]
+    b = ["Week zero plan", "Goals and metrics for the first month", "Owner and due date"]
+    screens = stitch([_frame(0, a), _frame(1, b)])
+    texts = [l.text for s in screens for l in s.lines]
+    assert "Goals" in texts
+    assert "Goals and metrics for the first month" in texts
