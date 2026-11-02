@@ -275,7 +275,8 @@ def evaluate(gh, cfg: Config, number: int) -> Decision:
         try:
             issue = gh.get(f"/repos/{cfg.repo}/issues/{candidate}")
         except GitHubError as exc:
-            issue, job_problem = None, f"issue #{candidate} could not be read ({exc})"
+            # A read failure is retryable, never a reason to switch routes.
+            return skip(f"issue #{candidate} could not be read ({exc})")
         if issue is not None:
             if "pull_request" in issue:
                 job_problem = f"#{candidate} is a pull request, not a job issue"
