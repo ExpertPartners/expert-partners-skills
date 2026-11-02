@@ -1,3 +1,18 @@
+## 2.76.0 - 2026-11-02
+
+New skill shadow-board v1.0, Week 0 tool 3, built from the approved spec [HQ][V1.0] Spec - Shadow
+Board and the Decision Log entries of 2026-10-29, 2026-10-31 and 2026-11-01. It seats five real,
+named experts on a project, decision, plan or draft, asks exactly one question when the input is
+too vague, keeps the same board for the life of a project, and allows a one-run swap that keeps the
+seat's lens and needs the user's yes. Every member gets the same question and the full business
+context word for word, runs as a separate subagent launched together, scores 0 to 100 against four
+bands, and cites the exact words that earned the score. One anonymous peer review and one synthesis
+follow, then at most three revise and rescore passes toward 100 from every member. The true score
+always shows and is never raised. The finished review is a native Google Doc in Claude Outputs
+[EP-BB], or Private [EP-BB] for private input, named [Company][Version] Title, with reruns advancing
+the version and old versions archived, never deleted. The skill never changes itself. It credits
+Cal and The Uncommon Business, Carter Jensen and Eliot Prince, and marks the rest as HQ's addition.
+HQ runs the one real-task test after merge, and HQ and Allison certify (Build Standard 1.2).
 ## 2.75.0 - 2026-11-01
 
 Code Block Routing follows Decision Log 2026-11-01, Chat to Code moves forward on its own, as
