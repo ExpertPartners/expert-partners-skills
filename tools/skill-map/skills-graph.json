@@ -1,8 +1,8 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "5b42512a274573edbbc32e98dd888fa5eeb704c3",
-    "aura": "21b592df131d74f762249cad4140f88661d67c88"
+    "eps": "b8c76061fa24208bdd9aeba92584f8af912233ee",
+    "aura": "3be73bd8402f597ad276a5455362bf91f3a074cd"
   },
   "zones": [
     "surfaces",
@@ -86,7 +86,7 @@
       "renderNote": null,
       "layout": {
         "x": 994,
-        "y": 5430,
+        "y": 5545,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -453,7 +453,7 @@
       "renderNote": null,
       "layout": {
         "x": 1009,
-        "y": 5517,
+        "y": 5632,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -567,7 +567,7 @@
       "renderNote": null,
       "layout": {
         "x": 1006,
-        "y": 5127,
+        "y": 5242,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -594,7 +594,7 @@
       "renderNote": null,
       "layout": {
         "x": 997,
-        "y": 5329,
+        "y": 5444,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -1253,7 +1253,7 @@
       "renderNote": null,
       "layout": {
         "x": 971.5,
-        "y": 5214,
+        "y": 5329,
         "width": 281,
         "height": 91,
         "rectHeight": 76,
@@ -2933,6 +2933,35 @@
       }
     },
     {
+      "id": "shadow-board",
+      "source": "eps:plugins/operating-doctrine/skills/shadow-board/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "hands",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "five real experts score the work, debate it and rebuild it toward 100",
+      "renderNote": null,
+      "layout": {
+        "x": 1000,
+        "y": 5127,
+        "width": 224,
+        "height": 91,
+        "rectHeight": 76,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "five real experts score the",
+          "work, debate it and rebuild it",
+          "toward 100"
+        ]
+      }
+    },
+    {
       "id": "skill-cataloger",
       "source": "eps:plugins/research-ops/skills/skill-cataloger/SKILL.md",
       "repo": "eps",
@@ -3035,7 +3064,7 @@
       "renderNote": null,
       "layout": {
         "x": 1044,
-        "y": 4925,
+        "y": 5012,
         "width": 218,
         "height": 91,
         "rectHeight": 76,
@@ -3232,7 +3261,7 @@
       "renderNote": null,
       "layout": {
         "x": 962,
-        "y": 5040,
+        "y": 3494,
         "width": 300,
         "height": 63,
         "rectHeight": 48,
@@ -3259,7 +3288,7 @@
       "renderNote": null,
       "layout": {
         "x": 962,
-        "y": 3494,
+        "y": 4636,
         "width": 300,
         "height": 63,
         "rectHeight": 48,
@@ -3286,7 +3315,7 @@
       "renderNote": null,
       "layout": {
         "x": 962,
-        "y": 4636,
+        "y": 4925,
         "width": 300,
         "height": 63,
         "rectHeight": 48,
@@ -3340,7 +3369,7 @@
       "renderNote": null,
       "layout": {
         "x": 1282,
-        "y": 4925,
+        "y": 5012,
         "width": 218,
         "height": 91,
         "rectHeight": 76,
@@ -4738,6 +4767,12 @@
       "points": null
     },
     {
+      "from": "shadow-board",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
       "from": "skill-cataloger",
       "to": "operating-doctrine",
       "type": "inherits",
@@ -4762,11 +4797,11 @@
       "points": [
         {
           "x": 1262,
-          "y": 4970.5
+          "y": 5057.5
         },
         {
           "x": 1282,
-          "y": 4970.5
+          "y": 5057.5
         }
       ]
     },
@@ -5102,7 +5137,7 @@
         "x": 940,
         "y": 3446,
         "width": 588,
-        "height": 2170,
+        "height": 2285,
         "rooms": []
       },
       {
