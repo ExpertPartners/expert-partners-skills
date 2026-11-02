@@ -223,7 +223,7 @@ describe('6. unknown deployment state is never promoted to Active', () => {
     const recs = byId(generate(makeRepo()));
     assert.equal(recs.get('alpha-one').status, 'Unknown');
     assert.equal(recs.get('kit-writer').status, 'Designed');
-    assert.equal(recs.get('aura-thing').status, 'Retired');
+    assert.equal(recs.get('old-thing').status, 'Retired');
     assert.deepEqual(recs.get('alpha-one').verifiedSurfaces, []);
     assert.ok(![...recs.values()].some(r => r.status === 'Active'));
   });

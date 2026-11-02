@@ -7,7 +7,7 @@
 # plus required surrounding text on the same line) work.
 #
 # This file must live next to brand-lint.py, which loads it from its own directory
-# (tools/ in aura, .ep/ in deployed repos).
+# (.ep/ in this repo).
 #
 # Use sparingly and only for genuine exceptions:
 #   - direct quotes that must preserve someone else's spelling

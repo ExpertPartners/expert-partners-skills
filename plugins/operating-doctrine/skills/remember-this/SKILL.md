@@ -13,7 +13,7 @@ subtitle: "future obligations get a durable home and a wake condition"
 
 # Remember This -- v1.1 (2026-10-08)
 
-v1.1 amendment 2026-10-08 (ruling of record aura intake/2026-10-08-ruling-claude-code-location-and-remove-lock-that.md, under decision 0101): the `Lock that` phrase gate is removed. A clear decision is saved as made. Obligation capture is unchanged.
+v1.1 amendment 2026-10-08 (ruling of record: history in GitHub Archive, under decision 0101): the `Lock that` phrase gate is removed. A clear decision is saved as made. Obligation capture is unchanged.
 
 Allison must be able to say `remember this`, or say nothing at all, and trust that the thing does not evaporate. This skill is the mechanism that earns that trust. It does not store anything itself. It routes a future obligation into the durable home that already owns it and attaches the wake condition that brings it back.
 

@@ -1,4 +1,4 @@
-// Skill Map Stage 2 layout step (aura intake/2026-08-04-skill-map-architecture-report.md).
+// Skill Map Stage 2 layout step (architecture report: history in GitHub Archive).
 // Runs ELK.js (layered algorithm, INCLUDE_CHILDREN over the compound zone
 // containers) at BUILD TIME ONLY, inside the same regeneration step as
 // extraction, and bakes absolute x/y/width/height into skills-graph.json.

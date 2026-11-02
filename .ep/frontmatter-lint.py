@@ -24,7 +24,7 @@ Frontmatter parsing:
 Escape hatch:
   Put `frontmatter-lint: ignore-file` anywhere in a file to skip it entirely.
 
-Usage (the kit directory is tools/ in aura, .ep/ in deployed repos):
+Usage (the kit directory is .ep/):
   python3 .ep/frontmatter-lint.py [FILE ...]   # validate named files (pre-commit passes these)
   python3 .ep/frontmatter-lint.py              # validate all git-tracked markdown
   python3 .ep/frontmatter-lint.py --schema P   # use an alternate schema path
@@ -50,7 +50,7 @@ except ImportError:  # pragma: no cover - depends on environment
 
 IGNORE_FILE_TOKEN = "frontmatter-lint: ignore-file"
 MARKDOWN_SUFFIXES = {".md", ".markdown", ".mdx"}
-# The schema ships beside this script (tools/ in aura, .ep/ in deployed repos), so the
+# The schema ships beside this script (.ep/), so the
 # default resolves script-adjacent; --schema still overrides (deployed CI passes it
 # explicitly). A repo-relative tools/ default previously broke bare runs in deployed repos.
 DEFAULT_SCHEMA_PATH = Path(__file__).resolve().parent / "classification-schema.json"

@@ -14,7 +14,7 @@ subtitle: "paste block routing and the job list"
 
 # Code Block Routing
 
-<!-- RULED-BY: aura/decisions/0107-retire-routing-naming-ceremony.md date:2026-10-12 superseded naming text removed -->
+<!-- RULED-BY: history in GitHub Archive date:2026-10-12 superseded naming text removed -->
 
 Current authority: the HQ Rulebook section Handoffs between AIs and Decision Log 2026-11-02, Allison never wakes workers by hand (which replaces the Oct 31 paste rule, while the mail system stays dissolved and the job list stays the one record).
 
@@ -61,7 +61,7 @@ This rule is Rule 8 of the routing line extended from shared state to shared PUR
 
 First ruled by Allison 2026-08-07 as decision 9d of the Estate Brain Door Phase B record, after the 2026-08-04 incident where two sessions sharing one working tree reset each other's uncommitted edits mid-job. Uncommitted work has no undo, so this is data loss, not inconvenience.
 
-HARDENED by Allison's ruling of 2026-08-07 afternoon (ruling of record: aura intake/2026-08-07-ruling-dispatch-blocks-must-name-worktrees.md). The rule existed but was not enforced at the dispatch chokepoint, and the Phase B session alone logged three collisions: a ledger edit that landed under a sibling's commit, a multi-branch git pull failure, and the Door Tools Build lane losing a full build to a sibling executing the same order. The requirement now lives where the violation is visible at paste time instead of discoverable at collision time.
+HARDENED by Allison's ruling of 2026-08-07 afternoon (ruling of record: history in GitHub Archive). The rule existed but was not enforced at the dispatch chokepoint, and the Phase B session alone logged three collisions: a ledger edit that landed under a sibling's commit, a multi-branch git pull failure, and the Door Tools Build lane losing a full build to a sibling executing the same order. The requirement now lives where the violation is visible at paste time instead of discoverable at collision time.
 
 **Every dispatch block that spawns a Claude Code session carries a `WORKTREE` line naming the isolated worktree the session works in.** Unconditional. Concurrency risk is assumed at dispatch, never assessed away with "they probably will not overlap."
 
@@ -112,15 +112,15 @@ Precedence notes so the rules do not fight each other:
 
 ## The Session Gives The Archive Verdict
 
-<!-- RULED-BY: aura/intake/2026-08-07-ruling-archive-verdict-returns-to-code-sessions.md date:2026-08-07 -->
-<!-- Restores and generalizes a rule Allison first ruled 2026-07-27, struck without disclosure 2026-08-07 morning, and re-ruled the same afternoon: aura/intake/2026-07-27-ruling-code-session-close-includes-safe-to-archive.md date:2026-07-27 status:superseded-and-restored -->
+<!-- RULED-BY: history in GitHub Archive date:2026-08-07 -->
+<!-- Restores and generalizes a rule Allison first ruled 2026-07-27, struck without disclosure 2026-08-07 morning, and re-ruled the same afternoon: history in GitHub Archive date:2026-07-27 status:superseded-and-restored -->
 
 Re-ruled by Allison 2026-08-07 evening in the Estate Brain Door Phase B Code session, superseding the same-date "Archive Authority Belongs To The Home Conversation" ruling. Her reason, recorded: the session must tell her whether it is okay to archive, determine whether something is open, and say whether a closeout or a wrap is needed, because sessions that cannot say whether they are done pile up, and too many open sessions is the real failure.
 
 **`SESSION STATUS: carry-back delivered, awaiting verification at home.` is RETIRED and never written again.** Every carry-back ends with one of the four verdict lines from `behavior-defaults.md`: Waiting on you, Still working, SAFE TO ARCHIVE with evidence, or NOT safe to archive with the one closing move named.
 
-<!-- RULED-BY: aura/intake/2026-09-01-ruling-table-and-worker-lifecycle-terminality.md date:2026-09-01 -->
-**SAFE TO ARCHIVE is a verified claim, never a phrase.** Issued only after all FIVE verify live in the same turn: `git status` clean and pushed on every repo the session touched; the session record, wrap, or closeout note written and pushed when doctrine requires one; every open wait preserved in its existing Chat to Code job with its named condition and stale date, so nothing dies with the archive; **the job report is saved through job_finish with a summary and result link and verified through job_status (section The Job Report below)**; and, added 2026-09-03 (ruling of record aura intake/2026-09-01-ruling-table-and-worker-lifecycle-terminality.md, delivered in session-steward v1.3 section 7A), **no monitor, check-in, subscription, scheduled wakeup, or background agent the session owns is still running**, each one released and confirmed released rather than assumed finished. The evidence rides in the line itself, and background activity is stated explicitly as NONE, never implied by omission. A worker that cannot stop something it owns names it and earns NOT safe to archive instead. Anything it does not own, an estate rail or another lane's work, is left running and said so.
+<!-- RULED-BY: history in GitHub Archive date:2026-09-01 -->
+**SAFE TO ARCHIVE is a verified claim, never a phrase.** Issued only after all FIVE verify live in the same turn: `git status` clean and pushed on every repo the session touched; the session record, wrap, or closeout note written and pushed when doctrine requires one; every open wait preserved in its existing Chat to Code job with its named condition and stale date, so nothing dies with the archive; **the job report is saved through job_finish with a summary and result link and verified through job_status (section The Job Report below)**; and, added 2026-09-03 (ruling of record: history in GitHub Archive, delivered in session-steward v1.3 section 7A), **no monitor, check-in, subscription, scheduled wakeup, or background agent the session owns is still running**, each one released and confirmed released rather than assumed finished. The evidence rides in the line itself, and background activity is stated explicitly as NONE, never implied by omission. A worker that cannot stop something it owns names it and earns NOT safe to archive instead. Anything it does not own, an estate rail or another lane's work, is left running and said so.
 
 **NOT safe means the session diagnoses AND prescribes.** It names exactly what is open and the single move that closes it: /session-wrap when chat-only decisions or flags are unrecorded, /session-closeout when shipped work has no handoff note on main, or the named open action otherwise. Never leave Allison to work out which close a session needs.
 
@@ -134,7 +134,7 @@ Precedence: where this and any older SESSION STATUS wording disagree (the pin sk
 
 ### The Earned Verdict Line
 
-<!-- RULED-BY: aura/intake/2026-08-07-ruling-earned-verdict-line-on-carry-backs.md date:2026-08-07 -->
+<!-- RULED-BY: history in GitHub Archive date:2026-08-07 -->
 
 Amended by Allison 2026-08-07 (Aura / Code Rule Fix lane). This amends the archive-verdict re-ruling above; it does not replace it. **Every Code session carry-back ends with the standing SESSION STATUS line PLUS one earned verdict line, and the verdict line is the carry-back's last line.** Exactly two verdicts exist:
 
@@ -145,7 +145,7 @@ Archive consent follows the current HQ Rulebook section Session lifecycle. Home'
 
 ### BUILD BLOCKERS and OUTCOME BLOCKERS: Two Lines, Never One
 
-Amended 2026-08-30, ruled by Allison; ruling of record: aura decisions/0083-sequencing-without-maximalism-amendment-to-decision-0075.md (an explicit amendment to decision 0075); advisory of record aura intake/2026-08-30-sequencing-without-maximalism-corrected-final-advisory-super.md.
+Amended 2026-08-30, ruled by Allison; ruling of record: history in GitHub Archive (an explicit amendment to decision 0075); advisory of record: history in GitHub Archive.
 
 Every carry-back reports BUILD BLOCKERS and OUTCOME BLOCKERS as two separate lines, riding immediately before the SESSION STATUS line. No surface ever reports a single BLOCKING line, and every disposition or completion list that would have carried one carries the BUILD and OUTCOME pair instead. "None" is a valid value and is stated explicitly, never implied by omission.
 
@@ -247,7 +247,7 @@ Scope widened 2026-08-07 (decision 9c of the Estate Brain Door Phase B record, w
 
 ## The Hand-Step URL Rule: Give Her The Address, Not Directions
 
-Ruled by Allison 2026-08-07; decision 9a of the Estate Brain Door Phase B record (aura intake/2026-08-05-session-record-estate-brain-door-phase-b-lane.md). The live proof: a manifest page a session needed Allison's eyes on sat inside a browser pane for hours, because the session handed over a navigation path instead of an address.
+Ruled by Allison 2026-08-07; decision 9a of the Estate Brain Door Phase B record (history in GitHub Archive). The live proof: a manifest page a session needed Allison's eyes on sat inside a browser pane for hours, because the session handed over a navigation path instead of an address.
 
 When a session needs Allison's hands on a web page, it hands her the full URL, complete and clickable, for her own browser. Never a navigation path. Never "go to Settings, then Connectors, then scroll to." Never a page left waiting in a Browser pane on the assumption she will find it there. The Browser pane is optional garnish, useful to the session for its own verification, never the delivery mechanism for a step that is hers.
 

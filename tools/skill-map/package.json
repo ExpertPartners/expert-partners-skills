@@ -2,7 +2,7 @@
   "name": "skill-map-pipeline",
   "private": true,
   "version": "1.2.0",
-  "description": "Skill Map extraction + layout pipeline. Stage 1 walks the canonical skill repos, validates SKILL.md skill-map frontmatter, emits skills-graph.json. Stage 2 bakes build-time ELK.js layout (layered, zones as compound containers, INCLUDE_CHILDREN over brand rooms) into the same JSON; ELK never ships to a browser. Spec, aura intake/2026-08-04-skill-map-architecture-report.md.",
+  "description": "Skill Map extraction + layout pipeline. Stage 1 walks this repo, validates SKILL.md skill-map frontmatter, emits skills-graph.json. Stage 2 bakes build-time ELK.js layout (layered, zones as compound containers, INCLUDE_CHILDREN over brand rooms) into the same JSON; ELK never ships to a browser. Spec: history in GitHub Archive.",
   "type": "module",
   "scripts": {
     "extract": "node extract-skills-graph.mjs",
