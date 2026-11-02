@@ -268,16 +268,25 @@ def evaluate(gh, cfg: Config, number: int) -> Decision:
         label.get("name") for label in pr.get("labels", [])
     }
     issue_number = None
+    issue_number = None
+    job_problem = None
     if author == FACTORY_LOGIN and job_issue_number(pr.get("body")) is not None:
-        issue_number = job_issue_number(pr.get("body"))
+        candidate = job_issue_number(pr.get("body"))
         try:
-            issue = gh.get(f"/repos/{cfg.repo}/issues/{issue_number}")
+            issue = gh.get(f"/repos/{cfg.repo}/issues/{candidate}")
         except GitHubError as exc:
-            return skip(f"issue #{issue_number} could not be read ({exc})")
-        if "pull_request" in issue:
-            return skip(f"#{issue_number} is a pull request, not a job issue")
-        if JOB_LABEL not in {label.get("name") for label in issue.get("labels", [])}:
-            return skip(f"issue #{issue_number} does not carry the {JOB_LABEL} label")
+            issue, job_problem = None, f"issue #{candidate} could not be read ({exc})"
+        if issue is not None:
+            if "pull_request" in issue:
+                job_problem = f"#{candidate} is a pull request, not a job issue"
+            elif JOB_LABEL not in {label.get("name") for label in issue.get("labels", [])}:
+                job_problem = f"issue #{candidate} does not carry the {JOB_LABEL} label"
+            else:
+                issue_number = candidate
+        # Either route is enough. A labelled pull request whose Closes #N is
+        # not a job issue still goes through the label route.
+        if job_problem and not labelled:
+            return skip(job_problem)
     elif not labelled:
         if author != FACTORY_LOGIN:
             why = f"author is {author}, not {FACTORY_LOGIN}"
@@ -291,10 +300,20 @@ def evaluate(gh, cfg: Config, number: int) -> Decision:
     comments = gh.paginate(f"/repos/{cfg.repo}/issues/{number}/comments")
     reasons = check_problems(gh, cfg, sha)
     threads = getattr(gh, "unresolved_threads", None)
-    reasons += codex_problems(
-        latest_codex_state(comments), sha,
-        (lambda: threads(cfg.repo, number)) if threads else None,
-    )
+
+    def open_threads():
+        # Resolving a thread is not the same as fixing it. A Codex review on
+        # this exact head that still carries findings keeps the gate shut.
+        reviews = gh.paginate(f"/repos/{cfg.repo}/pulls/{number}/reviews")
+        for review in reviews:
+            if (review.get("user") or {}).get("login") != CODEX_LOGIN or review.get("commit_id") != sha:
+                continue
+            found = gh.paginate(f"/repos/{cfg.repo}/pulls/{number}/reviews/{review['id']}/comments")
+            if found:
+                return len(found)
+        return threads(cfg.repo, number) if threads else None
+
+    reasons += codex_problems(latest_codex_state(comments), sha, open_threads)
     reasons += mergeable_problems(pr)
     action = "refuse" if reasons else "merge"
     return Decision(number, action, reasons, sha, issue_number, comments)

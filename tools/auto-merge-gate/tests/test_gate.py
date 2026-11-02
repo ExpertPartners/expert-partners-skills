@@ -404,8 +404,6 @@ class CodexParsing(unittest.TestCase):
         self.assertIsNone(gate.job_issue_number(None))
 
 
-if __name__ == "__main__":
-    unittest.main()
 
 
 LCFG = gate.Config(repo=REPO, merge_label="auto-merge")
@@ -525,7 +523,62 @@ class ResolvedThreadsRoute(unittest.TestCase):
         routes[f"/repos/{REPO}/issues/7/comments"] = [codex_comment()]
         state_comment = routes[f"/repos/{REPO}/issues/7/comments"][0]
         state_comment["body"] = state_comment["body"].replace('"has_unresolved_findings":false', '"has_unresolved_findings":null').replace('"has_any_findings":false', '"has_any_findings":true')
+        routes[f"/repos/{REPO}/pulls/7/reviews"] = []
         reader = FakeGitHub(routes)
         reader.unresolved_threads = lambda repo, n: calls.append(n) or 0
         self.assertEqual(gate.evaluate(reader, CFG, 7).action, "merge")
         self.assertEqual(calls, [7])
+
+
+class LabelFallbackAndHeadFindings(unittest.TestCase):
+    def test_labelled_factory_pr_with_a_non_job_issue_uses_the_label_route(self):
+        routes = labelled_routes(author="factory-droid[bot]")
+        routes[f"/repos/{REPO}/pulls/7"]["body"] = "Closes #126\n\nwork"
+        routes[f"/repos/{REPO}/issues/126"]["labels"] = []
+        d = gate.evaluate(FakeGitHub(routes), LCFG, 7)
+        self.assertEqual(d.action, "merge")
+        self.assertIsNone(d.issue)
+
+    def test_unlabelled_factory_pr_with_a_non_job_issue_is_still_skipped(self):
+        routes = passing_routes()
+        routes[f"/repos/{REPO}/issues/126"]["labels"] = []
+        self.assertEqual(gate.evaluate(FakeGitHub(routes), LCFG, 7).action, "skip")
+
+    def _null_routes(self):
+        routes = passing_routes()
+        c = routes[f"/repos/{REPO}/issues/7/comments"][0]
+        c["body"] = c["body"].replace('"has_unresolved_findings":false', '"has_unresolved_findings":null').replace('"has_any_findings":false', '"has_any_findings":true')
+        routes[f"/repos/{REPO}/pulls/7/reviews"] = [
+            {"id": 1, "user": {"login": "chatgpt-codex-connector[bot]"}, "commit_id": OLD},
+        ]
+        routes[f"/repos/{REPO}/pulls/7/reviews/1/comments"] = [{"id": 11}]
+        return routes
+
+    def test_findings_on_an_older_head_resolved_merges(self):
+        reader = FakeGitHub(self._null_routes())
+        reader.unresolved_threads = lambda repo, n: 0
+        self.assertEqual(gate.evaluate(reader, CFG, 7).action, "merge")
+
+    def test_findings_on_this_head_block_even_when_resolved(self):
+        routes = self._null_routes()
+        routes[f"/repos/{REPO}/pulls/7/reviews"].append(
+            {"id": 2, "user": {"login": "chatgpt-codex-connector[bot]"}, "commit_id": HEAD})
+        routes[f"/repos/{REPO}/pulls/7/reviews/2/comments"] = [{"id": 21}, {"id": 22}]
+        reader = FakeGitHub(routes)
+        reader.unresolved_threads = lambda repo, n: 0
+        d = gate.evaluate(reader, CFG, 7)
+        self.assertEqual(d.action, "refuse")
+        self.assertTrue(any("2 unresolved review thread" in r for r in d.reasons))
+
+    def test_a_clean_codex_review_on_this_head_does_not_block(self):
+        routes = self._null_routes()
+        routes[f"/repos/{REPO}/pulls/7/reviews"].append(
+            {"id": 3, "user": {"login": "chatgpt-codex-connector[bot]"}, "commit_id": HEAD})
+        routes[f"/repos/{REPO}/pulls/7/reviews/3/comments"] = []
+        reader = FakeGitHub(routes)
+        reader.unresolved_threads = lambda repo, n: 0
+        self.assertEqual(gate.evaluate(reader, CFG, 7).action, "merge")
+
+
+if __name__ == "__main__":
+    unittest.main()
