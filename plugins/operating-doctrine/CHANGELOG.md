@@ -1,3 +1,12 @@
+## 2.78.0 - 2026-11-02
+
+Browser Route Home (Chat to Code job 100094, from the Keys and Sign-Ins room). After the Nov 1 M2
+rebuild the M2 has one Mac user, ember, one Chrome profile, Default, and no pw-run, so the old
+browser route no longer exists, and Codex followed it today. browser-automation and
+ember-browser-routing now name the one live route, playwright-ember (SSH from the M4 to
+/Users/ember/maintenance/chrome-signed-in-mcp.sh on the M2), point to the AI Implementation SOP as
+its single home, and drop playwright, playwright-atlas, pw-run, the Atlas profile and the retired
+cua_ember route. Proven live Nov 2, 2026.
 ## 2.77.0 - 2026-11-02
 
 Finishes retiring the aura repo as a source (HQ Rulebook and Decision Log: aura is retired and
