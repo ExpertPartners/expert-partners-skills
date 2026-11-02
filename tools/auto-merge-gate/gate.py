@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""Auto-merge gate for finished Chat to Code jobs. README.md beside this file explains it.
+"""Auto-merge gate for finished Chat to Code jobs (Decision Log 2026-11-01, Finished code
+merges itself, except in Ember's repo). Copied from expert-partners-skills, with one addition.
+
+A pull request is eligible when either
+  - it is a Factory job pull request (author factory-droid[bot], body starting with
+    Closes #N where #N is an issue labeled job), or
+  - GATE_MERGE_LABEL is set and the pull request carries that label. Repos whose
+    builders push as a person (Factory missions, Claude Code) mark finished work this way.
+Either way it merges only when every check on the head commit passed, Codex's code review
+covers that exact head with no unresolved findings, and GitHub says it can merge.
 
 Two subcommands, run by .github/workflows/auto-merge-gate.yml:
 
@@ -11,7 +20,7 @@ Two subcommands, run by .github/workflows/auto-merge-gate.yml:
          comment the merge commit on it.
 
 GATE_TOKEN (the workflow's own token) does every read, comment and label. MERGE_TOKEN
-(the EP Skills Graph Bot app token) is used for the merge call and nothing else.
+(the merge token the workflow passes in) is used for the merge call and nothing else.
 Standard library only.
 """
 
@@ -93,6 +102,28 @@ class GitHub:
             url = next((p.split(";")[0].strip()[1:-1] for p in link.split(",") if 'rel="next"' in p), None)
         return items
 
+    def unresolved_threads(self, repo: str, number: int) -> int:
+        """How many review threads on the pull request are still unresolved."""
+        owner, name = repo.split("/", 1)
+        query = (
+            "query($o:String!,$n:String!,$p:Int!,$a:String){repository(owner:$o,name:$n){"
+            "pullRequest(number:$p){reviewThreads(first:100,after:$a){"
+            "nodes{isResolved} pageInfo{hasNextPage endCursor}}}}}"
+        )
+        count, after = 0, None
+        while True:
+            data, _ = self._request(
+                "POST", self.api_url + "/graphql",
+                {"query": query, "variables": {"o": owner, "n": name, "p": number, "a": after}},
+            )
+            if not data or data.get("errors"):
+                raise GitHubError(502, f"review threads could not be read: {(data or {}).get('errors')}")
+            threads = data["data"]["repository"]["pullRequest"]["reviewThreads"]
+            count += sum(1 for t in threads["nodes"] if not t.get("isResolved"))
+            if not threads["pageInfo"]["hasNextPage"]:
+                return count
+            after = threads["pageInfo"]["endCursor"]
+
     def post(self, path: str, body: dict):
         return self._request("POST", path, body)[0]
 
@@ -109,6 +140,7 @@ class Config:
     gate_check_name: str = "auto-merge-gate"
     base_branch: str = "main"
     server_url: str = "https://github.com"
+    merge_label: str = ""
 
 
 @dataclass
@@ -171,7 +203,10 @@ def check_problems(gh, cfg: Config, sha: str) -> list[str]:
     return problems
 
 
-def codex_problems(state: dict | None, sha: str) -> list[str]:
+def codex_problems(state: dict | None, sha: str, unresolved_threads=None) -> list[str]:
+    """unresolved_threads is a callable returning the number of unresolved
+    review threads on the pull request. It is only called in the one case that
+    needs it, see below."""
     short = sha[:7]
     if state is None:
         return [f"Codex has not reviewed head {short} yet (no Codex review summary on this pull request)."]
@@ -185,6 +220,20 @@ def codex_problems(state: dict | None, sha: str) -> list[str]:
         problems.append(f"Codex code review on {short} is {code.get('status')}, not completed.")
     elif code.get("has_unresolved_findings") is True:
         problems.append(f"Codex code review on {short} left unresolved findings.")
+    elif code.get("has_unresolved_findings") is None and code.get("has_any_findings") is True:
+        # Once a pull request has ever had findings, Codex reports null instead
+        # of false even after every finding is fixed and its thread resolved.
+        # Then the threads themselves decide: every one must be resolved.
+        try:
+            open_threads = unresolved_threads() if unresolved_threads else None
+        except GitHubError as exc:
+            open_threads = None
+            problems.append(f"Codex code review on {short} reported no open findings, but the review threads could not be read ({exc.message}).")
+        if open_threads is None:
+            if not problems:
+                problems.append(f"Codex code review on {short} did not report has_unresolved_findings: false.")
+        elif open_threads > 0:
+            problems.append(f"Codex code review on {short} has {open_threads} unresolved review thread(s).")
     elif code.get("has_unresolved_findings") is not False:
         problems.append(f"Codex code review on {short} did not report has_unresolved_findings: false.")
     security = state.get("security_review") or {}
@@ -213,26 +262,58 @@ def evaluate(gh, cfg: Config, number: int) -> Decision:
     if pr.get("draft"):
         return skip("draft")
     author = (pr.get("user") or {}).get("login")
-    if author != FACTORY_LOGIN:
-        return skip(f"author is {author}, not {FACTORY_LOGIN}")
     if (pr.get("base") or {}).get("ref") != cfg.base_branch:
         return skip(f"base is not {cfg.base_branch}")
-    issue_number = job_issue_number(pr.get("body"))
-    if issue_number is None:
-        return skip("body does not start with Closes #N")
-    try:
-        issue = gh.get(f"/repos/{cfg.repo}/issues/{issue_number}")
-    except GitHubError as exc:
-        return skip(f"issue #{issue_number} could not be read ({exc})")
-    if "pull_request" in issue:
-        return skip(f"#{issue_number} is a pull request, not a job issue")
-    if JOB_LABEL not in {label.get("name") for label in issue.get("labels", [])}:
-        return skip(f"issue #{issue_number} does not carry the {JOB_LABEL} label")
+    labelled = bool(cfg.merge_label) and cfg.merge_label in {
+        label.get("name") for label in pr.get("labels", [])
+    }
+    issue_number = None
+    issue_number = None
+    job_problem = None
+    if author == FACTORY_LOGIN and job_issue_number(pr.get("body")) is not None:
+        candidate = job_issue_number(pr.get("body"))
+        # A read failure is never a reason to switch routes. It is raised, so
+        # run_plan and run_merge report it and fail the run, and the next
+        # sweep retries.
+        issue = gh.get(f"/repos/{cfg.repo}/issues/{candidate}")
+        if issue is not None:
+            if "pull_request" in issue:
+                job_problem = f"#{candidate} is a pull request, not a job issue"
+            elif JOB_LABEL not in {label.get("name") for label in issue.get("labels", [])}:
+                job_problem = f"issue #{candidate} does not carry the {JOB_LABEL} label"
+            else:
+                issue_number = candidate
+        # Either route is enough. A labelled pull request whose Closes #N is
+        # not a job issue still goes through the label route.
+        if job_problem and not labelled:
+            return skip(job_problem)
+    elif not labelled:
+        if author != FACTORY_LOGIN:
+            why = f"author is {author}, not {FACTORY_LOGIN}"
+        else:
+            why = "body does not start with Closes #N"
+        if cfg.merge_label:
+            why += f", and it does not carry the {cfg.merge_label} label"
+        return skip(why)
 
     sha = (pr.get("head") or {}).get("sha", "")
     comments = gh.paginate(f"/repos/{cfg.repo}/issues/{number}/comments")
     reasons = check_problems(gh, cfg, sha)
-    reasons += codex_problems(latest_codex_state(comments), sha)
+    threads = getattr(gh, "unresolved_threads", None)
+
+    def open_threads():
+        # Resolving a thread is not the same as fixing it. A Codex review on
+        # this exact head that still carries findings keeps the gate shut.
+        reviews = gh.paginate(f"/repos/{cfg.repo}/pulls/{number}/reviews")
+        for review in reviews:
+            if (review.get("user") or {}).get("login") != CODEX_LOGIN or review.get("commit_id") != sha:
+                continue
+            found = gh.paginate(f"/repos/{cfg.repo}/pulls/{number}/reviews/{review['id']}/comments")
+            if found:
+                return len(found)
+        return threads(cfg.repo, number) if threads else None
+
+    reasons += codex_problems(latest_codex_state(comments), sha, open_threads)
     reasons += mergeable_problems(pr)
     action = "refuse" if reasons else "merge"
     return Decision(number, action, reasons, sha, issue_number, comments)
@@ -277,6 +358,8 @@ def merge(gh, merger, cfg: Config, d: Decision) -> str | None:
         post_refusal(gh, cfg, d)
         return None
     sha = (result or {}).get("sha", "")
+    if d.issue is None:
+        return sha
     gh.post(f"/repos/{cfg.repo}/issues/{d.issue}/labels", {"labels": [DONE_LABEL]})
     gh.post(
         f"/repos/{cfg.repo}/issues/{d.issue}/comments",
@@ -300,11 +383,14 @@ def target_prs(gh, cfg: Config, event_name: str, event: dict, dispatch_pr: str =
         return [int(dispatch_pr.strip())]
     # schedule, check_suite and a dispatch without a number sweep every open pull request.
     open_prs = gh.paginate(f"/repos/{cfg.repo}/pulls", params={"state": "open"})
-    return [
-        int(p["number"])
-        for p in open_prs
-        if not p.get("draft") and (p.get("user") or {}).get("login") == FACTORY_LOGIN
-    ]
+    def wanted(p: dict) -> bool:
+        if (p.get("user") or {}).get("login") == FACTORY_LOGIN:
+            return True
+        return bool(cfg.merge_label) and cfg.merge_label in {
+            label.get("name") for label in p.get("labels", [])
+        }
+
+    return [int(p["number"]) for p in open_prs if not p.get("draft") and wanted(p)]
 
 
 def is_excluded_repo(repo: str) -> bool:
@@ -368,6 +454,7 @@ def config_from_env() -> Config:
         gate_check_name=os.environ.get("GATE_CHECK_NAME", "auto-merge-gate"),
         base_branch=os.environ.get("GATE_BASE_BRANCH", "main"),
         server_url=os.environ.get("GITHUB_SERVER_URL", "https://github.com"),
+        merge_label=os.environ.get("GATE_MERGE_LABEL", ""),
     )
 
 

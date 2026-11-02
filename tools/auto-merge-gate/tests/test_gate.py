@@ -17,7 +17,7 @@ gate = importlib.util.module_from_spec(spec)
 sys.modules["gate"] = gate
 spec.loader.exec_module(gate)
 
-REPO = "ExpertPartners/expert-partners-skills"
+REPO = os.environ.get("GATE_TEST_REPO", "ExpertPartners/expert-partners-skills")
 HEAD = "a" * 40
 OLD = "b" * 40
 CFG = gate.Config(repo=REPO)
@@ -402,6 +402,193 @@ class CodexParsing(unittest.TestCase):
         self.assertEqual(gate.job_issue_number("Closes #126\nmore"), 126)
         self.assertIsNone(gate.job_issue_number("Fixes #126"))
         self.assertIsNone(gate.job_issue_number(None))
+
+
+
+
+LCFG = gate.Config(repo=REPO, merge_label="auto-merge")
+
+
+def labelled_routes(number=7, author="AllisonGaddy", labels=("auto-merge",)):
+    routes = passing_routes(number)
+    pr = routes[f"/repos/{REPO}/pulls/{number}"]
+    pr["user"] = {"login": author}
+    pr["body"] = "Job 100052. Prompt Builder."
+    pr["labels"] = [{"name": n} for n in labels]
+    return routes
+
+
+class LabelRoute(unittest.TestCase):
+    """Repos whose builders push as a person mark finished work with a label."""
+
+    def test_labelled_pull_request_by_a_person_merges(self):
+        reader = FakeGitHub(labelled_routes())
+        merger = FakeGitHub({}, put_result={"sha": "c" * 40, "merged": True})
+        ready = gate.run_plan(reader, LCFG, "pull_request_target", {"pull_request": {"number": 7}})
+        self.assertEqual(ready, [7])
+        merged = gate.run_merge(reader, merger, LCFG, ready)
+        self.assertEqual(merged, ["c" * 40])
+        self.assertEqual(reader.writes(), [], "no job issue, so nothing is labeled or commented")
+
+    def test_unlabelled_pull_request_by_a_person_is_left_alone(self):
+        d = gate.evaluate(FakeGitHub(labelled_routes(labels=())), LCFG, 7)
+        self.assertEqual(d.action, "skip")
+        self.assertIn("auto-merge label", d.reasons[0])
+
+    def test_label_is_ignored_when_the_repo_sets_no_label(self):
+        d = gate.evaluate(FakeGitHub(labelled_routes()), CFG, 7)
+        self.assertEqual(d.action, "skip")
+
+    def test_labelled_still_needs_codex_on_head(self):
+        routes = labelled_routes()
+        routes[f"/repos/{REPO}/issues/7/comments"] = [codex_comment(sha=OLD)]
+        d = gate.evaluate(FakeGitHub(routes), LCFG, 7)
+        self.assertEqual(d.action, "refuse")
+        self.assertTrue(any("Codex has not reviewed head" in r for r in d.reasons))
+
+    def test_labelled_still_needs_green_checks(self):
+        routes = labelled_routes()
+        routes[f"/repos/{REPO}/commits/{HEAD}/check-runs"][0]["conclusion"] = "failure"
+        d = gate.evaluate(FakeGitHub(routes), LCFG, 7)
+        self.assertEqual(d.action, "refuse")
+
+    def test_labelled_draft_is_left_alone(self):
+        routes = labelled_routes()
+        routes[f"/repos/{REPO}/pulls/7"]["draft"] = True
+        self.assertEqual(gate.evaluate(FakeGitHub(routes), LCFG, 7).action, "skip")
+
+    def test_sweep_includes_labelled_pull_requests(self):
+        routes = labelled_routes()
+        routes[f"/repos/{REPO}/pulls"] = [
+            {"number": 7, "draft": False, "user": {"login": "AllisonGaddy"}, "labels": [{"name": "auto-merge"}]},
+            {"number": 8, "draft": False, "user": {"login": "AllisonGaddy"}, "labels": []},
+            {"number": 9, "draft": True, "user": {"login": "AllisonGaddy"}, "labels": [{"name": "auto-merge"}]},
+        ]
+        self.assertEqual(gate.target_prs(FakeGitHub(routes), LCFG, "schedule", {}), [7])
+
+    def test_ember_is_excluded_even_with_the_label(self):
+        cfg = gate.Config(repo="ExpertPartners/ember", merge_label="auto-merge")
+        self.assertEqual(gate.run_plan(FakeGitHub({}), cfg, "schedule", {}), [])
+
+
+class ResolvedThreadsRoute(unittest.TestCase):
+    """Codex reports null, not false, once a pull request has ever had findings."""
+
+    def _state(self, unresolved=None, any_findings=True, sha=HEAD, status="completed"):
+        return {"code_review": {"commit_sha": sha, "has_any_findings": any_findings,
+                                "has_unresolved_findings": unresolved, "status": status},
+                "security_review": {}}
+
+    def test_null_with_all_threads_resolved_passes(self):
+        self.assertEqual(gate.codex_problems(self._state(), HEAD, lambda: 0), [])
+
+    def test_null_with_an_open_thread_refuses(self):
+        p = gate.codex_problems(self._state(), HEAD, lambda: 2)
+        self.assertTrue(p and "2 unresolved review thread" in p[0])
+
+    def test_null_without_a_thread_reader_refuses(self):
+        p = gate.codex_problems(self._state(), HEAD, None)
+        self.assertTrue(p and "did not report has_unresolved_findings: false" in p[0])
+
+    def test_null_when_threads_cannot_be_read_refuses(self):
+        def boom():
+            raise gate.GitHubError(502, "down")
+        p = gate.codex_problems(self._state(), HEAD, boom)
+        self.assertEqual(len(p), 1)
+        self.assertIn("could not be read", p[0])
+
+    def test_true_still_refuses_even_with_threads_resolved(self):
+        p = gate.codex_problems(self._state(unresolved=True), HEAD, lambda: 0)
+        self.assertTrue(p and "left unresolved findings" in p[0])
+
+    def test_null_without_any_findings_still_refuses(self):
+        p = gate.codex_problems(self._state(any_findings=None), HEAD, lambda: 0)
+        self.assertTrue(p and "did not report" in p[0])
+
+    def test_null_on_an_older_head_still_waits(self):
+        p = gate.codex_problems(self._state(sha=OLD), HEAD, lambda: 0)
+        self.assertTrue(p and "has not reviewed head" in p[0])
+
+    def test_null_while_review_running_refuses(self):
+        p = gate.codex_problems(self._state(status="running"), HEAD, lambda: 0)
+        self.assertTrue(p and "not completed" in p[0])
+
+    def test_evaluate_reads_threads_only_when_needed(self):
+        routes = passing_routes()
+        reader = FakeGitHub(routes)
+        calls = []
+        reader.unresolved_threads = lambda repo, n: calls.append(n) or 0
+        self.assertEqual(gate.evaluate(reader, CFG, 7).action, "merge")
+        self.assertEqual(calls, [], "a false state never needs the thread read")
+        routes[f"/repos/{REPO}/issues/7/comments"] = [codex_comment()]
+        state_comment = routes[f"/repos/{REPO}/issues/7/comments"][0]
+        state_comment["body"] = state_comment["body"].replace('"has_unresolved_findings":false', '"has_unresolved_findings":null').replace('"has_any_findings":false', '"has_any_findings":true')
+        routes[f"/repos/{REPO}/pulls/7/reviews"] = []
+        reader = FakeGitHub(routes)
+        reader.unresolved_threads = lambda repo, n: calls.append(n) or 0
+        self.assertEqual(gate.evaluate(reader, CFG, 7).action, "merge")
+        self.assertEqual(calls, [7])
+
+
+class LabelFallbackAndHeadFindings(unittest.TestCase):
+    def test_labelled_factory_pr_with_a_non_job_issue_uses_the_label_route(self):
+        routes = labelled_routes(author="factory-droid[bot]")
+        routes[f"/repos/{REPO}/pulls/7"]["body"] = "Closes #126\n\nwork"
+        routes[f"/repos/{REPO}/issues/126"]["labels"] = []
+        d = gate.evaluate(FakeGitHub(routes), LCFG, 7)
+        self.assertEqual(d.action, "merge")
+        self.assertIsNone(d.issue)
+
+    def test_labelled_factory_pr_whose_issue_cannot_be_read_waits(self):
+        routes = labelled_routes(author="factory-droid[bot]")
+        routes[f"/repos/{REPO}/pulls/7"]["body"] = "Closes #126\n\nwork"
+        del routes[f"/repos/{REPO}/issues/126"]
+        with self.assertRaises(gate.GitHubError):
+            gate.evaluate(FakeGitHub(routes), LCFG, 7)
+        errors = []
+        ready = gate.run_plan(FakeGitHub(routes), LCFG, "pull_request_target", {"pull_request": {"number": 7}}, errors=errors)
+        self.assertEqual(ready, [])
+        self.assertEqual(len(errors), 1, "the failed read fails the run")
+
+    def test_unlabelled_factory_pr_with_a_non_job_issue_is_still_skipped(self):
+        routes = passing_routes()
+        routes[f"/repos/{REPO}/issues/126"]["labels"] = []
+        self.assertEqual(gate.evaluate(FakeGitHub(routes), LCFG, 7).action, "skip")
+
+    def _null_routes(self):
+        routes = passing_routes()
+        c = routes[f"/repos/{REPO}/issues/7/comments"][0]
+        c["body"] = c["body"].replace('"has_unresolved_findings":false', '"has_unresolved_findings":null').replace('"has_any_findings":false', '"has_any_findings":true')
+        routes[f"/repos/{REPO}/pulls/7/reviews"] = [
+            {"id": 1, "user": {"login": "chatgpt-codex-connector[bot]"}, "commit_id": OLD},
+        ]
+        routes[f"/repos/{REPO}/pulls/7/reviews/1/comments"] = [{"id": 11}]
+        return routes
+
+    def test_findings_on_an_older_head_resolved_merges(self):
+        reader = FakeGitHub(self._null_routes())
+        reader.unresolved_threads = lambda repo, n: 0
+        self.assertEqual(gate.evaluate(reader, CFG, 7).action, "merge")
+
+    def test_findings_on_this_head_block_even_when_resolved(self):
+        routes = self._null_routes()
+        routes[f"/repos/{REPO}/pulls/7/reviews"].append(
+            {"id": 2, "user": {"login": "chatgpt-codex-connector[bot]"}, "commit_id": HEAD})
+        routes[f"/repos/{REPO}/pulls/7/reviews/2/comments"] = [{"id": 21}, {"id": 22}]
+        reader = FakeGitHub(routes)
+        reader.unresolved_threads = lambda repo, n: 0
+        d = gate.evaluate(reader, CFG, 7)
+        self.assertEqual(d.action, "refuse")
+        self.assertTrue(any("2 unresolved review thread" in r for r in d.reasons))
+
+    def test_a_clean_codex_review_on_this_head_does_not_block(self):
+        routes = self._null_routes()
+        routes[f"/repos/{REPO}/pulls/7/reviews"].append(
+            {"id": 3, "user": {"login": "chatgpt-codex-connector[bot]"}, "commit_id": HEAD})
+        routes[f"/repos/{REPO}/pulls/7/reviews/3/comments"] = []
+        reader = FakeGitHub(routes)
+        reader.unresolved_threads = lambda repo, n: 0
+        self.assertEqual(gate.evaluate(reader, CFG, 7).action, "merge")
 
 
 if __name__ == "__main__":
