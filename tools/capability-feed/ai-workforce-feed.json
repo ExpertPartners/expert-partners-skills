@@ -1,8 +1,8 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-11-02T00:43:18Z",
-  "verifiedAt": "2026-11-02T00:43:18Z",
+  "generatedAt": "2026-11-02T00:52:52Z",
+  "verifiedAt": "2026-11-02T00:52:52Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
@@ -177,7 +177,7 @@
       "id": "content-engines-plugin",
       "humanName": "Content Engines Plugin",
       "kind": "plugin",
-      "summary": "Allison Gaddy content and marketing engines (master-marketer-free-agent-builder, rare-content-engine, xavier-offer-builder, dm-to-dollars, video-transcript-relay, content-coach, hook-engine, post-grader, post-scheduler, post-value-filter, social-analyzer, speaker-introduction-writer, stage-cards).",
+      "summary": "Allison Gaddy content and marketing engines (master-marketer-free-agent-builder, rare-content-engine, xavier-offer-builder, dm-to-dollars, video-transcript-relay, content-coach, hook-engine, post-grader, post-scheduler, post-value-filter, social-analyzer, speaker-introduction-writer, stage-cards), plus training and film pre-production (gemini-notebook-training-architect, hero-video-preproduction, brand-film-reverse-engineering).",
       "status": "Unknown",
       "maintainer": "ExpertPartners",
       "collectionIds": [],
@@ -187,14 +187,17 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the content-engines plugin, version 0.8.0, in the expert-partners plugin marketplace.",
-        "Contains 13 skills. Each one activates when a request matches its purpose."
+        "Packaged as the content-engines plugin, version 0.9.0, in the expert-partners plugin marketplace.",
+        "Contains 16 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.8.0.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.9.0.",
       "containsSkillIds": [
+        "brand-film-reverse-engineering",
         "content-coach",
         "dm-to-dollars",
+        "gemini-notebook-training-architect",
+        "hero-video-preproduction",
         "hook-engine",
         "master-marketer-free-agent-builder",
         "post-grader",
@@ -211,10 +214,10 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/content-engines",
-        "packageVersion": "0.8.0",
+        "packageVersion": "0.9.0",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
-        "skillCount": "13"
+        "skillCount": "16"
       },
       "keywords": [
         "agent",
@@ -227,24 +230,31 @@
         "dollars",
         "engine",
         "engines",
+        "film",
         "filter",
         "free",
         "gaddy",
+        "gemini",
         "grader",
         "hook",
         "introduction",
         "marketer",
         "marketing",
         "master",
+        "notebook",
         "offer",
         "plugin",
+        "plus",
         "post",
+        "pre",
+        "production",
         "rare",
         "relay",
         "scheduler",
         "social",
         "speaker",
         "stage",
+        "training",
         "transcript",
         "value",
         "video",
@@ -257,10 +267,77 @@
       "example": false
     },
     {
+      "id": "fractional-cfo-plugin",
+      "humanName": "Fractional Cfo Plugin",
+      "kind": "plugin",
+      "summary": "Read-only Fractional CFO reviews (weekly cash flow, runway and burn, monthly close) over canonical categories and entity separation, for Expert Partners LLC and Moxie Signature Group.",
+      "status": "Unknown",
+      "maintainer": "Allison Gaddy",
+      "collectionIds": [],
+      "categories": [
+        "The money"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged as the fractional-cfo plugin, version 0.1.0, in the expert-partners plugin marketplace.",
+        "Contains 5 skills. Each one activates when a request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Package version 0.1.0.",
+      "containsSkillIds": [
+        "canonical-categories",
+        "entity-separation",
+        "monthly-close-review",
+        "runway-and-burn",
+        "weekly-cash-flow-review"
+      ],
+      "relatedIds": [],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/fractional-cfo",
+        "packageVersion": "0.1.0",
+        "marketplace": "expert-partners",
+        "presentedAs": "plugin",
+        "skillCount": "5"
+      },
+      "keywords": [
+        "burn",
+        "canonical",
+        "cash",
+        "categories",
+        "cfo",
+        "close",
+        "entity",
+        "expert",
+        "flow",
+        "fractional",
+        "group",
+        "llc",
+        "money",
+        "monthly",
+        "moxie",
+        "only",
+        "over",
+        "partners",
+        "plugin",
+        "read",
+        "reviews",
+        "runway",
+        "separation",
+        "signature",
+        "weekly"
+      ],
+      "bestFor": [],
+      "useCases": [],
+      "askExamples": [],
+      "example": false
+    },
+    {
       "id": "funnel-operations-plugin",
       "humanName": "Funnel Operations Plugin",
       "kind": "plugin",
-      "summary": "Build, migrate, and document funnels for Expert Partners and EPIC, with Notion as the single source of truth.",
+      "summary": "Build, migrate, and document funnels for Expert Partners and EPIC, with Notion as the single source of truth, plus GoHighLevel inventory, automation design, and safe tag cleanup.",
       "status": "Unknown",
       "maintainer": "Allison Gaddy",
       "collectionIds": [],
@@ -270,40 +347,51 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the funnel-operations plugin, version 0.2.2, in the expert-partners plugin marketplace.",
-        "Contains 3 skills. Each one activates when a request matches its purpose."
+        "Packaged as the funnel-operations plugin, version 0.3.0, in the expert-partners plugin marketplace.",
+        "Contains 6 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.2.2.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.3.0.",
       "containsSkillIds": [
         "funnel-build",
         "funnel-documentation",
-        "funnel-migration"
+        "funnel-migration",
+        "ghl-asset-inventory",
+        "ghl-automation-design",
+        "ghl-tag-audit-and-cleanup"
       ],
       "relatedIds": [],
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/funnel-operations",
-        "packageVersion": "0.2.2",
+        "packageVersion": "0.3.0",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
-        "skillCount": "3"
+        "skillCount": "6"
       },
       "keywords": [
+        "automation",
         "build",
+        "cleanup",
+        "design",
         "document",
         "epic",
         "expert",
         "funnel",
         "funnels",
+        "gohighlevel",
         "hands",
+        "inventory",
         "migrate",
         "notion",
         "operations",
         "partners",
         "plugin",
+        "plus",
+        "safe",
         "single",
         "source",
+        "tag",
         "truth"
       ],
       "bestFor": [],
@@ -394,7 +482,7 @@
       "id": "research-ops-plugin",
       "humanName": "Research Ops Plugin",
       "kind": "plugin",
-      "summary": "Research skills for capability currency, research intake, video discovery and source hunting. Imported TUB analyst prompts are retired and disabled.",
+      "summary": "Research and cataloging skills for capability currency, capability refresh, research intake, video discovery, source hunting, and the Notion skill, GPT, and SOP libraries. Imported TUB analyst prompts are retired and disabled.",
       "status": "Unknown",
       "maintainer": "Allison Gaddy",
       "collectionIds": [],
@@ -405,14 +493,18 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the research-ops plugin, version 0.4.1, in the expert-partners plugin marketplace.",
-        "Contains 7 skills. Each one activates when a request matches its purpose."
+        "Packaged as the research-ops plugin, version 0.5.0, in the expert-partners plugin marketplace.",
+        "Contains 11 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.4.1.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.5.0.",
       "containsSkillIds": [
         "capability-currency",
+        "capability-refresh",
+        "gpt-cataloger",
         "research-intake",
+        "skill-cataloger",
+        "sop-notion-logger",
         "source-hunter",
         "tub-students-competitive-intelligence-analyst-v1",
         "tub-students-customer-research-analyst-v1",
@@ -423,27 +515,33 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/research-ops",
-        "packageVersion": "0.4.1",
+        "packageVersion": "0.5.0",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
-        "skillCount": "7"
+        "skillCount": "11"
       },
       "keywords": [
         "analyst",
         "capability",
+        "cataloging",
         "currency",
         "disabled",
         "discovery",
+        "gpt",
         "hands",
         "hunting",
         "imported",
         "intake",
         "librarians",
+        "libraries",
+        "notion",
         "ops",
         "plugin",
         "prompts",
+        "refresh",
         "research",
         "retired",
+        "sop",
         "source",
         "tub",
         "video"
@@ -1035,6 +1133,89 @@
       "example": false
     },
     {
+      "id": "brand-film-reverse-engineering",
+      "humanName": "Brand Film Reverse-Engineering",
+      "kind": "skill",
+      "summary": "Reverse-engineer a reference personal-brand or luxury real-estate film (About Me video, website hero video) and produce a complete adaptation package for a client, covering shot-by-shot analysis, storyboard contact sheet, transcript/cadence/narrative analyses, story substitution framework, Google Drive asset audit, gap inventories, and three production pathways, stopping at an approval gate before any script or video generation.",
+      "status": "Unknown",
+      "maintainer": "ExpertPartners",
+      "collectionIds": [],
+      "categories": [
+        "The marketing engines"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Content Engines plugin, version 0.9.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "content-engines-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/content-engines/skills/brand-film-reverse-engineering/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "content",
+        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine"
+      },
+      "keywords": [
+        "about",
+        "adaptation",
+        "analyses",
+        "analysis",
+        "asset",
+        "audit",
+        "brand",
+        "cadence",
+        "client",
+        "complete",
+        "contact",
+        "content",
+        "covering",
+        "drive",
+        "engineer",
+        "engineering",
+        "engines",
+        "estate",
+        "film",
+        "framework",
+        "gap",
+        "google",
+        "hero",
+        "luxury",
+        "marketing",
+        "narrative",
+        "package",
+        "personal",
+        "produce",
+        "real",
+        "reference",
+        "reverse",
+        "sheet",
+        "shot",
+        "story",
+        "storyboard",
+        "substitution",
+        "transcript",
+        "video",
+        "website"
+      ],
+      "bestFor": [
+        "reverse-engineer a reference brand film"
+      ],
+      "useCases": [
+        "Use when a user provides a competitor's or reference video and asks to analyze it, replicate its structure with their own story/market/footage, plan an About Me or hero film, or audit their assets against a reference."
+      ],
+      "askExamples": [],
+      "example": false
+    },
+    {
       "id": "brand-voice",
       "humanName": "Brand Voice",
       "kind": "skill",
@@ -1400,6 +1581,68 @@
       "example": false
     },
     {
+      "id": "canonical-categories",
+      "humanName": "Canonical Categories",
+      "kind": "skill",
+      "summary": "Background translation layer for normalizing financial data across Mercury, QuickBooks, Stripe, and Monarch into one canonical category scheme.",
+      "status": "Unknown",
+      "maintainer": "Allison Gaddy",
+      "collectionIds": [],
+      "categories": [
+        "The money"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Fractional Cfo plugin, version 0.1.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "entity-separation",
+        "fractional-cfo-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/fractional-cfo/skills/canonical-categories/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "finance",
+        "packaging": "fractional-cfo plugin v0.1.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine",
+        "calls": "entity-separation"
+      },
+      "keywords": [
+        "across",
+        "background",
+        "canonical",
+        "categories",
+        "category",
+        "cfo",
+        "data",
+        "financial",
+        "fractional",
+        "layer",
+        "mercury",
+        "monarch",
+        "money",
+        "normalizing",
+        "quickbooks",
+        "scheme",
+        "source",
+        "stripe",
+        "translation"
+      ],
+      "bestFor": [
+        "one category scheme across every money source"
+      ],
+      "useCases": [],
+      "askExamples": [],
+      "example": false
+    },
+    {
       "id": "canva-assistant",
       "humanName": "Canva Assistant",
       "kind": "skill",
@@ -1483,7 +1726,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.4.1.",
+        "Packaged in the Research Ops plugin, version 0.5.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1498,7 +1741,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.4.1 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -1527,6 +1770,73 @@
         "twice-monthly estate capability sweep"
       ],
       "useCases": [],
+      "askExamples": [],
+      "example": false
+    },
+    {
+      "id": "capability-refresh",
+      "humanName": "Capability Refresh",
+      "kind": "skill",
+      "summary": "Use when a project runs its monthly self-update, or when I ask to refresh a specialist's knowledge of its own tools, software, and the latest Claude, Anthropic, or AI capabilities relevant to its specialty.",
+      "status": "Unknown",
+      "maintainer": "Allison Gaddy",
+      "collectionIds": [],
+      "categories": [
+        "The hands"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Research Ops plugin, version 0.5.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "research-ops-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/research-ops/skills/capability-refresh/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "hands",
+        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine"
+      },
+      "keywords": [
+        "anthropic",
+        "ask",
+        "capabilities",
+        "capability",
+        "claude",
+        "hands",
+        "knowledge",
+        "latest",
+        "monthly",
+        "ops",
+        "own",
+        "project",
+        "refresh",
+        "relevant",
+        "research",
+        "runs",
+        "self",
+        "software",
+        "specialist",
+        "specialty",
+        "tools",
+        "update",
+        "use",
+        "when"
+      ],
+      "bestFor": [
+        "monthly capability refresh for any specialist"
+      ],
+      "useCases": [
+        "Use when a project runs its monthly self-update, or when I ask to refresh a specialist's knowledge of its own tools, software, and the latest Claude, Anthropic, or AI capabilities relevant to its specialty."
+      ],
       "askExamples": [],
       "example": false
     },
@@ -2043,7 +2353,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.8.0.",
+        "Packaged in the Content Engines plugin, version 0.9.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2058,7 +2368,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.8.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -2359,7 +2669,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.8.0.",
+        "Packaged in the Content Engines plugin, version 0.9.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2374,7 +2684,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.8.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -2618,6 +2928,63 @@
         "session"
       ],
       "bestFor": [],
+      "useCases": [],
+      "askExamples": [],
+      "example": false
+    },
+    {
+      "id": "entity-separation",
+      "humanName": "Entity Separation",
+      "kind": "skill",
+      "summary": "Dual-view rule set for Allison's finances.",
+      "status": "Unknown",
+      "maintainer": "Allison Gaddy",
+      "collectionIds": [],
+      "categories": [
+        "The money"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Fractional Cfo plugin, version 0.1.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "fractional-cfo-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/fractional-cfo/skills/entity-separation/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "finance",
+        "packaging": "fractional-cfo plugin v0.1.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine"
+      },
+      "keywords": [
+        "allison",
+        "blended",
+        "books",
+        "cfo",
+        "clean",
+        "dual",
+        "entity",
+        "finances",
+        "fractional",
+        "lens",
+        "money",
+        "owner",
+        "rule",
+        "separation",
+        "set",
+        "view"
+      ],
+      "bestFor": [
+        "blended owner lens and entity-clean books"
+      ],
       "useCases": [],
       "askExamples": [],
       "example": false
@@ -2947,7 +3314,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Funnel Operations plugin, version 0.2.2.",
+        "Packaged in the Funnel Operations plugin, version 0.3.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2963,7 +3330,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "funnel-operations plugin v0.2.2 (expert-partners marketplace)",
+        "packaging": "funnel-operations plugin v0.3.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "funnel-documentation"
       },
@@ -3021,7 +3388,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Funnel Operations plugin, version 0.2.2.",
+        "Packaged in the Funnel Operations plugin, version 0.3.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3036,7 +3403,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "funnel-operations plugin v0.2.2 (expert-partners marketplace)",
+        "packaging": "funnel-operations plugin v0.3.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -3081,7 +3448,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Funnel Operations plugin, version 0.2.2.",
+        "Packaged in the Funnel Operations plugin, version 0.3.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3097,7 +3464,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "funnel-operations plugin v0.2.2 (expert-partners marketplace)",
+        "packaging": "funnel-operations plugin v0.3.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "funnel-documentation"
       },
@@ -3205,6 +3572,256 @@
         "decks planned and built in Gamma"
       ],
       "useCases": [],
+      "askExamples": [],
+      "example": false
+    },
+    {
+      "id": "gemini-notebook-training-architect",
+      "humanName": "Gemini Notebook Training Architect",
+      "kind": "skill",
+      "summary": "Turns SOPs, transcripts, docs, and notes into training.",
+      "status": "Unknown",
+      "maintainer": "ExpertPartners",
+      "collectionIds": [],
+      "categories": [
+        "The marketing engines"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Content Engines plugin, version 0.9.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "ag-personal-brand",
+        "content-engines-plugin",
+        "ep-brand",
+        "fam-epic-brand"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/content-engines/skills/gemini-notebook-training-architect/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "content",
+        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine",
+        "defersTo": "ep-brand, fam-epic-brand, ag-personal-brand"
+      },
+      "keywords": [
+        "architect",
+        "content",
+        "docs",
+        "engines",
+        "gemini",
+        "logging",
+        "marketing",
+        "notebook",
+        "notes",
+        "packs",
+        "sops",
+        "training",
+        "transcripts",
+        "turns",
+        "video"
+      ],
+      "bestFor": [
+        "Gemini Notebook training packs and video logging"
+      ],
+      "useCases": [],
+      "askExamples": [],
+      "example": false
+    },
+    {
+      "id": "ghl-asset-inventory",
+      "humanName": "GHL Asset Inventory",
+      "kind": "skill",
+      "summary": "Pull a complete read-only inventory of Allison's GoHighLevel account and save it as a reference file.",
+      "status": "Unknown",
+      "maintainer": "Allison Gaddy",
+      "collectionIds": [],
+      "categories": [
+        "The hands"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Funnel Operations plugin, version 0.3.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "funnel-operations-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/funnel-operations/skills/ghl-asset-inventory/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "hands",
+        "packaging": "funnel-operations plugin v0.3.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine"
+      },
+      "keywords": [
+        "account",
+        "allison",
+        "asset",
+        "complete",
+        "file",
+        "funnel",
+        "ghl",
+        "gohighlevel",
+        "hands",
+        "inventory",
+        "only",
+        "operations",
+        "pull",
+        "read",
+        "reference",
+        "save",
+        "snapshot"
+      ],
+      "bestFor": [
+        "read-only snapshot of the GHL account"
+      ],
+      "useCases": [
+        "Use whenever Allison wants to see what exists in GHL before designing or building anything, or says \"run a GHL asset inventory\", \"inventory my GHL\", \"what tags/fields/pipelines do I have\", \"map my GHL setup\", or asks for a current snapshot of tags, custom fields, pipelines, or calendars."
+      ],
+      "askExamples": [],
+      "example": false
+    },
+    {
+      "id": "ghl-automation-design",
+      "humanName": "GHL Automation Design",
+      "kind": "skill",
+      "summary": "Act as Allison's workflow strategist to design a new GoHighLevel and n8n automation before anything gets built.",
+      "status": "Unknown",
+      "maintainer": "Allison Gaddy",
+      "collectionIds": [],
+      "categories": [
+        "The hands"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Funnel Operations plugin, version 0.3.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "funnel-operations-plugin",
+        "ghl-asset-inventory"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/funnel-operations/skills/ghl-automation-design/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "hands",
+        "packaging": "funnel-operations plugin v0.3.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine",
+        "calls": "ghl-asset-inventory"
+      },
+      "keywords": [
+        "act",
+        "allison",
+        "anything",
+        "automation",
+        "before",
+        "building",
+        "built",
+        "design",
+        "funnel",
+        "gets",
+        "ghl",
+        "gohighlevel",
+        "hands",
+        "n8n",
+        "new",
+        "operations",
+        "strategist",
+        "workflow"
+      ],
+      "bestFor": [
+        "design a GHL or n8n automation before building"
+      ],
+      "useCases": [
+        "Use whenever Allison wants a new automation, says \"design a new automation\", \"I need an automation that...\", \"help me plan a workflow\", \"should this be n8n or GHL\", or describes a business outcome she wants automated."
+      ],
+      "askExamples": [],
+      "example": false
+    },
+    {
+      "id": "ghl-tag-audit-and-cleanup",
+      "humanName": "GHL Tag Audit and Safe Cleanup",
+      "kind": "skill",
+      "summary": "Audit Allison's GoHighLevel tags and, only after she approves, run a safe tag cleanup using the dry-run-approve-rollback-execute pattern.",
+      "status": "Unknown",
+      "maintainer": "Allison Gaddy",
+      "collectionIds": [],
+      "categories": [
+        "The hands"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Funnel Operations plugin, version 0.3.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "funnel-operations-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/funnel-operations/skills/ghl-tag-audit-and-cleanup/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "hands",
+        "packaging": "funnel-operations plugin v0.3.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine"
+      },
+      "keywords": [
+        "after",
+        "allison",
+        "approve",
+        "approves",
+        "audit",
+        "cleanup",
+        "dry",
+        "execute",
+        "first",
+        "funnel",
+        "ghl",
+        "gohighlevel",
+        "hands",
+        "only",
+        "operations",
+        "pattern",
+        "rollback",
+        "run",
+        "safe",
+        "she",
+        "tag",
+        "tags",
+        "then",
+        "using"
+      ],
+      "bestFor": [
+        "tag audit, then dry-run-first cleanup"
+      ],
+      "useCases": [
+        "Use whenever Allison says \"audit my tags\", \"clean up my tags\", \"run a safe cleanup\", \"remove old event tags\", \"add a tag to a batch\", or wants any bulk tag change in GHL."
+      ],
       "askExamples": [],
       "example": false
     },
@@ -3354,6 +3971,68 @@
       "example": false
     },
     {
+      "id": "gpt-cataloger",
+      "humanName": "GPT Cataloger",
+      "kind": "skill",
+      "summary": "Build and maintain the \"Expert Partners Custom GPT Library\" Notion database that documents every Custom GPT used inside Expert Partners and The Free Agent Movement.",
+      "status": "Unknown",
+      "maintainer": "Allison Gaddy",
+      "collectionIds": [],
+      "categories": [
+        "The librarians"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Research Ops plugin, version 0.5.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "research-ops-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/research-ops/skills/gpt-cataloger/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "cataloging",
+        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine"
+      },
+      "keywords": [
+        "agent",
+        "build",
+        "cataloger",
+        "custom",
+        "database",
+        "document",
+        "documents",
+        "expert",
+        "free",
+        "gpt",
+        "gpts",
+        "inside",
+        "librarians",
+        "library",
+        "maintain",
+        "movement",
+        "notion",
+        "ops",
+        "partners",
+        "research",
+        "used"
+      ],
+      "bestFor": [
+        "document Custom GPTs in the Notion GPT Library"
+      ],
+      "useCases": [],
+      "askExamples": [],
+      "example": false
+    },
+    {
       "id": "handoff",
       "humanName": "Handoff",
       "kind": "skill",
@@ -3398,6 +4077,69 @@
       "example": false
     },
     {
+      "id": "hero-video-preproduction",
+      "humanName": "Hero Video Pre-Production",
+      "kind": "skill",
+      "summary": "End-to-end pre-production workflow for website hero videos and brand films, especially luxury real estate.",
+      "status": "Unknown",
+      "maintainer": "ExpertPartners",
+      "collectionIds": [],
+      "categories": [
+        "The marketing engines"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Content Engines plugin, version 0.9.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "content-engines-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/content-engines/skills/hero-video-preproduction/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "content",
+        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine"
+      },
+      "keywords": [
+        "approval",
+        "brand",
+        "content",
+        "end",
+        "engines",
+        "especially",
+        "estate",
+        "films",
+        "gate",
+        "hero",
+        "luxury",
+        "marketing",
+        "pre",
+        "preproduction",
+        "production",
+        "real",
+        "video",
+        "videos",
+        "website",
+        "workflow"
+      ],
+      "bestFor": [
+        "hero video pre-production up to the approval gate"
+      ],
+      "useCases": [
+        "Use when a client provides a reference video to emulate and asks for shot-by-shot analysis, storyboard/contact sheets, an audit of their existing footage and photos, market/brand adaptation, tiered production plans (existing-only vs AI-hybrid vs premium pickup shoot), pickup-shoot call sheets, or web hero delivery specs."
+      ],
+      "askExamples": [],
+      "example": false
+    },
+    {
       "id": "hook-engine",
       "humanName": "Hook Engine",
       "kind": "skill",
@@ -3411,7 +4153,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.8.0.",
+        "Packaged in the Content Engines plugin, version 0.9.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3426,7 +4168,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.8.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -4370,7 +5112,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.8.0.",
+        "Packaged in the Content Engines plugin, version 0.9.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4386,7 +5128,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.8.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "xavier-offer-builder"
       },
@@ -4495,6 +5237,66 @@
       ],
       "useCases": [
         "Use when the agent says schedule this post, send this to Metricool, queue this up, or schedule this for tomorrow."
+      ],
+      "askExamples": [],
+      "example": false
+    },
+    {
+      "id": "monthly-close-review",
+      "humanName": "Monthly Close Review",
+      "kind": "skill",
+      "summary": "Run Allison's monthly close review after month end.",
+      "status": "Unknown",
+      "maintainer": "Allison Gaddy",
+      "collectionIds": [],
+      "categories": [
+        "The money"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Fractional Cfo plugin, version 0.1.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "canonical-categories",
+        "entity-separation",
+        "fractional-cfo-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/fractional-cfo/skills/monthly-close-review/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "finance",
+        "packaging": "fractional-cfo plugin v0.1.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine",
+        "calls": "canonical-categories, entity-separation"
+      },
+      "keywords": [
+        "after",
+        "against",
+        "allison",
+        "bank",
+        "cfo",
+        "close",
+        "end",
+        "fractional",
+        "money",
+        "month",
+        "monthly",
+        "review",
+        "run",
+        "stripe"
+      ],
+      "bestFor": [
+        "review the monthly close against bank and Stripe"
+      ],
+      "useCases": [
+        "Use whenever she asks to review the month, check the close, reconcile the books, compare QuickBooks to the bank, review the P and L, \"how did the month look\", or any request that reconciles accounting records against actual bank and payment activity."
       ],
       "askExamples": [],
       "example": false
@@ -5087,7 +5889,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.8.0.",
+        "Packaged in the Content Engines plugin, version 0.9.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -5102,7 +5904,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.8.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -5150,7 +5952,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.8.0.",
+        "Packaged in the Content Engines plugin, version 0.9.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -5165,7 +5967,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.8.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -5213,7 +6015,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.8.0.",
+        "Packaged in the Content Engines plugin, version 0.9.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -5228,7 +6030,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.8.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -5489,7 +6291,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.8.0.",
+        "Packaged in the Content Engines plugin, version 0.9.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -5504,7 +6306,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.8.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -5822,7 +6624,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.4.1.",
+        "Packaged in the Research Ops plugin, version 0.5.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -5837,7 +6639,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "cataloging",
-        "packaging": "research-ops plugin v0.4.1 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -5991,6 +6793,63 @@
       ],
       "useCases": [
         "Use when the agent says ask my client for a review, respond to this review, turn this review into a post, or review request."
+      ],
+      "askExamples": [],
+      "example": false
+    },
+    {
+      "id": "runway-and-burn",
+      "humanName": "Runway and Burn",
+      "kind": "skill",
+      "summary": "Compute burn rate, runway, and revenue sensitivity for Allison's businesses.",
+      "status": "Unknown",
+      "maintainer": "Allison Gaddy",
+      "collectionIds": [],
+      "categories": [
+        "The money"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Fractional Cfo plugin, version 0.1.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "canonical-categories",
+        "entity-separation",
+        "fractional-cfo-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/fractional-cfo/skills/runway-and-burn/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "finance",
+        "packaging": "fractional-cfo plugin v0.1.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine",
+        "calls": "canonical-categories, entity-separation"
+      },
+      "keywords": [
+        "allison",
+        "burn",
+        "businesses",
+        "cfo",
+        "compute",
+        "fractional",
+        "money",
+        "rate",
+        "revenue",
+        "runway",
+        "sensitivity"
+      ],
+      "bestFor": [
+        "burn, runway, and revenue sensitivity"
+      ],
+      "useCases": [
+        "Use whenever she asks about runway, burn, \"how long can we go\", cash cushion, sustainability, whether she can afford something, hiring affordability, what happens if revenue drops, or any forward-looking cash question."
       ],
       "askExamples": [],
       "example": false
@@ -6314,6 +7173,59 @@
       "example": false
     },
     {
+      "id": "skill-cataloger",
+      "humanName": "Skill Cataloger",
+      "kind": "skill",
+      "summary": "Create and maintain the Expert Partners CoWork Skill Library in Notion.",
+      "status": "Unknown",
+      "maintainer": "Allison Gaddy",
+      "collectionIds": [],
+      "categories": [
+        "The librarians"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Research Ops plugin, version 0.5.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "research-ops-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/research-ops/skills/skill-cataloger/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "cataloging",
+        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine"
+      },
+      "keywords": [
+        "cataloger",
+        "cowork",
+        "create",
+        "document",
+        "expert",
+        "librarians",
+        "library",
+        "maintain",
+        "notion",
+        "ops",
+        "partners",
+        "research"
+      ],
+      "bestFor": [
+        "document skills in the Notion Skill Library"
+      ],
+      "useCases": [],
+      "askExamples": [],
+      "example": false
+    },
+    {
       "id": "social-analyzer",
       "humanName": "Social Analyzer",
       "kind": "skill",
@@ -6327,7 +7239,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.8.0.",
+        "Packaged in the Content Engines plugin, version 0.9.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6342,7 +7254,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.8.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6380,6 +7292,63 @@
       "example": false
     },
     {
+      "id": "sop-notion-logger",
+      "humanName": "SOP Notion Logger",
+      "kind": "skill",
+      "summary": "Automatically log every SOP to the Notion SOPs Database the moment it is created or materially revised, in any CoWork session.",
+      "status": "Unknown",
+      "maintainer": "Allison Gaddy",
+      "collectionIds": [],
+      "categories": [
+        "The librarians"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Research Ops plugin, version 0.5.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "research-ops-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/research-ops/skills/sop-notion-logger/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "cataloging",
+        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine"
+      },
+      "keywords": [
+        "automatically",
+        "cowork",
+        "created",
+        "database",
+        "librarians",
+        "log",
+        "logger",
+        "materially",
+        "moment",
+        "notion",
+        "ops",
+        "research",
+        "revised",
+        "session",
+        "sop",
+        "sops"
+      ],
+      "bestFor": [
+        "log every SOP to the Notion SOPs Database"
+      ],
+      "useCases": [],
+      "askExamples": [],
+      "example": false
+    },
+    {
       "id": "source-hunter",
       "humanName": "Source Hunter",
       "kind": "skill",
@@ -6393,7 +7362,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.4.1.",
+        "Packaged in the Research Ops plugin, version 0.5.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6409,7 +7378,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.4.1 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "video-discovery"
       },
@@ -6455,7 +7424,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.8.0.",
+        "Packaged in the Content Engines plugin, version 0.9.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6471,7 +7440,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.8.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "brand-voice"
       },
@@ -6580,7 +7549,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.8.0.",
+        "Packaged in the Content Engines plugin, version 0.9.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6595,7 +7564,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.8.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6839,7 +7808,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.4.1.",
+        "Packaged in the Research Ops plugin, version 0.5.0.",
         "Do not use for new work."
       ],
       "sourceLinks": [],
@@ -6854,7 +7823,7 @@
         "lifecycle": "retired",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.4.1 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6891,7 +7860,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.4.1.",
+        "Packaged in the Research Ops plugin, version 0.5.0.",
         "Do not use for new work."
       ],
       "sourceLinks": [],
@@ -6906,7 +7875,7 @@
         "lifecycle": "retired",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.4.1 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6942,7 +7911,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.4.1.",
+        "Packaged in the Research Ops plugin, version 0.5.0.",
         "Do not use for new work."
       ],
       "sourceLinks": [],
@@ -6957,7 +7926,7 @@
         "lifecycle": "retired",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.4.1 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7055,7 +8024,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.4.1.",
+        "Packaged in the Research Ops plugin, version 0.5.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7070,7 +8039,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.4.1 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7184,7 +8153,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.8.0.",
+        "Packaged in the Content Engines plugin, version 0.9.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7199,7 +8168,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.8.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7229,6 +8198,66 @@
         "video to transcript relay"
       ],
       "useCases": [],
+      "askExamples": [],
+      "example": false
+    },
+    {
+      "id": "weekly-cash-flow-review",
+      "humanName": "Weekly Cash Flow Review",
+      "kind": "skill",
+      "summary": "Run Allison's weekly cash flow review across Mercury and Stripe.",
+      "status": "Unknown",
+      "maintainer": "Allison Gaddy",
+      "collectionIds": [],
+      "categories": [
+        "The money"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Fractional Cfo plugin, version 0.1.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "canonical-categories",
+        "entity-separation",
+        "fractional-cfo-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/fractional-cfo/skills/weekly-cash-flow-review/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "finance",
+        "packaging": "fractional-cfo plugin v0.1.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine",
+        "calls": "canonical-categories, entity-separation"
+      },
+      "keywords": [
+        "across",
+        "allison",
+        "cash",
+        "cfo",
+        "entity",
+        "flow",
+        "fractional",
+        "mercury",
+        "money",
+        "out",
+        "review",
+        "run",
+        "stripe",
+        "weekly"
+      ],
+      "bestFor": [
+        "weekly cash in and out, per entity"
+      ],
+      "useCases": [
+        "Use whenever she asks for a cash flow review, weekly money check, \"where's my cash\", \"how did this week look\", what came in and went out, or any request to review recent business cash movement."
+      ],
       "askExamples": [],
       "example": false
     },
@@ -7315,7 +8344,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.8.0.",
+        "Packaged in the Content Engines plugin, version 0.9.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7330,7 +8359,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.8.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
