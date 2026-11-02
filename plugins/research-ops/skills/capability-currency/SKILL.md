@@ -1,6 +1,6 @@
 ---
 name: capability-currency
-description: "Twice-monthly staying-current sweep for the Expert Partners AI Operating System, built on capability-refresh, extending never replacing it. Fires the 1st and 15th, 7 AM CDT, from launchd job com.expertpartners.capability-currency on the M4, and whenever Allison asks whether estate capability knowledge is current, whether anything moved at Anthropic, in the MCP spec, the pinned Python SDK lines, the AWS serverless stack under the Estate Brain door and memory spine, or in estate-relevant AI developments. Sweeps five heads against live sources, Firecrawl primary, overwrites the Capability Watch Doc, adds a dated entry with a source URL per claim to the Capability Refresh Changelog Doc, files the run record as a Google Doc in HQ Business Brain, and classifies findings first, preserving unactivated ones as Job Tracker rows with RETURN WHEN, carding only what Allison activates. Use it even unnamed, whenever the ask is whether the AI operating layer's knowledge is stale. Inherits the operating-doctrine."
+description: "Twice-monthly staying-current sweep for the Expert Partners AI Operating System, built on capability-refresh, extending never replacing it. Fires the 1st and 15th, 7 AM CDT, from launchd job com.expertpartners.capability-currency on the M4, and whenever Allison asks whether estate capability knowledge is current, whether anything moved at Anthropic, in the MCP spec, or in estate-relevant AI developments. Sweeps three heads against live sources, Firecrawl primary, overwrites the Capability Watch Doc, adds a dated entry with a source URL per claim to the Capability Refresh Changelog Doc, files the run record as a Google Doc in HQ Business Brain, and classifies findings first, preserving unactivated ones as Job Tracker rows with RETURN WHEN, carding only what Allison activates. Use it even unnamed, whenever the ask is whether the AI operating layer's knowledge is stale. Inherits the operating-doctrine."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Born dressed 2026-08-05 (Capability Currency Build lane, per the locked
 # Capability Currency plan). Zone hands per the acn-currency-check precedent.
@@ -10,7 +10,9 @@ status: live
 subtitle: "twice-monthly estate capability sweep"
 ---
 
-# Capability Currency -- v1.1 (2026-08-30)
+# Capability Currency -- v1.2 (2026-11-01)
+
+v1.2 amendment 2026-11-01: the pinned Python SDK head and the AWS serverless stack head are dropped, because the server they watched is retired (Decision Log 2026-10-30). The sweep now has three heads. Outputs, cadence, sources for the remaining heads, and healthcheck behavior are unchanged.
 
 v1.1 amendment 2026-08-30 (ruled by Allison; ruling of record: aura decisions/0083-sequencing-without-maximalism-amendment-to-decision-0075.md; advisory of record aura intake/2026-08-30-sequencing-without-maximalism-corrected-final-advisory-super.md): activation behavior only. Findings are classified first, and the prior rule that every needed change is emitted as a flag becoming a Founder Active Work card with a proposed due date is superseded by output 4 below. All research machinery, cadence, sources, capability-watch, changelog, run record, duplicate check, and healthcheck behavior stay exactly as they were.
 
@@ -18,7 +20,7 @@ Keep the estate's capability knowledge honest. The AI operating layer moves fast
 
 ## Relationship to capability-refresh
 
-This skill is built on the capability-refresh pattern and extends it. capability-refresh stays untouched as the generic monthly refresh any project can call with its own specialty. capability-currency is the Estate instance, twice monthly per Allison's 2026-08-05 ruling, with the five sweep heads fixed below and the estate's own output rails wired in. Never fork capability-refresh, never edit it from this skill, never treat this skill as its replacement.
+This skill is built on the capability-refresh pattern and extends it. capability-refresh stays untouched as the generic monthly refresh any project can call with its own specialty. capability-currency is the Estate instance, twice monthly per Allison's 2026-08-05 ruling, with the three sweep heads fixed below and the estate's own output rails wired in. Never fork capability-refresh, never edit it from this skill, never treat this skill as its replacement.
 
 ## When this fires
 
@@ -32,19 +34,15 @@ A run started by the scheduler works the whole sweep to completion and pings its
 
 Firecrawl is primary for every source check (the Code lane reaches mcp.firecrawl.dev with the Bearer key read from op://Automation/FIRECRAWL-API-KEY at call time, never plaintext). Built-in web fetch and web search are the fallback when Firecrawl cannot reach a source. Browser automation is the last resort and needs the browser-last gate.
 
-## The five sweep heads
+## The three sweep heads
 
-Sweep every head every run. For each head, compare live state against the baseline recorded in the Capability Watch Doc, and read every pinned line fresh from the repo, never from this skill's text. Baselines written here are as of 2026-08-05 and exist so the first runs have a floor, the watch file is the living baseline.
+Sweep every head every run. For each head, compare live state against the baseline recorded in the Capability Watch Doc, never against this skill's text. Baselines written here are as of 2026-08-05 and exist so the first runs have a floor, the watch file is the living baseline.
 
-1. MCP spec and deprecation clocks. Sources, modelcontextprotocol.io/specification/versioning for the current spec revision (2026-07-28 as of this writing), the deprecated features registry at modelcontextprotocol.io/specification/2026-07-28/deprecated (re-resolve the path against the current revision each run), and the feature lifecycle policy at modelcontextprotocol.io/community/feature-lifecycle. Watch for new revisions, newly deprecated features, and removal-eligibility dates. The Estate Brain door is dual-era (SDK 2.0.0 on Lambda serving both the 2026 negotiation style and the legacy initialize handshake), so any clock on either era matters, the known long clock is the legacy-handshake deprecation window landing around July 2027.
+1. MCP spec and deprecation clocks. Sources, modelcontextprotocol.io/specification/versioning for the current spec revision (2026-07-28 as of this writing), the deprecated features registry at modelcontextprotocol.io/specification/2026-07-28/deprecated (re-resolve the path against the current revision each run), and the feature lifecycle policy at modelcontextprotocol.io/community/feature-lifecycle. Watch for new revisions, newly deprecated features, and removal-eligibility dates.
 
 2. Anthropic and Claude releases. Sources, platform.claude.com/docs/en/release-notes/overview for the API and platform, support.claude.com release notes (support.claude.com/en/articles/12138966-release-notes) for Claude Apps and Cowork, the Claude Code changelog at github.com/anthropics/claude-code/blob/main/CHANGELOG.md, and anthropic.com/news. Watch for model retirements and new model strings, API feature changes, MCP-related platform changes, Claude Code and Cowork behavior changes, and pricing or plan changes that touch the estate.
 
-3. The pinned Python SDK lines. Read each pin fresh from the aura repo at run time. The Estate Brain server is on the Aura Retirement Plan's unplug path (Decision Log 2026-10-13), so aura is read-only history for these files until Ember's lane moves the server, and this head drops when the server is gone. The door's live Lambda home, tools/mcp-brain-server/server/requirements-lambda.txt (mcp>=2.0,<3 as of this writing). The Fargate bench and brainmcp, tools/mcp-brain-server/server/requirements.txt, tools/mcp-brain-server/brainmcp/pyproject.toml, and tools/mcp-brain-server/brainmcp/src/requirements.txt (all mcp[cli]>=1.29,<2.0 as of this writing, the old brainmcp >=1.9.0 floater is fixed in source and survives only in the agentcore staging cache, which is a cache, not a source). Also check the M4's installed mcp package version. Against each window, check PyPI for new mcp releases, yanked versions, and breaking changes announced inside or just outside the window.
-
-4. The AWS serverless stack the door and spine ride. Lambda (including the Python runtime deprecation calendar), API Gateway, Aurora Serverless v2 (the memory spine's PostgreSQL home, watch engine-version end-of-life clocks), Secrets Manager, and Fargate (the door's bench). Sources, the AWS What's New feed and each service's deprecation and end-of-support pages. Watch for runtime retirements, API deprecations, pricing changes, and regional behavior changes.
-
-5. Estate-relevant AI developments. Security advisories first, per the LiteLLM CVE precedent, check advisories (GitHub Security Advisories, osv.dev) against the packages the estate actually runs before reporting exposure, and report not-exposed findings on the record too. Then the named ecosystem pieces, Graphiti and FalkorDB (the keeper), Langfuse (the estate runs Langfuse Cloud), and any AI development material enough to change estate doctrine or open a capability the estate should act on.
+3. Estate-relevant AI developments. Security advisories first, per the LiteLLM CVE precedent, check advisories (GitHub Security Advisories, osv.dev) against the packages the estate actually runs before reporting exposure, and report not-exposed findings on the record too. Then the named ecosystem pieces, Graphiti and FalkorDB (the keeper), Langfuse (the estate runs Langfuse Cloud), and any AI development material enough to change estate doctrine or open a capability the estate should act on.
 
 ## Outputs per run, all five, every run
 

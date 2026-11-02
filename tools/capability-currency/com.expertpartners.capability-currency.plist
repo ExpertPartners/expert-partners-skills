@@ -14,7 +14,7 @@
 	<key>ProgramArguments</key>
 	<array>
 		<string>/bin/bash</string>
-		<string>/Users/allisongaddy/Claude/projects/ExpertPartnersSkills/tools/capability-currency/run-capability-currency.sh</string>
+		<string>/Users/allisongaddy/HQ-AI-Workspace-M4/Projects/ExpertPartnersSkills/tools/capability-currency/run-capability-currency.sh</string>
 	</array>
 	<key>StandardErrorPath</key>
 	<string>/Users/allisongaddy/Library/Logs/capability-currency/launchd.err.log</string>

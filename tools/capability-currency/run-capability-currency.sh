@@ -37,7 +37,9 @@ set -uo pipefail
 
 DRY_RUN="${CAPABILITY_CURRENCY_DRY_RUN:-}"
 HEARTBEAT_OP_REF="op://Automation/capability-currency-heartbeat/ping_url"
-SKILLS_HOME="$HOME/Claude/projects/ExpertPartnersSkills"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# The checkout this script lives in, so a moved workspace folder never strands the run.
+SKILLS_HOME="${SKILLS_HOME:-$(cd "$HERE/../.." && pwd)}"
 LOG_DIR="$HOME/Library/Logs/capability-currency"
 mkdir -p "$LOG_DIR"
 RUN_STAMP="$(date '+%Y-%m-%d')"
@@ -92,11 +94,13 @@ unset tok
 # Docs are found by title in Drive. This repo is public, so no Drive file ID lives here.
 WATCH_DOC="Capability Watch"
 CHANGELOG_DOC="Capability Refresh Changelog"
-HERE="$(cd "$(dirname "$0")" && pwd)"
 DRIVE="python3 $HERE/drive_docs.py"
 
 dry_run() {
   local entry out
+  [[ -f "$SKILLS_HOME/plugins/research-ops/skills/capability-currency/SKILL.md" ]] \
+    || { echo "DRY RUN FAILED: no skills checkout at $SKILLS_HOME"; return 1; }
+  echo "SKILLS_HOME OK: $SKILLS_HOME"
   entry="$(mktemp)"
   printf '## %s dry run\nHeadless dry run of the moved runner reached this Doc through the service account.\n' "$RUN_STAMP" >"$entry"
   $DRIVE read "$WATCH_DOC" | head -1 || { echo "DRY RUN FAILED: cannot read the Capability Watch Doc"; return 1; }
@@ -113,7 +117,7 @@ dry_run() {
 
 PROMPT="Run the capability-currency skill now. This is the scheduled twice-monthly \
 capability sweep on the M4 (launchd com.expertpartners.capability-currency, run of \
-$RUN_STAMP). Execute the full sweep per the skill: all five heads, all five outputs, \
+$RUN_STAMP). Execute the full sweep per the skill: all three heads, all five outputs, \
 Firecrawl primary. Write the Capability Watch and Capability Refresh Changelog Docs \
 and the run record in HQ Business Brain, Company Core. Use the Google Docs connector \
 if you have it. If you do not (a long-lived token cannot reach connectors), use \
