@@ -1,0 +1,8 @@
+{
+  "name": "fractional-cfo",
+  "version": "0.1.0",
+  "description": "Fractional CFO review skills for Expert Partners LLC and Moxie Signature Group, read-only across Mercury, Stripe, QuickBooks, and Monarch: weekly-cash-flow-review, runway-and-burn, and monthly-close-review, built on two background rule sets, canonical-categories (one category scheme across every source) and entity-separation (the blended owner lens and the entity-clean books). All math runs in code, entities never blend in a clean total, and nothing is ever posted to the books. Inherits the operating-doctrine.",
+  "author": {
+    "name": "Allison Gaddy"
+  }
+}

@@ -1,7 +1,7 @@
 {
   "name": "funnel-operations",
-  "version": "0.2.2",
-  "description": "Funnel operations skills for Expert Partners and EPIC: build new funnels, migrate funnels out of the legacy location, and document every funnel into Notion as the single source of truth. Built for non-technical teammates, hand-held one step at a time.",
+  "version": "0.3.0",
+  "description": "Funnel operations skills for Expert Partners and EPIC: build new funnels, migrate funnels out of the legacy location, and document every funnel into Notion as the single source of truth. Also carries the GoHighLevel account skills: ghl-asset-inventory (read-only snapshot of tags, fields, pipelines, and calendars), ghl-automation-design (design brief and build packet for a GHL or n8n automation, never building it), and ghl-tag-audit-and-cleanup (read-only tag audit, then dry-run, approve, rollback, execute). Built for non-technical teammates, hand-held one step at a time.",
   "author": {
     "name": "Allison Gaddy"
   }
