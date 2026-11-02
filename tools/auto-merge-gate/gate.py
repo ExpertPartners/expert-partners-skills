@@ -272,11 +272,10 @@ def evaluate(gh, cfg: Config, number: int) -> Decision:
     job_problem = None
     if author == FACTORY_LOGIN and job_issue_number(pr.get("body")) is not None:
         candidate = job_issue_number(pr.get("body"))
-        try:
-            issue = gh.get(f"/repos/{cfg.repo}/issues/{candidate}")
-        except GitHubError as exc:
-            # A read failure is retryable, never a reason to switch routes.
-            return skip(f"issue #{candidate} could not be read ({exc})")
+        # A read failure is never a reason to switch routes. It is raised, so
+        # run_plan and run_merge report it and fail the run, and the next
+        # sweep retries.
+        issue = gh.get(f"/repos/{cfg.repo}/issues/{candidate}")
         if issue is not None:
             if "pull_request" in issue:
                 job_problem = f"#{candidate} is a pull request, not a job issue"

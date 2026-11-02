@@ -543,9 +543,12 @@ class LabelFallbackAndHeadFindings(unittest.TestCase):
         routes = labelled_routes(author="factory-droid[bot]")
         routes[f"/repos/{REPO}/pulls/7"]["body"] = "Closes #126\n\nwork"
         del routes[f"/repos/{REPO}/issues/126"]
-        d = gate.evaluate(FakeGitHub(routes), LCFG, 7)
-        self.assertEqual(d.action, "skip")
-        self.assertIn("could not be read", d.reasons[0])
+        with self.assertRaises(gate.GitHubError):
+            gate.evaluate(FakeGitHub(routes), LCFG, 7)
+        errors = []
+        ready = gate.run_plan(FakeGitHub(routes), LCFG, "pull_request_target", {"pull_request": {"number": 7}}, errors=errors)
+        self.assertEqual(ready, [])
+        self.assertEqual(len(errors), 1, "the failed read fails the run")
 
     def test_unlabelled_factory_pr_with_a_non_job_issue_is_still_skipped(self):
         routes = passing_routes()
