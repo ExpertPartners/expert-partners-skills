@@ -12,7 +12,7 @@ subtitle: "browser work on Ember's M2, never Allison's M4"
 
 # Ember Browser Routing
 
-<!-- RULED-BY: aura/intake/2026-10-08-ruling-claude-code-location-and-remove-lock-that.md date:2026-10-08 -->
+<!-- RULED-BY: history in GitHub Archive date:2026-10-08 -->
 
 ## Core rule
 

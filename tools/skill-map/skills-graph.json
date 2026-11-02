@@ -1,8 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "036044807bce9372492afedec9b6ae99a60fd134",
-    "aura": "3be73bd8402f597ad276a5455362bf91f3a074cd"
+    "eps": "f0ca14f1336821b654d3c4371a52090e211981b3"
   },
   "zones": [
     "surfaces",
@@ -57,8 +56,8 @@
       "subtitle": "monthly ACN staying-current check",
       "renderNote": null,
       "layout": {
-        "x": 1009,
-        "y": 3682,
+        "x": 246,
+        "y": 5871,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -85,8 +84,8 @@
       "subtitle": "ACN inbox sweep, deadlines first",
       "renderNote": null,
       "layout": {
-        "x": 994,
-        "y": 5545,
+        "x": 231,
+        "y": 7734,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -114,8 +113,8 @@
       "subtitle": "luxury real estate voice under Allison’s name",
       "renderNote": null,
       "layout": {
-        "x": 1248,
-        "y": 2417.3,
+        "x": 1129,
+        "y": 2779.3,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -144,8 +143,8 @@
       "subtitle": "Allison’s first person voice",
       "renderNote": null,
       "layout": {
-        "x": 1253,
-        "y": 2715.3,
+        "x": 1134,
+        "y": 3077.3,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -169,8 +168,8 @@
       "subtitle": "social bios and headlines",
       "renderNote": null,
       "layout": {
-        "x": 301,
-        "y": 1347,
+        "x": 182,
+        "y": 1709,
         "width": 194,
         "height": 63,
         "rectHeight": 48,
@@ -194,8 +193,8 @@
       "subtitle": "writes the shared agent profile",
       "renderNote": null,
       "layout": {
-        "x": 343.5,
-        "y": 7288,
+        "x": 279,
+        "y": 143,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -221,8 +220,8 @@
       "subtitle": "ask before working",
       "renderNote": null,
       "layout": {
-        "x": 114,
-        "y": 4925,
+        "x": 902,
+        "y": 6826.2,
         "width": 163,
         "height": 63,
         "rectHeight": 48,
@@ -251,8 +250,8 @@
       "subtitle": "complete, ordered implementation handoffs",
       "renderNote": null,
       "layout": {
-        "x": 356,
-        "y": 5013.2,
+        "x": 1144,
+        "y": 5353.2,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -279,8 +278,8 @@
       "subtitle": "Allison's own words, saved to the right book",
       "renderNote": null,
       "layout": {
-        "x": 349.5,
-        "y": 7577,
+        "x": 285,
+        "y": 432,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -305,8 +304,8 @@
       "subtitle": "one-page brand direction",
       "renderNote": null,
       "layout": {
-        "x": 962,
-        "y": 2512.8,
+        "x": 843,
+        "y": 2874.8,
         "width": 215,
         "height": 63,
         "rectHeight": 48,
@@ -332,8 +331,8 @@
       "subtitle": "reverse-engineer a reference brand film",
       "renderNote": null,
       "layout": {
-        "x": 265,
-        "y": 4184,
+        "x": 146,
+        "y": 4546,
         "width": 266,
         "height": 77,
         "rectHeight": 62,
@@ -367,8 +366,8 @@
       "subtitle": "canonical brand context, registry per ADR 0045",
       "renderNote": null,
       "layout": {
-        "x": 985.1,
-        "y": 2596.8,
+        "x": 866.1,
+        "y": 2958.8,
         "width": 188,
         "height": 77,
         "rectHeight": 62,
@@ -398,8 +397,8 @@
       "subtitle": "signed-in Chrome automation on Ember's M2, GHL first",
       "renderNote": null,
       "layout": {
-        "x": 1282,
-        "y": 4448,
+        "x": 519,
+        "y": 6637,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -426,8 +425,8 @@
       "subtitle": "how every skill and tool is built, changed and retested",
       "renderNote": null,
       "layout": {
-        "x": 1009,
-        "y": 4723,
+        "x": 246,
+        "y": 6912,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -452,8 +451,8 @@
       "subtitle": "90-day plan book and weekly dashboard",
       "renderNote": null,
       "layout": {
-        "x": 1009,
-        "y": 5632,
+        "x": 246,
+        "y": 7821,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -461,36 +460,6 @@
         "subtitleLines": [
           "90-day plan book and weekly",
           "dashboard"
-        ]
-      }
-    },
-    {
-      "id": "can-i-close",
-      "source": "aura:.claude/skills/can-i-close/SKILL.md",
-      "repo": "aura",
-      "tier": "project",
-      "zone": "routing",
-      "status": "live",
-      "inherits": [
-        "operating-doctrine"
-      ],
-      "calls": [
-        "session-audit"
-      ],
-      "defersTo": [],
-      "brandScope": [],
-      "subtitle": "plain language safe-to-close check",
-      "renderNote": null,
-      "layout": {
-        "x": 124,
-        "y": 6269,
-        "width": 212,
-        "height": 77,
-        "rectHeight": 62,
-        "annotationHeight": 15,
-        "subtitleLines": [
-          "plain language safe-to-close",
-          "check"
         ]
       }
     },
@@ -510,8 +479,8 @@
       "subtitle": "canon and rule changes reach every surface, automatically",
       "renderNote": null,
       "layout": {
-        "x": 89.5,
-        "y": 5315,
+        "x": 877.5,
+        "y": 6133.2,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -540,8 +509,8 @@
       "subtitle": "one category scheme across every money source",
       "renderNote": null,
       "layout": {
-        "x": 370.5,
-        "y": 144.2,
+        "x": 306,
+        "y": 5392.2,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -566,8 +535,8 @@
       "subtitle": "written pieces sent to Canva",
       "renderNote": null,
       "layout": {
-        "x": 1006,
-        "y": 5242,
+        "x": 243,
+        "y": 7431,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -593,8 +562,8 @@
       "subtitle": "twice-monthly estate capability sweep",
       "renderNote": null,
       "layout": {
-        "x": 997,
-        "y": 5444,
+        "x": 234,
+        "y": 7633,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -621,8 +590,8 @@
       "subtitle": "monthly capability refresh for any specialist",
       "renderNote": null,
       "layout": {
-        "x": 1000,
-        "y": 4448,
+        "x": 237,
+        "y": 6637,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -647,8 +616,8 @@
       "subtitle": "carousel copy and design brief",
       "renderNote": null,
       "layout": {
-        "x": 286,
-        "y": 2593,
+        "x": 167,
+        "y": 2955,
         "width": 224,
         "height": 63,
         "rectHeight": 48,
@@ -672,8 +641,8 @@
       "subtitle": "sold post, case study, review request",
       "renderNote": null,
       "layout": {
-        "x": 287,
-        "y": 4285,
+        "x": 168,
+        "y": 4647,
         "width": 222,
         "height": 77,
         "rectHeight": 62,
@@ -698,8 +667,8 @@
       "subtitle": "relationship-first follow-up messages",
       "renderNote": null,
       "layout": {
-        "x": 290.5,
-        "y": 3909,
+        "x": 171.5,
+        "y": 4271,
         "width": 215,
         "height": 77,
         "rectHeight": 62,
@@ -724,8 +693,8 @@
       "subtitle": "welcome email and roadmap",
       "renderNote": null,
       "layout": {
-        "x": 279.5,
-        "y": 4097,
+        "x": 160.5,
+        "y": 4459,
         "width": 237,
         "height": 63,
         "rectHeight": 48,
@@ -753,8 +722,8 @@
       "subtitle": "paste block routing and the job list",
       "renderNote": null,
       "layout": {
-        "x": 632,
-        "y": 5155.2,
+        "x": 1420,
+        "y": 5836.8,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -779,8 +748,8 @@
       "subtitle": "competitor differentiation plan",
       "renderNote": null,
       "layout": {
-        "x": 343.5,
-        "y": 7201,
+        "x": 279,
+        "y": 56,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -806,8 +775,8 @@
       "subtitle": "hold the connection before you hold the screenshot",
       "renderNote": null,
       "layout": {
-        "x": 55,
-        "y": 5865,
+        "x": 843,
+        "y": 6624.2,
         "width": 274,
         "height": 77,
         "rectHeight": 62,
@@ -834,8 +803,8 @@
       "subtitle": "content engine orchestrator",
       "renderNote": null,
       "layout": {
-        "x": 295,
-        "y": 2144,
+        "x": 176,
+        "y": 2506,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -859,8 +828,8 @@
       "subtitle": "one idea into a week of content",
       "renderNote": null,
       "layout": {
-        "x": 283,
-        "y": 1883,
+        "x": 164,
+        "y": 2245,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -888,8 +857,8 @@
       "subtitle": "direct execution on surfaces that hold the access",
       "renderNote": null,
       "layout": {
-        "x": 377,
-        "y": 5149.7,
+        "x": 1165,
+        "y": 5454.2,
         "width": 215,
         "height": 77,
         "rectHeight": 62,
@@ -914,8 +883,8 @@
       "subtitle": "time-blocked day, money task first",
       "renderNote": null,
       "layout": {
-        "x": 1006,
-        "y": 4246,
+        "x": 243,
+        "y": 6435,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -942,8 +911,8 @@
       "subtitle": "deliverables land as named markdown links",
       "renderNote": null,
       "layout": {
-        "x": 356,
-        "y": 6544,
+        "x": 1144,
+        "y": 5555.2,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -970,8 +939,8 @@
       "subtitle": "DM to Dollars content engine",
       "renderNote": null,
       "layout": {
-        "x": 292,
-        "y": 4010,
+        "x": 173,
+        "y": 4372,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -999,8 +968,8 @@
       "subtitle": "the Rulebook sets the look, this skill applies it",
       "renderNote": null,
       "layout": {
-        "x": 84,
-        "y": 6544,
+        "x": 872,
+        "y": 5555.2,
         "width": 252,
         "height": 77,
         "rectHeight": 62,
@@ -1029,8 +998,8 @@
       "subtitle": "Don’s personal brand voice",
       "renderNote": null,
       "layout": {
-        "x": 1269,
-        "y": 2264.3,
+        "x": 1150,
+        "y": 2626.3,
         "width": 200,
         "height": 63,
         "rectHeight": 48,
@@ -1056,8 +1025,8 @@
       "subtitle": "browser work on Ember's M2, never Allison's M4",
       "renderNote": null,
       "layout": {
-        "x": 55,
-        "y": 5214,
+        "x": 843,
+        "y": 5945.2,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -1066,31 +1035,6 @@
           "browser work on Ember's M2,",
           "never Allison's M4"
         ]
-      }
-    },
-    {
-      "id": "ember-reactivate",
-      "source": "aura:.claude/skills/ember-reactivate/SKILL.md",
-      "repo": "aura",
-      "tier": "project",
-      "zone": "routing",
-      "status": "retired",
-      "inherits": [
-        "operating-doctrine"
-      ],
-      "calls": [],
-      "defersTo": [],
-      "brandScope": [],
-      "subtitle": null,
-      "renderNote": null,
-      "layout": {
-        "x": 114,
-        "y": 6370,
-        "width": 163,
-        "height": 49,
-        "rectHeight": 34,
-        "annotationHeight": 15,
-        "subtitleLines": []
       }
     },
     {
@@ -1109,8 +1053,8 @@
       "subtitle": "blended owner lens and entity-clean books",
       "renderNote": null,
       "layout": {
-        "x": 636.5,
-        "y": 151.9,
+        "x": 572,
+        "y": 5399.9,
         "width": 176,
         "height": 77,
         "rectHeight": 62,
@@ -1139,8 +1083,8 @@
       "subtitle": "Expert Partners parent voice",
       "renderNote": null,
       "layout": {
-        "x": 1253,
-        "y": 2147.3,
+        "x": 1134,
+        "y": 2509.3,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -1166,8 +1110,8 @@
       "subtitle": "one classifier, six existing destinations, no new store",
       "renderNote": null,
       "layout": {
-        "x": 89.5,
-        "y": 4549,
+        "x": 877.5,
+        "y": 6234.2,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1194,8 +1138,8 @@
       "subtitle": "where every system lives and what Claude can reach",
       "renderNote": null,
       "layout": {
-        "x": 336.5,
-        "y": 7678,
+        "x": 272,
+        "y": 533,
         "width": 244,
         "height": 77,
         "rectHeight": 62,
@@ -1225,8 +1169,8 @@
       "subtitle": "FAM and EPIC voice",
       "renderNote": null,
       "layout": {
-        "x": 1248,
-        "y": 2852.3,
+        "x": 1129,
+        "y": 3214.3,
         "width": 152,
         "height": 63,
         "rectHeight": 48,
@@ -1252,8 +1196,8 @@
       "subtitle": "turns any source file into clean, structured knowledge base Markdown",
       "renderNote": null,
       "layout": {
-        "x": 971.5,
-        "y": 5329,
+        "x": 208.5,
+        "y": 7518,
         "width": 281,
         "height": 91,
         "rectHeight": 76,
@@ -1283,8 +1227,8 @@
       "subtitle": "build a funnel that does not exist yet",
       "renderNote": null,
       "layout": {
-        "x": 1050,
-        "y": 3971,
+        "x": 287,
+        "y": 6160,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1311,8 +1255,8 @@
       "subtitle": "one complete Notion record per funnel",
       "renderNote": null,
       "layout": {
-        "x": 1282,
-        "y": 3795.8,
+        "x": 519,
+        "y": 5984.8,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -1341,8 +1285,8 @@
       "subtitle": "per-funnel walk from old location to clean location",
       "renderNote": null,
       "layout": {
-        "x": 1062,
-        "y": 3783,
+        "x": 299,
+        "y": 5972,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -1367,8 +1311,8 @@
       "subtitle": "decks planned and built in Gamma",
       "renderNote": null,
       "layout": {
-        "x": 993.5,
-        "y": 4072,
+        "x": 230.5,
+        "y": 6261,
         "width": 237,
         "height": 63,
         "rectHeight": 48,
@@ -1398,8 +1342,8 @@
       "subtitle": "Gemini Notebook training packs and video logging",
       "renderNote": null,
       "layout": {
-        "x": 566,
-        "y": 2875,
+        "x": 447,
+        "y": 3237,
         "width": 296,
         "height": 77,
         "rectHeight": 62,
@@ -1426,8 +1370,8 @@
       "subtitle": "read-only snapshot of the GHL account",
       "renderNote": null,
       "layout": {
-        "x": 1282,
-        "y": 4347,
+        "x": 519,
+        "y": 6536,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -1456,8 +1400,8 @@
       "subtitle": "design a GHL or n8n automation before building",
       "renderNote": null,
       "layout": {
-        "x": 1038,
-        "y": 4347,
+        "x": 275,
+        "y": 6536,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -1484,8 +1428,8 @@
       "subtitle": "tag audit, then dry-run-first cleanup",
       "renderNote": null,
       "layout": {
-        "x": 997.5,
-        "y": 3581,
+        "x": 234.5,
+        "y": 5770,
         "width": 229,
         "height": 77,
         "rectHeight": 62,
@@ -1510,8 +1454,8 @@
       "subtitle": "emails loaded into Gmail drafts",
       "renderNote": null,
       "layout": {
-        "x": 997,
-        "y": 3884,
+        "x": 234,
+        "y": 6073,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -1535,8 +1479,8 @@
       "subtitle": "Google Business Profile package",
       "renderNote": null,
       "layout": {
-        "x": 268.5,
-        "y": 1622,
+        "x": 149.5,
+        "y": 1984,
         "width": 259,
         "height": 63,
         "rectHeight": 48,
@@ -1562,8 +1506,8 @@
       "subtitle": "document Custom GPTs in the Notion GPT Library",
       "renderNote": null,
       "layout": {
-        "x": 355.5,
-        "y": 6822,
+        "x": 291,
+        "y": 4925,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -1571,33 +1515,6 @@
         "subtitleLines": [
           "document Custom GPTs in the",
           "Notion GPT Library"
-        ]
-      }
-    },
-    {
-      "id": "handoff",
-      "source": "aura:tools/continuity-skills/handoff/SKILL.md",
-      "repo": "aura",
-      "tier": "user",
-      "zone": "routing",
-      "status": "live",
-      "inherits": [
-        "operating-doctrine"
-      ],
-      "calls": [],
-      "defersTo": [],
-      "brandScope": [],
-      "subtitle": "hand work to another session",
-      "renderNote": null,
-      "layout": {
-        "x": 89.5,
-        "y": 5416,
-        "width": 212,
-        "height": 63,
-        "rectHeight": 48,
-        "annotationHeight": 15,
-        "subtitleLines": [
-          "hand work to another session"
         ]
       }
     },
@@ -1617,8 +1534,8 @@
       "subtitle": "hero video pre-production up to the approval gate",
       "renderNote": null,
       "layout": {
-        "x": 283,
-        "y": 1246,
+        "x": 164,
+        "y": 1608,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -1645,8 +1562,8 @@
       "subtitle": "scroll-stopping hooks and headlines",
       "renderNote": null,
       "layout": {
-        "x": 301,
-        "y": 1521,
+        "x": 182,
+        "y": 1883,
         "width": 194,
         "height": 77,
         "rectHeight": 62,
@@ -1671,8 +1588,8 @@
       "subtitle": "30 scroll-stopping hooks",
       "renderNote": null,
       "layout": {
-        "x": 304,
-        "y": 1709,
+        "x": 185,
+        "y": 2071,
         "width": 188,
         "height": 63,
         "rectHeight": 48,
@@ -1696,8 +1613,8 @@
       "subtitle": "Instagram story sequences",
       "renderNote": null,
       "layout": {
-        "x": 298,
-        "y": 2231,
+        "x": 179,
+        "y": 2593,
         "width": 200,
         "height": 63,
         "rectHeight": 48,
@@ -1723,8 +1640,8 @@
       "subtitle": "file content into the owning brain in Drive",
       "renderNote": null,
       "layout": {
-        "x": 89.5,
-        "y": 6168,
+        "x": 877.5,
+        "y": 5743.2,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1751,8 +1668,8 @@
       "subtitle": "plain language walkthroughs",
       "renderNote": null,
       "layout": {
-        "x": 92.5,
-        "y": 5503,
+        "x": 880.5,
+        "y": 5656.2,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -1781,8 +1698,8 @@
       "subtitle": "spawning new lanes with durable homes",
       "renderNote": null,
       "layout": {
-        "x": 106,
-        "y": 5590,
+        "x": 894,
+        "y": 5844.2,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -1807,8 +1724,8 @@
       "subtitle": "3-email lead follow-up sequence",
       "renderNote": null,
       "layout": {
-        "x": 276,
-        "y": 3721,
+        "x": 157,
+        "y": 4083,
         "width": 244,
         "height": 63,
         "rectHeight": 48,
@@ -1832,8 +1749,8 @@
       "subtitle": "local guides worth an email",
       "renderNote": null,
       "layout": {
-        "x": 295,
-        "y": 884,
+        "x": 176,
+        "y": 1246,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -1857,8 +1774,8 @@
       "subtitle": "scripts to give a guide away",
       "renderNote": null,
       "layout": {
-        "x": 272,
-        "y": 2419,
+        "x": 153,
+        "y": 2781,
         "width": 252,
         "height": 63,
         "rectHeight": 48,
@@ -1882,8 +1799,8 @@
       "subtitle": "Meta ad copy for listings",
       "renderNote": null,
       "layout": {
-        "x": 298,
-        "y": 3446,
+        "x": 179,
+        "y": 3808,
         "width": 200,
         "height": 63,
         "rectHeight": 48,
@@ -1907,8 +1824,8 @@
       "subtitle": "listing presentation and launch copy",
       "renderNote": null,
       "layout": {
-        "x": 283,
-        "y": 2680,
+        "x": 164,
+        "y": 3042,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -1933,8 +1850,8 @@
       "subtitle": "long-form YouTube scripts",
       "renderNote": null,
       "layout": {
-        "x": 290.5,
-        "y": 2969,
+        "x": 171.5,
+        "y": 3331,
         "width": 215,
         "height": 63,
         "rectHeight": 48,
@@ -1958,8 +1875,8 @@
       "subtitle": "cited market research brief",
       "renderNote": null,
       "layout": {
-        "x": 355.5,
-        "y": 7779,
+        "x": 291,
+        "y": 634,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -1983,8 +1900,8 @@
       "subtitle": "market update video package",
       "renderNote": null,
       "layout": {
-        "x": 295,
-        "y": 710,
+        "x": 176,
+        "y": 1072,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -2012,8 +1929,8 @@
       "subtitle": "marketing strategy in Allison’s voice",
       "renderNote": null,
       "layout": {
-        "x": 250,
-        "y": 2781,
+        "x": 131,
+        "y": 3143,
         "width": 296,
         "height": 77,
         "rectHeight": 62,
@@ -2038,8 +1955,8 @@
       "subtitle": "posts queued as Metricool drafts",
       "renderNote": null,
       "layout": {
-        "x": 994,
-        "y": 4159,
+        "x": 231,
+        "y": 6348,
         "width": 236,
         "height": 63,
         "rectHeight": 48,
@@ -2068,8 +1985,8 @@
       "subtitle": "review the monthly close against bank and Stripe",
       "renderNote": null,
       "layout": {
-        "x": 104.5,
-        "y": 157,
+        "x": 40,
+        "y": 5405,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -2098,8 +2015,8 @@
       "subtitle": "run the repo-standards gate, then bootstrap a justified project",
       "renderNote": null,
       "layout": {
-        "x": 368,
-        "y": 4898.2,
+        "x": 1438,
+        "y": 5225.3,
         "width": 212,
         "height": 91,
         "rectHeight": 76,
@@ -2125,8 +2042,8 @@
       "subtitle": "monthly database newsletter",
       "renderNote": null,
       "layout": {
-        "x": 295,
-        "y": 1159,
+        "x": 176,
+        "y": 1521,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -2150,8 +2067,8 @@
       "subtitle": "content board built in Notion",
       "renderNote": null,
       "layout": {
-        "x": 986,
-        "y": 4549,
+        "x": 223,
+        "y": 6738,
         "width": 252,
         "height": 63,
         "rectHeight": 48,
@@ -2175,8 +2092,8 @@
       "subtitle": "client-centered objection responses",
       "renderNote": null,
       "layout": {
-        "x": 283.5,
-        "y": 3345,
+        "x": 164.5,
+        "y": 3707,
         "width": 229,
         "height": 77,
         "rectHeight": 62,
@@ -2201,8 +2118,8 @@
       "subtitle": "offer and USP document",
       "renderNote": null,
       "layout": {
-        "x": 310,
-        "y": 1796,
+        "x": 191,
+        "y": 2158,
         "width": 176,
         "height": 63,
         "rectHeight": 48,
@@ -2226,8 +2143,8 @@
       "subtitle": "open house kit from one listing",
       "renderNote": null,
       "layout": {
-        "x": 283,
-        "y": 2882,
+        "x": 164,
+        "y": 3244,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -2251,8 +2168,8 @@
       "subtitle": "the standard every skill inherits",
       "renderNote": "single faint anchor, inheritance edges collapsed",
       "layout": {
-        "x": 364.5,
-        "y": 7375,
+        "x": 300,
+        "y": 230,
         "width": 188,
         "height": 77,
         "rectHeight": 62,
@@ -2260,33 +2177,6 @@
         "subtitleLines": [
           "the standard every skill",
           "inherits"
-        ]
-      }
-    },
-    {
-      "id": "park",
-      "source": "aura:tools/continuity-skills/park/SKILL.md",
-      "repo": "aura",
-      "tier": "user",
-      "zone": "routing",
-      "status": "live",
-      "inherits": [
-        "operating-doctrine"
-      ],
-      "calls": [],
-      "defersTo": [],
-      "brandScope": [],
-      "subtitle": "park work for a later resume",
-      "renderNote": null,
-      "layout": {
-        "x": 89.5,
-        "y": 5778,
-        "width": 212,
-        "height": 63,
-        "rectHeight": 48,
-        "annotationHeight": 15,
-        "subtitleLines": [
-          "park work for a later resume"
         ]
       }
     },
@@ -2308,8 +2198,8 @@
       "subtitle": "carry-back envelope and place-keeping baton",
       "renderNote": null,
       "layout": {
-        "x": 383,
-        "y": 5564.3,
+        "x": 1171,
+        "y": 6497.5,
         "width": 182,
         "height": 77,
         "rectHeight": 62,
@@ -2336,8 +2226,8 @@
       "subtitle": "grade a post for virality and brand fit",
       "renderNote": null,
       "layout": {
-        "x": 289,
-        "y": 971,
+        "x": 170,
+        "y": 1333,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -2364,8 +2254,8 @@
       "subtitle": "publish and schedule posts through Blotato",
       "renderNote": null,
       "layout": {
-        "x": 298,
-        "y": 3808,
+        "x": 179,
+        "y": 4170,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -2392,8 +2282,8 @@
       "subtitle": "seven-filter quality gate for posts",
       "renderNote": null,
       "layout": {
-        "x": 289,
-        "y": 3056,
+        "x": 170,
+        "y": 3418,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -2418,8 +2308,8 @@
       "subtitle": "pre-listing email and one-pager",
       "renderNote": null,
       "layout": {
-        "x": 279.5,
-        "y": 1970,
+        "x": 160.5,
+        "y": 2332,
         "width": 237,
         "height": 63,
         "rectHeight": 48,
@@ -2427,64 +2317,6 @@
         "subtitleLines": [
           "pre-listing email and one-pager"
         ]
-      }
-    },
-    {
-      "id": "project-architect",
-      "source": "aura:.claude/skills/project-architect/SKILL.md",
-      "repo": "aura",
-      "tier": "project",
-      "zone": "routing",
-      "status": "live",
-      "inherits": [
-        "operating-doctrine"
-      ],
-      "calls": [
-        "project-builder",
-        "new-project"
-      ],
-      "defersTo": [],
-      "brandScope": [],
-      "subtitle": "where a piece of work should live",
-      "renderNote": null,
-      "layout": {
-        "x": 124,
-        "y": 4824,
-        "width": 212,
-        "height": 77,
-        "rectHeight": 62,
-        "annotationHeight": 15,
-        "subtitleLines": [
-          "where a piece of work should",
-          "live"
-        ]
-      }
-    },
-    {
-      "id": "project-builder",
-      "source": "aura:.claude/skills/project-builder/SKILL.md",
-      "repo": "aura",
-      "tier": "project",
-      "zone": "routing",
-      "status": "live",
-      "inherits": [
-        "operating-doctrine"
-      ],
-      "calls": [
-        "repo-standards"
-      ],
-      "defersTo": [],
-      "brandScope": [],
-      "subtitle": null,
-      "renderNote": null,
-      "layout": {
-        "x": 396.5,
-        "y": 4825.2,
-        "width": 155,
-        "height": 49,
-        "rectHeight": 34,
-        "annotationHeight": 15,
-        "subtitleLines": []
       }
     },
     {
@@ -2503,8 +2335,8 @@
       "subtitle": "three short lists",
       "renderNote": null,
       "layout": {
-        "x": 122.5,
-        "y": 4462,
+        "x": 910.5,
+        "y": 6335.2,
         "width": 146,
         "height": 63,
         "rectHeight": 48,
@@ -2530,8 +2362,8 @@
       "subtitle": "RARE content engine",
       "renderNote": null,
       "layout": {
-        "x": 305.5,
-        "y": 3533,
+        "x": 186.5,
+        "y": 3895,
         "width": 185,
         "height": 63,
         "rectHeight": 48,
@@ -2555,8 +2387,8 @@
       "subtitle": "farm-area postcard copy",
       "renderNote": null,
       "layout": {
-        "x": 276,
-        "y": 435,
+        "x": 157,
+        "y": 797,
         "width": 244,
         "height": 63,
         "rectHeight": 48,
@@ -2580,8 +2412,8 @@
       "subtitle": "filmable 45-second reel scripts",
       "renderNote": null,
       "layout": {
-        "x": 283,
-        "y": 522,
+        "x": 164,
+        "y": 884,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -2607,8 +2439,8 @@
       "subtitle": "future obligations get a durable home and a wake condition",
       "renderNote": null,
       "layout": {
-        "x": 340.5,
-        "y": 7476,
+        "x": 276,
+        "y": 331,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -2635,8 +2467,8 @@
       "subtitle": "repo birth, readiness, and evidence-led content audits",
       "renderNote": null,
       "layout": {
-        "x": 962,
-        "y": 4824,
+        "x": 199,
+        "y": 7013,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -2663,8 +2495,8 @@
       "subtitle": "file a research report into the Deep Research folder",
       "renderNote": null,
       "layout": {
-        "x": 343.5,
-        "y": 6923,
+        "x": 279,
+        "y": 5026,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -2672,33 +2504,6 @@
         "subtitleLines": [
           "file a research report into the",
           "Deep Research folder"
-        ]
-      }
-    },
-    {
-      "id": "resume-work",
-      "source": "aura:tools/continuity-skills/resume-work/SKILL.md",
-      "repo": "aura",
-      "tier": "user",
-      "zone": "routing",
-      "status": "live",
-      "inherits": [
-        "operating-doctrine"
-      ],
-      "calls": [],
-      "defersTo": [],
-      "brandScope": [],
-      "subtitle": "resume parked or handed-off work",
-      "renderNote": null,
-      "layout": {
-        "x": 77.5,
-        "y": 4737,
-        "width": 236,
-        "height": 63,
-        "rectHeight": 48,
-        "annotationHeight": 15,
-        "subtitleLines": [
-          "resume parked or handed-off work"
         ]
       }
     },
@@ -2716,8 +2521,8 @@
       "subtitle": "review requests, replies, proof posts",
       "renderNote": null,
       "layout": {
-        "x": 283,
-        "y": 3620,
+        "x": 164,
+        "y": 3982,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -2747,8 +2552,8 @@
       "subtitle": "burn, runway, and revenue sensitivity",
       "renderNote": null,
       "layout": {
-        "x": 146.5,
-        "y": 258,
+        "x": 82,
+        "y": 5506,
         "width": 194,
         "height": 77,
         "rectHeight": 62,
@@ -2756,64 +2561,6 @@
         "subtitleLines": [
           "burn, runway, and revenue",
           "sensitivity"
-        ]
-      }
-    },
-    {
-      "id": "session-audit",
-      "source": "aura:.claude/skills/session-audit/SKILL.md",
-      "repo": "aura",
-      "tier": "project",
-      "zone": "routing",
-      "status": "live",
-      "inherits": [
-        "operating-doctrine"
-      ],
-      "calls": [],
-      "defersTo": [],
-      "brandScope": [],
-      "subtitle": "structured session audit for consolidation",
-      "renderNote": null,
-      "layout": {
-        "x": 356,
-        "y": 5978.8,
-        "width": 212,
-        "height": 77,
-        "rectHeight": 62,
-        "annotationHeight": 15,
-        "subtitleLines": [
-          "structured session audit for",
-          "consolidation"
-        ]
-      }
-    },
-    {
-      "id": "session-closeout",
-      "source": "aura:.claude/skills/session-closeout/SKILL.md",
-      "repo": "aura",
-      "tier": "project",
-      "zone": "routing",
-      "status": "live",
-      "inherits": [
-        "operating-doctrine"
-      ],
-      "calls": [
-        "session-audit"
-      ],
-      "defersTo": [],
-      "brandScope": [],
-      "subtitle": "handoff note to main, clean worktree",
-      "renderNote": null,
-      "layout": {
-        "x": 130,
-        "y": 5966,
-        "width": 206,
-        "height": 77,
-        "rectHeight": 62,
-        "annotationHeight": 15,
-        "subtitleLines": [
-          "handoff note to main, clean",
-          "worktree"
         ]
       }
     },
@@ -2833,8 +2580,8 @@
       "subtitle": "route work to the right project home",
       "renderNote": null,
       "layout": {
-        "x": 80.5,
-        "y": 6067,
+        "x": 868.5,
+        "y": 5454.2,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -2861,8 +2608,8 @@
       "subtitle": "model and effort fit-check at conversation start",
       "renderNote": null,
       "layout": {
-        "x": 632,
-        "y": 5000.3,
+        "x": 1420,
+        "y": 5340.3,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -2892,8 +2639,8 @@
       "subtitle": "Claude Code takes care of Claude Code",
       "renderNote": null,
       "layout": {
-        "x": 100,
-        "y": 5113,
+        "x": 888,
+        "y": 6523.2,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -2920,8 +2667,8 @@
       "subtitle": "the one canonical session close-out",
       "renderNote": null,
       "layout": {
-        "x": 98.5,
-        "y": 5012,
+        "x": 886.5,
+        "y": 6725.2,
         "width": 194,
         "height": 77,
         "rectHeight": 62,
@@ -2948,8 +2695,8 @@
       "subtitle": "five real experts score the work, debate it and rebuild it toward 100",
       "renderNote": null,
       "layout": {
-        "x": 1000,
-        "y": 5127,
+        "x": 237,
+        "y": 7316,
         "width": 224,
         "height": 91,
         "rectHeight": 76,
@@ -2977,8 +2724,8 @@
       "subtitle": "document skills in the Notion Skill Library",
       "renderNote": null,
       "layout": {
-        "x": 349.5,
-        "y": 6721,
+        "x": 285,
+        "y": 4824,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -3005,8 +2752,8 @@
       "subtitle": "90-day Instagram audit into post formulas",
       "renderNote": null,
       "layout": {
-        "x": 280,
-        "y": 2318,
+        "x": 161,
+        "y": 2680,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -3033,8 +2780,8 @@
       "subtitle": "log every SOP to the Notion SOPs Database",
       "renderNote": null,
       "layout": {
-        "x": 340.5,
-        "y": 7024,
+        "x": 276,
+        "y": 5127,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -3063,8 +2810,8 @@
       "subtitle": "recovers on-screen and public course material into private evidence",
       "renderNote": null,
       "layout": {
-        "x": 1044,
-        "y": 5012,
+        "x": 281,
+        "y": 7201,
         "width": 218,
         "height": 91,
         "rectHeight": 76,
@@ -3094,8 +2841,8 @@
       "subtitle": "speaker introductions that create desire to listen",
       "renderNote": null,
       "layout": {
-        "x": 618,
-        "y": 2976,
+        "x": 499,
+        "y": 3338,
         "width": 244,
         "height": 77,
         "rectHeight": 62,
@@ -3103,33 +2850,6 @@
         "subtitleLines": [
           "speaker introductions that",
           "create desire to listen"
-        ]
-      }
-    },
-    {
-      "id": "ss",
-      "source": "aura:_tools/personal-skills/ss/SKILL.md",
-      "repo": "aura",
-      "tier": "user",
-      "zone": "routing",
-      "status": "designed",
-      "inherits": [
-        "operating-doctrine"
-      ],
-      "calls": [],
-      "defersTo": [],
-      "brandScope": [],
-      "subtitle": "screenshot shorthand",
-      "renderNote": null,
-      "layout": {
-        "x": 113.5,
-        "y": 5691,
-        "width": 164,
-        "height": 63,
-        "rectHeight": 48,
-        "annotationHeight": 15,
-        "subtitleLines": [
-          "screenshot shorthand"
         ]
       }
     },
@@ -3149,8 +2869,8 @@
       "subtitle": "any text laid onto 4x6 note cards",
       "renderNote": null,
       "layout": {
-        "x": 295,
-        "y": 609,
+        "x": 176,
+        "y": 971,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -3177,8 +2897,8 @@
       "subtitle": "every step opens and closes as teaching",
       "renderNote": null,
       "layout": {
-        "x": 286,
-        "y": 3244,
+        "x": 167,
+        "y": 3606,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -3207,8 +2927,8 @@
       "subtitle": "The Strong Ones voice inside AG Personal Brand",
       "renderNote": null,
       "layout": {
-        "x": 1269,
-        "y": 2602.3,
+        "x": 1150,
+        "y": 2964.3,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -3233,8 +2953,8 @@
       "subtitle": "weekly local roundup post",
       "renderNote": null,
       "layout": {
-        "x": 287,
-        "y": 3157,
+        "x": 168,
+        "y": 3519,
         "width": 222,
         "height": 63,
         "rectHeight": 48,
@@ -3260,8 +2980,8 @@
       "subtitle": "retired imported research prompt",
       "renderNote": null,
       "layout": {
-        "x": 962,
-        "y": 3494,
+        "x": 199,
+        "y": 5683,
         "width": 300,
         "height": 63,
         "rectHeight": 48,
@@ -3287,8 +3007,8 @@
       "subtitle": "retired imported research prompt",
       "renderNote": null,
       "layout": {
-        "x": 962,
-        "y": 4636,
+        "x": 199,
+        "y": 6825,
         "width": 300,
         "height": 63,
         "rectHeight": 48,
@@ -3314,8 +3034,8 @@
       "subtitle": "retired imported research prompt",
       "renderNote": null,
       "layout": {
-        "x": 962,
-        "y": 4925,
+        "x": 199,
+        "y": 7114,
         "width": 300,
         "height": 63,
         "rectHeight": 48,
@@ -3341,8 +3061,8 @@
       "subtitle": "live-doc check before building",
       "renderNote": null,
       "layout": {
-        "x": 83.5,
-        "y": 4650,
+        "x": 871.5,
+        "y": 6046.2,
         "width": 224,
         "height": 63,
         "rectHeight": 48,
@@ -3368,8 +3088,8 @@
       "subtitle": "public video discovery with evidence and bounded playback checks",
       "renderNote": null,
       "layout": {
-        "x": 1282,
-        "y": 5012,
+        "x": 519,
+        "y": 7201,
         "width": 218,
         "height": 91,
         "rectHeight": 76,
@@ -3395,8 +3115,8 @@
       "subtitle": "long video into 3 shorts",
       "renderNote": null,
       "layout": {
-        "x": 294.5,
-        "y": 1072,
+        "x": 175.5,
+        "y": 1434,
         "width": 207,
         "height": 63,
         "rectHeight": 48,
@@ -3422,8 +3142,8 @@
       "subtitle": "video to transcript relay",
       "renderNote": null,
       "layout": {
-        "x": 294.5,
-        "y": 1434,
+        "x": 175.5,
+        "y": 1796,
         "width": 207,
         "height": 63,
         "rectHeight": 48,
@@ -3452,8 +3172,8 @@
       "subtitle": "weekly cash in and out, per entity",
       "renderNote": null,
       "layout": {
-        "x": 125.5,
-        "y": 56,
+        "x": 61,
+        "y": 5304,
         "width": 215,
         "height": 77,
         "rectHeight": 62,
@@ -3480,8 +3200,8 @@
       "subtitle": "pick the layer that owns the WordPress result",
       "renderNote": null,
       "layout": {
-        "x": 55,
-        "y": 6443,
+        "x": 843,
+        "y": 6422.2,
         "width": 281,
         "height": 77,
         "rectHeight": 62,
@@ -3508,8 +3228,8 @@
       "subtitle": "offer construction and audit",
       "renderNote": null,
       "layout": {
-        "x": 566,
-        "y": 2788,
+        "x": 447,
+        "y": 3150,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -3533,8 +3253,8 @@
       "subtitle": "YouTube channel setup checklist",
       "renderNote": null,
       "layout": {
-        "x": 276,
-        "y": 2057,
+        "x": 157,
+        "y": 2419,
         "width": 244,
         "height": 63,
         "rectHeight": 48,
@@ -3558,8 +3278,8 @@
       "subtitle": "YouTube upload package",
       "renderNote": null,
       "layout": {
-        "x": 310,
-        "y": 797,
+        "x": 191,
+        "y": 1159,
         "width": 176,
         "height": 63,
         "rectHeight": 48,
@@ -3583,8 +3303,8 @@
       "subtitle": "20 searchable YouTube ideas",
       "renderNote": null,
       "layout": {
-        "x": 283.5,
-        "y": 2506,
+        "x": 164.5,
+        "y": 2868,
         "width": 229,
         "height": 63,
         "rectHeight": 48,
@@ -3632,20 +3352,20 @@
       "type": "calls",
       "points": [
         {
-          "x": 592,
-          "y": 5064.5
+          "x": 1380,
+          "y": 5404.5
         },
         {
-          "x": 612,
-          "y": 5064.5
+          "x": 1400,
+          "y": 5404.5
         },
         {
-          "x": 612,
-          "y": 5166.2
+          "x": 1400,
+          "y": 5847.8
         },
         {
-          "x": 632,
-          "y": 5166.2
+          "x": 1420,
+          "y": 5847.8
         }
       ]
     },
@@ -3655,12 +3375,12 @@
       "type": "calls",
       "points": [
         {
-          "x": 592,
-          "y": 5038.8
+          "x": 1380,
+          "y": 5378.8
         },
         {
-          "x": 632,
-          "y": 5038.8
+          "x": 1420,
+          "y": 5378.8
         }
       ]
     },
@@ -3688,20 +3408,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 1173.1,
-          "y": 2629.8
+          "x": 1054.1,
+          "y": 2991.8
         },
         {
-          "x": 1217,
-          "y": 2629.8
+          "x": 1098,
+          "y": 2991.8
         },
         {
-          "x": 1217,
-          "y": 2455.8
+          "x": 1098,
+          "y": 2817.8
         },
         {
-          "x": 1248,
-          "y": 2455.8
+          "x": 1129,
+          "y": 2817.8
         }
       ]
     },
@@ -3711,20 +3431,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 1173.1,
-          "y": 2651.8
+          "x": 1054.1,
+          "y": 3013.8
         },
         {
-          "x": 1197,
-          "y": 2651.8
+          "x": 1078,
+          "y": 3013.8
         },
         {
-          "x": 1197,
-          "y": 2736.3
+          "x": 1078,
+          "y": 3098.3
         },
         {
-          "x": 1253,
-          "y": 2736.3
+          "x": 1134,
+          "y": 3098.3
         }
       ]
     },
@@ -3734,20 +3454,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 1173.1,
-          "y": 2618.8
+          "x": 1054.1,
+          "y": 2980.8
         },
         {
-          "x": 1207,
-          "y": 2618.8
+          "x": 1088,
+          "y": 2980.8
         },
         {
-          "x": 1207,
-          "y": 2295.8
+          "x": 1088,
+          "y": 2657.8
         },
         {
-          "x": 1269,
-          "y": 2295.8
+          "x": 1150,
+          "y": 2657.8
         }
       ]
     },
@@ -3757,20 +3477,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 1173.1,
-          "y": 2607.8
+          "x": 1054.1,
+          "y": 2969.8
         },
         {
-          "x": 1197,
-          "y": 2607.8
+          "x": 1078,
+          "y": 2969.8
         },
         {
-          "x": 1197,
-          "y": 2189.3
+          "x": 1078,
+          "y": 2551.3
         },
         {
-          "x": 1253,
-          "y": 2189.3
+          "x": 1134,
+          "y": 2551.3
         }
       ]
     },
@@ -3780,20 +3500,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 1173.1,
-          "y": 2662.8
+          "x": 1054.1,
+          "y": 3024.8
         },
         {
-          "x": 1187,
-          "y": 2662.8
+          "x": 1068,
+          "y": 3024.8
         },
         {
-          "x": 1187,
-          "y": 2873.3
+          "x": 1068,
+          "y": 3235.3
         },
         {
-          "x": 1248,
-          "y": 2873.3
+          "x": 1129,
+          "y": 3235.3
         }
       ]
     },
@@ -3803,12 +3523,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 1173.1,
-          "y": 2640.8
+          "x": 1054.1,
+          "y": 3002.8
         },
         {
-          "x": 1269,
-          "y": 2640.8
+          "x": 1150,
+          "y": 3002.8
         }
       ]
     },
@@ -3824,28 +3544,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 1506,
-          "y": 4473.7
+          "x": 743,
+          "y": 6662.7
         },
         {
-          "x": 1573,
-          "y": 4473.7
-        },
-        {
-          "x": 1573,
-          "y": 7884
-        },
-        {
-          "x": 18,
-          "y": 7884
-        },
-        {
-          "x": 18,
-          "y": 5903.5
-        },
-        {
-          "x": 55,
-          "y": 5903.5
+          "x": 843,
+          "y": 6662.7
         }
       ]
     },
@@ -3855,28 +3559,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 1506,
-          "y": 4499.3
+          "x": 743,
+          "y": 6688.3
         },
         {
-          "x": 1563,
-          "y": 4499.3
+          "x": 780,
+          "y": 6688.3
         },
         {
-          "x": 1563,
-          "y": 7874
+          "x": 780,
+          "y": 5983.7
         },
         {
-          "x": 8,
-          "y": 7874
-        },
-        {
-          "x": 8,
-          "y": 5252.5
-        },
-        {
-          "x": 55,
-          "y": 5252.5
+          "x": 843,
+          "y": 5983.7
         }
       ]
     },
@@ -3893,35 +3589,6 @@
       "points": null
     },
     {
-      "from": "can-i-close",
-      "to": "session-audit",
-      "type": "calls",
-      "points": [
-        {
-          "x": 336,
-          "y": 6307.5
-        },
-        {
-          "x": 346,
-          "y": 6307.5
-        },
-        {
-          "x": 346,
-          "y": 6030.2
-        },
-        {
-          "x": 356,
-          "y": 6030.2
-        }
-      ]
-    },
-    {
-      "from": "can-i-close",
-      "to": "operating-doctrine",
-      "type": "inherits",
-      "points": null
-    },
-    {
       "from": "canon-sync-protocol",
       "to": "operating-doctrine",
       "type": "inherits",
@@ -3933,12 +3600,12 @@
       "type": "calls",
       "points": [
         {
-          "x": 606.5,
-          "y": 182.7
+          "x": 542,
+          "y": 5430.7
         },
         {
-          "x": 636.5,
-          "y": 182.7
+          "x": 572,
+          "y": 5430.7
         }
       ]
     },
@@ -3966,20 +3633,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 632,
-          "y": 5199.2
+          "x": 1420,
+          "y": 5880.8
         },
         {
-          "x": 602,
-          "y": 5199.2
+          "x": 1390,
+          "y": 5880.8
         },
         {
-          "x": 602,
-          "y": 5590
+          "x": 1390,
+          "y": 6523.2
         },
         {
-          "x": 565,
-          "y": 5590
+          "x": 1353,
+          "y": 6523.2
         }
       ]
     },
@@ -4007,12 +3674,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 592,
-          "y": 5188.2
+          "x": 1380,
+          "y": 5492.7
         },
         {
-          "x": 632,
-          "y": 5188.2
+          "x": 1390,
+          "y": 5492.7
+        },
+        {
+          "x": 1390,
+          "y": 5858.8
+        },
+        {
+          "x": 1420,
+          "y": 5858.8
         }
       ]
     },
@@ -4040,12 +3715,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 336,
-          "y": 6582.5
+          "x": 1124,
+          "y": 5593.7
         },
         {
-          "x": 356,
-          "y": 6582.5
+          "x": 1144,
+          "y": 5593.7
         }
       ]
     },
@@ -4063,12 +3738,6 @@
     },
     {
       "from": "ember-browser-routing",
-      "to": "operating-doctrine",
-      "type": "inherits",
-      "points": null
-    },
-    {
-      "from": "ember-reactivate",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -4115,20 +3784,20 @@
       "type": "calls",
       "points": [
         {
-          "x": 1262,
-          "y": 4009.5
+          "x": 499,
+          "y": 6198.5
         },
         {
-          "x": 1272,
-          "y": 4009.5
+          "x": 509,
+          "y": 6198.5
         },
         {
-          "x": 1272,
-          "y": 3847.2
+          "x": 509,
+          "y": 6036.2
         },
         {
-          "x": 1282,
-          "y": 3847.2
+          "x": 519,
+          "y": 6036.2
         }
       ]
     },
@@ -4150,12 +3819,12 @@
       "type": "calls",
       "points": [
         {
-          "x": 1262,
-          "y": 3821.5
+          "x": 499,
+          "y": 6010.5
         },
         {
-          "x": 1282,
-          "y": 3821.5
+          "x": 519,
+          "y": 6010.5
         }
       ]
     },
@@ -4171,20 +3840,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 862,
-          "y": 2913.5
+          "x": 743,
+          "y": 3275.5
         },
         {
-          "x": 919,
-          "y": 2913.5
+          "x": 800,
+          "y": 3275.5
         },
         {
-          "x": 919,
-          "y": 2757.3
+          "x": 800,
+          "y": 3119.3
         },
         {
-          "x": 1253,
-          "y": 2757.3
+          "x": 1134,
+          "y": 3119.3
         }
       ]
     },
@@ -4194,28 +3863,28 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 862,
-          "y": 2932.8
+          "x": 743,
+          "y": 3294.8
         },
         {
-          "x": 899,
-          "y": 2932.8
+          "x": 780,
+          "y": 3294.8
         },
         {
-          "x": 899,
-          "y": 2585.8
+          "x": 780,
+          "y": 2947.8
         },
         {
-          "x": 1187,
-          "y": 2585.8
+          "x": 1068,
+          "y": 2947.8
         },
         {
-          "x": 1187,
-          "y": 2168.3
+          "x": 1068,
+          "y": 2530.3
         },
         {
-          "x": 1253,
-          "y": 2168.3
+          "x": 1134,
+          "y": 2530.3
         }
       ]
     },
@@ -4225,12 +3894,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 862,
-          "y": 2894.3
+          "x": 743,
+          "y": 3256.3
         },
         {
-          "x": 1248,
-          "y": 2894.3
+          "x": 1129,
+          "y": 3256.3
         }
       ]
     },
@@ -4252,12 +3921,12 @@
       "type": "calls",
       "points": [
         {
-          "x": 1262,
-          "y": 4385.5
+          "x": 499,
+          "y": 6574.5
         },
         {
-          "x": 1282,
-          "y": 4385.5
+          "x": 519,
+          "y": 6574.5
         }
       ]
     },
@@ -4275,12 +3944,6 @@
     },
     {
       "from": "gpt-cataloger",
-      "to": "operating-doctrine",
-      "type": "inherits",
-      "points": null
-    },
-    {
-      "from": "handoff",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -4315,28 +3978,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 336,
-          "y": 5641.3
+          "x": 1124,
+          "y": 5869.8
         },
         {
-          "x": 346,
-          "y": 5641.3
-        },
-        {
-          "x": 346,
-          "y": 5651.3
-        },
-        {
-          "x": 622,
-          "y": 5651.3
-        },
-        {
-          "x": 622,
-          "y": 5221.2
-        },
-        {
-          "x": 632,
-          "y": 5221.2
+          "x": 1420,
+          "y": 5869.8
         }
       ]
     },
@@ -4346,12 +3993,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 336,
-          "y": 5615.7
+          "x": 1124,
+          "y": 5895.5
         },
         {
-          "x": 383,
-          "y": 5615.7
+          "x": 1134,
+          "y": 5895.5
+        },
+        {
+          "x": 1134,
+          "y": 6523.2
+        },
+        {
+          "x": 1171,
+          "y": 6523.2
         }
       ]
     },
@@ -4367,12 +4022,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 546,
-          "y": 2819.5
+          "x": 427,
+          "y": 3181.5
         },
         {
-          "x": 566,
-          "y": 2819.5
+          "x": 447,
+          "y": 3181.5
         }
       ]
     },
@@ -4388,12 +4043,12 @@
       "type": "calls",
       "points": [
         {
-          "x": 340.5,
-          "y": 182.7
+          "x": 276,
+          "y": 5430.7
         },
         {
-          "x": 370.5,
-          "y": 182.7
+          "x": 306,
+          "y": 5430.7
         }
       ]
     },
@@ -4403,28 +4058,28 @@
       "type": "calls",
       "points": [
         {
-          "x": 340.5,
-          "y": 208.3
+          "x": 276,
+          "y": 5456.3
         },
         {
-          "x": 360.5,
-          "y": 208.3
+          "x": 296,
+          "y": 5456.3
         },
         {
-          "x": 360.5,
-          "y": 231.2
+          "x": 296,
+          "y": 5479.2
         },
         {
-          "x": 616.5,
-          "y": 231.2
+          "x": 552,
+          "y": 5479.2
         },
         {
-          "x": 616.5,
-          "y": 198.1
+          "x": 552,
+          "y": 5446.1
         },
         {
-          "x": 636.5,
-          "y": 198.1
+          "x": 572,
+          "y": 5446.1
         }
       ]
     },
@@ -4440,20 +4095,28 @@
       "type": "calls",
       "points": [
         {
-          "x": 580,
-          "y": 4943.7
+          "x": 1650,
+          "y": 5270.8
         },
         {
-          "x": 899,
-          "y": 4943.7
+          "x": 1687,
+          "y": 5270.8
         },
         {
-          "x": 899,
-          "y": 4875.3
+          "x": 1687,
+          "y": 7930
         },
         {
-          "x": 962,
-          "y": 4875.3
+          "x": 8,
+          "y": 7930
+        },
+        {
+          "x": 8,
+          "y": 7051.5
+        },
+        {
+          "x": 199,
+          "y": 7051.5
         }
       ]
     },
@@ -4464,31 +4127,25 @@
       "points": null
     },
     {
-      "from": "park",
-      "to": "operating-doctrine",
-      "type": "inherits",
-      "points": null
-    },
-    {
       "from": "pin",
       "to": "code-block-routing",
       "type": "defers-to",
       "points": [
         {
-          "x": 565,
-          "y": 5615.7
+          "x": 1353,
+          "y": 6548.8
         },
         {
-          "x": 612,
-          "y": 5615.7
+          "x": 1400,
+          "y": 6548.8
         },
         {
-          "x": 612,
-          "y": 5210.2
+          "x": 1400,
+          "y": 5891.8
         },
         {
-          "x": 632,
-          "y": 5210.2
+          "x": 1420,
+          "y": 5891.8
         }
       ]
     },
@@ -4512,71 +4169,6 @@
     },
     {
       "from": "post-value-filter",
-      "to": "operating-doctrine",
-      "type": "inherits",
-      "points": null
-    },
-    {
-      "from": "project-architect",
-      "to": "new-project",
-      "type": "calls",
-      "points": [
-        {
-          "x": 336,
-          "y": 4875.3
-        },
-        {
-          "x": 346,
-          "y": 4875.3
-        },
-        {
-          "x": 346,
-          "y": 4943.7
-        },
-        {
-          "x": 368,
-          "y": 4943.7
-        }
-      ]
-    },
-    {
-      "from": "project-architect",
-      "to": "project-builder",
-      "type": "calls",
-      "points": [
-        {
-          "x": 336,
-          "y": 4849.7
-        },
-        {
-          "x": 396.5,
-          "y": 4849.7
-        }
-      ]
-    },
-    {
-      "from": "project-architect",
-      "to": "operating-doctrine",
-      "type": "inherits",
-      "points": null
-    },
-    {
-      "from": "project-builder",
-      "to": "repo-standards",
-      "type": "calls",
-      "points": [
-        {
-          "x": 551.5,
-          "y": 4849.7
-        },
-        {
-          "x": 962,
-          "y": 4849.7
-        }
-      ]
-    },
-    {
-      "from": "project-builder",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -4612,31 +4204,25 @@
       "points": null
     },
     {
-      "from": "resume-work",
-      "to": "operating-doctrine",
-      "type": "inherits",
-      "points": null
-    },
-    {
       "from": "runway-and-burn",
       "to": "canonical-categories",
       "type": "calls",
       "points": [
         {
-          "x": 340.5,
-          "y": 283.7
+          "x": 276,
+          "y": 5531.7
         },
         {
-          "x": 350.5,
-          "y": 283.7
+          "x": 286,
+          "y": 5531.7
         },
         {
-          "x": 350.5,
-          "y": 201.9
+          "x": 286,
+          "y": 5449.9
         },
         {
-          "x": 370.5,
-          "y": 201.9
+          "x": 306,
+          "y": 5449.9
         }
       ]
     },
@@ -4646,52 +4232,25 @@
       "type": "calls",
       "points": [
         {
-          "x": 340.5,
-          "y": 309.3
+          "x": 276,
+          "y": 5557.3
         },
         {
-          "x": 626.5,
-          "y": 309.3
+          "x": 562,
+          "y": 5557.3
         },
         {
-          "x": 626.5,
-          "y": 213.5
+          "x": 562,
+          "y": 5461.5
         },
         {
-          "x": 636.5,
-          "y": 213.5
+          "x": 572,
+          "y": 5461.5
         }
       ]
     },
     {
       "from": "runway-and-burn",
-      "to": "operating-doctrine",
-      "type": "inherits",
-      "points": null
-    },
-    {
-      "from": "session-audit",
-      "to": "operating-doctrine",
-      "type": "inherits",
-      "points": null
-    },
-    {
-      "from": "session-closeout",
-      "to": "session-audit",
-      "type": "calls",
-      "points": [
-        {
-          "x": 336,
-          "y": 6004.5
-        },
-        {
-          "x": 356,
-          "y": 6004.5
-        }
-      ]
-    },
-    {
-      "from": "session-closeout",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -4714,20 +4273,28 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 336,
-          "y": 5138.7
+          "x": 1124,
+          "y": 6574.5
         },
         {
-          "x": 602,
-          "y": 5138.7
+          "x": 1134,
+          "y": 6574.5
         },
         {
-          "x": 602,
-          "y": 5177.2
+          "x": 1134,
+          "y": 6584.5
         },
         {
-          "x": 632,
-          "y": 5177.2
+          "x": 1410,
+          "y": 6584.5
+        },
+        {
+          "x": 1410,
+          "y": 5902.8
+        },
+        {
+          "x": 1420,
+          "y": 5902.8
         }
       ]
     },
@@ -4737,20 +4304,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 336,
-          "y": 5164.3
+          "x": 1124,
+          "y": 6548.8
         },
         {
-          "x": 346,
-          "y": 5164.3
-        },
-        {
-          "x": 346,
-          "y": 5590
-        },
-        {
-          "x": 383,
-          "y": 5590
+          "x": 1171,
+          "y": 6548.8
         }
       ]
     },
@@ -4796,12 +4355,12 @@
       "type": "calls",
       "points": [
         {
-          "x": 1262,
-          "y": 5057.5
+          "x": 499,
+          "y": 7246.5
         },
         {
-          "x": 1282,
-          "y": 5057.5
+          "x": 519,
+          "y": 7246.5
         }
       ]
     },
@@ -4817,31 +4376,25 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 862,
-          "y": 3014.5
+          "x": 743,
+          "y": 3376.5
         },
         {
-          "x": 909,
-          "y": 3014.5
+          "x": 790,
+          "y": 3376.5
         },
         {
-          "x": 909,
-          "y": 2635.3
+          "x": 790,
+          "y": 2997.3
         },
         {
-          "x": 985.1,
-          "y": 2635.3
+          "x": 866.1,
+          "y": 2997.3
         }
       ]
     },
     {
       "from": "speaker-introduction-writer",
-      "to": "operating-doctrine",
-      "type": "inherits",
-      "points": null
-    },
-    {
-      "from": "ss",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -4906,20 +4459,20 @@
       "type": "calls",
       "points": [
         {
-          "x": 340.5,
-          "y": 107.3
+          "x": 276,
+          "y": 5355.3
         },
         {
-          "x": 350.5,
-          "y": 107.3
+          "x": 286,
+          "y": 5355.3
         },
         {
-          "x": 350.5,
-          "y": 163.4
+          "x": 286,
+          "y": 5411.4
         },
         {
-          "x": 370.5,
-          "y": 163.4
+          "x": 306,
+          "y": 5411.4
         }
       ]
     },
@@ -4929,20 +4482,20 @@
       "type": "calls",
       "points": [
         {
-          "x": 340.5,
-          "y": 81.7
+          "x": 276,
+          "y": 5329.7
         },
         {
-          "x": 616.5,
-          "y": 81.7
+          "x": 552,
+          "y": 5329.7
         },
         {
-          "x": 616.5,
-          "y": 167.3
+          "x": 552,
+          "y": 5415.3
         },
         {
-          "x": 636.5,
-          "y": 167.3
+          "x": 572,
+          "y": 5415.3
         }
       ]
     },
@@ -4969,69 +4522,20 @@
     "declaredDuplicates": [
       "eps:operating-doctrine/SKILL.md"
     ],
-    "deployedMounts": [
-      {
-        "path": "aura:.agents/skills/can-i-close/SKILL.md",
-        "id": "can-i-close",
-        "canonical": "aura:.claude/skills/can-i-close/SKILL.md",
-        "deployedAt": "2026-09-04",
-        "stamp": "tree sha256 a6b3a1799a92",
-        "mount": "aura:.agents/skills/"
-      },
-      {
-        "path": "aura:.agents/skills/ember-reactivate/SKILL.md",
-        "id": "ember-reactivate",
-        "canonical": "aura:.claude/skills/ember-reactivate/SKILL.md",
-        "deployedAt": "2026-09-04",
-        "stamp": "tree sha256 ef1e9f73d887",
-        "mount": "aura:.agents/skills/"
-      },
-      {
-        "path": "aura:.agents/skills/project-architect/SKILL.md",
-        "id": "project-architect",
-        "canonical": "aura:.claude/skills/project-architect/SKILL.md",
-        "deployedAt": "2026-09-04",
-        "stamp": "tree sha256 37e7ab8b236e",
-        "mount": "aura:.agents/skills/"
-      },
-      {
-        "path": "aura:.agents/skills/project-builder/SKILL.md",
-        "id": "project-builder",
-        "canonical": "aura:.claude/skills/project-builder/SKILL.md",
-        "deployedAt": "2026-09-20",
-        "stamp": "tree sha256 c77f121d82fa",
-        "mount": "aura:.agents/skills/"
-      },
-      {
-        "path": "aura:.agents/skills/session-audit/SKILL.md",
-        "id": "session-audit",
-        "canonical": "aura:.claude/skills/session-audit/SKILL.md",
-        "deployedAt": "2026-10-12",
-        "stamp": "tree sha256 ab3f6dc2fa82",
-        "mount": "aura:.agents/skills/"
-      },
-      {
-        "path": "aura:.agents/skills/session-closeout/SKILL.md",
-        "id": "session-closeout",
-        "canonical": "aura:.claude/skills/session-closeout/SKILL.md",
-        "deployedAt": "2026-10-12",
-        "stamp": "tree sha256 99e025ff3c34",
-        "mount": "aura:.agents/skills/"
-      }
-    ]
+    "deployedMounts": []
   },
   "excluded": [],
   "layout": {
     "engine": "elkjs layered, single INCLUDE_CHILDREN hierarchy over zones and brand rooms, build-time only",
-    "width": 1581,
-    "height": 7892,
+    "width": 1695,
+    "height": 7938,
     "zones": [
       {
         "id": "brain",
         "label": "The brain",
         "caption": "the law and the map of the house",
-        "x": 314.5,
-        "y": 7153,
+        "x": 250,
+        "y": 8,
         "width": 288,
         "height": 711,
         "rooms": []
@@ -5040,8 +4544,8 @@
         "id": "brands",
         "label": "The voices",
         "caption": "one room per brand, registry per ADR 0045",
-        "x": 940,
-        "y": 2065.3,
+        "x": 821,
+        "y": 2427.3,
         "width": 613,
         "height": 888,
         "rooms": [
@@ -5052,8 +4556,8 @@
             ],
             "label": "AG Luxury",
             "parent": null,
-            "x": 1232,
-            "y": 2383.3,
+            "x": 1113,
+            "y": 2745.3,
             "width": 256,
             "height": 127
           },
@@ -5064,8 +4568,8 @@
             ],
             "label": "AG Personal Brand",
             "parent": null,
-            "x": 1232,
-            "y": 2534.3,
+            "x": 1113,
+            "y": 2896.3,
             "width": 299,
             "height": 260
           },
@@ -5076,8 +4580,8 @@
             ],
             "label": "The Strong Ones",
             "parent": "ag-personal-brand",
-            "x": 1253,
-            "y": 2568.3,
+            "x": 1134,
+            "y": 2930.3,
             "width": 262,
             "height": 127
           },
@@ -5088,8 +4592,8 @@
             ],
             "label": "Expert Partners",
             "parent": null,
-            "x": 1232,
-            "y": 2113.3,
+            "x": 1113,
+            "y": 2475.3,
             "width": 269,
             "height": 246
           },
@@ -5100,8 +4604,8 @@
             ],
             "label": "Don Hobbs",
             "parent": "expert-partners",
-            "x": 1253,
-            "y": 2230.3,
+            "x": 1134,
+            "y": 2592.3,
             "width": 232,
             "height": 113
           },
@@ -5113,8 +4617,8 @@
             ],
             "label": "FAM and EPIC",
             "parent": null,
-            "x": 1232,
-            "y": 2818.3,
+            "x": 1113,
+            "y": 3180.3,
             "width": 184,
             "height": 113
           }
@@ -5124,8 +4628,8 @@
         "id": "content",
         "label": "The marketing engines",
         "caption": "strategy, offers, content, conversations",
-        "x": 228,
-        "y": 387,
+        "x": 109,
+        "y": 749,
         "width": 656,
         "height": 3997,
         "rooms": []
@@ -5134,8 +4638,8 @@
         "id": "hands",
         "label": "The hands",
         "caption": "funnel work and account operations",
-        "x": 940,
-        "y": 3446,
+        "x": 177,
+        "y": 5635,
         "width": 588,
         "height": 2285,
         "rooms": []
@@ -5144,18 +4648,18 @@
         "id": "routing",
         "label": "Session machinery",
         "caption": "routing, ledgers, session lifecycle",
-        "x": 33,
-        "y": 4414,
+        "x": 821,
+        "y": 5177.3,
         "width": 851,
-        "height": 2229,
+        "height": 1733.8,
         "rooms": []
       },
       {
         "id": "finance",
         "label": "The money",
         "caption": "cash, close, runway",
-        "x": 82.5,
-        "y": 8,
+        "x": 18,
+        "y": 5256,
         "width": 752,
         "height": 349,
         "rooms": []
@@ -5164,8 +4668,8 @@
         "id": "cataloging",
         "label": "The librarians",
         "caption": "catalogs and registries",
-        "x": 318.5,
-        "y": 6673,
+        "x": 254,
+        "y": 4776,
         "width": 280,
         "height": 450,
         "rooms": []
