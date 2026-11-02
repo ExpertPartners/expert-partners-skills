@@ -43,7 +43,8 @@ tool list or an old config. Verified live Nov 2, 2026 after the Nov 1 M2 rebuild
 - `cua_ember` and the underscore `playwright_ember` launcher (`--user-data-dir
   .../ember-codex`) are retired. Both pointed at `/Users/allison` on the M2, an account that
   no longer exists, and the second one started a separate automation profile. Both are
-  switched off in Codex's config.
+  removed from Codex's config on the M4, so in Codex the tool name `playwright_ember` now
+  means only the live route.
 - Never use Claude in Chrome, the Codex browser, Chrome or computer-use plugins, or a local
   Playwright plugin. Each one drives Allison's M4 or a signed-out browser.
 
