@@ -36,7 +36,7 @@ const NODE_DEFAULTS = { tier: 'plugin', zone: 'content', status: 'live', inherit
 export function graphFor(nodes) {
   return {
     schema: 'skill-map/v1',
-    generatedFrom: { eps: 'fixture', aura: 'fixture' },
+    generatedFrom: { eps: 'fixture' },
     zones: ['brain', 'content', 'hands'],
     brands: {},
     nodes: nodes.map(n => ({ ...NODE_DEFAULTS, ...n })),
@@ -74,6 +74,7 @@ export function makeRepo(mutate = s => s) {
       'plugins/alpha/skills/alpha-two': skillMd({ name: 'alpha-two', description: 'Does the second alpha job.', zone: 'hands', calls: ['alpha-one'], defersTo: ['house-one'] }),
       'plugins/household/skills/house-one': skillMd({ name: 'house-one', description: 'Household inbox sweep.', zone: 'hands' }),
       'skills/solo': skillMd({ name: 'solo', description: 'A standalone skill.', tier: 'organization', zone: 'brain' }),
+      'skills/old-thing': skillMd({ name: 'old-thing', description: 'An old job.', status: 'retired', tier: 'project', zone: 'brain', subtitle: 'an old job' }),
     },
     nodes: [
       { id: 'kit-writer', source: 'eps:plugins/agent-kit/skills/kit-writer/SKILL.md', repo: 'eps', status: 'designed', subtitle: 'bios on demand', inherits: [] },
@@ -82,7 +83,7 @@ export function makeRepo(mutate = s => s) {
       { id: 'alpha-two', source: 'eps:plugins/alpha/skills/alpha-two/SKILL.md', repo: 'eps', zone: 'hands', calls: ['alpha-one'], defersTo: ['house-one'] },
       { id: 'house-one', source: 'eps:plugins/household/skills/house-one/SKILL.md', repo: 'eps', zone: 'hands' },
       { id: 'solo', source: 'eps:skills/solo/SKILL.md', repo: 'eps', tier: 'organization', zone: 'brain' },
-      { id: 'aura-thing', source: 'aura:.claude/skills/aura-thing/SKILL.md', repo: 'aura', tier: 'project', zone: 'brain', status: 'retired', subtitle: 'an old aura job' },
+      { id: 'old-thing', source: 'eps:skills/old-thing/SKILL.md', repo: 'eps', tier: 'project', zone: 'brain', status: 'retired', subtitle: 'an old job' },
     ],
     config: {
       packages: {

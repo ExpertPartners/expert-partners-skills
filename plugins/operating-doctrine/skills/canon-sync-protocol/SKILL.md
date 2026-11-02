@@ -3,7 +3,7 @@ name: canon-sync-protocol
 description: "Fires automatically, every time, the moment a canon doc, doctrine rule, operating rule, Claude project rule, or rule-encoding skill is created, changed, approved, or promoted, even if nobody says sync. Claude initiates the sync without being asked. The rule lives in one Drive home (the HQ Rulebook or the owning brain), the decision goes in the Decision Log with a Replaces note, and skills reach every surface only through the marketplace plugin, never by zip. Noticing is the trigger, never being asked. It inherits the operating-doctrine and never overrides it."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Adopted into canonical 2026-08-07 (Aura - Code Rule Fix - Both Shelves Rule lane).
-# Ruling of record: aura intake/2026-08-08-ruling-canon-sync-protocol-repo-home-and-shelf-surfaces.md (2f70ea0).
+# Ruling of record: history in GitHub Archive (2f70ea0).
 # Before this adoption the skill existed ONLY as a claude.ai user-scope copy with no repo home,
 # so no Code session could maintain it. That copy is a DEPLOYED COPY of this source from now on.
 tier: plugin
@@ -15,13 +15,13 @@ subtitle: "canon and rule changes reach every surface, automatically"
 
 # Canon Sync Protocol -- v2.0 (2026-10-13)
 
-<!-- RULED-BY: aura/decisions/0107-retire-routing-naming-ceremony.md date:2026-10-12 superseded naming text removed -->
+<!-- RULED-BY: history in GitHub Archive date:2026-10-12 superseded naming text removed -->
 
 Rule authored by Allison, 2026-07-28. Her words: this is the Ten Commandments. Any time a canon doc or a rule changes anywhere, the sync happens automatically, 100 percent of the time, and Claude initiates it. Allison never has to ask, never has to remember, and never discovers a stale copy later.
 
 v2.0 (2026-10-13, Decision Log 2026-10-13, the clean-slate cutover). Canon has one home, Google Drive. The partnersync repo copy, the canon folder id, the Team GPT surface, and the organization skills upload shelf are retired, and this supersedes the surface lists in the v1.1 history below. Skills reach every surface only through the marketplace plugin, no zips, ever.
 
-History, kept as written. v1.1 amendment 2026-08-07, ruled YES by Allison, both halves (ruling of record aura intake/2026-08-08-ruling-canon-sync-protocol-repo-home-and-shelf-surfaces.md, commit 2f70ea0). Half one, this skill gets a canonical home in the expert-partners-skills repo like every other rule-bearing skill, and the claude.ai user-scope copy becomes a deployed copy of it. Half two, the surface list gains the two skill shelves. The gap that forced both halves was found by the Both Shelves Rule lane and is worth stating plainly, because it is the exact failure this protocol exists to prevent: the trigger list below has always fired on a rule-encoding skill being created or overwritten, while the surface list named Drive, project knowledge, the partnersync repo, and the paused Team GPT. Not one of those is a skill shelf. The protocol caught skill changes and routed them nowhere.
+History, kept as written. v1.1 amendment 2026-08-07, ruled YES by Allison, both halves (ruling of record: history in GitHub Archive, commit 2f70ea0). Half one, this skill gets a canonical home in the expert-partners-skills repo like every other rule-bearing skill, and the claude.ai user-scope copy becomes a deployed copy of it. Half two, the surface list gains the two skill shelves. The gap that forced both halves was found by the Both Shelves Rule lane and is worth stating plainly, because it is the exact failure this protocol exists to prevent: the trigger list below has always fired on a rule-encoding skill being created or overwritten, while the surface list named Drive, project knowledge, the partnersync repo, and the paused Team GPT. Not one of those is a skill shelf. The protocol caught skill changes and routed them nowhere.
 
 ## When this fires
 

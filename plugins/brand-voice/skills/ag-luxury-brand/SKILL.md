@@ -1,6 +1,6 @@
 ---
 name: ag-luxury-brand
-description: "Apply the AG Luxury brand voice to consumer-facing real estate content for Allison Gaddy: listing copy, listing films and video scripts, bios, case studies, press materials, site copy, social, and email aimed at luxury sellers and buyers in North Dallas and the western ranch corridor. The public-facing brand is Allison Gaddy, the full name; AG Luxury is the internal workspace name only (aura ADR 0045). Producer positioning (The Producer Came Home), warm editorial voice, situational point of view, no hype, no urgency, never coaching or recruiting energy, never agents as the audience, never EP/EPIC/FAM vocabulary. Use for any content that represents Allison as a luxury real estate advisor to consumers -- NOT for Expert Partners, EPIC, FAM, or AG Personal Brand content. It inherits the operating-doctrine and never overrides it."
+description: "Apply the AG Luxury brand voice to consumer-facing real estate content for Allison Gaddy: listing copy, listing films and video scripts, bios, case studies, press materials, site copy, social, and email aimed at luxury sellers and buyers in North Dallas and the western ranch corridor. The public-facing brand is Allison Gaddy, the full name; AG Luxury is the internal workspace name only (ADR 0045). Producer positioning (The Producer Came Home), warm editorial voice, situational point of view, no hype, no urgency, never coaching or recruiting energy, never agents as the audience, never EP/EPIC/FAM vocabulary. Use for any content that represents Allison as a luxury real estate advisor to consumers -- NOT for Expert Partners, EPIC, FAM, or AG Personal Brand content. It inherits the operating-doctrine and never overrides it."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: brands
@@ -26,7 +26,7 @@ The live brand guide at https://brand.agluxurytx.com/ is the current source of b
 
 ## Naming ruling (never deviate)
 
-- The public-facing brand is Allison Gaddy, the full name. "AG Luxury" never appears in consumer copy. AG Luxury is the internal workspace and registry name only, per aura ADR 0045.
+- The public-facing brand is Allison Gaddy, the full name. "AG Luxury" never appears in consumer copy. AG Luxury is the internal workspace and registry name only, per ADR 0045 (history in GitHub Archive).
 - Rejected names, never use: Allison Gaddy Luxury, AG Luxury, Gaddy Luxury, Gaddy Homes, The Allison Gaddy Group, The Gaddy Group. The full name is the brand. Luxury is communicated by the work, not written into the name.
 - The lockup reads Allison Gaddy, Luxury Real Estate Advisor, eXp Luxury. The exact title is verified against current TREC and eXp rules before any publication (the strategist brief flags this verification as a standing pre-publication step; the formal listing bio uses Broker Associate | eXp Luxury, her licensed title).
 - The AG monogram is the secondary mark. Official eXp Luxury artwork stays a separate approved mark, never redrawn or fused into the Allison Gaddy identity.

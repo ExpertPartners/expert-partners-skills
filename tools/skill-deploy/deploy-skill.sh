@@ -29,7 +29,7 @@
 #                  as of 2026-08-07).
 #   <plugin-name>  (with --bundle) directory under plugins/ -- zips the whole
 #                  plugin bundle instead of one skill.
-#   --to           deployed-copy destination dir (e.g. aura .claude/skills).
+#   --to           deployed-copy destination dir (e.g. a repo's .claude/skills).
 #                  The copy lands at <deploy-dir>/<skill-name>/. Not valid
 #                  with --bundle; bundles are zip-only archival artifacts.
 #   --zip          build a claude.ai upload zip (skill) or an archival
@@ -37,7 +37,7 @@
 #   --bundle       treat the positional argument as a plugin name and zip
 #                  plugins/<plugin-name>/ in full, manifest included.
 #   --from         canonical source directory for a skill whose canonical home
-#                  is NOT this repo (the aura-native project skills under aura
+#                  is NOT this repo (project-native skills under another repo's
 #                  .claude/skills, for example). The DEPLOYED COPY header names
 #                  that home by its git remote repo name and repo-relative path.
 #                  A skill that has a canonical home in this repo refuses --from
@@ -49,8 +49,8 @@
 #                  skill: a canonical home in this repo (skills/<name> or
 #                  plugins/*/skills/<name>) wins; otherwise the mount directory
 #                  itself is the canonical home (--from <mount>/<name>). This is
-#                  how aura .claude/skills (the Claude Code project mount)
-#                  produces aura .agents/skills (the Codex repo-scope mount,
+#                  how a repo's .claude/skills (the Claude Code project mount)
+#                  produces its .agents/skills (the Codex repo-scope mount,
 #                  learn.chatgpt.com/docs/build-skills, verified 2026-09-04).
 #                  A skill directory present in --to but absent from the mount
 #                  is an ORPHAN and fails the run; removing it is a deliberate
@@ -69,8 +69,8 @@
 #                  output. Valid only with --to, never with --verify.
 #   --verify-copies <mount-dir>
 #                  write nothing. In a mount that MIXES canonical skills and
-#                  deployed copies (aura .claude/skills: seven aura-native
-#                  canonicals beside three copies of this repo's skills), verify
+#                  deployed copies (a .claude/skills holding its own native
+#                  canonicals beside copies of this repo's skills), verify
 #                  every skill directory that carries a DEPLOYED COPY header
 #                  against the canonical home in this repo, exactly as --verify
 #                  does, and leave the header-less canonicals alone. Exits
@@ -154,7 +154,7 @@ manifest() { # write checksums.sha256 over a dir (excluding the manifest itself)
   # LC_ALL=C pins the sort: `sort` honors LC_COLLATE, so an en_US.UTF-8 caller
   # would otherwise order "./reference/x" before "./SKILL.md" and write a
   # manifest whose line order differs from the committed one for no content
-  # reason (found 2026-09-04, aura issue #212 review).
+  # reason (found 2026-09-04 in review).
   ( cd "$1" && find . -type f ! -name checksums.sha256 -print0 | LC_ALL=C sort -z \
     | xargs -0 shasum -a 256 > checksums.sha256 )
 }
@@ -489,7 +489,7 @@ PY
 }
 
 # ---------------------------------------------------------------------------
-# Deployed-copy machinery (added 2026-09-04, aura issue #212). One render path
+# Deployed-copy machinery (added 2026-09-04). One render path
 # produces every deployed copy, whatever its canonical home, so a copy can
 # always be regenerated and diffed. The DEPLOYED COPY header format below is a
 # contract read by tools/skill-map/extract-skills-graph.mjs, which classifies a
@@ -507,8 +507,8 @@ has_deployed_header() { frontmatter_of "$1" | grep -q '^# DEPLOYED COPY ('; }
 header_names_canonical() { frontmatter_of "$1" | grep -qF -- "# $2. Deployed at "; }
 
 # canonical_label_external <dir> -> "<repo> <repo-relative-path>/SKILL.md"
-# The repo name comes from the origin remote (aura, not the local folder name
-# Aura), so the label is stable across clones and worktrees.
+# The repo name comes from the origin remote, not the local folder name, so the
+# label is stable across clones and worktrees.
 canonical_label_external() {
   local dir="$1" top url repo prefix
   top=$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null) \
@@ -516,10 +516,6 @@ canonical_label_external() {
   url=$(git -C "$dir" remote get-url origin 2>/dev/null || true)
   if [ -n "$url" ]; then repo="$(basename "${url%.git}")"; else repo="$(basename "$top")"; fi
   repo="$(printf '%s' "$repo" | tr '[:upper:]' '[:lower:]')"
-  # aura was renamed to ExpertPartners/Development on GitHub (2026-10). Keep the
-  # established "aura" label so existing deployed headers, --verify, and the
-  # skill-map's aura key stay valid across the rename.
-  [ "$repo" = "development" ] && repo="aura"
   prefix="$(git -C "$dir" rev-parse --show-prefix)"; prefix="${prefix%/}"
   [ -n "$prefix" ] || { echo "FATAL: --from $dir is a repository root, not a skill directory" >&2; return 1; }
   echo "$repo $prefix/SKILL.md"

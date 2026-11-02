@@ -1,8 +1,8 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-11-02T17:00:21Z",
-  "verifiedAt": "2026-11-02T17:00:21Z",
+  "generatedAt": "2026-11-02T19:21:08Z",
+  "verifiedAt": "2026-11-02T19:21:08Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
@@ -127,11 +127,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the brand-voice plugin, version 0.6.6, in the expert-partners plugin marketplace.",
+        "Packaged as the brand-voice plugin, version 0.6.7, in the expert-partners plugin marketplace.",
         "Contains 7 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.6.6.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.6.7.",
       "containsSkillIds": [
         "ag-luxury-brand",
         "ag-personal-brand",
@@ -145,7 +145,7 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/brand-voice",
-        "packageVersion": "0.6.6",
+        "packageVersion": "0.6.7",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
         "skillCount": "7"
@@ -187,11 +187,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the content-engines plugin, version 0.9.0, in the expert-partners plugin marketplace.",
+        "Packaged as the content-engines plugin, version 0.9.1, in the expert-partners plugin marketplace.",
         "Contains 16 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.9.0.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.9.1.",
       "containsSkillIds": [
         "brand-film-reverse-engineering",
         "content-coach",
@@ -214,7 +214,7 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/content-engines",
-        "packageVersion": "0.9.0",
+        "packageVersion": "0.9.1",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
         "skillCount": "16"
@@ -416,11 +416,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the operating-doctrine plugin, version 2.76.0, in the expert-partners plugin marketplace.",
+        "Packaged as the operating-doctrine plugin, version 2.77.0, in the expert-partners plugin marketplace.",
         "Contains 27 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 2.76.0.",
+      "lastVerified": "Not yet verified on any platform. Package version 2.77.0.",
       "containsSkillIds": [
         "ask-me-questions",
         "batch-first-execution",
@@ -454,7 +454,7 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/operating-doctrine",
-        "packageVersion": "2.76.0",
+        "packageVersion": "2.77.0",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
         "skillCount": "27"
@@ -494,11 +494,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the research-ops plugin, version 0.5.0, in the expert-partners plugin marketplace.",
+        "Packaged as the research-ops plugin, version 0.5.1, in the expert-partners plugin marketplace.",
         "Contains 11 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.5.0.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.5.1.",
       "containsSkillIds": [
         "capability-currency",
         "capability-refresh",
@@ -516,7 +516,7 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/research-ops",
-        "packageVersion": "0.5.0",
+        "packageVersion": "0.5.1",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
         "skillCount": "11"
@@ -566,11 +566,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the systems-map plugin, version 0.6.6, in the expert-partners plugin marketplace.",
+        "Packaged as the systems-map plugin, version 0.6.7, in the expert-partners plugin marketplace.",
         "Contains 1 skill. It activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.6.6.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.6.7.",
       "containsSkillIds": [
         "expert-partners-systems-map"
       ],
@@ -578,7 +578,7 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/systems-map",
-        "packageVersion": "0.6.6",
+        "packageVersion": "0.6.7",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
         "skillCount": "1"
@@ -620,7 +620,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.6.",
+        "Packaged in the Brand Voice plugin, version 0.6.7.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -635,7 +635,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.6 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.6.7 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "ag-luxury"
       },
@@ -698,7 +698,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.6.",
+        "Packaged in the Brand Voice plugin, version 0.6.7.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -713,7 +713,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.6 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.6.7 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "ag-personal-brand"
       },
@@ -899,7 +899,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -914,7 +914,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -950,7 +950,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -967,7 +967,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "session-model-advisor, code-block-routing"
       },
@@ -1009,7 +1009,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1024,7 +1024,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brain",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -1147,7 +1147,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.0.",
+        "Packaged in the Content Engines plugin, version 0.9.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1162,7 +1162,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -1230,7 +1230,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.6.",
+        "Packaged in the Brand Voice plugin, version 0.6.7.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1251,7 +1251,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.6 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.6.7 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "ep-brand, fam-epic-brand, ag-personal-brand, ag-luxury-brand, don-hobbs-brand, the-strong-ones-brand"
       },
@@ -1293,7 +1293,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1310,7 +1310,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "ember-browser-routing, connection-first-implementation"
       },
@@ -1353,7 +1353,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1368,7 +1368,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -1466,55 +1466,6 @@
       "example": false
     },
     {
-      "id": "can-i-close",
-      "humanName": "Can I Close",
-      "kind": "skill",
-      "summary": "Plain language safe-to-close check.",
-      "status": "Unknown",
-      "collectionIds": [],
-      "categories": [
-        "Session machinery"
-      ],
-      "portable": "unknown",
-      "verifiedSurfaces": [],
-      "invocationInstructions": [
-        "Standalone skill in the aura repository.",
-        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
-      ],
-      "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
-      "containsSkillIds": [],
-      "relatedIds": [
-        "session-audit"
-      ],
-      "accessNote": "Where this is available has not been verified yet.",
-      "technicalDetail": {
-        "canonicalSource": "aura/.claude/skills/can-i-close/SKILL.md",
-        "lifecycle": "live",
-        "tier": "project",
-        "zone": "routing",
-        "packaging": "standalone",
-        "inherits": "operating-doctrine",
-        "calls": "session-audit"
-      },
-      "keywords": [
-        "can",
-        "check",
-        "close",
-        "language",
-        "machinery",
-        "plain",
-        "safe",
-        "session"
-      ],
-      "bestFor": [
-        "plain language safe-to-close check"
-      ],
-      "useCases": [],
-      "askExamples": [],
-      "example": false
-    },
-    {
       "id": "canon-sync-protocol",
       "humanName": "Canon Sync Protocol",
       "kind": "skill",
@@ -1528,7 +1479,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1543,7 +1494,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -1727,7 +1678,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.5.0.",
+        "Packaged in the Research Ops plugin, version 0.5.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1742,7 +1693,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.5.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -1788,7 +1739,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.5.0.",
+        "Packaged in the Research Ops plugin, version 0.5.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1803,7 +1754,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.5.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -2147,7 +2098,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2163,7 +2114,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "pin"
       },
@@ -2280,7 +2231,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2295,7 +2246,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -2354,7 +2305,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.0.",
+        "Packaged in the Content Engines plugin, version 0.9.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2369,7 +2320,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -2474,7 +2425,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2490,7 +2441,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "code-block-routing"
       },
@@ -2606,7 +2557,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2621,7 +2572,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -2670,7 +2621,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.0.",
+        "Packaged in the Content Engines plugin, version 0.9.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2685,7 +2636,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -2727,7 +2678,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2743,7 +2694,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "deliverable-link"
       },
@@ -2786,7 +2737,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.6.",
+        "Packaged in the Brand Voice plugin, version 0.6.7.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2801,7 +2752,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.6 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.6.7 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "don-hobbs"
       },
@@ -2850,7 +2801,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2865,7 +2816,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -2889,46 +2840,6 @@
       "bestFor": [
         "browser work on Ember's M2, never Allison's M4"
       ],
-      "useCases": [],
-      "askExamples": [],
-      "example": false
-    },
-    {
-      "id": "ember-reactivate",
-      "humanName": "Ember Reactivate",
-      "kind": "skill",
-      "summary": "Ember Reactivate.",
-      "status": "Retired",
-      "collectionIds": [],
-      "categories": [
-        "Session machinery"
-      ],
-      "portable": "unknown",
-      "verifiedSurfaces": [],
-      "invocationInstructions": [
-        "Standalone skill in the aura repository.",
-        "Do not use for new work."
-      ],
-      "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: retired.",
-      "containsSkillIds": [],
-      "relatedIds": [],
-      "accessNote": "Retired. Kept for history only.",
-      "technicalDetail": {
-        "canonicalSource": "aura/.claude/skills/ember-reactivate/SKILL.md",
-        "lifecycle": "retired",
-        "tier": "project",
-        "zone": "routing",
-        "packaging": "standalone",
-        "inherits": "operating-doctrine"
-      },
-      "keywords": [
-        "ember",
-        "machinery",
-        "reactivate",
-        "session"
-      ],
-      "bestFor": [],
       "useCases": [],
       "askExamples": [],
       "example": false
@@ -3004,7 +2915,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.6.",
+        "Packaged in the Brand Voice plugin, version 0.6.7.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3019,7 +2930,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.6 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.6.7 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "expert-partners"
       },
@@ -3060,7 +2971,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3075,7 +2986,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -3127,7 +3038,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Systems Map plugin, version 0.6.6.",
+        "Packaged in the Systems Map plugin, version 0.6.7.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3142,7 +3053,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brain",
-        "packaging": "systems-map plugin v0.6.6 (expert-partners marketplace)",
+        "packaging": "systems-map plugin v0.6.7 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -3187,7 +3098,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.6.",
+        "Packaged in the Brand Voice plugin, version 0.6.7.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3202,7 +3113,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.6 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.6.7 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "fam, epic"
       },
@@ -3247,7 +3158,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3262,7 +3173,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -3590,7 +3501,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.0.",
+        "Packaged in the Content Engines plugin, version 0.9.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3608,7 +3519,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "ep-brand, fam-epic-brand, ag-personal-brand"
       },
@@ -3985,7 +3896,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.5.0.",
+        "Packaged in the Research Ops plugin, version 0.5.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4000,7 +3911,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "cataloging",
-        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.5.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -4034,50 +3945,6 @@
       "example": false
     },
     {
-      "id": "handoff",
-      "humanName": "Handoff",
-      "kind": "skill",
-      "summary": "Hand work to another session.",
-      "status": "Unknown",
-      "collectionIds": [],
-      "categories": [
-        "Session machinery"
-      ],
-      "portable": "unknown",
-      "verifiedSurfaces": [],
-      "invocationInstructions": [
-        "Standalone skill in the aura repository.",
-        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
-      ],
-      "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
-      "containsSkillIds": [],
-      "relatedIds": [],
-      "accessNote": "Where this is available has not been verified yet.",
-      "technicalDetail": {
-        "canonicalSource": "aura/tools/continuity-skills/handoff/SKILL.md",
-        "lifecycle": "live",
-        "tier": "user",
-        "zone": "routing",
-        "packaging": "standalone",
-        "inherits": "operating-doctrine"
-      },
-      "keywords": [
-        "another",
-        "hand",
-        "handoff",
-        "machinery",
-        "session",
-        "work"
-      ],
-      "bestFor": [
-        "hand work to another session"
-      ],
-      "useCases": [],
-      "askExamples": [],
-      "example": false
-    },
-    {
       "id": "hero-video-preproduction",
       "humanName": "Hero Video Pre-Production",
       "kind": "skill",
@@ -4091,7 +3958,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.0.",
+        "Packaged in the Content Engines plugin, version 0.9.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4106,7 +3973,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -4154,7 +4021,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.0.",
+        "Packaged in the Content Engines plugin, version 0.9.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4169,7 +4036,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -4417,7 +4284,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4432,7 +4299,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -4480,7 +4347,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4497,7 +4364,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "code-block-routing, pin"
       },
@@ -5113,7 +4980,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.0.",
+        "Packaged in the Content Engines plugin, version 0.9.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -5129,7 +4996,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "xavier-offer-builder"
       },
@@ -5734,7 +5601,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -5749,7 +5616,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brain",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)"
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)"
       },
       "keywords": [
         "brain",
@@ -5771,50 +5638,6 @@
       "example": false
     },
     {
-      "id": "park",
-      "humanName": "Park",
-      "kind": "skill",
-      "summary": "Park work for a later resume.",
-      "status": "Unknown",
-      "collectionIds": [],
-      "categories": [
-        "Session machinery"
-      ],
-      "portable": "unknown",
-      "verifiedSurfaces": [],
-      "invocationInstructions": [
-        "Standalone skill in the aura repository.",
-        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
-      ],
-      "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
-      "containsSkillIds": [],
-      "relatedIds": [],
-      "accessNote": "Where this is available has not been verified yet.",
-      "technicalDetail": {
-        "canonicalSource": "aura/tools/continuity-skills/park/SKILL.md",
-        "lifecycle": "live",
-        "tier": "user",
-        "zone": "routing",
-        "packaging": "standalone",
-        "inherits": "operating-doctrine"
-      },
-      "keywords": [
-        "later",
-        "machinery",
-        "park",
-        "resume",
-        "session",
-        "work"
-      ],
-      "bestFor": [
-        "park work for a later resume"
-      ],
-      "useCases": [],
-      "askExamples": [],
-      "example": false
-    },
-    {
       "id": "pin",
       "humanName": "Pin",
       "kind": "skill",
@@ -5828,7 +5651,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -5844,7 +5667,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "code-block-routing"
       },
@@ -5890,7 +5713,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.0.",
+        "Packaged in the Content Engines plugin, version 0.9.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -5905,7 +5728,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -5953,7 +5776,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.0.",
+        "Packaged in the Content Engines plugin, version 0.9.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -5968,7 +5791,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6016,7 +5839,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.0.",
+        "Packaged in the Content Engines plugin, version 0.9.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6031,7 +5854,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6131,100 +5954,6 @@
       "example": false
     },
     {
-      "id": "project-architect",
-      "humanName": "Project Architect",
-      "kind": "skill",
-      "summary": "Where a piece of work should live.",
-      "status": "Unknown",
-      "collectionIds": [],
-      "categories": [
-        "Session machinery"
-      ],
-      "portable": "unknown",
-      "verifiedSurfaces": [],
-      "invocationInstructions": [
-        "Standalone skill in the aura repository.",
-        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
-      ],
-      "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
-      "containsSkillIds": [],
-      "relatedIds": [
-        "new-project",
-        "project-builder"
-      ],
-      "accessNote": "Where this is available has not been verified yet.",
-      "technicalDetail": {
-        "canonicalSource": "aura/.claude/skills/project-architect/SKILL.md",
-        "lifecycle": "live",
-        "tier": "project",
-        "zone": "routing",
-        "packaging": "standalone",
-        "inherits": "operating-doctrine",
-        "calls": "project-builder, new-project"
-      },
-      "keywords": [
-        "architect",
-        "live",
-        "machinery",
-        "piece",
-        "project",
-        "session",
-        "should",
-        "where",
-        "work"
-      ],
-      "bestFor": [
-        "where a piece of work should live"
-      ],
-      "useCases": [],
-      "askExamples": [],
-      "example": false
-    },
-    {
-      "id": "project-builder",
-      "humanName": "Project Builder",
-      "kind": "skill",
-      "summary": "Project Builder.",
-      "status": "Unknown",
-      "collectionIds": [],
-      "categories": [
-        "Session machinery"
-      ],
-      "portable": "unknown",
-      "verifiedSurfaces": [],
-      "invocationInstructions": [
-        "Standalone skill in the aura repository.",
-        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
-      ],
-      "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
-      "containsSkillIds": [],
-      "relatedIds": [
-        "repo-standards"
-      ],
-      "accessNote": "Where this is available has not been verified yet.",
-      "technicalDetail": {
-        "canonicalSource": "aura/.claude/skills/project-builder/SKILL.md",
-        "lifecycle": "live",
-        "tier": "project",
-        "zone": "routing",
-        "packaging": "standalone",
-        "inherits": "operating-doctrine",
-        "calls": "repo-standards"
-      },
-      "keywords": [
-        "builder",
-        "machinery",
-        "project",
-        "session"
-      ],
-      "bestFor": [],
-      "useCases": [],
-      "askExamples": [],
-      "example": false
-    },
-    {
       "id": "quick-update",
       "humanName": "Quick Update",
       "kind": "skill",
@@ -6238,7 +5967,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6253,7 +5982,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6292,7 +6021,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.0.",
+        "Packaged in the Content Engines plugin, version 0.9.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6307,7 +6036,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6508,7 +6237,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6523,7 +6252,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brain",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6567,7 +6296,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6582,7 +6311,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6625,7 +6354,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.5.0.",
+        "Packaged in the Research Ops plugin, version 0.5.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6640,7 +6369,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "cataloging",
-        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.5.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6676,51 +6405,6 @@
       "useCases": [
         "Use whenever a research report, deep-research output, or external analysis appears in conversation with intent to use it, not just intent to read it once and discard it."
       ],
-      "askExamples": [],
-      "example": false
-    },
-    {
-      "id": "resume-work",
-      "humanName": "Resume Work",
-      "kind": "skill",
-      "summary": "Resume parked or handed-off work.",
-      "status": "Unknown",
-      "collectionIds": [],
-      "categories": [
-        "Session machinery"
-      ],
-      "portable": "unknown",
-      "verifiedSurfaces": [],
-      "invocationInstructions": [
-        "Standalone skill in the aura repository.",
-        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
-      ],
-      "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
-      "containsSkillIds": [],
-      "relatedIds": [],
-      "accessNote": "Where this is available has not been verified yet.",
-      "technicalDetail": {
-        "canonicalSource": "aura/tools/continuity-skills/resume-work/SKILL.md",
-        "lifecycle": "live",
-        "tier": "user",
-        "zone": "routing",
-        "packaging": "standalone",
-        "inherits": "operating-doctrine"
-      },
-      "keywords": [
-        "handed",
-        "machinery",
-        "off",
-        "parked",
-        "resume",
-        "session",
-        "work"
-      ],
-      "bestFor": [
-        "resume parked or handed-off work"
-      ],
-      "useCases": [],
       "askExamples": [],
       "example": false
     },
@@ -6856,98 +6540,6 @@
       "example": false
     },
     {
-      "id": "session-audit",
-      "humanName": "Session Audit",
-      "kind": "skill",
-      "summary": "Structured session audit for consolidation.",
-      "status": "Unknown",
-      "collectionIds": [],
-      "categories": [
-        "Session machinery"
-      ],
-      "portable": "unknown",
-      "verifiedSurfaces": [],
-      "invocationInstructions": [
-        "Standalone skill in the aura repository.",
-        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
-      ],
-      "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
-      "containsSkillIds": [],
-      "relatedIds": [],
-      "accessNote": "Where this is available has not been verified yet.",
-      "technicalDetail": {
-        "canonicalSource": "aura/.claude/skills/session-audit/SKILL.md",
-        "lifecycle": "live",
-        "tier": "project",
-        "zone": "routing",
-        "packaging": "standalone",
-        "inherits": "operating-doctrine"
-      },
-      "keywords": [
-        "audit",
-        "consolidation",
-        "machinery",
-        "session",
-        "structured"
-      ],
-      "bestFor": [
-        "structured session audit for consolidation"
-      ],
-      "useCases": [],
-      "askExamples": [],
-      "example": false
-    },
-    {
-      "id": "session-closeout",
-      "humanName": "Session Closeout",
-      "kind": "skill",
-      "summary": "Handoff note to main, clean worktree.",
-      "status": "Unknown",
-      "collectionIds": [],
-      "categories": [
-        "Session machinery"
-      ],
-      "portable": "unknown",
-      "verifiedSurfaces": [],
-      "invocationInstructions": [
-        "Standalone skill in the aura repository.",
-        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
-      ],
-      "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
-      "containsSkillIds": [],
-      "relatedIds": [
-        "session-audit"
-      ],
-      "accessNote": "Where this is available has not been verified yet.",
-      "technicalDetail": {
-        "canonicalSource": "aura/.claude/skills/session-closeout/SKILL.md",
-        "lifecycle": "live",
-        "tier": "project",
-        "zone": "routing",
-        "packaging": "standalone",
-        "inherits": "operating-doctrine",
-        "calls": "session-audit"
-      },
-      "keywords": [
-        "clean",
-        "closeout",
-        "handoff",
-        "machinery",
-        "main",
-        "note",
-        "session",
-        "worktree"
-      ],
-      "bestFor": [
-        "handoff note to main, clean worktree"
-      ],
-      "useCases": [],
-      "askExamples": [],
-      "example": false
-    },
-    {
       "id": "session-home",
       "humanName": "Session Home",
       "kind": "skill",
@@ -7021,7 +6613,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7036,7 +6628,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7077,7 +6669,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7094,7 +6686,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "code-block-routing, pin"
       },
@@ -7133,7 +6725,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7148,7 +6740,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7187,7 +6779,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7202,7 +6794,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7250,7 +6842,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.5.0.",
+        "Packaged in the Research Ops plugin, version 0.5.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7265,7 +6857,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "cataloging",
-        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.5.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7303,7 +6895,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.0.",
+        "Packaged in the Content Engines plugin, version 0.9.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7318,7 +6910,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7369,7 +6961,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.5.0.",
+        "Packaged in the Research Ops plugin, version 0.5.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7384,7 +6976,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "cataloging",
-        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.5.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7426,7 +7018,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.5.0.",
+        "Packaged in the Research Ops plugin, version 0.5.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7442,7 +7034,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.5.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "video-discovery"
       },
@@ -7488,7 +7080,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.0.",
+        "Packaged in the Content Engines plugin, version 0.9.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7504,7 +7096,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "brand-voice"
       },
@@ -7558,48 +7150,6 @@
       "example": false
     },
     {
-      "id": "ss",
-      "humanName": "SS",
-      "kind": "skill",
-      "summary": "Screenshot shorthand.",
-      "status": "Designed",
-      "collectionIds": [],
-      "categories": [
-        "Session machinery"
-      ],
-      "portable": "unknown",
-      "verifiedSurfaces": [],
-      "invocationInstructions": [
-        "Standalone skill in the aura repository.",
-        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
-      ],
-      "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: designed.",
-      "containsSkillIds": [],
-      "relatedIds": [],
-      "accessNote": "Designed, not yet deployed. Availability depends on what your AI assistant can load.",
-      "technicalDetail": {
-        "canonicalSource": "aura/_tools/personal-skills/ss/SKILL.md",
-        "lifecycle": "designed",
-        "tier": "user",
-        "zone": "routing",
-        "packaging": "standalone",
-        "inherits": "operating-doctrine"
-      },
-      "keywords": [
-        "machinery",
-        "screenshot",
-        "session",
-        "shorthand"
-      ],
-      "bestFor": [
-        "screenshot shorthand"
-      ],
-      "useCases": [],
-      "askExamples": [],
-      "example": false
-    },
-    {
       "id": "stage-cards",
       "humanName": "Stage Cards",
       "kind": "skill",
@@ -7613,7 +7163,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.0.",
+        "Packaged in the Content Engines plugin, version 0.9.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7628,7 +7178,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7677,7 +7227,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7692,7 +7242,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7740,7 +7290,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.6.",
+        "Packaged in the Brand Voice plugin, version 0.6.7.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7755,7 +7305,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.6 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.6.7 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "the-strong-ones"
       },
@@ -7872,7 +7422,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.5.0.",
+        "Packaged in the Research Ops plugin, version 0.5.1.",
         "Do not use for new work."
       ],
       "sourceLinks": [],
@@ -7887,7 +7437,7 @@
         "lifecycle": "retired",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.5.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7924,7 +7474,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.5.0.",
+        "Packaged in the Research Ops plugin, version 0.5.1.",
         "Do not use for new work."
       ],
       "sourceLinks": [],
@@ -7939,7 +7489,7 @@
         "lifecycle": "retired",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.5.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7975,7 +7525,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.5.0.",
+        "Packaged in the Research Ops plugin, version 0.5.1.",
         "Do not use for new work."
       ],
       "sourceLinks": [],
@@ -7990,7 +7540,7 @@
         "lifecycle": "retired",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.5.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -8088,7 +7638,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.5.0.",
+        "Packaged in the Research Ops plugin, version 0.5.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -8103,7 +7653,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.5.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.5.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -8217,7 +7767,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.0.",
+        "Packaged in the Content Engines plugin, version 0.9.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -8232,7 +7782,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -8339,7 +7889,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 2.76.0.",
+        "Packaged in the Operating Doctrine plugin, version 2.77.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -8354,7 +7904,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v2.76.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v2.77.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -8408,7 +7958,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.0.",
+        "Packaged in the Content Engines plugin, version 0.9.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -8423,7 +7973,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.0 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [

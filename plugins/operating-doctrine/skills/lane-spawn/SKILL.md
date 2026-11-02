@@ -15,15 +15,15 @@ subtitle: "spawning new lanes with durable homes"
 
 # Lane Spawn
 
-<!-- RULED-BY: aura/decisions/0107-retire-routing-naming-ceremony.md date:2026-10-12 superseded naming text removed -->
+<!-- RULED-BY: history in GitHub Archive date:2026-10-12 superseded naming text removed -->
 
 Ruled by Allison 2026-08-03 (Aura: Strategic Advisor / Repo Walk). The problem this kills: a detour surfaces mid-lane, gets half-absorbed into the wrong conversation, derails the thread, and its state lives nowhere. The fix: every detour gets its own lane at the moment it appears, the origin lane names what it is waiting on, and the origin thread continues without a beat.
 
 v1.1 (ruled by Allison 2026-08-03, after a live misroute): every paste bound for ANY surface carries its envelope. See "Every paste carries the envelope" below.
 
-v1.3 (ruled by Allison 2026-08-07 afternoon, the worktree dispatch ruling; ruling of record aura intake/2026-08-07-ruling-dispatch-blocks-must-name-worktrees.md): the Code half of a spawn pair carries a `WORKTREE` line naming the isolated worktree the worker session creates and works in, per code-block-routing's Worktree Isolation. A block that spawns a Code session without one is malformed and bounces home.
+v1.3 (ruled by Allison 2026-08-07 afternoon, the worktree dispatch ruling; ruling of record: history in GitHub Archive): the Code half of a spawn pair carries a `WORKTREE` line naming the isolated worktree the worker session creates and works in, per code-block-routing's Worktree Isolation. A block that spawns a Code session without one is malformed and bounces home.
 
-v1.7 (ruled by Allison 2026-09-01, ruling of record aura intake/2026-09-01-ruling-table-and-worker-lifecycle-terminality.md, source aura issue #200): a finite mission carries its own completion contract, MISSION and DONE WHEN, so it can later prove it is finished from its own durable record instead of waiting for Allison to notice the work is over. The live failure that forced it, 2026-09-01: the Shared History Bridge work's durable records said its mission was accepted complete, and its conversation still behaved like an open work surface and began absorbing adjacent work, because nothing it owned ever stated what finishing looked like.
+v1.7 (ruled by Allison 2026-09-01, ruling of record and source issue #200: history in GitHub Archive): a finite mission carries its own completion contract, MISSION and DONE WHEN, so it can later prove it is finished from its own durable record instead of waiting for Allison to notice the work is over. The live failure that forced it, 2026-09-01: the Shared History Bridge work's durable records said its mission was accepted complete, and its conversation still behaved like an open work surface and began absorbing adjacent work, because nothing it owned ever stated what finishing looked like.
 
 A detour is any work item that surfaces inside a lane but is not that lane's job per its kickoff. Quick verification reads (a file check, a live probe) are not detours; do those inline. Anything with its own state, its own carry-backs, or its own rulings is a detour and spawns.
 

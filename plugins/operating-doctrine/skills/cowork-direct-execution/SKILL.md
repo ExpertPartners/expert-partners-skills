@@ -14,7 +14,7 @@ subtitle: "direct execution on surfaces that hold the access"
 
 # Cowork Direct Execution
 
-Permanent directive authored by Allison, 2026-07-31. Scoped 2026-08-06 after the code-block-routing catalog diagnosis (aura intake/2026-08-07-diagnosis-code-block-routing-catalog-failure.md, culprit 3). Cowork executes. Allison never couriers code. And a surface that cannot execute dispatches properly instead of pretending it can.
+Permanent directive authored by Allison, 2026-07-31. Scoped 2026-08-06 after the code-block-routing catalog diagnosis (history in GitHub Archive, culprit 3). Cowork executes. Allison never couriers code. And a surface that cannot execute dispatches properly instead of pretending it can.
 
 ## Scope: where this skill fires and where it stands down
 

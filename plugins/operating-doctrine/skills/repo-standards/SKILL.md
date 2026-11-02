@@ -15,11 +15,11 @@ Every repo in the ExpertPartners organization meets the ruled baseline. This ski
 
 v1.1 adds the readiness gate. v1.0 ran in exactly two situations, a repo being born and a repo being audited, which meant readiness depended on Allison remembering to ask for an audit. It no longer does. A repo joining a Claude Project, a Project or repo relationship being materially reconfigured, and material work starting in a repo whose readiness nobody has established now all reach the same live evaluation, and repo creation now passes an ownership gate before it may proceed.
 
-<!-- RULED-BY: aura/decisions/0078-claude-project-repository-setup.md date:2026-08-27 -->
+<!-- RULED-BY: history in GitHub Archive date:2026-08-27 -->
 
-<!-- RULED-BY: aura/intake/2026-09-01-repo-final-reconciliation-execution-map.md date:2026-09-01 -->
+<!-- RULED-BY: history in GitHub Archive date:2026-09-01 -->
 
-v1.2 names the topology authority. The GitHub Archive Index sheet is the one answer to which repositories exist, what each holds, and its pile. Read it live, never a frozen roster. Stage A reads the sheet before proposing any repo, Stage B adds the new repo's row as part of birth, and path three reads the repo's row as its ownership input. A repo without a row is `UNREGISTERED` by design. The earlier aura Manifest Entity index is kept in GitHub Archive.
+v1.2 names the topology authority. The GitHub Archive Index sheet is the one answer to which repositories exist, what each holds, and its pile. Read it live, never a frozen roster. Stage A reads the sheet before proposing any repo, Stage B adds the new repo's row as part of birth, and path three reads the repo's row as its ownership input. A repo without a row is `UNREGISTERED` by design. The earlier Manifest Entity index from the retired aura repo is history in GitHub Archive.
 
 
 v1.3 extends only the explicit audit path with knowledge architecture assessment. Read [the content assessment](references/content-architecture.md) before changing governed content, and use the [audit record](references/audit-record-template.md) to preserve evidence and proposed dispositions. The ten baseline grades, creation gate, and automatic readiness authority stay unchanged. This is implementation of existing authority plus the bounded Phase Two brief, not adoption of the research's proposed schema or governance. Provenance and unresolved amendments are recorded in `intake/2026-09-21-repo-standards-phase-two-authority-review.md` and `intake/2026-09-21-repo-standards-phase-two-founder-decisions.md` in the canonical skills repo.
@@ -127,7 +127,7 @@ For an explicit Phase Two / Repo Design Tower pass, complete the linked sequence
 4. **Flag what is gated.** Anything destructive (deleting or rewriting existing content, force operations), anything that spends money, anything that changes who or what holds access (ruleset edits, bypass actors, token scopes), and any judgment call that needs business truth goes back to Allison as a named line item with a recommendation. The audit never executes these, even when the fix is obvious. Distinguish a verified typo or navigation correction already permitted by step 3 from a rewrite that changes governed meaning; Git reversibility alone does not authorize new business truth.
 5. **File the audit record.** A dated record lands as a Google Doc in the owning brain's home folder in Drive (HQ brain if none), titled `repo-standards-audit-<repo>`, carrying the per-point table, bounded content assessment, fixes applied with commit hashes, and open flags. Use [references/audit-record-template.md](references/audit-record-template.md). Report `READY` only when both the applicable baseline and usable front doors are evidenced; otherwise `REMEDIATION REQUIRED`. `ORGANIZE EXISTING REPO` is an action recommendation within that report, not a third readiness verdict or permission for gated changes.
 
-The walk of the existing estate runs this path one repo per pass, in the order the Archive Index and the Job Tracker set. Historically aura went first, per the ADR's sequencing, and the lane ledger breakup finding in its audit record is closed history now that the Job Tracker replaced the ledger.
+The walk of the existing estate runs this path one repo per pass, in the order the Archive Index and the Job Tracker set. Historically the now retired aura repo went first, per the ADR's sequencing, and the lane ledger breakup finding in its audit record is closed history now that the Job Tracker replaced the ledger.
 
 ## Path three, readiness check (Project attachment and material touch)
 
