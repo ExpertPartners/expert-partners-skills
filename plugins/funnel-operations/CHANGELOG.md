@@ -1,0 +1,3 @@
+## 0.3.0 - 2026-11-02
+
+Three of Allison's claude.ai GoHighLevel skills join funnel-operations (Decision Log 2026-10-25, Which of the 19 personal skills move into the marketplace). ghl-asset-inventory pulls a read-only inventory of the account. ghl-automation-design designs a new GoHighLevel and n8n automation and ends at an approved build packet, never building anything, and calls ghl-asset-inventory when it needs to confirm names. ghl-tag-audit-and-cleanup audits tags read-only and runs a cleanup only after a dry run Allison has approved and a rollback file is exported. The skill text is placed as it was. Each skill carries skill-map metadata in the hands zone.

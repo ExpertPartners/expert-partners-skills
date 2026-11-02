@@ -20,26 +20,26 @@
     {
       "name": "content-engines",
       "source": "./plugins/content-engines",
-      "version": "0.8.0",
-      "description": "Allison Gaddy content and marketing engines (master-marketer-free-agent-builder, rare-content-engine, xavier-offer-builder, dm-to-dollars, video-transcript-relay, content-coach, hook-engine, post-grader, post-scheduler, post-value-filter, social-analyzer, speaker-introduction-writer, stage-cards)."
+      "version": "0.9.0",
+      "description": "Allison Gaddy content and marketing engines (master-marketer-free-agent-builder, rare-content-engine, xavier-offer-builder, dm-to-dollars, video-transcript-relay, content-coach, hook-engine, post-grader, post-scheduler, post-value-filter, social-analyzer, speaker-introduction-writer, stage-cards, gemini-notebook-training-architect, hero-video-preproduction, brand-film-reverse-engineering)."
     },
     {
       "name": "funnel-operations",
       "source": "./plugins/funnel-operations",
-      "version": "0.2.2",
-      "description": "Build, migrate, and document funnels for Expert Partners and EPIC, with Notion as the single source of truth."
+      "version": "0.3.0",
+      "description": "Build, migrate, and document funnels for Expert Partners and EPIC, with Notion as the single source of truth, plus GoHighLevel asset inventory, automation design and safe tag cleanup."
     },
     {
       "name": "research-ops",
       "source": "./plugins/research-ops",
-      "version": "0.4.1",
-      "description": "Research skills for capability currency, research intake, video discovery and source hunting. Imported TUB analyst prompts are retired and disabled."
+      "version": "0.5.0",
+      "description": "Research skills for capability refresh, capability currency, research intake, video discovery and source hunting. Imported TUB analyst prompts are retired and disabled."
     },
     {
       "name": "systems-map",
       "source": "./plugins/systems-map",
-      "version": "0.6.6",
-      "description": "The canonical map of where every Expert Partners system lives. Loads at session start; inherits operating-doctrine."
+      "version": "0.7.0",
+      "description": "The canonical map of where every Expert Partners system lives, plus the Notion catalogers for SOPs, skills and Custom GPTs. Loads at session start; inherits operating-doctrine."
     },
     {
       "name": "acn-advisor",
@@ -52,6 +52,12 @@
       "source": "./plugins/real-estate-agent-toolkit",
       "version": "0.1.0",
       "description": "Portable, platform-neutral AI skills for real estate agents (forty skills sharing one agent-profile.md)."
+    },
+    {
+      "name": "fractional-cfo",
+      "source": "./plugins/fractional-cfo",
+      "version": "0.1.0",
+      "description": "Read-only Fractional CFO skills (weekly-cash-flow-review, runway-and-burn, monthly-close-review, canonical-categories, entity-separation) for cash, runway and month-end close across Mercury, Stripe and QuickBooks. Inherits operating-doctrine."
     }
   ]
 }
