@@ -1,7 +1,7 @@
 {
   "name": "funnel-operations",
-  "version": "0.2.2",
-  "description": "Funnel operations skills for Expert Partners and EPIC: build new funnels, migrate funnels out of the legacy location, and document every funnel into Notion as the single source of truth. Built for non-technical teammates, hand-held one step at a time.",
+  "version": "0.3.0",
+  "description": "Funnel and GoHighLevel operations skills for Expert Partners and EPIC: build new funnels, migrate funnels out of the legacy location, and document every funnel into Notion as the single source of truth, plus a read-only GoHighLevel asset inventory, automation design that stops at an approved build packet, and a tag audit with an approved safe cleanup. Built for non-technical teammates, hand-held one step at a time.",
   "author": {
     "name": "Allison Gaddy"
   }

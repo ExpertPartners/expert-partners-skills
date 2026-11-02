@@ -1,7 +1,7 @@
 {
   "name": "research-ops",
-  "version": "0.4.1",
-  "description": "Research skills for capability currency, research intake and bounded public video discovery. The three imported TUB analyst prompts are retired and disabled.",
+  "version": "0.5.0",
+  "description": "Research skills for capability refresh, capability currency, research intake and bounded public video discovery. The three imported TUB analyst prompts are retired and disabled.",
   "author": {
     "name": "Allison Gaddy"
   }

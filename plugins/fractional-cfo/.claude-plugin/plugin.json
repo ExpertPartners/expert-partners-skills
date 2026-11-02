@@ -1,0 +1,8 @@
+{
+  "name": "fractional-cfo",
+  "version": "0.1.0",
+  "description": "Read-only Fractional CFO skills for Allison's businesses: weekly-cash-flow-review, runway-and-burn and monthly-close-review across Mercury, Stripe and QuickBooks, built on canonical-categories (one category scheme across every money source) and entity-separation (the blended owner lens and the entity-clean lens). Each skill inherits the operating-doctrine and the Fractional CFO project instructions.",
+  "author": {
+    "name": "Allison Gaddy"
+  }
+}
