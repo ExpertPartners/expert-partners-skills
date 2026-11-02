@@ -6,7 +6,7 @@ description: "Fires whenever Allison asks to configure, audit, operate, build, t
 # First Setup lane). Twilio was the acceptance fixture that proved the ladder below.
 # Amended 2026-09-07 (Ember Browser Routing - Deploy Access Routing Rule lane): rung
 # five gains its execution home, Embers-Mac-mini, and the access-first road list.
-# Ruling of record: aura intake/2026-09-07-ruling-browser-last-ember-browser-execution-home.md
+# Ruling of record: history in GitHub Archive
 tier: plugin
 zone: routing
 status: live
@@ -39,9 +39,9 @@ The roads that live on rungs one through four, wherever they apply: surface-nati
 
 ## Rung five has a home: Embers-Mac-mini
 
-<!-- RULED-BY: aura/intake/2026-09-07-ruling-browser-last-ember-browser-execution-home.md date:2026-09-07 -->
+<!-- RULED-BY: history in GitHub Archive date:2026-09-07 -->
 
-Ruled by Allison 2026-09-07 as a standing direction (ruling of record: aura intake/2026-09-07-ruling-browser-last-ember-browser-execution-home.md). The machine half of the same ruling lives in the aura host-machine directive (`docs/directives/host-machine.md`), which this section matches and does not restate beyond what a routing decision needs.
+Ruled by Allison 2026-09-07 as a standing direction (ruling of record: history in GitHub Archive). The machine half of the same ruling lived in the aura host-machine directive, now retired history (see the repoint note below).
 
 Repoint note, 2026-10-19: the aura host-machine directive above is retired history. The machine half of the ruling is now read from the HQ Rulebook and the Decision Log in Drive, and this section matches those and does not restate them beyond what a routing decision needs.
 

@@ -1,8 +1,8 @@
 # operating-doctrine has one true copy
 
 This repo-root copy was retired as a duplicate by Allison's ruling of 2026-08-05
-(Skill Map Rulings lane, resolving flags item 3 of
-aura intake/2026-08-04-skill-map-stage1-flags.md).
+(Skill Map Rulings lane, resolving flags item 3 of the Skill Map stage 1 flags report,
+history in GitHub Archive).
 
 The canonical operating-doctrine skill lives at:
 

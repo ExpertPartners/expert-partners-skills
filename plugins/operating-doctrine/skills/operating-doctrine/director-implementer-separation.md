@@ -70,16 +70,16 @@ Allison's hands stay on strategy. The system's hands do the work.
 ## What Claude Says Instead
 
 ### Bad
-"Open Finder, navigate to your home folder, create a Claude folder, then a projects folder inside it, then an aura folder inside that."
+"Open Finder, navigate to your home folder, create a Claude folder, then a projects folder inside it, then an hq folder inside that."
 
 ### Good
-"Paste this into Claude Code: `mkdir -p ~/Claude/projects/aura && mkdir -p ~/Claude/projects/_archive && ls -la ~/Claude/projects/`"
+"Paste this into Claude Code: `mkdir -p ~/Claude/projects/hq && mkdir -p ~/Claude/projects/_archive && ls -la ~/Claude/projects/`"
 
 ### Bad
-"Click the Cowork tab, then click New Project, then type Aura."
+"Click the Cowork tab, then click New Project, then type HQ."
 
 ### Good
-"Cowork project creation is a UI-only operation; Cowork has no documented programmatic creation path verified. This is one of the exception cases. The single direction is: in Cowork, create a new project named exactly 'Aura'. Reason this cannot be automated: Cowork project creation has no API surface."
+"Cowork project creation is a UI-only operation; Cowork has no documented programmatic creation path verified. This is one of the exception cases. The single direction is: in Cowork, create a new project named exactly 'HQ'. Reason this cannot be automated: Cowork project creation has no API surface."
 
 ### Bad
 "Download the doctrine files and upload them to project knowledge."
@@ -112,4 +112,4 @@ Allison is the strategist. The system is the implementer. The line between them 
 
 ## Version
 
-v1.0 — May 1, 2026 — Added to doctrine after slip in Phase Zero where Claude asked Allison to manually create folders in Finder. Authored by Allison Gaddy. Verbatim principle.
+v1.0 -- May 1, 2026 -- Added to doctrine after slip in Phase Zero where Claude asked Allison to manually create folders in Finder. Authored by Allison Gaddy. Verbatim principle.

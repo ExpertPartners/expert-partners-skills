@@ -1,5 +1,5 @@
-// Regression coverage for extract-skills-graph.mjs (aura issue #212, 2026-09-04).
-// Builds throwaway eps and aura fixture trees and runs the real extractor as a child
+// Regression coverage for extract-skills-graph.mjs (added 2026-09-04).
+// Builds a throwaway eps fixture tree and runs the real extractor as a child
 // process, so every assertion is about the CLI's actual exit code, stderr, and JSON.
 //
 // What must stay true:
@@ -19,7 +19,6 @@
 // the frontmatter would (correctly) fail.
 //
 // Run: npm test  (from tools/skill-map, after npm ci)
-
 import { test } from 'node:test';
 import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
@@ -73,33 +72,31 @@ function deployMirror(canonicalFile, destDir, canonicalLabel, stamp = 'v1.0', da
   return out;
 }
 
-// A minimal but complete estate: the inherit root, one eps canonical skill, one
-// aura-native canonical skill (its only home is aura .claude/skills).
+// A minimal but complete repo: the inherit root and two standalone canonical skills,
+// alpha (versioned) and beta (no version line, so the pipeline tree-stamps it).
 function makeRepos() {
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'skills-graph-test-'));
   const eps = path.join(base, 'eps');
-  const aura = path.join(base, 'aura');
   fs.mkdirSync(path.join(eps, 'tools', 'skill-map'), { recursive: true });
-  fs.mkdirSync(aura, { recursive: true });
   const files = {};
   files.doctrine = writeSkill(eps, 'plugins/operating-doctrine/skills/operating-doctrine', {
     name: 'operating-doctrine',
     fields: { tier: 'plugin', zone: 'brain', inherits: [] },
   });
   files.alpha = writeSkill(eps, 'skills/alpha', { name: 'alpha', fields: { tier: 'organization', zone: 'hands' } });
-  files.beta = writeSkill(aura, '.claude/skills/beta', { name: 'beta' });
-  return { base, eps, aura, files, out: path.join(base, 'graph.json') };
+  files.beta = writeSkill(eps, 'skills/beta', { name: 'beta' });
+  return { base, eps, files, out: path.join(base, 'graph.json') };
 }
 
-function run({ eps, aura, out }) {
-  const r = spawnSync(process.execPath, [EXTRACTOR, '--eps', eps, '--aura', aura, '--out', out], { encoding: 'utf8' });
+function run({ eps, out }) {
+  const r = spawnSync(process.execPath, [EXTRACTOR, '--eps', eps, '--out', out], { encoding: 'utf8' });
   const graph = r.status === 0 && fs.existsSync(out) ? JSON.parse(fs.readFileSync(out, 'utf8')) : null;
   return { status: r.status, stdout: r.stdout, stderr: r.stderr, graph };
 }
 
 const ids = graph => graph.nodes.map(n => n.id).sort();
 
-test('baseline: canonical skills in both repos map, nothing deployed', () => {
+test('baseline: canonical skills map, nothing deployed', () => {
   const r = run(makeRepos());
   assert.equal(r.status, 0, r.stderr);
   assert.deepEqual(ids(r.graph), ['alpha', 'beta', 'operating-doctrine']);
@@ -109,15 +106,15 @@ test('baseline: canonical skills in both repos map, nothing deployed', () => {
 
 test('REAL duplicate: a second canonical SKILL.md with the same id still fails', () => {
   const repos = makeRepos();
-  writeSkill(repos.aura, '.claude/skills/alpha', { name: 'alpha' }); // no header: a second canonical identity
+  writeSkill(repos.eps, 'plugins/example/skills/alpha', { name: 'alpha' }); // no header: a second canonical identity
   const r = run(repos);
   assert.equal(r.status, 1);
   assert.match(r.stderr, /duplicate skill id "alpha"/);
 });
 
-test('REAL duplicate inside one repo still fails', () => {
+test('REAL duplicate under a project mount still fails', () => {
   const repos = makeRepos();
-  writeSkill(repos.aura, 'doctrine/skills/beta', { name: 'beta' });
+  writeSkill(repos.eps, '.claude/skills/beta', { name: 'beta' }); // no header: not a deployed copy
   const r = run(repos);
   assert.equal(r.status, 1);
   assert.match(r.stderr, /duplicate skill id "beta"/);
@@ -125,50 +122,50 @@ test('REAL duplicate inside one repo still fails', () => {
 
 test('legitimate deployed mirrors under .agents/skills do NOT create duplicates', () => {
   const repos = makeRepos();
-  deployMirror(repos.files.alpha, path.join(repos.aura, '.agents/skills/alpha'),
+  deployMirror(repos.files.alpha, path.join(repos.eps, '.agents/skills/alpha'),
     'expert-partners-skills skills/alpha/SKILL.md', 'v1.0');
-  deployMirror(repos.files.beta, path.join(repos.aura, '.agents/skills/beta'),
-    'aura .claude/skills/beta/SKILL.md', 'tree sha256 0123456789ab');
+  deployMirror(repos.files.beta, path.join(repos.eps, '.agents/skills/beta'),
+    'expert-partners-skills skills/beta/SKILL.md', 'tree sha256 0123456789ab');
   const r = run(repos);
   assert.equal(r.status, 0, r.stderr);
   assert.deepEqual(ids(r.graph), ['alpha', 'beta', 'operating-doctrine'], 'mirrors are never nodes');
   const mounts = r.graph.flags.deployedMounts;
   assert.equal(mounts.length, 2);
   assert.deepEqual(mounts.map(m => [m.id, m.canonical, m.mount]), [
-    ['alpha', 'eps:skills/alpha/SKILL.md', 'aura:.agents/skills/'],
-    ['beta', 'aura:.claude/skills/beta/SKILL.md', 'aura:.agents/skills/'],
+    ['alpha', 'eps:skills/alpha/SKILL.md', 'eps:.agents/skills/'],
+    ['beta', 'eps:skills/beta/SKILL.md', 'eps:.agents/skills/'],
   ]);
   assert.equal(mounts[1].stamp, 'tree sha256 0123456789ab');
   assert.equal(mounts[0].deployedAt, '2026-09-04');
   assert.doesNotMatch(r.stderr, /duplicate skill id/);
 });
 
-test('mirror classification is independent of walk order (.agents sorts before .claude)', () => {
-  // The aura-native canonical (.claude) is walked AFTER its .agents mirror on a
-  // sorted filesystem; the two-pass design must still resolve the mirror.
+test('mirror classification is independent of walk order (.agents sorts before skills)', () => {
+  // The canonical (skills/) is walked AFTER its .agents mirror on a sorted
+  // filesystem; the two-pass design must still resolve the mirror.
   const repos = makeRepos();
-  deployMirror(repos.files.beta, path.join(repos.aura, '.agents/skills/beta'),
-    'aura .claude/skills/beta/SKILL.md', 'tree sha256 0123456789ab');
+  deployMirror(repos.files.beta, path.join(repos.eps, '.agents/skills/beta'),
+    'expert-partners-skills skills/beta/SKILL.md', 'tree sha256 0123456789ab');
   const r = run(repos);
   assert.equal(r.status, 0, r.stderr);
   assert.equal(r.graph.flags.deployedMounts.length, 1);
-  assert.equal(r.graph.nodes.find(n => n.id === 'beta').source, 'aura:.claude/skills/beta/SKILL.md');
+  assert.equal(r.graph.nodes.find(n => n.id === 'beta').source, 'eps:skills/beta/SKILL.md');
 });
 
 test('a copy under the mount root WITHOUT the pipeline header fails as corruption, not as a duplicate', () => {
   const repos = makeRepos();
-  writeSkill(repos.aura, '.agents/skills/beta', { name: 'beta' }); // hand-copied, no header
+  writeSkill(repos.eps, '.agents/skills/beta', { name: 'beta' }); // hand-copied, no header
   const r = run(repos);
   assert.equal(r.status, 1);
-  assert.match(r.stderr, /deployed copy without a DEPLOYED COPY header: aura:\.agents\/skills\/beta\/SKILL\.md/);
+  assert.match(r.stderr, /deployed copy without a DEPLOYED COPY header: eps:\.agents\/skills\/beta\/SKILL\.md/);
   assert.doesNotMatch(r.stderr, /duplicate skill id/);
 });
 
 test('a hand-written header that is not the pipeline format is not a header', () => {
   const repos = makeRepos();
-  writeSkill(repos.aura, '.agents/skills/beta', {
+  writeSkill(repos.eps, '.agents/skills/beta', {
     name: 'beta',
-    extraHeader: ['# DEPLOYED COPY (2026-08-08, some build lane): the canonical home is', '# aura .claude/skills/beta/SKILL.md.'],
+    extraHeader: ['# DEPLOYED COPY (2026-08-08, some build lane): the canonical home is', '# expert-partners-skills skills/beta/SKILL.md.'],
   });
   const r = run(repos);
   assert.equal(r.status, 1);
@@ -177,16 +174,16 @@ test('a hand-written header that is not the pipeline format is not a header', ()
 
 test('a mirror whose header names a nonexistent canonical path fails', () => {
   const repos = makeRepos();
-  deployMirror(repos.files.beta, path.join(repos.aura, '.agents/skills/beta'),
-    'aura .Codex/skills/beta/SKILL.md', 'tree sha256 0123456789ab');
+  deployMirror(repos.files.beta, path.join(repos.eps, '.agents/skills/beta'),
+    'expert-partners-skills .Codex/skills/beta/SKILL.md', 'tree sha256 0123456789ab');
   const r = run(repos);
   assert.equal(r.status, 1);
-  assert.match(r.stderr, /names a canonical home that does not exist: aura:\.agents\/skills\/beta\/SKILL\.md -> aura:\.Codex\/skills\/beta\/SKILL\.md/);
+  assert.match(r.stderr, /names a canonical home that does not exist: eps:\.agents\/skills\/beta\/SKILL\.md -> eps:\.Codex\/skills\/beta\/SKILL\.md/);
 });
 
 test('a mirror whose header names an unknown repo fails', () => {
   const repos = makeRepos();
-  deployMirror(repos.files.beta, path.join(repos.aura, '.agents/skills/beta'),
+  deployMirror(repos.files.beta, path.join(repos.eps, '.agents/skills/beta'),
     'partnersync .claude/skills/beta/SKILL.md', 'v2.0');
   const r = run(repos);
   assert.equal(r.status, 1);
@@ -195,31 +192,31 @@ test('a mirror whose header names an unknown repo fails', () => {
 
 test('an orphan mirror (id no canonical skill owns) fails', () => {
   const repos = makeRepos();
-  const gammaDir = path.join(repos.aura, '.agents/skills/gamma');
+  const gammaDir = path.join(repos.eps, '.agents/skills/gamma');
   deployMirror(repos.files.alpha, gammaDir, 'expert-partners-skills skills/alpha/SKILL.md', 'v1.0');
   fs.writeFileSync(path.join(gammaDir, 'SKILL.md'),
     fs.readFileSync(path.join(gammaDir, 'SKILL.md'), 'utf8').replace('name: alpha', 'name: gamma'));
   const r = run(repos);
   assert.equal(r.status, 1);
-  assert.match(r.stderr, /orphan deployed copy: aura:\.agents\/skills\/gamma\/SKILL\.md carries id "gamma"/);
+  assert.match(r.stderr, /orphan deployed copy: eps:\.agents\/skills\/gamma\/SKILL\.md carries id "gamma"/);
 });
 
 test('a mirror pointing at the wrong canonical home for its id fails', () => {
   const repos = makeRepos();
-  deployMirror(repos.files.beta, path.join(repos.aura, '.agents/skills/beta'),
+  deployMirror(repos.files.beta, path.join(repos.eps, '.agents/skills/beta'),
     'expert-partners-skills skills/alpha/SKILL.md', 'v1.0');
   const r = run(repos);
   assert.equal(r.status, 1);
-  assert.match(r.stderr, /points at the wrong canonical home: aura:\.agents\/skills\/beta\/SKILL\.md names eps:skills\/alpha\/SKILL\.md, but "beta" is canonical at aura:\.claude\/skills\/beta\/SKILL\.md/);
+  assert.match(r.stderr, /points at the wrong canonical home: eps:\.agents\/skills\/beta\/SKILL\.md names eps:skills\/alpha\/SKILL\.md, but "beta" is canonical at eps:skills\/beta\/SKILL\.md/);
 });
 
 test('a mirror whose frontmatter name disagrees with its folder fails', () => {
   const repos = makeRepos();
-  const dir = path.join(repos.aura, '.agents/skills/beta');
+  const dir = path.join(repos.eps, '.agents/skills/beta');
   deployMirror(repos.files.alpha, dir, 'expert-partners-skills skills/alpha/SKILL.md', 'v1.0');
   const r = run(repos);
   assert.equal(r.status, 1);
-  assert.match(r.stderr, /name\/folder mismatch: aura:\.agents\/skills\/beta\/SKILL\.md declares name "alpha"/);
+  assert.match(r.stderr, /name\/folder mismatch: eps:\.agents\/skills\/beta\/SKILL\.md declares name "alpha"/);
 });
 
 // --- byte fidelity: a header is a claim; these prove the extractor demands proof ---
@@ -228,7 +225,7 @@ test('a DIVERGENT skill wearing a valid pipeline header is caught, not accepted 
   // The failure mode the header alone cannot catch: a real second skill with a
   // canonical's name and body of its own, plus three pasted header lines.
   const repos = makeRepos();
-  const dir = path.join(repos.aura, '.agents/skills/alpha');
+  const dir = path.join(repos.eps, '.agents/skills/alpha');
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, 'SKILL.md'), [
     '---',
@@ -247,14 +244,14 @@ test('a DIVERGENT skill wearing a valid pipeline header is caught, not accepted 
   ].join('\n'));
   const r = run(repos);
   assert.equal(r.status, 1);
-  assert.match(r.stderr, /is not a faithful render of its canonical: aura:\.agents\/skills\/alpha\/SKILL\.md differs from eps:skills\/alpha\/SKILL\.md beyond the DEPLOYED COPY header/);
+  assert.match(r.stderr, /is not a faithful render of its canonical: eps:\.agents\/skills\/alpha\/SKILL\.md differs from eps:skills\/alpha\/SKILL\.md beyond the DEPLOYED COPY header/);
   assert.doesNotMatch(r.stderr, /duplicate skill id/);
 });
 
 test('a mirror that drifted by one line in the body is caught', () => {
   const repos = makeRepos();
-  const file = deployMirror(repos.files.beta, path.join(repos.aura, '.agents/skills/beta'),
-    'aura .claude/skills/beta/SKILL.md', 'tree sha256 0123456789ab');
+  const file = deployMirror(repos.files.beta, path.join(repos.eps, '.agents/skills/beta'),
+    'expert-partners-skills skills/beta/SKILL.md', 'tree sha256 0123456789ab');
   fs.appendFileSync(file, '\nHand-edited afterwards.\n');
   const r = run(repos);
   assert.equal(r.status, 1);
@@ -263,8 +260,8 @@ test('a mirror that drifted by one line in the body is caught', () => {
 
 test('uncommitted stale bytes without historical proof remain fatal', () => {
   const repos = makeRepos();
-  deployMirror(repos.files.beta, path.join(repos.aura, '.agents/skills/beta'),
-    'aura .claude/skills/beta/SKILL.md', 'tree sha256 0123456789ab');
+  deployMirror(repos.files.beta, path.join(repos.eps, '.agents/skills/beta'),
+    'expert-partners-skills skills/beta/SKILL.md', 'tree sha256 0123456789ab');
   fs.appendFileSync(repos.files.beta, '\nA new canonical paragraph.\n');
   const r = run(repos);
   assert.equal(r.status, 1);
@@ -282,22 +279,22 @@ test('a canonical overwritten by its own deployed copy is diagnosed as that, not
 });
 
 test('a pipeline header outside a mount root also marks a deployed copy (no hand list needed)', () => {
-  // The three eps skills deployed into aura .claude/skills are NOT registered by
-  // hand any more; they resolve by header, and a fourth deployed there tomorrow
-  // needs no extractor edit.
+  // Copies deployed into a .claude/skills project mount are NOT registered by
+  // hand; they resolve by header, and another deployed there tomorrow needs no
+  // extractor edit.
   const repos = makeRepos();
-  deployMirror(repos.files.alpha, path.join(repos.aura, '.claude/skills/alpha'),
+  deployMirror(repos.files.alpha, path.join(repos.eps, '.claude/skills/alpha'),
     'expert-partners-skills skills/alpha/SKILL.md', 'v1.0');
   const r = run(repos);
   assert.equal(r.status, 0, r.stderr);
   assert.deepEqual(ids(r.graph), ['alpha', 'beta', 'operating-doctrine']);
   assert.deepEqual(r.graph.flags.deployedMounts.map(m => [m.path, m.mount]),
-    [['aura:.claude/skills/alpha/SKILL.md', null]]);
+    [['eps:.claude/skills/alpha/SKILL.md', null]]);
 });
 
 test('a header in the body (prose about the header) does not classify the file', () => {
   const repos = makeRepos();
-  writeSkill(repos.aura, '.claude/skills/delta', {
+  writeSkill(repos.eps, 'skills/delta', {
     name: 'delta',
     body: headerLines('expert-partners-skills skills/alpha/SKILL.md').join('\n'),
   });
@@ -338,7 +335,7 @@ test('a declared duplicate whose keep path is no longer the mapped canonical fai
 
 test('dangling references still fail', () => {
   const repos = makeRepos();
-  writeSkill(repos.aura, '.claude/skills/epsilon', { name: 'epsilon', fields: { calls: ['nowhere'] } });
+  writeSkill(repos.eps, 'skills/epsilon', { name: 'epsilon', fields: { calls: ['nowhere'] } });
   const r = run(repos);
   assert.equal(r.status, 1);
   assert.match(r.stderr, /dangling calls reference: epsilon -> "nowhere"/);
@@ -346,10 +343,10 @@ test('dangling references still fail', () => {
 
 test('born-dressed strict mode still fails an unzoned canonical skill', () => {
   const repos = makeRepos();
-  writeSkill(repos.aura, '.claude/skills/zeta', { name: 'zeta', fields: { zone: undefined } });
+  writeSkill(repos.eps, 'skills/zeta', { name: 'zeta', fields: { zone: undefined } });
   const r = run(repos);
   assert.equal(r.status, 1);
-  assert.match(r.stderr, /born-dressed violation: aura:\.claude\/skills\/zeta\/SKILL\.md is missing required field\(s\) zone/);
+  assert.match(r.stderr, /born-dressed violation: eps:skills\/zeta\/SKILL\.md is missing required field\(s\) zone/);
 });
 
 // --- canonical-first delivery: proof is an exact historical pipeline render ---
@@ -379,16 +376,16 @@ function rewriteManifest(dir) {
     .map(rel => `${digest(fs.readFileSync(path.join(dir, rel)))}  ./${rel}\n`).join('');
   fs.writeFileSync(path.join(dir, 'checksums.sha256'), text);
 }
-function committedDeployment({ native = false, plugin = false } = {}) {
+function committedDeployment({ treeStamped = false, plugin = false } = {}) {
   const repos = makeRepos();
-  const root = native ? repos.aura : repos.eps;
-  const name = plugin ? 'gamma' : native ? 'beta' : 'alpha';
+  const root = repos.eps;
+  const name = plugin ? 'gamma' : treeStamped ? 'beta' : 'alpha';
   let source = repos.files[name];
   if (plugin) {
     source = writeSkill(repos.eps, 'plugins/example/skills/gamma', { name: 'gamma' });
     fs.mkdirSync(path.join(repos.eps, 'plugins/example/.claude-plugin'), { recursive: true });
     fs.writeFileSync(path.join(repos.eps, 'plugins/example/.claude-plugin/plugin.json'), '{"version":"1.2.3"}\n');
-  } else if (!native) {
+  } else if (!treeStamped) {
     fs.appendFileSync(source, '\n# Alpha -- v1.0\n');
   }
   const reference = path.join(path.dirname(source), 'references', 'contract.txt');
@@ -403,8 +400,8 @@ function committedDeployment({ native = false, plugin = false } = {}) {
   const pipeline = path.join(repos.eps, 'tools/skill-deploy/deploy-skill.sh');
   fs.mkdirSync(path.dirname(pipeline), { recursive: true });
   fs.copyFileSync(DEPLOY_SCRIPT, pipeline);
-  const mount = path.join(repos.aura, '.agents/skills');
-  const args = [pipeline, name, ...(native ? ['--from', path.dirname(source)] : []), '--to', mount];
+  const mount = path.join(repos.eps, '.agents/skills');
+  const args = [pipeline, name, '--to', mount];
   const rendered = spawnSync('bash', args, {
     encoding: 'utf8', env: { ...process.env, SKILL_DEPLOY_TODAY: '2026-09-20' },
   });
@@ -440,8 +437,8 @@ test('exact prior committed pipeline deployment is VERIFIED STALE with proof and
   assert.match(verify.stdout + verify.stderr, /DRIFT/);
 });
 
-test('Aura-native tree-stamped prior committed deployment is also provable', () => {
-  const repos = committedDeployment({ native: true });
+test('tree-stamped prior committed deployment is also provable', () => {
+  const repos = committedDeployment({ treeStamped: true });
   const r = run(repos);
   assert.equal(r.status, 0, r.stderr);
   const mount = r.graph.flags.deployedMounts.find(m => m.id === 'beta');
@@ -528,7 +525,7 @@ test('invalid or missing historical header remains fatal', () => {
 test('historical match cannot override wrong ownership or an orphaned canonical', () => {
   const wrong = committedDeployment();
   fs.writeFileSync(wrong.file, fs.readFileSync(wrong.file, 'utf8')
-    .replace('expert-partners-skills skills/alpha/SKILL.md', 'aura .claude/skills/beta/SKILL.md'));
+    .replace('expert-partners-skills skills/alpha/SKILL.md', 'expert-partners-skills skills/beta/SKILL.md'));
   rewriteManifest(wrong.dir);
   assertFatal(wrong, /points at the wrong canonical home/);
   const orphan = committedDeployment();

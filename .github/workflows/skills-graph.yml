@@ -1,6 +1,5 @@
-# Skill Map Stage 1 pipeline (aura intake/2026-08-04-skill-map-architecture-report.md).
-# Regenerates tools/skill-map/skills-graph.json whenever a SKILL.md changes, in this repo
-# (push) or in aura (repository_dispatch fired by aura's skills-graph-trigger workflow).
+# Skill Map Stage 1 pipeline (architecture report: history in GitHub Archive).
+# Regenerates tools/skill-map/skills-graph.json whenever a SKILL.md in this repo changes.
 # The extractor exits non-zero on any dangling inherits / calls / defers-to id, duplicate
 # skill id, name/folder mismatch, or frontmatter parse error, which fails this workflow.
 # Branch pushes get validation only; the regenerated graph is committed back on main.
@@ -25,9 +24,7 @@ on:
       - "tools/skill-map/**"
       - "tools/skill-deploy/**"
       # A canonical skill's non-SKILL.md files (references/, templates/, scripts/)
-      # are part of its deployed copies, so changing one makes aura's mounts stale
-      # even though no SKILL.md moved. Watch them too, so the redeploy notice below
-      # fires in the repo that owns the canonical.
+      # are part of the skill even though no SKILL.md moved, so watch them too.
       - "skills/**"
       - "plugins/*/skills/**"
       # AI Workforce feed inputs and producer. A package description, version, or
@@ -36,8 +33,6 @@ on:
       - "plugins/*/.claude-plugin/**"
       - "plugins/*/README.md"
       - "tools/capability-feed/**"
-  repository_dispatch:
-    types: [skill-md-changed]
   workflow_dispatch:
 
 permissions:
@@ -45,8 +40,7 @@ permissions:
 
 # A superseded run is pure waste -- the newer push's run rebuilds the full
 # graph anyway -- so cancel it instead of letting it lose the push race and
-# page red. Same guard as aura generate-index (aura c6999c5); cancelled runs
-# are excluded by the CI watcher.
+# page red. Cancelled runs are excluded by the CI watcher.
 concurrency:
   group: skills-graph-${{ github.ref }}
   cancel-in-progress: true
@@ -73,14 +67,6 @@ jobs:
           path: eps
           fetch-depth: 0 # committed history is required to prove VERIFIED STALE copies
 
-      - name: Checkout aura (canonical co-source of SKILL.md files)
-        uses: actions/checkout@v6
-        with:
-          repository: ExpertPartners/aura
-          token: ${{ secrets.SKILLS_GRAPH_TOKEN }}
-          path: aura
-          fetch-depth: 0 # Aura-native canonicals need the same historical proof
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -90,8 +76,8 @@ jobs:
         working-directory: eps/tools/skill-map
         run: npm ci
 
-      # Regression coverage for the two tools this job depends on (aura issue #212,
-      # 2026-09-04): the extractor must keep failing REAL duplicate canonical ids while
+      # Regression coverage for the two tools this job depends on (added 2026-09-04):
+      # the extractor must keep failing REAL duplicate canonical ids while
       # accepting pipeline-produced deployed copies, and deploy-skill.sh must keep
       # producing copies whose manifest is true and whose drift --verify catches.
       - name: Pipeline tests (extractor fixtures + deploy-skill contract)
@@ -114,7 +100,7 @@ jobs:
 
       - name: Extract and validate (fails on any dangling reference)
         working-directory: eps/tools/skill-map
-        run: node extract-skills-graph.mjs --eps "$GITHUB_WORKSPACE/eps" --aura "$GITHUB_WORKSPACE/aura" --out "$GITHUB_WORKSPACE/eps/tools/skill-map/skills-graph.json"
+        run: node extract-skills-graph.mjs --eps "$GITHUB_WORKSPACE/eps" --out "$GITHUB_WORKSPACE/eps/tools/skill-map/skills-graph.json"
 
       # Built from the graph the step above just regenerated. On main the feed file is
       # rewritten (only when its records change) and committed with the graph below.
@@ -142,24 +128,6 @@ jobs:
           echo "::error title=AI Workforce feed drift::$FEED differs from what this branch's committed sources produce. It is generated output: run node tools/capability-feed/generate-feed.mjs --write, never hand-edit it."
           exit 1
 
-      # Forward signal, never a block. This repo owns canonicals that aura deploys
-      # as copies, so a change here can leave aura's mounts stale -- and aura's own
-      # deployed-copy-drift job would then go red for a change it did not make, with
-      # the fix living in this repo. Say so here instead, on the run that caused it.
-      # Non-blocking on purpose: making it a gate would deadlock the two repos
-      # against each other on every canonical bump.
-      - name: Notice whether aura's mounts still match this repo's canonicals
-        continue-on-error: true
-        run: |
-          set -uo pipefail
-          python3 -m pip install --quiet pyyaml
-          fail=0
-          eps/tools/skill-deploy/deploy-skill.sh --verify-copies aura/.claude/skills || fail=1
-          eps/tools/skill-deploy/deploy-skill.sh --mirror-mount aura/.claude/skills --to aura/.agents/skills --verify || fail=1
-          if [ "$fail" -ne 0 ]; then
-            echo "::warning title=aura skill mounts are stale::A canonical in this repo moved, so aura's deployed copies no longer match it. Canonical-first delivery is allowed only for VERIFIED STALE copies with committed-history proof. The later Aura redeploy step remains owed: tools/skill-deploy/deploy-skill.sh --mirror-mount .claude/skills --to .agents/skills (plus --to .claude/skills for the copies this repo owns). Until then aura's deployed-copy-drift job will be red."
-          fi
-
       - name: Commit regenerated graph and AI Workforce feed (main only)
         if: github.ref == 'refs/heads/main'
         working-directory: eps
@@ -179,7 +147,7 @@ jobs:
           git config user.name "skills-graph-bot"
           git config user.email "actions@users.noreply.github.com"
           git commit -m "$MSG"
-          # Push race guard (same shape as aura c6999c5): if main moved while
+          # Push race guard: if main moved while
           # this run was in flight, rebase onto the new tip, regenerate against
           # the new tree, and retry, instead of failing red on a
           # non-fast-forward reject.
@@ -189,7 +157,7 @@ jobs:
             fi
             echo "Push rejected, main moved. Rebase and regenerate, attempt ${attempt}."
             git pull --rebase origin main
-            (cd tools/skill-map && node extract-skills-graph.mjs --eps "$GITHUB_WORKSPACE/eps" --aura "$GITHUB_WORKSPACE/aura" --out "$GITHUB_WORKSPACE/eps/tools/skill-map/skills-graph.json")
+            (cd tools/skill-map && node extract-skills-graph.mjs --eps "$GITHUB_WORKSPACE/eps" --out "$GITHUB_WORKSPACE/eps/tools/skill-map/skills-graph.json")
             node tools/capability-feed/generate-feed.mjs --write
             git add "$GRAPH" "$FEED"
             if ! git diff --cached --quiet; then

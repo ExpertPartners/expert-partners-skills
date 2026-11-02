@@ -32,9 +32,9 @@ The HQ Rulebook first, then the Chat to Code job list through job_status for wha
 
 Expert Partners LLC is the legal and operating entity. Don Hobbs operates under Expert Partners LLC; his IP (Gateway to Mastery, Think Big Live Big, 2020 Vision, events, coaching clients, and related training assets) lives under Expert Partners LLC. He is not a separate brand stack or a separate business container.
 
-The brand registry's original record is aura ADR 0045 (ruled 2026-07-30), kept as history. Read current brand canon from the Drive brand canon Docs named in the brand-voice skill. The six active brands (Expert Partners, EPIC, Don Hobbs Personal Brand, AG Personal Brand, AG Luxury, Free Agent Movement), with Moxie Signature Group benched. No new Moxie work; consumer real estate routes to AG Luxury.
+The brand registry's original record is ADR 0045 (ruled 2026-07-30), kept as history in GitHub Archive. Read current brand canon from the Drive brand canon Docs named in the brand-voice skill. The six active brands (Expert Partners, EPIC, Don Hobbs Personal Brand, AG Personal Brand, AG Luxury, Free Agent Movement), with Moxie Signature Group benched. No new Moxie work; consumer real estate routes to AG Luxury.
 
-PartnerSync is the white-labeled GoHighLevel platform layer, the agency container (company `FOz8PSvqj7aYASb3wDzm`, "Expert Partners LLC dba Partner Sync"). It is plumbing, not a legal entity and not a brand. It holds five brand locations: EPIC, Expert Partners, AG Personal Brand, Moxie Signature Group (location exists physically; the brand is benched per aura ADR 0045, route no new work there), and Free Agent Nation Circle Community. The location IDs live in section 7.1 of the PartnerSync Identity Canon in Drive (02 - Identity Canon). The location a contact lives in IS the brand statement; the peer brand-tag vocabulary is retired as contact-routing architecture (ruled 2026-07-27; full rule in `partnersync/doctrine/cross-location-identity-rules.md`).
+PartnerSync is the white-labeled GoHighLevel platform layer, the agency container (company `FOz8PSvqj7aYASb3wDzm`, "Expert Partners LLC dba Partner Sync"). It is plumbing, not a legal entity and not a brand. It holds five brand locations: EPIC, Expert Partners, AG Personal Brand, Moxie Signature Group (location exists physically; the brand is benched per ADR 0045, history in GitHub Archive, route no new work there), and Free Agent Nation Circle Community. The location IDs live in section 7.1 of the PartnerSync Identity Canon in Drive (02 - Identity Canon). The location a contact lives in IS the brand statement; the peer brand-tag vocabulary is retired as contact-routing architecture (ruled 2026-07-27; full rule in `partnersync/doctrine/cross-location-identity-rules.md`).
 
 ## Storage map: what each system does, one job each
 
@@ -59,9 +59,9 @@ Not in the stack, stated so nobody re-litigates it:
 
 ## AI brains
 
-The brains, their seats, machines, one jobs, SOULs, and liveness rules live in Bible Chapter 4 (`canonical-bible-chapter-4-brains-and-sync-topology.md`, expert-partners doctrine area). This map does not restate the roster. The aura strategic brain is retired (Aura Retirement Plan), and rules and decisions are read from the Drive business brains. Ember (M2) was frozen and quieted 2026-08-03 (workspaces archived, gateway disabled, writer crons off). The 2026-08-03 pause condition on agentic rebuilds (Aura's brain in place and locked down) was MET when the Estate Brain went live and proven on every surface (2026-08-04, re-proven 2026-08-07); Ember's wake now proceeds under the one-move wake ruling (`aura/intake/2026-08-05-ruling-ember-one-move-wake-sequencing.md`) in its own lane per the ledger. Everything else is planned and dark by design. Liveness is proven by process evidence, never by a fresh commit.
+The brains, their seats, machines, one jobs, SOULs, and liveness rules live in Bible Chapter 4 (`canonical-bible-chapter-4-brains-and-sync-topology.md`, expert-partners doctrine area). This map does not restate the roster. The aura strategic brain is retired (Aura Retirement Plan), and rules and decisions are read from the Drive business brains. Ember (M2) was frozen and quieted 2026-08-03 (workspaces archived, gateway disabled, writer crons off). The 2026-08-03 pause condition on agentic rebuilds (Aura's brain in place and locked down) was MET when the Estate Brain went live and proven on every surface (2026-08-04, re-proven 2026-08-07); Ember's wake now proceeds under the one-move wake ruling (history in GitHub Archive) in its own lane per the ledger. Everything else is planned and dark by design. Liveness is proven by process evidence, never by a fresh commit.
 
-Ember has her own shared Google Drive, and it is her filing home at wake, she files her documents there when she wakes; the CI watchman is not Ember and keeps filing to the Aura Docs folder per document-formatting-standard (ruled 2026-08-05, robot delivery standards ruling, aura intake 3973c2b). Amended 2026-08-06 per the Ember Voice and Your Move Queue ruling (aura intake/2026-08-06-ruling-ember-voice-and-your-move-queue.md, ee86601). Every robot message to Allison speaks as Ember in first person (R2). Drive docs are for genuine reading material only, the your-move instruction lives on the board rendered at hq.allisongaddy.com, and robot texts link hq.allisongaddy.com only (R3, rail spec aura docs/estate/your-move-queue.md).
+Ember has her own shared Google Drive, and it is her filing home at wake, she files her documents there when she wakes; the CI watchman is not Ember and keeps filing to the Aura Docs folder per document-formatting-standard (ruled 2026-08-05, robot delivery standards ruling, history in GitHub Archive). Amended 2026-08-06 per the Ember Voice and Your Move Queue ruling (history in GitHub Archive, ee86601). Every robot message to Allison speaks as Ember in first person (R2). Drive docs are for genuine reading material only, the your-move instruction lives on the board rendered at hq.allisongaddy.com, and robot texts link hq.allisongaddy.com only (R3, rail spec: history in GitHub Archive).
 
 ## Where canon is read from
 
@@ -86,7 +86,7 @@ Warning line, ordered by Chapter 3: the Windsor GHL connector points at a foreig
 
 ## Google Workspace access doctrine (ruled 2026-08-06)
 
-Canonical text, verbatim from the ruling record (aura `intake/2026-08-07-google-workspace-access-doctrine-ordered-gate-pasted.md`):
+Canonical text, verbatim from the ruling record (history in GitHub Archive):
 
 GOOGLE WORKSPACE ACCESS DOCTRINE. Claude holds super-admin-grade access to the expertpartners.com Google Workspace through the service account with domain-wide delegation, credential in 1Password, impersonating allison@expertpartners.com or don@expertpartners.com as the task requires, exact-scope law per DWD (request the exact authorized scope strings, verified by token-mint smoke test). On any surface with execution and open egress (Claude Code, Cowork), the SA road is the FIRST road for every Workspace operation, list, search, read, and write per the write-autonomy bright line. Claude never claims Workspace access is missing, never asks Allison to share, grant, or manually fetch, and never blames connector limitations without first attempting the SA road and reporting the exact failure with its error text. The claude.ai chat connectors are a convenience layer for inline reads only, their failures never mean access is missing, they mean route the operation through the Code road. Both impersonations live-verified 2026-08-05 (drive.readonly, canon sweep evidence). This doctrine inherits the operating-doctrine and the credential currency doctrine and never overrides either.
 
@@ -119,7 +119,7 @@ The GHL capability boundary holds: the data layer is writable through the API (c
 
 ## The automation platform-selection rule (ruled 2026-07-27)
 
-Per automation, the implementer (Claude Code / Cowork) makes the platform call against current developer docs, with a hard bias for Claude-buildable. Allison never hand-builds workflows: where GHL API limits would force manual builder work, the logic goes to n8n. GHL keeps native sends on the location's number and sending reputation. Full doctrine: `partnersync/doctrine/automation-platform-selection.md` (moved there 2026-09-08 from the retired ghl-automation repo); read alongside aura decision 0090 (2026-09-04), which routes portable orchestration into Activepieces on touch.
+Per automation, the implementer (Claude Code / Cowork) makes the platform call against current developer docs, with a hard bias for Claude-buildable. Allison never hand-builds workflows: where GHL API limits would force manual builder work, the logic goes to n8n. GHL keeps native sends on the location's number and sending reputation. Full doctrine: `partnersync/doctrine/automation-platform-selection.md` (moved there 2026-09-08 from the retired ghl-automation repo); read alongside decision 0090 (2026-09-04, history in GitHub Archive), which routes portable orchestration into Activepieces on touch.
 
 ## Web data acquisition: Firecrawl-first (ruled 2026-07-27)
 
@@ -145,7 +145,7 @@ Two lanes, matched to the surface:
 - Live GHL reads or writes? Claude Code, with the Marketplace app token, app-token-first. Cowork orchestrates and verifies.
 - Scraping, crawling, or watching a JS-heavy page? Firecrawl first, on the lane that matches the surface. Native web search / fetch is fallback; browser automation is last resort.
 - Which brand owns this contact? The location it lives in. Brand labels are for assets that genuinely need one, never a routing layer.
-- Consumer real estate work? AG Luxury, never Moxie (benched, aura ADR 0045).
+- Consumer real estate work? AG Luxury, never Moxie (benched, ADR 0045, history in GitHub Archive).
 
 ## Where this skill lives
 

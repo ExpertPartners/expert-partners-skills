@@ -1,4 +1,4 @@
-## 2.77.0 - 2026-11-02
+## 2.79.0 - 2026-11-02
 
 New skill business-brain-foundations v1.0, Week 0 tool 2, built from the approved spec [HQ][V1.0]
 Spec - Business Brain Foundations, revision 1, and its Rulings section, where O01 to O10 and B1 to
@@ -18,7 +18,29 @@ About Us Google Doc stays beside the new file until Allison approves it. It neve
 Brain Auditor or ICP Researcher. The run closes with the four files linked with versions, what
 changed, the open-question list and one next step. Every instruction carries its spec or ruling ID,
 and the file structures are written in our own words with no course text. The first real Expert
-Partners run is the real-task test after merge, and HQ and Allison certify (Build Standard 1.2).## 2.76.0 - 2026-11-02
+Partners run is the real-task test after merge, and HQ and Allison certify (Build Standard 1.2).
+## 2.78.0 - 2026-11-02
+
+Browser Route Home (Chat to Code job 100094, from the Keys and Sign-Ins room). After the Nov 1 M2
+rebuild the M2 has one Mac user, ember, one Chrome profile, Default, and no pw-run, so the old
+browser route no longer exists, and Codex followed it today. browser-automation and
+ember-browser-routing now name the one live route, playwright-ember (SSH from the M4 to
+/Users/ember/maintenance/chrome-signed-in-mcp.sh on the M2), point to the AI Implementation SOP as
+its single home, and drop playwright, playwright-atlas, pw-run, the Atlas profile and the retired
+cua_ember route. Proven live Nov 2, 2026.
+## 2.77.0 - 2026-11-02
+
+Finishes retiring the aura repo as a source (HQ Rulebook and Decision Log: aura is retired and
+locked, never a knowledge source, and its old decisions and intake are history in GitHub Archive).
+RULED-BY notes and ruling-of-record citations that pointed at the retired aura repo's decision or
+intake files now read history in GitHub Archive, and ADR mentions drop the retired aura path. No
+rule changes meaning and no content from the retired aura repo is copied in. The repo tooling
+stops reading the retired aura repo in the same pull request: the skills-graph workflow no longer
+checks it out, the skill map and AI Workforce feed carry none of its skills, deploy-skill.sh drops
+its development label mapping to the retired aura repo, and the skills Builder workflow no longer
+accepts job issues from the retired expertpartners-aura repo. brand-voice 0.6.7,
+content-engines 0.9.1, research-ops 0.5.1 and systems-map 0.6.7 carry matching edits.
+## 2.76.0 - 2026-11-02
 
 New skill shadow-board v1.0, Week 0 tool 3, built from the approved spec [HQ][V1.0] Spec - Shadow
 Board and the Decision Log entries of 2026-10-29, 2026-10-31 and 2026-11-01. It seats five real,
@@ -48,8 +70,8 @@ Ping is switched off. Everything else in the skill stays as it was, including on
 response, FROM, TO, MODEL AND EFFORT or SPEED, worktrees for spawned code sessions, and job_finish
 with a verified summary and result link (Decision Log 2026-10-31, the mail system is dissolved
 everywhere). In the same pull request the skills Builder workflow accepts job issues from
-expertpartners-aura, and when an allowlisted author opens an issue whose title begins with Job:,
-the workflow adds the job label itself with the Factory app token and builds it once.
+expertpartners-aura (removed again in 2.77.0, aura is retired), and when an allowlisted author
+opens an issue whose title begins with Job:, the workflow adds the job label itself with the Factory app token and builds it once.
 ## 2.74.0 - 2026-11-01
 
 New skill book-moment v1.0 (Decision Log 2026-11-01, Book Moment is one simple skill, and the old
@@ -282,7 +304,7 @@ Repoints skills from the retired aura repo and the Estate Brain connector to
 the Google Drive business brains. This implements Aura Retirement Plan step 2
 and the Decision Log entries "Repointing the skills starts now" and "No skill
 exceptions" (2026-10-19). Only where a skill reads or writes changed. Each
-skill's job and triggers stay the same. Live reads of aura rules, ADRs and
+skill's job and triggers stay the same. Live reads of retired aura rules, ADRs and
 the lane ledger now point to the HQ Rulebook, the Decision Log and the Job
 Tracker (Handoffs tab for messages). Deployed-copy and upload-shelf wording
 in estate-memory-router, remember-this and repo-standards now says skills
@@ -356,7 +378,7 @@ definitions (business brain, repo).
 
 Step 1 of the clean-slate cutover, batch 1. code-block-routing, session-steward
 and session-model-advisor now use the Job Tracker (Drive sheet), the Decision
-Log and the HQ Rulebook in place of aura lanes.md, update_lane_row and Estate
+Log and the HQ Rulebook in place of retired aura lanes.md, update_lane_row and Estate
 Brain reads. Worktree, model and effort, closeout and verdict rules are
 unchanged. Companion changes in the standalone skills (session-wrap,
 estate-memory-router, intake, research-intake, capability-currency,
@@ -409,7 +431,7 @@ rule. No model matrix is copied into the plugin.
 ## 2.48.0 -- 2026-09-08
 
 Two-word worker titles per decision 0091 (ruled by Allison 2026-09-07 via Lock
-that, ruling of record aura decisions/0091-allison-controlled-two-word-routing-names.md).
+that, ruling of record: history in GitHub Archive).
 `code-block-routing` (dated amendment, description frontmatter updated),
 `lane-spawn` v1.9, `session-steward` v1.5, and `pin` v4.10 retire the
 `<Table Name> - <Specific Job>` worker form and the room-token exception that
@@ -445,7 +467,7 @@ pass only; no new rule, registry, or routing-state write.
 `connection-first-implementation` amended: access first, browser last, and
 rung five gains its execution home. Ruled by Allison 2026-09-07 as a standing
 direction (ruling of record:
-aura intake/2026-09-07-ruling-browser-last-ember-browser-execution-home.md).
+history in GitHub Archive).
 The ladder now names the access roads that live on rungs one through four
 (surface-native tools and connectors, Claude and ChatGPT plugins and
 connectors, Estate and official MCP servers, existing org integrations,
@@ -464,7 +486,7 @@ Guest profile, never the foreground window, never Allison's focus; Ember path
 unavailable means re-check non-browser roads, diagnose, report the blocker,
 never fall back silently to the M4; Allison may override per task. The M4
 keeps every non-browser job it already owns. Companion edit in the same pass:
-aura docs/directives/host-machine.md retires its "any machine with a browser"
+aura docs/directives/host-machine.md (now retired history) retires its "any machine with a browser"
 sentence and carries the machine half of the same ruling. No new skill was
 created and no per-project copy was made; the plugin distributes the rule.
 Inked by the Ember Browser Routing - Deploy Access Routing Rule Code session.
@@ -474,7 +496,7 @@ Inked by the Ember Browser Routing - Deploy Access Routing Rule Code session.
 New skill, `session-model-advisor`. Fires on the first user message of any
 new conversation, on Claude Chat, Claude Projects, and Claude Code. Reads
 the current model and effort, fetches ADR 0057 (Model and Effort Operating
-Standard, aura repo `decisions/0057-model-and-effort-operating-standard.md`)
+Standard, history in GitHub Archive)
 live, classifies the incoming task against the ADR's decision matrix, and
 states plainly -- before anything else -- whether to stay or switch. Carries
 no copy of the matrix, a changed default in the ADR never requires editing
@@ -497,8 +519,7 @@ installed and wired live on the M4 this same session.
 
 GitHub sync acceptance test. No doctrine change, no skill body change. This
 version bump exists to prove the claude.ai org marketplace pipe end to end,
-per Allison's ruling of record (aura
-intake/2026-08-07-ruling-github-sync-adopted-for-skill-deployment.md).
+per Allison's ruling of record (history in GitHub Archive).
 The pipe is proven when the deployed plugin reports 2.34.1 without any zip
 touching any page.
 

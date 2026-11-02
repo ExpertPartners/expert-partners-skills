@@ -85,7 +85,7 @@ Research is evidence, never authority. Raw transcripts, meeting records, imports
 
 A meeting account is evidence of discussion; identify any separately recorded accepted decision before treating a claim as current guidance. A distillation is a new derived artifact with source paths, revisions or capture identifiers, and preserved qualifications. Never overwrite its source. Preserve source history, decisions, and raw originals. Generated output points to its producer and sources; it is never a second editable authority.
 
-Do not blanket-exclude all `intake/` paths as non-authoritative: ordinary intake is unreviewed under ADR 0027, but Aura's dated ruling-of-record files intentionally live there under `aura doctrine/ruling-of-record-format.md`. Verify the specific ruling and its status directly. That exception does not promote an ordinary capture or research report.
+Do not blanket-exclude all `intake/` paths as non-authoritative: ordinary intake is unreviewed under ADR 0027, but the retired aura repo's dated ruling-of-record files intentionally lived there (history in GitHub Archive). Verify the specific ruling and its status directly. That exception does not promote an ordinary capture or research report.
 
 ## Choose dispositions within existing authority
 

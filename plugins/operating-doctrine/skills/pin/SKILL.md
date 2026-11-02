@@ -14,9 +14,9 @@ subtitle: "carry-back envelope and place-keeping baton"
 
 # Pin
 
-<!-- RULED-BY: aura/decisions/0107-retire-routing-naming-ceremony.md date:2026-10-12 superseded naming text removed -->
+<!-- RULED-BY: history in GitHub Archive date:2026-10-12 superseded naming text removed -->
 
-A pin is a bookmark, not a task. It marks the exact spot where work handed off between Claude Code and the Claude project conversation that drives it. Historical amendments, not current handoff instructions: v4 (ruled by Allison 2026-08-03) makes the protocol surface-neutral: the home is a Claude PROJECT plus CONVERSATION, never assumed to be CoWork, and adds the "come back here" pin close. v4.2 (ruled by Allison 2026-08-03) deletes the closing line that solicited a paste confirmation. v4.5 (re-ruled by Allison 2026-08-07 evening) has the session give its own archive verdict. v4.6 (ruled by Allison 2026-08-07, ruling of record aura intake/2026-08-07-ruling-dispatch-blocks-must-name-worktrees.md) adds the WORKTREE line to spawning blocks. v4.7 (ruled by Allison 2026-08-07, Aura / Code Rule Fix lane) adds the earned verdict line. v4.8 (ruled by Allison 2026-10-24, Decision Log 2026-10-24, Archiving is gated on the paper trail, and an orphan sweep catches what slips) makes the chat message the bell and the Handoffs report row the record, and gates the archive on that row. That v4.8 bell and Handoffs report row are retired by Decision Log 2026-10-31, Mail boxes and new Handoffs rows stop.
+A pin is a bookmark, not a task. It marks the exact spot where work handed off between Claude Code and the Claude project conversation that drives it. Historical amendments, not current handoff instructions: v4 (ruled by Allison 2026-08-03) makes the protocol surface-neutral: the home is a Claude PROJECT plus CONVERSATION, never assumed to be CoWork, and adds the "come back here" pin close. v4.2 (ruled by Allison 2026-08-03) deletes the closing line that solicited a paste confirmation. v4.5 (re-ruled by Allison 2026-08-07 evening) has the session give its own archive verdict. v4.6 (ruled by Allison 2026-08-07, ruling of record: history in GitHub Archive) adds the WORKTREE line to spawning blocks. v4.7 (ruled by Allison 2026-08-07, Aura / Code Rule Fix lane) adds the earned verdict line. v4.8 (ruled by Allison 2026-10-24, Decision Log 2026-10-24, Archiving is gated on the paper trail, and an orphan sweep catches what slips) makes the chat message the bell and the Handoffs report row the record, and gates the archive on that row. That v4.8 bell and Handoffs report row are retired by Decision Log 2026-10-31, Mail boxes and new Handoffs rows stop.
 
 Pins persist to `~/.claude/baton.md`. Every surface reads the same baton file, so one pin trail spans all of them.
 
@@ -43,8 +43,8 @@ The VERDICT line is the last line of the carry-back, directly after the SESSION 
 
 ### The session gives the archive verdict (v4.5, re-ruled by Allison 2026-08-07 evening)
 
-<!-- RULED-BY: aura/intake/2026-08-07-ruling-archive-verdict-returns-to-code-sessions.md date:2026-08-07 -->
-<!-- Restores and generalizes a rule Allison first ruled 2026-08-03 for this skill (pin v4.1), struck without disclosure 2026-08-07 morning, and re-ruled the same afternoon: aura/intake/2026-08-03-ruling-pin-v41-carry-back-names-verified-archive-verdict.md date:2026-08-03 status:superseded-and-restored -->
+<!-- RULED-BY: history in GitHub Archive date:2026-08-07 -->
+<!-- Restores and generalizes a rule Allison first ruled 2026-08-03 for this skill (pin v4.1), struck without disclosure 2026-08-07 morning, and re-ruled the same afternoon: history in GitHub Archive date:2026-08-03 status:superseded-and-restored -->
 
 This SUPERSEDES the v4.3 no-verdict addendum and retires `SESSION STATUS: carry-back delivered, awaiting verification at home.` permanently; that line is never written again. Allison's reason, recorded: the session must tell her whether it is okay to archive, determine whether something is open, and say whether a closeout or a wrap is needed, because sessions that cannot say whether they are done pile up, and too many open sessions is the real failure.
 
@@ -63,7 +63,7 @@ What stays with the home conversation is acceptance of the returned evidence aga
 
 ### The earned verdict line (v4.7, ruled by Allison 2026-08-07, Aura / Code Rule Fix lane)
 
-<!-- RULED-BY: aura/intake/2026-08-07-ruling-earned-verdict-line-on-carry-backs.md date:2026-08-07 -->
+<!-- RULED-BY: history in GitHub Archive date:2026-08-07 -->
 
 Amends v4.5; does not replace it. The standing SESSION STATUS line stays, and every carry-back adds exactly one earned VERDICT line after it, the carry-back's true last line:
 
