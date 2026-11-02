@@ -36,6 +36,9 @@ class Line:
     frame: int = 0
     time: float = 0.0
     variants: list[str] = field(default_factory=list)
+    # Set once the growth step sees this short line read as a different line in place,
+    # as a spinner or status word does. OCR noise on a steady line never sets it.
+    volatile: bool = False
 
     def add_variant(self, text: str) -> None:
         """Keep another reading of this line when it differs after normalizing."""
@@ -56,7 +59,7 @@ class Screen:
             "first_time": self.first_time,
             "last_time": self.last_time,
             "frames": self.frames,
-            "lines": [asdict(line) for line in self.lines],
+            "lines": [{k: v for k, v in asdict(line).items() if k != "volatile"} for line in self.lines],
         }
 
 
@@ -144,9 +147,7 @@ def _merge(screen: Screen, new: list[Line]) -> bool:
     for k in range(t):
         old, fresh = doc[i + k], new[j + k]
         if fresh.conf > old.conf:
-            kept = Line(fresh.text, fresh.conf, old.frame, old.time, list(old.variants))
-            kept.add_variant(old.text)
-            doc[i + k] = kept
+            doc[i + k] = _reread(old, fresh)
         else:
             old.add_variant(fresh.text)
     if j + t < len(new):
@@ -173,21 +174,39 @@ def _contained(screen: Screen, new: list[Line]) -> bool:
     return j == 0 and t == len(new)
 
 
-def _combine(old: Line, fresh: Line) -> Line:
-    """One line holding both readings, the more confident one as its text."""
-    if fresh.conf > old.conf:
-        kept = Line(fresh.text, fresh.conf, old.frame, old.time, list(old.variants))
-        kept.add_variant(old.text)
+def _reread(old: Line, fresh: Line) -> Line:
+    """Old's line with fresh's reading as its text and every earlier reading kept."""
+    kept = Line(fresh.text, fresh.conf, old.frame, old.time, list(old.variants), old.volatile)
+    kept.add_variant(old.text)
+    return kept
+
+
+def _combine(old: Line, fresh: Line, keep: Line | None = None) -> Line:
+    """One line holding both readings.
+
+    The text is keep's reading when given. Otherwise the complete reading wins
+    over one that was cut off or still being typed, and failing that the more
+    confident one.
+    """
+    if keep is None:
+        keep = _complete(old, fresh) or (fresh if fresh.conf > old.conf else old)
+    if keep is fresh:
+        kept = _reread(old, fresh)
     else:
-        kept = Line(old.text, old.conf, old.frame, old.time, list(old.variants))
+        kept = Line(old.text, old.conf, old.frame, old.time, list(old.variants), old.volatile)
         kept.add_variant(fresh.text)
     for variant in fresh.variants:
         kept.add_variant(variant)
+    kept.volatile = old.volatile or fresh.volatile
     return kept
 
 
 def _align(doc: list[Line], new: list[Line]) -> list[tuple[int, int]]:
-    """Longest in-order run of similar lines between doc and new, as index pairs."""
+    """Longest in-order run of similar lines between doc and new, as index pairs.
+
+    When two doc lines could take the same new line, the later one does, so new
+    lines up against the end of doc as a scroll does.
+    """
     n, m = len(doc), len(new)
     doc_norm = [normalize(d.text) for d in doc]
     new_norm = [normalize(x.text) for x in new]
@@ -201,7 +220,7 @@ def _align(doc: list[Line], new: list[Line]) -> list[tuple[int, int]]:
                 longest[a][b] = max(longest[a + 1][b], longest[a][b + 1])
     pairs, a, b = [], 0, 0
     while a < n and b < m:
-        if match[a][b]:
+        if match[a][b] and longest[a + 1][b] < longest[a][b]:
             pairs.append((a, b))
             a, b = a + 1, b + 1
         elif longest[a + 1][b] >= longest[a][b + 1]:
@@ -209,6 +228,40 @@ def _align(doc: list[Line], new: list[Line]) -> list[tuple[int, int]]:
         else:
             b += 1
     return pairs
+
+
+def _numbers(normalized: str) -> list[str]:
+    return re.findall(r"\d+", normalized)
+
+
+def _is_prefix(na: str, nb: str) -> bool:
+    """True when one normalized reading is a long enough start of the other."""
+    shorter, longer = sorted((na, nb), key=len)
+    return shorter != longer and len(shorter) >= MIN_PREFIX_CHARS and longer.startswith(shorter)
+
+
+def _continues(old: Line, fresh: Line) -> bool:
+    """True when fresh is old with more text typed after it."""
+    na, nb = normalize(old.text), normalize(fresh.text)
+    return len(nb) > len(na) and _is_prefix(na, nb)
+
+
+def _fragment_of(part: Line, whole: Line) -> bool:
+    """True when part reads as a cut off piece of whole."""
+    np_, nw = normalize(part.text), normalize(whole.text)
+    if not np_ or len(np_) >= len(nw):
+        return False
+    matcher = SequenceMatcher(None, np_, nw, autojunk=False)
+    return sum(block.size for block in matcher.get_matching_blocks()) >= SIMILARITY * len(np_)
+
+
+def _complete(old: Line, fresh: Line) -> Line | None:
+    """The full reading when the other one is cut off or still being typed."""
+    if _fragment_of(old, fresh):
+        return fresh
+    if _fragment_of(fresh, old):
+        return old
+    return None
 
 
 def _resemblance(old: str, fresh: str) -> float:
@@ -220,8 +273,7 @@ def _resemblance(old: str, fresh: str) -> float:
     na, nb = normalize(old), normalize(fresh)
     if not na or not nb:
         return 0.0
-    shorter, longer = sorted((na, nb), key=len)
-    if len(shorter) >= MIN_PREFIX_CHARS and longer.startswith(shorter):
+    if _is_prefix(na, nb):
         return 1.0
     da, db = re.sub(r"\d+", "", na).split(), re.sub(r"\d+", "", nb).split()
     return SequenceMatcher(None, " ".join(da), " ".join(db), autojunk=False).ratio()
@@ -231,19 +283,39 @@ def _short(line: Line) -> bool:
     return len(normalize(line.text)) <= VOLATILE_CHARS
 
 
-def _pair_gap(old: list[Line], fresh: list[Line]) -> dict[int, int]:
+def _pair_gap(old: list[Line], fresh: list[Line], bottom: bool) -> tuple[dict[int, int], set[int]]:
     """Pair lines that changed between two matched lines, in order.
 
     A line pairs with a later reading that resembles it. Failing that, a short
     line pairs with the short line at the same distance from the next matched
     line or the bottom of the frame, which is where a spinner or status word
-    sits from frame to frame.
+    sits from frame to frame. Lines whose numbers differ are different lines
+    (Week 1, Week 2), except a short last line at the bottom of both frames,
+    which is where a running counter sits.
+
+    Returns the pairs and the old indexes paired by place alone.
     """
+
+    def allowed(di: int, ni: int) -> bool:
+        na, nb = normalize(old[di].text), normalize(fresh[ni].text)
+        if _numbers(na) == _numbers(nb) or _is_prefix(na, nb):
+            return True
+        return (
+            bottom
+            and di == len(old) - 1
+            and ni == len(fresh) - 1
+            and _short(old[di])
+            and _short(fresh[ni])
+        )
+
     pairs: dict[int, int] = {}
+    by_place: set[int] = set()
     last = -1
     for di, line in enumerate(old):
         best = None
         for ni in range(last + 1, len(fresh)):
+            if not allowed(di, ni):
+                continue
             score = _resemblance(line.text, fresh[ni].text)
             if score >= RESEMBLANCE and (best is None or score > best[0]):
                 best = (score, ni)
@@ -256,10 +328,32 @@ def _pair_gap(old: list[Line], fresh: list[Line]) -> dict[int, int]:
             continue
         if di in pairs or ni in pairs.values() or not (_short(old[di]) and _short(fresh[ni])):
             break
-        if any((d < di) != (n < ni) for d, n in pairs.items()):
+        if not allowed(di, ni) or any((d < di) != (n < ni) for d, n in pairs.items()):
             break
         pairs[di] = ni
-    return pairs
+        by_place.add(di)
+    return pairs, by_place
+
+
+def _join_changed(old: Line, fresh: Line) -> Line:
+    """One line for a line that reads differently in the new frame.
+
+    A complete reading wins over a cut off or partly typed one. A short line
+    that changed in place, such as a spinner, shows its newest reading, so a
+    short closing line that replaced it stays visible. Otherwise the more
+    confident reading wins.
+    """
+    complete = _complete(old, fresh)
+    in_place = _short(old) and _short(fresh) and not similar(old.text, fresh.text)
+    if complete is not None:
+        joined = _combine(old, fresh, keep=complete)
+    elif in_place:
+        joined = _combine(old, fresh, keep=fresh)
+    else:
+        joined = _combine(old, fresh)
+    if in_place and not _continues(old, fresh):
+        joined.volatile = True
+    return joined
 
 
 def _grow(doc: list[Line], new: list[Line]) -> list[Line] | None:
@@ -267,24 +361,37 @@ def _grow(doc: list[Line], new: list[Line]) -> list[Line] | None:
 
     Lines above the first match scrolled off and are kept. Every line of doc
     from the first match down must reappear, or be one of a few short changing
-    lines, or be the last line of doc, which may have been cut off. New may
-    show one cut off line on top. New must add at least one line unless every
-    changed line was already seen changing, so a static slide whose title or
-    number changed still starts a new screen.
+    lines, or be a short last line of doc, which is kept. New may show one cut
+    off piece of the line above its first match on top. New must add a line,
+    or extend one, unless every changed line was already seen changing, so a
+    static slide whose title or number changed still starts a new screen.
+
+    A screen too short to hold GROW_MIN_ANCHORS steady lines, as at the start
+    of a message, joins only when new repeats every line of it in place, its
+    last line reappears as new's last line or changes into a line that
+    resembles it or was already seen changing, and new adds a line.
     """
     start = max(0, len(doc) - len(new) - GROW_MAX_CHANGED)
     window = doc[start:]
     anchors = _align(window, new)
-    if len(anchors) < GROW_MIN_ANCHORS:
+    steady = [(x, x) for x in range(len(doc) - 1)]
+    last_anchored = bool(anchors) and anchors[-1] == (len(doc) - 1, len(new) - 1)
+    early = (
+        start == 0
+        and 0 < len(anchors) < GROW_MIN_ANCHORS
+        and anchors[: len(steady)] == steady
+        and len(anchors) == len(steady) + last_anchored
+    )
+    if len(anchors) < GROW_MIN_ANCHORS and not early:
         return None
     bounds = [(-1, -1), *anchors, (len(window), len(new))]
     out = list(doc[:start])
-    changed = added = unseen = 0
+    changed = added = grown = unseen = 0
     for k in range(len(bounds) - 1):
         (a0, b0), (a1, b1) = bounds[k], bounds[k + 1]
         old, fresh = window[a0 + 1 : a1], new[b0 + 1 : b1]
         head, tail = k == 0, k == len(bounds) - 2
-        pairs = _pair_gap(old, fresh)
+        pairs, by_place = _pair_gap(old, fresh, bottom=tail)
         paired_new = set(pairs.values())
         lone_old = [di for di in range(len(old)) if di not in pairs]
         lone_new = [ni for ni in range(len(fresh)) if ni not in paired_new]
@@ -299,33 +406,42 @@ def _grow(doc: list[Line], new: list[Line]) -> list[Line] | None:
                 added += len(lone_new)
         else:
             changed += len(old)
-            allowed = [len(old) - 1] if tail else []
+            allowed = [len(old) - 1] if tail and old and _short(old[-1]) else []
             if any(di not in allowed for di in lone_old):
                 return None
+            if early and tail and not last_anchored:
+                last = len(old) - 1
+                if last not in pairs or (last in by_place and not old[last].volatile):
+                    return None
             unseen += len(lone_old)
             added += len(lone_new)
-        unseen += sum(1 for di in pairs if not old[di].variants)
+        for di, ni in pairs.items():
+            if _continues(old[di], fresh[ni]):
+                grown += 1
+            elif not old[di].volatile:
+                unseen += 1
         dpos = npos = 0
         for di, ni in [*sorted(pairs.items()), (len(old), len(fresh))]:
             out += old[dpos:di]
             for n in range(npos, ni):
                 if n == cut_top:
-                    if not out:
+                    if not out or not _fragment_of(fresh[n], out[-1]):
                         return None
-                    out[-1] = _combine(out[-1], fresh[n])
+                    out[-1] = _combine(out[-1], fresh[n], keep=out[-1])
                 else:
                     out.append(fresh[n])
             if di < len(old):
-                out.append(_combine(old[di], fresh[ni]))
+                out.append(_join_changed(old[di], fresh[ni]))
             dpos, npos = di + 1, ni + 1
         if k < len(anchors):
             out.append(_combine(window[a1], new[b1]))
     if changed > GROW_MAX_CHANGED:
         return None
-    if added < 1 and (changed == 0 or unseen):
+    if early and added < 1:
+        return None
+    if added + grown < 1 and (changed == 0 or unseen):
         return None
     return out
-
 
 def _grow_into(screen: Screen, new: list[Line]) -> bool:
     joined = _grow(screen.lines, new)
@@ -340,9 +456,7 @@ def _drop_consecutive_repeats(lines: list[Line]) -> list[Line]:
     for line in lines:
         if out and normalize(out[-1].text) == normalize(line.text):
             if line.conf > out[-1].conf:
-                kept = Line(line.text, line.conf, out[-1].frame, out[-1].time, list(out[-1].variants))
-                kept.add_variant(out[-1].text)
-                out[-1] = kept
+                out[-1] = _reread(out[-1], line)
             for variant in line.variants:
                 out[-1].add_variant(variant)
             continue

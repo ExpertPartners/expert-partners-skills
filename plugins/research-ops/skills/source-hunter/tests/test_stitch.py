@@ -172,7 +172,7 @@ def test_status_word_beside_a_streaming_message_stays_one_line():
     screens = stitch(frames)
     assert len(screens) == 1
     texts = [l.text for l in screens[0].lines]
-    assert texts == ["Assistant reply", "Thinking"] + MESSAGE[:22]
+    assert texts == ["Assistant reply", statuses[19 % 4]] + MESSAGE[:22]
     assert set(statuses) <= _readings(screens[0])
 
 
@@ -226,3 +226,93 @@ def test_growing_message_with_a_cut_off_top_line_stays_one_screen():
     assert len(screens) == 1
     assert [l.text for l in screens[0].lines[:-1]] == MESSAGE[:7]
     assert "ach copp bx a th" in _readings(screens[0])
+
+
+def test_a_numbered_slide_that_adds_a_bullet_starts_a_new_screen():
+    shared = ["Course schedule overview", "Calls are recorded for replay", "Bring one question each time"]
+    a = shared + ["Week 1 call recording link"]
+    b = shared + ["Week 2 call recording link", "Office hours run on the side"]
+    screens = stitch([_frame(0, a), _frame(1, b)])
+    assert len(screens) == 2
+    assert [l.text for l in screens[1].lines] == b
+    for screen in screens:
+        for line in screen.lines:
+            assert not any("Week" in v for v in line.variants)
+
+
+def test_a_static_numbered_slide_after_an_ocr_slip_starts_a_new_screen():
+    shared = ["Course schedule overview", "Calls are recorded for replay", "Bring one question each time"]
+    for week, slip, nxt in [
+        ("Week 1 call recording link", "Week 1 call recordlng link", "Week 2 call recording link"),
+        ("Week 1 recap", "Week 1 recaq", "Week 2 recap"),
+    ]:
+        screens = stitch([_frame(0, shared + [week]), _frame(1, shared + [slip]), _frame(2, shared + [nxt])])
+        assert len(screens) == 2
+        assert [l.text for l in screens[1].lines] == shared + [nxt]
+
+
+def test_a_short_closing_line_that_replaces_the_spinner_stays_visible():
+    frames, shown = _streaming_frames(MESSAGE, count=6)
+    last = frames[-1]
+    body = [Line(l.text, 90.0) for l in last[3][:-1]]
+    spun = (last[0] + 1, last[1] + 0.1, last[2] + 0.1, body + [Line("Thinking 30s", 95.0)])
+    done = (last[0] + 2, last[1] + 0.2, last[2] + 0.2, body + [Line("Let me know!", 80.0)])
+    screens = stitch(frames + [spun, done])
+    texts = [l.text for s in screens for l in s.lines]
+    assert "Let me know!" in texts
+
+
+def test_a_line_still_being_typed_keeps_its_full_reading():
+    partial = "Delta is being typ"
+    full = "Delta is being typed out in full now"
+    first = [Line(t, 90.0) for t in MESSAGE[:4]] + [Line(partial, 95.0)]
+    later = [Line(t, 90.0) for t in MESSAGE[:4]] + [Line(full, 80.0), Line(MESSAGE[4], 90.0)]
+    screens = stitch([(0, 0.0, 0.0, first), (1, 0.1, 0.1, later)])
+    assert len(screens) == 1
+    lines = screens[0].lines
+    assert [l.text for l in lines] == MESSAGE[:4] + [full, MESSAGE[4]]
+    assert partial in lines[4].variants
+
+
+def test_a_new_top_line_that_is_not_a_cut_off_piece_is_not_hidden():
+    first = MESSAGE[:5] + ["Thinking 3s"]
+    shifted = ["Unrelated top banner reads here"] + MESSAGE[2:7] + ["Thinking 4s"]
+    screens = stitch([_frame(0, first), _frame(1, shifted)])
+    texts = [l.text for s in screens for l in s.lines]
+    assert "Unrelated top banner reads here" in texts
+
+
+def test_the_first_frames_of_a_growing_message_join_one_screen():
+    frames = [_frame(f, MESSAGE[:f + 1] + [f"Thinking {f + 3}s"]) for f in range(5)]
+    screens = stitch(frames)
+    assert len(screens) == 1
+    lines = screens[0].lines
+    assert [l.text for l in lines[:-1]] == MESSAGE[:5]
+    assert {f"Thinking {f + 3}s" for f in range(5)} <= {lines[-1].text, *lines[-1].variants}
+
+
+def test_a_short_slide_that_shares_only_its_title_starts_a_new_screen():
+    a = ["Agenda for today", "Thanks"]
+    b = ["Agenda for today", "Questions welcome", "Next steps"]
+    screens = stitch([_frame(0, a), _frame(1, b)])
+    assert len(screens) == 2
+    assert [l.text for l in screens[1].lines] == b
+
+
+def test_a_message_that_extends_its_last_line_stays_one_screen():
+    words = "and the reply keeps running on past the edge of what was shown before".split()
+    steps = [" ".join(words[:n]) for n in (4, 8, 12, len(words))]
+    frames = [_frame(f, MESSAGE[:4] + [text]) for f, text in enumerate(steps)]
+    screens = stitch(frames)
+    assert len(screens) == 1
+    assert [l.text for l in screens[0].lines] == MESSAGE[:4] + [steps[-1]]
+
+
+def test_similar_lines_line_up_against_the_end_of_the_screen():
+    first_review = "Review the first draft before noon"
+    final_review = "Review the final draft before noon"
+    doc = [first_review, final_review, MESSAGE[0], MESSAGE[1], "Thinking 3s"]
+    new = [final_review, MESSAGE[0], MESSAGE[1], MESSAGE[2], "Pondering 4s"]
+    screens = stitch([_frame(0, doc), _frame(1, new)])
+    assert len(screens) == 1
+    assert [l.text for l in screens[0].lines[:-1]] == [first_review, final_review] + MESSAGE[:3]
