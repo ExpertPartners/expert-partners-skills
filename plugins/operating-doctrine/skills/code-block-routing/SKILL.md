@@ -1,6 +1,6 @@
 ---
 name: "code-block-routing"
-description: "Routes complete messages between AIs under the current HQ Rulebook. Requires one copy box naming sender, receiver, model and effort or speed; isolated worktrees for spawning code sessions; job_status ownership checks; code jobs filed as one GitHub issue titled Job: that starts the Builder on its own; job_create or job_claim at receipt for non-code jobs only; and job_finish with a verified summary and result link at completion. Keeps pin timing, approval gates and evidence-based archive readiness."
+description: "Routes complete messages between AIs under the current HQ Rulebook. Files work straight on the Chat to Code job list so Allison never wakes a worker by hand, keeps one copy box only for the first message that starts a new chat; isolated worktrees for spawning code sessions; job_status ownership checks; code jobs filed as one GitHub issue titled Job: that starts the Builder on its own; job_create or job_claim at receipt for non-code jobs only; and job_finish with a verified summary and result link at completion. Keeps pin timing, approval gates and evidence-based archive readiness."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -16,7 +16,11 @@ subtitle: "paste block routing and the job list"
 
 <!-- RULED-BY: aura/decisions/0107-retire-routing-naming-ceremony.md date:2026-10-12 superseded naming text removed -->
 
-Current authority: the HQ Rulebook section Handoffs between AIs and Decision Log 2026-10-31, The mail system is dissolved everywhere, and the job list stays as the one record. Every AI-to-AI message is one complete copy box with FROM, TO, MODEL and EFFORT/SPEED fields. Allison pastes it into the named chat. Include the whole assignment or reply, not a notice pointing to a separate message record.
+Current authority: the HQ Rulebook section Handoffs between AIs and Decision Log 2026-11-02, Allison never wakes workers by hand (which replaces the Oct 31 paste rule, while the mail system stays dissolved and the job list stays the one record).
+
+An AI that needs another AI files the work straight on the Chat to Code job list, job_create for non-code work or one GitHub issue titled Job: for code, with the whole assignment in the job. It never hands Allison a copy box to paste. Every chat that takes jobs runs its own scheduled check that reads job_inbox and starts what is waiting, every 15 minutes during Allison's working hours where the scheduler allows it and hourly the rest of the time. Work never goes to a worker that cannot check on its own, such as a Codex session. It goes to the Chat to Code Loop or to Factory instead.
+
+The one copy box left is the first message that starts a brand new chat, built by the lane-spawn skill, with FROM, TO, MODEL and EFFORT/SPEED fields. The new chat sets up its scheduled check before anything else.
 
 Rule authored by Allison, 2026-07-27. Every time a block is handed to Allison to paste into a Claude Code session (intake block, implementation brief, fix instruction, verification request, anything), the block must be preceded by exactly one routing line, outside the code fence.
 
@@ -47,7 +51,7 @@ The three outcomes, and there is no fourth:
 
 1. A standing owner exists and is active. Route the work to that lane as an existing session. Do not open a second lane on the same class.
 2. A standing owner exists but is complete or archived. Say so on the routing line, name the prior job, and dispatch fresh. The prior lane's record is the new lane's inherited state.
-3. No owner exists. Before giving Allison the copy box, the dispatcher creates or reuses one Chat to Code job through the authorized job tools and verifies the pending assignment with job_status. Record its intended receiver, exact scope, worktree/branch and return destination without claiming the receiver has started. Include that existing job identity in the copy box; the receiver uses job_claim before work, not a duplicate job_create. A code job's one record is its GitHub issue, filed as The Job Report below describes, never a job list entry beside it. For a direct assignment with no prior dispatch or job, the receiving AI uses job_create. If the pending assignment cannot be saved or its ownership is uncertain, stop the dispatch and report that blocker.
+3. No owner exists. The dispatcher creates or reuses one Chat to Code job through the authorized job tools and verifies the pending assignment with job_status. Record its intended receiver, exact scope, worktree/branch and return destination without claiming the receiver has started. The receiver finds it on its scheduled check and uses job_claim before work, not a duplicate job_create. A code job's one record is its GitHub issue, filed as The Job Report below describes, never a job list entry beside it. For a direct assignment with no prior dispatch or job, the receiving AI uses job_create. If the pending assignment cannot be saved or its ownership is uncertain, stop the dispatch and report that blocker.
 
 Two hard riders. Every dispatched build cuts its worktree from a freshly fetched remote ref, never from whatever the local clone happens to hold, because a stale base hides an existing implementation until pre-flight. And every build runs a pre-flight that checks the live artifact and origin/main for the thing it is about to build; finding it already there is a successful pre-flight, and the correct move is to drop the duplicate unmerged and report, exactly as the second lane did.
 
@@ -67,7 +71,7 @@ Mechanics:
 2. **A dispatch block that spawns a Code session and arrives WITHOUT a `WORKTREE` line is malformed and bounces home, same as a block missing its routing line.** The receiving session does not execute it; it replies naming what is missing so the dispatcher reships the block whole.
 3. A session NEVER writes in a repo's main working tree when another lane may hold uncommitted state in it. Check before writing: `git worktree list`, then `git status` in the main tree. Uncommitted changes belonging to someone else mean isolate, always.
 4. Serializing is a legitimate answer when the work genuinely cannot split, and it is stated, never assumed: the dispatch replaces the `WORKTREE` line with an explicit serialization statement naming the order, and the second lane's existing job records that it waits on the first. Silence is never serialization.
-5. The dispatcher records and verifies the assigned worktree/branch in that same job before dispatch, so the next dispatcher can see occupied scopes even while the copy box is unpasted. The receiver verifies the actual worktree on claim. No second reservation record.
+5. The dispatcher records and verifies the assigned worktree/branch in that same job before dispatch, so the next dispatcher can see occupied scopes even before the receiver claims it. The receiver verifies the actual worktree on claim. No second reservation record.
 6. This rule binds the dispatcher AND the dispatched session. The dispatcher ships the line; the session enforces it by bouncing a spawning block that lacks one, and confirms its tree's absolute path before touching anything else.
 7. Continuation blocks routed to an EXISTING session inherit that session's established worktree and need not restate it. A pre-rule session with no isolated tree that receives new work isolates itself at that point and says so in its carry-back.
 
@@ -164,13 +168,13 @@ A code job is never filed as a board job that someone copies into an issue. On 2
 
 job_create is for non-code jobs only: research, document, decision, browser and report jobs. The receiving AI uses job_create or job_claim before starting, retains the existing job identity on continuation, and uses job_finish with the full outcome summary and result link when finished. Check job_status before dispatch to avoid duplicate ownership and after completion to verify the saved report.
 
-Non-code jobs will be picked up automatically by Ember once the Ember Rebuild room puts her live. Until then, a copy box wakes the assigned chat.
+The assigned chat picks the job up on its own scheduled check, so no copy box wakes it. Once Ember is live she also wakes workers as jobs land.
 
 Alerts to Allison come through Ember, never as HighLevel texts, and the Chat to Code Text Ping is switched off.
 
 ### Recording The Job
 
-Record the actual worker, repository/worktree/branch, return destination, evidence, and any named wait in the existing job. Never create a second spreadsheet record. The return message follows the same complete copy-box envelope as the assignment. A copy box alone is not a saved job report.
+Record the actual worker, repository/worktree/branch, return destination, evidence, and any named wait in the existing job. Never create a second spreadsheet record. The return goes back through job_finish on the same job, never as a box for Allison to carry. Only a saved job_finish counts as the job report.
 
 If a job write fails, inspect job_status before retrying an uncertain write. If the report remains unverified, keep the reporting obligation open and name the failed action. Follow the current HQ Rulebook section Session lifecycle for archive readiness and consent. Session-steward checks job_inbox for work awaiting an owner and reports gaps from job evidence, not message receipts.
 
