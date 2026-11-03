@@ -49,7 +49,7 @@ Then one section per offer, headed with the offer's name, each with these fields
 5. Guarantee. The guarantee terms, or None (R18).
 6. Claims we do NOT make. The promises the offer never makes (R18).
 
-Gateway to Mastery's price is $997 (B7, Decision Log 2026-10-30, Gateway to Mastery's price is $997).
+For the Expert Partners brain only, Gateway to Mastery's price is $997. Leave it out for any other business (B7, R24, Decision Log 2026-10-30, Gateway to Mastery's price is $997).
 
 ## 4. Testimonials (R19)
 
