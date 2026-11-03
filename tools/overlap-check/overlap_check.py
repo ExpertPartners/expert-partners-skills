@@ -214,13 +214,25 @@ def normalize(path: str) -> str:
     return path.lstrip("/")
 
 
+# Each job writes its own note file in these folders, so a note only collides with the
+# very same file. The folder named alone never holds another job's note.
+NOTE_DIRS = (".changeset/",)
+
+
+def is_note(path: str) -> bool:
+    return any(path == d or path == d.rstrip("/") or path.startswith(d) for d in NOTE_DIRS)
+
+
 def is_shared(path: str) -> bool:
     return path.rstrip("/").rsplit("/", 1)[-1].lower() in SHARED_BASENAMES
 
 
 def paths_overlap(a: str, b: str) -> bool:
-    """Same file, one path inside the other's directory (a path ending in /), a glob match,
+    """A note in .changeset/ collides only with the same note. Otherwise same file, one path inside the other's directory (a path ending in /), a glob match,
     or a shared file named without its directory (plugin.json) against any file of that name."""
+    if is_note(a) or is_note(b):
+        # Only the very same note file collides, never the folder named alone.
+        return a == b and a.rstrip("/") not in {d.rstrip("/") for d in NOTE_DIRS}
     if a == b:
         return True
     if is_shared(a) and is_shared(b) and ("/" not in a or "/" not in b):
