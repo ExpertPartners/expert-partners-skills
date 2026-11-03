@@ -9,6 +9,7 @@ Working here
 - Read the skill you are changing and the canonical operating-doctrine skill first.
 - Use an isolated branch or worktree, inspect git state before editing, and open a pull request for every change. Never force-push or bypass required checks.
 - Correct the canonical skill source first. Generated files, deployed copies, and the skill graph come only from their producers in tools. Never hand-edit them.
+- Never edit a plugin version in plugin.json or marketplace.json, or the top of a CHANGELOG.md. Add one note in .changeset/ instead, as .changeset/README.md explains. The release step in tools/release owns versions and CHANGELOG entries.
 - Run the changed-file gates in .pre-commit-config.yaml and .github/workflows/ci.yml, plus the tests under tools, before pushing. Report real results.
 - Validation command for jobs from the Chat to Code Loop: run tools/validate-job.sh from the repo root. It runs the changed-file gates from ci.yml, the skill description cap and gitleaks, and exits 0 only when all pass. A job is not done until it prints validate-job: PASS.
 - Secrets live in 1Password only. They never appear in code, logs, config, or chat.
@@ -30,6 +31,6 @@ These rules bind Codex and every other reviewer of pull requests here, and the b
 
 - Block only on P0 and P1 findings. A P2 or lower finding never blocks a merge.
 - Re-review only the newest commit. Do not reopen code an earlier round already reviewed unless the newest commit changed it.
-- After three review rounds on one pull request, stop. Instead of a fourth round, leave one comment that starts with Question for Allison and gives a one-paragraph summary of what is still open and what you recommend.
+- Review rounds have no limit (Decision Log 2026-11-02, No caps stop work, which wins if this line drifts from it). The builder keeps fixing P0 and P1 findings round after round. Only a finding that comes back after it was fixed goes to Allison: mark the existing Chat to Code job needs-allison with one line starting Recommend: through the job tool's supported nonterminal path, never as a question inside an app.
 - Fix a P2 only when the fix is small and inside the pull request's scope. Otherwise reply on the thread with the reason it is not fixed here, and resolve the thread.
 - Do not report style, rare edge cases, or refinements of an earlier fix.
