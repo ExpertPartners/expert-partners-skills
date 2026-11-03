@@ -1,3 +1,6 @@
+## 0.5.7 - 2026-11-03
+
+video-discovery: `video_discovery.py` and `probe_media.py` now write privacy-safe operational status events to stderr through a new `scripts/operational_logging.py` module. Each event is one JSON line holding only a fixed event name, a random run identifier, a success or failure outcome, a duration and bounded counts. Unknown fields are rejected, exception text and content are never logged, and nothing is written to files or sent over the network.
 ## 0.5.6 - 2026-11-03
 
 Source Hunter joins a window title bar whose tail the OCR reads as different noise each frame, digits included. Found on the real class with anonymized fixtures, not guessed. The noise must be misread words, scraps of three letters or fewer, or words the title already shows, so a real word swapped in still splits, and a numbered slide (Week 1, Week 2) still splits when nothing else is added.

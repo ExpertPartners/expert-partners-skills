@@ -113,6 +113,29 @@ verification pass. `probe_media.py OUTPUT` retains the older optional 512 KiB
 prefix/ffmpeg approach for reproducibility; it can fail on MP4 files whose metadata
 is at the tail, so the seeking decoder is the practical verification command.
 
+## Operational status log
+
+`video_discovery.py` and `probe_media.py` write a short status record to stderr
+through `scripts/operational_logging.py`. Each record is one JSON line with sorted
+keys. Stdout, catalogs, request logs and evidence files are unchanged. Nothing is
+written to a file and nothing is sent anywhere; redirect stderr to keep a copy.
+
+| Field | Values |
+|---|---|
+| `schema` | `video-discovery.operational.v1` |
+| `event` | `discovery_started`, `discovery_finished`, `probe_started`, `probe_finished` |
+| `run_id` | 32 random hex characters, new for each run, not derived from any input |
+| `outcome` | `success` or `failure`, finished events only |
+| `duration_ms` | Whole milliseconds, capped at seven days, finished events only |
+| `candidates`, `requests`, `stopped_domains` | Counts on `discovery_finished`; `requests` includes budget carried over by `--resume` |
+| `records_checked`, `samples_decoded` | Counts on `probe_finished` |
+
+Counts are whole numbers capped at 1,000,000. The logger rejects any other field
+or value, and its error messages never repeat the rejected input. It never
+records URLs, paths, titles, creator names, prompts, captions, page text,
+request or response bodies, exception messages or credentials. A failed run
+logs only `outcome: failure`; the original error still reaches the terminal as
+before. A logging problem never changes what the script does.
 ## Limitations and maintenance
 
 This is a bounded discovery tool, not an exhaustive enumerator of unlisted videos.

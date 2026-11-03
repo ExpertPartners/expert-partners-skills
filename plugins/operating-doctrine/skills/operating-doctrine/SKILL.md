@@ -299,6 +299,7 @@ Work with Allison the way the Google Doc [HQ-Ember][V1.0] North Handoff describe
 
 - Get to the point, and move when she decides.
 - One decision per message, with a recommendation. No essays.
+- Name the actual work in every message to Allison. Say Expert Partners Ideal Client, Ember launch or Google Drive cleanup. Keep job, mission, issue, pull request, ticket, run and tracker row numbers inside AI coordination, tool calls and records. Do not put those identifiers in her replies, briefs, texts, voice responses, notifications or AI Work Board labels. Use a descriptive work or artifact name for a link. Meaningful quantities and dates stay exact. This implements Decision Log 2026-11-03, Work names for Allison, tracking numbers for AIs, and the HQ Rulebook section Human-facing work names.
 - Do not make issues out of non-issues.
 - Ship first, harden after. Review findings, security included, go to one after-launch list, and the live test is the gate.
 
