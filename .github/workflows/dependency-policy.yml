@@ -1,0 +1,69 @@
+name: dependency-policy
+
+# Python requirement files are exact, hash-locked pins, and the two JavaScript producers
+# under tools/ never drift apart on a shared dependency. The policy check and its tests
+# are offline; the lock-install job proves the locks install as written.
+# tools/dependency-policy/README.md explains the rules.
+
+on:
+  pull_request:
+    paths:
+      - '**/requirements*.txt'
+      - 'tools/*/package.json'
+      - 'tools/*/package-lock.json'
+      - 'tools/dependency-policy/**'
+      - '.github/workflows/**'
+  push:
+    branches: [main]
+    paths:
+      - '**/requirements*.txt'
+      - 'tools/*/package.json'
+      - 'tools/*/package-lock.json'
+      - 'tools/dependency-policy/**'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  policy:
+    name: dependency policy (offline)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Policy tests (synthetic fixtures, network blocked)
+        run: python3 -m unittest discover -s tools/dependency-policy/tests -v
+      - name: Check this repository
+        run: python3 tools/dependency-policy/check_versions.py
+
+  lock-install:
+    name: locks install exactly as written
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # --require-hashes refuses any package a lock does not list, so a lock missing a
+      # transitive dependency fails here instead of resolving one silently. Each line is a
+      # top layer and covers the locks it includes; add a line for any new top layer.
+      - name: Python locks resolve completely
+        run: |
+          set -euo pipefail
+          python3 -m pip install --dry-run --ignore-installed --quiet --require-hashes -r requirements-tooling.txt
+          python3 -m pip install --dry-run --ignore-installed --quiet --require-hashes -r plugins/research-ops/skills/video-discovery/requirements-dev.txt
+          python3 -m pip install --dry-run --ignore-installed --quiet --require-hashes -r plugins/research-ops/skills/source-hunter/requirements-dev.txt
+      - name: npm lockfiles install with verified integrity
+        run: |
+          set -euo pipefail
+          for producer in tools/capability-feed tools/skill-map; do
+            echo "== $producer"
+            (cd "$producer" && npm ci --ignore-scripts --no-audit --no-fund)
+          done
