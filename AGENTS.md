@@ -30,6 +30,6 @@ These rules bind Codex and every other reviewer of pull requests here, and the b
 
 - Block only on P0 and P1 findings. A P2 or lower finding never blocks a merge.
 - Re-review only the newest commit. Do not reopen code an earlier round already reviewed unless the newest commit changed it.
-- After three review rounds on one pull request, stop. Instead of a fourth round, leave one comment that starts with Question for Allison and gives a one-paragraph summary of what is still open and what you recommend.
+- Review rounds have no limit (Decision Log 2026-11-02, No caps stop work, which wins if this line drifts from it). The builder keeps fixing P0 and P1 findings round after round. Only a finding that comes back after it was fixed goes to Allison: mark the existing Chat to Code job needs-allison with one line starting Recommend: through the job tool's supported nonterminal path, never as a question inside an app.
 - Fix a P2 only when the fix is small and inside the pull request's scope. Otherwise reply on the thread with the reason it is not fixed here, and resolve the thread.
 - Do not report style, rare edge cases, or refinements of an earlier fix.
