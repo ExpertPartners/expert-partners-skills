@@ -1,3 +1,12 @@
+## 2.82.7 - 2026-11-03
+
+Job List Heartbeat checks now run silently, a CEO directive from Allison (Decision Log 2026-11-03, Job checks run silently). Every room still checks the job list every 15 minutes, and claiming and lease renewal are unchanged. A check posts in its room only when something significant changed, meaning a job was claimed, finished or failed, or now needs Allison, her reply was acted on, or a new blocker came up, and then it posts one short Quick Update or CEO brief. A check with nothing significant posts nothing. In local Claude Code it ends the tick with ScheduleWakeup and noop true, or the /loop equivalent, and no text. Lease renewals, still working, nothing new and next check set are never posted. The first reply still says the check is set and when the next one runs, once, and later checks never repeat it. A session started by its own recurring task counts as one of that task's checks, so it says nothing about the check either. A Quick Update a significant check posts keeps its one SESSION STATUS line, and a CEO brief is the HQ Rulebook's Decision Brief, not Teach Me's step opener. A new test case covers a check that finds nothing and posts nothing.
+## 2.82.6 - 2026-11-03
+
+Use descriptive work names in every message to Allison and keep tracking numbers inside AI coordination. Quick Update follows the same rule while preserving exact meaningful quantities and dates.
+## 2.82.5 - 2026-11-03
+
+Code Block Routing no longer restates how often job checks run. It now says every chat that takes jobs checks the job list on the schedule the HQ Rulebook section Handoffs between AIs sets (Decision Log 2026-11-02), so the Rulebook is the only home for the timing.
 ## 2.82.4 - 2026-11-03
 
 Browser Automation and Ember Browser Routing now let any AI sign in on Ember's M2 without waiting for Allison when 1Password in Chrome offers a saved login or a site offers Sign in with Google or another single sign-on for an account already signed in there (Decision Log 2026-11-03, AI uses the sign-ins Allison set up, without waiting for her). 1Password fills the credential itself, so no session reads a password with `op` for a browser sign-in. A sign-in page by itself is no longer a block or a human-only action. MFA, CAPTCHA and human approval screens still are, and new account access, live releases, messages outside approved campaigns and anything irreversible still need Allison's yes.

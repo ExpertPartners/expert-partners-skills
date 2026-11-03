@@ -60,7 +60,7 @@ jobs:
         if: steps.changed.outputs.count != '0'
         run: |
           set -euo pipefail
-          python3 -m pip install --quiet pyyaml
+          python3 -m pip install --quiet --require-hashes -r requirements-tooling.txt
           mapfile -t FILES < <(grep . changed_files.txt | grep -E '\.(md|markdown|mdx)$' || true)
           if [ "${#FILES[@]}" -gt 0 ]; then
             python3 .ep/frontmatter-lint.py --schema .ep/classification-schema.json "${FILES[@]}"
@@ -74,7 +74,7 @@ jobs:
       - name: Agent Skills description cap (F6)
         run: |
           set -euo pipefail
-          python3 -m pip install --quiet pyyaml
+          python3 -m pip install --quiet --require-hashes -r requirements-tooling.txt
           python3 .ep/skill-description-lint.py --selftest
 
   gitleaks:

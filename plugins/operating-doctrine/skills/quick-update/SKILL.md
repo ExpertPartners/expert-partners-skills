@@ -50,13 +50,13 @@ What I recommend. Two or three bullets. Give a recommendation, not a menu. Say w
 
 ## Reading level and shape
 
-First grade words. Short sentences. One idea per sentence. No jargon unless the plain words come in the same breath, like the old keys, the ones we used before. Numbers and dates stay exact, never rounded to sound simpler. The whole brief stays under about 150 words.
+First grade words. Short sentences. One idea per sentence. No jargon unless the plain words come in the same breath, like the old keys, the ones we used before. Name the actual work, such as Expert Partners Ideal Client or Ember launch. Job, mission, issue, pull request, ticket, run and tracker row numbers stay inside AI coordination and records, never in Allison's brief. Link the descriptive work name when useful. Meaningful quantities and dates stay exact, never rounded to sound simpler. The whole brief stays under about 150 words. This follows Decision Log 2026-11-03, Work names for Allison, tracking numbers for AIs, and the HQ Rulebook section Human-facing work names.
 
 Do not soften or hide a problem to keep it simple. If something failed or is unverified, it goes in the first list in plain words.
 
 ## Closing line
 
-Claude Code and Codex. End with exactly one verified SESSION STATUS line, chosen by the standing tests in the Code close rule, Waiting on you, Still working, SAFE TO ARCHIVE, or NOT safe to archive. Verify it live in the same turn. If waits exist, say where they are lodged, such as the Chat to Code job number.
+Claude Code and Codex. End with exactly one verified SESSION STATUS line, chosen by the standing tests in the Code close rule, Waiting on you, Still working, SAFE TO ARCHIVE, or NOT safe to archive. Verify it live in the same turn. If waits exist, name the work, the owner and what they must return. Keep its tracking number in the internal record.
 
 Cowork. Follow the Cowork close rule. Give an advance cue only when a next step exists. When nothing remains, say exactly We're done here. You can archive this session.
 

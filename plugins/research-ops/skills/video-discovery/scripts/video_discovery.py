@@ -24,6 +24,8 @@ from bs4 import BeautifulSoup
 from defusedxml import ElementTree
 from protego import Protego
 
+from operational_logging import OperationalRun
+
 UA = 'PublicVideoDiscovery/0.1 (bounded read-only public research)'
 
 class NoAccountAuth(requests.auth.AuthBase):
@@ -739,11 +741,14 @@ def parser():
 
 def main():
     args=parser().parse_args()
-    args.output.mkdir(parents=True,exist_ok=True)
-    if (args.output/'catalog.json').exists():raise SystemExit('Use a fresh output directory to preserve prior evidence')
-    if (args.output/'requests.jsonl').exists() and not args.resume:raise SystemExit('Use --resume or a fresh output directory to preserve request budgets')
-    # JSON-compatible configuration.
-    args.output=str(args.output)
-    Investigation(args).run()
+    with OperationalRun('discovery') as op:
+        args.output.mkdir(parents=True,exist_ok=True)
+        if (args.output/'catalog.json').exists():raise SystemExit('Use a fresh output directory to preserve prior evidence')
+        if (args.output/'requests.jsonl').exists() and not args.resume:raise SystemExit('Use --resume or a fresh output directory to preserve request budgets')
+        # JSON-compatible configuration.
+        args.output=str(args.output)
+        inv=Investigation(args)
+        try:inv.run()
+        finally:op.record(candidates=len(inv.catalog.records),requests=sum(inv.http.counts.values()),stopped_domains=len(inv.http.stopped))
 
 if __name__=='__main__':main()
