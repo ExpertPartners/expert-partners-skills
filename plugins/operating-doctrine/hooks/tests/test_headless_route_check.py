@@ -22,7 +22,8 @@ hrc = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(hrc)
 
 # Built at run time so no secret-shaped literal sits in the repository.
-FAKE_SECRET = "sk-" + "a1b2c3d4" * 5
+WITHHELD_SAMPLE = "sk-" + "a1b2c3d4" * 5
+HEX_SAMPLE = "0123456789abcdef" * 3
 
 MAP_CSV = (
     "System,Hosts,Headless route,1Password item,Status,No-API reason\n"
@@ -32,7 +33,19 @@ MAP_CSV = (
     "Vendor portal,portal.vendor.example,,,No API,Vendor offers no API or export\n"
     "Google,google.com,Google Workspace connector,,Live,\n"
     "Google Sites editor,sites.google.com,,,No API,No API for the Sites editor\n"
-    "Leaky row,leaky.example,Leaky API," + FAKE_SECRET + ",Live,\n"
+    "HubSpot,app.hubspot.com,mcp__claude_ai_HubSpot__search_crm_objects,"
+    "op://Engineering/hubspot-private-app/credential,Live,\n"
+    "Shared app,shared.example,Shared API,Shared API key,Live,\n"
+    "Shared app builder,shared.example,,,No API,Builder has no API\n"
+    "Example marketing,example.com,,,No API,Static site with no API\n"
+    "Example app,*.example.com,Example API,Example API key,Live (API),\n"
+    "Wording,setup.example,Wording API,Wording key,Setup,\n"
+)
+MAP_HEADER, _, MAP_ROWS = MAP_CSV.partition("\n")
+REVERSED_MAP_CSV = MAP_HEADER + "\n" + "\n".join(reversed(MAP_ROWS.strip().split("\n"))) + "\n"
+LEAKY_ROWS = (
+    "Leaky row,leaky.example,Leaky API," + WITHHELD_SAMPLE + ",Live,\n"
+    "Hex row,hex.example,Hex API," + HEX_SAMPLE + ",Live,\n"
 )
 
 
@@ -57,7 +70,7 @@ class HookCase(unittest.TestCase):
                 os.environ[key] = value
         self.tmp.cleanup()
 
-    def write_cache(self, csv_text=MAP_CSV):
+    def write_cache(self, csv_text=MAP_CSV + LEAKY_ROWS):
         hrc.write_cache(hrc.parse_map(csv_text))
 
     def fresh_stamp(self):
@@ -65,8 +78,10 @@ class HookCase(unittest.TestCase):
         self.state.mkdir(parents=True, exist_ok=True)
         (self.state / hrc.STAMP_FILE).touch()
 
-    def run_hook(self, url, tool="mcp__playwright-ember__browser_navigate"):
-        payload = {"hook_event_name": "PreToolUse", "tool_name": tool, "tool_input": {"url": url}}
+    def run_hook(self, url, tool="mcp__playwright-ember__browser_navigate", tool_input=None):
+        if tool_input is None:
+            tool_input = {"url": url}
+        payload = {"hook_event_name": "PreToolUse", "tool_name": tool, "tool_input": tool_input}
         result = subprocess.run(
             [sys.executable, str(HOOK)], input=json.dumps(payload), capture_output=True,
             text=True, env=self.env, timeout=20,
@@ -140,8 +155,63 @@ class Decisions(HookCase):
 
     def test_secret_shaped_map_value_is_never_printed(self):
         reason = self.assertDenied(self.run_hook("https://leaky.example/"))
-        self.assertNotIn(FAKE_SECRET, reason)
+        self.assertNotIn(WITHHELD_SAMPLE, reason)
         self.assertIn("[withheld, not an item name]", reason)
+        reason = self.assertDenied(self.run_hook("https://hex.example/"))
+        self.assertNotIn(HEX_SAMPLE, reason)
+        self.assertIn("[withheld, not an item name]", reason)
+
+    def test_long_names_and_op_paths_are_printed(self):
+        reason = self.assertDenied(self.run_hook("https://app.hubspot.com/contacts"))
+        self.assertIn("Use mcp__claude_ai_HubSpot__search_crm_objects ", reason)
+        self.assertIn("op://Engineering/hubspot-private-app/credential", reason)
+        self.assertNotIn("withheld", reason)
+
+    def test_equally_specific_rows_never_depend_on_row_order(self):
+        for name, csv_text in (("sheet order", MAP_CSV), ("reversed", REVERSED_MAP_CSV)):
+            with self.subTest(order=name):
+                self.write_cache(csv_text)
+                self.assertIsNone(self.run_hook("https://shared.example/builder"))
+                self.assertIn("map-conflict\tshared.example decided by Shared app builder no api",
+                              self.read(hrc.HOOK_LOG_FILE))
+
+    def test_wildcard_covers_subdomains_and_the_exact_row_covers_the_apex(self):
+        for name, csv_text in (("sheet order", MAP_CSV), ("reversed", REVERSED_MAP_CSV)):
+            with self.subTest(order=name):
+                self.write_cache(csv_text)
+                self.assertIsNone(self.run_hook("https://example.com/pricing"))
+                reason = self.assertDenied(self.run_hook("https://app.example.com/"))
+                self.assertIn("Example app", reason)
+
+    def test_common_status_wordings_are_understood(self):
+        self.assertIn("Example app", self.assertDenied(self.run_hook("https://app.example.com/")))
+        self.assertIn("setup job comes first", self.assertDenied(self.run_hook("https://setup.example/")))
+        self.assertEqual(
+            [hrc.normalize_status(s) for s in ("Live", "Live - API", "Setting up", "Set up", "In setup",
+                                               "No API", "No-API", "None", "not live", "")],
+            ["live", "live", "setting up", "setting up", "setting up",
+             "no api", "no api", "no api", "not live", ""],
+        )
+
+    def test_browser_code_that_navigates_to_a_live_system_is_denied(self):
+        cases = (
+            ("mcp__playwright-ember__browser_run_code_unsafe",
+             {"code": "async (page) => { await page.goto('https://app.gohighlevel.com/v2/contacts'); }"}),
+            ("mcp__playwright-ember__browser_run_code",
+             {"code": "async (page) => { await page.goto(`https://app.gohighlevel.com/${id}`); }"}),
+            ("mcp__playwright-ember__browser_evaluate",
+             {"function": "() => { window.location.href = \"https://app.gohighlevel.com/x\"; }"}),
+        )
+        for tool, tool_input in cases:
+            with self.subTest(tool=tool):
+                reason = self.assertDenied(self.run_hook(None, tool, tool_input))
+                self.assertIn("GoHighLevel contacts", reason)
+
+    def test_browser_code_without_a_mapped_navigation_is_allowed(self):
+        code = "async (page) => { await page.goto('https://portal.vendor.example/'); return page.title(); }"
+        self.assertIsNone(self.run_hook(None, "mcp__playwright-ember__browser_run_code_unsafe", {"code": code}))
+        self.assertIsNone(self.run_hook(None, "mcp__playwright-ember__browser_evaluate",
+                                        {"function": "() => document.title"}))
 
     def test_bad_input_is_allowed(self):
         result = subprocess.run([sys.executable, str(HOOK)], input="not json", capture_output=True,
@@ -179,10 +249,31 @@ class Refresh(HookCase):
         self.configure_fetch(MAP_CSV)
         ok, message = hrc.refresh()
         self.assertTrue(ok, message)
+        self.assertNotIn("not live, setting up or no API", message)
         cached = json.loads(self.read(hrc.CACHE_FILE))
-        self.assertEqual(len(cached["systems"]), 6)
-        self.assertEqual(cached["systems"][0]["hosts"], ["app.gohighlevel.com", "leadconnectorhq.com"])
+        self.assertEqual(len(cached["systems"]), 11)
+        self.assertEqual(cached["systems"][0]["hosts"], ["app.gohighlevel.com", "*.leadconnectorhq.com"])
         self.assertEqual(cached["systems"][1]["status"], "setting up")
+
+    def test_refresh_names_rows_with_an_unknown_status(self):
+        self.configure_fetch(MAP_CSV + "Odd row,odd.example,,,Maybe later,\n")
+        ok, message = hrc.refresh()
+        self.assertTrue(ok, message)
+        self.assertIn("1 with a status that is not live, setting up or no API", message)
+        self.assertIn("Odd row", message)
+
+    def test_refused_sheet_export_explains_the_drive_scope(self):
+        self.config.write_text(json.dumps({"sheet_id": "test-sheet"}), encoding="utf-8")
+        error = hrc.urllib.error.HTTPError("https://docs.google.com/", 403, "Forbidden", {}, None)
+        original = hrc.urllib.request.urlopen
+        hrc.urllib.request.urlopen = lambda *args, **kwargs: (_ for _ in ()).throw(error)
+        try:
+            ok, message = hrc.refresh()
+        finally:
+            hrc.urllib.request.urlopen = original
+        self.assertFalse(ok)
+        self.assertIn("HTTP 403", message)
+        self.assertIn("Drive scope", message)
 
     def test_failed_refresh_keeps_the_last_good_copy(self):
         self.write_cache()
@@ -235,7 +326,8 @@ class HooksJson(unittest.TestCase):
         group = config["hooks"]["PreToolUse"][0]
         matcher = re.compile(group["matcher"])
         for tool in ("mcp__playwright-ember__browser_navigate", "mcp__playwright-allison__browser_navigate",
-                     "mcp__claude-in-chrome__navigate", "mcp__claude-in-chrome__tabs_create_mcp"):
+                     "mcp__claude-in-chrome__navigate", "mcp__claude-in-chrome__tabs_create_mcp",
+                     "mcp__playwright-ember__browser_run_code_unsafe", "mcp__playwright-ember__browser_evaluate"):
             self.assertTrue(matcher.search(tool), tool)
         for tool in ("mcp__playwright-ember__browser_snapshot", "Bash", "WebFetch"):
             self.assertFalse(matcher.search(tool), tool)

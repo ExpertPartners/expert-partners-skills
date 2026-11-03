@@ -4,7 +4,7 @@
 Refuses browser navigation to any system that already has headless access (an API, CLI,
 MCP server, connector or 1Password item) and tells the session which headless route to use
 instead (Decision Log 2026-11-03, Headless access comes first, and Standing yes for headless
-access setup).
+access setup). Browser code tools are checked too, for URLs their code navigates to.
 
 The access map is a Google Sheet owned by Keys and Sign-Ins. The hook reads only a local
 cache of it, so a browser call never waits on Drive. When the cache is more than an hour
@@ -72,6 +72,8 @@ LIVE = "live"
 SETTING_UP = "setting up"
 NO_API = "no api"
 
+STATUS_TIE_ORDER = {NO_API: 0, SETTING_UP: 2, LIVE: 3}  # any other status ranks 1
+
 SECRET_RE = re.compile(
     r"-----BEGIN"
     r"|\b(?:sk|pk|rk)-[A-Za-z0-9_-]{8,}"
@@ -79,8 +81,19 @@ SECRET_RE = re.compile(
     r"|\bxox[abprs]-"
     r"|\beyJ[A-Za-z0-9_-]{10,}"
     r"|\bops_[A-Za-z0-9]"
-    r"|[A-Za-z0-9+/=_-]{40,}"
+    r"|\bAIza[A-Za-z0-9_-]{20,}"
+    r"|\bya29\.[A-Za-z0-9_-]{10,}"
 )
+# Long runs of letters and digits with no separator. Names (MCP tool names, op:// paths,
+# item slugs) break into short words at _ - / and spaces, while a key or hex token does not.
+UNBROKEN_RUN_RE = re.compile(r"[A-Za-z0-9+=]{24,}")
+
+# Navigation written into browser code: page.goto("..."), location.href = "...", and so on.
+CODE_KEYS = ("code", "function", "script", "expression")
+CODE_CALL_RE = re.compile(
+    r"""(?:\.goto|\blocation\.assign|\blocation\.replace|\bwindow\.open)\s*\(\s*(['"`])(.+?)\1"""
+)
+CODE_ASSIGN_RE = re.compile(r"""\blocation(?:\.href)?\s*=\s*(['"`])(.+?)\1""")
 
 
 def now_iso() -> str:
@@ -121,10 +134,19 @@ def one_line(value: object, limit: int = 300) -> str:
     return " ".join(str(value).split())[:limit]
 
 
+def looks_like_secret(text: str) -> bool:
+    if SECRET_RE.search(text):
+        return True
+    return any(
+        sum(char.isdigit() for char in run) >= 2 and any(char.isalpha() for char in run)
+        for run in UNBROKEN_RUN_RE.findall(text)
+    )
+
+
 def safe(value: object) -> str:
     """A map value fit to print. Anything shaped like a secret is withheld."""
     text = one_line(value, 200)
-    if SECRET_RE.search(text):
+    if looks_like_secret(text):
         return "[withheld, not an item name]"
     return text
 
@@ -134,7 +156,15 @@ def normalize_header(header: str) -> str:
 
 
 def normalize_status(status: str) -> str:
-    return " ".join(re.sub(r"[^a-z0-9]+", " ", status.lower()).split())
+    """One of live, setting up or no api for the wordings people use, otherwise the text."""
+    text = " ".join(re.sub(r"[^a-z0-9]+", " ", status.lower()).split())
+    if re.match(r"(?:no api|no|none)\b", text):
+        return NO_API
+    if re.search(r"\b(?:setting up|set up|setup|in progress)\b", text):
+        return SETTING_UP
+    if re.match(r"live\b", text):
+        return LIVE
+    return text
 
 
 def split_hosts(cell: str) -> list[str]:
@@ -146,11 +176,15 @@ def split_hosts(cell: str) -> list[str]:
         if "://" in raw:
             raw = urllib.parse.urlsplit(raw).hostname or ""
         raw = raw.split("/", 1)[0].split(":", 1)[0]
+        wildcard = False
         while raw.startswith("*.") or raw.startswith("."):
-            raw = raw[2:] if raw.startswith("*.") else raw[1:]
+            if raw.startswith("*."):
+                wildcard, raw = True, raw[2:]
+            else:
+                raw = raw[1:]
         raw = raw.rstrip(".")
         if raw:
-            hosts.append(raw)
+            hosts.append("*." + raw if wildcard else raw)
     return hosts
 
 
@@ -189,6 +223,10 @@ def parse_map(csv_text: str) -> list[dict]:
     if not systems:
         raise ValueError("the access map has no rows with a system and hosts")
     return systems
+
+
+def unknown_statuses(systems: list[dict]) -> list[str]:
+    return [safe(entry["system"]) for entry in systems if entry.get("status") not in STATUS_TIE_ORDER]
 
 
 def load_cache() -> list[dict] | None:
@@ -271,11 +309,19 @@ def fetch_map_csv(config: dict) -> str:
             body = response.read().decode("utf-8-sig")
             content_type = response.headers.get("Content-Type", "")
     except urllib.error.HTTPError as error:
+        if error.code in (401, 403):
+            raise RuntimeError(
+                f"the sheet export answered HTTP {error.code}, so the token cannot read the sheet. "
+                "It needs a Drive scope, see Setup on each machine in hooks/README.md"
+            ) from None
         raise RuntimeError(f"the sheet export answered HTTP {error.code}") from None
     except urllib.error.URLError as error:
         raise RuntimeError(f"the sheet export could not be reached ({one_line(error.reason, 80)})") from None
     if "text/html" in content_type:
-        raise RuntimeError("the sheet export returned a web page, not CSV (sign-in or sharing)")
+        raise RuntimeError(
+            "the sheet export returned a sign-in or sharing page, not CSV. The token needs a Drive "
+            "scope and access to the sheet, see Setup on each machine in hooks/README.md"
+        )
     return body
 
 
@@ -292,11 +338,16 @@ def refresh() -> tuple[bool, str]:
         systems = parse_map(fetch_map_csv(load_config()))
         write_cache(systems)
     except Exception as error:  # noqa: BLE001, every failure keeps the last good copy
-        message = f"{type(error).__name__}: {one_line(error, 200)}"
+        message = f"{type(error).__name__}: {one_line(error, 300)}"
         log_event("refresh-failed", message)
         return False, message
-    log_event("refresh-ok", f"{len(systems)} systems")
-    return True, f"{len(systems)} systems"
+    message = f"{len(systems)} systems"
+    unknown = unknown_statuses(systems)
+    if unknown:
+        message += (f", {len(unknown)} with a status that is not live, setting up or no API, so "
+                    f"the browser is let through for them: {', '.join(unknown)}")
+    log_event("refresh-ok", message)
+    return True, message
 
 
 def refresh_due() -> bool:
@@ -319,14 +370,22 @@ def start_background_refresh() -> None:
         log_event("refresh-not-started", type(error).__name__)
 
 
-def target_url(tool_input: object) -> str:
+def target_urls(tool_input: object) -> list[str]:
+    """The URL a navigation tool opens, plus any URL that browser code navigates to."""
     if not isinstance(tool_input, dict):
-        return ""
+        return []
+    urls = []
     for key in ("url", "uri", "href"):
         value = tool_input.get(key)
         if isinstance(value, str) and value.strip():
-            return value.strip()
-    return ""
+            urls.append(value.strip())
+            break
+    for key in CODE_KEYS:
+        code = tool_input.get(key)
+        if isinstance(code, str):
+            for pattern in (CODE_CALL_RE, CODE_ASSIGN_RE):
+                urls.extend(match.group(2).strip() for match in pattern.finditer(code))
+    return urls
 
 
 def target_host(url: str) -> str:
@@ -350,15 +409,45 @@ def target_host(url: str) -> str:
     return host
 
 
-def find_system(host: str, systems: list[dict]) -> dict | None:
-    """The most specific map entry whose host is the target or a parent domain of it."""
-    best, best_length = None, -1
+def match_rank(host: str, pattern: str) -> tuple[int, int] | None:
+    """How specifically a map host covers the target, or None when it does not.
+
+    A longer host ranks higher. At one length the exact host beats *.host, which matches
+    subdomains only, and that beats a plain parent domain.
+    """
+    pattern = pattern.lower()
+    if pattern.startswith("*."):
+        base = pattern[2:]
+        return (len(base), 1) if host.endswith("." + base) else None
+    if host == pattern:
+        return (len(pattern), 2)
+    if host.endswith("." + pattern):
+        return (len(pattern), 0)
+    return None
+
+
+def find_system(host: str, systems: list[dict]) -> tuple[dict | None, bool]:
+    """The map entry that decides the host, and whether equally specific entries disagreed.
+
+    Equally specific entries that disagree are settled by status, never by row order. No API
+    wins, because one feature with no API on a shared host needs the browser.
+    """
+    best: list[dict] = []
+    best_rank = None
     for entry in systems:
-        for pattern in entry.get("hosts") or []:
-            pattern = str(pattern).lower()
-            if (host == pattern or host.endswith("." + pattern)) and len(pattern) > best_length:
-                best, best_length = entry, len(pattern)
-    return best
+        ranks = [rank for rank in (match_rank(host, str(p)) for p in entry.get("hosts") or []) if rank]
+        if not ranks:
+            continue
+        rank = max(ranks)
+        if best_rank is None or rank > best_rank:
+            best, best_rank = [entry], rank
+        elif rank == best_rank:
+            best.append(entry)
+    if not best:
+        return None, False
+    chosen = min(best, key=lambda entry: STATUS_TIE_ORDER.get(entry.get("status"), 1))
+    conflict = len({entry.get("status") for entry in best}) > 1
+    return chosen, conflict
 
 
 def log_unknown_host(host: str, tool_name: str) -> None:
@@ -398,25 +487,31 @@ def deny_reason(entry: dict, host: str) -> str:
 
 def decide(payload: dict) -> str | None:
     """The deny reason for this tool call, or None to let it through."""
-    url = target_url(payload.get("tool_input"))
-    host = target_host(url) if url else ""
-    if not host:
+    hosts = []
+    for url in target_urls(payload.get("tool_input")):
+        host = target_host(url)
+        if host and host not in hosts:
+            hosts.append(host)
+    if not hosts:
         return None
     tool_name = str(payload.get("tool_name", ""))
     systems = load_cache()
     if systems is None:
-        log_event("no-cache-allowed", f"{host} {tool_name}")
+        log_event("no-cache-allowed", f"{' '.join(hosts)} {tool_name}")
         return None
-    entry = find_system(host, systems)
-    if entry is None:
-        log_unknown_host(host, tool_name)
-        return None
-    status = entry.get("status")
-    if status in (LIVE, SETTING_UP):
-        log_event("denied", f"{host} {safe(entry.get('system', ''))} {status}")
-        return deny_reason(entry, host)
-    if status != NO_API:
-        log_event("unknown-status-allowed", f"{host} {safe(entry.get('system', ''))} {safe(status)}")
+    for host in hosts:
+        entry, conflict = find_system(host, systems)
+        if entry is None:
+            log_unknown_host(host, tool_name)
+            continue
+        status = entry.get("status")
+        if conflict:
+            log_event("map-conflict", f"{host} decided by {safe(entry.get('system', ''))} {safe(status)}")
+        if status in (LIVE, SETTING_UP):
+            log_event("denied", f"{host} {safe(entry.get('system', ''))} {status}")
+            return deny_reason(entry, host)
+        if status != NO_API:
+            log_event("unknown-status-allowed", f"{host} {safe(entry.get('system', ''))} {safe(status)}")
     return None
 
 
