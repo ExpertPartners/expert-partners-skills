@@ -5,8 +5,9 @@ description: >
   or linked, into the department folder of the business brain that owns its
   subject, named Cal's way, [Brand-Department][V1.0] Name. AG Business Brain owns
   AG Luxury and Allison's brand. EP Business Brain owns Expert Partners, EPIC,
-  PartnerSync and Don. HQ Business Brain owns AI operations, Factory, Ember,
-  Claude, skills and tools. Never files into the Deep Research folder. Use
+  Don and PartnerSync product and market research. HQ Business Brain owns AI
+  operations, Factory, Ember, Claude, skills, tools and PartnerSync build and
+  shared operations material. Never files into the Deep Research folder. Use
   whenever a research report, deep-research output, or external analysis
   appears in conversation with intent to use it, not just to read it once.
   Answers Allison's question FIRST, files behind the answer, never files the
@@ -57,8 +58,15 @@ pick the one brain that owns it.
 | Subject | Owning brain | Brand tag |
 | --- | --- | --- |
 | AG Luxury, Allison's personal brand | AG Business Brain | AG |
-| Expert Partners, EPIC, PartnerSync, Don | EP Business Brain | EP |
-| AI operations, Factory, Ember, Claude, skills, tools | HQ Business Brain | HQ |
+| Expert Partners, EPIC, Don, PartnerSync product and market research | EP Business Brain | EP |
+| AI operations, Factory, Ember, Claude, skills, tools, PartnerSync build and shared operations material | HQ Business Brain | HQ |
+
+PartnerSync is split the way the HQ Rulebook department words split it.
+Research about the PartnerSync product, its market, its customers or its
+competitors goes to EP Business Brain. Material about building PartnerSync or
+running its shared operations goes to HQ Operations, into the
+`PartnerSync Source Material [HQ-BB]` folder, found by name, and is named
+`[HQ-Operations][V1.0] Title`.
 
 ## 3. Find the department it serves
 
