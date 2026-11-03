@@ -83,9 +83,13 @@ Google or another single sign-on for an account already signed in there, Claude 
 any AI working for Allison go ahead, sign in and keep working without asking her. 1Password fills
 the credential itself, so no AI types or sees a password. The hard stops stay. New account access
 (creating an account or adding access that does not exist yet), live releases, messages outside
-approved campaigns and anything irreversible still need her yes. Single sign-on counts only
+approved campaigns and anything irreversible still need the applicable founder's yes, which is
+Allison's for her own accounts. Single sign-on counts only
 for a site account that already exists. If the button leads to a sign-up page, a new consent or
 permissions screen, or asks to create anything, that is new account access, so stop and ask her.
+If an account chooser appears, pick only the identity already linked to that site, the one its
+1Password item or saved account names. If that is not clear, stop and ask, because many sites
+create an account the moment an unlinked identity signs in.
 
 Never ask her which browser to use, whether you are signed in, or to click or approve
 anything before steps 1 to 3. Do not use the Claude in Chrome extension for this work. It
