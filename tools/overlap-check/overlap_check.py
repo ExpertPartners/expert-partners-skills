@@ -214,13 +214,21 @@ def normalize(path: str) -> str:
     return path.lstrip("/")
 
 
-# Each job writes its own note file in these folders, so a note only collides with the
-# very same file. The folder named alone never holds another job's note.
-NOTE_DIRS = (".changeset/",)
+# Each job writes its own note file in .changeset/ (any top-level .md there except
+# README.md). A note collides only with the very same note, and two spellings of the
+# folder itself (the folder, or a glob inside it) never hold each other. README.md and
+# anything else in the folder keep the normal rules.
+NOTE_DIR = ".changeset"
 
 
-def is_note(path: str) -> bool:
-    return any(path == d or path == d.rstrip("/") or path.startswith(d) for d in NOTE_DIRS)
+def is_note_file(path: str) -> bool:
+    head, _, name = path.partition("/")
+    return (head == NOTE_DIR and "/" not in name and name.lower().endswith(".md")
+            and name.lower() != "readme.md" and not is_glob(name))
+
+
+def is_note_folder(path: str) -> bool:
+    return path in (NOTE_DIR, NOTE_DIR + "/") or (path.startswith(NOTE_DIR + "/") and is_glob(path))
 
 
 def is_shared(path: str) -> bool:
@@ -230,9 +238,10 @@ def is_shared(path: str) -> bool:
 def paths_overlap(a: str, b: str) -> bool:
     """A note in .changeset/ collides only with the same note. Otherwise same file, one path inside the other's directory (a path ending in /), a glob match,
     or a shared file named without its directory (plugin.json) against any file of that name."""
-    if is_note(a) or is_note(b):
-        # Only the very same note file collides, never the folder named alone.
-        return a == b and a.rstrip("/") not in {d.rstrip("/") for d in NOTE_DIRS}
+    if is_note_file(a) or is_note_file(b):
+        return a == b
+    if is_note_folder(a) and is_note_folder(b):
+        return False
     if a == b:
         return True
     if is_shared(a) and is_shared(b) and ("/" not in a or "/" not in b):
