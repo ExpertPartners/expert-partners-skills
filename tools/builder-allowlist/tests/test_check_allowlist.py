@@ -55,6 +55,19 @@ class Allowlist(unittest.TestCase):
         self.assertEqual(len(got), 1)
         self.assertIn("no contains(fromJSON", got[0])
 
+    def test_caller_that_hands_off_passes(self):
+        caller = "jobs:\n  builder:\n    uses: ./.github/workflows/factory-builder-reusable.yml\n"
+        self.assertEqual(check.problems("caller.yml", caller), [])
+        remote = caller.replace("./", "ExpertPartners/expert-partners-skills/").rstrip() + "@main\n"
+        self.assertEqual(check.problems("caller.yml", remote), [])
+
+    def test_only_hand_offs_fails(self):
+        with tempfile.TemporaryDirectory() as d:
+            caller = os.path.join(d, "caller.yml")
+            with open(caller, "w", encoding="utf-8") as f:
+                f.write("jobs:\n  builder:\n    uses: ./.github/workflows/factory-builder-reusable.yml\n")
+            self.assertEqual(check.main([caller]), 1)
+
     def test_bad_json_fails(self):
         got = check.problems("w.yml", workflow('["AllisonGaddy",]', FULL))
         self.assertEqual(len(got), 1)
