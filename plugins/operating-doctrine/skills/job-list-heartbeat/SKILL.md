@@ -40,7 +40,7 @@ This is doctrine, so it is always on. It fires at two moments.
    - Claude Code on a local machine. A /loop or a ScheduleWakeup loop every 15 minutes.
    - Claude Code in the cloud. send_later, chained, so each check schedules the next one 15 minutes out.
    - A surface with scheduled tasks. One recurring task at the shortest interval the scheduler allows. A check that starts a fresh session runs hourly around the clock, the shortest it can run.
-4. Verify the check is scheduled. Read it back from the surface's own schedule list or tool result, and say in the reply that it is set and when the next one runs. Say it once, in this first reply only, never on a later check. A check that was asked for but not read back is not set.
+4. Verify the check is scheduled. Read it back from the surface's own schedule list or tool result, and say in the reply that it is set and when the next one runs. Say it once, in this first reply only, never on a later check. A session started by the recurring task itself is one of that task's checks, not a new room, so it verifies the task without a word about it and posts only as Silent checks allows. A check that was asked for but not read back is not set.
 
 ## Every check
 
@@ -58,13 +58,13 @@ A CEO directive from Allison (Decision Log 2026-11-03, Job checks run silently).
 - her reply was acted on,
 - a new blocker came up.
 
-Then it posts one short Quick Update, the three lists from the quick-update skill, or one CEO brief, and nothing else. The Rulebook decides what counts as needing her.
+Then it posts one short Quick Update, the three lists from the quick-update skill and its one closing status line, or one CEO brief, the Decision Brief the HQ Rulebook rule CEO update or CEO brief defines, never Teach Me's step opener, and nothing else. The Rulebook decides what counts as needing her.
 
 A check with nothing significant posts nothing. No message, no reply text and no push.
 
 - In local Claude Code, the tick ends with ScheduleWakeup and noop true, or the /loop equivalent, and no text at all.
 - Where a surface must send a reply, the reply holds no status talk.
-- Lease renewals, still working, nothing new and next check set are never posted.
+- Lease renewals, still working, nothing new and next check set are never posted on their own. A Quick Update a significant check posts still ends with its one SESSION STATUS line, as quick-update requires, and that line may say Still working.
 
 Doing the check is the job, and reporting it is noise. The check itself never stops, and its timing and its claiming and lease renewal stay exactly as above.
 
@@ -88,7 +88,7 @@ The check runs for the life of the session. When the session wraps, it releases 
 - Let a claimed job's lease lapse while the work continues.
 - Say the check is set without reading it back.
 - Say the check is set, or when the next one runs, on any reply after the first.
-- Post on a check that found nothing significant, or post a lease renewal, still working, nothing new or next check set.
+- Post on a check that found nothing significant, or post a lease renewal, still working, nothing new or next check set on its own.
 
 ## Test cases
 
@@ -96,7 +96,7 @@ The check runs for the life of the session. When the session wraps, it releases 
 2. A job assigned to the session gets a Start press. Pass when the next check picks it up, within 15 minutes on a 15-minute surface and within the surface's shortest interval elsewhere.
 3. A chat on a surface with no timer. Pass when it checks on every reply and says once that it cannot run a timer.
 4. A session claims a job. Pass when each check and each working reply renews the lease so the sweep never returns it while work continues, on an hourly surface too.
-5. A session started by a recurring task. Pass when it verifies that task and adds no second recurring check.
+5. A session started by a recurring task. Pass when it verifies that task, adds no second recurring check, and posts nothing about the check unless something significant changed.
 6. A check where nothing changed for Allison. Pass when the session sends her no message or reply text at all.
 7. A check where a job she approved finished. Pass when she gets one short Quick Update or CEO brief and nothing else.
 8. A check that finds nothing. Pass when it posts nothing. In local Claude Code the tick ends with ScheduleWakeup and noop true, or the /loop equivalent, and no text, and no lease renewal, still working, nothing new or next check set line appears anywhere.
