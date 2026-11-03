@@ -23,6 +23,8 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
+      - name: Install PyYAML
+        run: python3 -m pip install --quiet pyyaml
       - name: Check builder allowlists
         run: python3 tools/builder-allowlist/check_allowlist.py
       - name: Check tests
