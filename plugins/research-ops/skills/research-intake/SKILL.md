@@ -8,12 +8,12 @@ description: >
   Free Agent Movement, Don and PartnerSync product and market research. HQ
   Business Brain owns AI operations, Factory, Ember, Claude, skills, tools and
   PartnerSync build and shared operations material. Never files into the Deep
-  Research folder. Use
-  whenever a research report, deep-research output, or external analysis
-  appears in conversation with intent to use it, not just to read it once.
-  Answers Allison's question FIRST, files behind the answer, never files the
-  same report twice, asks one question naming the two likeliest homes when the
-  owning department is unclear, then reports the Drive link.
+  Research folder. Use whenever a research report, deep-research output, or
+  external analysis appears in conversation with intent to use it, not just to
+  read it once. Answers Allison's question FIRST, files behind the answer,
+  never files the same report twice, asks one question naming the two
+  likeliest homes when the owning department is unclear, then reports the
+  Drive link.
 tier: plugin
 zone: cataloging
 status: live
