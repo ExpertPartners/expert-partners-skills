@@ -26,9 +26,9 @@ Load current canonical `expert-partners-skills plugins/operating-doctrine/skills
 for every run. If it cannot be reached live, create nothing and name the failed
 source. A local script or an older deployed skill never substitutes for the gate.
 
-<!-- RULED-BY: aura/decisions/0056-repo-baseline-standard.md date:2026-08-07 -->
-<!-- RULED-BY: aura/decisions/0078-claude-project-repository-setup.md date:2026-08-27 -->
-<!-- RULED-BY: aura/intake/2026-09-01-repo-final-reconciliation-execution-map.md date:2026-09-01 -->
+<!-- RULED-BY: history in GitHub Archive date:2026-08-07 -->
+<!-- RULED-BY: history in GitHub Archive date:2026-08-27 -->
+<!-- RULED-BY: history in GitHub Archive date:2026-09-01 -->
 
 ## Steps
 

@@ -63,7 +63,7 @@ function committedFiles(root, commit, dir) {
 }
 
 function pipelineStamp(root, commit, canonicalPath, files) {
-  // Plugin-only EPS skills use the plugin release; standalone and Aura-native
+  // Plugin-only EPS skills use the plugin release; standalone and external
   // skills use the first vX.Y line (all matches on that line), else a tree hash.
   const plugin = canonicalPath.match(/^plugins\/([^/]+)\/skills\/[^/]+\/SKILL\.md$/);
   if (plugin) {

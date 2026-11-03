@@ -22,7 +22,7 @@ and no one maintains a separate list.
 | Packages (plugins, collections) | `.claude-plugin/marketplace.json` and each `plugins/<name>/.claude-plugin/plugin.json` |
 | Package display name, collection shelves | `plugins/<name>/README.md` (H1, and the "Skills by function" section) |
 | Every skill, its lifecycle and relationships | `tools/skill-map/skills-graph.json`, produced by `tools/skill-map` from SKILL.md frontmatter |
-| Skill summary, display name, "Use when" sentence | the skill's own SKILL.md (this repo's skills only) |
+| Skill summary, display name, "Use when" sentence | the skill's own SKILL.md |
 | How a package is presented | `feed.config.json`, where every entry cites its evidence |
 | Verified deployment state | canonical capability records, once the AI Capability Curator writes them (below) |
 
@@ -31,8 +31,7 @@ Today it says two things. The Real Estate Agent Toolkit is shown as one portable
 collection of its 40 skills. The household ACN line is left off the Expert Partners HQ,
 because its own plugin.json says it is structurally separate from Expert Partners LLC.
 
-Skills owned by aura appear from their skill-graph entry alone (subtitle, lifecycle,
-relationships), so the feed is a pure function of this repository's tree.
+The feed is a pure function of this repository's tree.
 
 ## Truth rules
 
@@ -84,8 +83,7 @@ sources were refused, with every problem listed.
 feed. On main it commits both together and verifies the committed feed with `--check`.
 On a branch it validates without writing, and fails if the branch edits the feed file
 to anything other than generator output. Changes to the marketplace, plugin manifests,
-package READMEs, SKILL.md files, or this producer all trigger it, and so does an aura
-skill change through the existing repository dispatch.
+package READMEs, SKILL.md files, or this producer all trigger it.
 
 ## HQ wiring
 
@@ -104,7 +102,7 @@ on this repo only. Building a reader in the HQ app is a separate change in that 
 
 ## Capability records (AI Capability Curator)
 
-Under aura ADR 0098 the AI Capability Curator maintains capability lifecycle, with
+Under ADR 0098 (history in GitHub Archive) the AI Capability Curator maintains capability lifecycle, with
 GitHub as canonical truth. When the Curator settles where its canonical records live,
 add that repo-relative directory to `capabilityRecordSources` in `feed.config.json` and
 to the workflow's `paths`. Nothing else changes. The feed then regenerates whenever a

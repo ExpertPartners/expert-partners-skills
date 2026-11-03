@@ -19,7 +19,7 @@ subtitle: "canonical brand context, registry per ADR 0045"
 
 # Brand Voice -- canonical brand context
 
-The brand registry's original record is aura ADR 0045 (resynced from the ADR as it read on 2026-08-05), kept as history. aura is retired, so the Drive brand canon Docs listed below are the live sources, and the HQ Rulebook and Decision Log govern if anything conflicts. The active brands,
+The brand registry's original record is ADR 0045 (resynced from the ADR as it read on 2026-08-05), kept as history in GitHub Archive. aura is retired, so the Drive brand canon Docs listed below are the live sources, and the HQ Rulebook and Decision Log govern if anything conflicts. The active brands,
 
 - **Expert Partners**, the parent organization brand. EPIC and Expert Partners Coaching operate inside it, and Don Hobbs resolves under Expert Partners LLC as a sub-label.
 - **EPIC**, the inner-circle program for the eXp vertical inside Expert Partners. Never a synonym for the parent.

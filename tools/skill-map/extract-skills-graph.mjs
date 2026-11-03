@@ -1,18 +1,18 @@
 #!/usr/bin/env node
-// Skill Map Stage 1 extraction pipeline (aura intake/2026-08-04-skill-map-architecture-report.md).
-// Walks the canonical skill repos, strict-parses every SKILL.md frontmatter (gray-matter),
+// Skill Map Stage 1 extraction pipeline (architecture report: history in GitHub Archive).
+// Walks this repo, strict-parses every SKILL.md frontmatter (gray-matter),
 // validates the additive skill-map metadata block (zod), and emits skills-graph.json.
 // The build FAILS on: YAML parse errors, schema violations, name/folder mismatch,
 // duplicate skill ids (outside the declared duplicate list), and any inherits / calls /
 // defers-to id that does not resolve to a real SKILL.md.
 //
 // STRICT MODE (ruling 14, "skills are born dressed", Allison 2026-08-04): a SKILL.md
-// in any canonical repo missing the skill-map block, or missing zone, tier, or status,
+// missing the skill-map block, or missing zone, tier, or status,
 // FAILS the build. The former warning-and-holding-area behavior (unzoned as a non-fatal
 // flag) is retired. Vendor catalog packs and non-canonical paths stay excluded via
 // EXCLUDE, exactly as before.
 //
-// DEPLOYED COPIES (added 2026-09-04, aura issue #212): a skill deployed as a copy to a
+// DEPLOYED COPIES (added 2026-09-04): a skill deployed as a copy to a
 // second agent surface is the SAME skill, not a second identity. The pipeline in
 // tools/skill-deploy/deploy-skill.sh is the sole producer of such copies and stamps each
 // with a DEPLOYED COPY header naming its canonical home (ADR 0056 point 8). This
@@ -30,9 +30,8 @@
 // pipeline's --verify covers a copy's non-SKILL.md files and its manifest; this
 // covers the identity file wherever it lives.
 //
-// Usage: node extract-skills-graph.mjs [--eps <path>] [--aura <path>] [--out <file>]
+// Usage: node extract-skills-graph.mjs [--eps <path>] [--out <file>]
 //   --eps  expert-partners-skills checkout (default: this script's repo root)
-//   --aura aura checkout (default: env AURA_PATH, else ../aura relative to the eps root)
 //   --out  output path (default: <eps>/tools/skill-map/skills-graph.json)
 
 import fs from 'node:fs';
@@ -50,7 +49,7 @@ const ZONES = ['surfaces', 'brain', 'hands', 'routing', 'finance', 'content', 'c
 const TIERS = ['user', 'organization', 'plugin', 'project'];
 const STATUSES = ['live', 'designed', 'benched', 'retired', 'sleeping'];
 // Brand id vocabulary, RULED by Allison 2026-08-05 (Skill Map Rulings lane, flags item 8).
-// Each id may carry a parent brand id (null = top-level). Registry source: aura ADR 0045.
+// Each id may carry a parent brand id (null = top-level). Registry source: ADR 0045, history in GitHub Archive.
 // A ninth id for Allison's AI education lane (You've Got a Friend) mints only on the day
 // its voice card is born, not before (ruled 2026-08-05).
 const BRAND_IDS = {
@@ -67,21 +66,18 @@ const BRANDS = Object.keys(BRAND_IDS);
 const INHERIT_ROOT = 'operating-doctrine';
 
 // Paths that hold SKILL.md files but are NOT canonical skill sources
-// (mirrors, extracts, caches). See aura intake/2026-08-04-skill-map-stage1-inventory.md.
+// (mirrors, extracts, caches).
 const EXCLUDE = [
   /\/node_modules\//,
   /\/\.git\//,
   /\/\.cache\//,
   /\/worktrees\//,
-  /^aura:skills\//,                  // stale sync mirrors of expert-partners-skills
-  /^aura:docs\/estate\/extracts\//,  // reference extracts of external systems
 ];
 
 // Skills whose canonical home moved inside expert-partners-skills (2026-10-13, standalone
 // skills moved into marketplace plugins so every surface gets them by sync). A deployed
-// copy cut before the move still names the old path in its DEPLOYED COPY header. Aura
-// cannot be redeployed (it is being locked), so the header's old path is resolved to the
-// new canonical for the id and home checks, and the historical byte proof still runs
+// copy cut before the move still names the old path in its DEPLOYED COPY header, so the
+// header's old path is resolved to the new canonical for the id and home checks, and the historical byte proof still runs
 // against the OLD path, where that copy's committed version lives in git history.
 const RELOCATED_CANONICAL = new Map([
   ['skills/session-wrap/SKILL.md', 'plugins/operating-doctrine/skills/session-wrap/SKILL.md'],
@@ -104,22 +100,18 @@ const DECLARED_DUPLICATES = [
   // Ruled 2026-08-05 (flags item 3): the plugin path is canonical; the repo-root
   // copy is a pointer file naming it, kept here so the walk skips it.
   { id: 'operating-doctrine', keep: 'eps:plugins/operating-doctrine/skills/operating-doctrine/SKILL.md', duplicate: 'eps:operating-doctrine/SKILL.md' },
-  // The aura .claude/skills copies of session-wrap, repo-standards and
-  // research-intake USED to be listed here (2026-08-05, 08-07, 08-08). They are
-  // not any more: a hand-maintained exemption list skipped them before any
-  // classification ran, so those three paths were exempt from the header
-  // requirement, the canonical-exists check, and the id-ownership check, which
-  // is exactly the corruption class of aura issue #212 (research-intake was in
-  // fact a hand-made copy with no manifest, found 2026-09-04). They are now
-  // ordinary deployed copies: pipeline-produced, header-verified, byte-checked
-  // against canonical in pass 3, and reported under flags.deployedMounts.
+  // Deployed copies are never listed here: a hand-maintained exemption list would
+  // skip them before any classification ran, exempting them from the header
+  // requirement, the canonical-exists check, and the id-ownership check. They are
+  // classified in pass 1, byte-checked against canonical in pass 3, and reported
+  // under flags.deployedMounts.
 ];
 
 // Deployed-mount roots: every SKILL.md under one of these is a deployed copy by
 // construction, whatever its header says. .agents/skills is the Codex repo-scope
 // discovery path (learn.chatgpt.com/docs/build-skills, verified 2026-09-04); Codex
-// cannot be pointed at .claude/skills, so the estate mirrors its project mount there
-// through the deploy pipeline (aura .claude/skills -> aura .agents/skills).
+// cannot be pointed at .claude/skills, so a project mount is mirrored there through
+// the deploy pipeline (.claude/skills -> .agents/skills).
 const DEPLOYED_MOUNT_ROOTS = [
   /^[a-z-]+:\.agents\/skills\//,
 ];
@@ -133,7 +125,7 @@ const DEPLOYED_HEADER = /^# DEPLOYED COPY \((\d{4}-\d{2}-\d{2}), skill-deploy pi
 const DEPLOYED_HEADER_BLOCK = /^# DEPLOYED COPY \(\d{4}-\d{2}-\d{2}, skill-deploy pipeline\): the canonical home is\n# \S+ \S+?SKILL\.md\. Deployed at .+?\.\n# Edit the canonical copy first, then redeploy via tools\/skill-deploy\.\n/m;
 // Header repo names -> walk keys. A header naming a repo this walk does not cover
 // cannot be verified and fails the build.
-const REPO_NAME_TO_KEY = { 'expert-partners-skills': 'eps', 'aura': 'aura' };
+const REPO_NAME_TO_KEY = { 'expert-partners-skills': 'eps' };
 
 // ---------- schema ----------
 
@@ -175,10 +167,9 @@ function arg(flag, fallback) {
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const epsRoot = path.resolve(arg('--eps', path.join(scriptDir, '..', '..')));
-const auraRoot = path.resolve(arg('--aura', process.env.AURA_PATH || path.join(epsRoot, '..', 'aura')));
 const outFile = path.resolve(arg('--out', path.join(epsRoot, 'tools', 'skill-map', 'skills-graph.json')));
 
-const REPOS = { eps: epsRoot, aura: auraRoot };
+const REPOS = { eps: epsRoot };
 for (const [key, root] of Object.entries(REPOS)) {
   if (!fs.existsSync(root)) fail(`repo checkout missing: ${key} at ${root}`);
 }
@@ -375,7 +366,7 @@ for (const { tagged, abs, raw, header, mountRoot } of deployedFiles) {
       fail(`deployed copy is not a faithful render of its canonical: ${tagged} differs from ${canonicalTagged} beyond the DEPLOYED COPY header -- historical proof failed: ${historical.error}; redeploy through tools/skill-deploy`);
       continue;
     }
-    console.warn(`WARNING: VERIFIED STALE / awaiting redeploy: ${tagged} matches ${canonicalTagged} at committed version ${historical.commit} (blob ${historical.blob}); Aura's dedicated deployed-copy-drift gate still requires current canonical bytes.`);
+    console.warn(`WARNING: VERIFIED STALE / awaiting redeploy: ${tagged} matches ${canonicalTagged} at committed version ${historical.commit} (blob ${historical.blob}); the deploy pipeline's --verify gate still requires current canonical bytes.`);
   }
   deployedMounts.push({
     path: tagged,

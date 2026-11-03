@@ -2,7 +2,7 @@
 
 Shared reference for the Titans skill family, hoisted to the plugin-level shared location (plugins/content-engines/references/titans-core.md) when the second family member shipped, per the roster plan. Source: Allison Gaddy's synthesis and worked applications only. The original course library stays private in the archived claude-cowork repo and is never quoted here.
 
-Roster and governance: aura project-knowledge/marketing-canon/titans-family-scoping-plan-2026-08-04.md, governed by the marketing canon directive (aura intake/2026-08-03-marketing-canon-directive.md). These skills are active builders, never a passive library.
+Roster and governance: the Titans family scoping plan (2026-08-04), governed by the marketing canon directive, both history in GitHub Archive. These skills are active builders, never a passive library.
 
 ## The operating beliefs
 

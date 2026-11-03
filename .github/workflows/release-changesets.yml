@@ -1,0 +1,110 @@
+# Release step for changeset notes (.changeset/README.md, tools/release/README.md).
+# Builders never edit a plugin version or the top of a CHANGELOG. Their pull request adds
+# one note in .changeset/, and on every push to main that touches .changeset/ this workflow
+# runs tools/release/release.py, which folds the notes into one version bump per plugin
+# (plugins/<plugin>/.claude-plugin/plugin.json and .claude-plugin/marketplace.json) and one
+# entry at the top of plugins/<plugin>/CHANGELOG.md, deletes the notes, and commits the
+# result to main.
+#
+# The commit is made by the EP Skills Graph Bot app, the one actor allowed past the pull
+# request rule on main (Decision Log 2026-10-31), the same way skills-graph.yml commits the
+# regenerated graph. The message carries no [skip ci], because its push must start
+# skills-graph.yml so the AI Workforce feed picks up the new versions. The same push starts
+# this workflow once more, since the deleted notes sit under .changeset/, and that run finds
+# no notes and commits nothing.
+name: release-changesets
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".changeset/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# One release at a time. A waiting run may be replaced by a newer one, which loses nothing
+# because every run releases all the notes on main. A running release is never cancelled
+# between its commit and its push.
+concurrency:
+  group: release-changesets
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: fold changeset notes into versions and CHANGELOG
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      # Client ID is a repository variable, the private key a repository secret.
+      - name: Mint skills-graph app token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.SKILLS_GRAPH_APP_CLIENT_ID }}
+          private-key: ${{ secrets.SKILLS_GRAPH_APP_PRIVATE_KEY }}
+
+      - name: Checkout expert-partners-skills
+        uses: actions/checkout@v6
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          path: eps
+
+      - name: Release step tests
+        working-directory: eps
+        run: python3 -m unittest discover -s tools/release/tests
+
+      - name: Release the notes and commit to main
+        working-directory: eps
+        run: |
+          set -euo pipefail
+          if [ ! -f tools/release/release.py ]; then
+            echo "::error title=Release step missing::tools/release/release.py is not on main, so the notes in .changeset/ cannot be released."
+            exit 1
+          fi
+          git config user.name "skills-graph-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          # Returns 0 after committing a release, 1 when there is nothing to release.
+          # A bad note, or a change outside the release files, fails the run.
+          release_and_commit() {
+            local out
+            out="$(python3 tools/release/release.py)" || exit 1
+            printf '%s\n' "$out"
+            git add -A -- .changeset .claude-plugin/marketplace.json \
+              'plugins/*/.claude-plugin/plugin.json' 'plugins/*/CHANGELOG.md' || exit 1
+            if ! git diff --quiet || [ -n "$(git ls-files --others --exclude-standard)" ]; then
+              echo "::error title=Release touched other files::release.py changed files outside .changeset/, plugin.json, marketplace.json and CHANGELOG.md."
+              git status --short
+              exit 1
+            fi
+            if git diff --cached --quiet; then
+              echo "No notes in .changeset/; nothing to release."
+              return 1
+            fi
+            git commit -q -F - <<MSG || exit 1
+          release: fold changeset notes into versions and CHANGELOG
+
+          $(printf '%s\n' "$out" | grep -E '^release: .+ -> ' | sed 's/^release: //')
+          MSG
+            git show --stat --format='%s' HEAD
+          }
+
+          if ! release_and_commit; then
+            exit 0
+          fi
+          # Push race guard: if main moved while this run was in flight, start over from the
+          # new tip and release again, so notes merged in the meantime are included.
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            echo "Push rejected, main moved. Release again on the new tip, attempt ${attempt}."
+            git fetch origin main
+            git reset --hard origin/main
+            if ! release_and_commit; then
+              exit 0
+            fi
+          done
+          git push origin HEAD:main

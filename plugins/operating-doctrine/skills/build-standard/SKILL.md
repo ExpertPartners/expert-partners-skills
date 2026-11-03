@@ -16,7 +16,7 @@ subtitle: "how every skill and tool is built, changed and retested"
 
 One standard for every builder on every surface. It says what passing means, so a tool is either done or it is not, and nobody grades their own work. It applies to a skill, an AI employee, a prompt or a tool, whether it is new, changed or being brought back through the tests. It has to be live before any Week 0 tool is built, and the first tool built under it is the knowledge base optimizer.
 
-Rulings behind it, all in the live Decision Log. The HQ Build Standard becomes permanent and goes in before any Week 0 build. What same output means, which edition we target, and who certifies a recreated tool. When Cal's team has more than one version of a tool, we copy the most recent one we can see and fill its silences from the older ones. Every build carries four cost and quality rules. The October 31 ruling that ends build price estimates and the dollar wait line, anywhere, replaces that entry's spending line. Testing goes back to Cal's way, one test on the real task before a change and one after. Factory picks and manages the models on Factory work. Exact behavior is our operating standard. What we build is ours, and the chain map lives in Notion HQ. Everything already live goes back through the build standard. Read each entry live before relying on it, and never copy its text here. Where this skill differs from the live Rulebook or Decision Log, they win.
+Rulings behind it, all in the live Decision Log. The HQ Build Standard becomes permanent and goes in before any Week 0 build. What same output means, which edition we target, and who certifies a recreated tool. When Cal's team has more than one version of a tool, we copy the most recent one we can see and fill its silences from the older ones. Every build carries four cost and quality rules. The October 31 ruling that ends build price estimates and the dollar wait line, anywhere, replaces that entry's spending line. Testing goes back to Cal's way, one test on the real task before a change and one after. Factory picks and manages the models on Factory work. Exact behavior is our operating standard. What we build is ours, and the chain map lives in Notion HQ. Everything already live goes back through the build standard. AI employees beyond Ember may run unattended once proven. Read each entry live before relying on it, and never copy its text here. Where this skill differs from the live Rulebook or Decision Log, they win.
 
 ## Check first
 
@@ -59,6 +59,7 @@ Before building, write the test plan from the spec and show it with the spec lin
 2. List each test case the spec names. Add one for each of these when the spec lacks it, then send the added cases back to Allison to approve as part of the spec, real Expert Partners cases, missing information, conflicting information, a revised file.
 3. For each test give a number, its spec line, the real task it runs on, the input, the expected result and where the before and after evidence will be saved.
 4. Plan the chain tests. Name every upstream tool that feeds this one and every downstream tool this one feeds, from the chain map.
+5. When the build is an AI employee, name the proving runs that would let it run unattended, or say it stays human-checked (Decision Log 2026-11-02, AI employees beyond Ember may run unattended once proven).
 
 ## Chain check
 
@@ -87,6 +88,7 @@ Failures weighed. For each failed test, what broke, how bad it is, what it affec
 Chain results. The upstream check, the downstream reruns with their before and after results, and the supervised run on real work.
 Surface checks. Each surface, how it was reached and what was seen.
 Chain map update. The drafted record update for HQ, with feeds, fed by, last test date, result and evidence links.
+Runs unattended. For an AI employee only, yes or no, and if yes, the proving runs that earned it with their evidence links, and the charter that records it (Decision Log 2026-11-02, AI employees beyond Ember may run unattended once proven). Leave this line out for a skill, prompt or tool.
 Unresolved. Anything open, with its owner. Say none when there is nothing.
 Waiting on. Certification by Claude in HQ and Allison.
 

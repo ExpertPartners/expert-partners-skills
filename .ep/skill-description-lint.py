@@ -108,6 +108,7 @@ class Row:
     length: int          # -1 when the description is missing or unparseable
     note: str = ""
     truncated_from: int = 0   # authored length when YAML silently ate part of it, else 0
+    angle: bool = False       # description holds < or >, which claude.ai rejects as XML tags
 
     @property
     def headroom(self) -> int:
@@ -123,7 +124,7 @@ class Row:
 
     @property
     def breached(self) -> bool:
-        return self.over_cap or self.truncated
+        return self.over_cap or self.truncated or self.angle
 
 
 # ---------------------------------------------------------------------------
@@ -379,7 +380,8 @@ def collect(repo_root: Path) -> list[Row]:
             if authored is not None and authored > length:
                 truncated_from = authored
 
-        rows.append(Row(rel, name or "?", length, note, truncated_from))
+        angle = desc is not None and ("<" in desc or ">" in desc)
+        rows.append(Row(rel, name or "?", length, note, truncated_from, angle))
     # Ascending headroom == descending length. Unparseable rows (-1) sink to the bottom.
     rows.sort(key=lambda r: (-r.length, r.rel))
     return rows
@@ -468,7 +470,11 @@ def main(argv: list[str]) -> int:
     if breaches:
         print()
         for r in breaches:
-            if r.over_cap:
+            if r.angle:
+                print(f"skill-description-lint: ERROR {r.rel}: description contains < or >. "
+                      f"The claude.ai org marketplace sync reads them as XML tags and "
+                      f"leaves the skill out. Write the placeholder in words instead.")
+            elif r.over_cap:
                 print(f"skill-description-lint: ERROR {r.rel}: description is {r.length} "
                       f"characters, cap is {CAP_INCLUSIVE}. Trim "
                       f"{r.length - CAP_INCLUSIVE + 1} or more. The claude.ai org Skills "

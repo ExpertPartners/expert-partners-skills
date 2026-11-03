@@ -8,8 +8,8 @@ description: >
   Use whenever a research report, deep-research output, or external analysis
   appears in conversation with intent to use it, not just intent to read it once
   and discard it. Answers the question in front of Allison FIRST, files behind
-  the answer, then reports the Drive link. Replaces the aura docs/research/INDEX.md
-  index of ADR 0047.
+  the answer, then reports the Drive link. Replaces the retired aura research index
+  of ADR 0047.
 tier: plugin
 zone: cataloging
 status: live

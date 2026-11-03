@@ -7,8 +7,11 @@ A pull request is eligible when either
     Closes #N where #N is an issue labeled job), or
   - GATE_MERGE_LABEL is set and the pull request carries that label. Repos whose
     builders push as a person (Factory missions, Claude Code) mark finished work this way.
-Either way it merges only when every check on the head commit passed, Codex's code review
-covers that exact head with no unresolved findings, and GitHub says it can merge.
+Either way it merges only when every check on the head commit passed, the pull request
+leaves plugin versions and the top of every CHANGELOG.md to the release step
+(tools/release, fed by notes in .changeset/) and every note it adds is one that step can
+read, Codex's code review covers that exact head with no unresolved findings, and GitHub
+says it can merge.
 
 Two subcommands, run by .github/workflows/auto-merge-gate.yml:
 
@@ -26,6 +29,7 @@ Standard library only.
 
 from __future__ import annotations
 
+import base64
 import json
 import os
 import re
@@ -45,8 +49,22 @@ OK_CONCLUSIONS = {"success", "neutral", "skipped"}
 CLOSES_RE = re.compile(r"Closes #(\d+)\b")
 CODEX_STATE_RE = re.compile(r"<!--\s*codex-review-state:v1\s+(\{.*?\})\s*-->", re.DOTALL)
 MARKER_RE = re.compile(r"<!-- auto-merge-gate:v1 head=([0-9a-f]{40}) -->")
+CODEX_RECEIPT_MARKER = "codex-review-receipt:v1"
+CODEX_CLEAN_RE = re.compile(r"Codex Review:\s*Didn['\u2019]t find any major issues", re.IGNORECASE)
+# At least 10 hex, so a head pushed later cannot cheaply be made to share an
+# older receipt's prefix. Codex names 10.
+CODEX_REVIEWED_COMMIT_RE = re.compile(r"\*\*Reviewed commit:\*\*\s*`([0-9a-fA-F]{10,40})`")
 
 PR_EVENTS = {"pull_request", "pull_request_target", "pull_request_review"}
+
+MARKETPLACE_PATH = ".claude-plugin/marketplace.json"
+PLUGIN_MANIFEST_RE = re.compile(r"^plugins/([^/]+)/\.claude-plugin/plugin\.json$")
+CHANGELOG_RE = re.compile(r"(^|/)CHANGELOG\.md$")
+RELEASE_HINT = "The release step owns versions and CHANGELOG entries; add a note in `.changeset/` instead."
+CHANGESET_NOTE_RE = re.compile(r"^\.changeset/[^/]+\.md$")
+NOTE_BUMPS = ("patch", "minor", "major")
+NOTE_KEY_RE = re.compile(r"""^\s*(?:"([^"]+)"|'([^']+)'|([A-Za-z0-9._-]+))\s*:\s*(\S+?)\s*$""")
+NOTE_HINT = "The release step would refuse it and hold up every plugin's release; `.changeset/README.md` gives the format."
 
 
 class GitHubError(Exception):
@@ -177,6 +195,29 @@ def latest_codex_state(comments: list) -> dict | None:
     return best
 
 
+def has_clean_codex_receipt(comments: list, sha: str) -> bool:
+    """Whether Codex posted a clean code review receipt for this head.
+
+    When Codex's code review finds nothing it posts a codex-review-receipt:v1
+    comment instead of updating its summary. The receipt names the reviewed
+    commit by an abbreviated sha of at least 10 hex, or the full sha.
+    Security review receipts carry the same marker but are not a code review,
+    so they never count here."""
+    sha = sha.lower()
+    for c in comments:
+        if (c.get("user") or {}).get("login") != CODEX_LOGIN:
+            continue
+        body = c.get("body") or ""
+        if CODEX_RECEIPT_MARKER not in body or "Codex Security Review" in body:
+            continue
+        if not CODEX_CLEAN_RE.search(body):
+            continue
+        m = CODEX_REVIEWED_COMMIT_RE.search(body)
+        if m and sha and sha.startswith(m.group(1).lower()):
+            return True
+    return False
+
+
 def check_problems(gh, cfg: Config, sha: str) -> list[str]:
     problems: list[str] = []
     reported = 0
@@ -203,11 +244,45 @@ def check_problems(gh, cfg: Config, sha: str) -> list[str]:
     return problems
 
 
-def codex_problems(state: dict | None, sha: str, unresolved_threads=None) -> list[str]:
+def count_open_threads(unresolved_threads) -> tuple[int | None, str | None]:
+    """(open thread count or None, read error message or None)."""
+    try:
+        return (unresolved_threads() if unresolved_threads else None), None
+    except GitHubError as exc:
+        return None, exc.message
+
+
+def security_problems(state: dict | None, sha: str) -> list[str]:
+    security = (state or {}).get("security_review") or {}
+    if security.get("commit_sha") == sha and security.get("has_unresolved_findings") is True:
+        return [f"Codex security review on {sha[:7]} left unresolved findings."]
+    return []
+
+
+def codex_problems(state: dict | None, sha: str, unresolved_threads=None, clean_receipt: bool = False) -> list[str]:
     """unresolved_threads is a callable returning the number of unresolved
-    review threads on the pull request. It is only called in the one case that
-    needs it, see below."""
+    review threads on the pull request. It is only called in the cases that
+    need it, see below. clean_receipt says Codex posted a clean code review
+    receipt for this head (has_clean_codex_receipt)."""
     short = sha[:7]
+    if clean_receipt and ((state or {}).get("code_review") or {}).get("commit_sha") != sha:
+        # The receipt stands in only for a summary that is missing or still on
+        # an older commit. A summary that covers this head keeps deciding.
+        # The receipt says nothing about findings left open on earlier commits,
+        # and the summary it replaces may be stale, so every review thread must
+        # be resolved before it counts.
+        open_threads, error = count_open_threads(unresolved_threads)
+        if open_threads != 0:
+            if error:
+                why = f"the review threads could not be read ({error})"
+            elif open_threads is None:
+                why = "the review threads could not be checked"
+            else:
+                why = f"{open_threads} review thread(s) are still unresolved"
+            return [f"Codex posted a clean code review receipt for {short}, but {why}."] + security_problems(state, sha)
+        state = dict(state or {}, code_review={
+            "commit_sha": sha, "status": "completed", "has_unresolved_findings": False,
+        })
     if state is None:
         return [f"Codex has not reviewed head {short} yet (no Codex review summary on this pull request)."]
     code = state.get("code_review") or {}
@@ -224,11 +299,9 @@ def codex_problems(state: dict | None, sha: str, unresolved_threads=None) -> lis
         # Once a pull request has ever had findings, Codex reports null instead
         # of false even after every finding is fixed and its thread resolved.
         # Then the threads themselves decide: every one must be resolved.
-        try:
-            open_threads = unresolved_threads() if unresolved_threads else None
-        except GitHubError as exc:
-            open_threads = None
-            problems.append(f"Codex code review on {short} reported no open findings, but the review threads could not be read ({exc.message}).")
+        open_threads, error = count_open_threads(unresolved_threads)
+        if error:
+            problems.append(f"Codex code review on {short} reported no open findings, but the review threads could not be read ({error}).")
         if open_threads is None:
             if not problems:
                 problems.append(f"Codex code review on {short} did not report has_unresolved_findings: false.")
@@ -236,9 +309,7 @@ def codex_problems(state: dict | None, sha: str, unresolved_threads=None) -> lis
             problems.append(f"Codex code review on {short} has {open_threads} unresolved review thread(s).")
     elif code.get("has_unresolved_findings") is not False:
         problems.append(f"Codex code review on {short} did not report has_unresolved_findings: false.")
-    security = state.get("security_review") or {}
-    if security.get("commit_sha") == sha and security.get("has_unresolved_findings") is True:
-        problems.append(f"Codex security review on {short} left unresolved findings.")
+    problems += security_problems(state, sha)
     return problems
 
 
@@ -249,6 +320,160 @@ def mergeable_problems(pr: dict) -> list[str]:
     if mergeable is not True:
         return [f"GitHub reports the pull request is not mergeable (mergeable_state: {pr.get('mergeable_state')})."]
     return []
+
+
+class FileContentError(ValueError):
+    """A changed file whose content the gate cannot judge. It refuses that one pull
+    request instead of failing the run, so one odd file never holds up the others."""
+
+
+def file_text(gh, cfg: Config, path: str, ref: str) -> str:
+    data = gh.get(f"/repos/{cfg.repo}/contents/{urllib.parse.quote(path)}?ref={ref}")
+    # Directories, symlinks, submodules and files over 1 MB come back without base64 content.
+    if not isinstance(data, dict) or data.get("encoding") != "base64":
+        raise FileContentError(f"`{path}` at {ref[:7]} is not a text file the gate can read, so it cannot be checked.")
+    try:
+        return base64.b64decode(data.get("content") or "").decode("utf-8")
+    except ValueError:
+        raise FileContentError(f"`{path}` at {ref[:7]} is not UTF-8 text, so it cannot be checked.") from None
+
+
+def listed_versions(path: str, text: str) -> dict:
+    """Plugin name to version for a marketplace file or a plugin manifest."""
+    try:
+        data = json.loads(text)
+    except ValueError:
+        raise FileContentError(f"`{path}` is not valid JSON, so the gate cannot read the plugins in it.") from None
+    plugins = data.get("plugins", []) if isinstance(data, dict) else None
+    if not isinstance(data, dict) or (path == MARKETPLACE_PATH and not isinstance(plugins, list)):
+        raise FileContentError(f"`{path}` is not the JSON object it should be, so the gate cannot read the plugins in it.")
+    if path == MARKETPLACE_PATH:
+        return {p["name"]: p.get("version") for p in plugins if isinstance(p, dict) and isinstance(p.get("name"), str)}
+    return {PLUGIN_MANIFEST_RE.match(path).group(1): data.get("version")}
+
+
+def note_problem(text: str) -> tuple[str | None, list[str]]:
+    """Why the release step would refuse this .changeset note (None when it reads it), and
+    the plugins it names. Mirrors parse_note_text in tools/release/release.py. The gate
+    cannot import it, because the workflow checks out only tools/auto-merge-gate, so
+    tests/test_gate.py runs both on the same notes to keep them in step."""
+    lines = text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
+    if lines[0].strip() != "---":
+        return "must start with a --- line, then one plugin: bump line per plugin, then ---", []
+    end = next((i for i in range(1, len(lines)) if lines[i].strip() == "---"), None)
+    if end is None:
+        return "has an opening --- with no closing ---", []
+    names: list[str] = []
+    for raw in lines[1:end]:
+        if not raw.strip() or raw.lstrip().startswith("#"):
+            continue
+        m = NOTE_KEY_RE.match(raw)
+        if not m:
+            return f"has a line it cannot read, {raw.strip()!r}; write it as <plugin>: patch|minor|major", []
+        name = m.group(1) or m.group(2) or m.group(3)
+        bump = m.group(4).strip("\"'").lower()
+        if bump not in NOTE_BUMPS:
+            return f"asks for {bump!r} for {name}; use patch, minor or major", []
+        if name in names:
+            return f"names {name} twice", []
+        names.append(name)
+    if not names:
+        return "names no plugin", []
+    body = "\n".join(lines[end + 1:]).strip()
+    if not body:
+        return "says nothing about the change; write it below the closing ---", []
+    if any(line.startswith("## ") for line in body.split("\n")):
+        return "has a `## ` heading in its text, which would start a second CHANGELOG entry; use `###` or lower", []
+    return None, names
+
+
+def note_problems(gh, cfg: Config, notes: list, head: str) -> list[str]:
+    """A note the release step cannot read would stop every plugin's release on main,
+    so the gate refuses it here, before it can merge."""
+    problems: list[str] = []
+    named: list[tuple[str, str]] = []
+    for f in notes:
+        path = f["filename"]
+        try:
+            problem, names = note_problem(file_text(gh, cfg, path, head))
+        except FileContentError as exc:
+            problems.append(str(exc))
+            continue
+        if problem:
+            problems.append(f"`{path}` {problem}. {NOTE_HINT}")
+        named += [(path, name) for name in names]
+    if not named:
+        return problems
+    try:
+        known = listed_versions(MARKETPLACE_PATH, file_text(gh, cfg, MARKETPLACE_PATH, head))
+    except FileContentError as exc:
+        return problems + [str(exc)]
+    for path, name in named:
+        if name not in known:
+            problems.append(f"`{path}` names {name}, which is not a plugin in `{MARKETPLACE_PATH}`. {NOTE_HINT}")
+    return problems
+
+
+def changelog_shape(text: str) -> tuple[list[str], int]:
+    """The top entry (everything above the second ## heading) and how many entries there are."""
+    lines = text.splitlines()
+    heads = [i for i, line in enumerate(lines) if line.startswith("## ")]
+    return lines[: heads[1] if len(heads) > 1 else len(lines)], len(heads)
+
+
+def release_file_problems(gh, cfg: Config, number: int, pr: dict) -> list[str]:
+    """A pull request may not edit a plugin version or the top of a CHANGELOG.md.
+    Brand new plugins and edits to older CHANGELOG entries are allowed."""
+    files = [f for f in gh.paginate(f"/repos/{cfg.repo}/pulls/{number}/files") if f.get("status") != "removed"]
+    watched = [
+        f for f in files
+        if f.get("filename") == MARKETPLACE_PATH
+        or PLUGIN_MANIFEST_RE.match(f.get("filename", ""))
+        or CHANGELOG_RE.search(f.get("filename", ""))
+    ]
+    # The release step reads every top-level .changeset/*.md except the README.
+    notes = [
+        f for f in files
+        if CHANGESET_NOTE_RE.match(f.get("filename", "")) and f["filename"].rsplit("/", 1)[-1].lower() != "readme.md"
+    ]
+    if not watched and not notes:
+        return []
+    head = (pr.get("head") or {}).get("sha", "")
+    problems: list[str] = []
+    if watched:
+        # Compare against the merge base, not the base tip, so a release that landed on
+        # main after the branch was cut is not mistaken for an edit by this branch.
+        compare = gh.get(f"/repos/{cfg.repo}/compare/{(pr.get('base') or {}).get('sha', '')}...{head}")
+        merge_base = compare["merge_base_commit"]["sha"]
+        for f in watched:
+            try:
+                problems += release_file_change(gh, cfg, f, head, merge_base)
+            except FileContentError as exc:
+                problems.append(str(exc))
+    return problems + note_problems(gh, cfg, notes, head)
+
+
+def release_file_change(gh, cfg: Config, f: dict, head: str, merge_base: str) -> list[str]:
+    path = f["filename"]
+    added = f.get("status") == "added"
+    before_path = f.get("previous_filename") or path
+    if CHANGELOG_RE.search(path):
+        if added:
+            return [f"`{path}` is a new CHANGELOG. {RELEASE_HINT}"]
+        old_top, old_count = changelog_shape(file_text(gh, cfg, before_path, merge_base))
+        new_top, new_count = changelog_shape(file_text(gh, cfg, path, head))
+        if new_count > old_count:
+            return [f"`{path}` adds a CHANGELOG entry. {RELEASE_HINT}"]
+        if new_top != old_top:
+            return [f"`{path}` edits the top CHANGELOG entry. {RELEASE_HINT}"]
+        return []
+    after = listed_versions(path, file_text(gh, cfg, path, head))
+    before = {} if added else listed_versions(path, file_text(gh, cfg, before_path, merge_base))
+    return [
+        f"`{path}` changes the {name} version from {before[name]} to {after[name]}. {RELEASE_HINT}"
+        for name in sorted(set(before) & set(after))
+        if before[name] != after[name]
+    ]
 
 
 def evaluate(gh, cfg: Config, number: int) -> Decision:
@@ -299,6 +524,7 @@ def evaluate(gh, cfg: Config, number: int) -> Decision:
     sha = (pr.get("head") or {}).get("sha", "")
     comments = gh.paginate(f"/repos/{cfg.repo}/issues/{number}/comments")
     reasons = check_problems(gh, cfg, sha)
+    reasons += release_file_problems(gh, cfg, number, pr)
     threads = getattr(gh, "unresolved_threads", None)
 
     def open_threads():
@@ -313,7 +539,7 @@ def evaluate(gh, cfg: Config, number: int) -> Decision:
                 return len(found)
         return threads(cfg.repo, number) if threads else None
 
-    reasons += codex_problems(latest_codex_state(comments), sha, open_threads)
+    reasons += codex_problems(latest_codex_state(comments), sha, open_threads, has_clean_codex_receipt(comments, sha))
     reasons += mergeable_problems(pr)
     action = "refuse" if reasons else "merge"
     return Decision(number, action, reasons, sha, issue_number, comments)

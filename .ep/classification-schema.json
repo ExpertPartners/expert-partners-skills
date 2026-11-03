@@ -7,7 +7,7 @@
   "frontmatter_key": "classification",
   "allowed_values": ["public", "internal", "confidential", "restricted"],
   "_allowed_values_ref": "decisions/0025-data-classification.md -- Table: The four classes",
-  "_required_in_paths_comment": "Glob patterns (relative to repo root) where a classification tag is MANDATORY and absence is a commit error (fail-closed per ADR-0025). Empty on the aura repo today; L5 populates per brand repo as content is born tagged. Once populated, untagged files in these paths are rejected at pre-commit and CI.",
+  "_required_in_paths_comment": "Glob patterns (relative to repo root) where a classification tag is MANDATORY and absence is a commit error (fail-closed per ADR-0025). Empty today; L5 populates per brand repo as content is born tagged. Once populated, untagged files in these paths are rejected at pre-commit and CI.",
   "required_in_paths": [],
   "_exempt_paths_comment": "Paths where classification is never required (and value-checking is skipped). Machine-generated files, root READMEs, and CI config are out of scope per ADR-0025.",
   "exempt_paths": [

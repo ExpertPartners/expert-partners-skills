@@ -3,8 +3,9 @@
 brand-lint.py -- Expert Partners brand-naming and formatting linter (L6 Gatekeeper, F2 + F4).
 
 Enforces the non-negotiable brand spelling, naming, and formatting standards from the
-organization operating standard and the Aura CLAUDE.md, so violations are caught at
-commit time and in CI rather than after publish.
+organization operating standard (the earlier Aura CLAUDE.md source is history in
+GitHub Archive), so violations are caught at commit time and in CI rather than after
+publish.
 
 What it checks (high-precision, word-boundary anchored):
   ERROR rules (fail the commit):
@@ -27,7 +28,7 @@ Escape hatches (for legitimate exceptions -- quotes, tickers, third-party names)
                        any line whose full text matches a pattern is exempt from all findings
                        on that line.
 
-Usage (the kit directory is tools/ in aura, .ep/ in deployed repos):
+Usage (the kit directory is .ep/):
   python3 .ep/brand-lint.py [FILE ...]          # lint the named files (pre-commit passes these)
   python3 .ep/brand-lint.py                     # lint all git-tracked text files
   python3 .ep/brand-lint.py --strict ...        # treat WARN as failure too
@@ -156,7 +157,7 @@ def mask_codeblocks(lines: list[str]) -> list[str]:
 # Allowlist
 # ---------------------------------------------------------------------------
 
-# The kit ships as one flat directory (tools/ in aura, .ep/ in deployed repos) with the
+# The kit ships as one flat directory (.ep/) with the
 # allowlist beside this script, so resolve it script-adjacent. A repo-relative tools/ path
 # here previously left every deployed .ep/brand-lint-allow.txt silently unread.
 ALLOWLIST_PATH = Path(__file__).resolve().parent / "brand-lint-allow.txt"

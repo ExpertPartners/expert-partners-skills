@@ -12,7 +12,7 @@ subtitle: "browser work on Ember's M2, never Allison's M4"
 
 # Ember Browser Routing
 
-<!-- RULED-BY: aura/intake/2026-10-08-ruling-claude-code-location-and-remove-lock-that.md date:2026-10-08 -->
+<!-- RULED-BY: history in GitHub Archive date:2026-10-08 -->
 
 ## Core rule
 
@@ -25,19 +25,28 @@ Never attach to, click, type in, navigate, foreground, or move the cursor on All
 ## Browser workflow
 
 1. Use an API/MCP when it reliably completes the task without a browser.
-2. When browser/UI work is required, connect to Ember's M2 through the available Ember/CUA/browser integration.
+2. When browser/UI work is required, connect to Ember's M2 through the `playwright-ember` tool, the one browser route (AI Implementation SOP, section 5).
 3. Enumerate the M2 browser targets and select the exact tab/window needed for the current assignment.
 4. Continue without asking Allison whether the M2 is available merely because other tabs, windows, tasks, or sessions are visible.
 5. Keep one working tab per task and reuse it by navigating in place. Open a second tab only when two pages must sit side by side, and close it right after. Preserve pre-existing tabs and anything owned by another session or by Allison.
 
 ## Existing authenticated Chrome attachment
 
-Use the registered `mcp__cua_ember__js` route. The standalone
-`playwright_ember` launcher with `--user-data-dir .../ember-codex` starts a
-separate automation profile; it does not attach to the signed-in Chrome app.
-A lock on that directory is evidence about that automation process, not proof
-that the authenticated browser is unavailable. Do not use `--isolated`, remove
-locks, restart Chrome, copy authentication, or create another profile to bypass it.
+The route lives in one place, the AI Implementation SOP in HQ Company Core (section 5, How
+each AI connects, and How code sessions reach the M2). Read it there, never guess it from a
+tool list or an old config. Verified live Nov 2, 2026 after the Nov 1 M2 rebuild:
+
+- Claude Code and Codex use `playwright-ember`, an SSH command from the M4 to the alias
+  `ember` that starts `/Users/ember/maintenance/chrome-signed-in-mcp.sh` on the M2. It
+  attaches to the M2's signed-in Chrome, `Default` profile (ember@expertpartners.com),
+  through the Playwright Extension, with no debugging prompt.
+- `cua_ember` and the underscore `playwright_ember` launcher (`--user-data-dir
+  .../ember-codex`) are retired. Both pointed at `/Users/allison` on the M2, an account that
+  no longer exists, and the second one started a separate automation profile. Both are
+  removed from Codex's config on the M4, so in Codex the tool name `playwright_ember` now
+  means only the live route.
+- Never use Claude in Chrome, the Codex browser, Chrome or computer-use plugins, or a local
+  Playwright plugin. Each one drives Allison's M4 or a signed-out browser.
 
 <!-- RULED-BY: HQ Business Brain, [HQ][V1.0] Decision Log, 2026-10-20 entry "Browser automation runs only in the signed-in Chrome on Ember's M2" date:2026-10-20 -->
 
@@ -46,51 +55,13 @@ work. Always use the signed-in Chrome, and assume it and 1Password are
 available until a real failure proves otherwise.
 
 Scripted, repeatable, or unattended jobs (GoHighLevel workflows, contact
-merges, bulk UI work) follow [browser-automation](../browser-automation/SKILL.md).
-It reaches this same signed-in Chrome through the Playwright Extension and the
-shared connector (verified live 2026-10-20, no "Allow remote debugging?"
-prompt), so it is the same browser and not a second launcher. Every rule in this skill still applies
-to it, including exact tab ownership, closing only its own tabs, and never
-using Allison's M4.
+merges, bulk UI work) follow [browser-automation](../browser-automation/SKILL.md),
+which uses the same `playwright-ember` route. Every rule in this skill still applies,
+including exact tab ownership, closing only your own tabs, and never using Allison's M4.
 
-Interactive work uses the `cua_ember` route below.
-
-On first use, execute exactly one discovery call:
-
-```javascript
-await cua.getState();
-```
-
-Inspect the returned M2 browser/profile metadata and existing task URL. Select
-that exact browser ID, never the first Chrome result. Browser IDs and profile
-names are live observations, not permanent constants. If multiple profiles
-match and the correct one cannot be established, stop on that ambiguity.
-
-```javascript
-let estateBrowser = await cua.getBrowser({id: verifiedBrowserId});
-```
-
-Read the returned API documentation. Name the session and create a task-owned
-tab in that selected existing profile with `cua.createBrowserTab`, using a
-unique `sessionName`. Preserve existing tabs, including another task's tab at
-the same URL. Keep the returned tab handle and ID for every subsequent action.
-Where the selected provider exposes `tab.playwright`, its locators and frame
-inspection control that same authenticated tab; a second Playwright launcher
-is unnecessary. Never assume a loopback listener is CDP: verify the endpoint
-before configuring any attachment, and do not expose a new debugging listener.
-
-If browser-provider enumeration fails or returns no usable target, attempt the
-existing native app route before declaring browser access blocked:
-
-```javascript
-let emberChrome = await cua.getApp('com.google.Chrome');
-```
-
-Inspect fresh window, profile, URL and task ownership before input. Native app
-input is not a substitute for exact tab isolation: if another task owns the
-window or focus cannot be safely established, stop on that specific conflict.
-Do not reset a runtime owned by another task. This fallback follows Aura
-[decision 0104](https://github.com/ExpertPartners/Development/blob/main/decisions/0104-ember-native-browser-control-before-screen-sharing.md).
+On first use, open your own working tab with `browser_tabs` (new), confirm the
+signed-in account on the page, and keep that tab index for the task. The tab list
+starts with the connector's Welcome tab; leave it alone.
 
 Treat attachment and app rendering as separate checks. First verify the
 expected location/account in the authenticated browser. Then inspect the
@@ -119,7 +90,7 @@ Stop only when the browser-control tool returns a real blocker, such as:
 - connector unreachable after one normal retry;
 - explicit exclusive-control or lock failure;
 - no browser target can be enumerated or safely selected;
-- authentication, MFA, CAPTCHA, or approval requires Allison;
+- a sign-in that neither the 1Password fill nor single sign-on covers, a sign-up or consent screen, or MFA, CAPTCHA, or approval that requires Allison;
 - exact tab selection is impossible and proceeding could interfere with another session.
 
 When stopped for one of those reasons, report the exact blocker. **Never fall back to Allison's M4 browser.**
@@ -146,7 +117,25 @@ Never use a click on Allison's M4 as a workaround to rebind browser control.
 
 ## Human-only browser actions
 
-If Allison must complete login, MFA, CAPTCHA, approval, or another human-only action:
+<!-- RULED-BY: HQ Business Brain, [HQ][V1.0] Decision Log, 2026-11-03 entry "AI uses the sign-ins Allison set up, without waiting for her" date:2026-11-03 -->
+
+When 1Password in Ember's Chrome on the M2 offers a saved login, or a site offers Sign in with
+Google or another single sign-on for an account already signed in there, Claude Code, Ember and
+any AI working for Allison go ahead, sign in and keep working without asking her. 1Password fills
+the credential itself, so no AI types or sees a password. The hard stops stay. New account access
+(creating an account or adding access that does not exist yet), live releases, messages outside
+approved campaigns and anything irreversible still need the applicable founder's yes, which is
+Allison's for her own accounts. Single sign-on counts only
+for a site account that already exists. If the button leads to a sign-up page, a new consent or
+permissions screen, or asks to create anything, that is new account access, so stop and ask her.
+If an account chooser appears, pick only the identity already linked to that site, the one its
+1Password item or saved account names. If that is not clear, stop and ask, because many sites
+create an account the moment an unlinked identity signs in.
+
+A sign-in page by itself is not human-only. Use the 1Password fill or the single sign-on button
+first, and never read a password into the session's own context.
+
+If Allison must complete a sign-in that neither the 1Password fill nor single sign-on covers, MFA, CAPTCHA, approval, or another human-only action:
 
 - leave the exact required screen open on Ember's M2;
 - tell Allison the single required action and where it is;
@@ -168,4 +157,4 @@ This follows the HQ Rulebook's Browser tabs stay clean section (Decision Log 202
 
 When a handoff needs an explicit browser line, use:
 
-`BROWSER RULE: Browser/UI work runs on Ember's M2 only. Allison's M4 may be used for code/terminal/files but never for browser control. Assume the M2 is available; do not ask because other M2 tabs/sessions are visible. Stop only on an explicit M2 browser-control failure, auth/MFA, or a genuine tab-selection conflict, and never fall back to the M4.`
+`BROWSER RULE: Browser/UI work runs on Ember's M2 only. Allison's M4 may be used for code/terminal/files but never for browser control. Assume the M2 is available; do not ask because other M2 tabs/sessions are visible. Stop only on an explicit M2 browser-control failure, a sign-in that neither the 1Password fill nor single sign-on covers, MFA, CAPTCHA, a sign-up or consent screen, a human approval, or a genuine tab-selection conflict, and never fall back to the M4.`

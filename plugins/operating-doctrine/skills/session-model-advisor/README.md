@@ -2,7 +2,7 @@
 
 ## What it's for
 
-Every implementation conversation runs on some model (Haiku, Sonnet, Opus, Fable) at some effort level (low, medium, high, xhigh, max). The right choice depends on the task -- a format-locked social post wants a smaller model at low effort, because lower effort holds tighter to narrow rules like "no em dashes." A dense financial analysis wants a bigger model at high effort. The fit check and handoff recommendation use the current Estate standard. Allison ruled the answer in ADR 0057 (`decisions/0057-model-and-effort-operating-standard.md` in the aura repo) on 2026-08-08. This skill is what makes that ruling actually apply, turn one, every conversation, instead of sitting in a doc nobody reads before typing.
+Every implementation conversation runs on some model (Haiku, Sonnet, Opus, Fable) at some effort level (low, medium, high, xhigh, max). The right choice depends on the task -- a format-locked social post wants a smaller model at low effort, because lower effort holds tighter to narrow rules like "no em dashes." A dense financial analysis wants a bigger model at high effort. The fit check and handoff recommendation use the current Estate standard. Allison ruled the answer in ADR 0057 (history in GitHub Archive) on 2026-08-08. This skill is what makes that ruling actually apply, turn one, every conversation, instead of sitting in a doc nobody reads before typing.
 
 ## What it does, in one sentence
 

@@ -1,4 +1,4 @@
-# Expert Partners pre-commit framework -- deployed from L6 Gatekeeper (aura).
+# Expert Partners pre-commit framework (L6 Gatekeeper).
 # Same ruleset as .github/workflows/ci.yml (server-side). Install once per clone:
 #   pre-commit install
 # Run against everything: pre-commit run --all-files

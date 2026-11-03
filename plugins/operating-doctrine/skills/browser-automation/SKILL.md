@@ -10,7 +10,7 @@ description: >
   never opens a fresh or signed-out browser, assumes Chrome and 1Password access until a
   real failure, picks the most durable and fastest path, keeps one working tab per task,
   and closes every tab it opens before it reports.
-  Same setup for Claude Code, Claude desktop, Codex and Antigravity CLI. Defers to
+  Claude Code and Codex reach it through the playwright-ember tool. Defers to
   ember-browser-routing on which machine runs browser work. It inherits the
   operating-doctrine and never overrides it.
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
@@ -49,12 +49,14 @@ Playwright Extension with the shared connector below.
 Start every task assuming Chrome is signed in and 1Password is available. Do not ask
 Allison whether you have access. Try first.
 
-Report a block only after one of these really happens.
+Report a block only after one of these really happens. A sign-in page by itself is not a
+block.
 
 - The connector fails to connect twice in a row.
-- A login screen appears and signing in with the 1Password item fails.
+- A sign-in page appears and neither the 1Password fill in Chrome nor single sign-on gets you
+  in.
 - MFA, CAPTCHA, or a human approval screen appears.
-- 1Password returns an error for the item you need.
+- A sign-up page or a new consent screen appears, which is new account access.
 
 When blocked, leave the exact screen open on the M2, tell Allison the one thing she needs
 to do and where, and pick up again when she says done. If a tool or access she needs is
@@ -67,15 +69,32 @@ tools, its bookmarks bar goes straight to them, and 1Password holds every login.
 about access before following that trail is the most common way AI stalls her work.
 
 1. Use the API or connector if one covers the job.
-2. Otherwise open the page with the `playwright` tool. You are almost always already signed
+2. Otherwise open the page with the `playwright-ember` tool. You are almost always already signed
    in. Look before you assume you are not.
-3. Only on a real login page, sign in with the matching 1Password item through `op`.
+3. Only on a real sign-in page, use the saved login that 1Password offers in Chrome, or the
+   site's Sign in with Google or other single sign-on button, then keep working. Never read a
+   password into the session's own context.
 4. Only if all of that truly fails, tell Allison the one thing she must do.
+
+<!-- RULED-BY: HQ Business Brain, [HQ][V1.0] Decision Log, 2026-11-03 entry "AI uses the sign-ins Allison set up, without waiting for her" date:2026-11-03 -->
+
+When 1Password in Ember's Chrome on the M2 offers a saved login, or a site offers Sign in with
+Google or another single sign-on for an account already signed in there, Claude Code, Ember and
+any AI working for Allison go ahead, sign in and keep working without asking her. 1Password fills
+the credential itself, so no AI types or sees a password. The hard stops stay. New account access
+(creating an account or adding access that does not exist yet), live releases, messages outside
+approved campaigns and anything irreversible still need the applicable founder's yes, which is
+Allison's for her own accounts. Single sign-on counts only
+for a site account that already exists. If the button leads to a sign-up page, a new consent or
+permissions screen, or asks to create anything, that is new account access, so stop and ask her.
+If an account chooser appears, pick only the identity already linked to that site, the one its
+1Password item or saved account names. If that is not clear, stop and ask, because many sites
+create an account the moment an unlinked identity signs in.
 
 Never ask her which browser to use, whether you are signed in, or to click or approve
 anything before steps 1 to 3. Do not use the Claude in Chrome extension for this work. It
-is connected on the M4 as well, so it cannot tell the computers apart. `playwright` and
-`playwright-atlas` reach only the M2.
+drives Allison's own Chrome on the M4. `playwright-ember` is the only browser tool that
+reaches the M2.
 
 ## Rule 3. Most durable and fastest, not easiest
 
@@ -107,8 +126,8 @@ sessions. This rule follows the HQ Rulebook's Browser tabs stay clean section (D
   after.
 - Each connection starts with a "Welcome" connect tab. Navigate it to your first page so
   it becomes your working tab, rather than leaving it behind.
-- Close every tab you opened before you report or end your turn. `pw-run` does this
-  automatically. In an MCP session, end with `browser_tabs` close on each of your tabs.
+- Close every tab you opened before you report or end your turn. End with `browser_tabs`
+  close on each of your tabs.
   `browser_close` alone leaves the tab open in extension mode.
 - After a crash or reconnect, close your own leftover tabs before starting again.
 - Never close another AI's tabs or Allison's. The extension gives each connection its own
@@ -117,27 +136,35 @@ sessions. This rule follows the HQ Rulebook's Browser tabs stay clean section (D
 
 ## The setup on Ember's M2
 
+The route itself lives in one place, the AI Implementation SOP in HQ Company Core
+(sections 5 and 8, and How code sessions reach the M2). If this table and the SOP ever
+differ, the SOP wins. Verified live Nov 2, 2026, after the Nov 1 M2 rebuild.
+
 | Item | Value |
 |---|---|
-| Machine | Ember's M2 only |
-| Chrome profile | `Default` (ember@expertpartners.com), Playwright Extension installed |
-| Shared connector | `~/maintenance/chrome-signed-in-mcp.sh` (Playwright MCP 0.0.83, pinned, `--extension`) |
-| Job runner | `~/maintenance/pw-run.py` (also `~/bin/pw-run`) |
-| Extension tokens | 1Password, Automation vault, two items titled `Playwright MCP Extension Token`, told apart by username (ember@ and atlas@); the connector reads them by item ID |
-| Antigravity CLI | `agy` (alias for `~/maintenance/agy-launch.sh`), Gemini API key from 1Password, browser tools allowed in `~/.gemini/antigravity-cli/settings.json` |
-| Python environment | `~/.venvs/playwright` (Playwright 1.56.0) for local work that needs no browser |
+| Machine | Ember's M2 only. One Mac user, `ember`. There is no `/Users/allison` on the M2 any more |
+| Chrome profile | `Default` only (ember@expertpartners.com, allison@ also added in Google), Playwright Extension installed. The Atlas profile did not come back after the rebuild |
+| Shared connector | `/Users/ember/maintenance/chrome-signed-in-mcp.sh` (Playwright MCP 0.0.83, pinned, `--extension`) |
+| Extension token | 1Password, Automation vault, item ID `tzqvnlgilv4evwffp27amnwxw4`. The connector reads an owner-only copy at `~/.config/ember/playwright-extension-token`, because SSH sessions cannot unlock the Keychain |
+| Job runner | None since the rebuild. `pw-run` is gone |
 
-Every AI client on the M2 (Claude Code, Claude desktop, Codex, Antigravity CLI) has two MCP
-servers that run the shared connector.
+Claude Code and Codex start on Allison's M4 and reach that Chrome through one MCP server,
+`playwright-ember`, registered at user scope in each.
 
-- `playwright` drives the Ember browser (`Default` profile). Use it unless told otherwise.
-- `playwright-atlas` drives the Atlas browser (`Profile 3`). Use it when Allison says "use
-  the Atlas browser" or the job needs the logins signed in there.
+```text
+command: ssh
+args:    -T -o BatchMode=yes -o ConnectTimeout=8 ember /Users/ember/maintenance/chrome-signed-in-mcp.sh
+```
 
-Several AIs can share one browser at once, each in its own tab group. Pick the browser by
-the logins the job needs, not to avoid overlap. Tab groups do not stop two AIs from
-changing the same record at the same time, so give each job to one AI. The AI acts as
-whoever is signed in, and changes show under that person's name.
+- There is no `playwright` or `playwright-atlas` server. Any config or note naming them, a
+  `/Users/allison` path, or a separate browser profile is out of date. Do not guess a route;
+  read the SOP.
+- Never use Claude in Chrome, the Codex browser, Chrome or computer-use plugins, or a local
+  Playwright plugin. Each one drives Allison's M4 or a signed-out browser.
+
+Several AIs can share one browser at once, each in its own tab group. Tab groups do not
+stop two AIs from changing the same record at the same time, so give each job to one AI.
+The AI acts as whoever is signed in, and changes show under that person's name.
 
 ### Chrome settings that keep the M2 clean
 
@@ -154,50 +181,16 @@ whoever is signed in, and changes show under that person's name.
 
 ### Running a job
 
-Write the job as one JavaScript function that receives a Playwright `page`, then run it.
-
-```javascript
-async (page) => {
-  await page.goto('https://app.gohighlevel.com/', { waitUntil: 'domcontentloaded' });
-  // do the work here
-  return { title: await page.title() };
-}
-```
-
-```bash
-pw-run path/to/job.js            # add --timeout 600 for long jobs
-```
-
-`pw-run` prints what the function returns, closes every tab from the run, and exits
-non-zero on any failure, so it works the same from a chat session, an agent, or cron.
+Use the `playwright-ember` tools from the session: `browser_tabs` (new) to open your working
+tab, `browser_navigate`, `browser_snapshot`, `browser_evaluate` and the rest, then
+`browser_tabs` close on your tab. For a longer scripted job, `browser_run_code_unsafe`
+runs one function that receives the Playwright `page`.
 
 ### Health check
 
-```bash
-cat > /tmp/ghl-check.js <<'JS'
-async (page) => {
-  await page.goto('https://app.gohighlevel.com/', { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(4000);
-  return { signedIn: !page.url().includes('login') };
-}
-JS
-pw-run /tmp/ghl-check.js
-```
-
-Expect `{"signedIn":true}` and `pw-run: closed 1 tab(s) from this run`.
-
-### More than one profile
-
-Each Chrome profile can carry its own Playwright Extension with its own token, which lets
-separate AI lanes work in separate signed-in profiles (for example Atlas for Don's work).
-Install the extension in that profile, save its token in 1Password under its own item name,
-and launch the connector with both set (`pw-run` passes them through too). The Atlas item ID is in the `playwright-atlas` server
-settings, for example `claude mcp get playwright-atlas`.
-
-```bash
-CHROME_PROFILE_DIR="Profile 3" PW_TOKEN_ITEM="<Atlas token item ID>" \
-  ~/maintenance/chrome-signed-in-mcp.sh
-```
+Open a new tab at `https://accounts.google.com/SignOutOptions`, read the signed-in emails
+with `browser_evaluate`, and close the tab. Expect `ember@expertpartners.com`, and a tab list
+that ends with only the connector's Welcome tab.
 
 ### Rotating the token
 
@@ -208,9 +201,12 @@ Never print, log, or paste the token anywhere else.
 
 ## 1Password
 
-Use the `op` command with the service account. Read a secret at the moment it is needed,
-pass it straight to the page, and never print, log, save, or commit it. If a GHL session has
-expired, sign back in with the matching 1Password item before reporting anything.
+For a browser sign-in, use the saved login 1Password offers in Chrome or the site's single
+sign-on, as Rule 2a says. Never read a password with `op` for a browser sign-in. Use the `op`
+command with the service account only for secrets a script or the connector needs, such as the
+extension token. Read such a secret at the moment it is needed and never print, log, save, or
+commit it. If a GHL session has expired, sign back in with the 1Password fill or single sign-on
+before reporting anything.
 
 ## GoHighLevel guardrails
 
@@ -230,15 +226,14 @@ expired, sign back in with the matching 1Password item before reporting anything
 - A job that will run again lives in the repo that owns the work. One-time work runs from
   the session scratchpad. Never in this skills repo, never in a business brain.
 - Respect site terms, keep the pace human, and never get around a CAPTCHA or bot block.
-- A job goes on cron only after it has run by hand and the result was checked. Use the full
-  path to `pw-run`, set `PATH` in the crontab line, and stay out of the nightly pipeline
-  window (2:45 AM to 6:30 AM).
+- There is no scheduled browser runner since the Nov 1 rebuild. A browser job that needs
+  to run on a schedule is a build for the Ember Rebuild room, not a cron line.
 
 ## Every AI on the M2
 
 This skill ships in the operating-doctrine plugin of the expert-partners marketplace, which
-Claude Code, Claude surfaces, and Codex load. Antigravity CLI and the Claude desktop app reach
-the same browser through their `playwright` MCP server. Tab groups are what let several AIs
+Claude Code, Claude surfaces, and Codex load. Claude Code and Codex reach the M2 browser
+through `playwright-ember`. Tab groups are what let several AIs
 share the M2 at once without stepping on each other.
 
 ## Reporting

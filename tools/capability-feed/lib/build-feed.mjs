@@ -27,7 +27,7 @@ export const LIFECYCLE_STATUS = {
   sleeping: 'Unknown',
 };
 
-const REPO_NAMES = { eps: 'expert-partners-skills', aura: 'aura' };
+const REPO_NAMES = { eps: 'expert-partners-skills' };
 const ID_RX = /^[a-z0-9-]+$/;
 const PRESENT_AS = ['plugin', 'collection', 'excluded'];
 const KIND_ORDER = ['collection', 'plugin', 'capability', 'agent', 'skill'];

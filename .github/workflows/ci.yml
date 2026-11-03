@@ -1,6 +1,6 @@
 name: ci-gates
 
-# Expert Partners CI quality gates -- deployed from L6 Gatekeeper (aura).
+# Expert Partners CI quality gates (L6 Gatekeeper).
 # Mirrors .pre-commit-config.yaml: same ruleset, server-side enforced.
 # Gates the diff (changed files); gitleaks scans full history.
 # Tools live in .ep/ -- self-contained.

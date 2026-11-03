@@ -25,10 +25,10 @@
 #   ~/.claude/capability-currency-off  this job only
 #
 # Built 2026-08-05 by the Capability Currency Build session per the locked
-# Capability Currency plan (Allison, 2026-08-05). Moved 2026-10-13 from the aura
-# repo (tools/capability-currency/) to expert-partners-skills in the clean-slate
-# cutover. The run now writes the Capability Watch and Capability Refresh
-# Changelog Docs in HQ Business Brain (Drive), not aura reference files.
+# Capability Currency plan (Allison, 2026-08-05). Moved 2026-10-13 to
+# expert-partners-skills in the clean-slate cutover; its earlier home is history
+# in GitHub Archive. The run writes the Capability Watch and Capability Refresh
+# Changelog Docs in HQ Business Brain (Drive).
 
 set -uo pipefail
 

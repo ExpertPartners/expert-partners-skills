@@ -109,9 +109,8 @@ export function readInputs(repoRoot, { graphPath, configPath } = {}) {
     plugins.push({ entry, manifest, readme, dir: path.relative(root, dir).split(path.sep).join('/') });
   }
 
-  // Published descriptions and display names for the skills this repo owns. Skills
-  // owned by another repo (aura) are represented by their graph entry alone, so the
-  // feed stays a pure function of this repository's tree.
+  // Published descriptions and display names for the skills this repo owns, read from
+  // this repository's tree so the feed stays a pure function of it.
   const skillDocs = new Map();
   for (const node of graph?.nodes ?? []) {
     if (typeof node?.source !== 'string' || !node.source.startsWith('eps:')) continue;
@@ -125,7 +124,7 @@ export function readInputs(repoRoot, { graphPath, configPath } = {}) {
     skillDocs.set(node.id, { description: desc, heading: h1 });
   }
 
-  // Future canonical capability records (AI Capability Curator, aura ADR 0098).
+  // Future canonical capability records (AI Capability Curator, ADR 0098, history in GitHub Archive).
   // Each configured source is a repo-relative directory of *.json files; see README.
   const capabilityRecords = [];
   for (const src of config?.capabilityRecordSources ?? []) {

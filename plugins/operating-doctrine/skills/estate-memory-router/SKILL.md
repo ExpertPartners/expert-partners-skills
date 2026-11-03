@@ -13,7 +13,7 @@ subtitle: "one classifier, six existing destinations, no new store"
 
 # Estate Memory Router -- v1.1 (2026-10-08)
 
-v1.1 amendment 2026-10-08 (ruling of record aura intake/2026-10-08-ruling-claude-code-location-and-remove-lock-that.md, under decision 0101): the `Lock that` phrase gate is removed. A clear decision is saved as made. Candidates, the no-new-store rule, and every other route are unchanged.
+v1.1 amendment 2026-10-08 (ruling of record: history in GitHub Archive, under decision 0101): the `Lock that` phrase gate is removed. A clear decision is saved as made. Candidates, the no-new-store rule, and every other route are unchanged.
 
 The Estate already has strong downstream memory mechanisms. What it lacked was anything that decides, continuously and without being asked, which mechanism should receive a thing that was just learned. That decision was landing on Allison. This skill takes it off her.
 
