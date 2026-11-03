@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "a2d5e032f52618b1e0edfb412928883cf7e579d7"
+    "eps": "e68a855ac4b814396c06454a95a6640245902649"
   },
   "zones": [
     "surfaces",
@@ -221,7 +221,7 @@
       "renderNote": null,
       "layout": {
         "x": 902,
-        "y": 6826.2,
+        "y": 6335.2,
         "width": 163,
         "height": 63,
         "rectHeight": 48,
@@ -251,7 +251,7 @@
       "renderNote": null,
       "layout": {
         "x": 1144,
-        "y": 5353.2,
+        "y": 6693.3,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -480,7 +480,7 @@
       "renderNote": null,
       "layout": {
         "x": 877.5,
-        "y": 6133.2,
+        "y": 6234.2,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -723,7 +723,7 @@
       "renderNote": null,
       "layout": {
         "x": 1420,
-        "y": 5836.8,
+        "y": 6490.2,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -858,7 +858,7 @@
       "renderNote": null,
       "layout": {
         "x": 1165,
-        "y": 5454.2,
+        "y": 6071.8,
         "width": 215,
         "height": 77,
         "rectHeight": 62,
@@ -912,7 +912,7 @@
       "renderNote": null,
       "layout": {
         "x": 1144,
-        "y": 5555.2,
+        "y": 5931.2,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -969,7 +969,7 @@
       "renderNote": null,
       "layout": {
         "x": 872,
-        "y": 5555.2,
+        "y": 5931.2,
         "width": 252,
         "height": 77,
         "rectHeight": 62,
@@ -1026,7 +1026,7 @@
       "renderNote": null,
       "layout": {
         "x": 843,
-        "y": 5945.2,
+        "y": 6812.2,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -1111,7 +1111,7 @@
       "renderNote": null,
       "layout": {
         "x": 877.5,
-        "y": 6234.2,
+        "y": 6032.2,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1641,7 +1641,7 @@
       "renderNote": null,
       "layout": {
         "x": 877.5,
-        "y": 5743.2,
+        "y": 7000.2,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1669,7 +1669,7 @@
       "renderNote": null,
       "layout": {
         "x": 880.5,
-        "y": 5656.2,
+        "y": 5555.2,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -1699,7 +1699,7 @@
       "renderNote": null,
       "layout": {
         "x": 894,
-        "y": 5844.2,
+        "y": 6133.2,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -2016,7 +2016,7 @@
       "renderNote": null,
       "layout": {
         "x": 1438,
-        "y": 5225.3,
+        "y": 6591.2,
         "width": 212,
         "height": 91,
         "rectHeight": 76,
@@ -2336,7 +2336,7 @@
       "renderNote": null,
       "layout": {
         "x": 910.5,
-        "y": 6335.2,
+        "y": 6913.2,
         "width": 146,
         "height": 63,
         "rectHeight": 48,
@@ -2480,6 +2480,33 @@
       }
     },
     {
+      "id": "research-before-guessing",
+      "source": "eps:plugins/operating-doctrine/skills/research-before-guessing/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "look it up before you guess",
+      "renderNote": null,
+      "layout": {
+        "x": 872.5,
+        "y": 5844.2,
+        "width": 222,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "look it up before you guess"
+        ]
+      }
+    },
+    {
       "id": "research-intake",
       "source": "eps:plugins/research-ops/skills/research-intake/SKILL.md",
       "repo": "eps",
@@ -2581,7 +2608,7 @@
       "renderNote": null,
       "layout": {
         "x": 868.5,
-        "y": 5454.2,
+        "y": 5743.2,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -2609,7 +2636,7 @@
       "renderNote": null,
       "layout": {
         "x": 1420,
-        "y": 5340.3,
+        "y": 6706.2,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -2668,7 +2695,7 @@
       "renderNote": null,
       "layout": {
         "x": 886.5,
-        "y": 6725.2,
+        "y": 6422.2,
         "width": 194,
         "height": 77,
         "rectHeight": 62,
@@ -3062,7 +3089,7 @@
       "renderNote": null,
       "layout": {
         "x": 871.5,
-        "y": 6046.2,
+        "y": 6725.2,
         "width": 224,
         "height": 63,
         "rectHeight": 48,
@@ -3201,7 +3228,7 @@
       "renderNote": null,
       "layout": {
         "x": 843,
-        "y": 6422.2,
+        "y": 5642.2,
         "width": 281,
         "height": 77,
         "rectHeight": 62,
@@ -3353,19 +3380,19 @@
       "points": [
         {
           "x": 1380,
-          "y": 5404.5
+          "y": 6719
         },
         {
-          "x": 1400,
-          "y": 5404.5
+          "x": 1410,
+          "y": 6719
         },
         {
-          "x": 1400,
-          "y": 5847.8
+          "x": 1410,
+          "y": 6556.2
         },
         {
           "x": 1420,
-          "y": 5847.8
+          "y": 6556.2
         }
       ]
     },
@@ -3376,11 +3403,11 @@
       "points": [
         {
           "x": 1380,
-          "y": 5378.8
+          "y": 6744.7
         },
         {
           "x": 1420,
-          "y": 5378.8
+          "y": 6744.7
         }
       ]
     },
@@ -3568,11 +3595,11 @@
         },
         {
           "x": 780,
-          "y": 5983.7
+          "y": 6850.7
         },
         {
           "x": 843,
-          "y": 5983.7
+          "y": 6850.7
         }
       ]
     },
@@ -3634,14 +3661,6 @@
       "points": [
         {
           "x": 1420,
-          "y": 5880.8
-        },
-        {
-          "x": 1390,
-          "y": 5880.8
-        },
-        {
-          "x": 1390,
           "y": 6523.2
         },
         {
@@ -3675,19 +3694,19 @@
       "points": [
         {
           "x": 1380,
-          "y": 5492.7
+          "y": 6110.3
         },
         {
-          "x": 1390,
-          "y": 5492.7
+          "x": 1400,
+          "y": 6110.3
         },
         {
-          "x": 1390,
-          "y": 5858.8
+          "x": 1400,
+          "y": 6501.2
         },
         {
           "x": 1420,
-          "y": 5858.8
+          "y": 6501.2
         }
       ]
     },
@@ -3716,11 +3735,11 @@
       "points": [
         {
           "x": 1124,
-          "y": 5593.7
+          "y": 5969.7
         },
         {
           "x": 1144,
-          "y": 5593.7
+          "y": 5969.7
         }
       ]
     },
@@ -3979,11 +3998,19 @@
       "points": [
         {
           "x": 1124,
-          "y": 5869.8
+          "y": 6158.8
+        },
+        {
+          "x": 1390,
+          "y": 6158.8
+        },
+        {
+          "x": 1390,
+          "y": 6512.2
         },
         {
           "x": 1420,
-          "y": 5869.8
+          "y": 6512.2
         }
       ]
     },
@@ -3994,11 +4021,11 @@
       "points": [
         {
           "x": 1124,
-          "y": 5895.5
+          "y": 6184.5
         },
         {
           "x": 1134,
-          "y": 5895.5
+          "y": 6184.5
         },
         {
           "x": 1134,
@@ -4096,11 +4123,11 @@
       "points": [
         {
           "x": 1650,
-          "y": 5270.8
+          "y": 6636.7
         },
         {
           "x": 1687,
-          "y": 5270.8
+          "y": 6636.7
         },
         {
           "x": 1687,
@@ -4136,16 +4163,16 @@
           "y": 6548.8
         },
         {
-          "x": 1400,
+          "x": 1390,
           "y": 6548.8
         },
         {
-          "x": 1400,
-          "y": 5891.8
+          "x": 1390,
+          "y": 6534.2
         },
         {
           "x": 1420,
-          "y": 5891.8
+          "y": 6534.2
         }
       ]
     },
@@ -4193,6 +4220,12 @@
     },
     {
       "from": "repo-standards",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "research-before-guessing",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -4285,16 +4318,16 @@
           "y": 6584.5
         },
         {
-          "x": 1410,
+          "x": 1400,
           "y": 6584.5
         },
         {
-          "x": 1410,
-          "y": 5902.8
+          "x": 1400,
+          "y": 6545.2
         },
         {
           "x": 1420,
-          "y": 5902.8
+          "y": 6545.2
         }
       ]
     },
@@ -4649,9 +4682,9 @@
         "label": "Session machinery",
         "caption": "routing, ledgers, session lifecycle",
         "x": 821,
-        "y": 5177.3,
+        "y": 5507.2,
         "width": 851,
-        "height": 1733.8,
+        "height": 1592,
         "rooms": []
       },
       {
