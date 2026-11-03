@@ -1,0 +1,17 @@
+{
+  "description": "Headless route check. Refuses browser navigation to systems that already have headless access and names the headless route to use instead.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^mcp__.*__(browser_navigate|navigate|tabs_create_mcp)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/headless_route_check.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

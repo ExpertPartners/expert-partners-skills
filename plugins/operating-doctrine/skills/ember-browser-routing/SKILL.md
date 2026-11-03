@@ -22,9 +22,32 @@ Claude Code and Codex may run from Allison's M4/local desktop, cloud session, te
 
 Never attach to, click, type in, navigate, foreground, or move the cursor on Allison's M4 browser or local screen.
 
+## Headless route first
+
+<!-- RULED-BY: HQ Business Brain, [HQ][V1.0] Decision Log, 2026-11-03 entries "Headless access comes first, and no browser is used where headless access exists" and "Standing yes for headless access setup" date:2026-11-03 -->
+
+No AI uses a browser for a system that has headless access. Before any browser work, check
+the system in this order and stop at the first step that applies.
+
+1. A connected MCP server or connector that covers the system.
+2. An API or CLI with its 1Password item.
+3. If neither exists yet but could, a setup job filed right away as the first job on that
+   system. Any AI may set up headless access inside an existing account without asking,
+   with the secret going straight into 1Password. A new account or anything paid still
+   needs Allison's yes.
+4. Only then a browser, and only for a vendor with no API, with that reason written down.
+
+The access map, a Google Sheet owned by Keys and Sign-Ins, records each system's hosts,
+headless route, 1Password item and status. The operating-doctrine plugin's headless route
+check hook refuses any browser navigation to a system marked live, naming the route and item
+to use, and to a system marked setting up, because the setup job comes first. A refusal is
+the answer, not a blocker. Switch to the route it names and never get around it with
+another browser tool. [browser-automation](../browser-automation/SKILL.md) Rule 0 carries
+the full rule.
+
 ## Browser workflow
 
-1. Use an API/MCP when it reliably completes the task without a browser.
+1. Follow Headless route first above. Use a browser only when that order ends at step 4.
 2. When browser/UI work is required, connect to Ember's M2 through the `playwright-ember` tool, the one browser route (AI Implementation SOP, section 5).
 3. Enumerate the M2 browser targets and select the exact tab/window needed for the current assignment.
 4. Continue without asking Allison whether the M2 is available merely because other tabs, windows, tasks, or sessions are visible.
@@ -153,8 +176,21 @@ This follows the HQ Rulebook's Browser tabs stay clean section (Decision Log 202
 - Never close another AI's tabs or Allison's, and preserve every pre-existing tab.
 - Never leave Allison's M4 browser or cursor altered.
 
+## Reporting
+
+Every report from a session that used a browser carries these two lines together. A report
+without them is incomplete.
+
+```text
+Headless route checked, <system>, <result>
+Tabs left open, none
+```
+
+The result is one of `live, used <route>`, `setting up, setup job filed first`,
+`no API, <reason>`, or `not on the access map, <what you did>`.
+
 ## Dispatch wording
 
 When a handoff needs an explicit browser line, use:
 
-`BROWSER RULE: Browser/UI work runs on Ember's M2 only. Allison's M4 may be used for code/terminal/files but never for browser control. Assume the M2 is available; do not ask because other M2 tabs/sessions are visible. Stop only on an explicit M2 browser-control failure, a sign-in that neither the 1Password fill nor single sign-on covers, MFA, CAPTCHA, a sign-up or consent screen, a human approval, or a genuine tab-selection conflict, and never fall back to the M4.`
+`BROWSER RULE: Check the headless route first, and use no browser for a system with headless access. Browser/UI work runs on Ember's M2 only. Allison's M4 may be used for code/terminal/files but never for browser control. Assume the M2 is available; do not ask because other M2 tabs/sessions are visible. Stop only on an explicit M2 browser-control failure, a sign-in that neither the 1Password fill nor single sign-on covers, MFA, CAPTCHA, a sign-up or consent screen, a human approval, or a genuine tab-selection conflict, and never fall back to the M4.`
