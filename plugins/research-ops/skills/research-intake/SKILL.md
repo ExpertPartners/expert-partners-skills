@@ -5,7 +5,7 @@ description: >
   or linked, into the department folder of the business brain that owns its
   subject, named Cal's way, [Brand-Department][V1.0] Name. AG Business Brain owns
   AG Luxury and Allison's brand. EP Business Brain owns Expert Partners, EPIC,
-  Don and PartnerSync product and market research. HQ Business Brain owns AI
+  Free Agent Movement, Don and PartnerSync product and market research. HQ Business Brain owns AI
   operations, Factory, Ember, Claude, skills, tools and PartnerSync build and
   shared operations material. Never files into the Deep Research folder. Use
   whenever a research report, deep-research output, or external analysis
@@ -41,16 +41,25 @@ the end, never instead of engaging with the content.
 
 ## 1. Never duplicate a filing
 
-Before writing anything, search all of Drive, shared drives included, through
-the Drive connector for the report's Drive file id if it has one, or its title
-if it does not. A filed copy carries a Cal prefix in front of the title, so
-search for the title inside the name, not for an exact name. If you find it,
-this is a rediscovery, not a new filing. Create nothing, skip to step 6 and
-report the existing Doc. If the existing Doc still sits in the Deep Research
-folder, say so in the report and leave it for the Drive Cleanup work in HQ
-Operations to move. Never copy it.
+Before writing anything, search Drive, shared drives included, through the
+Drive connector for the report's Drive file id if it has one, or its title if
+it does not. A filed copy carries a Cal prefix in front of the title, so
+search for the title inside the name, not for an exact name.
+
+- **A match already filed in a department folder of AG, EP or HQ Business
+  Brain**: this is a rediscovery, not a new filing. Create nothing, add no
+  entry and no Job Tracker row, skip to step 8 and report the existing Doc.
+- **Any other match**, including the linked file itself or a copy in the Deep
+  Research folder: that file is the report. Use it, make no second copy, and
+  carry on to step 2. Step 5 moves it home.
 
 ## 2. Find the brain that owns the subject
+
+First read the live routing canon: Organization Instructions, the HQ Rulebook
+and the Decision Log, all in HQ Business Brain, Company Core, each found by
+its title. They win over the tables in steps 2 and 3, and the newest Decision
+Log entry wins over both. If any of them cannot be read, save and move
+nothing, and tell Allison which source failed.
 
 Read the report's actual subject matter, not just its title or filename, and
 pick the one brain that owns it.
@@ -58,7 +67,7 @@ pick the one brain that owns it.
 | Subject | Owning brain | Brand tag |
 | --- | --- | --- |
 | AG Luxury, Allison's personal brand | AG Business Brain | AG |
-| Expert Partners, EPIC, Don, PartnerSync product and market research | EP Business Brain | EP |
+| Expert Partners, EPIC, Free Agent Movement, Don, PartnerSync product and market research | EP Business Brain | EP |
 | AI operations, Factory, Ember, Claude, skills, tools, PartnerSync build and shared operations material | HQ Business Brain | HQ |
 
 PartnerSync is split the way the HQ Rulebook department words split it.
@@ -75,6 +84,13 @@ department words. Each word matches a department folder in that brain, and
 the folder name ends with the department and the brain tag, like
 `Marketing [AG-BB]` or `Operations [HQ-BB]`. Find the folder by name in Drive.
 Never hard-code a folder id.
+
+A folder name alone proves nothing, because anyone can share a folder with
+the same name. Accept a folder only when it is the one match inside that
+brain's own folder tree and is owned by allison@expertpartners.com or sits in
+an Expert Partners shared drive. Ignore folders reached only through Shared
+with me. If no folder or more than one folder passes, treat the home as
+unclear (step 4).
 
 | Brain | Department word | Folder |
 | --- | --- | --- |
@@ -98,6 +114,10 @@ this skill invents. HQ owns folder structure, so if the right department
 folder does not exist yet, treat the home as unclear (step 4) instead of
 creating one.
 
+The target folder is the department folder found here. For PartnerSync build
+and shared operations material, it is the `PartnerSync Source Material [HQ-BB]`
+folder inside `Operations [HQ-BB]`, checked the same way.
+
 ## 4. When the home is unclear, ask one question
 
 When the report fits more than one brain or department, or no department
@@ -108,16 +128,21 @@ she answers. Then file it where she says.
 ## 5. Give the report its one home
 
 - **No Drive home yet** (pasted text, an uploaded file with no Drive copy, a
-  web page): save it into the department folder from step 3, as a Google Doc
-  if it is text, or in its original file type if it is a document. Use the
-  Drive connector, or SA+DWD impersonating allison@expertpartners.com if the
+  web page): save it into the target folder from step 3, as a Google Doc if
+  it is text, or in its original file type if it is a document. Use the Drive
+  connector, or SA+DWD impersonating allison@expertpartners.com if the
   connector refuses the write.
-- **Already in its owning brain's department folder**: use that file where it
-  is. No upload, no copy.
-- **Already in Drive somewhere else**: move that same file, by its file id,
-  into the department folder from step 3, and rename it to Cal's naming in the
-  same step (HQ Rulebook, Every move includes a relabel). Never copy it. If
-  the move is refused, leave the file where it is and say so in the report.
+- **Already in its owning brain's target folder**: use that file where it is.
+  No upload, no copy.
+- **Already in Drive somewhere else, owned by allison@expertpartners.com or in
+  an Expert Partners shared drive**: move that same file, by its file id, into
+  the target folder from step 3, and rename it to Cal's naming in the same
+  step (HQ Rulebook, Every move includes a relabel). Never copy it. If the
+  move is refused, leave the file where it is and say so in the report.
+- **Already in Drive, owned by someone else**: leave it where it is, with its
+  name unchanged, because a move or rename changes it for its owner and every
+  collaborator. Never copy it. Say so in the report and name the home it
+  belongs in.
 
 Name the file `[Brand-Department][V1.0] Title`. Brand is the tag from step 2.
 Department is the department word from step 3, as one whole word in title
