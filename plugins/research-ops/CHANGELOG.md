@@ -1,3 +1,6 @@
+## 0.5.8 - 2026-11-03
+
+Source Hunter and Video Discovery now install from exact, hash-locked requirement files. Every Python package, direct and transitive, is pinned with `==` and carries its sha256 hashes, so `pip install -r` runs in hash-checking mode and refuses any package the lock does not list. The pins freeze what the earlier ranges resolved to on Python 3.12, with Pillow at one version in both skills.
 ## 0.5.7 - 2026-11-03
 
 video-discovery: `video_discovery.py` and `probe_media.py` now write privacy-safe operational status events to stderr through a new `scripts/operational_logging.py` module. Each event is one JSON line holding only a fixed event name, a random run identifier, a success or failure outcome, a duration and bounded counts. Unknown fields are rejected, exception text and content are never logged, and nothing is written to files or sent over the network.
