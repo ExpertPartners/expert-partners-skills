@@ -5,9 +5,10 @@ description: >
   or linked, into the department folder of the business brain that owns its
   subject, named Cal's way, [Brand-Department][V1.0] Name. AG Business Brain owns
   AG Luxury and Allison's brand. EP Business Brain owns Expert Partners, EPIC,
-  Free Agent Movement, Don and PartnerSync product and market research. HQ Business Brain owns AI
-  operations, Factory, Ember, Claude, skills, tools and PartnerSync build and
-  shared operations material. Never files into the Deep Research folder. Use
+  Free Agent Movement, Don and PartnerSync product and market research. HQ
+  Business Brain owns AI operations, Factory, Ember, Claude, skills, tools and
+  PartnerSync build and shared operations material. Never files into the Deep
+  Research folder. Use
   whenever a research report, deep-research output, or external analysis
   appears in conversation with intent to use it, not just to read it once.
   Answers Allison's question FIRST, files behind the answer, never files the
