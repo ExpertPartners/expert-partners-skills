@@ -36,6 +36,10 @@ GROW_MAX_CHANGED = 3
 LONG_LINE_CHARS = 30
 # How closely a misread long line must read like its other reading.
 NEAR_MISS = 0.5
+# A changed word still counts as the same word misread at this likeness.
+WORD_MISREAD = 0.6
+# A line cut at another place still shares at least this much of its words in the middle.
+CUT_KEEP = 0.6
 # More changed lines than GROW_MAX_CHANGED are noise, not a different screen, only
 # when at least this share of the compared lines still match in order.
 KEPT_SHARE = 2 / 3
@@ -280,10 +284,45 @@ def _numbers_agree(na: str, nb: str, pattern: str = r"\d+") -> bool:
     return not wanted
 
 
+def _ocr_damage(na: str, nb: str) -> bool:
+    """True when every word that differs looks misread, not rewritten.
+
+    OCR damage swaps, drops or splits letters inside a word, or cuts the line at
+    another place. An edit swaps a word for a different word. So words may only
+    differ at either end around a long shared middle, each other changed
+    stretch must keep about the same number of words, and each changed word
+    must still read like its partner.
+    """
+    wa, wb = re.sub(r"\d+", "", na).split(), re.sub(r"\d+", "", nb).split()
+    codes = SequenceMatcher(None, wa, wb, autojunk=False).get_opcodes()
+    same = sum(i2 - i1 for tag, i1, i2, _, _ in codes if tag == "equal")
+    cut = same >= CUT_KEEP * min(len(wa), len(wb))
+    for tag, i1, i2, j1, j2 in codes:
+        if tag == "equal":
+            continue
+        # Words that differ only at either end, around a long shared middle, are
+        # the line cut at another place or a neighbor's words run into it.
+        if cut and (i1 == 0 and j1 == 0 or i2 == len(wa) and j2 == len(wb)):
+            continue
+        a, b = wa[i1:i2], wb[j1:j2]
+        if abs(len(a) - len(b)) > 1:
+            return False
+        if len(a) != len(b):
+            # A word split or joined by the OCR reads the same once spaces go.
+            if SequenceMatcher(None, "".join(a), "".join(b), autojunk=False).ratio() < WORD_MISREAD:
+                return False
+            continue
+        for x, y in zip(a, b):
+            if SequenceMatcher(None, x, y, autojunk=False).ratio() < WORD_MISREAD:
+                return False
+    return True
+
+
 def _near_miss(old: Line, fresh: Line) -> bool:
     """True when two readings of a long line differ only as OCR noise does."""
     na, nb = normalize(old.text), normalize(fresh.text)
-    return _long(na) and _long(nb) and _numbers_agree(na, nb) and _resemblance(old.text, fresh.text) >= NEAR_MISS
+    return (_long(na) and _long(nb) and _numbers_agree(na, nb)
+            and _resemblance(old.text, fresh.text) >= NEAR_MISS and _ocr_damage(na, nb))
 
 
 def _keeps_most(steady: int, changed: int) -> bool:

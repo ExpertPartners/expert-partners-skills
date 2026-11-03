@@ -409,6 +409,13 @@ def test_a_line_cut_at_a_different_place_still_grows_the_screen():
     assert screen.lines[-1].text == ADDED
 
 
+def test_a_long_line_really_rewritten_still_starts_a_new_screen():
+    # Review on PR 197. A real edit is not OCR noise, even when the two lines look alike.
+    second = _noisy_frame({3: "Fold the paper swan thrice along the painted rim"})
+    screens = stitch([_frame(0, BASE), _frame(1, second)])
+    assert len(screens) == 2
+
+
 def test_a_repeat_frame_whose_top_line_has_a_stray_digit_adds_nothing():
     second = _noisy_frame({0: "Gather the amber 1 pebbles near the willow bank"}, added=False)
     screen = _assert_one_screen_keeps_every_reading(second)
