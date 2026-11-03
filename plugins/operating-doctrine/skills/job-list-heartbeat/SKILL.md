@@ -1,7 +1,7 @@
 ---
 name: job-list-heartbeat
 description: |
-  Every Claude session checks the job list every 15 minutes, a CEO directive from Allison. Always on as doctrine for every Claude Code session and every Claude chat, in any project on any surface. Fires at the first reply of every session and at every scheduled check. In its first reply the session runs job_inbox under its own name and any old name, claims and acts on its jobs, then sets its own 15-minute check with what its surface supports, a /loop or ScheduleWakeup locally, send_later chained in cloud Claude Code, a recurring task at the shortest interval elsewhere, and keeps it running for the life of the session. Each check reads both names, acts on Start presses and Allison's replies, renews the lease on every claimed job and schedules the next check. A check with nothing new for Allison sends her nothing, otherwise one brief CEO update. A surface with no timer checks on every reply and says so once. It never asks Allison to wake it. Inherits operating-doctrine.
+  Every Claude session checks the job list every 15 minutes, a CEO directive from Allison. Always on as doctrine for every Claude Code session and every Claude chat, in any project on any surface. Fires at the first reply of every session and at every scheduled check. In its first reply the session runs job_inbox under its own name and any old name, claims and acts on its jobs, then sets its own 15-minute check with what its surface supports, a /loop or ScheduleWakeup locally, send_later chained in cloud Claude Code, a recurring task at the shortest interval elsewhere, and keeps it running for the life of the session. Each check reads both names, acts on Start presses and Allison's replies, renews the lease on every claimed job and schedules the next check. Checks run silently and post only one Quick Update or CEO brief when something significant changed. A surface with no timer checks on every reply and says so once. It never asks Allison to wake it. Inherits operating-doctrine.
 allowed-tools: []
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Born dressed 2026-11-03 (Decision Log 2026-11-02, CEO directive, every Claude
@@ -19,7 +19,7 @@ subtitle: "check the job list every 15 minutes"
 
 One job. Every Claude session checks the Chat to Code job list in its first reply, then keeps checking it every 15 minutes on its own timer for as long as the session lives. No session ever needs Allison to wake it.
 
-Source: the HQ Rulebook, Handoffs between AIs, and the Decision Log 2026-11-02 entries Every HQ conversation connects in its first reply, CEO directive, every Claude session checks the job list every 15 minutes, Every job check runs every 15 minutes, around the clock, and Claimed jobs return after one missed check. The Rulebook wins wherever this differs. This skill applies the Messages Between AIs section of operating-doctrine to the clock.
+Source: the HQ Rulebook, Handoffs between AIs, and the Decision Log 2026-11-02 entries Every HQ conversation connects in its first reply, CEO directive, every Claude session checks the job list every 15 minutes, Every job check runs every 15 minutes, around the clock, and Claimed jobs return after one missed check, and the Decision Log 2026-11-03 entry Job checks run silently. The Rulebook wins wherever this differs. This skill applies the Messages Between AIs section of operating-doctrine to the clock.
 
 ## Who it binds
 
@@ -40,7 +40,7 @@ This is doctrine, so it is always on. It fires at two moments.
    - Claude Code on a local machine. A /loop or a ScheduleWakeup loop every 15 minutes.
    - Claude Code in the cloud. send_later, chained, so each check schedules the next one 15 minutes out.
    - A surface with scheduled tasks. One recurring task at the shortest interval the scheduler allows. A check that starts a fresh session runs hourly around the clock, the shortest it can run.
-4. Verify the check is scheduled. Read it back from the surface's own schedule list or tool result, and say in the reply that it is set and when the next one runs. A check that was asked for but not read back is not set.
+4. Verify the check is scheduled. Read it back from the surface's own schedule list or tool result, and say in the reply that it is set and when the next one runs. Say it once, in this first reply only, never on a later check. A session started by the recurring task itself is one of that task's checks, not a new room, so it verifies the task without a word about it and posts only as Silent checks allows. A check that was asked for but not read back is not set.
 
 ## Every check
 
@@ -48,10 +48,25 @@ This is doctrine, so it is always on. It fires at two moments.
 2. Act on every Start press and every reply from Allison waiting there. Claim new work with job_claim and start it in the same check.
 3. Renew the lease on every job this session has claimed and is still working, using the renew the live job tool offers. A claimed job goes back to the list after 20 minutes, one missed check, so a working session renews on every check and never lets the sweep take back work in progress.
 4. If the timer is one-shot (send_later, ScheduleWakeup), schedule the next check and confirm it. A timer that already repeats (a /loop, a recurring scheduled task) is left as it is, so checks never stack up.
+5. Post nothing unless something significant changed, as Silent checks says.
 
-## Quiet checks
+## Silent checks
 
-A CEO directive from Allison (Decision Log 2026-11-03, Quiet checks). A check that finds nothing relevant for her sends her nothing, so no reply text, no message, no text and no push. Doing the check is the job, and reporting that nothing changed is noise. When something relevant changed, like work finished, a decision she must make, something stuck or a result she would want, she gets one brief CEO update covering what moved, what it means, and the one thing that needs her if any. The Rulebook decides what counts as needing her. The check itself never stops.
+A CEO directive from Allison (Decision Log 2026-11-03, Job checks run silently). Every check runs silently in the background. It posts in its room only when something significant changed since the last check:
+
+- a job was claimed, finished or failed, or now needs Allison,
+- her reply was acted on,
+- a new blocker came up.
+
+Then it posts one short Quick Update, the three lists from the quick-update skill and its one closing status line, or one CEO brief, the Decision Brief the HQ Rulebook rule CEO update or CEO brief defines, never Teach Me's step opener, and nothing else. The Rulebook decides what counts as needing her.
+
+A check with nothing significant posts nothing. No message, no reply text and no push.
+
+- In local Claude Code, the tick ends with ScheduleWakeup and noop true, or the /loop equivalent, and no text at all.
+- Where a surface must send a reply, the reply holds no status talk.
+- Lease renewals, still working, nothing new and next check set are never posted on their own. A Quick Update a significant check posts still ends with its one SESSION STATUS line, as quick-update requires, and that line may say Still working.
+
+Doing the check is the job, and reporting it is noise. The check itself never stops, and its timing and its claiming and lease renewal stay exactly as above.
 
 ## Renewing between checks
 
@@ -72,6 +87,8 @@ The check runs for the life of the session. When the session wraps, it releases 
 - Wait on a question inside its own app. A question that truly needs Allison goes on the board, per the HQ Rulebook.
 - Let a claimed job's lease lapse while the work continues.
 - Say the check is set without reading it back.
+- Say the check is set, or when the next one runs, on any reply after the first.
+- Post on a check that found nothing significant, or post a lease renewal, still working, nothing new or next check set on its own.
 
 ## Test cases
 
@@ -79,6 +96,7 @@ The check runs for the life of the session. When the session wraps, it releases 
 2. A job assigned to the session gets a Start press. Pass when the next check picks it up, within 15 minutes on a 15-minute surface and within the surface's shortest interval elsewhere.
 3. A chat on a surface with no timer. Pass when it checks on every reply and says once that it cannot run a timer.
 4. A session claims a job. Pass when each check and each working reply renews the lease so the sweep never returns it while work continues, on an hourly surface too.
-5. A session started by a recurring task. Pass when it verifies that task and adds no second recurring check.
+5. A session started by a recurring task. Pass when it verifies that task, adds no second recurring check, and posts nothing about the check unless something significant changed.
 6. A check where nothing changed for Allison. Pass when the session sends her no message or reply text at all.
-7. A check where a job she approved finished. Pass when she gets one brief CEO update and nothing else.
+7. A check where a job she approved finished. Pass when she gets one short Quick Update or CEO brief and nothing else.
+8. A check that finds nothing. Pass when it posts nothing. In local Claude Code the tick ends with ScheduleWakeup and noop true, or the /loop equivalent, and no text, and no lease renewal, still working, nothing new or next check set line appears anywhere.
