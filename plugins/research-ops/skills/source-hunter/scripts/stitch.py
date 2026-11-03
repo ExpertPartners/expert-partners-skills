@@ -41,6 +41,8 @@ MEDIUM_LINE_CHARS = VOLATILE_CHARS
 NEAR_MISS = 0.5
 # A changed word still counts as the same word misread at this likeness.
 WORD_MISREAD = 0.6
+# A word in a ticking header counts as misread, not rewritten, only at this likeness.
+COUNTER_WORD_MISREAD = 0.75
 # A line cut at another place still shares at least this much of its words in the middle.
 CUT_KEEP = 0.6
 # More changed lines than GROW_MAX_CHANGED are noise, not a different screen, only
@@ -307,18 +309,36 @@ def _counter_ticked(na: str, nb: str) -> bool:
     """True when two long readings differ in their numbers, as a running counter does.
 
     The words around the counter may also be misread a little from frame to
-    frame, so the letters need only be alike at SIMILARITY, and only where the
-    difference looks like OCR damage, never a rewritten line.
+    frame, so the letters need only be alike at SIMILARITY, and every word that
+    differs, end words included, must still read like its partner.
     """
     if na == nb or not (_long(na) and _long(nb)):
         return False
     la, lb = _letters(na), _letters(nb)
-    if re.sub(r"\D", "", na) == re.sub(r"\D", "", nb):
-        return False
     if la == lb:
         return True
-    return (SequenceMatcher(None, la, lb, autojunk=False).ratio() >= SIMILARITY
-            and _ocr_damage(na, nb))
+    if re.sub(r"\D", "", na) == re.sub(r"\D", "", nb):
+        return False
+    if SequenceMatcher(None, la, lb, autojunk=False).ratio() < SIMILARITY:
+        return False
+    # Every differing word, end words included, must read like its partner.
+    wa, wb = la.split(), lb.split()
+    for tag, i1, i2, j1, j2 in SequenceMatcher(None, wa, wb, autojunk=False).get_opcodes():
+        if tag == "equal":
+            continue
+        if i2 - i1 != j2 - j1:
+            return False
+        for x, y in zip(wa[i1:i2], wb[j1:j2]):
+            if not _misread_word(x, y):
+                return False
+    return True
+
+
+def _misread_word(x: str, y: str) -> bool:
+    """True when y reads as x with a letter or two misread, not as another word."""
+    if len(x) == len(y) and len(x) <= 4:
+        return sum(a != b for a, b in zip(x, y)) <= 1
+    return SequenceMatcher(None, x, y, autojunk=False).ratio() >= COUNTER_WORD_MISREAD
 
 
 def _cut_off(old: Line, fresh: Line) -> bool:

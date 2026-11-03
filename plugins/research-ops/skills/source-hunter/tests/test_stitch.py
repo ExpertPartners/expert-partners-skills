@@ -475,6 +475,14 @@ def test_a_top_line_rewritten_while_its_counter_ticks_still_starts_a_new_screen(
     assert len(screens) == 2
 
 
+def test_a_top_line_whose_end_word_is_rewritten_as_its_counter_ticks_starts_a_new_screen():
+    # Review on PR 200: "viewers" to "listeners" is an edit, not a misreading.
+    a = ["Replay chat for the juniper cohort 1 viewers 3"] + MESSAGE[:4]
+    b = ["Replay chat for the juniper cohort 2 listeners 5"] + MESSAGE[:5]
+    screens = stitch([_frame(0, a), _frame(1, b)])
+    assert len(screens) == 2
+
+
 def test_a_long_line_below_the_top_whose_number_ticks_still_starts_a_new_screen():
     rows = [f"Replay chat for the juniper cohort {n} viewers {2 * n + 1}" for n in range(2)]
     a = MESSAGE[:4] + [rows[0]] + MESSAGE[4:6]
