@@ -1,0 +1,25 @@
+# The stall sweeper itself lives in factory-stall-sweeper-reusable.yml. Another repo installs
+# it by copying this file, changing builder_workflow to the file name of its own builder
+# caller, and changing the uses: line to
+# ExpertPartners/expert-partners-skills/.github/workflows/factory-stall-sweeper-reusable.yml@main
+name: Factory Stall Sweeper
+"on":
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Print what the sweeper would do without doing it
+        type: boolean
+        default: false
+permissions:
+  actions: write
+  contents: read
+  issues: write
+  pull-requests: write
+jobs:
+  sweeper:
+    uses: ./.github/workflows/factory-stall-sweeper-reusable.yml
+    with:
+      builder_workflow: factory-chat-to-code-loop-builder-skills.yml
+      dry_run: ${{ inputs.dry_run == true }}
