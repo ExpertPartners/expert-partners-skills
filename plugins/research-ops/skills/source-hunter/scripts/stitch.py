@@ -334,6 +334,38 @@ def _counter_ticked(na: str, nb: str) -> bool:
     return True
 
 
+def _noisy_title(na: str, nb: str) -> bool:
+    """True when a long top line is the same title bar read with OCR noise.
+
+    A window's title bar often ends in a few unreadable marks that read
+    differently every frame, digits included. Its letters stay alike at
+    SIMILARITY but are not identical. A numbered slide (Week 1, Week 2) keeps
+    identical letters and changes only its number, so it never passes here and
+    still goes through _counter_ticked, which never lets a frame that adds
+    nothing join. Found on the real class with anonymized fixtures (job 100221).
+    """
+    if na == nb or not (_long(na) and _long(nb)):
+        return False
+    la, lb = _letters(na), _letters(nb)
+    if la == lb or not _similar_normalized(la, lb):
+        return False
+    # The words that differ must look like noise: a misread word, a scrap of
+    # three letters or fewer, or a word the title already shows elsewhere. A
+    # real word swapped in (viewers to listeners) is an edit and splits.
+    wa, wb = la.split(), lb.split()
+    seen = set(wa) | set(wb)
+    for tag, i1, i2, j1, j2 in SequenceMatcher(None, wa, wb, autojunk=False).get_opcodes():
+        if tag == "equal":
+            continue
+        a, b = wa[i1:i2], wb[j1:j2]
+        if tag == "replace" and len(a) == len(b) and all(_misread_word(x, y) for x, y in zip(a, b)):
+            continue
+        for w in a + b:
+            if len(w) > 3 and not ((w in wa) and (w in wb)):
+                return False
+    return True
+
+
 def _misread_word(x: str, y: str) -> bool:
     """True when y reads as x with a letter or two misread, not as another word."""
     if len(x) == len(y) and len(x) <= 4:
@@ -497,7 +529,7 @@ def _pair_gap(
         na, nb = normalize(old[di].text), normalize(fresh[ni].text)
         if _numbers_agree(na, nb) or _is_prefix(na, nb):
             return True
-        if top and di == 0 and ni == 0 and _counter_ticked(na, nb):
+        if top and di == 0 and ni == 0 and (_counter_ticked(na, nb) or _noisy_title(na, nb)):
             return True
         return (
             bottom
@@ -639,6 +671,10 @@ def _grow(doc: list[Line], new: list[Line]) -> list[Line] | None:
                     # slide, so it never lets a frame that adds nothing join.
                     tolerated += 1
                     unseen += 1
+                elif head and di == 0 and ni == 0 and _noisy_title(
+                    normalize(old[di].text), normalize(fresh[ni].text)
+                ):
+                    tolerated += 1
                 elif status_like or _complete(old[di], fresh[ni]) is not None:
                     unseen += 1
                     cut += _cut_off(old[di], fresh[ni])
