@@ -227,27 +227,22 @@ class Evaluate(unittest.TestCase):
         v = oc.evaluate(153, ["plugins/operating-doctrine/CHANGELOG.md"], [own], [me])
         self.assertTrue(v.start)
 
-    def test_five_open_pull_requests_wait(self):
-        prs = [oc.Holder(n, "pr", [f"tools/t{n}/a.py"], {n + 100}) for n in range(1, 6)]
-        v = oc.evaluate(158, ["tools/overlap-check/"], prs, [])
-        self.assertFalse(v.start)
-        self.assertTrue(v.capped)
-        self.assertEqual(v.lines(), ["Waiting, this repo has 5 open pull requests"])
-        self.assertIn("Waiting, this repo has 5 open pull requests", oc.comment_body(v).splitlines())
+    def test_five_or_more_open_pull_requests_do_not_hold_a_job(self):
+        # Decision Log 2026-11-02, No caps stop work: only a file collision holds a build.
+        for count in (5, 6, 12):
+            prs = [oc.Holder(n, "pr", [f"tools/t{n}/a.py"], {n + 100}) for n in range(1, count + 1)]
+            v = oc.evaluate(158, ["tools/overlap-check/"], prs, [])
+            self.assertTrue(v.start, count)
+            self.assertEqual(v.lines(), [])
+            self.assertEqual(v.open_prs, count)
+            self.assertNotIn("open pull requests", oc.comment_body(v))
 
-    def test_four_open_pull_requests_start(self):
-        prs = [oc.Holder(n, "pr", [f"tools/t{n}/a.py"], {n + 100}) for n in range(1, 5)]
-        self.assertTrue(oc.evaluate(158, ["tools/overlap-check/"], prs, []).start)
-
-    def test_own_pull_request_does_not_count_toward_the_cap(self):
-        prs = [oc.Holder(n, "pr", [f"tools/t{n}/a.py"], {n + 100}) for n in range(1, 5)]
-        prs.append(oc.Holder(9, "pr", ["tools/overlap-check/x.py"], {158}))
-        self.assertTrue(oc.evaluate(158, ["tools/overlap-check/"], prs, []).start)
-
-    def test_overlap_and_cap_are_both_listed(self):
-        prs = [oc.Holder(n, "pr", [f"tools/t{n}/a.py"], {n + 100}) for n in range(1, 6)]
+    def test_many_open_pull_requests_hold_only_on_overlap(self):
+        prs = [oc.Holder(n, "pr", [f"tools/t{n}/a.py"], {n + 100}) for n in range(1, 8)]
         v = oc.evaluate(158, ["tools/t3/a.py"], prs, [])
-        self.assertEqual(v.lines(), ["Waiting on #3, same file", "Waiting, this repo has 5 open pull requests"])
+        self.assertFalse(v.start)
+        self.assertEqual(v.lines(), ["Waiting on #3, same file"])
+        self.assertNotIn("Waiting, this repo has", oc.comment_body(v))
 
 
 class BuilderPullRequests(unittest.TestCase):
@@ -292,11 +287,12 @@ class RunCheck(unittest.TestCase):
         _, blocker = pr(156, ["tools/auto-merge-gate/gate.py"], closes=155)
         gh = FakeGitHub([issue(159, "tools/auto-merge-gate/gate.py")], [blocker])
         oc.run_check(gh, CFG, 159, sleep=lambda s: None)
-        gh.prs = [pr(n, [f"tools/t{n}/a.py"], closes=n + 100)[1] for n in range(1, 6)]
+        gh.prs = [pr(163, ["tools/auto-merge-gate/gate.py"], closes=160)[1]]
         self.assertFalse(oc.run_check(gh, CFG, 159, sleep=lambda s: None))
         self.assertEqual(len(gh.comment_bodies(159)), 1)
-        self.assertIn("Waiting, this repo has 5 open pull requests", gh.comment_bodies(159)[0])
-        gh.prs = gh.prs[:4]
+        self.assertIn("Waiting on #163, same file", gh.comment_bodies(159)[0])
+        self.assertNotIn("Waiting on #156, same file", gh.comment_bodies(159)[0])
+        gh.prs = []
         self.assertTrue(oc.run_check(gh, CFG, 159, sleep=lambda s: None))
         self.assertEqual(len(gh.comment_bodies(159)), 1)
         self.assertIn("Started.", gh.comment_bodies(159)[0])
@@ -346,12 +342,13 @@ class RunNext(unittest.TestCase):
         self.assertEqual(sent, [161], "one dispatch per closed pull request")
         self.assertEqual(gh.writes(), [], "next writes nothing but the dispatch")
 
-    def test_starts_again_once_the_cap_frees(self):
-        prs = [pr(n, [f"tools/t{n}/a.py"], closes=n + 100)[1] for n in range(1, 6)]
-        gh = FakeGitHub([issue(158, "tools/overlap-check/", labels=("job", "waiting"))], prs)
+    def test_starts_again_once_the_blocking_pull_request_closes(self):
+        _, blocker = pr(156, ["tools/overlap-check/overlap_check.py"], closes=155)
+        others = [pr(n, [f"tools/t{n}/a.py"], closes=n + 100)[1] for n in range(1, 7)]
+        gh = FakeGitHub([issue(158, "tools/overlap-check/", labels=("job", "waiting"))], others + [blocker])
         sent = []
         self.assertIsNone(oc.run_next(gh, CFG, sent.append))
-        gh.prs = prs[1:]  # one merged
+        gh.prs = others  # #156 merged; six other open pull requests do not hold it
         self.assertEqual(oc.run_next(gh, CFG, sent.append), 158)
         self.assertEqual(sent, [158])
 
@@ -375,6 +372,18 @@ class Workflows(unittest.TestCase):
         self.assertIn('python3 "$script" check', text)
         self.assertIn('python3 "$script" next', text)
         self.assertIn("needs.gate.outputs.start == 'true'", text)
+
+    def test_reusable_workflow_has_no_pull_request_cap(self):
+        text = self.read("factory-builder-reusable.yml")
+        self.assertNotIn("open pull requests", text)
+        self.assertNotIn("pull request cap", text)
+
+    def test_overlap_check_comes_only_from_main(self):
+        # A ref the caller or a pull request could set would let pull request code run in
+        # the privileged pull_request_target redispatch job.
+        text = self.read("factory-builder-reusable.yml")
+        self.assertEqual(text.count("ref: main"), 2)
+        self.assertNotIn("tools_ref", text)
 
     def test_skills_caller_is_small_and_passes_the_key(self):
         text = self.read("factory-chat-to-code-loop-builder-skills.yml")

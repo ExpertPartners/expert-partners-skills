@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 """Overlap check for Chat to Code builds (Decision Log 2026-11-02, Factory runs everything at
-once, and Claimed jobs return after one missed check, five open pull requests per repo).
+once, and No caps stop work).
 
-A build starts right away unless one of these holds it:
-  - a file in the issue's Files in scope is also in an open builder pull request (its
-    changed files) or in the Files in scope of another in-progress Job issue. Shared files
-    (plugin.json, marketplace.json, CHANGELOG.md, AGENTS.md, lockfiles) count the same way
-    and are named as shared in the comment. The issue gets "Waiting on #N, same file".
-  - the repo already has five open builder pull requests. The issue gets
-    "Waiting, this repo has 5 open pull requests".
+A build starts right away unless a file in the issue's Files in scope is also in an open
+builder pull request (its changed files) or in the Files in scope of another in-progress Job
+issue. Shared files (plugin.json, marketplace.json, CHANGELOG.md, AGENTS.md, lockfiles) count
+the same way and are named as shared in the comment. A held issue gets "Waiting on #N, same
+file". There is no cap on how many builds or open pull requests a repo may have.
 
 Two subcommands, run by .github/workflows/factory-builder-reusable.yml:
 
@@ -40,7 +38,6 @@ COMMENT_AUTHOR = "github-actions[bot]"
 JOB_LABEL = "job"
 IN_PROGRESS_LABEL = "in-progress"
 WAITING_LABEL = "waiting"
-PR_CAP = 5
 
 SHARED_BASENAMES = {
     "plugin.json",
@@ -247,22 +244,17 @@ class Verdict:
     start: bool
     overlaps: list[Overlap] = field(default_factory=list)
     open_prs: int = 0
-    capped: bool = False
     scope: list[str] = field(default_factory=list)
 
     def lines(self) -> list[str]:
-        out = [f"Waiting on #{o.number}, same file" for o in self.overlaps]
-        if self.capped:
-            out.append(f"Waiting, this repo has {PR_CAP} open pull requests")
-        return out
+        return [f"Waiting on #{o.number}, same file" for o in self.overlaps]
 
 
-def evaluate(issue: int, scope: list[str], prs: list[Holder], issues: list[Holder], cap: int = PR_CAP) -> Verdict:
+def evaluate(issue: int, scope: list[str], prs: list[Holder], issues: list[Holder]) -> Verdict:
     """Judge one job. prs are open builder pull requests, issues are other in-progress Job issues.
 
-    A pull request that closes this issue is this job's own earlier work, so it neither
-    collides nor counts toward the cap. An issue whose overlapping pull request is already
-    named is not named again.
+    A pull request that closes this issue is this job's own earlier work, so it never
+    collides. An issue whose overlapping pull request is already named is not named again.
     """
     prs = [p for p in prs if issue not in p.closes]
     found: list[Overlap] = []
@@ -278,24 +270,20 @@ def evaluate(issue: int, scope: list[str], prs: list[Holder], issues: list[Holde
         hit = overlapping(scope, i.files)
         if hit:
             found.append(Overlap(i.number, "issue", hit))
-    capped = len(prs) >= cap
-    return Verdict(not found and not capped, found, len(prs), capped, scope)
+    return Verdict(not found, found, len(prs), scope)
 
 
 def comment_body(v: Verdict) -> str:
     if v.start:
         return "\n".join([
             MARKER,
-            "Started. No other build touches these files and the repo is under "
-            f"{PR_CAP} open pull requests.",
+            "Started. No other build touches these files.",
         ])
     lines = [MARKER, *v.lines(), ""]
     for o in v.overlaps:
         what = "pull request" if o.kind == "pr" else "in-progress job"
         named = ", ".join(f"`{p}`{' (shared file)' if is_shared(p) else ''}" for p in o.paths)
         lines.append(f"- #{o.number} ({what}): {named}")
-    if v.capped:
-        lines.append(f"- {v.open_prs} builder pull requests are open, the cap is {PR_CAP}.")
     lines += [
         "",
         "This build starts on its own when a pull request in this repo closes and nothing "
@@ -311,7 +299,6 @@ def comment_body(v: Verdict) -> str:
 class Config:
     repo: str
     settle_seconds: float = 10.0
-    cap: int = PR_CAP
 
 
 def labels_of(item: dict) -> set[str]:
@@ -349,7 +336,7 @@ def judge(gh, cfg: Config, issue: dict, only_older_issues: bool = False) -> Verd
     issues = in_progress_issues(gh, cfg)
     if only_older_issues:
         issues = [i for i in issues if i.number < number]
-    return evaluate(number, parse_scope(issue.get("body")), open_builder_prs(gh, cfg), issues, cfg.cap)
+    return evaluate(number, parse_scope(issue.get("body")), open_builder_prs(gh, cfg), issues)
 
 
 def add_labels(gh, cfg: Config, number: int, names: list[str]) -> None:
