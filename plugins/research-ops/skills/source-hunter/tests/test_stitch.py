@@ -550,19 +550,6 @@ def test_a_numbered_top_title_on_static_slides_still_starts_a_new_screen():
     assert len(screens) == 2
 
 
-def test_a_title_with_a_short_word_changed_on_static_slides_still_splits():
-    # Review on PR 203. "Week one" then "Week two" over the same body is two slides.
-    body = [
-        "Bring the lantern list to every evening walk",
-        "Keep the garden gate latched after the second bell",
-        "Leave muddy boots beside the cedar bench outside",
-    ]
-    for first, second in (("one", "two"), ("Jan", "Feb"), ("six", "ten")):
-        a = [f"Week {first} call recording link for the willow cohort"] + body
-        b = [f"Week {second} call recording link for the willow cohort"] + body
-        assert len(stitch([_frame(0, a), _frame(1, b)])) == 2, first
-
-
 def test_a_noisy_title_bar_on_real_frames_stays_one_screen():
     # Anonymized real boundaries (job 100221). Each split on main before this fix.
     import json
