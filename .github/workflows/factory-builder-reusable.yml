@@ -1,0 +1,254 @@
+# Reusable Factory builder for the Chat to Code Loop (Decision Log 2026-11-02, New mission,
+# Factory never stalls: the Factory builder is installed in every repo from one template).
+#
+# A repo installs the builder with one small caller file. Copy
+# factory-chat-to-code-loop-builder-skills.yml from this repo, keep its triggers and
+# permissions, and point its uses: line here:
+#
+#   uses: ExpertPartners/expert-partners-skills/.github/workflows/factory-builder-reusable.yml@main
+#
+# FACTORY_API_KEY comes from the organization-level Actions secret of that name. A
+# repository secret with the same name overrides it, so remove the repository copy once the
+# organization secret is set.
+#
+# Four jobs:
+#   gate        Runs tools/overlap-check (checked out from this repo's main, so a pull
+#               request cannot loosen it) before every build. A job that changes the same
+#               file as an open builder pull request or another in-progress job waits with
+#               a comment naming it. Nothing else holds a build (Decision Log 2026-11-02,
+#               No caps stop work).
+#   build       The Factory droid, unchanged from the single-file builder.
+#   release     After a build the gate started, when no open pull request closes the job,
+#               removes in-progress so the job stops holding its files. A build that did
+#               not succeed goes back to waiting.
+#   redispatch  When a pull request or issue closes, or an issue loses in-progress,
+#               dispatches every waiting job that can start now. On pull_request_target it
+#               never checks out pull request code, only the overlap check from main.
+name: Factory Builder (reusable)
+"on":
+  workflow_call:
+    inputs:
+      model:
+        description: Model the Factory droid runs on
+        type: string
+        default: claude-opus-5-5
+    secrets:
+      FACTORY_API_KEY:
+        required: true
+permissions:
+  contents: read
+jobs:
+  gate:
+    # Three ways in, each building an issue once:
+    # 1. Manual dispatch (also how the redispatch job restarts a waiting job).
+    # 2. The job label added to an issue from an allowlisted author. A job label the
+    #    Factory app adds to a "Job:" issue is skipped, because path 3 added it and is
+    #    already building that issue.
+    # 3. A "Job:" issue opened by an allowlisted author without the job label. This run
+    #    adds the label itself, then builds. An issue opened with the label already on it
+    #    is left to path 2, which GitHub starts for that label.
+    # The github context here is the caller's, so these are the caller's event fields.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.action == 'labeled' && github.event.label.name == 'job' &&
+        contains(fromJSON('["AllisonGaddy","expertpartners","expertpartners-ember","expertpartners-aura"]'), github.event.issue.user.login) &&
+        !(github.event.sender.login == 'factory-droid[bot]' && startsWith(github.event.issue.title, 'Job:'))) ||
+      (github.event.action == 'opened' && startsWith(github.event.issue.title, 'Job:') &&
+        contains(fromJSON('["AllisonGaddy","expertpartners","expertpartners-ember","expertpartners-aura"]'), github.event.issue.user.login) &&
+        !contains(github.event.issue.labels.*.name, 'job'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
+    outputs:
+      start: ${{ steps.check.outputs.start }}
+    steps:
+      - name: Checkout the overlap check
+        uses: actions/checkout@v4
+        with:
+          repository: ExpertPartners/expert-partners-skills
+          ref: main
+          path: .factory-builder-tools
+          persist-credentials: false
+          sparse-checkout: tools/overlap-check
+      - name: Overlap check
+        id: check
+        env:
+          OVERLAP_TOKEN: ${{ github.token }}
+          OVERLAP_ISSUE: ${{ github.event.issue.number || github.event.inputs.issue }}
+        run: |
+          set -euo pipefail
+          script=.factory-builder-tools/tools/overlap-check/overlap_check.py
+          if [ ! -f "$script" ]; then
+            echo "::notice::The overlap check is not on main yet; building without it."
+            echo "start=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          python3 "$script" check
+
+  build:
+    needs: gate
+    if: needs.gate.outputs.start == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Factory Droid
+        run: |
+          curl --retry 5 --retry-delay 2 --retry-all-errors -fsSL https://app.factory.ai/cli | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Write automation prompt
+        env:
+          FACTORY_AUTOMATION_PROMPT: "You are the Builder for Expert Partners' Chat to Code Loop. Act only when this run was started by the label job being added to an issue, by a new issue whose title begins with Job: that this workflow labeled job when it opened, by a comment that begins with Factory, build this job on an issue that carries the label job, or by a manual dispatch whose issue input names such an issue; otherwise exit with no changes. The triggering GitHub event is in the JSON file named by the GITHUB_EVENT_PATH environment variable, read it to find the issue number (for a manual dispatch it is inputs.issue). Read the issue in full. Its body holds the mission, objective, files in scope, acceptance checks and decisions already made. Follow CLAUDE.md and AGENTS.md if present. Add the label in-progress to the issue. Work only inside the files in scope, run tools/validate-job.sh until it prints validate-job: PASS, push a branch named job/<issue number>-<short slug>, and open exactly one pull request into main whose body starts with the line Closes #<issue number> and then lists each acceptance check as PASS or FAIL with the command output as evidence. Never push to main or merge. If anything is unclear, open the pull request as a draft and say exactly what is unclear. Never ask the user inside Factory. Put any question on the GitHub issue as a comment starting Question for Allison, or on the job list as needs-allison with a line starting Recommend:, and keep working on everything else."
+        run: |
+          printf '%s' "$FACTORY_AUTOMATION_PROMPT" > "$RUNNER_TEMP/factory-automation-prompt.txt"
+      - name: Get Factory GitHub App token
+        shell: bash
+        run: |
+          # Exchange this run's GitHub OIDC token for a Factory GitHub App installation
+          # token scoped to this repository, so later steps can push, comment and open
+          # pull requests as the Factory app. When no token can be obtained the run
+          # continues without one.
+          skip() {
+            echo "::warning::$1 Continuing without a GitHub token, so the prompt cannot write to GitHub."
+            exit 0
+          }
+          if [ -z "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ] || [ -z "${ACTIONS_ID_TOKEN_REQUEST_TOKEN:-}" ]; then
+            skip "This run has no GitHub OIDC token (the workflow needs id-token: write; pull requests from forks never get one)."
+          fi
+          command -v jq >/dev/null || skip "jq is not installed on this runner."
+          oidc_token=$(curl -fsS --retry 3 --retry-delay 2 --retry-all-errors \
+            -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=droid-github-action" | jq -r '.value // empty') \
+            || skip "Requesting a GitHub OIDC token failed."
+          [ -n "$oidc_token" ] || skip "GitHub returned an empty OIDC token."
+          response="$RUNNER_TEMP/factory-github-token.json"
+          # Never leave an exchange response (success or failure body) behind for the
+          # later steps to read.
+          trap 'rm -f "$response"' EXIT
+          status=$(curl -sS --retry 3 --retry-delay 2 -o "$response" -w '%{http_code}' \
+            -X POST -H "Authorization: Bearer $oidc_token" \
+            https://app.factory.ai/api/github/token-exchange) \
+            || skip "The Factory token exchange could not be reached."
+          if [ "$status" != "200" ]; then
+            code=$(jq -r '.error_code // .error // empty' "$response" 2>/dev/null || true)
+            case "$code" in
+              workflow_not_found_on_default_branch|workflow_modified_from_default_branch|workflow_validation_failed)
+                skip "The Factory GitHub App token is only available to the version of this workflow file that is on the default branch (merge the pull request that adds or changes it)." ;;
+              app_not_installed)
+                skip "The Factory GitHub App is not installed on this repository (install it at https://github.com/apps/factory-droid)." ;;
+              *)
+                skip "The Factory token exchange failed (HTTP $status${code:+, $code})." ;;
+            esac
+          fi
+          token=$(jq -r '.token // empty' "$response" 2>/dev/null || true)
+          [ -n "$token" ] || skip "The Factory token exchange returned no token."
+          echo "::add-mask::$token"
+          # GH_TOKEN is a Factory GitHub App installation token for this repository only
+          # (it expires after one hour). gh reads it directly; git reads it through the
+          # credential helper below.
+          echo "GH_TOKEN=$token" >> "$GITHUB_ENV"
+          # actions/checkout stored the read-only Actions token as an Authorization
+          # header on this clone, which git would send instead of consulting a
+          # credential helper. Drop it so pushes authenticate as the Factory app.
+          git config --local --unset-all "http.$GITHUB_SERVER_URL/.extraheader" || true
+          git config --local --replace-all credential.helper ''
+          git config --local --add credential.helper '!f() { echo "username=x-access-token"; echo "password=$GH_TOKEN"; }; f'
+          git config user.name >/dev/null || git config --local user.name 'factory-droid[bot]'
+          git config user.email >/dev/null || git config --local user.email '138933559+factory-droid[bot]@users.noreply.github.com'
+          echo "GitHub writes from this run are made as the Factory GitHub App."
+      - name: Label the new job issue
+        if: github.event_name == 'issues' && github.event.action == 'opened'
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          if [ -z "${GH_TOKEN:-}" ]; then
+            echo "::error::No Factory GitHub App token, so the job label cannot be added and the job cannot be built."
+            exit 1
+          fi
+          gh issue edit "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --add-label job
+      - name: Run Factory Droid
+        run: droid exec --auto high -m "$FACTORY_MODEL" -f "$RUNNER_TEMP/factory-automation-prompt.txt"
+        env:
+          FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
+          FACTORY_MODEL: ${{ inputs.model }}
+
+  release:
+    # A build that ends without a pull request for its job must not keep holding its files.
+    needs: [gate, build]
+    if: always() && needs.gate.outputs.start == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
+    steps:
+      - name: Checkout the overlap check
+        uses: actions/checkout@v4
+        with:
+          repository: ExpertPartners/expert-partners-skills
+          ref: main
+          path: .factory-builder-tools
+          persist-credentials: false
+          sparse-checkout: tools/overlap-check
+      - name: Release the job unless its pull request holds its files
+        env:
+          OVERLAP_TOKEN: ${{ github.token }}
+          OVERLAP_ISSUE: ${{ github.event.issue.number || github.event.inputs.issue }}
+          BUILD_RESULT: ${{ needs.build.result }}
+        run: |
+          set -euo pipefail
+          script=.factory-builder-tools/tools/overlap-check/overlap_check.py
+          if [ ! -f "$script" ]; then
+            echo "::notice::The overlap check is not on main yet; nothing to release."
+            exit 0
+          fi
+          python3 "$script" release
+
+  redispatch:
+    # Each of these can free the files a waiting job needs: a closed pull request, a closed
+    # issue, or an issue that loses in-progress. Changes made with github.token start no
+    # workflow, so the check's own label edits never land here.
+    if: >-
+      ((github.event_name == 'pull_request_target' || github.event_name == 'pull_request') &&
+        github.event.action == 'closed') ||
+      (github.event_name == 'issues' && github.event.action == 'closed') ||
+      (github.event_name == 'issues' && github.event.action == 'unlabeled' &&
+        github.event.label.name == 'in-progress')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      actions: write
+      contents: read
+      issues: read
+      pull-requests: read
+    steps:
+      - name: Checkout the overlap check
+        uses: actions/checkout@v4
+        with:
+          repository: ExpertPartners/expert-partners-skills
+          ref: main
+          path: .factory-builder-tools
+          persist-credentials: false
+          sparse-checkout: tools/overlap-check
+      - name: Start every waiting job that can build now
+        env:
+          OVERLAP_TOKEN: ${{ github.token }}
+          # The caller's workflow file, which this dispatch starts again.
+          BUILDER_WORKFLOW_REF: ${{ github.workflow_ref }}
+          BUILDER_REF: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          script=.factory-builder-tools/tools/overlap-check/overlap_check.py
+          if [ ! -f "$script" ]; then
+            echo "::notice::The overlap check is not on main yet; nothing to do."
+            exit 0
+          fi
+          python3 "$script" next
