@@ -43,6 +43,9 @@ NEAR_MISS = 0.5
 WORD_MISREAD = 0.6
 # A word in a ticking header counts as misread, not rewritten, only at this likeness.
 COUNTER_WORD_MISREAD = 0.75
+# A number among this many first words of a top line numbers the slide (Week 1),
+# rather than counting something on it.
+TITLE_NUMBER_WORDS = 2
 # A line cut at another place still shares at least this much of its words in the middle.
 CUT_KEEP = 0.6
 # More changed lines than GROW_MAX_CHANGED are noise, not a different screen, only
@@ -334,6 +337,20 @@ def _counter_ticked(na: str, nb: str) -> bool:
     return True
 
 
+def _counter_on_top(old: Line, fresh: Line) -> bool:
+    """True when the top line of both frames reads the same apart from a running counter.
+
+    The words must agree as _counter_ticked asks, so a rewritten header never
+    passes. A changed number among the first TITLE_NUMBER_WORDS words numbers
+    the slide (Week 1, Week 2) instead of counting, so it does not pass either.
+    """
+    na, nb = normalize(old.text), normalize(fresh.text)
+    if not _counter_ticked(na, nb):
+        return False
+    lead_a, lead_b = (" ".join(n.split()[:TITLE_NUMBER_WORDS]) for n in (na, nb))
+    return _numbers(lead_a) == _numbers(lead_b)
+
+
 def _misread_word(x: str, y: str) -> bool:
     """True when y reads as x with a letter or two misread, not as another word."""
     if len(x) == len(y) and len(x) <= 4:
@@ -485,7 +502,7 @@ def _pair_gap(
     sits from frame to frame. Lines whose numbers differ are different lines
     (Week 1, Week 2), except a stray digit on a long line, and a short last
     line at the bottom of both frames, which is where a running counter sits.
-    At the top of the window, the first lines of both frames also pair when
+    At the top of the screen, the first lines of both frames also pair when
     they are long and only their numbers differ, as a header with a running
     counter does. Only there, since a long line lower down whose number
     changes is a different line.
@@ -577,9 +594,10 @@ def _grow(doc: list[Line], new: list[Line]) -> list[Line] | None:
     judged by how much of the screen it keeps in order. When most compared
     lines match in order, a long line that is a near miss of its earlier
     reading joins it, and a line missing from new between matched lines, with
-    nothing in its place, is kept. So does the top line of the window when only
+    nothing in its place, is kept. So does the top line of the screen when only
     its numbers changed, as a header with a running counter does. None of these
-    counts as a change new must add to.
+    counts as a change new must add to, except a changed number in the first
+    words of the top line, which may be the next numbered slide.
 
     A screen too short to hold GROW_MIN_ANCHORS steady lines, as at the start
     of a message, joins only when new repeats every line of it in place, apart
@@ -600,7 +618,7 @@ def _grow(doc: list[Line], new: list[Line]) -> list[Line] | None:
         (a0, b0), (a1, b1) = bounds[k], bounds[k + 1]
         old, fresh = window[a0 + 1 : a1], new[b0 + 1 : b1]
         head, tail = k == 0, k == len(bounds) - 2
-        pairs, by_place = _pair_gap(old, fresh, bottom=tail, top=head)
+        pairs, by_place = _pair_gap(old, fresh, bottom=tail, top=head and start == 0)
         paired_new = set(pairs.values())
         lone_old = [di for di in range(len(old)) if di not in pairs]
         lone_new = [ni for ni in range(len(fresh)) if ni not in paired_new]
@@ -632,13 +650,14 @@ def _grow(doc: list[Line], new: list[Line]) -> list[Line] | None:
                 grown += 1
             elif not old[di].volatile:
                 status_like = not head and _short(old[di]) and _short(fresh[ni])
-                if head and di == 0 and ni == 0 and _counter_ticked(
+                if head and start == 0 and di == 0 and ni == 0 and _counter_ticked(
                     normalize(old[di].text), normalize(fresh[ni].text)
                 ):
-                    # A number change on top alone could be the next numbered
-                    # slide, so it never lets a frame that adds nothing join.
                     tolerated += 1
-                    unseen += 1
+                    if not _counter_on_top(old[di], fresh[ni]):
+                        # A title number change alone could be the next numbered
+                        # slide, so it never lets a frame that adds nothing join.
+                        unseen += 1
                 elif status_like or _complete(old[di], fresh[ni]) is not None:
                     unseen += 1
                     cut += _cut_off(old[di], fresh[ni])

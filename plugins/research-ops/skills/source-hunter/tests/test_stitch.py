@@ -548,3 +548,25 @@ def test_a_numbered_top_title_on_static_slides_still_starts_a_new_screen():
     b = ["Week 2 call recording link for the willow cohort"] + body
     screens = stitch([_frame(0, a), _frame(1, b)])
     assert len(screens) == 2
+
+def test_a_top_line_whose_only_change_is_a_running_counter_stays_one_screen():
+    # Case R11, the protoA2 rule: a long top line whose only change is a running
+    # counter joins even when the frame adds nothing, since every other line is the same.
+    body = [
+        "Sort the cobalt tickets by the harbor door",
+        "Hang the linen maps along the quarry wall",
+        "Count the walnut drawers before the late bell",
+    ]
+    headers = [f"Lantern keepers posted {n} notes in the cedar hall today" for n in (10, 11, 12)]
+    screens = stitch([_frame(f, [header] + body) for f, header in enumerate(headers)])
+    assert len(screens) == 1
+    assert [l.text for l in screens[0].lines[1:]] == body
+    assert set(headers) <= _readings(screens[0])
+    # A top line whose letters change as its counter ticks is a different line.
+    for changed in (
+        "Lantern keepers burned 11 notes in the cedar hall today",
+        "Lantern keepers posted 11 notes in the cedar barn today",
+    ):
+        screens = stitch([_frame(0, [headers[0]] + body), _frame(1, [changed] + body)])
+        assert len(screens) == 2
+        assert [l.text for l in screens[1].lines] == [changed] + body
