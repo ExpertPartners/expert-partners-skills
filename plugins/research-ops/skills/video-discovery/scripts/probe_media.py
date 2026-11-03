@@ -14,6 +14,7 @@ import time
 from pathlib import Path
 
 import requests
+from operational_logging import OperationalRun
 from video_discovery import Fetch, Investigation, Record, classify, domain, now, request_delay
 
 
@@ -79,10 +80,15 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('output',type=Path);p.add_argument('--max-bytes',type=int,default=524288)
     args=p.parse_args()
+    with OperationalRun('probe') as op:probe(args,op)
+
+
+def probe(args,op):
     data=json.loads((args.output/'catalog.json').read_text())
     config=data['configuration'];config['resume']=True;config['output']=str(args.output)
     inv=Investigation(argparse.Namespace(**config))
     inv.notes=data['notes'];inv.page_titles=data['page_titles']
+    checked=decoded_samples=0;op.record(records_checked=0,samples_decoded=0)
     for raw in data['records']:
         r=Record(**raw);inv.catalog.records[(r.platform,r.video_id)]=r
         if r.platform!='direct' or any(c.get('method')=='range_decode' for c in r.checks):continue
@@ -97,6 +103,7 @@ def main():
         check=dict(time=now(),source=r.url,method='range_decode',result='sample_frame_decoded' if decoded else result,
                    bytes_read=len(body or b''),maximum_bytes=size,detail=detail)
         r.checks.append(check)
+        checked+=1;decoded_samples+=decoded;op.record(records_checked=checked,samples_decoded=decoded_samples)
         if decoded:r.playback='one_frame_decoded_full_playback_unverified'
         r.accessibility=classify(r.checks,bool(r.metadata))
         print(r.video_id,check['result'],check['bytes_read'],flush=True)
