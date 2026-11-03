@@ -62,6 +62,26 @@ def passing_routes(number=7, issue=126):
         f"/repos/{REPO}/contents/.changeset/126-change.md?ref={HEAD}": content(GOOD_NOTE),
         f"/repos/{REPO}/contents/.claude-plugin/marketplace.json?ref={HEAD}": content(market()),
         f"/repos/{REPO}/pulls": [],
+        f"/repos/{REPO}/pulls/{number}/comments": [],
+    }
+
+
+def finding_comment(cid, severity="P2", sha=HEAD, security=False, login="chatgpt-codex-connector[bot]",
+                    title="Parse global pip options before install", reply_to=None, badge=True):
+    """An inline finding in the shape Codex posts, copied from pull requests #214 and #108."""
+    mark = f"**<sub><sub>![{severity} Badge](https://img.shields.io/badge/{severity}-yellow?style=flat)</sub></sub>  " if badge else "**"
+    if security:
+        body = (
+            "<!-- codex-security-review-finding:v1 -->\n\n"
+            "### \U0001f6e1\ufe0f Codex Security Review \u00b7 _Automatically triggered_\n\n"
+            f"{mark}Security: {title}**\n\nDetails.\n\nUseful? React with \U0001f44d / \U0001f44e."
+        )
+    else:
+        body = f"{mark}{title}**\n\nDetails.\n\nUseful? React with \U0001f44d / \U0001f44e.\n\n<!-- codex-code-review-finding:v1 -->"
+    return {
+        "id": cid, "user": {"login": login}, "body": body, "commit_id": HEAD, "original_commit_id": sha,
+        "in_reply_to_id": reply_to, "path": "tools/x.py",
+        "html_url": f"https://github.com/{REPO}/pull/7#discussion_r{cid}",
     }
 
 
@@ -219,10 +239,17 @@ class Refused(Base):
         routes[f"/repos/{REPO}/issues/7/comments"] = [codex_comment(status="in_progress")]
         self.assert_refused(routes, "is in_progress, not completed")
 
-    def test_codex_open_findings(self):
+    def test_codex_open_findings_it_cannot_find(self):
         routes = passing_routes()
         routes[f"/repos/{REPO}/issues/7/comments"] = [codex_comment(unresolved=True)]
-        self.assert_refused(routes, f"Codex code review on {HEAD[:7]} left unresolved findings.")
+        self.assert_refused(routes, f"Codex code review on {HEAD[:7]} reports unresolved findings, but the gate found no open Codex code finding comment")
+
+    def test_codex_open_p1_finding(self):
+        routes = passing_routes()
+        routes[f"/repos/{REPO}/issues/7/comments"] = [codex_comment(unresolved=True)]
+        routes[f"/repos/{REPO}/pulls/7/comments"] = [finding_comment(31, "P1")]
+        self.assert_refused(routes, f"Codex P1 code finding \"Parse global pip options before install\" "
+                                    f"(https://github.com/{REPO}/pull/7#discussion_r31) blocks: Codex raised it on head {HEAD[:7]}.")
 
     def test_codex_findings_unknown(self):
         routes = passing_routes()
@@ -247,7 +274,7 @@ class Refused(Base):
             codex_comment(unresolved=True, updated="2026-11-01T12:00:00Z"),
             codex_comment(unresolved=False, updated="2026-11-01T09:00:00Z"),
         ]
-        self.assert_refused(routes, "left unresolved findings")
+        self.assert_refused(routes, "reports unresolved findings")
 
     def test_not_mergeable(self):
         routes = passing_routes()
@@ -265,7 +292,7 @@ class Refused(Base):
         routes[f"/repos/{REPO}/issues/7/comments"] = [codex_comment(unresolved=True)]
         routes[f"/repos/{REPO}/pulls/7"]["mergeable"] = False
         body = self.assert_refused(routes, "finished as failure")
-        self.assertIn("left unresolved findings", body)
+        self.assertIn("reports unresolved findings", body)
         self.assertIn("not mergeable", body)
 
 
@@ -436,8 +463,9 @@ def codex_receipt(sha=HEAD, clean=True, security=False, login="chatgpt-codex-con
 class CodexReceipt(Base):
     """Codex posts a codex-review-receipt:v1 comment, not a summary, when its code review is clean."""
 
-    # What the fake GraphQL thread read returns: a count, an exception to raise, or None for no reader.
-    threads = 0
+    # What the fake GraphQL thread read returns: {first comment id: resolved},
+    # an exception to raise, or None for no reader.
+    threads = {}
 
     def fake(self, routes):
         gh = FakeGitHub(routes)
@@ -445,18 +473,18 @@ class CodexReceipt(Base):
         if threads is None:
             return gh
 
-        def unresolved_threads(repo, n):
+        def review_threads(repo, n):
             if isinstance(threads, Exception):
                 raise threads
             return threads
 
-        gh.unresolved_threads = unresolved_threads
+        gh.review_threads = review_threads
         return gh
 
-    def receipt_routes(self, *comments):
+    def receipt_routes(self, *comments, findings=()):
         routes = passing_routes()
         routes[f"/repos/{REPO}/issues/7/comments"] = list(comments)
-        routes[f"/repos/{REPO}/pulls/7/reviews"] = []
+        routes[f"/repos/{REPO}/pulls/7/comments"] = list(findings)
         return routes
 
     def test_clean_receipt_for_head_merges(self):
@@ -507,18 +535,17 @@ class CodexReceipt(Base):
 
     def test_a_summary_on_this_head_still_decides(self):
         routes = self.receipt_routes(codex_comment(unresolved=True), codex_receipt())
-        self.assert_refused(routes, f"Codex code review on {HEAD[:7]} left unresolved findings.")
+        self.assert_refused(routes, f"Codex code review on {HEAD[:7]} reports unresolved findings")
 
     def test_a_summary_on_this_head_with_null_findings_still_reads_threads(self):
         state = codex_comment()
         state["body"] = state["body"].replace('"has_unresolved_findings":false', '"has_unresolved_findings":null').replace('"has_any_findings":false', '"has_any_findings":true')
-        routes = self.receipt_routes(state, codex_receipt())
-        routes[f"/repos/{REPO}/pulls/7/reviews"] = []
+        routes = self.receipt_routes(state, codex_receipt(), findings=[finding_comment(41, "P1", sha=OLD)])
         reader = FakeGitHub(routes)
-        reader.unresolved_threads = lambda repo, n: 1
+        reader.review_threads = lambda repo, n: {41: False}
         d = gate.evaluate(reader, CFG, 7)
         self.assertEqual(d.action, "refuse")
-        self.assertTrue(any("1 unresolved review thread" in r for r in d.reasons))
+        self.assertTrue(any(f"its thread from {OLD[:7]} is unresolved" in r for r in d.reasons), d.reasons)
 
     def test_security_findings_on_head_still_block_a_clean_receipt(self):
         routes = self.receipt_routes(codex_comment(sha=OLD), codex_receipt())
@@ -551,38 +578,51 @@ class CodexReceipt(Base):
         comments = [{"user": {"login": "chatgpt-codex-connector[bot]"}, "body": body}]
         self.assertTrue(gate.has_clean_codex_receipt(comments, head))
         self.assertFalse(gate.has_clean_codex_receipt(comments, "42b26d90b2" + head[10:]))
-        self.assertEqual(gate.codex_problems(None, head, lambda: 0, True), [])
+        self.assertEqual(gate.codex_problems(None, head, lambda: ([], None), True), [])
 
-    def test_clean_receipt_with_an_open_thread_refuses(self):
-        self.threads = 1
-        self.assert_refused(self.receipt_routes(codex_receipt()),
-                            f"Codex posted a clean code review receipt for {HEAD[:7]}, but 1 review thread(s) are still unresolved.")
+    def test_clean_receipt_with_an_open_p1_thread_refuses(self):
+        self.threads = {41: False}
+        routes = self.receipt_routes(codex_receipt(), findings=[finding_comment(41, "P1", sha=OLD)])
+        self.assert_refused(routes, f"Codex P1 code finding \"Parse global pip options before install\" "
+                                    f"(https://github.com/{REPO}/pull/7#discussion_r41) blocks: its thread from {OLD[:7]} is unresolved.")
+
+    def test_clean_receipt_with_an_open_p2_thread_merges(self):
+        self.threads = {41: False}
+        routes = self.receipt_routes(codex_receipt(), findings=[finding_comment(41, "P2", sha=OLD)])
+        self.assertEqual(self.evaluate(routes).action, "merge")
 
     def test_clean_receipt_does_not_wave_through_open_findings_from_an_older_commit(self):
         # Codex left a finding on OLD, then posted a clean receipt for HEAD before
         # refreshing its summary. The finding's thread is still open.
-        self.threads = 1
-        routes = self.receipt_routes(codex_comment(sha=OLD, unresolved=True), codex_receipt())
-        self.assert_refused(routes, "1 review thread(s) are still unresolved")
+        self.threads = {41: False}
+        routes = self.receipt_routes(codex_comment(sha=OLD, unresolved=True), codex_receipt(),
+                                     findings=[finding_comment(41, "P1", sha=OLD)])
+        self.assert_refused(routes, f"its thread from {OLD[:7]} is unresolved")
 
     def test_clean_receipt_counts_once_older_findings_are_resolved(self):
-        routes = self.receipt_routes(codex_comment(sha=OLD, unresolved=True), codex_receipt())
+        self.threads = {41: True}
+        routes = self.receipt_routes(codex_comment(sha=OLD, unresolved=True), codex_receipt(),
+                                     findings=[finding_comment(41, "P1", sha=OLD)])
         self.assertEqual(self.evaluate(routes).action, "merge")
 
     def test_clean_receipt_when_threads_cannot_be_read_refuses(self):
         self.threads = gate.GitHubError(502, "down")
-        self.assert_refused(self.receipt_routes(codex_receipt()), "but the review threads could not be read (down).")
+        routes = self.receipt_routes(codex_receipt(), findings=[finding_comment(41, "P1", sha=OLD)])
+        self.assert_refused(routes, f"from {OLD[:7]} may still be open: the review threads could not be read (down).")
 
     def test_clean_receipt_without_a_thread_reader_refuses(self):
         self.threads = None
-        self.assert_refused(self.receipt_routes(codex_receipt()), "but the review threads could not be checked.")
+        routes = self.receipt_routes(codex_receipt(), findings=[finding_comment(41, "P1", sha=OLD)])
+        self.assert_refused(routes, "may still be open: the review threads could not be checked.")
+
+    def test_clean_receipt_when_review_comments_cannot_be_read_refuses(self):
+        routes = self.receipt_routes(codex_receipt())
+        del routes[f"/repos/{REPO}/pulls/7/comments"]
+        self.assert_refused(routes, f"Codex posted a clean code review receipt for {HEAD[:7]}, but the review comments could not be read")
 
     def test_codex_findings_on_this_head_block_a_clean_receipt(self):
-        routes = self.receipt_routes(codex_receipt())
-        routes[f"/repos/{REPO}/pulls/7/reviews"] = [
-            {"id": 2, "user": {"login": "chatgpt-codex-connector[bot]"}, "commit_id": HEAD}]
-        routes[f"/repos/{REPO}/pulls/7/reviews/2/comments"] = [{"id": 21}]
-        self.assert_refused(routes, "1 review thread(s) are still unresolved")
+        routes = self.receipt_routes(codex_receipt(), findings=[finding_comment(21, "P1")])
+        self.assert_refused(routes, f"blocks: Codex raised it on head {HEAD[:7]}.")
 
     def test_receipt_naming_fewer_than_10_hex_refuses(self):
         for length in (7, 9):
@@ -597,13 +637,13 @@ class CodexReceipt(Base):
         self.assert_refused(self.receipt_routes(receipt), "no Codex review summary")
 
     def test_security_findings_on_head_are_reported_with_an_open_thread(self):
-        self.threads = 1
-        routes = self.receipt_routes(codex_comment(sha=OLD), codex_receipt())
+        self.threads = {41: False}
+        routes = self.receipt_routes(codex_comment(sha=OLD), codex_receipt(), findings=[finding_comment(41, "P1", sha=OLD)])
         state = routes[f"/repos/{REPO}/issues/7/comments"][0]
         state["body"] = state["body"].replace(
             f'"security_review":{{"commit_sha":"{OLD}","has_any_findings":null,"has_unresolved_findings":null',
             f'"security_review":{{"commit_sha":"{HEAD}","has_any_findings":true,"has_unresolved_findings":true')
-        body = self.assert_refused(routes, "1 review thread(s) are still unresolved")
+        body = self.assert_refused(routes, f"its thread from {OLD[:7]} is unresolved")
         self.assertIn("Codex security review", body)
 
 
@@ -681,53 +721,71 @@ class ResolvedThreadsRoute(unittest.TestCase):
                                 "has_unresolved_findings": unresolved, "status": status},
                 "security_review": {}}
 
+    @staticmethod
+    def _found(*findings, note=None):
+        return lambda: (list(findings), note)
+
+    @staticmethod
+    def _finding(severity="P1", sha=OLD, resolved=True, kind="code"):
+        return gate.Finding(41, kind, severity, sha, "A finding", "https://example.test/41", resolved)
+
     def test_null_with_all_threads_resolved_passes(self):
-        self.assertEqual(gate.codex_problems(self._state(), HEAD, lambda: 0), [])
+        self.assertEqual(gate.codex_problems(self._state(), HEAD, self._found(self._finding())), [])
 
-    def test_null_with_an_open_thread_refuses(self):
-        p = gate.codex_problems(self._state(), HEAD, lambda: 2)
-        self.assertTrue(p and "2 unresolved review thread" in p[0])
+    def test_null_with_an_open_p1_thread_refuses(self):
+        p = gate.codex_problems(self._state(), HEAD, self._found(self._finding(resolved=False)))
+        self.assertEqual(p, [f"Codex P1 code finding \"A finding\" (https://example.test/41) blocks: its thread from {OLD[:7]} is unresolved."])
 
-    def test_null_without_a_thread_reader_refuses(self):
+    def test_null_with_an_open_p2_thread_passes(self):
+        self.assertEqual(gate.codex_problems(self._state(), HEAD, self._found(self._finding("P2", resolved=False))), [])
+
+    def test_null_without_a_finding_reader_refuses(self):
         p = gate.codex_problems(self._state(), HEAD, None)
         self.assertTrue(p and "did not report has_unresolved_findings: false" in p[0])
 
-    def test_null_when_threads_cannot_be_read_refuses(self):
+    def test_null_when_review_comments_cannot_be_read_refuses(self):
         def boom():
             raise gate.GitHubError(502, "down")
         p = gate.codex_problems(self._state(), HEAD, boom)
         self.assertEqual(len(p), 1)
-        self.assertIn("could not be read", p[0])
+        self.assertIn("the review comments could not be read (down)", p[0])
 
-    def test_true_still_refuses_even_with_threads_resolved(self):
-        p = gate.codex_problems(self._state(unresolved=True), HEAD, lambda: 0)
-        self.assertTrue(p and "left unresolved findings" in p[0])
+    def test_null_when_a_p1_thread_cannot_be_read_refuses(self):
+        p = gate.codex_problems(self._state(), HEAD, self._found(
+            self._finding(resolved=None), note="the review threads could not be read (down)"))
+        self.assertEqual(len(p), 1)
+        self.assertIn("may still be open: the review threads could not be read (down).", p[0])
+
+    def test_true_with_every_finding_resolved_is_an_evidence_gap(self):
+        p = gate.codex_problems(self._state(unresolved=True), HEAD, self._found(self._finding()))
+        self.assertTrue(p and "reports unresolved findings, but the gate found no open Codex code finding comment" in p[0], p)
 
     def test_null_without_any_findings_still_refuses(self):
-        p = gate.codex_problems(self._state(any_findings=None), HEAD, lambda: 0)
+        p = gate.codex_problems(self._state(any_findings=None), HEAD, self._found())
         self.assertTrue(p and "did not report" in p[0])
 
     def test_null_on_an_older_head_still_waits(self):
-        p = gate.codex_problems(self._state(sha=OLD), HEAD, lambda: 0)
+        p = gate.codex_problems(self._state(sha=OLD), HEAD, self._found())
         self.assertTrue(p and "has not reviewed head" in p[0])
 
     def test_null_while_review_running_refuses(self):
-        p = gate.codex_problems(self._state(status="running"), HEAD, lambda: 0)
+        p = gate.codex_problems(self._state(status="running"), HEAD, self._found())
         self.assertTrue(p and "not completed" in p[0])
 
     def test_evaluate_reads_threads_only_when_needed(self):
         routes = passing_routes()
         reader = FakeGitHub(routes)
         calls = []
-        reader.unresolved_threads = lambda repo, n: calls.append(n) or 0
+        reader.review_threads = lambda repo, n: calls.append(n) or {}
         self.assertEqual(gate.evaluate(reader, CFG, 7).action, "merge")
         self.assertEqual(calls, [], "a false state never needs the thread read")
+        self.assertFalse([c for c in reader.calls if c[1].endswith("/pulls/7/comments")], "nor the review comments")
         routes[f"/repos/{REPO}/issues/7/comments"] = [codex_comment()]
         state_comment = routes[f"/repos/{REPO}/issues/7/comments"][0]
         state_comment["body"] = state_comment["body"].replace('"has_unresolved_findings":false', '"has_unresolved_findings":null').replace('"has_any_findings":false', '"has_any_findings":true')
-        routes[f"/repos/{REPO}/pulls/7/reviews"] = []
+        routes[f"/repos/{REPO}/pulls/7/comments"] = [finding_comment(41, "P1", sha=OLD)]
         reader = FakeGitHub(routes)
-        reader.unresolved_threads = lambda repo, n: calls.append(n) or 0
+        reader.review_threads = lambda repo, n: calls.append(n) or {41: True}
         self.assertEqual(gate.evaluate(reader, CFG, 7).action, "merge")
         self.assertEqual(calls, [7])
 
@@ -761,36 +819,253 @@ class LabelFallbackAndHeadFindings(unittest.TestCase):
         routes = passing_routes()
         c = routes[f"/repos/{REPO}/issues/7/comments"][0]
         c["body"] = c["body"].replace('"has_unresolved_findings":false', '"has_unresolved_findings":null').replace('"has_any_findings":false', '"has_any_findings":true')
-        routes[f"/repos/{REPO}/pulls/7/reviews"] = [
-            {"id": 1, "user": {"login": "chatgpt-codex-connector[bot]"}, "commit_id": OLD},
-        ]
-        routes[f"/repos/{REPO}/pulls/7/reviews/1/comments"] = [{"id": 11}]
+        routes[f"/repos/{REPO}/pulls/7/comments"] = [finding_comment(11, "P1", sha=OLD)]
         return routes
 
+    def reader(self, routes, threads):
+        reader = FakeGitHub(routes)
+        reader.review_threads = lambda repo, n: threads
+        return reader
+
     def test_findings_on_an_older_head_resolved_merges(self):
-        reader = FakeGitHub(self._null_routes())
-        reader.unresolved_threads = lambda repo, n: 0
-        self.assertEqual(gate.evaluate(reader, CFG, 7).action, "merge")
+        self.assertEqual(gate.evaluate(self.reader(self._null_routes(), {11: True}), CFG, 7).action, "merge")
 
-    def test_findings_on_this_head_block_even_when_resolved(self):
+    def test_p1_findings_on_this_head_block_even_when_resolved(self):
         routes = self._null_routes()
-        routes[f"/repos/{REPO}/pulls/7/reviews"].append(
-            {"id": 2, "user": {"login": "chatgpt-codex-connector[bot]"}, "commit_id": HEAD})
-        routes[f"/repos/{REPO}/pulls/7/reviews/2/comments"] = [{"id": 21}, {"id": 22}]
-        reader = FakeGitHub(routes)
-        reader.unresolved_threads = lambda repo, n: 0
-        d = gate.evaluate(reader, CFG, 7)
+        routes[f"/repos/{REPO}/pulls/7/comments"] += [finding_comment(21, "P1"), finding_comment(22, "P0", title="Second")]
+        d = gate.evaluate(self.reader(routes, {11: True, 21: True, 22: True}), CFG, 7)
         self.assertEqual(d.action, "refuse")
-        self.assertTrue(any("2 unresolved review thread" in r for r in d.reasons))
+        self.assertEqual(len(d.reasons), 2, d.reasons)
+        self.assertIn(f"Codex P1 code finding \"Parse global pip options before install\" (https://github.com/{REPO}/pull/7#discussion_r21) blocks: Codex raised it on head {HEAD[:7]}.", d.reasons)
+        self.assertIn(f"Codex P0 code finding \"Second\" (https://github.com/{REPO}/pull/7#discussion_r22) blocks: Codex raised it on head {HEAD[:7]}.", d.reasons)
 
-    def test_a_clean_codex_review_on_this_head_does_not_block(self):
-        routes = self._null_routes()
-        routes[f"/repos/{REPO}/pulls/7/reviews"].append(
-            {"id": 3, "user": {"login": "chatgpt-codex-connector[bot]"}, "commit_id": HEAD})
-        routes[f"/repos/{REPO}/pulls/7/reviews/3/comments"] = []
-        reader = FakeGitHub(routes)
-        reader.unresolved_threads = lambda repo, n: 0
-        self.assertEqual(gate.evaluate(reader, CFG, 7).action, "merge")
+
+PR214_HEAD = "77c12b54898a379d600463ebe2bf0e20a21fcedd"
+
+
+def pr214_routes():
+    """Pull request #214 as it stood on 2026-11-03: Codex's completed review of the head
+    reports has_unresolved_findings true, and its three findings on that head are all P2.
+    claude[bot] also left two optional threads. Bodies are copied, trimmed."""
+    routes = passing_routes()
+    routes[f"/repos/{REPO}/pulls/7"]["head"]["sha"] = PR214_HEAD
+    for suffix in ("check-runs", "status"):
+        routes[f"/repos/{REPO}/commits/{PR214_HEAD}/{suffix}"] = routes.pop(f"/repos/{REPO}/commits/{HEAD}/{suffix}")
+    routes[f"/repos/{REPO}/contents/.changeset/126-change.md?ref={PR214_HEAD}"] = content(GOOD_NOTE)
+    routes[f"/repos/{REPO}/contents/.claude-plugin/marketplace.json?ref={PR214_HEAD}"] = content(market())
+    summary = {
+        "id": 6615828876, "user": {"login": "chatgpt-codex-connector[bot]"}, "updated_at": "2026-11-03T21:32:23Z",
+        "body": (
+            "<!-- codex-pull-request-review-summary -->\n"
+            '<!-- codex-review-state:v1 {"code_review":{"commit_sha":"77c12b54898a379d600463ebe2bf0e20a21fcedd",'
+            '"has_any_findings":true,"has_unresolved_findings":true,"status":"completed"},"security_review":'
+            '{"commit_sha":"77c12b54898a379d600463ebe2bf0e20a21fcedd","has_any_findings":null,'
+            '"has_unresolved_findings":null,"status":"completed"}} -->\n'
+            '<!-- codex-security-review:v1 {"blockingSeverityThreshold":"P0","headSha":"77c12b54898a379d600463ebe2bf0e20a21fcedd",'
+            '"mergeGateEnabled":false,"pullRequestNumber":214,"status":"completed"} -->\n'
+            "## Codex Review Summary\n"
+        ),
+    }
+    security_receipt = codex_receipt(sha=PR214_HEAD, security=True)
+    routes[f"/repos/{REPO}/issues/7/comments"] = [summary, security_receipt]
+    findings = [
+        finding_comment(4460685575, "P2", PR214_HEAD, title="Parse global pip options before install"),
+        finding_comment(4460685589, "P2", PR214_HEAD, title="Scope pending exceptions to the recorded finding"),
+        finding_comment(4460685601, "P2", PR214_HEAD, title="Install every newly added requirements lock"),
+    ]
+    claude = [dict(finding_comment(n, "P2", PR214_HEAD, login="claude[bot]"),
+                   body="\U0001f7e1 (optional) A workflow line that chains a second install ...") for n in (4460455272, 4460455280)]
+    routes[f"/repos/{REPO}/pulls/7/comments"] = claude + findings
+    return routes
+
+
+def with_threads(routes, threads):
+    gh = FakeGitHub(routes)
+    gh.review_threads = lambda repo, n: threads
+    return gh
+
+
+class SeverityThreshold(Base):
+    """AGENTS.md, Review guidelines: block only on P0 and P1. The summary's
+    has_unresolved_findings is an aggregate, not a severity."""
+
+    def test_pr214_p2_only_review_on_head_does_not_block(self):
+        routes = pr214_routes()
+        # Every thread is still open, Codex's and claude[bot]'s alike.
+        reader = with_threads(routes, {4460685575: False, 4460685589: False, 4460685601: False,
+                                       4460455272: False, 4460455280: False})
+        merger = FakeGitHub({}, put_result={"sha": "c" * 40, "merged": True})
+        ready = gate.run_plan(reader, CFG, "pull_request_target", {"pull_request": {"number": 7}})
+        self.assertEqual(ready, [7], gate.evaluate(reader, CFG, 7).reasons)
+        self.assertEqual(reader.writes(), [], "no refusal comment")
+        self.assertEqual(gate.run_merge(reader, merger, CFG, ready), ["c" * 40])
+        self.assertEqual(merger.calls, [
+            ("PUT", f"/repos/{REPO}/pulls/7/merge", {"merge_method": "squash", "sha": PR214_HEAD})])
+
+    def test_pr214_with_one_finding_raised_to_p1_blocks_and_names_it(self):
+        routes = pr214_routes()
+        routes[f"/repos/{REPO}/pulls/7/comments"][-1] = finding_comment(
+            4460685601, "P1", PR214_HEAD, title="Install every newly added requirements lock")
+        d = gate.evaluate(FakeGitHub(routes), CFG, 7)
+        self.assertEqual(d.action, "refuse")
+        self.assertEqual(d.reasons, [
+            "Codex P1 code finding \"Install every newly added requirements lock\" "
+            f"(https://github.com/{REPO}/pull/7#discussion_r4460685601) blocks: Codex raised it on head 77c12b5."])
+
+    def test_p0_blocks(self):
+        routes = pr214_routes()
+        routes[f"/repos/{REPO}/pulls/7/comments"].append(finding_comment(5, "P0", PR214_HEAD, title="Drops every check"))
+        d = gate.evaluate(FakeGitHub(routes), CFG, 7)
+        self.assertEqual(d.action, "refuse")
+        self.assertTrue(any(r.startswith("Codex P0 code finding \"Drops every check\"") for r in d.reasons), d.reasons)
+
+    def test_p3_does_not_block(self):
+        routes = pr214_routes()
+        routes[f"/repos/{REPO}/pulls/7/comments"].append(finding_comment(5, "P3", PR214_HEAD))
+        self.assertEqual(gate.evaluate(FakeGitHub(routes), CFG, 7).action, "merge")
+
+    def test_an_open_p1_from_an_older_commit_blocks_and_a_resolved_one_does_not(self):
+        routes = pr214_routes()
+        routes[f"/repos/{REPO}/pulls/7/comments"].append(finding_comment(5, "P1", OLD, title="Old one"))
+        d = gate.evaluate(with_threads(routes, {5: False}), CFG, 7)
+        self.assertEqual(d.reasons, [
+            f"Codex P1 code finding \"Old one\" (https://github.com/{REPO}/pull/7#discussion_r5) blocks: its thread from {OLD[:7]} is unresolved."])
+        self.assertEqual(gate.evaluate(with_threads(routes, {5: True}), CFG, 7).action, "merge")
+
+    def test_a_finding_with_no_severity_badge_is_an_evidence_gap(self):
+        routes = pr214_routes()
+        routes[f"/repos/{REPO}/pulls/7/comments"].append(finding_comment(5, sha=PR214_HEAD, title="No badge", badge=False))
+        d = gate.evaluate(FakeGitHub(routes), CFG, 7)
+        self.assertEqual(d.action, "refuse")
+        self.assertEqual(d.reasons, [
+            f"Codex code finding with no readable severity \"No badge\" (https://github.com/{REPO}/pull/7#discussion_r5) "
+            "blocks: Codex raised it on head 77c12b5. The gate cannot read its severity, so this is a gap in the review evidence, not a pass."])
+
+    def test_a_finding_with_two_different_badges_is_an_evidence_gap(self):
+        routes = pr214_routes()
+        twice = finding_comment(5, "P2", PR214_HEAD)
+        twice["body"] += "\n![P1 Badge](https://img.shields.io/badge/P1-orange?style=flat)"
+        routes[f"/repos/{REPO}/pulls/7/comments"].append(twice)
+        d = gate.evaluate(FakeGitHub(routes), CFG, 7)
+        self.assertTrue(any("no readable severity" in r for r in d.reasons), d.reasons)
+
+    def test_p1_from_someone_else_is_not_trusted_review_evidence(self):
+        routes = pr214_routes()
+        routes[f"/repos/{REPO}/pulls/7/comments"].append(finding_comment(5, "P1", PR214_HEAD, login="someone"))
+        self.assertEqual(gate.evaluate(FakeGitHub(routes), CFG, 7).action, "merge")
+
+    def test_forged_p2_findings_cannot_explain_an_unresolved_summary(self):
+        routes = pr214_routes()
+        for c in routes[f"/repos/{REPO}/pulls/7/comments"]:
+            c["user"] = {"login": "someone"}
+        self.assert_refused_at(routes, "Codex code review on 77c12b5 reports unresolved findings, but the gate found no open Codex code finding comment")
+
+    def test_codex_replies_are_not_findings(self):
+        routes = pr214_routes()
+        routes[f"/repos/{REPO}/pulls/7/comments"].append(
+            finding_comment(5, sha=PR214_HEAD, title="Thanks, fixed.", badge=False, reply_to=4460685575))
+        self.assertEqual(gate.evaluate(FakeGitHub(routes), CFG, 7).action, "merge")
+
+    def test_p2_findings_do_not_stand_in_for_missing_stale_or_incomplete_review(self):
+        cases = {
+            "missing": ([], "Codex has not reviewed head 77c12b5 yet (no Codex review summary on this pull request)."),
+            "stale": ([codex_comment(sha=OLD, unresolved=True)], f"Codex has not reviewed head 77c12b5 yet (its last code review covered {OLD[:7]})."),
+            "incomplete": ([codex_comment(sha=PR214_HEAD, status="in_progress", unresolved=True)], "Codex code review on 77c12b5 is in_progress, not completed."),
+            "untrusted": ([dict(codex_comment(sha=PR214_HEAD, unresolved=False), user={"login": "someone"})],
+                          "Codex has not reviewed head 77c12b5 yet (no Codex review summary on this pull request)."),
+        }
+        for name, (comments, reason) in cases.items():
+            with self.subTest(name):
+                routes = pr214_routes()
+                routes[f"/repos/{REPO}/issues/7/comments"] = comments
+                d = gate.evaluate(FakeGitHub(routes), CFG, 7)
+                self.assertEqual(d.action, "refuse")
+                self.assertEqual(d.reasons, [reason])
+
+    def test_security_p1_blocks(self):
+        routes = self.security_routes()
+        routes[f"/repos/{REPO}/pulls/7/comments"].append(
+            finding_comment(6, "P1", PR214_HEAD, security=True, title="Protect the main-bypass App key from branch workflows"))
+        d = gate.evaluate(FakeGitHub(routes), CFG, 7)
+        self.assertEqual(d.action, "refuse")
+        self.assertEqual(d.reasons, [
+            "Codex P1 security finding \"Security: Protect the main-bypass App key from branch workflows\" "
+            f"(https://github.com/{REPO}/pull/7#discussion_r6) blocks: Codex raised it on head 77c12b5."])
+
+    def test_security_p2_alone_does_not_block(self):
+        routes = self.security_routes()
+        routes[f"/repos/{REPO}/pulls/7/comments"].append(
+            finding_comment(6, "P2", PR214_HEAD, security=True, title="Require trusted approval for resolved Codex findings"))
+        self.assertEqual(gate.evaluate(FakeGitHub(routes), CFG, 7).action, "merge")
+
+    def test_security_unresolved_with_no_finding_to_read_is_an_evidence_gap(self):
+        d = gate.evaluate(FakeGitHub(self.security_routes()), CFG, 7)
+        self.assertEqual(d.reasons, [
+            "Codex security review on 77c12b5 reports unresolved findings, but the gate found no open Codex security finding comment to read their severity from."])
+
+    def test_security_unresolved_when_comments_cannot_be_read_refuses(self):
+        routes = self.security_routes()
+        summary = routes[f"/repos/{REPO}/issues/7/comments"][0]
+        summary["body"] = summary["body"].replace(
+            '"has_any_findings":true,"has_unresolved_findings":true,"status":"completed"},"security_review"',
+            '"has_any_findings":false,"has_unresolved_findings":false,"status":"completed"},"security_review"')
+        del routes[f"/repos/{REPO}/pulls/7/comments"]
+        d = gate.evaluate(FakeGitHub(routes), CFG, 7)
+        self.assertEqual(len(d.reasons), 1, d.reasons)
+        self.assertTrue(d.reasons[0].startswith("Codex security review on 77c12b5 reports unresolved findings, but the review comments could not be read"))
+
+    def security_routes(self):
+        routes = pr214_routes()
+        summary = routes[f"/repos/{REPO}/issues/7/comments"][0]
+        summary["body"] = summary["body"].replace(
+            '"has_any_findings":null,"has_unresolved_findings":null', '"has_any_findings":true,"has_unresolved_findings":true')
+        return routes
+
+    def assert_refused_at(self, routes, fragment):
+        d = gate.evaluate(FakeGitHub(routes), CFG, 7)
+        self.assertEqual(d.action, "refuse")
+        self.assertTrue(any(fragment in r for r in d.reasons), d.reasons)
+
+
+class FindingParsing(unittest.TestCase):
+    def test_reads_the_real_finding_shapes(self):
+        code = finding_comment(1, "P2", title="Parse global pip options before install")
+        f = gate.parse_finding(code)
+        self.assertEqual((f.kind, f.severity, f.commit, f.title), ("code", "P2", HEAD, "Parse global pip options before install"))
+        sec = gate.parse_finding(finding_comment(2, "P1", OLD, security=True, title="Pin the recorder handoff"))
+        self.assertEqual((sec.kind, sec.severity, sec.commit, sec.title), ("security", "P1", OLD, "Security: Pin the recorder handoff"))
+
+    def test_older_findings_without_a_marker_still_carry_a_badge(self):
+        body = "**<sub><sub>![P1 Badge](https://img.shields.io/badge/P1-orange?style=flat)</sub></sub>  Old shape**\n\nText."
+        self.assertEqual(gate.finding_severity(body), "P1")
+        self.assertEqual(gate.finding_title(body), "Old shape")
+
+    def test_severity_is_none_without_a_badge(self):
+        self.assertIsNone(gate.finding_severity("**Something** without a badge"))
+
+
+class ReviewThreadsQuery(unittest.TestCase):
+    def test_maps_first_comment_ids_to_resolution_across_pages(self):
+        pages = [
+            {"data": {"repository": {"pullRequest": {"reviewThreads": {
+                "nodes": [{"isResolved": True, "comments": {"nodes": [{"databaseId": 11}]}},
+                          {"isResolved": False, "comments": {"nodes": []}}],
+                "pageInfo": {"hasNextPage": True, "endCursor": "c1"}}}}}},
+            {"data": {"repository": {"pullRequest": {"reviewThreads": {
+                "nodes": [{"isResolved": False, "comments": {"nodes": [{"databaseId": 12}]}}],
+                "pageInfo": {"hasNextPage": False, "endCursor": None}}}}}},
+        ]
+        gh = gate.GitHub("t")
+        sent = []
+        gh._request = lambda method, url, body=None: (sent.append(body["variables"]["a"]) or pages.pop(0), "")
+        self.assertEqual(gh.review_threads(REPO, 7), {11: True, 12: False})
+        self.assertEqual(sent, [None, "c1"])
+
+    def test_graphql_errors_raise(self):
+        gh = gate.GitHub("t")
+        gh._request = lambda method, url, body=None: ({"errors": [{"message": "nope"}]}, "")
+        with self.assertRaises(gate.GitHubError):
+            gh.review_threads(REPO, 7)
 
 
 MERGE_BASE = "d" * 40
