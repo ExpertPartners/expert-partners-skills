@@ -1,0 +1,11 @@
+# Code owners for the files that guard the Chat to Code Loop.
+# A builder must not be able to loosen its own guardrails, so every change to
+# these paths asks for Allison's review.
+#
+# CODEOWNERS owns whole files, not sections, so AGENTS.md is owned in full to
+# cover its Review guidelines.
+
+/.github/workflows/ @AllisonGaddy
+/tools/auto-merge-gate/ @AllisonGaddy
+/.github/CODEOWNERS @AllisonGaddy
+/AGENTS.md @AllisonGaddy
