@@ -2,15 +2,12 @@
 name: research-intake
 description: >
   Files a research report that surfaces in ANY conversation, pasted, uploaded,
-  or linked, into the department folder of the business brain that owns its
-  subject, named Cal's way, [Brand-Department][V1.0] Name. AG Business Brain owns
-  AG Luxury and Allison's brand. EP Business Brain owns Expert Partners, EPIC,
-  Free Agent Movement, Don and PartnerSync product and market research. HQ
-  Business Brain owns AI operations, Factory, Ember, Claude, skills, tools and
-  PartnerSync build and shared operations material. Never files into the Deep
-  Research folder. Use whenever a research report, deep-research output, or
-  external analysis appears in conversation with intent to use it, not just to
-  read it once. Answers Allison's question FIRST, files behind the answer,
+  or linked, into the department folder of the business brain, AG, EP or HQ,
+  that owns its subject under the live HQ Rulebook, named Cal's way,
+  [Brand-Department][V1.0] Name. Never files into the Deep Research folder.
+  Use whenever a research report, deep-research output, or external analysis
+  appears in conversation with intent to use it, not just to read it once.
+  Answers Allison's question FIRST, files behind the answer,
   never files the same report twice, asks one question naming the two
   likeliest homes when the owning department is unclear, then reports the
   Drive link.
@@ -47,6 +44,12 @@ Drive connector for the report's Drive file id if it has one, or its title if
 it does not. A filed copy carries a Cal prefix in front of the title, so
 search for the title inside the name, not for an exact name.
 
+A file id match is the report. A title match is only a candidate, because
+anyone can give a file the same title. Count a title match as the report only
+when it is the one candidate and its content is the same report Allison
+showed you. If no candidate passes, treat the report as having no Drive home
+yet, and step 5 saves it from the content Allison supplied.
+
 - **A match already filed in a department folder of AG, EP or HQ Business
   Brain**: this is a rediscovery, not a new filing. Create nothing, add no
   entry and no Job Tracker row, skip to step 8 and report the existing Doc.
@@ -56,35 +59,29 @@ search for the title inside the name, not for an exact name.
 
 ## 2. Find the brain that owns the subject
 
-First read the live routing canon: Organization Instructions, the HQ Rulebook
-and the Decision Log, all in HQ Business Brain, Company Core, each found by
-its title. They win over the tables in steps 2 and 3, and the newest Decision
-Log entry wins over both. If any of them cannot be read, save and move
-nothing, and tell Allison which source failed.
+This skill carries no copy of which brain owns which subject. That lives only
+in the routing canon: Organization Instructions, the HQ Rulebook and the
+Decision Log, all in HQ Business Brain, Company Core, each found by its
+title. Read all three live every time, and let the newest Decision Log entry
+win. If any of them cannot be read, save and move nothing, and tell Allison
+which source failed.
 
 Read the report's actual subject matter, not just its title or filename, and
-pick the one brain that owns it.
+pick the one brain, AG, EP or HQ Business Brain, whose ownership in the
+routing canon covers it. The brain's short name is its brand tag: AG, EP or
+HQ.
 
-| Subject | Owning brain | Brand tag |
-| --- | --- | --- |
-| AG Luxury, Allison's personal brand | AG Business Brain | AG |
-| Expert Partners, EPIC, Free Agent Movement, Don, PartnerSync product and market research | EP Business Brain | EP |
-| AI operations, Factory, Ember, Claude, skills, tools, PartnerSync build and shared operations material | HQ Business Brain | HQ |
-
-PartnerSync is split the way the HQ Rulebook department words split it.
-Research about the PartnerSync product, its market, its customers or its
-competitors goes to EP Business Brain. Material about building PartnerSync or
-running its shared operations goes to HQ Operations, into the
-`PartnerSync Source Material [HQ-BB]` folder, found by name, and is named
-`[HQ-Operations][V1.0] Title`.
+Where the routing canon splits one brand across brains by the kind of
+material, file by the kind of material the report is, into the folder the
+canon names for that kind.
 
 ## 3. Find the department it serves
 
-Pick the department the report's knowledge serves, using the HQ Rulebook
-department words. Each word matches a department folder in that brain, and
-the folder name ends with the department and the brain tag, like
-`Marketing [AG-BB]` or `Operations [HQ-BB]`. Find the folder by name in Drive.
-Never hard-code a folder id.
+Pick the department the report's knowledge serves, using the department words
+in the HQ Rulebook for that brain. Each word matches a department folder in
+that brain, and the folder name ends with the department and the brain tag,
+like `Marketing [AG-BB]` or `Operations [HQ-BB]`. Find the folder by name in
+Drive. Never hard-code a folder id.
 
 A folder name alone proves nothing, because anyone can share a folder with
 the same name. Accept a folder only when it is the one match inside that
@@ -93,38 +90,31 @@ an Expert Partners shared drive. Ignore folders reached only through Shared
 with me. If no folder or more than one folder passes, treat the home as
 unclear (step 4).
 
-| Brain | Department word | Folder |
-| --- | --- | --- |
-| AG, EP | Marketing | Marketing |
-| AG, EP | Sales | Sales |
-| AG | Listings | Listings |
-| AG, EP | Client | Client Experience |
-| AG, EP | Operations | Ops |
-| EP | Product | Product Discovery |
-| AG, EP | Private | Private |
-| HQ | Finance | Finance |
-| HQ | People | People and HR |
-| HQ | Employees | AI Employees |
-| HQ | Skills | Skills Vault |
-| HQ | Reporting | Analytics and Reporting |
-| HQ | Audits | Routine Audits, read-only audit reports only |
-| HQ | Operations | Operations |
+Research goes only to a folder the routing canon names as a department folder
+or a subfolder for that kind of material, never to a folder this skill
+invents. HQ owns folder structure, so if the right folder does not exist yet,
+treat the home as unclear (step 4) instead of creating one.
 
-Research never goes to Company Core, the Archives, Claude Outputs, or a folder
-this skill invents. HQ owns folder structure, so if the right department
-folder does not exist yet, treat the home as unclear (step 4) instead of
-creating one.
-
-The target folder is the department folder found here. For PartnerSync build
-and shared operations material, it is the `PartnerSync Source Material [HQ-BB]`
-folder inside `Operations [HQ-BB]`, checked the same way.
+The target folder is the department folder found here, or the subfolder the
+routing canon names for that kind of material, checked the same way.
 
 ## 4. When the home is unclear, ask one question
 
 When the report fits more than one brain or department, or no department
 clearly, ask Allison one question that names the two likeliest homes, for
-example, "Should this go to EP Marketing or AG Marketing?" Save nothing until
-she answers. Then file it where she says.
+example, "Should this go to EP Marketing or AG Marketing?" Save and move
+nothing for this report until she answers. Then file it where she says.
+
+Where the question goes depends on where this skill is running.
+
+- **Claude chat or Cowork**: ask in chat and wait for her answer.
+- **Factory, Codex or Claude Code**: never wait inside the app. Follow the
+  HQ Rulebook question path: post the question as a comment starting
+  `Question for Allison` on the GitHub issue for the work, or mark the
+  existing Chat to Code job needs-allison with one line starting
+  `Recommend:` through the job tool's nonterminal path, never job_finish.
+  Keep working on everything that does not depend on this report, and file
+  it where she says once she answers.
 
 ## 5. Give the report its one home
 
