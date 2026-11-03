@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "37a73842e8e14b7954cc54fb1a6f9c724b931504"
+    "eps": "c92b4ede84ebc5e7e1bad7154319308e5b3c5b4b"
   },
   "zones": [
     "surfaces",
@@ -221,7 +221,7 @@
       "renderNote": null,
       "layout": {
         "x": 902,
-        "y": 6335.2,
+        "y": 5569.2,
         "width": 163,
         "height": 63,
         "rectHeight": 48,
@@ -251,7 +251,7 @@
       "renderNote": null,
       "layout": {
         "x": 1144,
-        "y": 6693.3,
+        "y": 5930.5,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -480,7 +480,7 @@
       "renderNote": null,
       "layout": {
         "x": 877.5,
-        "y": 6234.2,
+        "y": 6220.2,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -722,8 +722,8 @@
       "subtitle": "paste block routing and the job list",
       "renderNote": null,
       "layout": {
-        "x": 1420,
-        "y": 6490.2,
+        "x": 1430,
+        "y": 5735.2,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -858,7 +858,7 @@
       "renderNote": null,
       "layout": {
         "x": 1165,
-        "y": 6071.8,
+        "y": 5832.5,
         "width": 215,
         "height": 77,
         "rectHeight": 62,
@@ -912,7 +912,7 @@
       "renderNote": null,
       "layout": {
         "x": 1144,
-        "y": 5931.2,
+        "y": 6422.2,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -969,7 +969,7 @@
       "renderNote": null,
       "layout": {
         "x": 872,
-        "y": 5931.2,
+        "y": 6422.2,
         "width": 252,
         "height": 77,
         "rectHeight": 62,
@@ -1026,7 +1026,7 @@
       "renderNote": null,
       "layout": {
         "x": 843,
-        "y": 6812.2,
+        "y": 6032.2,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -1111,7 +1111,7 @@
       "renderNote": null,
       "layout": {
         "x": 877.5,
-        "y": 6032.2,
+        "y": 7014.2,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1641,7 +1641,7 @@
       "renderNote": null,
       "layout": {
         "x": 877.5,
-        "y": 7000.2,
+        "y": 6725.2,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1649,6 +1649,34 @@
         "subtitleLines": [
           "file content into the owning",
           "brain in Drive"
+        ]
+      }
+    },
+    {
+      "id": "job-list-heartbeat",
+      "source": "eps:plugins/operating-doctrine/skills/job-list-heartbeat/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "check the job list every 15 minutes",
+      "renderNote": null,
+      "layout": {
+        "x": 880.5,
+        "y": 6523.2,
+        "width": 206,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "check the job list every 15",
+          "minutes"
         ]
       }
     },
@@ -1669,7 +1697,7 @@
       "renderNote": null,
       "layout": {
         "x": 880.5,
-        "y": 5555.2,
+        "y": 6133.2,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -1699,7 +1727,7 @@
       "renderNote": null,
       "layout": {
         "x": 894,
-        "y": 6133.2,
+        "y": 5757.2,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -2015,8 +2043,8 @@
       "subtitle": "run the repo-standards gate, then bootstrap a justified project",
       "renderNote": null,
       "layout": {
-        "x": 1438,
-        "y": 6591.2,
+        "x": 1448,
+        "y": 5620.2,
         "width": 212,
         "height": 91,
         "rectHeight": 76,
@@ -2199,7 +2227,7 @@
       "renderNote": null,
       "layout": {
         "x": 1171,
-        "y": 6497.5,
+        "y": 5731.5,
         "width": 182,
         "height": 77,
         "rectHeight": 62,
@@ -2336,7 +2364,7 @@
       "renderNote": null,
       "layout": {
         "x": 910.5,
-        "y": 6913.2,
+        "y": 5858.2,
         "width": 146,
         "height": 63,
         "rectHeight": 48,
@@ -2496,7 +2524,7 @@
       "renderNote": null,
       "layout": {
         "x": 872.5,
-        "y": 5844.2,
+        "y": 6927.2,
         "width": 222,
         "height": 63,
         "rectHeight": 48,
@@ -2608,7 +2636,7 @@
       "renderNote": null,
       "layout": {
         "x": 868.5,
-        "y": 5743.2,
+        "y": 6321.2,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -2635,8 +2663,8 @@
       "subtitle": "model and effort fit-check at conversation start",
       "renderNote": null,
       "layout": {
-        "x": 1420,
-        "y": 6706.2,
+        "x": 1430,
+        "y": 5943.3,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -2667,7 +2695,7 @@
       "renderNote": null,
       "layout": {
         "x": 888,
-        "y": 6523.2,
+        "y": 5656.2,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -2695,7 +2723,7 @@
       "renderNote": null,
       "layout": {
         "x": 886.5,
-        "y": 6422.2,
+        "y": 6826.2,
         "width": 194,
         "height": 77,
         "rectHeight": 62,
@@ -3089,7 +3117,7 @@
       "renderNote": null,
       "layout": {
         "x": 871.5,
-        "y": 6725.2,
+        "y": 5945.2,
         "width": 224,
         "height": 63,
         "rectHeight": 48,
@@ -3228,7 +3256,7 @@
       "renderNote": null,
       "layout": {
         "x": 843,
-        "y": 5642.2,
+        "y": 5468.2,
         "width": 281,
         "height": 77,
         "rectHeight": 62,
@@ -3380,19 +3408,19 @@
       "points": [
         {
           "x": 1380,
-          "y": 6719
-        },
-        {
-          "x": 1410,
-          "y": 6719
-        },
-        {
-          "x": 1410,
-          "y": 6556.2
+          "y": 5956.2
         },
         {
           "x": 1420,
-          "y": 6556.2
+          "y": 5956.2
+        },
+        {
+          "x": 1420,
+          "y": 5801.2
+        },
+        {
+          "x": 1430,
+          "y": 5801.2
         }
       ]
     },
@@ -3403,11 +3431,11 @@
       "points": [
         {
           "x": 1380,
-          "y": 6744.7
+          "y": 5981.8
         },
         {
-          "x": 1420,
-          "y": 6744.7
+          "x": 1430,
+          "y": 5981.8
         }
       ]
     },
@@ -3595,11 +3623,11 @@
         },
         {
           "x": 780,
-          "y": 6850.7
+          "y": 6070.7
         },
         {
           "x": 843,
-          "y": 6850.7
+          "y": 6070.7
         }
       ]
     },
@@ -3660,12 +3688,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 1420,
-          "y": 6523.2
+          "x": 1430,
+          "y": 5757.2
         },
         {
           "x": 1353,
-          "y": 6523.2
+          "y": 5757.2
         }
       ]
     },
@@ -3694,19 +3722,19 @@
       "points": [
         {
           "x": 1380,
-          "y": 6110.3
+          "y": 5871
         },
         {
           "x": 1400,
-          "y": 6110.3
+          "y": 5871
         },
         {
           "x": 1400,
-          "y": 6501.2
+          "y": 5779.2
         },
         {
-          "x": 1420,
-          "y": 6501.2
+          "x": 1430,
+          "y": 5779.2
         }
       ]
     },
@@ -3735,11 +3763,11 @@
       "points": [
         {
           "x": 1124,
-          "y": 5969.7
+          "y": 6460.7
         },
         {
           "x": 1144,
-          "y": 5969.7
+          "y": 6460.7
         }
       ]
     },
@@ -3986,6 +4014,12 @@
       "points": null
     },
     {
+      "from": "job-list-heartbeat",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
       "from": "kindergartner-mode",
       "to": "operating-doctrine",
       "type": "inherits",
@@ -3998,19 +4032,27 @@
       "points": [
         {
           "x": 1124,
-          "y": 6158.8
+          "y": 5808.5
         },
         {
-          "x": 1390,
-          "y": 6158.8
+          "x": 1134,
+          "y": 5808.5
         },
         {
-          "x": 1390,
-          "y": 6512.2
+          "x": 1134,
+          "y": 5919.5
         },
         {
-          "x": 1420,
-          "y": 6512.2
+          "x": 1410,
+          "y": 5919.5
+        },
+        {
+          "x": 1410,
+          "y": 5790.2
+        },
+        {
+          "x": 1430,
+          "y": 5790.2
         }
       ]
     },
@@ -4021,19 +4063,11 @@
       "points": [
         {
           "x": 1124,
-          "y": 6184.5
-        },
-        {
-          "x": 1134,
-          "y": 6184.5
-        },
-        {
-          "x": 1134,
-          "y": 6523.2
+          "y": 5782.8
         },
         {
           "x": 1171,
-          "y": 6523.2
+          "y": 5782.8
         }
       ]
     },
@@ -4122,15 +4156,15 @@
       "type": "calls",
       "points": [
         {
-          "x": 1650,
-          "y": 6636.7
+          "x": 1660,
+          "y": 5665.7
         },
         {
-          "x": 1687,
-          "y": 6636.7
+          "x": 1697,
+          "y": 5665.7
         },
         {
-          "x": 1687,
+          "x": 1697,
           "y": 7930
         },
         {
@@ -4160,19 +4194,19 @@
       "points": [
         {
           "x": 1353,
-          "y": 6548.8
+          "y": 5782.8
         },
         {
           "x": 1390,
-          "y": 6548.8
+          "y": 5782.8
         },
         {
           "x": 1390,
-          "y": 6534.2
+          "y": 5768.2
         },
         {
-          "x": 1420,
-          "y": 6534.2
+          "x": 1430,
+          "y": 5768.2
         }
       ]
     },
@@ -4307,27 +4341,19 @@
       "points": [
         {
           "x": 1124,
-          "y": 6574.5
+          "y": 5681.8
         },
         {
-          "x": 1134,
-          "y": 6574.5
+          "x": 1390,
+          "y": 5681.8
         },
         {
-          "x": 1134,
-          "y": 6584.5
+          "x": 1390,
+          "y": 5746.2
         },
         {
-          "x": 1400,
-          "y": 6584.5
-        },
-        {
-          "x": 1400,
-          "y": 6545.2
-        },
-        {
-          "x": 1420,
-          "y": 6545.2
+          "x": 1430,
+          "y": 5746.2
         }
       ]
     },
@@ -4338,11 +4364,19 @@
       "points": [
         {
           "x": 1124,
-          "y": 6548.8
+          "y": 5707.5
+        },
+        {
+          "x": 1134,
+          "y": 5707.5
+        },
+        {
+          "x": 1134,
+          "y": 5757.2
         },
         {
           "x": 1171,
-          "y": 6548.8
+          "y": 5757.2
         }
       ]
     },
@@ -4560,7 +4594,7 @@
   "excluded": [],
   "layout": {
     "engine": "elkjs layered, single INCLUDE_CHILDREN hierarchy over zones and brand rooms, build-time only",
-    "width": 1695,
+    "width": 1705,
     "height": 7938,
     "zones": [
       {
@@ -4682,9 +4716,9 @@
         "label": "Session machinery",
         "caption": "routing, ledgers, session lifecycle",
         "x": 821,
-        "y": 5507.2,
-        "width": 851,
-        "height": 1592,
+        "y": 5420.2,
+        "width": 861,
+        "height": 1693,
         "rooms": []
       },
       {
