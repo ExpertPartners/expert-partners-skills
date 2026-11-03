@@ -1,3 +1,6 @@
+## 2.82.6 - 2026-11-03
+
+Use descriptive work names in every message to Allison and keep tracking numbers inside AI coordination. Quick Update follows the same rule while preserving exact meaningful quantities and dates.
 ## 2.82.5 - 2026-11-03
 
 Code Block Routing no longer restates how often job checks run. It now says every chat that takes jobs checks the job list on the schedule the HQ Rulebook section Handoffs between AIs sets (Decision Log 2026-11-02), so the Rulebook is the only home for the timing.
