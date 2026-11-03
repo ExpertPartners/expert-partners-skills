@@ -139,6 +139,12 @@ jobs:
               source_text, source_url, unclear = comment.get("body") or "", comment["html_url"], ""
               where = f"a {BOT} comment on pull request #{pr['number']}"
 
+          # The issue_comment event carries no head repository, so check it on the fetched
+          # pull request; head.repo is null when a fork was deleted.
+          if ((pr.get("head") or {}).get("repo") or {}).get("full_name") != REPO:
+              print(f"{where} does not come from a branch of {REPO}; nothing copied.")
+              sys.exit(0)
+
           asks = ask_lines(source_text)
           if unclear:
               asks = [a for a in asks if a not in unclear]
@@ -169,7 +175,9 @@ jobs:
           content = "\n".join(parts)
           if len(content) > 60000:
               content = content[:60000] + "\n\n(cut short, read the rest at the link)"
-          digest = hashlib.sha256(f"{pr['number']}\n{content}".encode()).hexdigest()[:16]
+          # The title is left out of the key, so editing it never posts the same question twice.
+          key = "\n".join([str(pr["number"]), *asks, "", unclear])
+          digest = hashlib.sha256(key.encode()).hexdigest()[:16]
           body = f"{content}\n\nSource: {source_url}\n\n<!-- {MARK}{digest} -->"
 
           if any(f"{MARK}{digest}" in (c.get("body") or "")
