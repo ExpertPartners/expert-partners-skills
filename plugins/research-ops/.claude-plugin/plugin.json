@@ -1,6 +1,6 @@
 {
   "name": "research-ops",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Research and cataloging skills for capability currency, capability refresh, research intake, bounded public video discovery, and the Notion libraries (skill-cataloger, gpt-cataloger, sop-notion-logger). The three imported TUB analyst prompts are retired and disabled.",
   "author": {
     "name": "Allison Gaddy"
