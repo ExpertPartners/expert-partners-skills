@@ -59,6 +59,7 @@ Before building, write the test plan from the spec and show it with the spec lin
 2. List each test case the spec names. Add one for each of these when the spec lacks it, then send the added cases back to Allison to approve as part of the spec, real Expert Partners cases, missing information, conflicting information, a revised file.
 3. For each test give a number, its spec line, the real task it runs on, the input, the expected result and where the before and after evidence will be saved.
 4. Plan the chain tests. Name every upstream tool that feeds this one and every downstream tool this one feeds, from the chain map.
+5. When the build is an AI employee, name the proving runs that would let it run unattended, or say it stays human-checked (Decision Log 2026-11-02, AI employees beyond Ember may run unattended once proven).
 
 ## Chain check
 
@@ -87,6 +88,7 @@ Failures weighed. For each failed test, what broke, how bad it is, what it affec
 Chain results. The upstream check, the downstream reruns with their before and after results, and the supervised run on real work.
 Surface checks. Each surface, how it was reached and what was seen.
 Chain map update. The drafted record update for HQ, with feeds, fed by, last test date, result and evidence links.
+Runs unattended. Yes or no, and if yes, the proving runs that earned it with their evidence links, and the charter that records it (Decision Log 2026-11-02, AI employees beyond Ember may run unattended once proven).
 Unresolved. Anything open, with its owner. Say none when there is nothing.
 Waiting on. Certification by Claude in HQ and Allison.
 
