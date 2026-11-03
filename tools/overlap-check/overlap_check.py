@@ -17,9 +17,9 @@ Three subcommands, run by .github/workflows/factory-builder-reusable.yml:
   release  After a build the gate started, when no open builder pull request closes
            OVERLAP_ISSUE, drop its in-progress label so it holds nothing. A build that did not
            succeed (BUILD_RESULT) goes back to waiting, so it starts again on its own.
-  next     After a pull request or issue closes, in-progress is removed, or an issue is
-           marked parked or done, dispatch the builder for every waiting Job issue that would
-           start now, oldest first. Each one is claimed by removing its waiting label first,
+  next     After a pull request or issue closes, in-progress is removed, or an issue gains
+           or loses parked or done, dispatch the builder for every waiting Job issue that
+           would start now, oldest first. Each one is claimed by removing its waiting label first,
            so two runs never dispatch the same job. Writes dispatched=<n,n,...>.
 
 OVERLAP_TOKEN (the workflow's own token) does every read and write. Standard library only.

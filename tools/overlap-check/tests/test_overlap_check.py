@@ -514,6 +514,15 @@ class StoppedJobs(unittest.TestCase):
             self.assertEqual(gh.writes(), [], label)
             self.assertIn("waiting", gh.labels(201))
 
+    def test_a_waiting_job_is_sent_once_parked_or_done_is_removed(self):
+        for label in ("parked", "done"):
+            gh = FakeGitHub([issue(201, "tools/a.py", labels=("job", "waiting", label))])
+            self.assertEqual(oc.run_next(gh, CFG, [].append), [], label)
+            gh.issues[201]["labels"] = [{"name": "job"}, {"name": "waiting"}]
+            sent = []
+            self.assertEqual(oc.run_next(gh, CFG, sent.append), [201], label)
+            self.assertEqual(sent, [201], label)
+
     def test_a_closed_parked_or_done_job_never_builds(self):
         # Building a stopped job would let a colliding job build beside it unseen, since a
         # stopped job holds no files.
@@ -651,13 +660,15 @@ class Workflows(unittest.TestCase):
         for kind in ("labeled", "opened", "closed", "unlabeled"):
             self.assertIn(f"      - {kind}\n", caller)
 
-    def test_restarts_when_a_job_is_marked_parked_or_done(self):
+    def test_restarts_when_parked_or_done_is_added_or_removed(self):
         # A blocker that gets parked or done while a stale in-progress stays on it holds
-        # nothing, so its waiting jobs must be reconsidered right then.
+        # nothing, so its waiting jobs must be reconsidered right then. A waiting job that
+        # loses parked or done is back in line and must be reconsidered too.
         text = self.read("factory-builder-reusable.yml")
         redispatch = text.split("  redispatch:", 1)[1].split("runs-on:", 1)[0]
         self.assertIn(
-            "(github.event_name == 'issues' && github.event.action == 'labeled' &&\n"
+            "(github.event_name == 'issues' &&\n"
+            "        (github.event.action == 'labeled' || github.event.action == 'unlabeled') &&\n"
             "        (github.event.label.name == 'parked' || github.event.label.name == 'done'))",
             redispatch)
         gate = text.split("  gate:", 1)[1].split("runs-on:", 1)[0]
