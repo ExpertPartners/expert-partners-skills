@@ -449,6 +449,83 @@ class RunNext(unittest.TestCase):
             "factory-chat-to-code-loop-builder-skills.yml")
 
 
+class StoppedJobs(unittest.TestCase):
+    """Only a job that is truly building holds files. Closed, parked and done jobs hold
+    nothing, whatever other labels they carry (Nov 3: #179 sat behind parked #201, and
+    merged jobs kept in-progress beside done)."""
+
+    OTHER_LABELS = (("job", "in-progress"), ("job", "in-progress", "waiting"), ("in-progress", "needs-allison"))
+
+    def test_a_closed_issue_never_holds_files(self):
+        for labels in self.OTHER_LABELS:
+            closed = dict(issue(130, "tools/overlap-check/", labels=labels), state="closed")
+            self.assertFalse(oc.holds_files(dict(closed, labels=[{"name": n} for n in labels])), labels)
+            gh = FakeGitHub([closed, issue(179, "tools/overlap-check/overlap_check.py")])
+            self.assertEqual(oc.in_progress_issues(gh, CFG), [], labels)
+            self.assertTrue(oc.run_check(gh, CFG, 179, sleep=lambda s: None), labels)
+            self.assertEqual(gh.labels(179), {"job", "in-progress"})
+
+    def test_a_parked_issue_never_holds_files(self):
+        for labels in self.OTHER_LABELS:
+            parked = issue(201, "tools/overlap-check/", labels=labels + ("parked",))
+            self.assertFalse(oc.holds_files(dict(parked, labels=[{"name": n} for n in parked["labels"]])), labels)
+            gh = FakeGitHub([parked, issue(179, "tools/overlap-check/overlap_check.py")])
+            self.assertEqual(oc.in_progress_issues(gh, CFG), [], labels)
+            self.assertTrue(oc.run_check(gh, CFG, 179, sleep=lambda s: None), labels)
+
+    def test_a_done_issue_never_holds_files(self):
+        for labels in self.OTHER_LABELS:
+            done = issue(206, "tools/overlap-check/", labels=labels + ("done",))
+            self.assertFalse(oc.holds_files(dict(done, labels=[{"name": n} for n in done["labels"]])), labels)
+            gh = FakeGitHub([done, issue(179, "tools/overlap-check/overlap_check.py")])
+            self.assertEqual(oc.in_progress_issues(gh, CFG), [], labels)
+            self.assertTrue(oc.run_check(gh, CFG, 179, sleep=lambda s: None), labels)
+
+    def test_an_open_in_progress_job_still_holds_files(self):
+        building = issue(205, "tools/overlap-check/", labels=("job", "in-progress"))
+        self.assertTrue(oc.holds_files(dict(building, labels=[{"name": n} for n in building["labels"]])))
+        gh = FakeGitHub([building, issue(179, "tools/overlap-check/overlap_check.py")])
+        self.assertFalse(oc.run_check(gh, CFG, 179, sleep=lambda s: None))
+        self.assertIn("Waiting on #205, same file", gh.comment_bodies(179)[0])
+
+    def test_179_waiting_on_parked_201_is_sent_by_the_restart(self):
+        scope = "tools/overlap-check/overlap_check.py"
+        gh = FakeGitHub([
+            dict(issue(130, scope, labels=("job", "in-progress", "done")), state="closed"),
+            issue(164, scope, labels=("job", "in-progress", "done")),
+            issue(179, scope, labels=("job", "waiting")),
+            issue(201, scope, labels=("job", "in-progress", "parked")),
+        ])
+        sent = []
+        self.assertEqual(oc.run_next(gh, CFG, sent.append), [179])
+        self.assertEqual(sent, [179], "its only blockers are closed, parked or done")
+        self.assertEqual(gh.writes(), [("DELETE", f"/repos/{REPO}/issues/179/labels/waiting", None)])
+
+        # The same board with #201 really building still holds #179.
+        gh = FakeGitHub([issue(179, scope, labels=("job", "waiting")),
+                         issue(201, scope, labels=("job", "in-progress"))])
+        self.assertEqual(oc.run_next(gh, CFG, [].append), [])
+
+    def test_a_parked_or_done_waiting_job_is_not_sent(self):
+        for label in ("parked", "done"):
+            gh = FakeGitHub([issue(201, "tools/a.py", labels=("job", "waiting", label))])
+            sent = []
+            self.assertEqual(oc.run_next(gh, CFG, sent.append), [], label)
+            self.assertEqual(gh.writes(), [], label)
+            self.assertIn("waiting", gh.labels(201))
+
+    def test_an_open_builder_pull_request_still_holds_its_files(self):
+        # The pull request is the real collision guard, even when its job issue is parked or done.
+        _, blocker = pr(211, ["tools/overlap-check/overlap_check.py"], closes=201)
+        gh = FakeGitHub([
+            issue(179, "tools/overlap-check/overlap_check.py", labels=("job", "waiting")),
+            issue(201, "tools/overlap-check/", labels=("job", "in-progress", "parked")),
+        ], [blocker])
+        self.assertEqual(oc.run_next(gh, CFG, [].append), [])
+        self.assertFalse(oc.run_check(gh, CFG, 179, sleep=lambda s: None))
+        self.assertEqual(gh.comment_bodies(179)[0].splitlines()[1], "Waiting on #211, same file")
+
+
 class RunRelease(unittest.TestCase):
     def test_failed_build_without_a_pull_request_goes_back_to_waiting(self):
         gh = FakeGitHub([issue(159, "tools/a.py", labels=("job", "in-progress"))])

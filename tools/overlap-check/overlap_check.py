@@ -3,8 +3,8 @@
 once, and No caps stop work).
 
 A build starts right away unless a file in the issue's Files in scope is also in an open
-builder pull request (its changed files) or in the Files in scope of another in-progress Job
-issue. Shared files (plugin.json, marketplace.json, CHANGELOG.md, AGENTS.md, lockfiles) count
+builder pull request (its changed files) or in the Files in scope of another Job issue that is
+truly building: open, labeled in-progress, and neither parked nor done. Shared files (plugin.json, marketplace.json, CHANGELOG.md, AGENTS.md, lockfiles) count
 the same way and are named as shared in the comment. A held issue gets "Waiting on #N, same
 file". There is no cap on how many builds or open pull requests a repo may have.
 
@@ -43,6 +43,11 @@ COMMENT_AUTHOR = "github-actions[bot]"
 JOB_LABEL = "job"
 IN_PROGRESS_LABEL = "in-progress"
 WAITING_LABEL = "waiting"
+PARKED_LABEL = "parked"
+DONE_LABEL = "done"
+# A parked job is off Factory by Allison's logged decision, and a done job has merged, so
+# neither is building even when a stale in-progress label is still on it.
+NOT_BUILDING_LABELS = {PARKED_LABEL, DONE_LABEL}
 
 SHARED_BASENAMES = {
     "plugin.json",
@@ -369,16 +374,26 @@ def open_builder_prs(gh, cfg: Config) -> list[Holder]:
     return holders
 
 
+def is_stopped(issue: dict) -> bool:
+    """Closed, parked or done: the job is not building, whatever other labels it has."""
+    return issue.get("state") == "closed" or bool(labels_of(issue) & NOT_BUILDING_LABELS)
+
+
+def holds_files(issue: dict) -> bool:
+    """Only a job that is truly building holds its Files in scope."""
+    return (
+        "pull_request" not in issue
+        and IN_PROGRESS_LABEL in labels_of(issue)
+        and not is_stopped(issue)
+    )
+
+
 def in_progress_issues(gh, cfg: Config) -> list[Holder]:
     found = gh.paginate(
         f"/repos/{cfg.repo}/issues",
         {"state": "open", "labels": f"{JOB_LABEL},{IN_PROGRESS_LABEL}"},
     )
-    return [
-        Holder(int(i["number"]), "issue", parse_scope(i.get("body")))
-        for i in found
-        if "pull_request" not in i
-    ]
+    return [Holder(int(i["number"]), "issue", parse_scope(i.get("body"))) for i in found if holds_files(i)]
 
 
 def judge(gh, cfg: Config, issue: dict, only_older_issues: bool = False) -> Verdict:
@@ -470,7 +485,8 @@ def claim(gh, cfg: Config, number: int) -> bool:
 
 
 def run_next(gh, cfg: Config, dispatch) -> list[int]:
-    """Dispatch every waiting Job issue that would start now, oldest first. A job dispatched
+    """Dispatch every waiting Job issue that would start now, oldest first. Only a job that is
+    truly building holds files, so a job held by a closed, parked or done one starts. A job dispatched
     in this pass holds its files for the later ones, so two colliding jobs are never sent
     together. Writes nothing but the claim, and puts the claim back if the dispatch fails."""
     waiting = gh.paginate(
@@ -482,6 +498,9 @@ def run_next(gh, cfg: Config, dispatch) -> list[int]:
     sent: list[int] = []
     for issue in sorted((i for i in waiting if "pull_request" not in i), key=lambda i: int(i["number"])):
         number = int(issue["number"])
+        if is_stopped(issue):
+            print(f"overlap-check: waiting job #{number} is closed, parked or done, so it is not sent.")
+            continue
         v = evaluate(number, parse_scope(issue.get("body")), prs, holders)
         if not v.start:
             print(f"overlap-check: waiting job #{number} still waits: {'; '.join(v.lines())}")
