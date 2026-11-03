@@ -1,0 +1,60 @@
+# Fails CI when a Chat to Code Loop builder workflow stops allowing one of
+# Allison's own accounts. A builder whose allowlist drops an account leaves that
+# account's Job: issues unbuilt with no error anywhere, which is how
+# expertpartners-aura fell off after PR 125.
+name: builder-allowlist
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: builder allowlist (required accounts)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Every builder allowlist names every required account
+        run: |
+          python3 - <<'PY'
+          import glob, json, re, sys
+
+          REQUIRED = ["AllisonGaddy", "expertpartners", "expertpartners-ember", "expertpartners-aura"]
+          ALLOWLIST = re.compile(r"""contains\(\s*fromJSON\(\s*'(\[[^']*\])'\s*\)\s*,\s*github\.event\.issue\.user\.login\s*\)""")
+
+          files = sorted(glob.glob(".github/workflows/factory-chat-to-code-loop-builder*.yml"))
+          if not files:
+              print("builder-allowlist: FAIL, no builder workflow found")
+              sys.exit(1)
+
+          failed = False
+          for path in files:
+              text = open(path, encoding="utf-8").read()
+              lists = ALLOWLIST.findall(text)
+              if not lists:
+                  print(f"builder-allowlist: FAIL, {path} has no allowlist")
+                  failed = True
+                  continue
+              for n, raw in enumerate(lists, 1):
+                  try:
+                      names = json.loads(raw)
+                  except ValueError as err:
+                      print(f"builder-allowlist: FAIL, {path} allowlist {n} is not valid JSON ({err})")
+                      failed = True
+                      continue
+                  missing = [name for name in REQUIRED if name not in names]
+                  if missing:
+                      print(f"builder-allowlist: FAIL, {path} allowlist {n} is missing {', '.join(missing)}")
+                      failed = True
+                  else:
+                      print(f"builder-allowlist: ok, {path} allowlist {n}: {', '.join(names)}")
+
+          if failed:
+              sys.exit(1)
+          print("builder-allowlist: PASS")
+          PY
