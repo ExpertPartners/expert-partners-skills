@@ -1,3 +1,6 @@
+## 2.82.2 - 2026-11-03
+
+Job List Heartbeat now has quiet checks, a CEO directive from Allison (Decision Log 2026-11-03). Sessions still check the job list every 15 minutes, but a check with nothing relevant for her sends her nothing. When something relevant changed, she gets one brief CEO update.
 ## 2.82.1 - 2026-11-03
 
 Build Standard lists AI employees beyond Ember may run unattended once proven among the rulings behind it, by title only, so a builder following Check first step 1 reads that Decision Log entry live before relying on it. The Test plan and the report already cite it.
