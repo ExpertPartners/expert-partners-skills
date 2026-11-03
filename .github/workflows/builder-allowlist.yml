@@ -1,0 +1,29 @@
+name: builder-allowlist
+
+# Fails when a Chat to Code builder workflow drops Allison or one of her own room accounts
+# from an author allowlist, so their Job: issues keep starting the builder on their own.
+# tools/builder-allowlist/check_allowlist.py holds the required accounts. Runs on every
+# push and pull request, not behind a paths filter, so a required check never waits.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: builder allowlist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Check builder allowlists
+        run: python3 tools/builder-allowlist/check_allowlist.py
+      - name: Check tests
+        run: python3 -m unittest discover -s tools/builder-allowlist/tests -p 'test_*.py' -v
