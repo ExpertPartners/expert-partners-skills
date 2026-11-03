@@ -9,7 +9,8 @@ with Job: and whose author is on the builder's allowlist, it applies the first r
   1. No job label and no parked label: add job, comment once why, dispatch the builder.
   2. done, and the pull request that closes it is merged: close it as completed and comment
      the merge commit.
-  3. waiting, and every job it waits on is closed, parked or done: dispatch the builder.
+  3. waiting, nothing it waits on still holds it, and no builder run in the last 30 minutes:
+     dispatch the builder.
   4. job with no in-progress, no waiting, no open pull request and no builder run in the
      last 30 minutes: dispatch the builder.
   5. in-progress with no builder run in progress and no open pull request for 45 minutes:
@@ -20,7 +21,8 @@ with Job: and whose author is on the builder's allowlist, it applies the first r
      failing check, and no builder run started in the last 30 minutes: comment what to fix and
      dispatch the builder. When a Codex finding comes back after it was fixed (Decision Log
      2026-11-02, No caps stop work), it marks the job needs-allison with a Recommend: line
-     instead and stops restarting it.
+     instead and stops restarting it. Rule 4 does the same when a rebuild after a build with
+     no pull request again ends with no pull request.
 
 A parked job is never touched, nor its pull request. A job marked needs-allison is not
 restarted. No issue is dispatched twice in one sweep, and none is dispatched while a builder
@@ -76,8 +78,13 @@ CLOSED_RE = re.compile(rf"<!-- {MARK} closed pr=(\d+) -->")
 CODEX_ASK_RE = re.compile(rf"<!-- {MARK} codex-review head=([0-9a-f]{{40}}) -->")
 FIX_RE = re.compile(rf"<!-- {MARK} fix head=([0-9a-f]{{40}}) digest=([0-9a-f]+) findings=(\S*) -->")
 RETURNED_RE = re.compile(rf"<!-- {MARK} returned head=([0-9a-f]{{40}}) -->")
+REBUILT_MARK = f"<!-- {MARK} rebuilt-no-pr -->"
+NO_PR_RETURNED_MARK = f"<!-- {MARK} no-pr-returned -->"
 
 OVERLAP_MARK = "<!-- factory-overlap-check:v1 -->"
+# The overlap check's release text after a build that succeeded without a pull request
+# (tools/overlap-check/overlap_check.py, release_body).
+NO_PR_RELEASE = "The build finished without opening a pull request"
 WAITING_ON_RE = re.compile(r"^Waiting on #(\d+)\b", re.MULTILINE)
 CLOSES_RE = re.compile(r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s*:?\s+#(\d+)\b", re.IGNORECASE)
 GATE_MARK_RE = re.compile(r"<!-- auto-merge-gate:v1 head=([0-9a-f]{40}) -->")
@@ -150,6 +157,8 @@ class GitHub:
                 link = resp.headers.get("Link", "") or ""
         except urllib.error.HTTPError as exc:
             raise self._error(exc) from None
+        except (urllib.error.URLError, OSError) as exc:
+            raise GitHubError(0, f"{method} {url} failed: {exc}") from None
         return (json.loads(raw) if raw else None), link
 
     def get(self, path: str, params: dict | None = None):
@@ -179,8 +188,15 @@ class GitHub:
             if exc.code not in (301, 302, 303, 307, 308):
                 raise self._error(exc) from None
             location = exc.headers.get("Location")
-        with urllib.request.urlopen(location, timeout=60) as resp:
-            return resp.read().decode("utf-8", "replace")
+        except (urllib.error.URLError, OSError) as exc:
+            raise GitHubError(0, f"GET {path} failed: {exc}") from None
+        try:
+            with urllib.request.urlopen(location, timeout=60) as resp:
+                return resp.read().decode("utf-8", "replace")
+        except urllib.error.HTTPError as exc:
+            raise GitHubError(exc.code, f"download of {path} failed") from None
+        except (urllib.error.URLError, OSError, ValueError) as exc:
+            raise GitHubError(0, f"download of {path} failed: {exc}") from None
 
     def graphql(self, query: str, variables: dict):
         data, _ = self._request("POST", self.api_url + "/graphql", {"query": query, "variables": variables})
@@ -241,8 +257,13 @@ def pr_issues(pr: dict) -> set[int]:
     return found
 
 
-def is_builder_pr(pr: dict) -> bool:
-    return login_of(pr) == FACTORY_LOGIN or ((pr.get("head") or {}).get("ref") or "").startswith(BUILDER_BRANCH_PREFIX)
+def is_builder_pr(pr: dict, repo: str) -> bool:
+    """A pull request the loop opened. Anyone can open a fork pull request on a job/ branch,
+    so only a branch in this repo counts, since pushing one takes write access."""
+    head = pr.get("head") or {}
+    if ((head.get("repo") or {}).get("full_name") or "").lower() != repo.lower():
+        return False
+    return login_of(pr) == FACTORY_LOGIN or (head.get("ref") or "").startswith(BUILDER_BRANCH_PREFIX)
 
 
 def codex_reviewed(comments: list, sha: str) -> bool:
@@ -287,13 +308,21 @@ def is_codex_reason(reason: str) -> bool:
     return any(p.search(reason) for p in CODEX_REASONS)
 
 
+def _plain(line: str) -> str:
+    line = re.sub(r"!\[[^\]]*\]\([^)]*\)", "", line)
+    line = re.sub(r"<[^>]+>", "", line)
+    line = line.replace("*", "").replace("`", "")
+    return re.sub(r"\s+", " ", line).strip().lower()
+
+
 def finding_title(body: str) -> str:
-    """The first line of a Codex finding, without badges, markup or case."""
-    first = next((line for line in (body or "").splitlines() if line.strip()), "")
-    first = re.sub(r"!\[[^\]]*\]\([^)]*\)", "", first)
-    first = re.sub(r"<[^>]+>", "", first)
-    first = first.replace("*", "").replace("`", "")
-    return re.sub(r"\s+", " ", first).strip().lower()
+    """The title line of a Codex finding, without badges, markup or case. It is the line with
+    the severity badge; a security finding puts a marker and a heading above it."""
+    lines = (body or "").splitlines()
+    badge = next((line for line in lines if re.search(r"!\[P\d Badge\]", line)), None)
+    if badge is not None and _plain(badge):
+        return _plain(badge)
+    return next((_plain(line) for line in lines if _plain(line)), "")
 
 
 @dataclass
@@ -302,10 +331,20 @@ class Finding:
     path: str
     title: str
     url: str
+    resolved: bool = False
 
     @property
     def fingerprint(self) -> str:
         return hashlib.sha256(f"{self.path}\n{self.title}".encode()).hexdigest()[:12]
+
+
+def holder_finished(item: dict) -> bool:
+    """Whether a holder the overlap check named still holds the waiting job's files. A job
+    issue holds them only while it carries in-progress, the same test the overlap check
+    uses; an open pull request holds them until it closes."""
+    if item.get("state") == "closed" or labels_of(item) & {PARKED, DONE}:
+        return True
+    return "pull_request" not in item and IN_PROGRESS not in labels_of(item)
 
 
 def waited_on(comments: list) -> list[int]:
@@ -345,7 +384,7 @@ class BuilderRuns:
     has finished. Logs are read only when a rule needs them, and once per sweep."""
 
     def __init__(self, gh, repo: str, workflow: str, now: dt.datetime, titles: dict[str, set[int]]):
-        self.gh, self.repo, self.titles = gh, repo, titles
+        self.gh, self.repo, self.titles, self.now = gh, repo, titles, now
         found = gh.paginate(
             f"/repos/{repo}/actions/workflows/{urllib.parse.quote(workflow)}/runs",
             {"created": f">={iso(now - RUN_LOOKBACK)}"},
@@ -397,10 +436,19 @@ class BuilderRuns:
     def unknown_active(self) -> bool:
         return any(r.active and UNKNOWN in self.issues_of(r) for r in self.runs if r.event == "workflow_dispatch")
 
+    def relevant(self, run: Run) -> bool:
+        """Whether any rule can be decided by this run: it is active, started inside
+        RECENT_RUN, or ended inside IN_PROGRESS_QUIET. Older finished runs are never mapped,
+        which keeps log downloads, and the shared hourly API budget, small."""
+        return (run.active or run.started >= self.now - RECENT_RUN
+                or run.updated >= self.now - IN_PROGRESS_QUIET)
+
     def for_issue(self, number: int, title: str) -> list[Run]:
         out = []
         for r in self.runs:
             if r.event == "issues" and r.title != title:
+                continue
+            if not self.relevant(r):
                 continue
             if number in self.issues_of(r):
                 out.append(r)
@@ -469,7 +517,8 @@ class Sweeper:
 
     def comment(self, number: int, body: str) -> None:
         self.write(number, "POST", f"/repos/{self.cfg.repo}/issues/{number}/comments", {"body": body})
-        self._comments.setdefault(number, []).append({"user": {"login": ACTIONS_LOGIN}, "body": body})
+        self._comments.setdefault(number, []).append(
+            {"user": {"login": ACTIONS_LOGIN}, "body": body, "created_at": iso(self.now)})
 
     def add_labels(self, number: int, names: list[str]) -> None:
         self.write(number, "POST", f"/repos/{self.cfg.repo}/issues/{number}/labels", {"labels": names})
@@ -549,7 +598,8 @@ class Sweeper:
         self.parked = {int(i["number"]) for i in issues if PARKED in labels_of(i)}
         for i in issues:
             self.titles.setdefault(i.get("title") or "", set()).add(int(i["number"]))
-        self.prs = [p for p in self.gh.paginate(f"/repos/{self.cfg.repo}/pulls", {"state": "open"}) if is_builder_pr(p)]
+        self.prs = [p for p in self.gh.paginate(f"/repos/{self.cfg.repo}/pulls", {"state": "open"})
+                    if is_builder_pr(p, self.cfg.repo)]
         for p in self.prs:
             if pr_issues(p) & self.parked:
                 self.parked.add(int(p["number"]))
@@ -647,8 +697,12 @@ class Sweeper:
                 if exc.status in (404, 410):
                     continue
                 raise
-            if item.get("state") != "closed" and not (labels_of(item) & {PARKED, DONE}):
+            if not holder_finished(item):
                 return
+        # A build that failed goes back to waiting with no holder. Restarting it on every
+        # sweep would rebuild a failing job every 10 minutes, so it gets the same pause as rule 4.
+        if self.started_recently(issue, RECENT_RUN):
+            return
         if self.held(issue, "waits on nothing open"):
             return
         # The overlap check's restart claims a job the same way, so only one of them sends it.
@@ -664,14 +718,63 @@ class Sweeper:
         on = ", ".join(f"#{h}" for h in holders) or "nothing"
         self.act(f"#{number} dispatched: it was waiting on {on}, and nothing it waits on is still open.")
 
+    def no_pr_release_at(self, number: int) -> dt.datetime | None:
+        """When the overlap check last said a build finished without a pull request, or None
+        when its comment says something else now."""
+        for c in reversed(self.comments(number)):
+            body = c.get("body") or ""
+            if login_of(c) == ACTIONS_LOGIN and OVERLAP_MARK in body:
+                if NO_PR_RELEASE not in body:
+                    return None
+                return parse_time(c.get("updated_at") or c.get("created_at"))
+        return None
+
+    def last_no_pr_mark(self, number: int) -> tuple[str, dt.datetime] | None:
+        last = None
+        for c in self.comments(number):
+            body = c.get("body") or ""
+            if login_of(c) != ACTIONS_LOGIN:
+                continue
+            kind = REBUILT_MARK if REBUILT_MARK in body else NO_PR_RETURNED_MARK if NO_PR_RETURNED_MARK in body else None
+            at = parse_time(c.get("created_at"))
+            if kind and at and (last is None or at >= last[1]):
+                last = (kind, at)
+        return last
+
     def rule_idle(self, issue: dict) -> None:
         number = int(issue["number"])
         if self.started_recently(issue, RECENT_RUN):
             return
+        released = self.no_pr_release_at(number)
+        last = self.last_no_pr_mark(number) if released else None
+        if released and last and last[0] == REBUILT_MARK and released > last[1]:
+            # The sweeper already rebuilt this job once after a build with no pull request,
+            # and that rebuild ended the same way. Another rebuild would repeat it every 30
+            # minutes, so it goes to Allison (Decision Log 2026-11-02, No caps stop work).
+            self.add_labels(number, [NEEDS_ALLISON])
+            self.comment(number, "\n".join([
+                "Recommend: look at why the builder finishes this job without opening a pull "
+                "request. The stall sweeper rebuilt it after a build with no pull request, and "
+                "the rebuild ended the same way, so the sweeper stopped restarting it. Remove "
+                "needs-allison to let the sweeper build it again.",
+                "",
+                NO_PR_RETURNED_MARK,
+            ]))
+            self.act(f"#{number} marked needs-allison: its build ended without a pull request again after a rebuild.")
+            return
         if self.held(issue, "is idle"):
             return
+        if released:
+            self.comment(number, "\n".join([
+                "The stall sweeper restarted the builder, because the last build finished without "
+                "opening a pull request. If this build ends the same way, the sweeper marks the "
+                "job needs-allison instead of restarting it again.",
+                "",
+                REBUILT_MARK,
+            ]))
         self.dispatch(number)
-        self.act(f"#{number} dispatched: labeled job with no build, no pull request and no builder run in 30 minutes.")
+        why = "its last build finished without a pull request" if released else "labeled job with no build, no pull request"
+        self.act(f"#{number} dispatched: {why} and no builder run in 30 minutes.")
 
     def in_progress_since(self, number: int) -> dt.datetime | None:
         at = None
@@ -719,7 +822,8 @@ class Sweeper:
         waited = f"{minutes(self.now - since)} minutes" if since else "over 30 minutes"
         self.act(f"#{number} (job #{issue['number']}) asked Codex to review head {sha[:7]}, unreviewed for {waited}.")
 
-    def unresolved_findings(self, pr_number: int) -> list[Finding]:
+    def codex_threads(self, pr_number: int) -> list[Finding]:
+        """Every review thread Codex opened on the pull request, resolved or not."""
         owner, name = self.cfg.repo.split("/", 1)
         query = (
             "query($o:String!,$n:String!,$p:Int!,$a:String){repository(owner:$o,name:$n){"
@@ -733,9 +837,10 @@ class Sweeper:
             threads = data["repository"]["pullRequest"]["reviewThreads"]
             for t in threads["nodes"]:
                 first = ((t.get("comments") or {}).get("nodes") or [{}])[0]
-                if t.get("isResolved") or ((first.get("author") or {}).get("login") or "") not in (CODEX_LOGIN, "chatgpt-codex-connector"):
+                if ((first.get("author") or {}).get("login") or "") not in (CODEX_LOGIN, "chatgpt-codex-connector"):
                     continue
-                found.append(Finding(t["id"], t.get("path") or "", finding_title(first.get("body") or ""), first.get("url") or ""))
+                found.append(Finding(t["id"], t.get("path") or "", finding_title(first.get("body") or ""),
+                                     first.get("url") or "", bool(t.get("isResolved"))))
             if not threads["pageInfo"]["hasNextPage"]:
                 return found
             after = threads["pageInfo"]["endCursor"]
@@ -753,9 +858,18 @@ class Sweeper:
             return
         if self.started_recently(issue, RECENT_RUN):
             return
+        threads = self.codex_threads(pr_number) if any(is_codex_reason(r) for r in fix) else []
+        findings = [t for t in threads if not t.resolved]
+        if not findings and any(is_codex_reason(r) for r in fix):
+            # The gate counts every unresolved thread, but the builder can only answer Codex's.
+            # A thread a person or another reviewer opened waits for them, not for a rebuild.
+            fix = [r for r in fix if not is_codex_reason(r)]
+            if not fix:
+                self.note(f"#{number} has pull request #{pr_number} held by review threads with no open Codex "
+                          "finding, which the builder cannot resolve; not dispatched.")
+                return
         if self.held(issue, f"has pull request #{pr_number} refused by the auto-merge gate"):
             return
-        findings = self.unresolved_findings(pr_number) if any(is_codex_reason(r) for r in fix) else []
 
         asked: dict[str, set[str]] = {}
         for body in self.my_comments(number):
@@ -763,20 +877,30 @@ class Sweeper:
             for pair in (m.group(3).split(",") if m and m.group(3) else []):
                 fp, _, thread = pair.partition(":")
                 asked.setdefault(fp, set()).add(thread)
-        returned = [f for f in findings if f.fingerprint in asked and f.thread not in asked[f.fingerprint]]
-        if returned:
-            if not any((m := RETURNED_RE.search(b)) and m.group(1) == sha for b in self.my_comments(number)):
-                listed = "; ".join(f"`{f.path}`: {f.title}" for f in returned)
-                self.add_labels(number, [NEEDS_ALLISON])
-                self.comment(number, "\n".join([
-                    f"Recommend: decide how pull request #{pr_number} should fix {listed}. This Codex "
-                    "finding came back after the builder fixed it, so the stall sweeper stopped "
-                    "restarting the builder for it (Decision Log 2026-11-02, No caps stop work).",
-                    "",
-                    *[f"- {f.url}" for f in returned if f.url],
-                    "",
-                    f"<!-- {MARK} returned head={sha} -->",
-                ]))
+        resolved = {t.thread: t.resolved for t in threads}
+        # A finding came back only when every thread the builder was asked to fix for it is
+        # resolved and Codex opened a new one. A second thread beside a still-open first one
+        # is the same unfixed finding, so it is sent back again, not escalated.
+        returned = [
+            f for f in findings
+            if f.fingerprint in asked and f.thread not in asked[f.fingerprint]
+            and all(resolved.get(t) is True for t in asked[f.fingerprint])
+        ]
+        escalated = any((m := RETURNED_RE.search(b)) and m.group(1) == sha for b in self.my_comments(number))
+        # Once escalated at this head, reaching here means Allison removed needs-allison, which
+        # clears those findings for another round.
+        if returned and not escalated:
+            listed = "; ".join(f"`{f.path}`: {f.title}" for f in returned)
+            self.add_labels(number, [NEEDS_ALLISON])
+            self.comment(number, "\n".join([
+                f"Recommend: decide how pull request #{pr_number} should fix {listed}. This Codex "
+                "finding came back after the builder fixed it, so the stall sweeper stopped "
+                "restarting the builder for it (Decision Log 2026-11-02, No caps stop work).",
+                "",
+                *[f"- {f.url}" for f in returned if f.url],
+                "",
+                f"<!-- {MARK} returned head={sha} -->",
+            ]))
             self.act(f"#{number} marked needs-allison: a Codex finding on pull request #{pr_number} came back after it was fixed.")
             return
 

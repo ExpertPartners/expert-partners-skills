@@ -60,7 +60,7 @@ def pr(number, closes, head=HEAD, author="factory-droid[bot]", draft=False, crea
         "number": number,
         "user": {"login": author},
         "body": f"Closes #{closes}\n\nwork",
-        "head": {"ref": f"job/{closes}-work", "sha": head},
+        "head": {"ref": f"job/{closes}-work", "sha": head, "repo": {"full_name": REPO}},
         "draft": draft,
         "state": "open",
         "created_at": ago(created),
@@ -79,19 +79,23 @@ def run(run_id, *, event="workflow_dispatch", title="Chat to Code Loop Builder -
     }
 
 
-def comment(body, login="github-actions[bot]", cid=None):
-    return {"id": cid or abs(hash(body)) % 100000, "user": {"login": login}, "body": body}
+def comment(body, login="github-actions[bot]", cid=None, at=None, updated=None):
+    c = {"id": cid or abs(hash(body)) % 100000, "user": {"login": login}, "body": body}
+    if at is not None:
+        c["created_at"] = ago(at)
+        c["updated_at"] = ago(updated if updated is not None else at)
+    return c
 
 
 def refusal(sha, *reasons):
     return comment(gate.refusal_body(gate.Decision(1, "refuse", list(reasons), sha)))
 
 
-def thread(tid, path, title, resolved=False):
+def thread(tid, path, title, resolved=False, author="chatgpt-codex-connector"):
     return {
         "id": tid, "isResolved": resolved, "path": path,
         "comments": {"nodes": [{
-            "author": {"login": "chatgpt-codex-connector"},
+            "author": {"login": author},
             "body": f"**<sub><sub>![P1 Badge](https://img.shields.io/badge/P1-orange)</sub></sub>  {title}**\n\nDetails.",
             "url": f"https://github.com/{REPO}/pull/9#discussion_{tid}",
         }]},
@@ -246,7 +250,7 @@ class CleanBoard(unittest.TestCase):
                 20: [], 21: [comment("<!-- codex-review-state:v1 " + '{"code_review": {"commit_sha": "%s"}}' % HEAD + " -->",
                                      login="chatgpt-codex-connector[bot]")],
             },
-            extra=[{**pr(21, 1), "labels": []}],
+            extra=[{**pr(21, 1), "labels": [], "pull_request": {}}],
             events={4: [{"event": "labeled", "label": {"name": "in-progress"}, "created_at": ago(3)}]},
         )
         s = sweep(gh)
@@ -360,6 +364,38 @@ class Rule3Waiting(unittest.TestCase):
         sweep(gh)
         self.assertEqual(gh.writes(), [])
 
+    def test_an_open_pull_request_holder_keeps_it_waiting(self):
+        gh = self.board("open")
+        gh.extra[40]["pull_request"] = {}
+        sweep(gh)
+        self.assertEqual(gh.writes(), [])
+
+    def test_a_job_holder_that_lost_in_progress_holds_nothing(self):
+        gh = self.board("open", ("job", "needs-allison"))
+        sweep(gh)
+        self.assertEqual(gh.dispatches(), [9])
+
+    def test_a_failed_build_is_not_restarted_on_every_sweep(self):
+        # A failed build goes back to waiting with no holder named.
+        gh = FakeGitHub(
+            issues=[issue(9, "job", "waiting")],
+            comments={9: [comment("<!-- factory-overlap-check:v1 -->\nThe build did not finish (result: failure).")]},
+            runs=[run(5, started=20)],
+            jobs={5: [{"id": 50, "name": "builder / gate", "status": "completed", "conclusion": "success"}]},
+            logs={50: "OVERLAP_ISSUE: 9"},
+        )
+        sweep(gh)
+        self.assertEqual(gh.writes(), [])
+        gh = FakeGitHub(
+            issues=[issue(9, "job", "waiting")],
+            comments={9: [comment("<!-- factory-overlap-check:v1 -->\nThe build did not finish (result: failure).")]},
+            runs=[run(5, started=40, updated=35)],
+            jobs={5: [{"id": 50, "name": "builder / gate", "status": "completed", "conclusion": "success"}]},
+            logs={50: "OVERLAP_ISSUE: 9"},
+        )
+        sweep(gh)
+        self.assertEqual(gh.dispatches(), [9], "after 30 minutes it is tried again")
+
     def test_another_run_claimed_it_first(self):
         gh = self.board()
         real_delete = gh.delete
@@ -397,6 +433,48 @@ class Rule4Idle(unittest.TestCase):
         gh = FakeGitHub(issues=[issue(10, "job", "needs-allison")])
         sweep(gh)
         self.assertEqual(gh.writes(), [])
+
+    NO_PR = "<!-- factory-overlap-check:v1 -->\nThe build finished without opening a pull request for this job, so it no longer holds its files."
+
+    def test_a_build_with_no_pull_request_is_rebuilt_once_with_a_note(self):
+        gh = FakeGitHub(issues=[issue(10, "job")], comments={10: [comment(self.NO_PR, at=60)]})
+        s = sweep(gh)
+        self.assertEqual(gh.dispatches(), [10])
+        self.assertIn(sw.REBUILT_MARK, gh.comment_bodies(10)[-1])
+        self.assertIn("without a pull request", s.actions[0])
+
+    def test_a_rebuild_that_again_opens_no_pull_request_goes_to_allison(self):
+        gh = FakeGitHub(issues=[issue(10, "job")], comments={10: [
+            comment(self.NO_PR, at=180, updated=40),
+            comment(f"restarted\n\n{sw.REBUILT_MARK}", at=120),
+        ]})
+        s = sweep(gh)
+        self.assertEqual(gh.dispatches(), [])
+        self.assertIn("needs-allison", gh.labels(10))
+        self.assertTrue(gh.comment_bodies(10)[-1].startswith("Recommend: "))
+        self.assertIn("needs-allison", s.actions[0])
+        gh.calls.clear()
+        sweep(gh)
+        self.assertEqual(gh.writes(), [], "a needs-allison job is not restarted again")
+
+    def test_a_rebuild_still_on_its_way_is_not_escalated(self):
+        gh = FakeGitHub(issues=[issue(10, "job")], comments={10: [
+            comment(self.NO_PR, at=180),
+            comment(f"restarted\n\n{sw.REBUILT_MARK}", at=120),
+        ]})
+        sweep(gh)
+        self.assertEqual(gh.dispatches(), [10], "the rebuild never ran, so it is sent again")
+        self.assertNotIn("needs-allison", gh.labels(10))
+
+    def test_removing_needs_allison_allows_one_more_rebuild(self):
+        gh = FakeGitHub(issues=[issue(10, "job")], comments={10: [
+            comment(self.NO_PR, at=180, updated=90),
+            comment(f"restarted\n\n{sw.REBUILT_MARK}", at=120),
+            comment(f"Recommend: look\n\n{sw.NO_PR_RETURNED_MARK}", at=60),
+        ]})
+        sweep(gh)
+        self.assertEqual(gh.dispatches(), [10])
+        self.assertIn(sw.REBUILT_MARK, gh.comment_bodies(10)[-1])
 
 
 class Rule5StuckInProgress(unittest.TestCase):
@@ -572,6 +650,92 @@ class Rule7Refused(unittest.TestCase):
         self.assertEqual(gh.dispatches(), [13])
         self.assertNotIn("needs-allison", gh.labels(13))
 
+    def test_a_second_thread_beside_a_still_open_first_one_is_sent_back(self):
+        first = self.board(["Codex code review on aaaaaaa left unresolved findings."],
+                           threads=[thread("T1", "tools/x.py", "Guard the empty list")])
+        sweep(first)
+        gh = FakeGitHub(
+            issues=[issue(13, "job")],
+            prs=[pr(70, 13, head=NEW_HEAD)],
+            comments={70: [refusal(NEW_HEAD, "Codex code review on bbbbbbb left unresolved findings.")],
+                      13: [comment(first.comment_bodies(13)[0])]},
+            threads={70: [thread("T1", "tools/x.py", "Guard the empty list"),
+                          thread("T2", "tools/x.py", "Guard the empty list")]},
+            commits={NEW_HEAD: {"commit": {"committer": {"date": ago(5)}}}},
+        )
+        sweep(gh)
+        self.assertEqual(gh.dispatches(), [13], "nothing was fixed, so nothing came back")
+        self.assertNotIn("needs-allison", gh.labels(13))
+        self.assertFalse(any(b.startswith("Recommend: ") for b in gh.comment_bodies(13)))
+
+    def test_a_recorded_thread_that_is_gone_is_not_proof_of_a_fix(self):
+        first = self.board(["Codex code review on aaaaaaa left unresolved findings."],
+                           threads=[thread("T1", "tools/x.py", "Guard the empty list")])
+        sweep(first)
+        gh = FakeGitHub(
+            issues=[issue(13, "job")],
+            prs=[pr(70, 13, head=NEW_HEAD)],
+            comments={70: [refusal(NEW_HEAD, "Codex code review on bbbbbbb left unresolved findings.")],
+                      13: [comment(first.comment_bodies(13)[0])]},
+            threads={70: [thread("T2", "tools/x.py", "Guard the empty list")]},
+            commits={NEW_HEAD: {"commit": {"committer": {"date": ago(5)}}}},
+        )
+        sweep(gh)
+        self.assertEqual(gh.dispatches(), [13])
+        self.assertNotIn("needs-allison", gh.labels(13))
+
+    def test_removing_needs_allison_after_a_return_sends_it_back(self):
+        first = self.board(["Codex code review on aaaaaaa left unresolved findings."],
+                           threads=[thread("T1", "tools/x.py", "Guard the empty list")])
+        sweep(first)
+
+        def board():
+            return FakeGitHub(
+                issues=[issue(13, "job")],
+                prs=[pr(70, 13, head=NEW_HEAD)],
+                comments={70: [refusal(NEW_HEAD, "Codex code review on bbbbbbb left unresolved findings.")],
+                          13: [comment(first.comment_bodies(13)[0])]},
+                threads={70: [thread("T1", "tools/x.py", "Guard the empty list", resolved=True),
+                              thread("T2", "tools/x.py", "Guard the empty list")]},
+                commits={NEW_HEAD: {"commit": {"committer": {"date": ago(5)}}}},
+            )
+        gh = board()
+        sweep(gh)
+        self.assertIn("needs-allison", gh.labels(13))
+        escalated = gh.comments[13]
+        # Allison decides and removes needs-allison.
+        gh = board()
+        gh.comments[13] = list(escalated)
+        s = sweep(gh)
+        self.assertEqual(gh.dispatches(), [13])
+        self.assertNotIn("needs-allison", gh.labels(13))
+        self.assertFalse(any("needs-allison" in a for a in s.actions), "no action it did not take")
+
+    def test_threads_only_a_person_can_resolve_do_not_restart_the_builder(self):
+        for reason in ("Codex code review on aaaaaaa has 1 unresolved review thread(s).",
+                       "Codex code review on aaaaaaa left unresolved findings."):
+            gh = self.board([reason], threads=[thread("H1", "tools/x.py", "Why this?", author="AllisonGaddy"),
+                                               thread("T0", "tools/y.py", "Old one", resolved=True)])
+            s = sweep(gh)
+            self.assertEqual(gh.writes(), [], reason)
+            self.assertTrue(any("cannot resolve" in n for n in s.notes), reason)
+
+    def test_a_failing_check_beside_a_person_s_thread_is_still_sent_back(self):
+        gh = self.board(["Check `ci` finished as failure.",
+                         "Codex code review on aaaaaaa has 1 unresolved review thread(s)."],
+                        threads=[thread("H1", "tools/x.py", "Why this?", author="AllisonGaddy")])
+        sweep(gh)
+        self.assertEqual(gh.dispatches(), [13])
+        body = gh.comment_bodies(13)[0]
+        self.assertIn("finished as failure", body)
+        self.assertNotIn("review thread", body)
+
+    def test_security_findings_on_one_file_have_their_own_titles(self):
+        body = ("<!-- codex-security-review-finding:v1 -->\n\n### 🛡️ Codex Security Review · _Automatically triggered_\n\n"
+                "**<sub><sub>![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat)</sub></sub> "
+                "Security: Authenticate PRs before suppressing recovery**\n\nDetails.")
+        self.assertEqual(sw.finding_title(body), "security: authenticate prs before suppressing recovery")
+
     def test_refusal_for_an_older_head_is_ignored(self):
         gh = FakeGitHub(issues=[issue(13, "job")], prs=[pr(70, 13, head=NEW_HEAD)],
                         comments={70: [self.REVIEWED, refusal(HEAD, "Check `ci` finished as failure.")], 13: []},
@@ -606,6 +770,25 @@ class Safety(unittest.TestCase):
         sweep(gh)
         self.assertEqual(gh.writes(), [])
         self.assertFalse(any("/80/" in c[1] or "/14/" in c[1] for c in gh.calls), "not even read")
+
+    def test_a_pull_request_from_a_fork_or_a_stranger_never_holds_a_job(self):
+        fork = {**pr(81, 16, author="stranger"), "head": {"ref": "job/16-x", "sha": HEAD, "repo": {"full_name": "stranger/fork"}}}
+        gh = FakeGitHub(issues=[issue(16, "job")], prs=[fork])
+        sweep(gh)
+        self.assertEqual(gh.dispatches(), [16], "the idle job is still restarted")
+        self.assertFalse(sw.is_builder_pr(fork, REPO))
+        self.assertTrue(sw.is_builder_pr(pr(82, 16), REPO))
+        self.assertTrue(sw.is_builder_pr({**pr(83, 16, author=ALLISON)}, REPO), "a branch in this repo needs write access")
+
+    def test_a_network_error_becomes_a_github_error(self):
+        import urllib.error
+        client = sw.GitHub("t", "https://example.invalid")
+        with mock.patch.object(sw.urllib.request, "urlopen", side_effect=urllib.error.URLError("reset")):
+            with self.assertRaises(sw.GitHubError):
+                client.get("/x")
+        with mock.patch.object(sw.urllib.request, "urlopen", side_effect=TimeoutError("slow")):
+            with self.assertRaises(sw.GitHubError):
+                client.get("/x")
 
     def test_write_allowlist(self):
         s = sw.Sweeper(FakeGitHub(), sw.Config(repo=REPO, builder_workflow=WORKFLOW), NOW)
@@ -645,7 +828,7 @@ class OneDispatchPerIssue(unittest.TestCase):
     def test_two_refused_pull_requests_for_one_job_dispatch_it_once(self):
         gh = FakeGitHub(
             issues=[issue(15, "job")],
-            prs=[pr(90, 15), {**pr(91, 15), "head": {"ref": "job/15-again", "sha": HEAD}}],
+            prs=[pr(90, 15), {**pr(91, 15), "head": {"ref": "job/15-again", "sha": HEAD, "repo": {"full_name": REPO}}}],
             comments={90: [Rule7Refused.REVIEWED, refusal(HEAD, "Check `ci` finished as failure.")],
                       91: [Rule7Refused.REVIEWED, refusal(HEAD, "Check `ci` finished as failure.")], 15: []},
         )
@@ -671,6 +854,13 @@ class OneDispatchPerIssue(unittest.TestCase):
                         logs={90: "OVERLAP_ISSUE: 99"})
         sweep(gh)
         self.assertEqual(gh.dispatches(), [16])
+
+    def test_old_finished_runs_are_never_mapped(self):
+        gh = FakeGitHub(issues=[issue(16, "job")], runs=[run(9, started=150, updated=100)])
+        sweep(gh)
+        self.assertEqual(gh.dispatches(), [16])
+        self.assertFalse(any("/actions/runs/9/" in c[1] or "/logs" in c[1] for c in gh.calls),
+                         "a run no rule can use costs no API call")
 
     def test_many_stalled_jobs_each_go_once(self):
         gh = FakeGitHub(issues=[issue(n, "job") for n in (18, 19, 20)] + [issue(21)])
