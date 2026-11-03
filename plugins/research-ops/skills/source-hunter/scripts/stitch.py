@@ -353,6 +353,7 @@ def _noisy_title(na: str, nb: str) -> bool:
     # three letters or fewer, or a word the title already shows elsewhere. A
     # real word swapped in (viewers to listeners) is an edit and splits.
     wa, wb = la.split(), lb.split()
+    seen = set(wa) | set(wb)
     for tag, i1, i2, j1, j2 in SequenceMatcher(None, wa, wb, autojunk=False).get_opcodes():
         if tag == "equal":
             continue
