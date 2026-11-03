@@ -9,8 +9,9 @@ A pull request is eligible when either
     builders push as a person (Factory missions, Claude Code) mark finished work this way.
 Either way it merges only when every check on the head commit passed, the pull request
 leaves plugin versions and the top of every CHANGELOG.md to the release step
-(tools/release, fed by notes in .changeset/), Codex's code review covers that exact head
-with no unresolved findings, and GitHub says it can merge.
+(tools/release, fed by notes in .changeset/) and every note it adds is one that step can
+read, Codex's code review covers that exact head with no unresolved findings, and GitHub
+says it can merge.
 
 Two subcommands, run by .github/workflows/auto-merge-gate.yml:
 
@@ -60,6 +61,10 @@ MARKETPLACE_PATH = ".claude-plugin/marketplace.json"
 PLUGIN_MANIFEST_RE = re.compile(r"^plugins/([^/]+)/\.claude-plugin/plugin\.json$")
 CHANGELOG_RE = re.compile(r"(^|/)CHANGELOG\.md$")
 RELEASE_HINT = "The release step owns versions and CHANGELOG entries; add a note in `.changeset/` instead."
+CHANGESET_NOTE_RE = re.compile(r"^\.changeset/[^/]+\.md$")
+NOTE_BUMPS = ("patch", "minor", "major")
+NOTE_KEY_RE = re.compile(r"""^\s*(?:"([^"]+)"|'([^']+)'|([A-Za-z0-9._-]+))\s*:\s*(\S+?)\s*$""")
+NOTE_HINT = "The release step would refuse it and hold up every plugin's release; `.changeset/README.md` gives the format."
 
 
 class GitHubError(Exception):
@@ -317,19 +322,96 @@ def mergeable_problems(pr: dict) -> list[str]:
     return []
 
 
+class FileContentError(ValueError):
+    """A changed file whose content the gate cannot judge. It refuses that one pull
+    request instead of failing the run, so one odd file never holds up the others."""
+
+
 def file_text(gh, cfg: Config, path: str, ref: str) -> str:
     data = gh.get(f"/repos/{cfg.repo}/contents/{urllib.parse.quote(path)}?ref={ref}")
+    # Directories, symlinks, submodules and files over 1 MB come back without base64 content.
     if not isinstance(data, dict) or data.get("encoding") != "base64":
-        raise GitHubError(502, f"{path} at {ref[:7]} could not be read")
-    return base64.b64decode(data.get("content") or "").decode("utf-8")
+        raise FileContentError(f"`{path}` at {ref[:7]} is not a text file the gate can read, so it cannot be checked.")
+    try:
+        return base64.b64decode(data.get("content") or "").decode("utf-8")
+    except ValueError:
+        raise FileContentError(f"`{path}` at {ref[:7]} is not UTF-8 text, so it cannot be checked.") from None
 
 
 def listed_versions(path: str, text: str) -> dict:
     """Plugin name to version for a marketplace file or a plugin manifest."""
-    data = json.loads(text)
+    try:
+        data = json.loads(text)
+    except ValueError:
+        raise FileContentError(f"`{path}` is not valid JSON, so the gate cannot read the plugins in it.") from None
+    plugins = data.get("plugins", []) if isinstance(data, dict) else None
+    if not isinstance(data, dict) or (path == MARKETPLACE_PATH and not isinstance(plugins, list)):
+        raise FileContentError(f"`{path}` is not the JSON object it should be, so the gate cannot read the plugins in it.")
     if path == MARKETPLACE_PATH:
-        return {p.get("name"): p.get("version") for p in data.get("plugins", []) if isinstance(p, dict)}
+        return {p["name"]: p.get("version") for p in plugins if isinstance(p, dict) and isinstance(p.get("name"), str)}
     return {PLUGIN_MANIFEST_RE.match(path).group(1): data.get("version")}
+
+
+def note_problem(text: str) -> tuple[str | None, list[str]]:
+    """Why the release step would refuse this .changeset note (None when it reads it), and
+    the plugins it names. Mirrors parse_note_text in tools/release/release.py. The gate
+    cannot import it, because the workflow checks out only tools/auto-merge-gate, so
+    tests/test_gate.py runs both on the same notes to keep them in step."""
+    lines = text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
+    if lines[0].strip() != "---":
+        return "must start with a --- line, then one plugin: bump line per plugin, then ---", []
+    end = next((i for i in range(1, len(lines)) if lines[i].strip() == "---"), None)
+    if end is None:
+        return "has an opening --- with no closing ---", []
+    names: list[str] = []
+    for raw in lines[1:end]:
+        if not raw.strip() or raw.lstrip().startswith("#"):
+            continue
+        m = NOTE_KEY_RE.match(raw)
+        if not m:
+            return f"has a line it cannot read, {raw.strip()!r}; write it as <plugin>: patch|minor|major", []
+        name = m.group(1) or m.group(2) or m.group(3)
+        bump = m.group(4).strip("\"'").lower()
+        if bump not in NOTE_BUMPS:
+            return f"asks for {bump!r} for {name}; use patch, minor or major", []
+        if name in names:
+            return f"names {name} twice", []
+        names.append(name)
+    if not names:
+        return "names no plugin", []
+    body = "\n".join(lines[end + 1:]).strip()
+    if not body:
+        return "says nothing about the change; write it below the closing ---", []
+    if any(line.startswith("## ") for line in body.split("\n")):
+        return "has a `## ` heading in its text, which would start a second CHANGELOG entry; use `###` or lower", []
+    return None, names
+
+
+def note_problems(gh, cfg: Config, notes: list, head: str) -> list[str]:
+    """A note the release step cannot read would stop every plugin's release on main,
+    so the gate refuses it here, before it can merge."""
+    problems: list[str] = []
+    named: list[tuple[str, str]] = []
+    for f in notes:
+        path = f["filename"]
+        try:
+            problem, names = note_problem(file_text(gh, cfg, path, head))
+        except FileContentError as exc:
+            problems.append(str(exc))
+            continue
+        if problem:
+            problems.append(f"`{path}` {problem}. {NOTE_HINT}")
+        named += [(path, name) for name in names]
+    if not named:
+        return problems
+    try:
+        known = listed_versions(MARKETPLACE_PATH, file_text(gh, cfg, MARKETPLACE_PATH, head))
+    except FileContentError as exc:
+        return problems + [str(exc)]
+    for path, name in named:
+        if name not in known:
+            problems.append(f"`{path}` names {name}, which is not a plugin in `{MARKETPLACE_PATH}`. {NOTE_HINT}")
+    return problems
 
 
 def changelog_shape(text: str) -> tuple[list[str], int]:
@@ -342,48 +424,56 @@ def changelog_shape(text: str) -> tuple[list[str], int]:
 def release_file_problems(gh, cfg: Config, number: int, pr: dict) -> list[str]:
     """A pull request may not edit a plugin version or the top of a CHANGELOG.md.
     Brand new plugins and edits to older CHANGELOG entries are allowed."""
-    files = gh.paginate(f"/repos/{cfg.repo}/pulls/{number}/files")
+    files = [f for f in gh.paginate(f"/repos/{cfg.repo}/pulls/{number}/files") if f.get("status") != "removed"]
     watched = [
         f for f in files
-        if f.get("status") != "removed" and (
-            f.get("filename") == MARKETPLACE_PATH
-            or PLUGIN_MANIFEST_RE.match(f.get("filename", ""))
-            or CHANGELOG_RE.search(f.get("filename", "")))
+        if f.get("filename") == MARKETPLACE_PATH
+        or PLUGIN_MANIFEST_RE.match(f.get("filename", ""))
+        or CHANGELOG_RE.search(f.get("filename", ""))
     ]
-    if not watched:
+    # The release step reads every top-level .changeset/*.md except the README.
+    notes = [
+        f for f in files
+        if CHANGESET_NOTE_RE.match(f.get("filename", "")) and f["filename"].rsplit("/", 1)[-1].lower() != "readme.md"
+    ]
+    if not watched and not notes:
         return []
     head = (pr.get("head") or {}).get("sha", "")
-    # Compare against the merge base, not the base tip, so a release that landed on
-    # main after the branch was cut is not mistaken for an edit by this branch.
-    compare = gh.get(f"/repos/{cfg.repo}/compare/{(pr.get('base') or {}).get('sha', '')}...{head}")
-    merge_base = compare["merge_base_commit"]["sha"]
     problems: list[str] = []
-    for f in watched:
-        path = f["filename"]
-        added = f.get("status") == "added"
-        before_path = f.get("previous_filename") or path
-        if CHANGELOG_RE.search(path):
-            if added:
-                problems.append(f"`{path}` is a new CHANGELOG. {RELEASE_HINT}")
-                continue
-            old_top, old_count = changelog_shape(file_text(gh, cfg, before_path, merge_base))
-            new_top, new_count = changelog_shape(file_text(gh, cfg, path, head))
-            if new_count > old_count:
-                problems.append(f"`{path}` adds a CHANGELOG entry. {RELEASE_HINT}")
-            elif new_top != old_top:
-                problems.append(f"`{path}` edits the top CHANGELOG entry. {RELEASE_HINT}")
-            continue
-        try:
-            after = listed_versions(path, file_text(gh, cfg, path, head))
-            before = {} if added else listed_versions(path, file_text(gh, cfg, before_path, merge_base))
-        except ValueError:
-            problems.append(f"`{path}` is not valid JSON, so the gate cannot tell whether it changes a version.")
-            continue
-        for name in sorted(set(before) & set(after), key=str):
-            if before[name] != after[name]:
-                problems.append(
-                    f"`{path}` changes the {name} version from {before[name]} to {after[name]}. {RELEASE_HINT}")
-    return problems
+    if watched:
+        # Compare against the merge base, not the base tip, so a release that landed on
+        # main after the branch was cut is not mistaken for an edit by this branch.
+        compare = gh.get(f"/repos/{cfg.repo}/compare/{(pr.get('base') or {}).get('sha', '')}...{head}")
+        merge_base = compare["merge_base_commit"]["sha"]
+        for f in watched:
+            try:
+                problems += release_file_change(gh, cfg, f, head, merge_base)
+            except FileContentError as exc:
+                problems.append(str(exc))
+    return problems + note_problems(gh, cfg, notes, head)
+
+
+def release_file_change(gh, cfg: Config, f: dict, head: str, merge_base: str) -> list[str]:
+    path = f["filename"]
+    added = f.get("status") == "added"
+    before_path = f.get("previous_filename") or path
+    if CHANGELOG_RE.search(path):
+        if added:
+            return [f"`{path}` is a new CHANGELOG. {RELEASE_HINT}"]
+        old_top, old_count = changelog_shape(file_text(gh, cfg, before_path, merge_base))
+        new_top, new_count = changelog_shape(file_text(gh, cfg, path, head))
+        if new_count > old_count:
+            return [f"`{path}` adds a CHANGELOG entry. {RELEASE_HINT}"]
+        if new_top != old_top:
+            return [f"`{path}` edits the top CHANGELOG entry. {RELEASE_HINT}"]
+        return []
+    after = listed_versions(path, file_text(gh, cfg, path, head))
+    before = {} if added else listed_versions(path, file_text(gh, cfg, before_path, merge_base))
+    return [
+        f"`{path}` changes the {name} version from {before[name]} to {after[name]}. {RELEASE_HINT}"
+        for name in sorted(set(before) & set(after))
+        if before[name] != after[name]
+    ]
 
 
 def evaluate(gh, cfg: Config, number: int) -> Decision:

@@ -71,7 +71,7 @@ class Repo(unittest.TestCase):
         return code, out.getvalue(), err.getvalue()
 
     def snapshot(self):
-        return {str(p.relative_to(self.root)): p.read_text(encoding="utf-8")
+        return {str(p.relative_to(self.root)): p.read_bytes()
                 for p in self.root.rglob("*") if p.is_file() and ".git" not in p.parts}
 
 
@@ -129,6 +129,12 @@ class Releases(Repo):
         self.assertIn("nothing to release", out)
         self.assertEqual(self.snapshot(), before)
 
+    def test_a_level_three_heading_in_the_text_is_kept(self):
+        self.write(".changeset/6-x.md", note({"brand-voice": "patch"}, "Fix.\n\n### Details\n\nMore."))
+        self.assertEqual(self.run_release()[0], 0)
+        self.assertEqual(self.read("plugins/brand-voice/CHANGELOG.md"),
+                         "## 0.6.8 - 2026-11-03\n\nFix.\n\n### Details\n\nMore.\n")
+
     def test_check_writes_nothing(self):
         self.write(".changeset/5-x.md", note({"operating-doctrine": "minor"}, "Change."))
         before = self.snapshot()
@@ -175,6 +181,24 @@ class Refuses(Repo):
         self.write("plugins/brand-voice/.claude-plugin/plugin.json", COMPACT_MANIFEST.replace("0.6.7", "0.6.9"))
         self.write(".changeset/13-x.md", note({"brand-voice": "patch"}, "Fix."))
         self.assert_refused("must carry one version")
+
+    def test_a_level_two_heading_in_the_text(self):
+        self.write(".changeset/15-x.md", note({"brand-voice": "patch"}, "Fix.\n\n## Breaking changes\n\nMore."))
+        self.assert_refused("has a '## ' heading in its text")
+
+    def test_a_note_that_is_not_utf8(self):
+        (self.root / ".changeset/16-x.md").write_bytes(b"---\nbrand-voice: patch\n---\n\n\xff\n")
+        self.assert_refused("16-x.md: is not UTF-8 text")
+
+    def test_a_manifest_that_is_not_a_json_object(self):
+        self.write("plugins/brand-voice/.claude-plugin/plugin.json", "[]\n")
+        self.write(".changeset/17-x.md", note({"brand-voice": "patch"}, "Fix."))
+        self.assert_refused("is not a JSON object")
+
+    def test_a_marketplace_without_a_plugins_list(self):
+        self.write(".claude-plugin/marketplace.json", '{"plugins": {"brand-voice": {}}}\n')
+        self.write(".changeset/18-x.md", note({"brand-voice": "patch"}, "Fix."))
+        self.assert_refused("has no plugins list")
 
     def test_entry_for_the_new_version_already_exists(self):
         self.write("plugins/operating-doctrine/CHANGELOG.md", "## 2.79.0 - 2026-11-03\n\nHand edit.\n" + DOCTRINE_LOG)

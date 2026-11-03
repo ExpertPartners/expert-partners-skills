@@ -66,9 +66,18 @@ class Plan:
 
 
 def parse_note(path: Path) -> Note:
-    text = path.read_text(encoding="utf-8").replace("\r\n", "\n")
-    lines = text.split("\n")
-    if not lines or lines[0].strip() != "---":
+    try:
+        text = path.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        raise ReleaseError(f"{path}: is not UTF-8 text") from None
+    return parse_note_text(path, text)
+
+
+def parse_note_text(path: Path, text: str) -> Note:
+    """tools/auto-merge-gate/gate.py (note_problem) applies the same rules before a note
+    can merge; its tests run both on the same notes, so change them together."""
+    lines = text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
+    if lines[0].strip() != "---":
         raise ReleaseError(f"{path}: must start with a --- line, then one plugin: bump line per plugin, then ---")
     try:
         end = next(i for i in range(1, len(lines)) if lines[i].strip() == "---")
@@ -93,6 +102,10 @@ def parse_note(path: Path) -> Note:
     body = "\n".join(lines[end + 1:]).strip()
     if not body:
         raise ReleaseError(f"{path}: says nothing about the change; write it below the closing ---")
+    # Each release adds exactly one "## " heading, the line the gate splits CHANGELOG entries on.
+    if any(line.startswith("## ") for line in body.split("\n")):
+        raise ReleaseError(f"{path}: has a '## ' heading in its text, which would start a second CHANGELOG entry; "
+                           "use ### or lower")
     return Note(path, bumps, body)
 
 
@@ -123,16 +136,21 @@ def changelog_path(root: Path, plugin: str) -> Path:
     return root / "plugins" / plugin / "CHANGELOG.md"
 
 
-def load_json(path: Path):
+def load_json(path: Path) -> dict:
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        data = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
         raise ReleaseError(f"{path}: cannot be read as JSON ({exc})") from None
+    if not isinstance(data, dict):
+        raise ReleaseError(f"{path}: is not a JSON object")
+    return data
 
 
 def plan_release(root: Path, notes: list[Note]) -> list[Plan]:
     market = load_json(root / MARKETPLACE)
-    entries = {p.get("name"): p for p in market.get("plugins", []) if isinstance(p, dict)}
+    if not isinstance(market.get("plugins"), list):
+        raise ReleaseError(f"{MARKETPLACE}: has no plugins list")
+    entries = {p.get("name"): p for p in market["plugins"] if isinstance(p, dict)}
     plans: dict[str, Plan] = {}
     for note in notes:
         for plugin, bump in note.bumps.items():

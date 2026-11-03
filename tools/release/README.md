@@ -16,7 +16,7 @@ For each plugin named by at least one note:
 3. Adds `## <version> - <date>` with every note's text, in file name order, to the top of `plugins/<plugin>/CHANGELOG.md`, creating the file if the plugin has none.
 4. Deletes the notes it used.
 
-Every note is checked before anything is written. An unknown plugin, a bump that is not `patch`, `minor` or `major`, a note with no text, or a version that already has a CHANGELOG entry stops the run with exit code 1 and changes nothing.
+Every note is checked before anything is written. An unknown plugin, a bump that is not `patch`, `minor` or `major`, a note with no text or with a `## ` heading in its text, a note that is not UTF-8, or a version that already has a CHANGELOG entry stops the run with exit code 1 and changes nothing. The auto-merge gate applies the same note rules before a pull request merges (`note_problem` in `tools/auto-merge-gate/gate.py`, kept in step by its tests), so a bad note is refused there instead of stopping the release here.
 
 ## Running it
 

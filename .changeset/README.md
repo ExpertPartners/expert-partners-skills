@@ -16,7 +16,8 @@ One paragraph, in the words the CHANGELOG should carry, saying what changed and 
 ```
 
 - Between the `---` lines, write one line per plugin the pull request changes: the plugin name as it appears in `.claude-plugin/marketplace.json`, then `patch`, `minor` or `major`.
-- Below the closing `---`, write the change. It cannot be empty.
+- Below the closing `---`, write the change. It cannot be empty, and it cannot hold a `## ` heading, because that would start a second CHANGELOG entry. Use `###` or lower.
+- The auto-merge gate checks every note before the pull request can merge, so one bad note never holds up the release of every plugin on main.
 - Do not edit `version` in `plugins/<plugin>/.claude-plugin/plugin.json` or `.claude-plugin/marketplace.json`, and do not add or edit the top entry of any `CHANGELOG.md`. The auto-merge gate refuses a pull request that does. A brand new plugin may carry its first version.
 - A pull request that changes no plugin needs no note.
 
