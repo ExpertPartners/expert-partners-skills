@@ -1,3 +1,6 @@
+## 2.82.3 - 2026-11-03
+
+Book Moment's description no longer holds angle brackets. The claude.ai org marketplace sync read them as XML tags and left the skill out. The description lint now fails on < or > in any skill description, so this cannot ship again.
 ## 2.82.2 - 2026-11-03
 
 Job List Heartbeat now has quiet checks, a CEO directive from Allison (Decision Log 2026-11-03). Sessions still check the job list every 15 minutes, but a check with nothing relevant for her sends her nothing. When something relevant changed, she gets one brief CEO update.
