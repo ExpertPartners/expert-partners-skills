@@ -17,7 +17,7 @@ with Job: and whose author is on the builder's allowlist, it applies the first r
      remove in-progress and dispatch the builder.
   6. Its factory-droid pull request is open and Codex has not reviewed the current head after
      30 minutes: comment @codex review once per head.
-  7. Its pull request is refused by the auto-merge gate for unresolved Codex findings or a
+  7. Its pull request is refused by the auto-merge gate for a blocking Codex finding or a
      failing check, and no builder run started in the last 30 minutes: comment what to fix and
      dispatch the builder. When a Codex finding comes back after it was fixed (Decision Log
      2026-11-02, No caps stop work), it marks the job needs-allison with a Recommend: line
@@ -94,16 +94,18 @@ CODEX_REVIEWED_COMMIT_RE = re.compile(r"\*\*Reviewed commit:\*\*\s*`([0-9a-fA-F]
 OVERLAP_ISSUE_RE = re.compile(r"\bOVERLAP_ISSUE:\s*#?(\d+)\b")
 
 # Gate refusal lines (tools/auto-merge-gate/gate.py) that a builder can fix. Pending checks,
-# a review not done yet or GitHub still computing mergeability are not stalls.
+# a review not done yet, GitHub still computing mergeability, or review evidence the gate
+# could not read are not stalls a rebuild can clear.
 CHECK_REASONS = (
     re.compile(r"^Check `.+` finished as \S+\.$"),
     re.compile(r"^Commit status `.+` is (?:failure|error)\.$"),
 )
+# A P0, P1 or unreadable-severity Codex finding the gate names as blocking (blocking_findings).
 CODEX_REASONS = (
-    re.compile(r"^Codex (?:code|security) review on \S+ left unresolved findings\.$"),
-    re.compile(r"unresolved review thread"),
-    re.compile(r"review thread\(s\) are still unresolved"),
+    re.compile(r"^Codex (?:P\d+ )?(?:code|security) finding\b.* blocks: "
+               r"(?:Codex raised it on head \S+|its thread from \S+ is unresolved)\."),
 )
+REASON_TITLE_RE = re.compile(r'^Codex [^"]* finding[^"]* "(.*)"(?: \((https://\S+)\))? blocks: ')
 
 
 class GitHubError(Exception):
@@ -336,6 +338,20 @@ class Finding:
     @property
     def fingerprint(self) -> str:
         return hashlib.sha256(f"{self.path}\n{self.title}".encode()).hexdigest()[:12]
+
+
+def blocking_threads(threads: list[Finding], reasons: list[str]) -> list[Finding]:
+    """The Codex threads behind the findings the gate says block, matched by the link the
+    gate quotes, or by title when it quotes none. A finding raised on the current head blocks
+    even when its thread is resolved, because resolving a thread does not fix the code."""
+    urls, titles = set(), set()
+    for r in reasons:
+        m = REASON_TITLE_RE.match(r) if is_codex_reason(r) else None
+        if m and m.group(2):
+            urls.add(m.group(2))
+        elif m:
+            titles.add(_plain(m.group(1)))
+    return [t for t in threads if (t.url and t.url in urls) or t.title in titles]
 
 
 def holder_finished(item: dict) -> bool:
@@ -751,16 +767,17 @@ class Sweeper:
             # The sweeper already rebuilt this job once after a build with no pull request,
             # and that rebuild ended the same way. Another rebuild would repeat it every 30
             # minutes, so it goes to Allison (Decision Log 2026-11-02, No caps stop work).
-            self.add_labels(number, [NEEDS_ALLISON])
-            self.comment(number, "\n".join([
+            self.escalate(number, "\n".join([
                 "Recommend: look at why the builder finishes this job without opening a pull "
                 "request. The stall sweeper rebuilt it after a build with no pull request, and "
                 "the rebuild ended the same way, so the sweeper stopped restarting it. Remove "
                 "needs-allison to let the sweeper build it again.",
                 "",
                 NO_PR_RETURNED_MARK,
-            ]))
-            self.act(f"#{number} marked needs-allison: its build ended without a pull request again after a rebuild.")
+            ]), f"#{number} marked needs-allison: its build ended without a pull request again after a rebuild.")
+            return
+        if last and last[0] == NO_PR_RETURNED_MARK and not self.needs_allison_removed_since(number, last[1]):
+            self.relabel(number, "its build ended without a pull request again after a rebuild")
             return
         if self.held(issue, "is idle"):
             return
@@ -775,6 +792,29 @@ class Sweeper:
         self.dispatch(number)
         why = "its last build finished without a pull request" if released else "labeled job with no build, no pull request"
         self.act(f"#{number} dispatched: {why} and no builder run in 30 minutes.")
+
+    def needs_allison_removed_since(self, number: int, at: dt.datetime | None) -> bool:
+        """Whether someone removed needs-allison after the sweeper's escalation comment. With
+        no removal, a missing label means the sweeper's own label write failed after the
+        comment, so the escalation is finished instead of the job restarting."""
+        for e in self.gh.paginate(f"/repos/{self.cfg.repo}/issues/{number}/events"):
+            if e.get("event") != "unlabeled" or (e.get("label") or {}).get("name") != NEEDS_ALLISON:
+                continue
+            when = parse_time(e.get("created_at"))
+            if at is None or (when and when >= at):
+                return True
+        return False
+
+    def escalate(self, number: int, body: str, action: str) -> None:
+        # The Recommend: comment goes first. If the label write then fails, the next sweep
+        # finds the comment and adds the label; the other order could halt the job silently.
+        self.comment(number, body)
+        self.add_labels(number, [NEEDS_ALLISON])
+        self.act(action)
+
+    def relabel(self, number: int, why: str) -> None:
+        self.add_labels(number, [NEEDS_ALLISON])
+        self.act(f"#{number} marked needs-allison: {why} (its Recommend: comment was posted, the label was not).")
 
     def in_progress_since(self, number: int) -> dt.datetime | None:
         at = None
@@ -859,15 +899,7 @@ class Sweeper:
         if self.started_recently(issue, RECENT_RUN):
             return
         threads = self.codex_threads(pr_number) if any(is_codex_reason(r) for r in fix) else []
-        findings = [t for t in threads if not t.resolved]
-        if not findings and any(is_codex_reason(r) for r in fix):
-            # The gate counts every unresolved thread, but the builder can only answer Codex's.
-            # A thread a person or another reviewer opened waits for them, not for a rebuild.
-            fix = [r for r in fix if not is_codex_reason(r)]
-            if not fix:
-                self.note(f"#{number} has pull request #{pr_number} held by review threads with no open Codex "
-                          "finding, which the builder cannot resolve; not dispatched.")
-                return
+        findings = blocking_threads(threads, fix)
         if self.held(issue, f"has pull request #{pr_number} refused by the auto-merge gate"):
             return
 
@@ -886,13 +918,18 @@ class Sweeper:
             if f.fingerprint in asked and f.thread not in asked[f.fingerprint]
             and all(resolved.get(t) is True for t in asked[f.fingerprint])
         ]
-        escalated = any((m := RETURNED_RE.search(b)) and m.group(1) == sha for b in self.my_comments(number))
-        # Once escalated at this head, reaching here means Allison removed needs-allison, which
-        # clears those findings for another round.
-        if returned and not escalated:
+        escalated = [parse_time(c.get("created_at")) for c in self.comments(number)
+                     if login_of(c) == ACTIONS_LOGIN and (m := RETURNED_RE.search(c.get("body") or "")) and m.group(1) == sha]
+        # Once escalated at this head, reaching here with needs-allison removed by someone
+        # clears those findings for another round. With no removal, the label write failed.
+        if escalated:
+            known = [t for t in escalated if t]
+            if not self.needs_allison_removed_since(number, max(known) if known else None):
+                self.relabel(number, f"a Codex finding on pull request #{pr_number} came back after it was fixed")
+                return
+        elif returned:
             listed = "; ".join(f"`{f.path}`: {f.title}" for f in returned)
-            self.add_labels(number, [NEEDS_ALLISON])
-            self.comment(number, "\n".join([
+            self.escalate(number, "\n".join([
                 f"Recommend: decide how pull request #{pr_number} should fix {listed}. This Codex "
                 "finding came back after the builder fixed it, so the stall sweeper stopped "
                 "restarting the builder for it (Decision Log 2026-11-02, No caps stop work).",
@@ -900,8 +937,7 @@ class Sweeper:
                 *[f"- {f.url}" for f in returned if f.url],
                 "",
                 f"<!-- {MARK} returned head={sha} -->",
-            ]))
-            self.act(f"#{number} marked needs-allison: a Codex finding on pull request #{pr_number} came back after it was fixed.")
+            ]), f"#{number} marked needs-allison: a Codex finding on pull request #{pr_number} came back after it was fixed.")
             return
 
         digest = hashlib.sha256("\n".join(sorted(fix) + sorted(f.thread for f in findings)).encode()).hexdigest()[:16]
@@ -913,7 +949,7 @@ class Sweeper:
                 *[f"- {r}" for r in fix],
             ]
             if findings:
-                lines += ["", "Unresolved Codex findings:", ""]
+                lines += ["", "Codex findings that block the merge:", ""]
                 lines += [f"- `{f.path}`: {f.title}{f' ({f.url})' if f.url else ''}" for f in findings]
             lines += [
                 "",

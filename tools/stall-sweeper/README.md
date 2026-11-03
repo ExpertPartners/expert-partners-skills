@@ -25,7 +25,7 @@ It reads every open issue whose title begins with `Job:` and whose author is on 
 | 4 | Carries `job`, with no `in-progress`, no `waiting`, no open pull request and no builder run in the last 30 minutes. | Dispatches the builder. After a build that finished with no pull request, it says so on the issue first. |
 | 5 | Carries `in-progress`, with no builder run in progress and no open pull request for 45 minutes. | Removes `in-progress`, then dispatches the builder. |
 | 6 | Its `factory-droid[bot]` pull request is open, not a draft, and Codex has not reviewed the current head 30 minutes after it was pushed. | Comments `@codex review`, once per head. |
-| 7 | Its pull request is refused by the auto-merge gate on the current head for unresolved Codex findings or a failing check, and no builder run for it started in the last 30 minutes. | Comments on the issue what to fix (the gate's reasons and each unresolved Codex thread), then dispatches the builder. |
+| 7 | Its pull request is refused by the auto-merge gate on the current head for a blocking Codex finding or a failing check, and no builder run for it started in the last 30 minutes. | Comments on the issue what to fix (the gate's reasons and each blocking Codex thread), then dispatches the builder. |
 
 A holder no longer holds a waiting job when it is closed, parked or done, or, for a job issue, when it has lost `in-progress`. That is the same test the overlap check uses. An open pull request holds until it closes. The 30-minute pause in rule 3 matters after a failed build: the overlap check puts the job back to waiting with no holder, and without the pause a failing job would rebuild every 10 minutes.
 
@@ -33,9 +33,11 @@ Rule 7 keeps sending the builder back round after round. It stops only when a Co
 
 Rule 4 stops in the same way. When a build finishes without opening a pull request, the sweeper rebuilds the job once and says so on the issue. If that rebuild also ends with no pull request, it adds `needs-allison` with a `Recommend:` line. Removing `needs-allison` allows one more rebuild. A job marked `needs-allison` is never restarted by rules 3, 4, 5 or 7.
 
-The gate counts every unresolved review thread, but the builder can only answer Codex's. When none of the unresolved threads are Codex's, a thread reason is not something the builder can fix, so rule 7 does not restart the builder for it. A failing check on the same pull request still sends the builder back.
+Both stops post the `Recommend:` comment before they add `needs-allison`, so Allison is told before the job halts. If the label write fails after the comment, the next sweep finds the comment and adds the label instead of restarting the job. The sweeper reads someone's removal of `needs-allison` from the issue's events, so a label that was never added is not mistaken for Allison's go-ahead.
 
-The gate's waiting reasons are not stalls: a check still running, a Codex review not done yet, or GitHub still computing whether the pull request can merge. Rule 7 ignores them.
+The gate blocks only on P0 and P1 Codex findings, and on findings whose severity it cannot read (AGENTS.md, Review guidelines). Each blocking finding is one line in its refusal, with the finding's link. Rule 7 matches those links to Codex's review threads, so a P2 finding, or a thread a person opened, never restarts the builder. A finding Codex raised on the current head still blocks after its thread is resolved, because resolving a thread does not fix the code, so rule 7 sends the builder back for it.
+
+The gate's waiting reasons are not stalls: a check still running, a Codex review not done yet, GitHub still computing whether the pull request can merge, or review evidence the gate could not read. Rule 7 ignores them. A failing check on the same pull request still sends the builder back.
 
 Every action is one plain line in the run summary, followed by a final count. A clean board gets no writes and the summary says `No stalled jobs. 0 actions taken.`
 

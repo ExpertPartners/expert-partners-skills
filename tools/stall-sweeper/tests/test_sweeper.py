@@ -102,6 +102,21 @@ def thread(tid, path, title, resolved=False, author="chatgpt-codex-connector"):
     }
 
 
+def finding_reason(t, sha=HEAD, raised=None):
+    """The gate's own refusal line for a P1 Codex finding on thread t, raised on raised (the
+    head by default), so rule 7 is tested against the wording the gate really writes."""
+    first = t["comments"]["nodes"][0]
+    f = gate.parse_finding({"id": 1, "body": first["body"], "original_commit_id": raised or sha, "html_url": first["url"]})
+    f.resolved = t["isResolved"]
+    reasons, _ = gate.blocking_findings([f], sha, None)
+    assert len(reasons) == 1, reasons
+    return reasons[0]
+
+
+GUARD_T1 = thread("T1", "tools/x.py", "Guard the empty list")
+GUARD_T2 = thread("T2", "tools/x.py", "Guard the empty list")
+
+
 class FakeGitHub:
     """Holds the board and answers the calls the sweeper makes. An unexpected call fails."""
 
@@ -192,7 +207,7 @@ class FakeGitHub:
             have = {label["name"] for label in item["labels"]}
             item["labels"] += [{"name": n} for n in body["labels"] if n not in have]
         elif path.endswith("/comments"):
-            self.comments.setdefault(int(parts[-2]), []).append(comment(body["body"]))
+            self.comments.setdefault(int(parts[-2]), []).append(comment(body["body"], at=0))
         return None
 
     def patch(self, path, body):
@@ -223,6 +238,24 @@ class FakeGitHub:
 
     def comment_bodies(self, n):
         return [c["body"] for c in self.comments.get(n, [])]
+
+
+def failing_label_writes(gh):
+    """Make every needs-allison label write fail, as a transient GitHub error would."""
+    real_post = gh.post
+
+    def post(path, body):
+        if path.endswith("/labels") and "needs-allison" in body["labels"]:
+            gh.calls.append(("POST", path, body))
+            raise sw.GitHubError(502, "Bad Gateway")
+        return real_post(path, body)
+
+    gh.post = post
+    return real_post
+
+
+def removed_needs_allison(at=0):
+    return {"event": "unlabeled", "label": {"name": "needs-allison"}, "created_at": ago(at)}
 
 
 def sweep(gh, dry_run=False, repo=REPO):
@@ -471,10 +504,39 @@ class Rule4Idle(unittest.TestCase):
             comment(self.NO_PR, at=180, updated=90),
             comment(f"restarted\n\n{sw.REBUILT_MARK}", at=120),
             comment(f"Recommend: look\n\n{sw.NO_PR_RETURNED_MARK}", at=60),
-        ]})
+        ]}, events={10: [removed_needs_allison(at=30)]})
         sweep(gh)
         self.assertEqual(gh.dispatches(), [10])
         self.assertIn(sw.REBUILT_MARK, gh.comment_bodies(10)[-1])
+
+    def test_the_recommendation_is_posted_before_the_label(self):
+        gh = FakeGitHub(issues=[issue(10, "job")], comments={10: [
+            comment(self.NO_PR, at=180, updated=40),
+            comment(f"restarted\n\n{sw.REBUILT_MARK}", at=120),
+        ]})
+        sweep(gh)
+        writes = [c[1] for c in gh.writes()]
+        self.assertEqual(writes, [f"/repos/{REPO}/issues/10/comments", f"/repos/{REPO}/issues/10/labels"])
+
+    def test_a_failed_label_write_is_finished_by_the_next_sweep(self):
+        gh = FakeGitHub(issues=[issue(10, "job")], comments={10: [
+            comment(self.NO_PR, at=180, updated=40),
+            comment(f"restarted\n\n{sw.REBUILT_MARK}", at=120),
+        ]})
+        real_post = failing_label_writes(gh)
+        s = sw.Sweeper(gh, sw.Config(repo=REPO, builder_workflow=WORKFLOW, ref="main"), NOW)
+        with contextlib.redirect_stdout(io.StringIO()):
+            s.sweep()
+        self.assertTrue(s.errors, "the failed label write is reported")
+        self.assertTrue(gh.comment_bodies(10)[-1].startswith("Recommend: "), "Allison is told first")
+        self.assertNotIn("needs-allison", gh.labels(10))
+        gh.post = real_post
+        gh.calls.clear()
+        s = sweep(gh)
+        self.assertEqual(gh.dispatches(), [], "the job is not rebuilt")
+        self.assertIn("needs-allison", gh.labels(10))
+        self.assertEqual(sum(b.startswith("Recommend: ") for b in gh.comment_bodies(10)), 1, "one recommendation")
+        self.assertIn("needs-allison", s.actions[0])
 
 
 class Rule5StuckInProgress(unittest.TestCase):
@@ -588,7 +650,7 @@ class Rule7Refused(unittest.TestCase):
         self.assertFalse(any(c[0] == "GRAPHQL" for c in gh.calls), "no Codex reason, no thread read")
 
     def test_unresolved_codex_findings_are_listed(self):
-        gh = self.board(["Codex code review on aaaaaaa left unresolved findings."],
+        gh = self.board([finding_reason(GUARD_T1)],
                         threads=[thread("T1", "tools/x.py", "Guard the empty list"),
                                  thread("T0", "tools/y.py", "Old one", resolved=True)])
         sweep(gh)
@@ -611,7 +673,7 @@ class Rule7Refused(unittest.TestCase):
         self.assertEqual(gh.writes(), [])
 
     def test_a_finding_that_comes_back_goes_to_allison(self):
-        first = self.board(["Codex code review on aaaaaaa left unresolved findings."],
+        first = self.board([finding_reason(GUARD_T1)],
                            threads=[thread("T1", "tools/x.py", "Guard the empty list")])
         sweep(first)
         asked = first.comment_bodies(13)[0]
@@ -619,7 +681,7 @@ class Rule7Refused(unittest.TestCase):
         gh = FakeGitHub(
             issues=[issue(13, "job")],
             prs=[pr(70, 13, head=NEW_HEAD)],
-            comments={70: [refusal(NEW_HEAD, "Codex code review on bbbbbbb left unresolved findings.")],
+            comments={70: [refusal(NEW_HEAD, finding_reason(GUARD_T2, NEW_HEAD))],
                       13: [comment(asked)]},
             threads={70: [thread("T1", "tools/x.py", "Guard the empty list", resolved=True),
                           thread("T2", "tools/x.py", "Guard the empty list")]},
@@ -635,13 +697,13 @@ class Rule7Refused(unittest.TestCase):
         self.assertEqual(gh.writes(), [], "a needs-allison job is not restarted again")
 
     def test_a_finding_still_open_on_its_old_thread_is_sent_back_again(self):
-        first = self.board(["Codex code review on aaaaaaa left unresolved findings."],
+        first = self.board([finding_reason(GUARD_T1)],
                            threads=[thread("T1", "tools/x.py", "Guard the empty list")])
         sweep(first)
         gh = FakeGitHub(
             issues=[issue(13, "job")],
             prs=[pr(70, 13, head=NEW_HEAD)],
-            comments={70: [refusal(NEW_HEAD, "Codex code review on bbbbbbb left unresolved findings.")],
+            comments={70: [refusal(NEW_HEAD, finding_reason(GUARD_T1, NEW_HEAD, raised=HEAD))],
                       13: [comment(first.comment_bodies(13)[0])]},
             threads={70: [thread("T1", "tools/x.py", "Guard the empty list")]},
             commits={NEW_HEAD: {"commit": {"committer": {"date": ago(5)}}}},
@@ -651,13 +713,14 @@ class Rule7Refused(unittest.TestCase):
         self.assertNotIn("needs-allison", gh.labels(13))
 
     def test_a_second_thread_beside_a_still_open_first_one_is_sent_back(self):
-        first = self.board(["Codex code review on aaaaaaa left unresolved findings."],
+        first = self.board([finding_reason(GUARD_T1)],
                            threads=[thread("T1", "tools/x.py", "Guard the empty list")])
         sweep(first)
         gh = FakeGitHub(
             issues=[issue(13, "job")],
             prs=[pr(70, 13, head=NEW_HEAD)],
-            comments={70: [refusal(NEW_HEAD, "Codex code review on bbbbbbb left unresolved findings.")],
+            comments={70: [refusal(NEW_HEAD, finding_reason(GUARD_T1, NEW_HEAD, raised=HEAD),
+                                   finding_reason(GUARD_T2, NEW_HEAD))],
                       13: [comment(first.comment_bodies(13)[0])]},
             threads={70: [thread("T1", "tools/x.py", "Guard the empty list"),
                           thread("T2", "tools/x.py", "Guard the empty list")]},
@@ -669,13 +732,13 @@ class Rule7Refused(unittest.TestCase):
         self.assertFalse(any(b.startswith("Recommend: ") for b in gh.comment_bodies(13)))
 
     def test_a_recorded_thread_that_is_gone_is_not_proof_of_a_fix(self):
-        first = self.board(["Codex code review on aaaaaaa left unresolved findings."],
+        first = self.board([finding_reason(GUARD_T1)],
                            threads=[thread("T1", "tools/x.py", "Guard the empty list")])
         sweep(first)
         gh = FakeGitHub(
             issues=[issue(13, "job")],
             prs=[pr(70, 13, head=NEW_HEAD)],
-            comments={70: [refusal(NEW_HEAD, "Codex code review on bbbbbbb left unresolved findings.")],
+            comments={70: [refusal(NEW_HEAD, finding_reason(GUARD_T2, NEW_HEAD))],
                       13: [comment(first.comment_bodies(13)[0])]},
             threads={70: [thread("T2", "tools/x.py", "Guard the empty list")]},
             commits={NEW_HEAD: {"commit": {"committer": {"date": ago(5)}}}},
@@ -685,7 +748,7 @@ class Rule7Refused(unittest.TestCase):
         self.assertNotIn("needs-allison", gh.labels(13))
 
     def test_removing_needs_allison_after_a_return_sends_it_back(self):
-        first = self.board(["Codex code review on aaaaaaa left unresolved findings."],
+        first = self.board([finding_reason(GUARD_T1)],
                            threads=[thread("T1", "tools/x.py", "Guard the empty list")])
         sweep(first)
 
@@ -693,7 +756,7 @@ class Rule7Refused(unittest.TestCase):
             return FakeGitHub(
                 issues=[issue(13, "job")],
                 prs=[pr(70, 13, head=NEW_HEAD)],
-                comments={70: [refusal(NEW_HEAD, "Codex code review on bbbbbbb left unresolved findings.")],
+                comments={70: [refusal(NEW_HEAD, finding_reason(GUARD_T2, NEW_HEAD))],
                           13: [comment(first.comment_bodies(13)[0])]},
                 threads={70: [thread("T1", "tools/x.py", "Guard the empty list", resolved=True),
                               thread("T2", "tools/x.py", "Guard the empty list")]},
@@ -706,29 +769,75 @@ class Rule7Refused(unittest.TestCase):
         # Allison decides and removes needs-allison.
         gh = board()
         gh.comments[13] = list(escalated)
+        gh.events[13] = [removed_needs_allison()]
         s = sweep(gh)
         self.assertEqual(gh.dispatches(), [13])
         self.assertNotIn("needs-allison", gh.labels(13))
         self.assertFalse(any("needs-allison" in a for a in s.actions), "no action it did not take")
 
-    def test_threads_only_a_person_can_resolve_do_not_restart_the_builder(self):
-        for reason in ("Codex code review on aaaaaaa has 1 unresolved review thread(s).",
-                       "Codex code review on aaaaaaa left unresolved findings."):
-            gh = self.board([reason], threads=[thread("H1", "tools/x.py", "Why this?", author="AllisonGaddy"),
-                                               thread("T0", "tools/y.py", "Old one", resolved=True)])
-            s = sweep(gh)
-            self.assertEqual(gh.writes(), [], reason)
-            self.assertTrue(any("cannot resolve" in n for n in s.notes), reason)
+    def test_a_failed_label_write_after_a_return_is_finished_by_the_next_sweep(self):
+        first = self.board([finding_reason(GUARD_T1)],
+                           threads=[thread("T1", "tools/x.py", "Guard the empty list")])
+        sweep(first)
+        gh = FakeGitHub(
+            issues=[issue(13, "job")],
+            prs=[pr(70, 13, head=NEW_HEAD)],
+            comments={70: [refusal(NEW_HEAD, finding_reason(GUARD_T2, NEW_HEAD))],
+                      13: [comment(first.comment_bodies(13)[0])]},
+            threads={70: [thread("T1", "tools/x.py", "Guard the empty list", resolved=True),
+                          thread("T2", "tools/x.py", "Guard the empty list")]},
+            commits={NEW_HEAD: {"commit": {"committer": {"date": ago(5)}}}},
+        )
+        real_post = failing_label_writes(gh)
+        s = sw.Sweeper(gh, sw.Config(repo=REPO, builder_workflow=WORKFLOW, ref="main"), NOW)
+        with contextlib.redirect_stdout(io.StringIO()):
+            s.sweep()
+        self.assertTrue(s.errors)
+        self.assertTrue(gh.comment_bodies(13)[-1].startswith("Recommend: "), "Allison is told first")
+        self.assertNotIn("needs-allison", gh.labels(13))
+        gh.post = real_post
+        gh.calls.clear()
+        s = sweep(gh)
+        self.assertEqual(gh.dispatches(), [], "the builder is not restarted")
+        self.assertIn("needs-allison", gh.labels(13))
+        self.assertEqual(sum(b.startswith("Recommend: ") for b in gh.comment_bodies(13)), 1, "one recommendation")
+        self.assertIn("needs-allison", s.actions[0])
 
-    def test_a_failing_check_beside_a_person_s_thread_is_still_sent_back(self):
-        gh = self.board(["Check `ci` finished as failure.",
-                         "Codex code review on aaaaaaa has 1 unresolved review thread(s)."],
-                        threads=[thread("H1", "tools/x.py", "Why this?", author="AllisonGaddy")])
+    UNREADABLE = [
+        gate.unexplained("code", HEAD, [], None),
+        gate.codex_problems({"code_review": {"commit_sha": HEAD, "status": "completed", "has_unresolved_findings": True}},
+                            HEAD, None)[0],
+    ]
+
+    def test_review_evidence_the_gate_cannot_read_does_not_restart_the_builder(self):
+        for reason in self.UNREADABLE:
+            gh = self.board([reason], threads=[thread("T0", "tools/y.py", "Old one", resolved=True)])
+            sweep(gh)
+            self.assertEqual(gh.writes(), [], reason)
+
+    def test_a_p2_finding_never_restarts_the_builder(self):
+        p2 = gate.Finding(1, "code", "P2", HEAD, "Nit", "https://example.invalid/1")
+        self.assertEqual(gate.blocking_findings([p2], HEAD, None)[0], [], "the gate does not block on a P2")
+        gh = self.board(gate.codex_problems(
+            {"code_review": {"commit_sha": HEAD, "status": "completed", "has_unresolved_findings": True}},
+            HEAD, lambda: ([p2], None)))
+        sweep(gh)
+        self.assertEqual(gh.writes(), [])
+
+    def test_a_finding_on_the_head_whose_thread_was_resolved_is_still_sent_back(self):
+        resolved = thread("T1", "tools/x.py", "Guard the empty list", resolved=True)
+        gh = self.board([finding_reason(resolved)], threads=[resolved])
+        sweep(gh)
+        self.assertEqual(gh.dispatches(), [13], "resolving a thread does not fix the code")
+        self.assertIn("`tools/x.py`: guard the empty list", gh.comment_bodies(13)[0])
+
+    def test_a_failing_check_beside_unreadable_evidence_is_still_sent_back(self):
+        gh = self.board(["Check `ci` finished as failure.", *self.UNREADABLE])
         sweep(gh)
         self.assertEqual(gh.dispatches(), [13])
         body = gh.comment_bodies(13)[0]
         self.assertIn("finished as failure", body)
-        self.assertNotIn("review thread", body)
+        self.assertNotIn("severity", body)
 
     def test_security_findings_on_one_file_have_their_own_titles(self):
         body = ("<!-- codex-security-review-finding:v1 -->\n\n### 🛡️ Codex Security Review · _Automatically triggered_\n\n"
@@ -902,18 +1011,27 @@ class DryRun(unittest.TestCase):
 
 class GateFormat(unittest.TestCase):
     def test_reads_the_gate_refusal_it_was_written_for(self):
-        reasons = ["Check `ci` finished as failure.", "Codex code review on aaaaaaa left unresolved findings."]
+        reasons = ["Check `ci` finished as failure.", finding_reason(GUARD_T1)]
         self.assertEqual(sw.gate_refusal([refusal(HEAD, *reasons)], HEAD), reasons)
         self.assertIsNone(sw.gate_refusal([refusal(HEAD, *reasons)], NEW_HEAD))
 
     def test_fixable_reasons_match_the_gate_wording(self):
-        self.assertTrue(sw.is_codex_reason(gate.codex_problems(
-            {"code_review": {"commit_sha": HEAD, "status": "completed", "has_unresolved_findings": True}}, HEAD)[0]))
-        self.assertTrue(sw.is_codex_reason(gate.codex_problems(
-            {"code_review": {"commit_sha": HEAD, "status": "completed", "has_unresolved_findings": None,
-                             "has_any_findings": True}}, HEAD, lambda: 2)[0]))
-        self.assertTrue(sw.is_codex_reason(gate.security_problems(
-            {"security_review": {"commit_sha": HEAD, "has_unresolved_findings": True}}, HEAD)[0]))
+        old = "c" * 40
+        on_head = gate.Finding(1, "code", "P1", HEAD, "Guard it", "https://example.invalid/1")
+        open_thread = gate.Finding(2, "code", "P0", old, "Old one", "https://example.invalid/2", resolved=False)
+        unreadable = gate.Finding(3, "code", None, HEAD, "No badge", "https://example.invalid/3")
+        security = gate.Finding(4, "security", "P1", HEAD, "Security: check it", "https://example.invalid/4")
+        state = {"code_review": {"commit_sha": HEAD, "status": "completed", "has_unresolved_findings": True},
+                 "security_review": {"commit_sha": HEAD, "has_unresolved_findings": True}}
+        reasons = gate.codex_problems(state, HEAD, lambda: ([on_head, open_thread, unreadable, security], None))
+        self.assertEqual(len(reasons), 4, reasons)
+        for r in reasons:
+            self.assertTrue(sw.is_codex_reason(r), r)
+            self.assertIsNotNone(sw.REASON_TITLE_RE.match(r), r)
+        self.assertEqual(sw.REASON_TITLE_RE.match(reasons[0]).groups(), ("Guard it", "https://example.invalid/1"))
+        may_be_open = gate.Finding(5, "code", "P1", old, "Unknown", "https://example.invalid/5")
+        self.assertFalse(sw.is_codex_reason(gate.blocking_findings([may_be_open], HEAD, "its review thread was not found")[0][0]))
+        self.assertFalse(sw.is_codex_reason(gate.unexplained("code", HEAD, [], None)))
         self.assertFalse(sw.is_codex_reason(gate.codex_problems(None, HEAD)[0]))
         self.assertFalse(sw.is_check_reason(gate.mergeable_problems({"mergeable": None})[0]))
 
