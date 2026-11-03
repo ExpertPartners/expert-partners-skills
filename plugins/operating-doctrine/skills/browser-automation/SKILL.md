@@ -49,12 +49,13 @@ Playwright Extension with the shared connector below.
 Start every task assuming Chrome is signed in and 1Password is available. Do not ask
 Allison whether you have access. Try first.
 
-Report a block only after one of these really happens.
+Report a block only after one of these really happens. A sign-in page by itself is not a
+block.
 
 - The connector fails to connect twice in a row.
-- A login screen appears and signing in with the 1Password item fails.
+- A sign-in page appears and neither the 1Password fill in Chrome nor single sign-on gets you
+  in.
 - MFA, CAPTCHA, or a human approval screen appears.
-- 1Password returns an error for the item you need.
 
 When blocked, leave the exact screen open on the M2, tell Allison the one thing she needs
 to do and where, and pick up again when she says done. If a tool or access she needs is
@@ -69,8 +70,19 @@ about access before following that trail is the most common way AI stalls her wo
 1. Use the API or connector if one covers the job.
 2. Otherwise open the page with the `playwright-ember` tool. You are almost always already signed
    in. Look before you assume you are not.
-3. Only on a real login page, sign in with the matching 1Password item through `op`.
+3. Only on a real sign-in page, use the saved login that 1Password offers in Chrome, or the
+   site's Sign in with Google or other single sign-on button, then keep working. Never read a
+   password into the session's own context.
 4. Only if all of that truly fails, tell Allison the one thing she must do.
+
+<!-- RULED-BY: HQ Business Brain, [HQ][V1.0] Decision Log, 2026-11-03 entry "AI uses the sign-ins Allison set up, without waiting for her" date:2026-11-03 -->
+
+When 1Password in Ember's Chrome on the M2 offers a saved login, or a site offers Sign in with
+Google or another single sign-on for an account already signed in there, Claude Code, Ember and
+any AI working for Allison go ahead, sign in and keep working without asking her. 1Password fills
+the credential itself, so no AI types or sees a password. The hard stops stay. New account access
+(creating an account or adding access that does not exist yet), live releases, messages outside
+approved campaigns and anything irreversible still need her yes.
 
 Never ask her which browser to use, whether you are signed in, or to click or approve
 anything before steps 1 to 3. Do not use the Claude in Chrome extension for this work. It
@@ -182,9 +194,12 @@ Never print, log, or paste the token anywhere else.
 
 ## 1Password
 
-Use the `op` command with the service account. Read a secret at the moment it is needed,
-pass it straight to the page, and never print, log, save, or commit it. If a GHL session has
-expired, sign back in with the matching 1Password item before reporting anything.
+For a browser sign-in, use the saved login 1Password offers in Chrome or the site's single
+sign-on, as Rule 2a says. Never read a password with `op` for a browser sign-in. Use the `op`
+command with the service account only for secrets a script or the connector needs, such as the
+extension token. Read such a secret at the moment it is needed and never print, log, save, or
+commit it. If a GHL session has expired, sign back in with the 1Password fill or single sign-on
+before reporting anything.
 
 ## GoHighLevel guardrails
 

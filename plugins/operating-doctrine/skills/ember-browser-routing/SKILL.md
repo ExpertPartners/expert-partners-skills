@@ -90,7 +90,7 @@ Stop only when the browser-control tool returns a real blocker, such as:
 - connector unreachable after one normal retry;
 - explicit exclusive-control or lock failure;
 - no browser target can be enumerated or safely selected;
-- authentication, MFA, CAPTCHA, or approval requires Allison;
+- a sign-in that neither the 1Password fill nor single sign-on covers, or MFA, CAPTCHA, or approval that requires Allison;
 - exact tab selection is impossible and proceeding could interfere with another session.
 
 When stopped for one of those reasons, report the exact blocker. **Never fall back to Allison's M4 browser.**
@@ -117,7 +117,19 @@ Never use a click on Allison's M4 as a workaround to rebind browser control.
 
 ## Human-only browser actions
 
-If Allison must complete login, MFA, CAPTCHA, approval, or another human-only action:
+<!-- RULED-BY: HQ Business Brain, [HQ][V1.0] Decision Log, 2026-11-03 entry "AI uses the sign-ins Allison set up, without waiting for her" date:2026-11-03 -->
+
+When 1Password in Ember's Chrome on the M2 offers a saved login, or a site offers Sign in with
+Google or another single sign-on for an account already signed in there, Claude Code, Ember and
+any AI working for Allison go ahead, sign in and keep working without asking her. 1Password fills
+the credential itself, so no AI types or sees a password. The hard stops stay. New account access
+(creating an account or adding access that does not exist yet), live releases, messages outside
+approved campaigns and anything irreversible still need her yes.
+
+A sign-in page by itself is not human-only. Use the 1Password fill or the single sign-on button
+first, and never read a password into the session's own context.
+
+If Allison must complete a sign-in that neither the 1Password fill nor single sign-on covers, MFA, CAPTCHA, approval, or another human-only action:
 
 - leave the exact required screen open on Ember's M2;
 - tell Allison the single required action and where it is;
@@ -139,4 +151,4 @@ This follows the HQ Rulebook's Browser tabs stay clean section (Decision Log 202
 
 When a handoff needs an explicit browser line, use:
 
-`BROWSER RULE: Browser/UI work runs on Ember's M2 only. Allison's M4 may be used for code/terminal/files but never for browser control. Assume the M2 is available; do not ask because other M2 tabs/sessions are visible. Stop only on an explicit M2 browser-control failure, auth/MFA, or a genuine tab-selection conflict, and never fall back to the M4.`
+`BROWSER RULE: Browser/UI work runs on Ember's M2 only. Allison's M4 may be used for code/terminal/files but never for browser control. Assume the M2 is available; do not ask because other M2 tabs/sessions are visible. Stop only on an explicit M2 browser-control failure, a sign-in that neither the 1Password fill nor single sign-on covers, MFA, or a genuine tab-selection conflict, and never fall back to the M4.`
