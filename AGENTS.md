@@ -23,3 +23,13 @@ Read Organization Instructions, the HQ Rulebook and the Decision Log, all in HQ 
 - Questions go on the board (Decision Log 2026-11-02, which wins if this line drifts from it). Never wait on a question you raise yourself inside your own app (Factory, Codex, Claude Code). This does not change the ask-me-questions flow above: when Allison asks for clarifying questions, ask her in chat and wait for each answer. If a question truly needs Allison, post it as a comment on the GitHub issue starting `Question for Allison`, or mark the existing Chat to Code job needs-allison with one line starting Recommend: through the job tool's supported nonterminal path, never job_finish, and keep working on everything that does not depend on it.
 - When the assignment is complete, file this job's report with job_finish, including a summary and result link, and verify it with job_status. Preserve unfinished work and its nonterminal state in its existing Chat to Code job; a partial wrap never calls job_finish. Before archive readiness, leave no uncommitted or unpushed work of its own and follow the HQ Rulebook section Session lifecycle.
 - Never give legal, tax, or compliance advice, or suggest a professional, unless Allison asks.
+
+## Review guidelines
+
+These rules bind Codex and every other reviewer of pull requests here, and the builder answering them. A round is one review posted on the pull request.
+
+- Block only on P0 and P1 findings. A P2 or lower finding never blocks a merge.
+- Re-review only the newest commit. Do not reopen code an earlier round already reviewed unless the newest commit changed it.
+- After three review rounds on one pull request, stop. Instead of a fourth round, leave one comment that starts with Question for Allison and gives a one-paragraph summary of what is still open and what you recommend.
+- Fix a P2 only when the fix is small and inside the pull request's scope. Otherwise reply on the thread with the reason it is not fixed here, and resolve the thread.
+- Do not report style, rare edge cases, or refinements of an earlier fix.

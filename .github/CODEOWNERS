@@ -4,6 +4,10 @@
 #
 # CODEOWNERS owns whole files, not sections, so AGENTS.md is owned in full to
 # cover its Review guidelines.
+#
+# The auto-merge gate lives in /tools/auto-merge-gate/ (gate.py, its tests and
+# README) and runs from /.github/workflows/auto-merge-gate.yml, which the
+# /.github/workflows/ line covers.
 
 /.github/workflows/ @AllisonGaddy
 /tools/auto-merge-gate/ @AllisonGaddy
