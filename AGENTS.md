@@ -9,6 +9,7 @@ Working here
 - Read the skill you are changing and the canonical operating-doctrine skill first.
 - Use an isolated branch or worktree, inspect git state before editing, and open a pull request for every change. Never force-push or bypass required checks.
 - Correct the canonical skill source first. Generated files, deployed copies, and the skill graph come only from their producers in tools. Never hand-edit them.
+- Never edit a plugin version in plugin.json or marketplace.json, or the top of a CHANGELOG.md. Add one note in .changeset/ instead, as .changeset/README.md explains. The release step in tools/release owns versions and CHANGELOG entries.
 - Run the changed-file gates in .pre-commit-config.yaml and .github/workflows/ci.yml, plus the tests under tools, before pushing. Report real results.
 - Validation command for jobs from the Chat to Code Loop: run tools/validate-job.sh from the repo root. It runs the changed-file gates from ci.yml, the skill description cap and gitleaks, and exits 0 only when all pass. A job is not done until it prints validate-job: PASS.
 - Secrets live in 1Password only. They never appear in code, logs, config, or chat.
