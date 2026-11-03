@@ -291,6 +291,21 @@ The Estate operates always in beta, never sloppy. Current canon governs, and eve
 
 ---
 
+## Working With Allison
+
+Ruled by Allison 2026-11-02 (Decision Log 2026-11-02, Ship Ember first, harden after, and every AI works with Allison the way North describes). The HQ Rulebook section Working with Allison points to the same source.
+
+Work with Allison the way the Google Doc [HQ-Ember][V1.0] North Handoff describes. Find it in Google Drive by that title and point to it. Never copy its text, link, or ID into this public repo.
+
+- Get to the point, and move when she decides.
+- One decision per message, with a recommendation. No essays.
+- Do not make issues out of non-issues.
+- Ship first, harden after. Review findings, security included, go to one after-launch list, and the live test is the gate.
+
+The HQ Rulebook holds the rest. Where this section and the Rulebook differ, the Rulebook wins.
+
+---
+
 ## Messages Between AIs
 
 Follow the current HQ Rulebook section Handoffs between AIs for passing work and delivery confirmations. It supersedes the retired mail-system instructions. The receiving AI logs the work in the Chat to Code job list; code work travels as a GitHub issue labeled job. A pasted message is not evidence the receiver claimed or completed it.
@@ -482,6 +497,7 @@ Propagation rule: on every version bump, this surface list gets verified against
 
 ## Historical versions
 
+v2.19 -- November 3, 2026 -- Added Working With Allison, ruled by Allison (Decision Log 2026-11-02, Ship Ember first, harden after, and every AI works with Allison the way North describes): work with her the way the Google Doc [HQ-Ember][V1.0] North Handoff describes, found by title and pointed to, never copied; get to the point, move when she decides, one decision per message with a recommendation, no essays, no issues made out of non-issues; ship first and harden after, with review findings, security included, on one after-launch list and the live test as the gate. The HQ Rulebook holds the rest and wins.
 v2.18 -- October 25, 2026 -- Narrowed S Always Means Sent so only S or s means sent and no other single letter does, and pointed bare Q to the new ask-me-questions skill, ruled by Allison (Decision Log 2026-10-25, S means sent, and no other single letter does, and Q means ask me clarifying questions). Companion edits in code-block-routing and pin.
 
 v2.17 -- October 24, 2026 -- Added The Archive Gate And The Orphan Sweep, ruled by Allison (Decision Log 2026-10-24, Archiving is gated on the paper trail, and an orphan sweep catches what slips): a session archives itself only after its report row is written in Handoffs and read back and its incoming row is marked Done with a pointer to that report, the mail box in chat is only the bell, and the Session Stewards sweep for rows and pull requests that slipped. Companion edits in session-wrap, code-block-routing, pin, and session-steward. This Handoffs report row and mail box gate is retired by Decision Log 2026-10-31, Mail boxes and new Handoffs rows stop; the Chat to Code job list replaces it.
