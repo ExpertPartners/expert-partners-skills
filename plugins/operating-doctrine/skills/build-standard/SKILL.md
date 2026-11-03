@@ -88,7 +88,7 @@ Failures weighed. For each failed test, what broke, how bad it is, what it affec
 Chain results. The upstream check, the downstream reruns with their before and after results, and the supervised run on real work.
 Surface checks. Each surface, how it was reached and what was seen.
 Chain map update. The drafted record update for HQ, with feeds, fed by, last test date, result and evidence links.
-Runs unattended. Yes or no, and if yes, the proving runs that earned it with their evidence links, and the charter that records it (Decision Log 2026-11-02, AI employees beyond Ember may run unattended once proven).
+Runs unattended. For an AI employee only, yes or no, and if yes, the proving runs that earned it with their evidence links, and the charter that records it (Decision Log 2026-11-02, AI employees beyond Ember may run unattended once proven). Leave this line out for a skill, prompt or tool.
 Unresolved. Anything open, with its owner. Say none when there is nothing.
 Waiting on. Certification by Claude in HQ and Allison.
 
