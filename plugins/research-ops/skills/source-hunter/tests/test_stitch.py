@@ -509,3 +509,17 @@ def test_a_short_status_line_changing_in_place_still_starts_a_new_screen():
         screens = stitch([_frame(0, BASE[:4] + [before]), _frame(1, BASE[:4] + [after])])
         assert len(screens) == 2
         assert [l.text for l in screens[1].lines] == BASE[:4] + [after]
+
+
+def test_a_numbered_top_title_on_static_slides_still_starts_a_new_screen():
+    # Review on PR 199. "Week 1" then "Week 2" over the same body is two slides,
+    # not a ticking counter, when the second frame adds nothing.
+    body = [
+        "Bring the lantern list to every evening walk",
+        "Keep the garden gate latched after the second bell",
+        "Leave muddy boots beside the cedar bench outside",
+    ]
+    a = ["Week 1 call recording link for the willow cohort"] + body
+    b = ["Week 2 call recording link for the willow cohort"] + body
+    screens = stitch([_frame(0, a), _frame(1, b)])
+    assert len(screens) == 2

@@ -602,7 +602,10 @@ def _grow(doc: list[Line], new: list[Line]) -> list[Line] | None:
                 if head and di == 0 and ni == 0 and _counter_ticked(
                     normalize(old[di].text), normalize(fresh[ni].text)
                 ):
+                    # A number change on top alone could be the next numbered
+                    # slide, so it never lets a frame that adds nothing join.
                     tolerated += 1
+                    unseen += 1
                 elif status_like or _complete(old[di], fresh[ni]) is not None:
                     unseen += 1
                     cut += _cut_off(old[di], fresh[ni])
