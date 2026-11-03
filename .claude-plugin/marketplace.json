@@ -8,7 +8,7 @@
     {
       "name": "operating-doctrine",
       "source": "./plugins/operating-doctrine",
-      "version": "2.80.0",
+      "version": "2.82.4",
       "description": "The non-negotiable operating standard. Loads at every session."
     },
     {
@@ -20,7 +20,7 @@
     {
       "name": "content-engines",
       "source": "./plugins/content-engines",
-      "version": "0.9.1",
+      "version": "0.9.2",
       "description": "Allison Gaddy content and marketing engines (master-marketer-free-agent-builder, rare-content-engine, xavier-offer-builder, dm-to-dollars, video-transcript-relay, content-coach, hook-engine, post-grader, post-scheduler, post-value-filter, social-analyzer, speaker-introduction-writer, stage-cards), plus training and film pre-production (gemini-notebook-training-architect, hero-video-preproduction, brand-film-reverse-engineering)."
     },
     {
@@ -32,7 +32,7 @@
     {
       "name": "research-ops",
       "source": "./plugins/research-ops",
-      "version": "0.5.1",
+      "version": "0.5.6",
       "description": "Research and cataloging skills for capability currency, capability refresh, research intake, video discovery, source hunting, and the Notion skill, GPT, and SOP libraries. Imported TUB analyst prompts are retired and disabled."
     },
     {
