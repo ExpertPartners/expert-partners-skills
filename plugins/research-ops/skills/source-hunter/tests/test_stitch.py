@@ -458,6 +458,23 @@ def test_a_top_line_with_a_running_counter_stays_one_screen():
     assert set(headers) <= _readings(screens[0])
 
 
+def test_a_misread_top_line_with_a_running_counter_stays_one_screen():
+    # Live recheck after PR 199: the real header is also misread a little each frame.
+    spellings = ["juniper", "junlper", "juniper", "jun1per"]
+    headers = [f"Replay chat for the {spellings[n]} cohort {n} viewers {2 * n + 1}" for n in range(4)]
+    frames = [_frame(f, [headers[f]] + MESSAGE[:4 + f]) for f in range(4)]
+    screens = stitch(frames)
+    assert len(screens) == 1
+    assert [l.text for l in screens[0].lines[1:]] == MESSAGE[:7]
+
+
+def test_a_top_line_rewritten_while_its_counter_ticks_still_starts_a_new_screen():
+    a = ["Replay chat for the juniper cohort 1 viewers 3"] + MESSAGE[:4]
+    b = ["Office hours for the maple circle 2 viewers 5"] + MESSAGE[:5]
+    screens = stitch([_frame(0, a), _frame(1, b)])
+    assert len(screens) == 2
+
+
 def test_a_long_line_below_the_top_whose_number_ticks_still_starts_a_new_screen():
     rows = [f"Replay chat for the juniper cohort {n} viewers {2 * n + 1}" for n in range(2)]
     a = MESSAGE[:4] + [rows[0]] + MESSAGE[4:6]

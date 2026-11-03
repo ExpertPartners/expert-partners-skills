@@ -304,8 +304,21 @@ def _stray_digit(na: str, nb: str) -> bool:
 
 
 def _counter_ticked(na: str, nb: str) -> bool:
-    """True when two long readings differ only in their numbers, as a running counter does."""
-    return na != nb and _long(na) and _long(nb) and _letters(na) == _letters(nb)
+    """True when two long readings differ in their numbers, as a running counter does.
+
+    The words around the counter may also be misread a little from frame to
+    frame, so the letters need only be alike at SIMILARITY, and only where the
+    difference looks like OCR damage, never a rewritten line.
+    """
+    if na == nb or not (_long(na) and _long(nb)):
+        return False
+    la, lb = _letters(na), _letters(nb)
+    if re.sub(r"\D", "", na) == re.sub(r"\D", "", nb):
+        return False
+    if la == lb:
+        return True
+    return (SequenceMatcher(None, la, lb, autojunk=False).ratio() >= SIMILARITY
+            and _ocr_damage(na, nb))
 
 
 def _cut_off(old: Line, fresh: Line) -> bool:
