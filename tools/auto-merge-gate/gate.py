@@ -47,7 +47,9 @@ CODEX_STATE_RE = re.compile(r"<!--\s*codex-review-state:v1\s+(\{.*?\})\s*-->", r
 MARKER_RE = re.compile(r"<!-- auto-merge-gate:v1 head=([0-9a-f]{40}) -->")
 CODEX_RECEIPT_MARKER = "codex-review-receipt:v1"
 CODEX_CLEAN_RE = re.compile(r"Codex Review:\s*Didn['\u2019]t find any major issues", re.IGNORECASE)
-CODEX_REVIEWED_COMMIT_RE = re.compile(r"\*\*Reviewed commit:\*\*\s*`([0-9a-fA-F]{7,40})`")
+# At least 10 hex, so a head pushed later cannot cheaply be made to share an
+# older receipt's prefix. Codex names 10.
+CODEX_REVIEWED_COMMIT_RE = re.compile(r"\*\*Reviewed commit:\*\*\s*`([0-9a-fA-F]{10,40})`")
 
 PR_EVENTS = {"pull_request", "pull_request_target", "pull_request_review"}
 
@@ -185,8 +187,9 @@ def has_clean_codex_receipt(comments: list, sha: str) -> bool:
 
     When Codex's code review finds nothing it posts a codex-review-receipt:v1
     comment instead of updating its summary. The receipt names the reviewed
-    commit by an abbreviated sha. Security review receipts carry the same
-    marker but are not a code review, so they never count here."""
+    commit by an abbreviated sha of at least 10 hex, or the full sha.
+    Security review receipts carry the same marker but are not a code review,
+    so they never count here."""
     sha = sha.lower()
     for c in comments:
         if (c.get("user") or {}).get("login") != CODEX_LOGIN:
@@ -228,15 +231,42 @@ def check_problems(gh, cfg: Config, sha: str) -> list[str]:
     return problems
 
 
+def count_open_threads(unresolved_threads) -> tuple[int | None, str | None]:
+    """(open thread count or None, read error message or None)."""
+    try:
+        return (unresolved_threads() if unresolved_threads else None), None
+    except GitHubError as exc:
+        return None, exc.message
+
+
+def security_problems(state: dict | None, sha: str) -> list[str]:
+    security = (state or {}).get("security_review") or {}
+    if security.get("commit_sha") == sha and security.get("has_unresolved_findings") is True:
+        return [f"Codex security review on {sha[:7]} left unresolved findings."]
+    return []
+
+
 def codex_problems(state: dict | None, sha: str, unresolved_threads=None, clean_receipt: bool = False) -> list[str]:
     """unresolved_threads is a callable returning the number of unresolved
-    review threads on the pull request. It is only called in the one case that
-    needs it, see below. clean_receipt says Codex posted a clean code review
+    review threads on the pull request. It is only called in the cases that
+    need it, see below. clean_receipt says Codex posted a clean code review
     receipt for this head (has_clean_codex_receipt)."""
     short = sha[:7]
     if clean_receipt and ((state or {}).get("code_review") or {}).get("commit_sha") != sha:
         # The receipt stands in only for a summary that is missing or still on
         # an older commit. A summary that covers this head keeps deciding.
+        # The receipt says nothing about findings left open on earlier commits,
+        # and the summary it replaces may be stale, so every review thread must
+        # be resolved before it counts.
+        open_threads, error = count_open_threads(unresolved_threads)
+        if open_threads != 0:
+            if error:
+                why = f"the review threads could not be read ({error})"
+            elif open_threads is None:
+                why = "the review threads could not be checked"
+            else:
+                why = f"{open_threads} review thread(s) are still unresolved"
+            return [f"Codex posted a clean code review receipt for {short}, but {why}."] + security_problems(state, sha)
         state = dict(state or {}, code_review={
             "commit_sha": sha, "status": "completed", "has_unresolved_findings": False,
         })
@@ -256,11 +286,9 @@ def codex_problems(state: dict | None, sha: str, unresolved_threads=None, clean_
         # Once a pull request has ever had findings, Codex reports null instead
         # of false even after every finding is fixed and its thread resolved.
         # Then the threads themselves decide: every one must be resolved.
-        try:
-            open_threads = unresolved_threads() if unresolved_threads else None
-        except GitHubError as exc:
-            open_threads = None
-            problems.append(f"Codex code review on {short} reported no open findings, but the review threads could not be read ({exc.message}).")
+        open_threads, error = count_open_threads(unresolved_threads)
+        if error:
+            problems.append(f"Codex code review on {short} reported no open findings, but the review threads could not be read ({error}).")
         if open_threads is None:
             if not problems:
                 problems.append(f"Codex code review on {short} did not report has_unresolved_findings: false.")
@@ -268,9 +296,7 @@ def codex_problems(state: dict | None, sha: str, unresolved_threads=None, clean_
             problems.append(f"Codex code review on {short} has {open_threads} unresolved review thread(s).")
     elif code.get("has_unresolved_findings") is not False:
         problems.append(f"Codex code review on {short} did not report has_unresolved_findings: false.")
-    security = state.get("security_review") or {}
-    if security.get("commit_sha") == sha and security.get("has_unresolved_findings") is True:
-        problems.append(f"Codex security review on {short} left unresolved findings.")
+    problems += security_problems(state, sha)
     return problems
 
 

@@ -98,11 +98,14 @@ class FakeGitHub:
 
 
 class Base(unittest.TestCase):
+    def fake(self, routes):
+        return FakeGitHub(routes)
+
     def evaluate(self, routes, number=7):
-        return gate.evaluate(FakeGitHub(routes), CFG, number)
+        return gate.evaluate(self.fake(routes), CFG, number)
 
     def assert_left_alone(self, routes, fragment):
-        gh = FakeGitHub(routes)
+        gh = self.fake(routes)
         merger = FakeGitHub({})
         self.assertEqual(gate.run_plan(gh, CFG, "pull_request_target", {"pull_request": {"number": 7}}), [])
         self.assertEqual(gate.run_merge(gh, merger, CFG, [7]), [])
@@ -113,7 +116,7 @@ class Base(unittest.TestCase):
         self.assertEqual(merger.calls, [])
 
     def assert_refused(self, routes, fragment):
-        gh = FakeGitHub(routes)
+        gh = self.fake(routes)
         merger = FakeGitHub({})
         ready = gate.run_plan(gh, CFG, "pull_request_target", {"pull_request": {"number": 7}})
         self.assertEqual(ready, [])
@@ -427,13 +430,31 @@ def codex_receipt(sha=HEAD, clean=True, security=False, login="chatgpt-codex-con
 class CodexReceipt(Base):
     """Codex posts a codex-review-receipt:v1 comment, not a summary, when its code review is clean."""
 
+    # What the fake GraphQL thread read returns: a count, an exception to raise, or None for no reader.
+    threads = 0
+
+    def fake(self, routes):
+        gh = FakeGitHub(routes)
+        threads = self.threads
+        if threads is None:
+            return gh
+
+        def unresolved_threads(repo, n):
+            if isinstance(threads, Exception):
+                raise threads
+            return threads
+
+        gh.unresolved_threads = unresolved_threads
+        return gh
+
     def receipt_routes(self, *comments):
         routes = passing_routes()
         routes[f"/repos/{REPO}/issues/7/comments"] = list(comments)
+        routes[f"/repos/{REPO}/pulls/7/reviews"] = []
         return routes
 
     def test_clean_receipt_for_head_merges(self):
-        reader = FakeGitHub(self.receipt_routes(codex_receipt()))
+        reader = self.fake(self.receipt_routes(codex_receipt()))
         merger = FakeGitHub({}, put_result={"sha": "c" * 40, "merged": True})
         ready = gate.run_plan(reader, CFG, "pull_request_target", {"pull_request": {"number": 7}})
         self.assertEqual(ready, [7])
@@ -524,7 +545,60 @@ class CodexReceipt(Base):
         comments = [{"user": {"login": "chatgpt-codex-connector[bot]"}, "body": body}]
         self.assertTrue(gate.has_clean_codex_receipt(comments, head))
         self.assertFalse(gate.has_clean_codex_receipt(comments, "42b26d90b2" + head[10:]))
-        self.assertEqual(gate.codex_problems(None, head, None, True), [])
+        self.assertEqual(gate.codex_problems(None, head, lambda: 0, True), [])
+
+    def test_clean_receipt_with_an_open_thread_refuses(self):
+        self.threads = 1
+        self.assert_refused(self.receipt_routes(codex_receipt()),
+                            f"Codex posted a clean code review receipt for {HEAD[:7]}, but 1 review thread(s) are still unresolved.")
+
+    def test_clean_receipt_does_not_wave_through_open_findings_from_an_older_commit(self):
+        # Codex left a finding on OLD, then posted a clean receipt for HEAD before
+        # refreshing its summary. The finding's thread is still open.
+        self.threads = 1
+        routes = self.receipt_routes(codex_comment(sha=OLD, unresolved=True), codex_receipt())
+        self.assert_refused(routes, "1 review thread(s) are still unresolved")
+
+    def test_clean_receipt_counts_once_older_findings_are_resolved(self):
+        routes = self.receipt_routes(codex_comment(sha=OLD, unresolved=True), codex_receipt())
+        self.assertEqual(self.evaluate(routes).action, "merge")
+
+    def test_clean_receipt_when_threads_cannot_be_read_refuses(self):
+        self.threads = gate.GitHubError(502, "down")
+        self.assert_refused(self.receipt_routes(codex_receipt()), "but the review threads could not be read (down).")
+
+    def test_clean_receipt_without_a_thread_reader_refuses(self):
+        self.threads = None
+        self.assert_refused(self.receipt_routes(codex_receipt()), "but the review threads could not be checked.")
+
+    def test_codex_findings_on_this_head_block_a_clean_receipt(self):
+        routes = self.receipt_routes(codex_receipt())
+        routes[f"/repos/{REPO}/pulls/7/reviews"] = [
+            {"id": 2, "user": {"login": "chatgpt-codex-connector[bot]"}, "commit_id": HEAD}]
+        routes[f"/repos/{REPO}/pulls/7/reviews/2/comments"] = [{"id": 21}]
+        self.assert_refused(routes, "1 review thread(s) are still unresolved")
+
+    def test_receipt_naming_fewer_than_10_hex_refuses(self):
+        for length in (7, 9):
+            receipt = codex_receipt()
+            receipt["body"] = receipt["body"].replace(f"`{HEAD[:10]}`", f"`{HEAD[:length]}`")
+            self.assertFalse(gate.has_clean_codex_receipt([receipt], HEAD), length)
+            self.assertEqual(self.evaluate(self.receipt_routes(receipt)).action, "refuse", length)
+
+    def test_receipt_naming_a_sha_that_is_not_a_prefix_refuses(self):
+        receipt = codex_receipt()
+        receipt["body"] = receipt["body"].replace(f"`{HEAD[:10]}`", f"`{HEAD[:9]}b`")
+        self.assert_refused(self.receipt_routes(receipt), "no Codex review summary")
+
+    def test_security_findings_on_head_are_reported_with_an_open_thread(self):
+        self.threads = 1
+        routes = self.receipt_routes(codex_comment(sha=OLD), codex_receipt())
+        state = routes[f"/repos/{REPO}/issues/7/comments"][0]
+        state["body"] = state["body"].replace(
+            f'"security_review":{{"commit_sha":"{OLD}","has_any_findings":null,"has_unresolved_findings":null',
+            f'"security_review":{{"commit_sha":"{HEAD}","has_any_findings":true,"has_unresolved_findings":true')
+        body = self.assert_refused(routes, "1 review thread(s) are still unresolved")
+        self.assertIn("Codex security review", body)
 
 
 
