@@ -1,0 +1,617 @@
+{
+ "job": 100221,
+ "source": "anonymized title-bar boundaries from a real class (Chat to Code job 100221): every letter-word replaced by a made-up word of the same length, digits, spacing, punctuation and line lengths kept",
+ "main_sha": "b875a93",
+ "expect": "main stitches each pair into 2 screens, protoA2 into 1",
+ "fixtures": [
+  {
+   "boundary": [
+    40,
+    43
+   ],
+   "seed": 1,
+   "frames": [
+    {
+     "index": 40,
+     "first_seen": 3585.48,
+     "time": 3585.6,
+     "lines": [
+      {
+       "text": "1} Nofahiga n butuhepalaho rdsesop tuwuv g jepawi-muhur-hagedeg coc hi Va",
+       "conf": 73.9
+      },
+      {
+       "text": "Z Nke 5 gonilupi, savufe n puse, jifi n puse >",
+       "conf": 87.1
+      },
+      {
+       "text": "B son 4 roli: jepawi-muhur-hagedeg sinowulamog:",
+       "conf": 73.2
+      },
+      {
+       "text": "_ cusomin gisa dimesofeb kib, Domupivu n bogavi jepawi muhur du 5 butavu",
+       "conf": 78.8
+      },
+      {
+       "text": "T Pil tuwuv kame: hagedegv se vuwip, kehuho, suc memodenu-soni gos",
+       "conf": 92.6
+      },
+      {
+       "text": "; c Savu-logomo 5 butavui warimum se bezuside kas hsuc za : nocu, fiko, lakuposo, lu mevovisu rutu 0-100. Cud",
+       "conf": 86.3
+      },
+      {
+       "text": "</> g bi",
+       "conf": 69.0
+      },
+      {
+       "text": "& (lap n beroh mazur) nasi tuwuv becdside jenukev kudaw ke kisagar",
+       "conf": 90.5
+      },
+      {
+       "text": "c) c Wod lofigugenu vuwipr jemo lodowupu sali suc berou molifecedos pa n nocu pilu'pu wuderunab, n dewodepa",
+       "conf": 89.2
+      },
+      {
+       "text": "-H pilu'pu jufutape, n lakuposo pilu'pu gutobipe, lu ke",
+       "conf": 85.3
+      },
+      {
+       "text": "~ mevovisu pilu'pu cabepa voboh. Fiwekeg pa:",
+       "conf": 94.3
+      },
+      {
+       "text": "\"jepawi muhur nasi\", \"vuwip wa nocu\", \"memodenu",
+       "conf": 95.2
+      },
+      {
+       "text": "=n % | Vupe tuwuv soni nasi\", \"puru tujic [butavu] miruc\", \"defer wa",
+       "conf": 78.4
+      },
+      {
+       "text": "lakuposo\", \"cecat nasi mevovisu\", \"piz wu kisagar",
+       "conf": 95.7
+      },
+      {
+       "text": "molifecedos\", \"jepawi muhur juvico\", \"wod nasi",
+       "conf": 94.4
+      },
+      {
+       "text": "* rukedaj pil muhur\", lu gos sesahidup du rucesop",
+       "conf": 88.6
+      },
+      {
+       "text": "butavu cihisija ziruhi mumacezovi se n dmieweepa.",
+       "conf": 95.9
+      },
+      {
+       "text": "> Fiwup n rafahaf... h Zeso fiwekeg foti jenukev jejabiwew n nocu suc",
+       "conf": 84.7
+      },
+      {
+       "text": "N2 lila sa za'p pil vawoh cago. Vafuf elu gos daloza:",
+       "conf": 87.0
+      },
+      {
+       "text": "+ Refabi 4.6 (0) - :",
+       "conf": 71.7
+      },
+      {
+       "text": "cuwagub, pilowepowa, rufa, zahena, cvohfhiga,",
+       "conf": 96.3
+      },
+      {
+       "text": "n Gudosi fu Na suc hke luza mowovugi. Zikiwi wuputi-denod satuweban. fovavadu lakuposo, nuzimob, wutigagu, lu cusuvode",
+       "conf": 90.8
+      }
+     ]
+    },
+    {
+     "index": 43,
+     "first_seen": 3585.64,
+     "time": 3585.72,
+     "lines": [
+      {
+       "text": "0 Nofahiga n butuhepalaho rdsesop tuwuv g jepawi-muhur-hagedeg / TUWUV.fa hii hi",
+       "conf": 77.1
+      },
+      {
+       "text": "Z Nke 5 gonilupi, savufe n puse, jifi n puse >",
+       "conf": 87.1
+      },
+      {
+       "text": "B Cubowehim 4 roli: jepawi-muhur-hagedeg sinowulamog:",
+       "conf": 69.5
+      },
+      {
+       "text": "kzme '",
+       "conf": 41.1
+      },
+      {
+       "text": "_ g n Domupivu n bogavi jepawi muhur du 5 butavu",
+       "conf": 79.2
+      },
+      {
+       "text": "T Pil tuwuv kame: hagedegv se vuwip, kehuho, suc memodenu-soni gos",
+       "conf": 92.6
+      },
+      {
+       "text": "; c Savu-logomo 5 butavui warimum se bezuside kas hsuc za : nocu, fiko, lakuposo, lu mevovisu rutu 0-100. Cud",
+       "conf": 86.3
+      },
+      {
+       "text": "</> b bi",
+       "conf": 59.3
+      },
+      {
+       "text": "& (lap n beroh mazur) nasi tuwuv becdside jenukev kudaw ke kisagar",
+       "conf": 90.5
+      },
+      {
+       "text": "c) c Wod lofigugenu vuwipr jemo lodowupu sali suc berou molifecedos pa n nocu pilu'pu wuderunab, n dewodepa",
+       "conf": 89.2
+      },
+      {
+       "text": "W c Kehuho bahohuz nihogeb jemo jifb bupenebopohu pilu'pu jufutape, n lakuposo pilu'pu gutobipe, lu ke",
+       "conf": 80.9
+      },
+      {
+       "text": "5. Ku mevovisu pilu'pu cabepa voboh. Fiwekeg pa:",
+       "conf": 83.4
+      },
+      {
+       "text": "\"jepawi muhur nasi\", \"vuwip wa nocu\", \"memodenu",
+       "conf": 95.2
+      },
+      {
+       "text": "soni nasi\", \"puru tujic [butavu] miruc\", \"defer wa",
+       "conf": 96.0
+      },
+      {
+       "text": "jepawi-muhur-hagedeg g g n ; ce .",
+       "conf": 48.0
+      },
+      {
+       "text": "No Vupe tuwuv lakuposo\", \"cecat nasi mevovisu\", \"piz wu kisagar",
+       "conf": 83.8
+      },
+      {
+       "text": "molifecedos\", \"jepawi muhur juvico\", \"wod nasi",
+       "conf": 94.4
+      },
+      {
+       "text": "go rukedaj pil muhur\", lu gos sesahidup du rucesop",
+       "conf": 88.1
+      },
+      {
+       "text": "butavu cihisija ziruhi mumacezovi se n dmieweepa.",
+       "conf": 95.9
+      },
+      {
+       "text": "n Fiwup n rafahaf... h Zeso fiwekeg foti jenukev jejabiwew n nocu suc",
+       "conf": 83.1
+      },
+      {
+       "text": "N2 lila sa za'p pil vawoh cago. Vafuf elu gos daloza:",
+       "conf": 88.1
+      },
+      {
+       "text": "+ Refabi 4.6 (0) - :",
+       "conf": 71.7
+      },
+      {
+       "text": "cuwagub, pilowepowa, rufa, zahena, cvohfhiga,",
+       "conf": 96.3
+      },
+      {
+       "text": "n Gudosi fu Na suc hke luza mowovugi. Zikiwi wuputi-denod satuweban. fovavadu lakuposo, nuzimob, wutigagu, lu cusuvode",
+       "conf": 90.8
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "boundary": [
+    114,
+    117
+   ],
+   "seed": 3,
+   "frames": [
+    {
+     "index": 114,
+     "first_seen": 3588.36,
+     "time": 3588.56,
+     "lines": [
+      {
+       "text": "0 Wecedoja n jedonanogovi nafeomu retoh h wesiho-gozeh-sotusar / RETOH.fu jor Mis",
+       "conf": 76.9
+      },
+      {
+       "text": "* ¢ Cahide n ezozufuteca 100/100 hijitim japu n etoh loga",
+       "conf": 64.2
+      },
+      {
+       "text": "M pag vutajur tohuhuj",
+       "conf": 94.8
+      },
+      {
+       "text": "M, f Kewuko ra bev rivimasihag rozeho bojuna lec jiwi jepf pono: wesiho-gozeh-sotusar vecomimuhir:",
+       "conf": 92.2
+      },
+      {
+       "text": "_ Wuhagivo n wakezi wesiho gozeh li 5 toceju",
+       "conf": 93.6
+      },
+      {
+       "text": "lo Kudavun bo japu \"wesiho gozeh pere\" su gojebomu — n zibi, n sotusarb ce zeziz, kugezo, pag racufima-sede rim",
+       "conf": 87.5
+      },
+      {
+       "text": "</> kevahapo, ri tufuw, n wazanuvimi gedlwjv, n deka rasehoki. Bo'fa zibi, mani, kevahapo, hi puwawiha zeri 0-100. Jep",
+       "conf": 95.2
+      },
+      {
+       "text": "& rab suk ribeteri pi bev zewet pe h pere retoh jusegupi wilidan zazic ri gedewiv",
+       "conf": 91.4
+      },
+      {
+       "text": "@ . Nehemagasejosuwuwu 5 fepe} tomucavitem su n zibi bevj'mi Marav n rasehoki",
+       "conf": 54.3
+      },
+      {
+       "text": "JU | tuw j% bevj'mi ruwodupu, n kevahapo bevj'mi bufahogo, hi ri",
+       "conf": 75.1
+      },
+      {
+       "text": "~ puwawiha bevj'mi fosere wagaf. Kudavun su:",
+       "conf": 90.3
+      },
+      {
+       "text": "\"wesiho gozeh pere\", \"zeziz ji zibi\", \"racufima",
+       "conf": 95.8
+      },
+      {
+       "text": "* sede pere\", \"johu ceden [toceju] kucin\", \"casej ji",
+       "conf": 94.0
+      },
+      {
+       "text": "kevahapo\", \"cijim pere puwawiha\", \"muc vo gedewiv",
+       "conf": 95.4
+      },
+      {
+       "text": "tomucavitem\", \"wesiho gozeh huneci\", \"kam pere",
+       "conf": 94.9
+      },
+      {
+       "text": "zibohen bev gozeh\", hi rim gifotezur li ngoeomu",
+       "conf": 96.4
+      },
+      {
+       "text": "toceju fubovulo kubuwu suciceniga ce n rlaasioki.",
+       "conf": 96.0
+      },
+      {
+       "text": "Hotut n benugos... Funi kudavun siji wilidan sifiruhot n zibi pag",
+       "conf": 96.0
+      },
+      {
+       "text": "Z 4 4 [ rabv pi bo't bev gawoz bena. Kufiv khi rim teromi:",
+       "conf": 82.6
+      },
+      {
+       "text": "zuv © notenil, wazanuvimi, gome, lerere, boeucdoja,",
+       "conf": 86.7
+      },
+      {
+       "text": "PA Iwowfd pe Tu pag jri tana jinacojr. Detiro limaba-foham leuufuija. cifalavi kevahapo, jarabiw, wowamada, hi dijemema",
+       "conf": 89.9
+      }
+     ]
+    },
+    {
+     "index": 117,
+     "first_seen": 3588.6,
+     "time": 3588.68,
+     "lines": [
+      {
+       "text": "1) Wecedoja n jedonanogovi nafeomu retoh h wesiho-gozeh-sotusar / RETOH.fu co h 3H",
+       "conf": 71.1
+      },
+      {
+       "text": "La f Cahide kezozufuteca 100/100 hijitim japu n etoh loga",
+       "conf": 80.7
+      },
+      {
+       "text": "M pag vutajur tohuhuj",
+       "conf": 95.8
+      },
+      {
+       "text": "M2, f Kewuko ra bev rivimasihag rozeho bojuna lec jiwi jepf pono: wesiho-gozeh-sotusar vecomimuhir:",
+       "conf": 83.9
+      },
+      {
+       "text": "_ Wuhagivo n wakezi wesiho gozeh li 5 toceju",
+       "conf": 93.4
+      },
+      {
+       "text": "= Kudavun bo japu \"wesiho gozeh pere\" su gojebomu — n zibi, n sotusarb ce zeziz, kugezo, pag racufima-sede rim",
+       "conf": 84.6
+      },
+      {
+       "text": "</> kevahapo, ri tufuw, n wazanuvimi gedlwjv, n deka rasehoki. Bo'fa zibi, mani, kevahapo, hi puwawiha zeri 0-100. Jep",
+       "conf": 95.9
+      },
+      {
+       "text": "& rab suk ribeteri pi bev zewet pe kicip, beva nu pere retoh jusegupi wilidan zazic ri gedewiv",
+       "conf": 92.6
+      },
+      {
+       "text": "tomucavitem su n zibi bevj'mi tabecogen, n rasehoki",
+       "conf": 96.0
+      },
+      {
+       "text": "f vitenazuhoziwemez & Jege retoh bevj'mi ruwodupu, n kevahapo bevj'mi bufahogo, hi ri",
+       "conf": 71.2
+      },
+      {
+       "text": "Retoh 9 9",
+       "conf": 88.8
+      },
+      {
+       "text": "~ . puwawiha bevj'mi fosere wagaf. Kudavun su:",
+       "conf": 80.8
+      },
+      {
+       "text": "\"wesiho gozeh pere\", \"zeziz ji zibi\", \"racufima",
+       "conf": 96.1
+      },
+      {
+       "text": "RA sede pere\", \"johu ceden [toceju] kucin\", \"casej ji",
+       "conf": 85.9
+      },
+      {
+       "text": "kevahapo\", \"cijim pere puwawiha\", \"muc vo gedewiv",
+       "conf": 94.4
+      },
+      {
+       "text": "tomucavitem\", \"wesiho gozeh huneci\", \"kam pere",
+       "conf": 95.2
+      },
+      {
+       "text": "zibohen bev gozeh\", hi rim gifotezur li ngoeomu",
+       "conf": 96.4
+      },
+      {
+       "text": "toceju fubovulo kubuwu suciceniga ce n rlaasioki.",
+       "conf": 96.0
+      },
+      {
+       "text": "Hotut n benugos... Funi kudavun siji wilidan sifiruhot n zibi pag",
+       "conf": 96.4
+      },
+      {
+       "text": "Z [ rabv pi bo't bev gawoz bena. Kufiv khi rim teromi:",
+       "conf": 79.6
+      },
+      {
+       "text": "+ — f notenil, wazanuvimi, gome, lerere, boeucdoja,",
+       "conf": 81.4
+      },
+      {
+       "text": "z& Iwowmd gefukagi jriz tvana jifacoji Detiro wuhofuzimifuz lezufujav cifalavi kevahapo, jarabiw, wowamada, hi dijemema",
+       "conf": 49.4
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "boundary": [
+    234,
+    239
+   ],
+   "seed": 1,
+   "frames": [
+    {
+     "index": 234,
+     "first_seen": 3592.56,
+     "time": 3593.36,
+     "lines": [
+      {
+       "text": "0 Bonezeko n golocobobewu viuouho disig l bifugi-gorec-hamuvas / DISIG.pa NA g- 39",
+       "conf": 72.1
+      },
+      {
+       "text": "ta n Ropema huciwur degiris daje talo papawajumevo",
+       "conf": 82.8
+      },
+      {
+       "text": "L n Nunupo wedividatubi 100/100 saoikih daje n isig vaku",
+       "conf": 88.1
+      },
+      {
+       "text": "cur fotavet fudanub",
+       "conf": 96.5
+      },
+      {
+       "text": "L n Bucuso fu met n wepuza korimu fim cijo lipr vacabuzefoluzelidamin mucu",
+       "conf": 63.4
+      },
+      {
+       "text": "_ Wujufodi n riligi bifugi gorec mi 5 kujiwo",
+       "conf": 93.5
+      },
+      {
+       "text": "~ Vebipoh va daje \"bifugi gorec duve\" bo nucotuho — n duje, n hamuvash mu sobih, ropema, cur vutifuru-tohi hot",
+       "conf": 81.4
+      },
+      {
+       "text": "? tasicele, ho jifop, n zewelatipi letbbcs, n kizo nulazuce. Va'vo duje, roli, tasicele, nu mifesofu pewe 0-100. Lip",
+       "conf": 93.3
+      },
+      {
+       "text": "=) fuw boe jejibowa zu met hutoc pu cunal, metj wac met cotu duve disig wolamulu kuvucik nigog ho letebus",
+       "conf": 94.3
+      },
+      {
+       "text": "@ bavikih. ketihisuvuv bo n duje mete'co pomosiluh, n nulazuce",
+       "conf": 92.8
+      },
+      {
+       "text": "mete'co tipupola, n tasicele mete'co nuneduka, nu ho",
+       "conf": 96.3
+      },
+      {
+       "text": ": Ji so voSijuh Ne mifesofu mete'co dinopa binuj. Vebipoh bo:",
+       "conf": 58.9
+      },
+      {
+       "text": "\"bifugi gorec duve\", \"sobih hi duje\", \"vutifuru",
+       "conf": 95.9
+      },
+      {
+       "text": "tohi duve\", \"tibe danuc [kujiwo] webep\", \"zadat hi",
+       "conf": 96.1
+      },
+      {
+       "text": "3290 tasicele\", \"misul duve mifesofu\", \"ger za letebus",
+       "conf": 83.2
+      },
+      {
+       "text": "ketihisuvuv\", \"bifugi gorec juroza\", \"wac duve",
+       "conf": 95.1
+      },
+      {
+       "text": "f pebecej met gorec\", nu hot gabapegab mi vnuouho",
+       "conf": 87.7
+      },
+      {
+       "text": "kujiwo hoveruvu cujatu rifagetiga mu n nclulsuce.",
+       "conf": 95.8
+      },
+      {
+       "text": "Rupiv n mitedic... Dusu vebipoh tetj kuvucik gimemegut n duje cur",
+       "conf": 96.3
+      },
+      {
+       "text": "Ze 0 fuwn zu va'f met jefif lehi. Wawec tnu hot mizosi:",
+       "conf": 83.3
+      },
+      {
+       "text": "+ Pigotu 4.6 huzo : n8 :",
+       "conf": 69.5
+      },
+      {
+       "text": "socosun, zewelatipi, dusi, nahule, fgognzeko,",
+       "conf": 96.5
+      },
+      {
+       "text": "n Dedini pu Ma cur pho feca jirupuvi. Zadupi tucuni-subot hatecefib. madabizu tasicele, cihanuv, godegipi, nu fodisufi",
+       "conf": 89.7
+      }
+     ]
+    },
+    {
+     "index": 239,
+     "first_seen": 3593.4,
+     "time": 3593.56,
+     "lines": [
+      {
+       "text": "0 Bonezeko n golocobobewu viuouho disig l bifugi-gorec-hamuvas / DISIG.pa G) jiz VFu",
+       "conf": 76.3
+      },
+      {
+       "text": "ta n Ropema huciwur degiris daje talo papawajumevo",
+       "conf": 82.8
+      },
+      {
+       "text": "L n Nunupo wedividatubi 100/100 saoikih daje n isig vaku",
+       "conf": 88.1
+      },
+      {
+       "text": "cur fotavet fudanub",
+       "conf": 96.5
+      },
+      {
+       "text": "L n Bucuso fu met n wepuza korimu fim cijo lipr vacabuzefoluzelidamin mucu",
+       "conf": 63.4
+      },
+      {
+       "text": "_ Wujufodi n riligi bifugi gorec mi 5 kujiwo",
+       "conf": 93.5
+      },
+      {
+       "text": "~ Vebipoh va daje \"bifugi gorec duve\" bo nucotuho — n duje, n hamuvash mu sobih, ropema, cur vutifuru-tohi hot",
+       "conf": 81.4
+      },
+      {
+       "text": "? tasicele, ho jifop, n zewelatipi letbbcs, n kizo nulazuce. Va'vo duje, roli, tasicele, nu mifesofu pewe 0-100. Lip",
+       "conf": 93.3
+      },
+      {
+       "text": "=) fuw boe jejibowa zu met hutoc pu cunal, metj wac met cotu duve disig wolamulu kuvucik nigog ho letebus",
+       "conf": 94.3
+      },
+      {
+       "text": "@ bavikih. ketihisuvuv bo n duje mete'co pomosiluh, n nulazuce",
+       "conf": 92.8
+      },
+      {
+       "text": "mete'co tipupola, n tasicele mete'co nuneduka, nu ho",
+       "conf": 96.3
+      },
+      {
+       "text": "n wi hibatagedob ku — mifesofu mete'co dinopa binuj. Vebipoh bo:",
+       "conf": 67.1
+      },
+      {
+       "text": "\"bifugi gorec duve\", \"sobih hi duje\", \"vutifuru",
+       "conf": 95.9
+      },
+      {
+       "text": "tohi duve\", \"tibe danuc [kujiwo] webep\", \"zadat hi",
+       "conf": 96.1
+      },
+      {
+       "text": "3290 tasicele\", \"misul duve mifesofu\", \"ger za letebus",
+       "conf": 83.2
+      },
+      {
+       "text": "ketihisuvuv\", \"bifugi gorec juroza\", \"wac duve",
+       "conf": 95.1
+      },
+      {
+       "text": "f pebecej met gorec\", nu hot gabapegab mi vnuouho",
+       "conf": 87.7
+      },
+      {
+       "text": "kujiwo hoveruvu cujatu rifagetiga mu n nclulsuce.",
+       "conf": 95.8
+      },
+      {
+       "text": "Rupiv n mitedic... Dusu vebipoh tetj kuvucik gimemegut n duje cur",
+       "conf": 96.3
+      },
+      {
+       "text": "Ze 0 fuwn zu va'f met jefif lehi. Wawec tnu hot mizosi:",
+       "conf": 83.3
+      },
+      {
+       "text": "+ Pigotu 4.6 huzo : n8 :",
+       "conf": 69.5
+      },
+      {
+       "text": "socosun, zewelatipi, dusi, nahule, fgognzeko,",
+       "conf": 96.5
+      },
+      {
+       "text": "n Dedini pu Ma cur pho feca jirupuvi. Zadupi tucuni-subot hatecefib. madabizu tasicele, cihanuv, godegipi, nu fodisufi",
+       "conf": 89.7
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

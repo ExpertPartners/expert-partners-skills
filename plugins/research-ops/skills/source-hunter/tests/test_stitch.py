@@ -548,3 +548,17 @@ def test_a_numbered_top_title_on_static_slides_still_starts_a_new_screen():
     b = ["Week 2 call recording link for the willow cohort"] + body
     screens = stitch([_frame(0, a), _frame(1, b)])
     assert len(screens) == 2
+
+
+def test_a_noisy_title_bar_on_real_frames_stays_one_screen():
+    # Anonymized real boundaries (job 100221). Each split on main before this fix.
+    import json
+    from pathlib import Path
+
+    data = json.loads((Path(__file__).parent / "fixtures" / "noisy_title_bar.json").read_text())
+    for fixture in data["fixtures"]:
+        frames = [
+            (f["index"], f["first_seen"], f["time"], [Line(l["text"], l["conf"]) for l in f["lines"]])
+            for f in fixture["frames"]
+        ]
+        assert len(stitch(frames)) == 1, fixture["boundary"]
