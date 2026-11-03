@@ -7,7 +7,9 @@ Run from the repo root: python3 -m unittest discover -s tools/overlap-check/test
 import importlib.util
 import os
 import sys
+import tempfile
 import unittest
+from unittest import mock
 
 HERE = os.path.dirname(__file__)
 spec = importlib.util.spec_from_file_location("overlap_check", os.path.join(HERE, "..", "overlap_check.py"))
@@ -19,6 +21,10 @@ spec.loader.exec_module(oc)
 REPO = "ExpertPartners/expert-partners-skills"
 CFG = oc.Config(repo=REPO, settle_seconds=0)
 ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
+NEVER_ASK = (
+    "Never ask the user inside Factory. Put any question on the GitHub issue as a comment starting Q"
+    "uestion for Allison, or on the job list as needs-allison with a line starting Recommend:, and keep working on everything else."
+)
 
 
 def job_body(*paths):
@@ -148,6 +154,33 @@ class ParseScope(unittest.TestCase):
         ])
         self.assertEqual(oc.parse_scope(body), [".claude-plugin/marketplace.json"])
 
+    def test_bold_section_labels_end_the_scope(self):
+        body = "\n".join([
+            "**Files in scope**",
+            "- `tools/release/notes.py`",
+            "",
+            "**Acceptance checks**",
+            "1. `tools/validate-job.sh` prints `validate-job: PASS`.",
+            "**Decisions already made**",
+            "- Follow `AGENTS.md`",
+        ])
+        self.assertEqual(oc.parse_scope(body), ["tools/release/notes.py"])
+
+    def test_bold_label_with_the_colon_inside(self):
+        for heading in ("**Files in scope:**", "**Files in scope**:", "__Files in scope__", "### Files in scope:"):
+            body = "\n".join([heading, "- `a/b.py`", "**Acceptance checks:**", "- `c/d.py`"])
+            self.assertEqual(oc.parse_scope(body), ["a/b.py"], heading)
+
+    def test_directory_without_a_trailing_slash_is_kept(self):
+        body = "\n".join([
+            "## Files in scope",
+            "- `tools/auto-merge-gate`",
+            "- skills/brand-voice for the voice notes",
+            "- See https://example.com/a/b",
+            "## Acceptance checks",
+        ])
+        self.assertEqual(oc.parse_scope(body), ["tools/auto-merge-gate", "skills/brand-voice"])
+
     def test_no_scope_section(self):
         self.assertEqual(oc.parse_scope("## Mission\nNothing listed."), [])
         self.assertEqual(oc.parse_scope(None), [])
@@ -163,6 +196,11 @@ class PathsOverlap(unittest.TestCase):
         self.assertFalse(oc.paths_overlap("tools/x", "tools/xy/a.py"))
         self.assertFalse(oc.paths_overlap("tools/x/a.py", "tools/x/b.py"))
         self.assertFalse(oc.paths_overlap("README.md", "tools/x/README.md"), "only shared files match by name")
+
+    def test_directory_named_without_a_trailing_slash(self):
+        self.assertTrue(oc.paths_overlap("tools/auto-merge-gate", "tools/auto-merge-gate/gate.py"))
+        self.assertTrue(oc.paths_overlap("skills/brand-voice/SKILL.md", "skills/brand-voice"))
+        self.assertFalse(oc.paths_overlap("tools/auto-merge-gate", "tools/auto-merge-gate-two/a.py"))
 
     def test_shared_files(self):
         for p in ("plugins/a/.claude-plugin/plugin.json", ".claude-plugin/marketplace.json",
@@ -338,24 +376,117 @@ class RunNext(unittest.TestCase):
             issue(163, "tools/unrelated/a.py", labels=("job",)),
         ], [blocker])
         sent = []
-        self.assertEqual(oc.run_next(gh, CFG, sent.append), 161)
-        self.assertEqual(sent, [161], "one dispatch per closed pull request")
-        self.assertEqual(gh.writes(), [], "next writes nothing but the dispatch")
+        self.assertEqual(oc.run_next(gh, CFG, sent.append), [161, 162])
+        self.assertEqual(sent, [161, 162], "every waiting job that can start is sent")
+        self.assertEqual(gh.writes(), [
+            ("DELETE", f"/repos/{REPO}/issues/161/labels/waiting", None),
+            ("DELETE", f"/repos/{REPO}/issues/162/labels/waiting", None),
+        ], "next writes nothing but the claims")
+        self.assertEqual(gh.labels(159), {"job", "waiting"})
+
+    def test_two_colliding_waiting_jobs_are_not_sent_together(self):
+        gh = FakeGitHub([
+            issue(159, "AGENTS.md", labels=("job", "waiting")),
+            issue(161, "AGENTS.md", labels=("job", "waiting")),
+        ])
+        sent = []
+        self.assertEqual(oc.run_next(gh, CFG, sent.append), [159])
+        self.assertEqual(gh.labels(161), {"job", "waiting"})
+
+    def test_a_job_another_run_already_claimed_is_not_sent_again(self):
+        gh = FakeGitHub([issue(159, "tools/a.py", labels=("job", "waiting"))])
+        sent = []
+        # Both runs list #159 as waiting before either claims it.
+        listing = gh.paginate(f"/repos/{REPO}/issues", {"labels": "job,waiting"})
+        self.assertEqual(oc.run_next(gh, CFG, sent.append), [159])
+        with mock.patch.object(gh, "paginate", side_effect=lambda path, params=None: (
+                listing if path == f"/repos/{REPO}/issues" and "waiting" in (params or {}).get("labels", "")
+                else FakeGitHub.paginate(gh, path, params))):
+            self.assertEqual(oc.run_next(gh, CFG, sent.append), [])
+        self.assertEqual(sent, [159], "the second run finds the claim gone and sends nothing")
+
+    def test_a_failed_dispatch_puts_the_claim_back(self):
+        gh = FakeGitHub([issue(159, "tools/a.py", labels=("job", "waiting"))])
+
+        def fail(number):
+            raise oc.GitHubError(500, "boom")
+
+        with self.assertRaises(oc.GitHubError):
+            oc.run_next(gh, CFG, fail)
+        self.assertEqual(gh.labels(159), {"job", "waiting"})
 
     def test_starts_again_once_the_blocking_pull_request_closes(self):
         _, blocker = pr(156, ["tools/overlap-check/overlap_check.py"], closes=155)
         others = [pr(n, [f"tools/t{n}/a.py"], closes=n + 100)[1] for n in range(1, 7)]
         gh = FakeGitHub([issue(158, "tools/overlap-check/", labels=("job", "waiting"))], others + [blocker])
         sent = []
-        self.assertIsNone(oc.run_next(gh, CFG, sent.append))
+        self.assertEqual(oc.run_next(gh, CFG, sent.append), [])
         gh.prs = others  # #156 merged; six other open pull requests do not hold it
-        self.assertEqual(oc.run_next(gh, CFG, sent.append), 158)
+        self.assertEqual(oc.run_next(gh, CFG, sent.append), [158])
         self.assertEqual(sent, [158])
 
     def test_workflow_file_from_ref(self):
         self.assertEqual(
             oc.workflow_file("ExpertPartners/x/.github/workflows/factory-chat-to-code-loop-builder-skills.yml@refs/heads/main"),
             "factory-chat-to-code-loop-builder-skills.yml")
+
+
+class RunRelease(unittest.TestCase):
+    def test_failed_build_without_a_pull_request_goes_back_to_waiting(self):
+        gh = FakeGitHub([issue(159, "tools/a.py", labels=("job", "in-progress"))])
+        self.assertEqual(oc.run_release(gh, CFG, 159, "failure"), "waiting")
+        self.assertEqual(gh.labels(159), {"job", "waiting"})
+        self.assertIn("did not finish (result: failure)", gh.comment_bodies(159)[0])
+
+        # It no longer holds an overlapping job, and the next restart sends it again.
+        other = FakeGitHub([issue(159, "tools/a.py", labels=("job", "waiting")), issue(161, "tools/a.py")])
+        self.assertTrue(oc.run_check(other, CFG, 161, sleep=lambda s: None))
+
+    def test_cancelled_build_is_released_too(self):
+        gh = FakeGitHub([issue(159, "tools/a.py", labels=("job", "in-progress"))])
+        self.assertEqual(oc.run_release(gh, CFG, 159, "cancelled"), "waiting")
+        self.assertNotIn("in-progress", gh.labels(159))
+
+    def test_successful_build_without_a_pull_request_stops_holding(self):
+        gh = FakeGitHub([issue(159, "tools/a.py", labels=("job", "in-progress"))])
+        self.assertEqual(oc.run_release(gh, CFG, 159, "success"), "released")
+        self.assertEqual(gh.labels(159), {"job"}, "not queued again, so a finished run never loops")
+
+    def test_a_build_with_its_pull_request_keeps_its_labels(self):
+        _, own = pr(166, ["tools/a.py"], closes=159)
+        for result in ("success", "failure"):
+            gh = FakeGitHub([issue(159, "tools/a.py", labels=("job", "in-progress"))], [own])
+            self.assertEqual(oc.run_release(gh, CFG, 159, result), "kept")
+            self.assertEqual(gh.writes(), [])
+
+
+class Main(unittest.TestCase):
+    def run_main(self, gh, argv, **env):
+        with tempfile.NamedTemporaryFile("r", suffix=".out") as out:
+            base = {"GITHUB_REPOSITORY": REPO, "OVERLAP_TOKEN": "t", "GITHUB_OUTPUT": out.name,
+                    "OVERLAP_SETTLE_SECONDS": "0"}
+            with mock.patch.dict(os.environ, {**base, **env}), mock.patch.object(oc, "GitHub", return_value=gh):
+                code = oc.main(argv)
+            return code, open(out.name, encoding="utf-8").read()
+
+    def test_a_network_error_leaves_the_job_waiting_without_in_progress(self):
+        gh = FakeGitHub([issue(159, "tools/a.py", labels=("job", "in-progress"))])
+        real_get = gh.get
+        gh.get = mock.Mock(side_effect=TimeoutError("timed out"))
+        code, out = self.run_main(gh, ["check"], OVERLAP_ISSUE="159")
+        gh.get = real_get
+        self.assertEqual(code, 1)
+        self.assertEqual(out, "start=false\n")
+        self.assertEqual(gh.labels(159), {"job", "waiting"})
+
+    def test_issue_typed_with_a_hash(self):
+        gh = FakeGitHub([issue(159, "tools/a.py")])
+        code, out = self.run_main(gh, ["check"], OVERLAP_ISSUE="#159")
+        self.assertEqual((code, out), (0, "start=true\n"))
+
+    def test_unreadable_issue_input_does_not_start(self):
+        code, out = self.run_main(FakeGitHub(), ["check"], OVERLAP_ISSUE="abc")
+        self.assertEqual((code, out), (1, "start=false\n"))
 
 
 class Workflows(unittest.TestCase):
@@ -367,7 +498,8 @@ class Workflows(unittest.TestCase):
 
     def test_reusable_workflow_keeps_the_author_allowlist(self):
         text = self.read("factory-builder-reusable.yml")
-        self.assertEqual(text.count('["AllisonGaddy","expertpartners","expertpartners-ember"]'), 2)
+        self.assertEqual(
+            text.count('["AllisonGaddy","expertpartners","expertpartners-ember","expertpartners-aura"]'), 2)
         self.assertIn("workflow_call:", text)
         self.assertIn('python3 "$script" check', text)
         self.assertIn('python3 "$script" next', text)
@@ -382,8 +514,27 @@ class Workflows(unittest.TestCase):
         # A ref the caller or a pull request could set would let pull request code run in
         # the privileged pull_request_target redispatch job.
         text = self.read("factory-builder-reusable.yml")
-        self.assertEqual(text.count("ref: main"), 2)
+        self.assertEqual(text.count("ref: main"), 3)
         self.assertNotIn("tools_ref", text)
+
+    def test_failed_builds_are_released(self):
+        text = self.read("factory-builder-reusable.yml")
+        self.assertIn("needs: [gate, build]", text)
+        self.assertIn("if: always() && needs.gate.outputs.start == 'true'", text)
+        self.assertIn("BUILD_RESULT: ${{ needs.build.result }}", text)
+        self.assertIn('python3 "$script" release', text)
+
+    def test_restarts_on_closed_issues_and_removed_in_progress(self):
+        text = self.read("factory-builder-reusable.yml")
+        self.assertIn("(github.event_name == 'issues' && github.event.action == 'closed')", text)
+        self.assertIn("github.event.label.name == 'in-progress'", text)
+        caller = self.read("factory-chat-to-code-loop-builder-skills.yml")
+        for kind in ("labeled", "opened", "closed", "unlabeled"):
+            self.assertIn(f"      - {kind}\n", caller)
+
+    def test_every_builder_workflow_carries_the_never_ask_line(self):
+        for name in ("factory-builder-reusable.yml", "factory-chat-to-code-loop-builder-skills.yml"):
+            self.assertIn(NEVER_ASK, self.read(name), name)
 
     def test_skills_caller_is_small_and_passes_the_key(self):
         text = self.read("factory-chat-to-code-loop-builder-skills.yml")

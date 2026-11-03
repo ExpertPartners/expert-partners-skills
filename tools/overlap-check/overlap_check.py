@@ -8,13 +8,18 @@ issue. Shared files (plugin.json, marketplace.json, CHANGELOG.md, AGENTS.md, loc
 the same way and are named as shared in the comment. A held issue gets "Waiting on #N, same
 file". There is no cap on how many builds or open pull requests a repo may have.
 
-Two subcommands, run by .github/workflows/factory-builder-reusable.yml:
+Three subcommands, run by .github/workflows/factory-builder-reusable.yml:
 
-  check  Judge OVERLAP_ISSUE. A clear issue is labeled in-progress (and job) and loses
-         waiting. A held issue is labeled waiting and gets one comment saying what it waits
-         on, edited in place when that changes. Writes start=true|false to GITHUB_OUTPUT.
-  next   After a pull request closes, find the oldest open Job issue labeled waiting that
-         would start now and dispatch the builder workflow for it. Writes dispatched=<n>.
+  check    Judge OVERLAP_ISSUE. A clear issue is labeled in-progress (and job) and loses
+           waiting. A held issue is labeled waiting and gets one comment saying what it waits
+           on, edited in place when that changes. Writes start=true|false to GITHUB_OUTPUT.
+  release  After a build the gate started, when no open builder pull request closes
+           OVERLAP_ISSUE, drop its in-progress label so it holds nothing. A build that did not
+           succeed (BUILD_RESULT) goes back to waiting, so it starts again on its own.
+  next     After a pull request or issue closes, or in-progress is removed, dispatch the
+           builder for every waiting Job issue that would start now, oldest first. Each one is
+           claimed by removing its waiting label first, so two runs never dispatch the same
+           job. Writes dispatched=<n,n,...>.
 
 OVERLAP_TOKEN (the workflow's own token) does every read and write. Standard library only.
 """
@@ -61,11 +66,13 @@ SHARED_BASENAMES = {
 
 MARKER = "<!-- factory-overlap-check:v1 -->"
 CLOSES_RE = re.compile(r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)\b", re.IGNORECASE)
-SCOPE_HEADING_RE = re.compile(r"^\s*(?:#+\s*)?\**files in scope\**\s*:?\s*$", re.IGNORECASE)
 HEADING_RE = re.compile(r"^\s*#+\s+\S")
-# Bare section names from .github/ISSUE_TEMPLATE/job.md, for bodies written without ## headings.
+SCOPE_SECTION = "files in scope"
+# Section names from .github/ISSUE_TEMPLATE/job.md and common additions, for bodies written
+# with bare or bold labels instead of ## headings.
 SECTION_NAMES = {
     "mission", "goal", "objective", "acceptance checks", "decisions already made",
+    "out of scope", "not in scope", "constraints", "notes", "context", "background", "validation",
 }
 BACKTICK_RE = re.compile(r"`([^`]+)`")
 BARE_FILENAMES = {"Makefile", "Dockerfile", "CODEOWNERS", "LICENSE", "Procfile", "Gemfile", "Brewfile"}
@@ -137,18 +144,23 @@ class GitHub:
 # ---------------------------------------------------------------- pure logic
 
 
+def section_name(line: str) -> str:
+    """'## Files in scope', '**Files in scope:**', '__Files in scope__:' -> 'files in scope'."""
+    s = re.sub(r"^\s*#+\s*", "", line).strip()
+    s = s.strip("*_ ").rstrip(":").strip("*_ ").rstrip(":").strip()
+    return s.lower()
+
+
 def parse_scope(body: str | None) -> list[str]:
     """The paths listed under Files in scope, in order, without the (new) marks."""
     paths: list[str] = []
     in_scope = False
     for line in (body or "").splitlines():
-        if SCOPE_HEADING_RE.match(line):
-            in_scope = True
-            continue
         if not in_scope:
+            in_scope = section_name(line) == SCOPE_SECTION
             continue
         stripped = line.strip()
-        if HEADING_RE.match(line) or stripped.rstrip(":").lower() in SECTION_NAMES or stripped == "---":
+        if HEADING_RE.match(line) or section_name(line) in SECTION_NAMES or stripped == "---":
             break
         if not stripped:
             continue
@@ -164,16 +176,32 @@ def parse_scope(body: str | None) -> list[str]:
 
 def looks_like_path(path: str) -> bool:
     """Keeps prose and branch names out of the scope: a file has an extension or a known
-    bare name, a directory ends in /, a glob has a wildcard."""
-    if not path or " " in path:
+    bare name, a directory ends in / or is a slashed path, a glob has a wildcard. Builder
+    branch names (job/...) and URLs are not paths."""
+    if not path or " " in path or "://" in path or path.startswith(BUILDER_BRANCH_PREFIX):
         return False
     last = path.rstrip("/").rsplit("/", 1)[-1]
     return (
-        path.endswith("/")
+        "/" in path
         or any(ch in path for ch in "*?[")
         or "." in last.lstrip(".") or (last.startswith(".") and len(last) > 1)
         or last in BARE_FILENAMES
     )
+
+
+def is_glob(path: str) -> bool:
+    return any(ch in path for ch in "*?[")
+
+
+def as_directory(path: str) -> str | None:
+    """The directory prefix a path stands for: 'tools/x/' as is, and 'tools/x' too, since a
+    slashed entry with no extension may name a directory written without its trailing /."""
+    if path.endswith("/"):
+        return path
+    last = path.rsplit("/", 1)[-1]
+    if "/" in path and "." not in last and last not in BARE_FILENAMES and not is_glob(path):
+        return path + "/"
+    return None
 
 
 def normalize(path: str) -> str:
@@ -198,9 +226,10 @@ def paths_overlap(a: str, b: str) -> bool:
     if is_shared(a) and is_shared(b) and ("/" not in a or "/" not in b):
         return a.rsplit("/", 1)[-1].lower() == b.rsplit("/", 1)[-1].lower()
     for x, y in ((a, b), (b, a)):
-        if x.endswith("/") and y.startswith(x):
+        prefix = as_directory(x)
+        if prefix and y.startswith(prefix):
             return True
-        if any(ch in x for ch in "*?[") and fnmatch.fnmatchcase(y, x):
+        if is_glob(x) and fnmatch.fnmatchcase(y, x):
             return True
     return False
 
@@ -286,8 +315,8 @@ def comment_body(v: Verdict) -> str:
         lines.append(f"- #{o.number} ({what}): {named}")
     lines += [
         "",
-        "This build starts on its own when a pull request in this repo closes and nothing "
-        "above still holds it.",
+        "This build starts on its own when a pull request or job issue in this repo closes, "
+        "or a job loses its in-progress label, and nothing above still holds it.",
     ]
     return "\n".join(lines)
 
@@ -406,22 +435,83 @@ def report(number: int, v: Verdict, again: bool = False) -> None:
         print(f"overlap-check: #{number} waits{when}: {'; '.join(v.lines())}")
 
 
-def run_next(gh, cfg: Config, dispatch) -> int | None:
-    """Dispatch the oldest waiting Job issue that would start now. Writes nothing else."""
+def claim(gh, cfg: Config, number: int) -> bool:
+    """Take a waiting job for one dispatch by removing its waiting label. GitHub answers 404
+    when the label is already gone, so when two runs race for the same job only the first
+    removal succeeds and only that run dispatches it."""
+    try:
+        gh.delete(f"/repos/{cfg.repo}/issues/{number}/labels/{urllib.parse.quote(WAITING_LABEL)}")
+    except GitHubError as exc:
+        if exc.status == 404:
+            return False
+        raise
+    return True
+
+
+def run_next(gh, cfg: Config, dispatch) -> list[int]:
+    """Dispatch every waiting Job issue that would start now, oldest first. A job dispatched
+    in this pass holds its files for the later ones, so two colliding jobs are never sent
+    together. Writes nothing but the claim, and puts the claim back if the dispatch fails."""
     waiting = gh.paginate(
         f"/repos/{cfg.repo}/issues",
         {"state": "open", "labels": f"{JOB_LABEL},{WAITING_LABEL}", "sort": "created", "direction": "asc"},
     )
+    prs = open_builder_prs(gh, cfg)
+    holders = in_progress_issues(gh, cfg)
+    sent: list[int] = []
     for issue in sorted((i for i in waiting if "pull_request" not in i), key=lambda i: int(i["number"])):
-        v = judge(gh, cfg, issue)
         number = int(issue["number"])
-        if v.start:
+        v = evaluate(number, parse_scope(issue.get("body")), prs, holders)
+        if not v.start:
+            print(f"overlap-check: waiting job #{number} still waits: {'; '.join(v.lines())}")
+            continue
+        if not claim(gh, cfg, number):
+            print(f"overlap-check: waiting job #{number} was already taken by another run.")
+            continue
+        try:
             dispatch(number)
-            print(f"overlap-check: dispatched the builder for waiting job #{number}.")
-            return number
-        print(f"overlap-check: waiting job #{number} still waits: {'; '.join(v.lines())}")
-    print("overlap-check: no waiting job can start yet.")
-    return None
+        except Exception:
+            add_labels(gh, cfg, number, [JOB_LABEL, WAITING_LABEL])
+            raise
+        holders.append(Holder(number, "issue", v.scope))
+        sent.append(number)
+        print(f"overlap-check: dispatched the builder for waiting job #{number}.")
+    if not sent:
+        print("overlap-check: no waiting job can start yet.")
+    return sent
+
+
+def release_body(result: str) -> str:
+    if result == "success":
+        return "\n".join([
+            MARKER,
+            "The build finished without opening a pull request for this job, so it no longer "
+            "holds its files. Add the job label again or dispatch the builder to build it again.",
+        ])
+    return "\n".join([
+        MARKER,
+        f"The build did not finish (result: {result or 'unknown'}), so this job no longer holds "
+        "its files and waits to start again. It starts on its own when a pull request or job "
+        "issue in this repo closes, or a job loses its in-progress label.",
+    ])
+
+
+def run_release(gh, cfg: Config, number: int, result: str) -> str:
+    """After a build the gate started. Returns kept, released or waiting."""
+    if any(number in p.closes for p in open_builder_prs(gh, cfg)):
+        print(f"overlap-check: #{number} has an open pull request, which holds its files.")
+        return "kept"
+    issue = gh.get(f"/repos/{cfg.repo}/issues/{number}")
+    remove_label(gh, cfg, number, IN_PROGRESS_LABEL)
+    if result == "success" or issue.get("state") == "closed":
+        if issue.get("state") != "closed":
+            upsert_comment(gh, cfg, number, release_body("success"))
+        print(f"overlap-check: #{number} built with no pull request; in-progress removed.")
+        return "released"
+    add_labels(gh, cfg, number, [JOB_LABEL, WAITING_LABEL])
+    upsert_comment(gh, cfg, number, release_body(result))
+    print(f"overlap-check: #{number} build ended {result or 'unknown'}; back to waiting.")
+    return "waiting"
 
 
 def workflow_file(workflow_ref: str) -> str:
@@ -437,9 +527,14 @@ def write_output(key: str, value: str) -> None:
             fh.write(f"{key}={value}\n")
 
 
+def issue_number() -> int:
+    """OVERLAP_ISSUE as a number; a manual dispatch may type it as #158."""
+    return int(os.environ.get("OVERLAP_ISSUE", "").strip().lstrip("#"))
+
+
 def main(argv: list[str]) -> int:
-    if len(argv) != 1 or argv[0] not in ("check", "next"):
-        print("usage: overlap_check.py check|next", file=sys.stderr)
+    if len(argv) != 1 or argv[0] not in ("check", "next", "release"):
+        print("usage: overlap_check.py check|next|release", file=sys.stderr)
         return 2
     cfg = Config(
         repo=os.environ["GITHUB_REPOSITORY"],
@@ -448,19 +543,29 @@ def main(argv: list[str]) -> int:
     gh = GitHub(os.environ["OVERLAP_TOKEN"], os.environ.get("GITHUB_API_URL", "https://api.github.com"))
 
     if argv[0] == "check":
-        number = int(os.environ["OVERLAP_ISSUE"])
+        number = None
         try:
+            number = issue_number()
             start = run_check(gh, cfg, number)
-        except GitHubError as exc:
-            print(f"::error::overlap-check: #{number} could not be checked: {exc}")
+        except Exception as exc:  # any failure must leave the job where a restart finds it
+            print(f"::error::overlap-check: #{number or os.environ.get('OVERLAP_ISSUE')} could not be checked: {exc!r}")
             write_output("start", "false")
-            # Leave the job where the next closed pull request will pick it up again.
-            try:
-                add_labels(gh, cfg, number, [JOB_LABEL, WAITING_LABEL])
-            except GitHubError:
-                pass
+            if number is not None:
+                try:
+                    remove_label(gh, cfg, number, IN_PROGRESS_LABEL)
+                    add_labels(gh, cfg, number, [JOB_LABEL, WAITING_LABEL])
+                except Exception:
+                    pass
             return 1
         write_output("start", "true" if start else "false")
+        return 0
+
+    if argv[0] == "release":
+        try:
+            run_release(gh, cfg, issue_number(), os.environ.get("BUILD_RESULT", ""))
+        except Exception as exc:
+            print(f"::error::overlap-check: #{os.environ.get('OVERLAP_ISSUE')} could not be released: {exc!r}")
+            return 1
         return 0
 
     workflow = workflow_file(os.environ["BUILDER_WORKFLOW_REF"])
@@ -473,11 +578,11 @@ def main(argv: list[str]) -> int:
         )
 
     try:
-        number = run_next(gh, cfg, dispatch)
-    except GitHubError as exc:
-        print(f"::error::overlap-check: waiting jobs could not be checked: {exc}")
+        sent = run_next(gh, cfg, dispatch)
+    except Exception as exc:
+        print(f"::error::overlap-check: waiting jobs could not be checked: {exc!r}")
         return 1
-    write_output("dispatched", str(number or ""))
+    write_output("dispatched", ",".join(str(n) for n in sent))
     return 0
 
 

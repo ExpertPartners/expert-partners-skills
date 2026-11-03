@@ -11,16 +11,19 @@
 # repository secret with the same name overrides it, so remove the repository copy once the
 # organization secret is set.
 #
-# Three jobs:
+# Four jobs:
 #   gate        Runs tools/overlap-check (checked out from this repo's main, so a pull
 #               request cannot loosen it) before every build. A job that changes the same
 #               file as an open builder pull request or another in-progress job waits with
 #               a comment naming it. Nothing else holds a build (Decision Log 2026-11-02,
 #               No caps stop work).
 #   build       The Factory droid, unchanged from the single-file builder.
-#   redispatch  When a pull request closes, dispatches the oldest waiting job that can
-#               start now. It runs on pull_request_target, so it never checks out pull
-#               request code, only the overlap check from main.
+#   release     After a build the gate started, when no open pull request closes the job,
+#               removes in-progress so the job stops holding its files. A build that did
+#               not succeed goes back to waiting.
+#   redispatch  When a pull request or issue closes, or an issue loses in-progress,
+#               dispatches every waiting job that can start now. On pull_request_target it
+#               never checks out pull request code, only the overlap check from main.
 name: Factory Builder (reusable)
 "on":
   workflow_call:
@@ -48,10 +51,10 @@ jobs:
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (github.event.action == 'labeled' && github.event.label.name == 'job' &&
-        contains(fromJSON('["AllisonGaddy","expertpartners","expertpartners-ember"]'), github.event.issue.user.login) &&
+        contains(fromJSON('["AllisonGaddy","expertpartners","expertpartners-ember","expertpartners-aura"]'), github.event.issue.user.login) &&
         !(github.event.sender.login == 'factory-droid[bot]' && startsWith(github.event.issue.title, 'Job:'))) ||
       (github.event.action == 'opened' && startsWith(github.event.issue.title, 'Job:') &&
-        contains(fromJSON('["AllisonGaddy","expertpartners","expertpartners-ember"]'), github.event.issue.user.login) &&
+        contains(fromJSON('["AllisonGaddy","expertpartners","expertpartners-ember","expertpartners-aura"]'), github.event.issue.user.login) &&
         !contains(github.event.issue.labels.*.name, 'job'))
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -102,7 +105,7 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       - name: Write automation prompt
         env:
-          FACTORY_AUTOMATION_PROMPT: "You are the Builder for Expert Partners' Chat to Code Loop. Act only when this run was started by the label job being added to an issue, by a new issue whose title begins with Job: that this workflow labeled job when it opened, by a comment that begins with Factory, build this job on an issue that carries the label job, or by a manual dispatch whose issue input names such an issue; otherwise exit with no changes. The triggering GitHub event is in the JSON file named by the GITHUB_EVENT_PATH environment variable, read it to find the issue number (for a manual dispatch it is inputs.issue). Read the issue in full. Its body holds the mission, objective, files in scope, acceptance checks and decisions already made. Follow CLAUDE.md and AGENTS.md if present. Add the label in-progress to the issue. Work only inside the files in scope, run tools/validate-job.sh until it prints validate-job: PASS, push a branch named job/<issue number>-<short slug>, and open exactly one pull request into main whose body starts with the line Closes #<issue number> and then lists each acceptance check as PASS or FAIL with the command output as evidence. Never push to main or merge. If anything is unclear, open the pull request as a draft and say exactly what is unclear."
+          FACTORY_AUTOMATION_PROMPT: "You are the Builder for Expert Partners' Chat to Code Loop. Act only when this run was started by the label job being added to an issue, by a new issue whose title begins with Job: that this workflow labeled job when it opened, by a comment that begins with Factory, build this job on an issue that carries the label job, or by a manual dispatch whose issue input names such an issue; otherwise exit with no changes. The triggering GitHub event is in the JSON file named by the GITHUB_EVENT_PATH environment variable, read it to find the issue number (for a manual dispatch it is inputs.issue). Read the issue in full. Its body holds the mission, objective, files in scope, acceptance checks and decisions already made. Follow CLAUDE.md and AGENTS.md if present. Add the label in-progress to the issue. Work only inside the files in scope, run tools/validate-job.sh until it prints validate-job: PASS, push a branch named job/<issue number>-<short slug>, and open exactly one pull request into main whose body starts with the line Closes #<issue number> and then lists each acceptance check as PASS or FAIL with the command output as evidence. Never push to main or merge. If anything is unclear, open the pull request as a draft and say exactly what is unclear. Never ask the user inside Factory. Put any question on the GitHub issue as a comment starting Question for Allison, or on the job list as needs-allison with a line starting Recommend:, and keep working on everything else."
         run: |
           printf '%s' "$FACTORY_AUTOMATION_PROMPT" > "$RUNNER_TEMP/factory-automation-prompt.txt"
       - name: Get Factory GitHub App token
@@ -176,11 +179,49 @@ jobs:
           FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
           FACTORY_MODEL: ${{ inputs.model }}
 
+  release:
+    # A build that ends without a pull request for its job must not keep holding its files.
+    needs: [gate, build]
+    if: always() && needs.gate.outputs.start == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
+    steps:
+      - name: Checkout the overlap check
+        uses: actions/checkout@v4
+        with:
+          repository: ExpertPartners/expert-partners-skills
+          ref: main
+          path: .factory-builder-tools
+          persist-credentials: false
+          sparse-checkout: tools/overlap-check
+      - name: Release the job unless its pull request holds its files
+        env:
+          OVERLAP_TOKEN: ${{ github.token }}
+          OVERLAP_ISSUE: ${{ github.event.issue.number || github.event.inputs.issue }}
+          BUILD_RESULT: ${{ needs.build.result }}
+        run: |
+          set -euo pipefail
+          script=.factory-builder-tools/tools/overlap-check/overlap_check.py
+          if [ ! -f "$script" ]; then
+            echo "::notice::The overlap check is not on main yet; nothing to release."
+            exit 0
+          fi
+          python3 "$script" release
+
   redispatch:
-    # A closed pull request frees the files another job waits on.
+    # Each of these can free the files a waiting job needs: a closed pull request, a closed
+    # issue, or an issue that loses in-progress. Changes made with github.token start no
+    # workflow, so the check's own label edits never land here.
     if: >-
-      (github.event_name == 'pull_request_target' || github.event_name == 'pull_request') &&
-      github.event.action == 'closed'
+      ((github.event_name == 'pull_request_target' || github.event_name == 'pull_request') &&
+        github.event.action == 'closed') ||
+      (github.event_name == 'issues' && github.event.action == 'closed') ||
+      (github.event_name == 'issues' && github.event.action == 'unlabeled' &&
+        github.event.label.name == 'in-progress')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -197,7 +238,7 @@ jobs:
           path: .factory-builder-tools
           persist-credentials: false
           sparse-checkout: tools/overlap-check
-      - name: Start the oldest waiting job that can build now
+      - name: Start every waiting job that can build now
         env:
           OVERLAP_TOKEN: ${{ github.token }}
           # The caller's workflow file, which this dispatch starts again.

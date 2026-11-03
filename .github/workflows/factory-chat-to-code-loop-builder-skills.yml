@@ -2,6 +2,8 @@
 # The builder itself lives in factory-builder-reusable.yml. Another repo installs it by
 # copying this file and changing the uses: line to
 # ExpertPartners/expert-partners-skills/.github/workflows/factory-builder-reusable.yml@main
+# The builder prompt there carries this rule, and every installed copy of this file keeps it:
+# Never ask the user inside Factory. Put any question on the GitHub issue as a comment starting Question for Allison, or on the job list as needs-allison with a line starting Recommend:, and keep working on everything else.
 name: Chat to Code Loop Builder - Skills
 "on":
   workflow_dispatch:
@@ -13,7 +15,10 @@ name: Chat to Code Loop Builder - Skills
     types:
       - labeled
       - opened
-  # Runs from main and never checks out pull request code. It only restarts a waiting job.
+      # closed and unlabeled (in-progress) only restart waiting jobs.
+      - closed
+      - unlabeled
+  # Runs from main and never checks out pull request code. It only restarts waiting jobs.
   pull_request_target:
     types:
       - closed
