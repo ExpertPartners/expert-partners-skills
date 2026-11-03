@@ -10,7 +10,7 @@ Claude Code hooks that ship with the operating-doctrine plugin. `hooks.json` wir
 
 ## Headless route check
 
-No AI drives a browser at a system that already has headless access (Decision Log 2026-11-03, Headless access comes first, and Standing yes for headless access setup). The hook runs before the browser navigation tools, `browser_navigate`, `navigate` and `tabs_create_mcp` on any MCP server, which covers `playwright-ember`, `playwright-allison` and `claude-in-chrome`. It also runs before the browser code tools `browser_run_code_unsafe`, `browser_run_code` and `browser_evaluate`, and checks every URL their code navigates to with `page.goto`, `location`, `location.href`, `location.assign`, `location.replace` or `window.open`. It cannot see a URL that code builds at run time, so the check order in browser-automation Rule 0 still applies to every browser job. The hook reads the target host and looks it up in the access map, the Google Sheet owned by Keys and Sign-Ins.
+The hook backs the check order in browser-automation Rule 0, which points to where the rule itself lives. It runs before the browser navigation tools, `browser_navigate`, `navigate` and `tabs_create_mcp` on any MCP server, which covers `playwright-ember`, `playwright-allison` and `claude-in-chrome`. It also runs before the browser code tools `browser_run_code_unsafe`, `browser_run_code` and `browser_evaluate`, and checks every URL their code navigates to with `page.goto`, `location`, `location.href`, `location.assign`, `location.replace` or `window.open`. It cannot see a URL that code builds at run time, so the check order in browser-automation Rule 0 still applies to every browser job. The hook reads the target host and looks it up in the access map, the Google Sheet owned by Keys and Sign-Ins.
 
 | Access map status for the host | What the hook does |
 |---|---|
@@ -20,12 +20,14 @@ No AI drives a browser at a system that already has headless access (Decision Lo
 | host not on the map | Lets the call through and adds the host to `unknown-hosts.log` |
 | no cached map at all | Lets the call through and logs it in `hook.log` |
 
+Either way the session gets the `Headless route checked` report line to use. A refusal carries it in the deny reason. A call that goes through gets it as `additionalContext`, with no permission decision, so the normal permission flow is unchanged.
+
 A host matches a map entry when it is the entry's host or a subdomain of it, and the most specific entry wins. `about:`, `chrome:`, `file:` and local addresses are never checked.
 
 - `example.com` covers `example.com` and every subdomain. `*.example.com` covers the subdomains only. For one host name, an exact match beats `*.`, which beats a parent domain.
 - Two rows can share a host, for example one feature with an API and one without. When equally specific rows disagree, the status decides and row order never does: no API wins and the call goes through, because the feature with no API needs the browser. The hook logs `map-conflict` in `hook.log`. The skills' check order still applies, so work the API covers goes through the API.
 
-The map needs the columns System, Hosts, Headless route, 1Password item, Status and No-API reason. Hosts can hold several hosts separated by commas or spaces. Status is read loosely: anything starting with live (Live, Live - API) counts as live, setting up, set up, setup and in progress count as setting up, and no API, no and none count as no API. Any other status lets the call through and is logged, and `--refresh` names the rows that carry one. The map holds 1Password item names only. The hook never reads a secret, and if a map value looks like one (a known token prefix, a private key, or a long unbroken run of letters and digits) it prints `[withheld, not an item name]` instead. MCP tool names, `op://` paths and item names print as written.
+The map needs the columns System, Hosts, Headless route, 1Password item, Status and No-API reason. Hosts can hold several hosts separated by commas or spaces. Status is read loosely: anything starting with live (Live, Live - API) counts as live, setting up, set up, setup and in progress count as setting up, and no API, no and none count as no API. Any other status lets the call through and is logged, and `--refresh` names the rows that carry one. The map holds 1Password item names only. The hook never reads a secret, and if a map value looks like one (a known token prefix such as an AWS, Stripe, GitHub, GitLab, Slack or Google key, a private key, a password or bearer value, credentials in a URL, a long unbroken run of letters and digits, or a long word that mixes upper case, lower case and digits) it prints `[withheld, not an item name]` instead. MCP tool names, `op://` paths and item names print as written.
 
 ### The cache
 

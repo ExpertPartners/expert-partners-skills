@@ -35,16 +35,20 @@ the work has no background API.
 
 <!-- RULED-BY: HQ Business Brain, [HQ][V1.0] Decision Log, 2026-11-03 entries "Headless access comes first, and no browser is used where headless access exists" and "Standing yes for headless access setup" date:2026-11-03 -->
 
-No AI uses a browser for a system that has headless access. Before any browser work, check
-the system in this order and stop at the first step that applies.
+The rule, what setup needs no ask and its exceptions live in HQ Business Brain: the HQ
+Rulebook section Use the access Allison already gave, and the Decision Log 2026-11-03
+entries Headless access comes first and Standing yes for headless access setup. Read them
+there before acting. They win if this section ever differs.
+
+Before any browser work, check the system in this order and stop at the first step that
+applies.
 
 1. **A connected MCP server or connector.** If one covers the system, use it.
 2. **An API or CLI with its 1Password item.** Use it. Read the secret from 1Password at the
    moment it is needed and never print it.
 3. **A setup job.** If the system could be reached headlessly but is not set up yet, file
-   the setup job right away as the first job on that system. Any AI may set up headless
-   access inside an existing account without asking, with the secret going straight into
-   1Password. A new account or anything paid still needs Allison's yes.
+   the setup job right away as the first job on that system. The Decision Log entry
+   Standing yes for headless access setup says which setup goes ahead without asking.
 4. **The browser, only for a vendor with no API.** Write down why there is no headless
    route.
 
@@ -282,5 +286,7 @@ Tabs left open, none
 ```
 
 The result is one of `live, used <route>`, `setting up, setup job filed first`,
-`no API, <reason>`, or `not on the access map, <what you did>`. For example,
-`Headless route checked, GoHighLevel workflows, no API, no public workflow API`.
+`no API, <reason>`, `not on the access map, <what you did>`, or `not checked, <why>`. For
+example, `Headless route checked, GoHighLevel workflows, no API, no public workflow API`.
+The headless route check hook hands the session the line to use, both when it refuses a call
+and when it lets one through.

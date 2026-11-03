@@ -101,6 +101,15 @@ class HookCase(unittest.TestCase):
         self.assertEqual(specific["permissionDecision"], "deny")
         return specific["permissionDecisionReason"]
 
+    def assertAllowed(self, output):
+        """The call goes through with no permission decision, and the note carries the report line."""
+        self.assertIsNotNone(output, "expected an allow note")
+        specific = output["hookSpecificOutput"]
+        self.assertEqual(specific["hookEventName"], "PreToolUse")
+        self.assertNotIn("permissionDecision", specific)
+        self.assertIn("Report it as: Headless route checked, ", specific["additionalContext"])
+        return specific["additionalContext"]
+
 
 class Decisions(HookCase):
     def setUp(self):
@@ -129,22 +138,24 @@ class Decisions(HookCase):
         self.assertIn("Cloudflare API Token", reason)
 
     def test_no_api_is_allowed(self):
-        self.assertIsNone(self.run_hook("https://portal.vendor.example/login"))
+        note = self.assertAllowed(self.run_hook("https://portal.vendor.example/login"))
+        self.assertIn("Headless route checked, Vendor portal, no API, Vendor offers no API or export.", note)
         self.assertEqual(self.read(hrc.UNKNOWN_HOSTS_FILE), "")
 
     def test_most_specific_host_wins(self):
-        self.assertIsNone(self.run_hook("https://sites.google.com/edit"))
+        self.assertIn("Google Sites editor, no API", self.assertAllowed(self.run_hook("https://sites.google.com/edit")))
         self.assertDenied(self.run_hook("https://docs.google.com/document/d/x"))
 
     def test_unknown_host_is_allowed_and_logged_once(self):
-        self.assertIsNone(self.run_hook("https://new-vendor.example/dashboard"))
-        self.assertIsNone(self.run_hook("https://new-vendor.example/other"))
+        note = self.assertAllowed(self.run_hook("https://new-vendor.example/dashboard"))
+        self.assertIn("Headless route checked, new-vendor.example, not on the access map", note)
+        self.assertAllowed(self.run_hook("https://new-vendor.example/other"))
         lines = self.read(hrc.UNKNOWN_HOSTS_FILE).splitlines()
         self.assertEqual(len(lines), 1)
         self.assertEqual(lines[0].split("\t")[1:], ["new-vendor.example", "mcp__playwright-ember__browser_navigate"])
 
     def test_lookalike_host_is_not_matched(self):
-        self.assertIsNone(self.run_hook("https://notgoogle.com/"))
+        self.assertAllowed(self.run_hook("https://notgoogle.com/"))
         self.assertIn("notgoogle.com", self.read(hrc.UNKNOWN_HOSTS_FILE))
 
     def test_non_web_targets_are_allowed_and_not_logged(self):
@@ -171,7 +182,8 @@ class Decisions(HookCase):
         for name, csv_text in (("sheet order", MAP_CSV), ("reversed", REVERSED_MAP_CSV)):
             with self.subTest(order=name):
                 self.write_cache(csv_text)
-                self.assertIsNone(self.run_hook("https://shared.example/builder"))
+                note = self.assertAllowed(self.run_hook("https://shared.example/builder"))
+                self.assertIn("Shared app builder, no API, Builder has no API", note)
                 self.assertIn("map-conflict\tshared.example decided by Shared app builder no api",
                               self.read(hrc.HOOK_LOG_FILE))
 
@@ -179,7 +191,7 @@ class Decisions(HookCase):
         for name, csv_text in (("sheet order", MAP_CSV), ("reversed", REVERSED_MAP_CSV)):
             with self.subTest(order=name):
                 self.write_cache(csv_text)
-                self.assertIsNone(self.run_hook("https://example.com/pricing"))
+                self.assertAllowed(self.run_hook("https://example.com/pricing"))
                 reason = self.assertDenied(self.run_hook("https://app.example.com/"))
                 self.assertIn("Example app", reason)
 
@@ -209,9 +221,22 @@ class Decisions(HookCase):
 
     def test_browser_code_without_a_mapped_navigation_is_allowed(self):
         code = "async (page) => { await page.goto('https://portal.vendor.example/'); return page.title(); }"
-        self.assertIsNone(self.run_hook(None, "mcp__playwright-ember__browser_run_code_unsafe", {"code": code}))
+        self.assertAllowed(self.run_hook(None, "mcp__playwright-ember__browser_run_code_unsafe", {"code": code}))
         self.assertIsNone(self.run_hook(None, "mcp__playwright-ember__browser_evaluate",
                                         {"function": "() => document.title"}))
+
+    def test_unrecognized_status_is_allowed_with_a_not_checked_line(self):
+        self.write_cache(MAP_CSV + "Odd row,odd.example,,,Maybe later,\n")
+        note = self.assertAllowed(self.run_hook("https://odd.example/"))
+        self.assertIn("Headless route checked, Odd row, not checked, status not recognized", note)
+        self.assertIn("unknown-status-allowed", self.read(hrc.HOOK_LOG_FILE))
+
+    def test_every_navigated_host_gets_a_line(self):
+        code = ("async (page) => { await page.goto('https://portal.vendor.example/');"
+                " await page.goto('https://another-new.example/'); }")
+        note = self.assertAllowed(self.run_hook(None, "mcp__playwright-ember__browser_run_code_unsafe", {"code": code}))
+        self.assertIn("Vendor portal, no API", note)
+        self.assertIn("another-new.example, not on the access map", note)
 
     def test_bad_input_is_allowed(self):
         result = subprocess.run([sys.executable, str(HOOK)], input="not json", capture_output=True,
@@ -223,13 +248,14 @@ class Decisions(HookCase):
 class MissingCache(HookCase):
     def test_missing_cache_is_allowed_and_logged(self):
         self.fresh_stamp()
-        self.assertIsNone(self.run_hook("https://app.gohighlevel.com/"))
+        note = self.assertAllowed(self.run_hook("https://app.gohighlevel.com/"))
+        self.assertIn("Headless route checked, app.gohighlevel.com, not checked, no cached access map", note)
         self.assertIn("no-cache-allowed\tapp.gohighlevel.com", self.read(hrc.HOOK_LOG_FILE))
 
     def test_corrupt_cache_is_allowed_and_logged(self):
         self.fresh_stamp()
         (self.state / hrc.CACHE_FILE).write_text("{not json", encoding="utf-8")
-        self.assertIsNone(self.run_hook("https://app.gohighlevel.com/"))
+        self.assertAllowed(self.run_hook("https://app.gohighlevel.com/"))
         log = self.read(hrc.HOOK_LOG_FILE)
         self.assertIn("cache-unreadable", log)
         self.assertIn("no-cache-allowed", log)
@@ -302,7 +328,7 @@ class Refresh(HookCase):
 
     def test_stale_stamp_starts_one_background_refresh(self):
         self.configure_fetch(MAP_CSV)
-        self.assertIsNone(self.run_hook("https://app.gohighlevel.com/"))
+        self.assertAllowed(self.run_hook("https://app.gohighlevel.com/"))
         deadline = time.time() + 15
         while time.time() < deadline and not (self.state / hrc.CACHE_FILE).exists():
             time.sleep(0.1)
@@ -315,9 +341,52 @@ class Refresh(HookCase):
     def test_recent_stamp_starts_no_refresh(self):
         self.configure_fetch(MAP_CSV)
         self.fresh_stamp()
-        self.assertIsNone(self.run_hook("https://app.gohighlevel.com/"))
+        self.assertAllowed(self.run_hook("https://app.gohighlevel.com/"))
         time.sleep(1)
         self.assertFalse((self.state / hrc.CACHE_FILE).exists())
+
+
+class SecretShapes(unittest.TestCase):
+    # Built at run time from fake parts, so no credential-shaped literal sits in the repository.
+    SECRET_SAMPLES = {
+        "AWS access key": "AK" + "IA" + "Q" * 8 + "7" * 8,
+        "Stripe live key": "sk" + "_live_" + "a1B2" * 6,
+        "Stripe test key": "rk" + "_test_" + "a1B2" * 4,
+        "Stripe webhook secret": "wh" + "sec_" + "a1B2" * 6,
+        "GitHub fine-grained token": "github" + "_pat_" + "a1B2" * 6,
+        "GitLab token": "gl" + "pat-" + "a1B2" * 5,
+        "Slack app token": "xa" + "pp-1-" + "A1" * 6,
+        "Slack config token": "xo" + "xe-1-" + "a1" * 6,
+        "SendGrid key": "S" + "G." + "a1B2c3" * 3 + "." + "d4E5f6" * 3,
+        "Google OAuth client secret": "GOC" + "SPX-" + "a1B2" * 6,
+        "npm token": "np" + "m_" + "a1B2" * 9,
+        "Hugging Face token": "h" + "f_" + "a1B2" * 9,
+        "credentials in a URL": "https://" + "user" + ":" + "hunter2" + "@vault.example/x",
+        "password assignment": "pass" + "word=" + "letmein",
+        "bearer header": "Bear" + "er " + "a1b2c3d4e5f6g7h8",
+        "unknown prefix across underscores": "zz" + "_Ab3_Cd4_Ef5_Gh6_Ij7",
+    }
+    NAMES = (
+        "GHL Private Integration Token",
+        "GHL API v2 through the n8n connector",
+        "mcp__claude_ai_HubSpot__search_crm_objects",
+        "op://Engineering/hubspot-private-app/credential",
+        "Stripe API key (restricted, read only)",
+        "gh CLI with GH_TOKEN from 1Password",
+        "ghl-private-integration-2026-11",
+        "AWS CLI, profile ep-prod, item AWS access key",
+    )
+
+    def test_common_credential_formats_are_withheld(self):
+        for name, sample in self.SECRET_SAMPLES.items():
+            with self.subTest(shape=name):
+                self.assertTrue(hrc.looks_like_secret(sample), name)
+                self.assertEqual(hrc.safe(f"Use {sample} here"), "[withheld, not an item name]")
+
+    def test_names_print_as_written(self):
+        for name in self.NAMES:
+            with self.subTest(name=name):
+                self.assertEqual(hrc.safe(name), name)
 
 
 class HooksJson(unittest.TestCase):

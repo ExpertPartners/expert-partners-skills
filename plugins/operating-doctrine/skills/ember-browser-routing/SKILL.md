@@ -26,15 +26,19 @@ Never attach to, click, type in, navigate, foreground, or move the cursor on All
 
 <!-- RULED-BY: HQ Business Brain, [HQ][V1.0] Decision Log, 2026-11-03 entries "Headless access comes first, and no browser is used where headless access exists" and "Standing yes for headless access setup" date:2026-11-03 -->
 
-No AI uses a browser for a system that has headless access. Before any browser work, check
-the system in this order and stop at the first step that applies.
+The rule, what setup needs no ask and its exceptions live in HQ Business Brain: the HQ
+Rulebook section Use the access Allison already gave, and the Decision Log 2026-11-03
+entries Headless access comes first and Standing yes for headless access setup. Read them
+there before acting. They win if this section ever differs.
+
+Before any browser work, check the system in this order and stop at the first step that
+applies.
 
 1. A connected MCP server or connector that covers the system.
 2. An API or CLI with its 1Password item.
 3. If neither exists yet but could, a setup job filed right away as the first job on that
-   system. Any AI may set up headless access inside an existing account without asking,
-   with the secret going straight into 1Password. A new account or anything paid still
-   needs Allison's yes.
+   system. The Decision Log entry Standing yes for headless access setup says which setup
+   goes ahead without asking.
 4. Only then a browser, and only for a vendor with no API, with that reason written down.
 
 The access map, a Google Sheet owned by Keys and Sign-Ins, records each system's hosts,
@@ -187,7 +191,9 @@ Tabs left open, none
 ```
 
 The result is one of `live, used <route>`, `setting up, setup job filed first`,
-`no API, <reason>`, or `not on the access map, <what you did>`.
+`no API, <reason>`, `not on the access map, <what you did>`, or `not checked, <why>`. The
+headless route check hook hands the session the line to use, both when it refuses a call and
+when it lets one through.
 
 ## Dispatch wording
 

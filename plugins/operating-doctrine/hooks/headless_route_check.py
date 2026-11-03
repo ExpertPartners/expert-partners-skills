@@ -3,8 +3,8 @@
 
 Refuses browser navigation to any system that already has headless access (an API, CLI,
 MCP server, connector or 1Password item) and tells the session which headless route to use
-instead (Decision Log 2026-11-03, Headless access comes first, and Standing yes for headless
-access setup). Browser code tools are checked too, for URLs their code navigates to.
+instead. Browser code tools are checked too, for URLs their code navigates to. When the call
+is let through, the hook still hands the session its Headless route checked report line.
 
 The access map is a Google Sheet owned by Keys and Sign-Ins. The hook reads only a local
 cache of it, so a browser call never waits on Drive. When the cache is more than an hour
@@ -77,16 +77,34 @@ STATUS_TIE_ORDER = {NO_API: 0, SETTING_UP: 2, LIVE: 3}  # any other status ranks
 SECRET_RE = re.compile(
     r"-----BEGIN"
     r"|\b(?:sk|pk|rk)-[A-Za-z0-9_-]{8,}"
+    r"|\b(?:sk|pk|rk)_(?:live|test)_[A-Za-z0-9]{6,}"
+    r"|\bwhsec_[A-Za-z0-9]{8,}"
+    r"|\b(?:AKIA|ASIA|AGPA|AIDA|AROA|ANPA|ANVA|AIPA)[A-Z0-9]{16}\b"
     r"|\bgh[pousr]_[A-Za-z0-9]{20,}"
-    r"|\bxox[abprs]-"
+    r"|\bgithub_pat_[A-Za-z0-9_]{20,}"
+    r"|\bglpat-[A-Za-z0-9_-]{16,}"
+    r"|\bxox[a-z]-"
+    r"|\bxapp-"
     r"|\beyJ[A-Za-z0-9_-]{10,}"
     r"|\bops_[A-Za-z0-9]"
     r"|\bAIza[A-Za-z0-9_-]{20,}"
     r"|\bya29\.[A-Za-z0-9_-]{10,}"
+    r"|\bGOCSPX-"
+    r"|\bSG\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}"
+    r"|\bnpm_[A-Za-z0-9]{20,}"
+    r"|\bhf_[A-Za-z0-9]{20,}"
+    r"|\bshp(?:at|ca|pa|ss)_[A-Fa-f0-9]{16,}"
+    r"|\bdo[opr]_v1_[A-Fa-f0-9]{16,}"
+    r"|\b[A-Za-z][A-Za-z0-9+.-]*://[^/\s:@]+:[^/\s@]+@"
+    r"|(?i:\b(?:password|passwd|pwd|secret|token|api[_ -]?key|access[_ -]?key)\s*[:=]\s*\S)"
+    r"|(?i:\bbearer\s+[A-Za-z0-9._~+/-]{12,})"
 )
 # Long runs of letters and digits with no separator. Names (MCP tool names, op:// paths,
 # item slugs) break into short words at _ - / and spaces, while a key or hex token does not.
 UNBROKEN_RUN_RE = re.compile(r"[A-Za-z0-9+=]{24,}")
+# A word that mixes upper case, lower case and digits even across _ - . separators, the shape
+# of a generated key with a vendor prefix this list does not know. Names rarely look like it.
+MIXED_WORD_RE = re.compile(r"[A-Za-z0-9_.+=-]{20,}")
 
 # Navigation written into browser code: page.goto("..."), location.href = "...", and so on.
 CODE_KEYS = ("code", "function", "script", "expression")
@@ -137,9 +155,16 @@ def one_line(value: object, limit: int = 300) -> str:
 def looks_like_secret(text: str) -> bool:
     if SECRET_RE.search(text):
         return True
-    return any(
+    if any(
         sum(char.isdigit() for char in run) >= 2 and any(char.isalpha() for char in run)
         for run in UNBROKEN_RUN_RE.findall(text)
+    ):
+        return True
+    return any(
+        sum(char.isdigit() for char in word) >= 3
+        and any(char.isupper() for char in word)
+        and any(char.islower() for char in word)
+        for word in MIXED_WORD_RE.findall(text)
     )
 
 
@@ -481,12 +506,44 @@ def deny_reason(entry: dict, host: str) -> str:
         f"refused for {host}. The setup job comes first. Finish or file the setup job for "
         f"{system} ({route} {item_part}), then do this work headlessly. Decision Log 2026-11-03, "
         f"Headless access comes first. Report it as: Headless route checked, {system}, setting "
-        f"up, setup job first."
+        f"up, setup job filed first."
     )
 
 
-def decide(payload: dict) -> str | None:
-    """The deny reason for this tool call, or None to let it through."""
+def allow_note(host: str, entry: dict | None, cached: bool) -> str:
+    """What the session is told when the browser is let through, with its report line."""
+    if not cached:
+        return (
+            f"Headless route check: {host} was not checked, because this machine has no cached "
+            f"access map. Follow the check order in browser-automation Rule 0 yourself. Report it "
+            f"as: Headless route checked, {host}, not checked, no cached access map."
+        )
+    if entry is None:
+        return (
+            f"Headless route check: {host} is not on the access map, so the browser is let through "
+            f"and the host is logged for the nightly check. Follow the check order in "
+            f"browser-automation Rule 0 before going on. Report it as: Headless route checked, "
+            f"{host}, not on the access map, <what you did>."
+        )
+    system = safe(entry.get("system", ""))
+    if entry.get("status") == NO_API:
+        reason = safe(entry.get("reason", "")) or "the access map gives no reason"
+        return (
+            f"Headless route check: {system} is marked no API on the access map, so the browser is "
+            f"let through for {host}. Report it as: Headless route checked, {system}, no API, "
+            f"{reason}."
+        )
+    status = safe(entry.get("status", "")) or "(blank)"
+    return (
+        f"Headless route check: {system} has the status {status} on the access map, which is not "
+        f"live, setting up or no API, so the browser is let through for {host}. Follow the check "
+        f"order in browser-automation Rule 0 yourself. Report it as: Headless route checked, "
+        f"{system}, not checked, status not recognized."
+    )
+
+
+def decide(payload: dict) -> tuple[str, str] | None:
+    """("deny", reason) or ("allow", note) for this tool call, or None when no site is opened."""
     hosts = []
     for url in target_urls(payload.get("tool_input")):
         host = target_host(url)
@@ -498,21 +555,38 @@ def decide(payload: dict) -> str | None:
     systems = load_cache()
     if systems is None:
         log_event("no-cache-allowed", f"{' '.join(hosts)} {tool_name}")
-        return None
+        return "allow", "\n".join(allow_note(host, None, cached=False) for host in hosts)
+    notes = []
     for host in hosts:
         entry, conflict = find_system(host, systems)
         if entry is None:
             log_unknown_host(host, tool_name)
+            notes.append(allow_note(host, None, cached=True))
             continue
         status = entry.get("status")
         if conflict:
             log_event("map-conflict", f"{host} decided by {safe(entry.get('system', ''))} {safe(status)}")
         if status in (LIVE, SETTING_UP):
             log_event("denied", f"{host} {safe(entry.get('system', ''))} {status}")
-            return deny_reason(entry, host)
+            return "deny", deny_reason(entry, host)
         if status != NO_API:
             log_event("unknown-status-allowed", f"{host} {safe(entry.get('system', ''))} {safe(status)}")
-    return None
+        notes.append(allow_note(host, entry, cached=True))
+    return "allow", "\n".join(notes)
+
+
+def hook_output(decision: tuple[str, str] | None) -> dict | None:
+    if decision is None:
+        return None
+    kind, message = decision
+    if kind == "deny":
+        return {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "deny",
+            "permissionDecisionReason": message,
+        }
+    # No permissionDecision, so an allowed call still goes through the normal permission flow.
+    return {"hookEventName": "PreToolUse", "additionalContext": message}
 
 
 def hook_main() -> int:
@@ -520,18 +594,12 @@ def hook_main() -> int:
         payload = json.loads(sys.stdin.read() or "{}")
         if not isinstance(payload, dict):
             payload = {}
-        reason = decide(payload)
+        specific = hook_output(decide(payload))
     except Exception as error:  # noqa: BLE001, a broken hook must never stop a browser call
         log_event("hook-error", type(error).__name__)
-        reason = None
-    if reason:
-        json.dump({
-            "hookSpecificOutput": {
-                "hookEventName": "PreToolUse",
-                "permissionDecision": "deny",
-                "permissionDecisionReason": reason,
-            }
-        }, sys.stdout)
+        specific = None
+    if specific:
+        json.dump({"hookSpecificOutput": specific}, sys.stdout)
         sys.stdout.write("\n")
     sys.stdout.flush()
     # The decision is printed before the refresh starts, so the refresh can never delay it.
