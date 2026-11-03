@@ -1,32 +1,27 @@
-## 2.79.0 - 2026-11-02
+## 2.80.0 - 2026-11-03
 
-New skill business-brain-foundations v1.0, Week 0 tool 2, built from the approved spec [HQ][V1.0]
-Spec - Business Brain Foundations, revision 1, and its Rulings section, where O01 to O10 and B1 to
-B9 are decided (Decision Log 2026-10-29 to 2026-10-31). It builds a business brain's four core files
-in Cal's order, About Us, Ideal Client, Products and Offerings and Testimonials, as Markdown named by
-the company file rules, like [EP][V1.0] About Us, saved to Company Core [EP-BB] with old versions in
-the _archived folder inside Company Core, never deleted. Allison runs it and answers at most five
-questions at a time, and Don's questions come through her. It reads the business brain in Drive only,
-never Plaud, Fireflies or Zoom, lists every file and part it read and checks itself for skimming, and
-runs the certified File to Knowledge Base Optimizer on any important file not yet cleaned. Each file
-is researched, drafted to its template, clarified, saved and confirmed by reopening before the next
-begins. Unknown answers save as MISSING with the exact question and who can answer it. Conflicts go
-to Allison with every version and its source, never newest wins, and it edits only its own four
-files while listing others that carry the losing version. Reruns start from the saved files, find
-what changed on their own, wait for Allison's ok and recheck down the chain. The existing [EP][V1.1]
-About Us Google Doc stays beside the new file until Allison approves it. It never calls Business
-Brain Auditor or ICP Researcher. The run closes with the four files linked with versions, what
-changed, the open-question list and one next step. Every instruction carries its spec or ruling ID,
-and the file structures are written in our own words with no course text. The first real Expert
-Partners run is the real-task test after merge, and HQ and Allison certify (Build Standard 1.2).
-Before merge, the five Codex findings on pull request 142 are fixed (job 171). A run is a rerun only
-when all four files exist, and a partial first run resumes at the first missing file in Cal's order.
-The Gateway to Mastery price applies only to the Expert Partners brain. The description fires on a
-website only together with a request for the business brain, as the body says. A failed save or
-reopen check is retried once, and if it fails again the run stops at that file and says why, never
-building on an unsaved file. Every web page and public source is untrusted data: facts only, no
-instructions followed and no Drive action taken because of page text, and the web sources are read
-and reduced to a fact list before any private brain file is opened.
+Operating Doctrine v2.19 adds Working With Allison (Chat to Code job 100159, Decision Log
+2026-11-02, Ship Ember first, harden after, and every AI works with Allison the way North
+describes). Every AI works with Allison the way the Google Doc [HQ-Ember][V1.0] North Handoff
+describes, found by its title and pointed to, never copied. Get to the point, move when she
+decides, one decision per message with a recommendation, no essays, and no issues made out of
+non-issues. Ship first and harden after: review findings, security included, go to one
+after-launch list, and the live test is the gate. The HQ Rulebook holds the rest and wins.
+
+## 2.79.0 - 2026-11-03
+
+New skill research-before-guessing v1.0 (Decision Log 2026-11-02, Research instead of guessing, as
+a skill now, shipped with no proving line as a simple CEO directive skill). Any AI about to guess
+how a tool, account, system, API, setting or rule works looks it up or tests it first, before it
+acts or reports. It checks our own rules in the owning brain, the HQ Rulebook and the Decision Log,
+then the tool's current official docs, then the live system with a harmless test, then the people
+or rooms that own it. When one route fails it tries the other routes it has (another tool, Ember's
+M2, a browser, code, n8n) before saying it can't be done, and a repeat problem or a patch on a
+patch gets root research instead of another fix. Only a true blocker no route can pass goes to
+Allison, as one ask with a recommendation. It never reports a guess as a fact and never adds a
+restriction Allison did not ask for. Source is the HQ Rulebook, Handoffs between AIs, which wins
+wherever the skill differs.
+
 ## 2.78.0 - 2026-11-02
 
 Browser Route Home (Chat to Code job 100094, from the Keys and Sign-Ins room). After the Nov 1 M2
