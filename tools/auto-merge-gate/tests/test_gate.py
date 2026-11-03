@@ -404,6 +404,128 @@ class CodexParsing(unittest.TestCase):
         self.assertIsNone(gate.job_issue_number(None))
 
 
+def codex_receipt(sha=HEAD, clean=True, security=False, login="chatgpt-codex-connector[bot]", created="2026-11-02T23:18:09Z"):
+    """The receipt shapes Codex posts on a pull request, copied from pull request #145."""
+    if security:
+        middle = (
+            "### \U0001f6e1\ufe0f Codex Security Review \u00b7 _Automatically triggered_\n\n"
+            "Security review completed. No security issues were found in this pull request.\n"
+        )
+    elif clean:
+        middle = "Codex Review: Didn't find any major issues. More of your lovely PRs please.\n"
+    else:
+        middle = "### \U0001f4a1 Codex Review\n\nHere are some automated review suggestions for this pull request.\n"
+    body = (
+        "<!-- codex-review-receipt:v1 -->\n\n"
+        f"{middle}\n"
+        f"**Reviewed commit:** `{sha[:10]}`\n\n"
+        "<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n</details>"
+    )
+    return {"id": 901, "user": {"login": login}, "body": body, "created_at": created, "updated_at": created}
+
+
+class CodexReceipt(Base):
+    """Codex posts a codex-review-receipt:v1 comment, not a summary, when its code review is clean."""
+
+    def receipt_routes(self, *comments):
+        routes = passing_routes()
+        routes[f"/repos/{REPO}/issues/7/comments"] = list(comments)
+        return routes
+
+    def test_clean_receipt_for_head_merges(self):
+        reader = FakeGitHub(self.receipt_routes(codex_receipt()))
+        merger = FakeGitHub({}, put_result={"sha": "c" * 40, "merged": True})
+        ready = gate.run_plan(reader, CFG, "pull_request_target", {"pull_request": {"number": 7}})
+        self.assertEqual(ready, [7])
+        self.assertEqual(reader.writes(), [], "a passing pull request gets no refusal comment")
+        self.assertEqual(gate.run_merge(reader, merger, CFG, ready), ["c" * 40])
+        self.assertEqual(merger.calls, [
+            ("PUT", f"/repos/{REPO}/pulls/7/merge", {"merge_method": "squash", "sha": HEAD}),
+        ])
+
+    def test_clean_receipt_for_head_beats_a_summary_on_an_older_commit(self):
+        routes = self.receipt_routes(codex_comment(sha=OLD, unresolved=True), codex_receipt())
+        self.assertEqual(self.evaluate(routes).action, "merge")
+
+    def test_clean_receipt_with_the_full_sha_counts(self):
+        receipt = codex_receipt()
+        receipt["body"] = receipt["body"].replace(f"`{HEAD[:10]}`", f"`{HEAD}`")
+        self.assertEqual(self.evaluate(self.receipt_routes(receipt)).action, "merge")
+
+    def test_clean_receipt_with_a_curly_apostrophe_counts(self):
+        receipt = codex_receipt()
+        receipt["body"] = receipt["body"].replace("Didn't", "Didn\u2019t")
+        self.assertEqual(self.evaluate(self.receipt_routes(receipt)).action, "merge")
+
+    def test_clean_receipt_for_an_older_commit_refuses(self):
+        self.assert_refused(self.receipt_routes(codex_receipt(sha=OLD)), f"Codex has not reviewed head {HEAD[:7]} yet")
+
+    def test_older_receipt_does_not_count_for_a_new_head_after_a_summary_on_the_old_one(self):
+        routes = self.receipt_routes(codex_comment(sha=OLD), codex_receipt(sha=OLD))
+        self.assert_refused(routes, f"its last code review covered {OLD[:7]}")
+
+    def test_security_only_receipt_refuses(self):
+        self.assert_refused(self.receipt_routes(codex_receipt(security=True)), "no Codex review summary")
+
+    def test_receipt_with_suggestions_refuses(self):
+        self.assert_refused(self.receipt_routes(codex_receipt(clean=False)), "no Codex review summary")
+
+    def test_receipt_from_someone_else_refuses(self):
+        self.assert_refused(self.receipt_routes(codex_receipt(login="someone")), "no Codex review summary")
+
+    def test_receipt_without_a_reviewed_commit_refuses(self):
+        receipt = codex_receipt()
+        receipt["body"] = receipt["body"].replace(f"**Reviewed commit:** `{HEAD[:10]}`", "")
+        self.assert_refused(self.receipt_routes(receipt), "no Codex review summary")
+
+    def test_a_summary_on_this_head_still_decides(self):
+        routes = self.receipt_routes(codex_comment(unresolved=True), codex_receipt())
+        self.assert_refused(routes, f"Codex code review on {HEAD[:7]} left unresolved findings.")
+
+    def test_a_summary_on_this_head_with_null_findings_still_reads_threads(self):
+        state = codex_comment()
+        state["body"] = state["body"].replace('"has_unresolved_findings":false', '"has_unresolved_findings":null').replace('"has_any_findings":false', '"has_any_findings":true')
+        routes = self.receipt_routes(state, codex_receipt())
+        routes[f"/repos/{REPO}/pulls/7/reviews"] = []
+        reader = FakeGitHub(routes)
+        reader.unresolved_threads = lambda repo, n: 1
+        d = gate.evaluate(reader, CFG, 7)
+        self.assertEqual(d.action, "refuse")
+        self.assertTrue(any("1 unresolved review thread" in r for r in d.reasons))
+
+    def test_security_findings_on_head_still_block_a_clean_receipt(self):
+        routes = self.receipt_routes(codex_comment(sha=OLD), codex_receipt())
+        state = routes[f"/repos/{REPO}/issues/7/comments"][0]
+        state["body"] = state["body"].replace(
+            f'"security_review":{{"commit_sha":"{OLD}","has_any_findings":null,"has_unresolved_findings":null',
+            f'"security_review":{{"commit_sha":"{HEAD}","has_any_findings":true,"has_unresolved_findings":true')
+        self.assert_refused(routes, "Codex security review")
+
+    def test_clean_receipt_still_needs_green_checks(self):
+        routes = self.receipt_routes(codex_receipt())
+        routes[f"/repos/{REPO}/commits/{HEAD}/check-runs"][1]["conclusion"] = "failure"
+        self.assert_refused(routes, "finished as failure")
+
+    def test_clean_receipt_still_needs_mergeable(self):
+        routes = self.receipt_routes(codex_receipt())
+        routes[f"/repos/{REPO}/pulls/7"].update(mergeable=False, mergeable_state="dirty")
+        self.assert_refused(routes, "not mergeable")
+
+    def test_reads_the_real_receipt_shape(self):
+        head = "42b26d90b13bf57d8b7fdde0fd15c31d3d808308"
+        body = (
+            "<!-- codex-review-receipt:v1 -->\n\n"
+            "Codex Review: Didn't find any major issues. More of your lovely PRs please.\n\n"
+            "**Reviewed commit:** `42b26d90b1`\n\n"
+            "<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n"
+            "[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general).\n"
+            "</details>"
+        )
+        comments = [{"user": {"login": "chatgpt-codex-connector[bot]"}, "body": body}]
+        self.assertTrue(gate.has_clean_codex_receipt(comments, head))
+        self.assertFalse(gate.has_clean_codex_receipt(comments, "42b26d90b2" + head[10:]))
+        self.assertEqual(gate.codex_problems(None, head, None, True), [])
+
 
 
 LCFG = gate.Config(repo=REPO, merge_label="auto-merge")
