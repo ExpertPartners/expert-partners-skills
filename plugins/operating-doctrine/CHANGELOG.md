@@ -1,3 +1,27 @@
+## 2.80.0 - 2026-11-03
+
+Operating Doctrine v2.19 adds Working With Allison (Chat to Code job 100159, Decision Log
+2026-11-02, Ship Ember first, harden after, and every AI works with Allison the way North
+describes). Every AI works with Allison the way the Google Doc [HQ-Ember][V1.0] North Handoff
+describes, found by its title and pointed to, never copied. Get to the point, move when she
+decides, one decision per message with a recommendation, no essays, and no issues made out of
+non-issues. Ship first and harden after: review findings, security included, go to one
+after-launch list, and the live test is the gate. The HQ Rulebook holds the rest and wins.
+
+## 2.79.0 - 2026-11-03
+
+New skill research-before-guessing v1.0 (Decision Log 2026-11-02, Research instead of guessing, as
+a skill now, shipped with no proving line as a simple CEO directive skill). Any AI about to guess
+how a tool, account, system, API, setting or rule works looks it up or tests it first, before it
+acts or reports. It checks our own rules in the owning brain, the HQ Rulebook and the Decision Log,
+then the tool's current official docs, then the live system with a harmless test, then the people
+or rooms that own it. When one route fails it tries the other routes it has (another tool, Ember's
+M2, a browser, code, n8n) before saying it can't be done, and a repeat problem or a patch on a
+patch gets root research instead of another fix. Only a true blocker no route can pass goes to
+Allison, as one ask with a recommendation. It never reports a guess as a fact and never adds a
+restriction Allison did not ask for. Source is the HQ Rulebook, Handoffs between AIs, which wins
+wherever the skill differs.
+
 ## 2.78.0 - 2026-11-02
 
 Browser Route Home (Chat to Code job 100094, from the Keys and Sign-Ins room). After the Nov 1 M2
