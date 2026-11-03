@@ -34,6 +34,9 @@ GROW_MAX_CHANGED = 3
 # A line this long or longer, digits left out, is long enough that OCR noise on it
 # reads as noise rather than as a different line.
 LONG_LINE_CHARS = 30
+# A line longer than this, digits left out, is not a status word, so a lone digit
+# that only one reading has, with every other word the same, is OCR noise.
+MEDIUM_LINE_CHARS = VOLATILE_CHARS
 # How closely a misread long line must read like its other reading.
 NEAR_MISS = 0.5
 # A changed word still counts as the same word misread at this likeness.
@@ -264,13 +267,16 @@ def _numbers_agree(na: str, nb: str, pattern: str = r"\d+") -> bool:
 
     Numbers that differ mark different lines (Week 1, Week 2) when the line is
     otherwise short, or when one number reads as another. On a long line, a lone
-    digit that only one reading has is OCR noise, as a stray 1 or 0 often is.
+    digit that only one reading has is OCR noise, as a stray 1 or 0 often is. On
+    a medium line it is noise only when every other word reads the same.
     """
     a, b = re.findall(pattern, na), re.findall(pattern, nb)
     if a == b:
         return True
-    if len(a) == len(b) or not (_long(na) and _long(nb)):
+    if len(a) == len(b):
         return False
+    if not (_long(na) and _long(nb)):
+        return _stray_digit(na, nb)
     fewer, more = (a, nb) if len(a) < len(b) else (b, na)
     wanted = list(fewer)
     for token in more.split():
@@ -282,6 +288,30 @@ def _numbers_agree(na: str, nb: str, pattern: str = r"\d+") -> bool:
         elif not (len(token) == 1 and token.isdigit()):
             return False
     return not wanted
+
+
+def _stray_digit(na: str, nb: str) -> bool:
+    """True when two medium readings differ only by one lone digit word."""
+    if min(len(_letters(na)), len(_letters(nb))) <= MEDIUM_LINE_CHARS:
+        return False
+    fewer, more = sorted((na.split(), nb.split()), key=len)
+    if len(more) != len(fewer) + 1:
+        return False
+    return any(
+        len(word) == 1 and word.isdigit() and more[:k] + more[k + 1 :] == fewer
+        for k, word in enumerate(more)
+    )
+
+
+def _counter_ticked(na: str, nb: str) -> bool:
+    """True when two long readings differ only in their numbers, as a running counter does."""
+    return na != nb and _long(na) and _long(nb) and _letters(na) == _letters(nb)
+
+
+def _cut_off(old: Line, fresh: Line) -> bool:
+    """True when fresh is a clean start of old, a line that is not a status word, read cut off."""
+    na, nb = normalize(old.text), normalize(fresh.text)
+    return not _short(old) and len(nb) < len(na) and _is_prefix(na, nb)
 
 
 def _ocr_damage(na: str, nb: str) -> bool:
@@ -410,7 +440,9 @@ def _short(line: Line) -> bool:
     return len(normalize(line.text)) <= VOLATILE_CHARS
 
 
-def _pair_gap(old: list[Line], fresh: list[Line], bottom: bool) -> tuple[dict[int, int], set[int]]:
+def _pair_gap(
+    old: list[Line], fresh: list[Line], bottom: bool, top: bool = False
+) -> tuple[dict[int, int], set[int]]:
     """Pair lines that changed between two matched lines, in order.
 
     A line pairs with a later reading that resembles it, or with a misread
@@ -420,6 +452,10 @@ def _pair_gap(old: list[Line], fresh: list[Line], bottom: bool) -> tuple[dict[in
     sits from frame to frame. Lines whose numbers differ are different lines
     (Week 1, Week 2), except a stray digit on a long line, and a short last
     line at the bottom of both frames, which is where a running counter sits.
+    At the top of the window, the first lines of both frames also pair when
+    they are long and only their numbers differ, as a header with a running
+    counter does. Only there, since a long line lower down whose number
+    changes is a different line.
 
     Returns the pairs and the old indexes paired by place alone.
     """
@@ -427,6 +463,8 @@ def _pair_gap(old: list[Line], fresh: list[Line], bottom: bool) -> tuple[dict[in
     def allowed(di: int, ni: int) -> bool:
         na, nb = normalize(old[di].text), normalize(fresh[ni].text)
         if _numbers_agree(na, nb) or _is_prefix(na, nb):
+            return True
+        if top and di == 0 and ni == 0 and _counter_ticked(na, nb):
             return True
         return (
             bottom
@@ -498,14 +536,17 @@ def _grow(doc: list[Line], new: list[Line]) -> list[Line] | None:
     is not short, or that sits above the first match, must be a cut off,
     partly typed or wrapped reading of the same line, so a slide whose title
     changed starts a new screen even when it adds a bullet. New must add a
-    line, or extend one, unless every changed line was already seen changing,
-    so a static slide whose title or number changed still starts a new screen.
+    line, or extend one, unless every changed line was already seen changing
+    or reads as a clean cut off start of a line that is not a status word, so a
+    static slide whose title or number changed still starts a new screen.
 
     Real OCR misreads a few steady lines in every frame, so the frame is also
     judged by how much of the screen it keeps in order. When most compared
     lines match in order, a long line that is a near miss of its earlier
     reading joins it, and a line missing from new between matched lines, with
-    nothing in its place, is kept. Neither counts as a change new must add to.
+    nothing in its place, is kept. So does the top line of the window when only
+    its numbers changed, as a header with a running counter does. None of these
+    counts as a change new must add to.
 
     A screen too short to hold GROW_MIN_ANCHORS steady lines, as at the start
     of a message, joins only when new repeats every line of it in place, apart
@@ -521,12 +562,12 @@ def _grow(doc: list[Line], new: list[Line]) -> list[Line] | None:
         return None
     bounds = [(-1, -1), *anchors, (len(window), len(new))]
     out = list(doc[:start])
-    changed = added = grown = unseen = tolerated = 0
+    changed = added = grown = unseen = tolerated = cut = 0
     for k in range(len(bounds) - 1):
         (a0, b0), (a1, b1) = bounds[k], bounds[k + 1]
         old, fresh = window[a0 + 1 : a1], new[b0 + 1 : b1]
         head, tail = k == 0, k == len(bounds) - 2
-        pairs, by_place = _pair_gap(old, fresh, bottom=tail)
+        pairs, by_place = _pair_gap(old, fresh, bottom=tail, top=head)
         paired_new = set(pairs.values())
         lone_old = [di for di in range(len(old)) if di not in pairs]
         lone_new = [ni for ni in range(len(fresh)) if ni not in paired_new]
@@ -558,8 +599,16 @@ def _grow(doc: list[Line], new: list[Line]) -> list[Line] | None:
                 grown += 1
             elif not old[di].volatile:
                 status_like = not head and _short(old[di]) and _short(fresh[ni])
-                if status_like or _complete(old[di], fresh[ni]) is not None:
+                if head and di == 0 and ni == 0 and _counter_ticked(
+                    normalize(old[di].text), normalize(fresh[ni].text)
+                ):
+                    # A number change on top alone could be the next numbered
+                    # slide, so it never lets a frame that adds nothing join.
+                    tolerated += 1
                     unseen += 1
+                elif status_like or _complete(old[di], fresh[ni]) is not None:
+                    unseen += 1
+                    cut += _cut_off(old[di], fresh[ni])
                 elif _near_miss(old[di], fresh[ni]):
                     tolerated += 1
                 else:
@@ -586,7 +635,7 @@ def _grow(doc: list[Line], new: list[Line]) -> list[Line] | None:
         return None
     if early and added < 1:
         return None
-    if added + grown < 1 and (changed == 0 or unseen):
+    if added + grown < 1 and (changed == 0 or unseen > cut):
         return None
     return out
 

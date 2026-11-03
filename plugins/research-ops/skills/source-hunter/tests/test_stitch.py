@@ -446,3 +446,80 @@ def test_a_long_numbered_line_whose_number_changes_still_starts_a_new_screen():
         screens = stitch([_frame(0, a), _frame(1, b)])
         assert len(screens) == 2
         assert [l.text for l in screens[1].lines] == b
+
+
+def test_a_top_line_with_a_running_counter_stays_one_screen():
+    # Cause A: the top line reads the same every frame apart from a number that ticks.
+    headers = [f"Replay chat for the juniper cohort {n} viewers {2 * n + 1}" for n in range(4)]
+    frames = [_frame(f, [headers[f]] + MESSAGE[:4 + f]) for f in range(4)]
+    screens = stitch(frames)
+    assert len(screens) == 1
+    assert [l.text for l in screens[0].lines[1:]] == MESSAGE[:7]
+    assert set(headers) <= _readings(screens[0])
+
+
+def test_a_long_line_below_the_top_whose_number_ticks_still_starts_a_new_screen():
+    rows = [f"Replay chat for the juniper cohort {n} viewers {2 * n + 1}" for n in range(2)]
+    a = MESSAGE[:4] + [rows[0]] + MESSAGE[4:6]
+    b = MESSAGE[:4] + [rows[1]] + MESSAGE[4:7]
+    screens = stitch([_frame(0, a), _frame(1, b)])
+    assert len(screens) == 2
+
+
+MEDIUM = [
+    "Carry the copper lantern home",
+    "Sweep the cedar porch at dusk",
+    "Stack the walnut crates high",
+    "Mend the linen sail by noon",
+    "Trim the hazel hedge neatly",
+]
+
+
+def test_a_stray_digit_on_a_medium_line_still_grows_the_screen():
+    # Cause B: these lines are just under LONG_LINE_CHARS once digits go.
+    from stitch import LONG_LINE_CHARS, VOLATILE_CHARS, _letters
+
+    assert all(VOLATILE_CHARS < len(_letters(normalize(t))) < LONG_LINE_CHARS for t in MEDIUM)
+    for slip in ("Sweep the cedar 1 porch at dusk", "Sweep the cedar porch at dusk 7"):
+        second = [MEDIUM[0], slip, *MEDIUM[2:], ADDED]
+        screens = stitch([_frame(0, MEDIUM), _frame(1, second)])
+        assert len(screens) == 1
+        assert [l.text for l in screens[0].lines] == MEDIUM + [ADDED]
+        assert slip in _readings(screens[0])
+
+
+def test_a_medium_line_whose_number_really_changes_still_starts_a_new_screen():
+    a = MEDIUM[:4] + ["Week 1 of the hazel hedge plan"]
+    for last in ("Week 2 of the hazel hedge plan", "Week 12 of the hazel hedge plan"):
+        screens = stitch([_frame(0, a), _frame(1, MEDIUM[:4] + [last, ADDED])])
+        assert len(screens) == 2
+
+
+def test_a_repeat_frame_with_one_cut_off_line_adds_nothing():
+    # Cause C: the frame repeats the screen and one line reads cut off.
+    for n, cut in [(4, "Sing softly while the kettle"), (2, "Plant the silver turnips before")]:
+        second = [cut if k == n else line for k, line in enumerate(BASE)]
+        screen = _assert_one_screen_keeps_every_reading(second)
+        assert [l.text for l in screen.lines] == BASE
+        assert cut in screen.lines[n].variants
+
+
+def test_a_short_status_line_changing_in_place_still_starts_a_new_screen():
+    for before, after in [("Upload pending", "Upload complete"), ("Draft saved locally", "Draft saved")]:
+        screens = stitch([_frame(0, BASE[:4] + [before]), _frame(1, BASE[:4] + [after])])
+        assert len(screens) == 2
+        assert [l.text for l in screens[1].lines] == BASE[:4] + [after]
+
+
+def test_a_numbered_top_title_on_static_slides_still_starts_a_new_screen():
+    # Review on PR 199. "Week 1" then "Week 2" over the same body is two slides,
+    # not a ticking counter, when the second frame adds nothing.
+    body = [
+        "Bring the lantern list to every evening walk",
+        "Keep the garden gate latched after the second bell",
+        "Leave muddy boots beside the cedar bench outside",
+    ]
+    a = ["Week 1 call recording link for the willow cohort"] + body
+    b = ["Week 2 call recording link for the willow cohort"] + body
+    screens = stitch([_frame(0, a), _frame(1, b)])
+    assert len(screens) == 2
