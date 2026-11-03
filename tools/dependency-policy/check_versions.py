@@ -35,11 +35,13 @@ SKIP_DIRS = {".git", "node_modules", ".venv", "venv", "__pycache__"}
 JS_PRODUCERS_DIR = "tools"
 WORKFLOWS_DIR = ".github/workflows"
 
-# Workflows outside the change that brought them under this policy. Their findings print
-# as warnings instead of failing, and an entry fails once the workflow is clean, so the
-# exception cannot outlive the gap it records.
-PENDING_WORKFLOWS: dict[str, str] = {
-    "skills-graph.yml": "installs PyYAML by name; move it to -r requirements-tooling.txt",
+# Workflows outside the change that brought them under this policy, mapped to the one
+# finding still waived there and the follow-up that removes it. Only a finding containing
+# that text prints as a warning; any other finding in the workflow fails. The entry fails
+# once the waived finding is gone, so the exception cannot outlive the gap it records.
+PENDING_WORKFLOWS: dict[str, tuple[str, str]] = {
+    "skills-graph.yml": ("installs 'pyyaml' by name",
+                         "installs PyYAML by name; move it to -r requirements-tooling.txt"),
 }
 
 DEP_SECTIONS = ("dependencies", "devDependencies", "optionalDependencies", "peerDependencies")
@@ -52,7 +54,9 @@ PIN_RE = re.compile(
     r"(?P<hashes>(?:\s+--hash=sha256:[0-9a-f]{64})+)\s*$"
 )
 RANGE_RE = re.compile(r"(>=|<=|~=|!=|===|>|<|\*)")
-PIP_INSTALL_RE = re.compile(r"\bpip3?\s+install\b")
+PIP_INSTALL_RE = re.compile(r"\bpip[\d.]*\s(?:[^\n;&|]*\s)?install\b")
+PIP_RE = re.compile(r"pip[\d.]*")
+SHELL_OPERATOR_CHARS = "();&|<>"
 NPM_INSTALL_RE = re.compile(r"\bnpm\s+(?:install|i|add)\b")
 NPM_INTEGRITY_RE = re.compile(r"^sha512-[A-Za-z0-9+/]+={0,2}$")
 NPM_REGISTRY = "https://registry.npmjs.org/"
@@ -272,21 +276,47 @@ def check_javascript(root: Path, report: Report) -> list[str]:
 # ---------------------------------------------------------------------------
 
 
-def check_pip_command(root: Path, command: str) -> list[str]:
-    """Reasons a pip install command bypasses the locks (empty when it installs from them)."""
+def shell_commands(line: str) -> list[list[str]]:
+    """Tokens of each simple command on a shell line, split at ;, &&, ||, |, parens and redirects."""
+    lexer = shlex.shlex(line, posix=True, punctuation_chars=SHELL_OPERATOR_CHARS)
+    lexer.whitespace_split = True
     try:
-        tokens = shlex.split(command, comments=True)
+        tokens = list(lexer)
     except ValueError:
-        tokens = command.split()
-    start = next((i for i in range(len(tokens) - 1)
-                  if re.fullmatch(r"pip3?", tokens[i]) and tokens[i + 1] == "install"), None)
-    if start is None:
+        tokens = line.split()
+    commands, current = [], []
+    for token in tokens:
+        if token and set(token) <= set(SHELL_OPERATOR_CHARS):
+            if current:
+                commands.append(current)
+            current = []
+        else:
+            current.append(token)
+    if current:
+        commands.append(current)
+    return commands
+
+
+def pip_install_args(tokens: list[str]) -> list[str] | None:
+    """Arguments after `install` when tokens run pip install, global options allowed between."""
+    for i, token in enumerate(tokens):
+        if PIP_RE.fullmatch(token) and "install" in tokens[i + 1:]:
+            return tokens[tokens.index("install", i + 1) + 1:]
+    return None
+
+
+def check_pip_command(root: Path, command: str) -> list[str]:
+    """Reasons a line's pip install commands bypass the locks (empty when all install from them)."""
+    installs = [args for args in map(pip_install_args, shell_commands(command)) if args is not None]
+    if not installs:
         return ["runs pip install in a form this check cannot read; call pip install -r directly"]
-    args = tokens[start + 2:]
-    for i, token in enumerate(args):
-        if token in ("&&", "||", ";", "|"):
-            args = args[:i]
-            break
+    problems: list[str] = []
+    for args in installs:
+        problems += check_pip_args(root, args)
+    return problems
+
+
+def check_pip_args(root: Path, args: list[str]) -> list[str]:
     problems, locks, i = [], [], 0
     while i < len(args):
         token = args[i]
@@ -312,7 +342,7 @@ def check_pip_command(root: Path, command: str) -> list[str]:
     return problems
 
 
-def check_workflows(root: Path, report: Report, pending: dict[str, str]) -> list[str]:
+def check_workflows(root: Path, report: Report, pending: dict[str, tuple[str, str]]) -> list[str]:
     base = root / WORKFLOWS_DIR
     paths = sorted(p for p in base.glob("*") if p.suffix in (".yml", ".yaml")) if base.is_dir() else []
     for path in paths:
@@ -323,17 +353,17 @@ def check_workflows(root: Path, report: Report, pending: dict[str, str]) -> list
                 findings += [Finding(f"{where}:{number}", p) for p in check_pip_command(root, line)]
             if NPM_INSTALL_RE.search(line):
                 findings.append(Finding(f"{where}:{number}", "runs npm install; use npm ci so the lock is honored"))
-        if path.name in pending:
-            if findings:
-                report.warnings += findings
-            else:
-                report.error(where, "is listed in PENDING_WORKFLOWS but now passes; remove the entry")
-        else:
-            report.errors += findings
+        waived_text = pending[path.name][0] if path.name in pending else None
+        waived = [f for f in findings if waived_text and waived_text in f.message]
+        report.warnings += waived
+        report.errors += [f for f in findings if f not in waived]
+        if waived_text and not waived:
+            report.error(where, "is listed in PENDING_WORKFLOWS but no longer has its waived finding; "
+                         "remove the entry")
     return [rel(root, p) for p in paths]
 
 
-def check(root: Path, pending: dict[str, str] | None = None) -> Report:
+def check(root: Path, pending: dict[str, tuple[str, str]] | None = None) -> Report:
     report = Report()
     check_python(root, report)
     check_javascript(root, report)
@@ -347,7 +377,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     report = check(args.root)
     for warning in report.warnings:
-        reason = PENDING_WORKFLOWS.get(Path(warning.path.split(":")[0]).name, "")
+        reason = PENDING_WORKFLOWS.get(Path(warning.path.split(":")[0]).name, ("", ""))[1]
         print(f"WARN {warning} (pending: {reason})")
     for error in report.errors:
         print(f"FAIL {error}")

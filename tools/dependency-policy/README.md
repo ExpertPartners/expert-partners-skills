@@ -11,7 +11,9 @@ python3 -m unittest discover -s tools/dependency-policy/tests -v
 
 It prints `dependency-policy: PASS` and exits 0, or prints one `FAIL` line per problem
 and exits 1. `.github/workflows/dependency-policy.yml` runs the tests and the check, then
-installs every lock to prove it is complete.
+dry-runs an install of each top layer, which covers every lock below it, to prove the
+locks are complete. The check cannot see a missing transitive dependency, so a new lock
+that no listed lock includes must be added to that job's install list.
 
 ## Python locks
 
@@ -66,16 +68,24 @@ works on macOS and Windows.
 A tool such as a type checker belongs in `requirements-tooling.txt` with its full
 hash-locked closure.
 
+An exact pin also freezes yt-dlp, whose extractors follow changes on video sites. When
+video-discovery or source-hunter needs a newer release, re-resolve with
+`--upgrade-package yt-dlp` added to step 2 and follow the remaining steps.
+
 ### Workflow installs
 
 Workflows install Python packages only with `pip install ... -r <requirements*.txt>`,
 named from the repository root. A package named on the command line, even with
 `==`, is refused because nothing verifies its hash or its dependencies. Options that
 take a value, other than `-r`, are refused too, since their value reads as a package.
+Every `pip install` on a line is checked, including one chained with `&&`, `||`, `;`
+or `|`, one inside a subshell, and one with pip options before `install`.
 
-`PENDING_WORKFLOWS` in `check_versions.py` lists a workflow that still installs by
-name. Its findings print as `WARN` instead of failing. The entry itself fails once the
-workflow is clean, so remove it in the change that fixes the workflow.
+`PENDING_WORKFLOWS` in `check_versions.py` names a workflow that still installs by
+name and the text of the one finding waived there. That finding prints as `WARN`
+instead of failing. Every other finding in the workflow still fails. The entry itself
+fails once the waived finding is gone, so remove it in the change that fixes the
+workflow.
 
 ## JavaScript producers
 

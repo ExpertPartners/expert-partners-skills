@@ -153,7 +153,7 @@ class PolicyTestCase(unittest.TestCase):
         self.addCleanup(self._tmp.cleanup)
         self.repo = Fixture(Path(self._tmp.name))
 
-    def errors(self, pending: dict[str, str] | None = None) -> list[str]:
+    def errors(self, pending: dict[str, tuple[str, str]] | None = None) -> list[str]:
         return [str(f) for f in check_versions.check(self.repo.root, pending or {}).errors]
 
     def assertFails(self, *fragments: str) -> list[str]:
@@ -337,21 +337,54 @@ class WorkflowInstallTest(PolicyTestCase):
         self.add_step("pip install -r requirements-tooling.txt \\\n          mypy")
         self.assertFails("installs 'mypy' by name")
 
+    def test_chained_second_install_fails(self) -> None:
+        for separator in ("&&", "||", ";", "|"):
+            with self.subTest(separator=separator):
+                self.add_step(f"pip install -r requirements-tooling.txt {separator} pip install pyyaml")
+                self.assertFails(".github/workflows/ci.yml:14: installs 'pyyaml' by name")
+
+    def test_install_in_subshell_is_checked(self) -> None:
+        self.add_step("(cd tools && python3 -m pip install pyyaml)")
+        self.assertFails("installs 'pyyaml' by name")
+
+    def test_global_option_before_install_fails(self) -> None:
+        self.add_step("python3 -m pip --isolated --disable-pip-version-check install pyyaml")
+        self.assertFails("installs 'pyyaml' by name")
+
+    def test_global_option_before_lock_install_passes(self) -> None:
+        self.add_step("python3 -m pip --isolated install --require-hashes -r requirements-tooling.txt")
+        self.assertEqual(self.errors(), [])
+
     def test_npm_install_fails(self) -> None:
         self.add_step("npm install")
         self.assertFails("runs npm install; use npm ci")
 
+    PENDING = {"graph.yml": ("installs 'pyyaml' by name", "follow-up")}
+    GRAPH = "jobs:\n  a:\n    steps:\n      - run: pip install pyyaml\n"
+
     def test_pending_workflow_warns_and_stale_entry_fails(self) -> None:
-        self.repo.write(".github/workflows/graph.yml", "jobs:\n  a:\n    steps:\n      - run: pip install pyyaml\n")
-        report = check_versions.check(self.repo.root, {"graph.yml": "follow-up"})
+        self.repo.write(".github/workflows/graph.yml", self.GRAPH)
+        report = check_versions.check(self.repo.root, self.PENDING)
         self.assertEqual(report.errors, [])
         self.assertEqual([str(w) for w in report.warnings],
                          [".github/workflows/graph.yml:4: installs 'pyyaml' by name; install it from a lock with -r"])
         self.assertIn("graph.yml", "\n".join(self.errors()))
         self.repo.write(".github/workflows/graph.yml", "jobs: {}\n")
-        report = check_versions.check(self.repo.root, {"graph.yml": "follow-up"})
+        report = check_versions.check(self.repo.root, self.PENDING)
         self.assertEqual([str(e) for e in report.errors],
-                         [".github/workflows/graph.yml: is listed in PENDING_WORKFLOWS but now passes; remove the entry"])
+                         [".github/workflows/graph.yml: is listed in PENDING_WORKFLOWS but no longer has its "
+                          "waived finding; remove the entry"])
+
+    def test_pending_workflow_still_fails_other_findings(self) -> None:
+        self.repo.write(".github/workflows/graph.yml", self.GRAPH + "      - run: npm install\n"
+                        "      - run: pip install mypy\n")
+        report = check_versions.check(self.repo.root, self.PENDING)
+        self.assertEqual([str(w) for w in report.warnings],
+                         [".github/workflows/graph.yml:4: installs 'pyyaml' by name; install it from a lock with -r"])
+        self.assertEqual([str(e) for e in report.errors], [
+            ".github/workflows/graph.yml:5: runs npm install; use npm ci so the lock is honored",
+            ".github/workflows/graph.yml:6: installs 'mypy' by name; install it from a lock with -r",
+        ])
 
 
 class RepositoryTest(unittest.TestCase):

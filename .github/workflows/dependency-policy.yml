@@ -52,7 +52,8 @@ jobs:
         with:
           node-version: 22
       # --require-hashes refuses any package a lock does not list, so a lock missing a
-      # transitive dependency fails here instead of resolving one silently.
+      # transitive dependency fails here instead of resolving one silently. Each line is a
+      # top layer and covers the locks it includes; add a line for any new top layer.
       - name: Python locks resolve completely
         run: |
           set -euo pipefail
