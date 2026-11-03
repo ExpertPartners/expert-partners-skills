@@ -1,3 +1,6 @@
+## 0.5.6 - 2026-11-03
+
+Source Hunter joins a window title bar whose tail the OCR reads as different noise each frame, digits included. Found on the real class with anonymized fixtures, not guessed. The noise must be misread words, scraps of three letters or fewer, or words the title already shows, so a real word swapped in still splits, and a numbered slide (Week 1, Week 2) still splits when nothing else is added.
 ## 0.5.5 - 2026-11-03
 
 Source Hunter joins a ticking header even when its words are misread a little from frame to frame. The live May 13 recheck after PR 199 showed the counter rule never fired, because it needed the header letters to match exactly. It now accepts them at the stitching similarity bar, only where the change looks like OCR damage, so a rewritten top line still starts a new screen.
