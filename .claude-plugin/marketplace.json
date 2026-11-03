@@ -32,7 +32,7 @@
     {
       "name": "research-ops",
       "source": "./plugins/research-ops",
-      "version": "0.5.4",
+      "version": "0.5.5",
       "description": "Research and cataloging skills for capability currency, capability refresh, research intake, video discovery, source hunting, and the Notion skill, GPT, and SOP libraries. Imported TUB analyst prompts are retired and disabled."
     },
     {
