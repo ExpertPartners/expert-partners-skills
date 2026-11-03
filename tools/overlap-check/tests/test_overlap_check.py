@@ -514,6 +514,30 @@ class StoppedJobs(unittest.TestCase):
             self.assertEqual(gh.writes(), [], label)
             self.assertIn("waiting", gh.labels(201))
 
+    def test_a_closed_parked_or_done_job_never_builds(self):
+        # Building a stopped job would let a colliding job build beside it unseen, since a
+        # stopped job holds no files.
+        boards = {
+            "closed": dict(issue(201, "tools/a.py", labels=("job", "waiting")), state="closed"),
+            "parked": issue(201, "tools/a.py", labels=("job", "waiting", "parked")),
+            "done": issue(201, "tools/a.py", labels=("job", "in-progress", "done")),
+        }
+        for kind, stopped in boards.items():
+            gh = FakeGitHub([stopped])
+            before = gh.labels(201)
+            self.assertFalse(oc.run_check(gh, CFG, 201, sleep=lambda s: None), kind)
+            self.assertEqual(gh.writes(), [], kind)
+            self.assertEqual(gh.labels(201), before, kind)
+
+    def test_label_names_are_read_without_regard_to_case(self):
+        building = {"number": 205, "labels": [{"name": "Job"}, {"name": "In-Progress"}]}
+        self.assertTrue(oc.holds_files(building))
+        parked = {"number": 201, "labels": [{"name": "In-Progress"}, {"name": "Parked"}]}
+        self.assertFalse(oc.holds_files(parked))
+        gh = FakeGitHub([issue(201, "tools/a.py", labels=("job", "Done"))])
+        self.assertFalse(oc.run_check(gh, CFG, 201, sleep=lambda s: None))
+        self.assertEqual(gh.writes(), [])
+
     def test_an_open_builder_pull_request_still_holds_its_files(self):
         # The pull request is the real collision guard, even when its job issue is parked or done.
         _, blocker = pr(211, ["tools/overlap-check/overlap_check.py"], closes=201)
@@ -626,6 +650,18 @@ class Workflows(unittest.TestCase):
         caller = self.read("factory-chat-to-code-loop-builder-skills.yml")
         for kind in ("labeled", "opened", "closed", "unlabeled"):
             self.assertIn(f"      - {kind}\n", caller)
+
+    def test_restarts_when_a_job_is_marked_parked_or_done(self):
+        # A blocker that gets parked or done while a stale in-progress stays on it holds
+        # nothing, so its waiting jobs must be reconsidered right then.
+        text = self.read("factory-builder-reusable.yml")
+        redispatch = text.split("  redispatch:", 1)[1].split("runs-on:", 1)[0]
+        self.assertIn(
+            "(github.event_name == 'issues' && github.event.action == 'labeled' &&\n"
+            "        (github.event.label.name == 'parked' || github.event.label.name == 'done'))",
+            redispatch)
+        gate = text.split("  gate:", 1)[1].split("runs-on:", 1)[0]
+        self.assertNotIn("parked", gate, "marking a job parked or done must never build it")
 
     def test_every_builder_workflow_carries_the_never_ask_line(self):
         for name in ("factory-builder-reusable.yml", "factory-chat-to-code-loop-builder-skills.yml"):

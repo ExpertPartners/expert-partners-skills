@@ -10,16 +10,17 @@ file". There is no cap on how many builds or open pull requests a repo may have.
 
 Three subcommands, run by .github/workflows/factory-builder-reusable.yml:
 
-  check    Judge OVERLAP_ISSUE. A clear issue is labeled in-progress (and job) and loses
-           waiting. A held issue is labeled waiting and gets one comment saying what it waits
-           on, edited in place when that changes. Writes start=true|false to GITHUB_OUTPUT.
+  check    Judge OVERLAP_ISSUE. A closed, parked or done issue never builds and is left as
+           it is. A clear issue is labeled in-progress (and job) and loses waiting. A held
+           issue is labeled waiting and gets one comment saying what it waits on, edited in
+           place when that changes. Writes start=true|false to GITHUB_OUTPUT.
   release  After a build the gate started, when no open builder pull request closes
            OVERLAP_ISSUE, drop its in-progress label so it holds nothing. A build that did not
            succeed (BUILD_RESULT) goes back to waiting, so it starts again on its own.
-  next     After a pull request or issue closes, or in-progress is removed, dispatch the
-           builder for every waiting Job issue that would start now, oldest first. Each one is
-           claimed by removing its waiting label first, so two runs never dispatch the same
-           job. Writes dispatched=<n,n,...>.
+  next     After a pull request or issue closes, in-progress is removed, or an issue is
+           marked parked or done, dispatch the builder for every waiting Job issue that would
+           start now, oldest first. Each one is claimed by removing its waiting label first,
+           so two runs never dispatch the same job. Writes dispatched=<n,n,...>.
 
 OVERLAP_TOKEN (the workflow's own token) does every read and write. Standard library only.
 """
@@ -342,7 +343,8 @@ def comment_body(v: Verdict) -> str:
     lines += [
         "",
         "This build starts on its own when a pull request or job issue in this repo closes, "
-        "or a job loses its in-progress label, and nothing above still holds it.",
+        "a job loses its in-progress label, or a job is marked parked or done, and nothing "
+        "above still holds it.",
     ]
     return "\n".join(lines)
 
@@ -357,7 +359,9 @@ class Config:
 
 
 def labels_of(item: dict) -> set[str]:
-    return {label.get("name") for label in item.get("labels", [])}
+    # GitHub matches label names without regard to case, so a repo whose label is spelled
+    # In-Progress or Parked must be read the same as the lowercase names above.
+    return {(label.get("name") or "").casefold() for label in item.get("labels", [])}
 
 
 def open_builder_prs(gh, cfg: Config) -> list[Holder]:
@@ -438,6 +442,12 @@ def run_check(gh, cfg: Config, number: int, sleep=time.sleep) -> bool:
     """True when the build may start. Leaves the issue labeled for what happened."""
     issue = gh.get(f"/repos/{cfg.repo}/issues/{number}")
     labels = labels_of(issue)
+    if is_stopped(issue):
+        # A stopped job holds no files, so building it would let a colliding job build
+        # beside it unseen. Parked is the only way a job stays off Factory.
+        print(f"overlap-check: #{number} is closed, parked or done, so it does not build. "
+              "Reopen it or remove parked or done to build it.")
+        return False
     first = judge(gh, cfg, issue)
     report(number, first)
     if not first.start:
@@ -532,7 +542,8 @@ def release_body(result: str) -> str:
         MARKER,
         f"The build did not finish (result: {result or 'unknown'}), so this job no longer holds "
         "its files and waits to start again. It starts on its own when a pull request or job "
-        "issue in this repo closes, or a job loses its in-progress label.",
+        "issue in this repo closes, a job loses its in-progress label, or a job is marked "
+        "parked or done.",
     ])
 
 

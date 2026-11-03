@@ -21,8 +21,9 @@
 #   release     After a build the gate started, when no open pull request closes the job,
 #               removes in-progress so the job stops holding its files. A build that did
 #               not succeed goes back to waiting.
-#   redispatch  When a pull request or issue closes, or an issue loses in-progress,
-#               dispatches every waiting job that can start now. On pull_request_target it
+#   redispatch  When a pull request or issue closes, an issue loses in-progress, or an
+#               issue is marked parked or done, dispatches every waiting job that can
+#               start now. On pull_request_target it
 #               never checks out pull request code, only the overlap check from main.
 name: Factory Builder (reusable)
 "on":
@@ -214,14 +215,17 @@ jobs:
 
   redispatch:
     # Each of these can free the files a waiting job needs: a closed pull request, a closed
-    # issue, or an issue that loses in-progress. Changes made with github.token start no
-    # workflow, so the check's own label edits never land here.
+    # issue, an issue that loses in-progress, or an issue marked parked or done (a parked or
+    # done job holds nothing even while a stale in-progress is still on it). Changes made
+    # with github.token start no workflow, so the check's own label edits never land here.
     if: >-
       ((github.event_name == 'pull_request_target' || github.event_name == 'pull_request') &&
         github.event.action == 'closed') ||
       (github.event_name == 'issues' && github.event.action == 'closed') ||
       (github.event_name == 'issues' && github.event.action == 'unlabeled' &&
-        github.event.label.name == 'in-progress')
+        github.event.label.name == 'in-progress') ||
+      (github.event_name == 'issues' && github.event.action == 'labeled' &&
+        (github.event.label.name == 'parked' || github.event.label.name == 'done'))
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
