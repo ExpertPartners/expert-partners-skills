@@ -316,3 +316,44 @@ def test_similar_lines_line_up_against_the_end_of_the_screen():
     screens = stitch([_frame(0, doc), _frame(1, new)])
     assert len(screens) == 1
     assert [l.text for l in screens[0].lines[:-1]] == [first_review, final_review] + MESSAGE[:3]
+
+
+def test_a_status_above_the_first_lines_of_a_growing_message_stays_one_screen():
+    statuses = ["Thinking", "Writing", "Reading sources"]
+    frames = [_frame(f, ["Assistant reply", statuses[f]] + MESSAGE[:f + 1]) for f in range(3)]
+    screens = stitch(frames)
+    assert len(screens) == 1
+    assert [l.text for l in screens[0].lines] == ["Assistant reply", statuses[-1]] + MESSAGE[:3]
+    assert set(statuses) <= _readings(screens[0])
+
+
+def test_a_slide_whose_title_changes_and_adds_a_bullet_starts_a_new_screen():
+    shared = ["Calls are recorded for replay", "Bring one question each time", "Notes go in the shared folder"]
+    for before, after in [
+        ("Pricing plan overview", "Hiring plan review"),
+        ("Pricing plan", "Hiring plan"),
+        ("Pricing for the launch", "Hiring for the launch team"),
+    ]:
+        a = [before] + shared
+        b = [after] + shared + ["Office hours run on the side"]
+        screens = stitch([_frame(0, a), _frame(1, b)])
+        assert len(screens) == 2
+        assert [l.text for l in screens[1].lines] == b
+        for screen in screens:
+            for line in screen.lines:
+                assert before not in line.variants and after not in line.variants
+
+
+def test_a_typed_word_that_wraps_to_the_next_line_is_not_repeated():
+    partial, start, wrapped = "The answer mentions collabor", "The answer mentions", "collaboration in detail"
+    in_place = [_frame(0, MESSAGE[:4] + [partial]), _frame(1, MESSAGE[:4] + [start, wrapped])]
+    shifted = [
+        _frame(0, MESSAGE[:4] + [partial, "Thinking 3s"]),
+        _frame(1, MESSAGE[1:4] + [start, wrapped, "Pondering 4s"]),
+    ]
+    for frames, spinner in [(in_place, 0), (shifted, 1)]:
+        screens = stitch(frames)
+        assert len(screens) == 1
+        lines = screens[0].lines[:len(screens[0].lines) - spinner]
+        assert [l.text for l in lines] == MESSAGE[:4] + [start, wrapped]
+        assert partial in lines[4].variants

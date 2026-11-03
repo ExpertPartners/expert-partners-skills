@@ -146,7 +146,8 @@ def _merge(screen: Screen, new: list[Line]) -> bool:
         return False
     for k in range(t):
         old, fresh = doc[i + k], new[j + k]
-        if fresh.conf > old.conf:
+        following = new[j + k + 1] if j + k + 1 < len(new) else None
+        if fresh.conf > old.conf or _wrapped(old, fresh, following):
             doc[i + k] = _reread(old, fresh)
         else:
             old.add_variant(fresh.text)
@@ -251,6 +252,11 @@ def _fragment_of(part: Line, whole: Line) -> bool:
     np_, nw = normalize(part.text), normalize(whole.text)
     if not np_ or len(np_) >= len(nw):
         return False
+    if nw.startswith(np_):
+        return True
+    # A reading nearly as long as the line that still differs from it is another line.
+    if len(np_) > SIMILARITY * len(nw):
+        return False
     matcher = SequenceMatcher(None, np_, nw, autojunk=False)
     return sum(block.size for block in matcher.get_matching_blocks()) >= SIMILARITY * len(np_)
 
@@ -262,6 +268,32 @@ def _complete(old: Line, fresh: Line) -> Line | None:
     if _fragment_of(fresh, old):
         return old
     return None
+
+
+def _wrapped(old: Line, fresh: Line, following: Line | None) -> bool:
+    """True when old's end moved down to start the following line, as a word does when it wraps."""
+    if following is None:
+        return False
+    no, nf, nn = normalize(old.text), normalize(fresh.text), normalize(following.text)
+    if len(nf) < MIN_PREFIX_CHARS or not no.startswith(nf + " "):
+        return False
+    return nn.startswith(no[len(nf) + 1 :])
+
+
+def _repeats_in_place(doc: list[Line], new: list[Line], anchors: list[tuple[int, int]]) -> bool:
+    """True when new shows every line of a short doc at its place, give or take its last line.
+
+    A short line may read differently at its place, as a status word does. The
+    doc's last line may also be matched lower down, below lines new added above it.
+    """
+    body = anchors[:-1] if anchors[-1] == (len(doc) - 1, len(new) - 1) else anchors
+    if any(a != b for a, b in body):
+        return False
+    held = {a for a, _ in body}
+    return all(
+        x in held or (x < len(new) and _short(doc[x]) and _short(new[x]))
+        for x in range(len(doc) - 1)
+    )
 
 
 def _resemblance(old: str, fresh: str) -> float:
@@ -335,17 +367,20 @@ def _pair_gap(old: list[Line], fresh: list[Line], bottom: bool) -> tuple[dict[in
     return pairs, by_place
 
 
-def _join_changed(old: Line, fresh: Line) -> Line:
+def _join_changed(old: Line, fresh: Line, following: Line | None = None) -> Line:
     """One line for a line that reads differently in the new frame.
 
-    A complete reading wins over a cut off or partly typed one. A short line
+    A complete reading wins over a cut off or partly typed one, unless the
+    rest of the longer reading wrapped onto the following line. A short line
     that changed in place, such as a spinner, shows its newest reading, so a
     short closing line that replaced it stays visible. Otherwise the more
     confident reading wins.
     """
     complete = _complete(old, fresh)
     in_place = _short(old) and _short(fresh) and not similar(old.text, fresh.text)
-    if complete is not None:
+    if _wrapped(old, fresh, following):
+        joined = _combine(old, fresh, keep=fresh)
+    elif complete is not None:
         joined = _combine(old, fresh, keep=complete)
     elif in_place:
         joined = _combine(old, fresh, keep=fresh)
@@ -362,26 +397,23 @@ def _grow(doc: list[Line], new: list[Line]) -> list[Line] | None:
     Lines above the first match scrolled off and are kept. Every line of doc
     from the first match down must reappear, or be one of a few short changing
     lines, or be a short last line of doc, which is kept. New may show one cut
-    off piece of the line above its first match on top. New must add a line,
-    or extend one, unless every changed line was already seen changing, so a
-    static slide whose title or number changed still starts a new screen.
+    off piece of the line above its first match on top. A changed line that
+    is not short, or that sits above the first match, must be a cut off,
+    partly typed or wrapped reading of the same line, so a slide whose title
+    changed starts a new screen even when it adds a bullet. New must add a
+    line, or extend one, unless every changed line was already seen changing,
+    so a static slide whose title or number changed still starts a new screen.
 
     A screen too short to hold GROW_MIN_ANCHORS steady lines, as at the start
-    of a message, joins only when new repeats every line of it in place, its
-    last line reappears as new's last line or changes into a line that
+    of a message, joins only when new repeats every line of it in place, apart
+    from short lines such as a status word that read differently in place,
+    its last line reappears as new's last line or changes into a line that
     resembles it or was already seen changing, and new adds a line.
     """
     start = max(0, len(doc) - len(new) - GROW_MAX_CHANGED)
     window = doc[start:]
     anchors = _align(window, new)
-    steady = [(x, x) for x in range(len(doc) - 1)]
-    last_anchored = bool(anchors) and anchors[-1] == (len(doc) - 1, len(new) - 1)
-    early = (
-        start == 0
-        and 0 < len(anchors) < GROW_MIN_ANCHORS
-        and anchors[: len(steady)] == steady
-        and len(anchors) == len(steady) + last_anchored
-    )
+    early = start == 0 and 0 < len(anchors) < GROW_MIN_ANCHORS and _repeats_in_place(doc, new, anchors)
     if len(anchors) < GROW_MIN_ANCHORS and not early:
         return None
     bounds = [(-1, -1), *anchors, (len(window), len(new))]
@@ -409,7 +441,7 @@ def _grow(doc: list[Line], new: list[Line]) -> list[Line] | None:
             allowed = [len(old) - 1] if tail and old and _short(old[-1]) else []
             if any(di not in allowed for di in lone_old):
                 return None
-            if early and tail and not last_anchored:
+            if early and tail and old:
                 last = len(old) - 1
                 if last not in pairs or (last in by_place and not old[last].volatile):
                     return None
@@ -419,6 +451,9 @@ def _grow(doc: list[Line], new: list[Line]) -> list[Line] | None:
             if _continues(old[di], fresh[ni]):
                 grown += 1
             elif not old[di].volatile:
+                status_like = not head and _short(old[di]) and _short(fresh[ni])
+                if not status_like and _complete(old[di], fresh[ni]) is None:
+                    return None
                 unseen += 1
         dpos = npos = 0
         for di, ni in [*sorted(pairs.items()), (len(old), len(fresh))]:
@@ -431,10 +466,13 @@ def _grow(doc: list[Line], new: list[Line]) -> list[Line] | None:
                 else:
                     out.append(fresh[n])
             if di < len(old):
-                out.append(_join_changed(old[di], fresh[ni]))
+                following = new[b0 + 2 + ni] if b0 + 2 + ni < len(new) else None
+                out.append(_join_changed(old[di], fresh[ni], following))
             dpos, npos = di + 1, ni + 1
         if k < len(anchors):
-            out.append(_combine(window[a1], new[b1]))
+            following = new[b1 + 1] if b1 + 1 < len(new) else None
+            keep = new[b1] if _wrapped(window[a1], new[b1], following) else None
+            out.append(_combine(window[a1], new[b1], keep=keep))
     if changed > GROW_MAX_CHANGED:
         return None
     if early and added < 1:
