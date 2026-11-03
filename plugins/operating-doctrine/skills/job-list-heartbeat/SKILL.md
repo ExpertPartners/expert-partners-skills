@@ -36,7 +36,7 @@ This is doctrine, so it is always on. It fires at two moments.
 
 1. Run job_inbox under the session's own name, then under every old name it has carried. Read the live job tool schema before calling it. Never guess a tool's arguments.
 2. Claim each job meant for this session with job_claim, so job_status shows who is doing it, and start the work.
-3. Set the session's own 15-minute check with what its surface supports.
+3. Set the session's own 15-minute check with what its surface supports. If a check for this session already exists (a recurring task that started this session, or one set earlier), verify it and set no second one.
    - Claude Code on a local machine. A /loop or a ScheduleWakeup loop every 15 minutes.
    - Claude Code in the cloud. send_later, chained, so each check schedules the next one 15 minutes out.
    - A surface with scheduled tasks. One recurring task at the shortest interval the scheduler allows. A check that starts a fresh session runs hourly around the clock, the shortest it can run.
@@ -47,7 +47,11 @@ This is doctrine, so it is always on. It fires at two moments.
 1. Run job_inbox under the session's name and every old name.
 2. Act on every Start press and every reply from Allison waiting there. Claim new work with job_claim and start it in the same check.
 3. Renew the lease on every job this session has claimed and is still working, using the renew the live job tool offers. A claimed job goes back to the list after 20 minutes, one missed check, so a working session renews on every check and never lets the sweep take back work in progress.
-4. Schedule the next check, then confirm it is scheduled.
+4. If the timer is one-shot (send_later, ScheduleWakeup), schedule the next check and confirm it. A timer that already repeats (a /loop, a recurring scheduled task) is left as it is, so checks never stack up.
+
+## Renewing between checks
+
+The lease is 20 minutes, and some surfaces check less often than that (an hourly scheduled task). So while a session is working a claimed job, it renews that job's lease in every reply, not only at the check, and before any step it expects to run longer than 15 minutes. A run started by an hourly task finishes or renews each job it claims before that run ends.
 
 ## A surface with no timer
 
@@ -68,6 +72,7 @@ The check runs for the life of the session. When the session wraps, it releases 
 ## Test cases
 
 1. A new Claude Code session opens. Pass when its first reply runs job_inbox under its name and sets a 15-minute check, verified as scheduled.
-2. A job assigned to the session gets a Start press. Pass when the next check picks it up within 15 minutes.
+2. A job assigned to the session gets a Start press. Pass when the next check picks it up, within 15 minutes on a 15-minute surface and within the surface's shortest interval elsewhere.
 3. A chat on a surface with no timer. Pass when it checks on every reply and says once that it cannot run a timer.
-4. A session claims a job. Pass when each check renews the lease so the sweep never returns it while work continues.
+4. A session claims a job. Pass when each check and each working reply renews the lease so the sweep never returns it while work continues, on an hourly surface too.
+5. A session started by a recurring task. Pass when it verifies that task and adds no second recurring check.
