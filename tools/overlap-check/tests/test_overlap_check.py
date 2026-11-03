@@ -247,6 +247,24 @@ class Evaluate(unittest.TestCase):
         v = oc.evaluate(159, ["plugins/research-ops/.claude-plugin/plugin.json"], [], [other])
         self.assertEqual(v.lines(), ["Waiting on #154, same file"])
 
+    def test_changeset_notes_only_collide_on_the_same_note(self):
+        other = oc.Holder(188, "issue", [".changeset/", ".changeset/188-build-standard.md"])
+        v = oc.evaluate(189, [".changeset/", ".changeset/189-job-list-heartbeat.md"], [], [other])
+        self.assertTrue(v.start, "separate note files in .changeset/ never hold each other")
+        same = oc.Holder(190, "issue", [".changeset/189-job-list-heartbeat.md"])
+        v = oc.evaluate(189, [".changeset/189-job-list-heartbeat.md"], [], [same])
+        self.assertEqual(v.lines(), ["Waiting on #190, same file"])
+
+    def test_changeset_folder_spellings_never_hold_each_other(self):
+        other = oc.Holder(188, "issue", [".changeset/**", ".changeset/*.md"])
+        v = oc.evaluate(189, [".changeset/", ".changeset/*.md"], [], [other])
+        self.assertTrue(v.start)
+
+    def test_changeset_readme_still_collides_with_the_folder(self):
+        other = oc.Holder(188, "issue", [".changeset/README.md"])
+        v = oc.evaluate(189, [".changeset/"], [], [other])
+        self.assertEqual(v.lines(), ["Waiting on #188, same file"])
+
     def test_agents_md_is_shared(self):
         a = oc.Holder(152, "pr", ["AGENTS.md"], {151})
         v = oc.evaluate(157, ["AGENTS.md", ".github/workflows/questions-to-job-list.yml"], [a], [oc.Holder(151, "issue", ["AGENTS.md"])])
