@@ -10,8 +10,9 @@ A pull request is eligible when either
 Either way it merges only when every check on the head commit passed, the pull request
 leaves plugin versions and the top of every CHANGELOG.md to the release step
 (tools/release, fed by notes in .changeset/) and every note it adds is one that step can
-read, Codex's code review covers that exact head with no unresolved findings, and GitHub
-says it can merge.
+read, Codex's code review covers that exact head and leaves no P0 or P1 finding open, and
+GitHub says it can merge. P2 and lower findings never block on their own (AGENTS.md,
+Review guidelines).
 
 Two subcommands, run by .github/workflows/auto-merge-gate.yml:
 
@@ -54,6 +55,14 @@ CODEX_CLEAN_RE = re.compile(r"Codex Review:\s*Didn['\u2019]t find any major issu
 # At least 10 hex, so a head pushed later cannot cheaply be made to share an
 # older receipt's prefix. Codex names 10.
 CODEX_REVIEWED_COMMIT_RE = re.compile(r"\*\*Reviewed commit:\*\*\s*`([0-9a-fA-F]{10,40})`")
+# Codex marks each inline finding with a severity badge, e.g.
+# ![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat).
+SEVERITY_RE = re.compile(r"!\[(P\d+) Badge\]|img\.shields\.io/badge/(P\d+)-", re.IGNORECASE)
+SECURITY_FINDING_MARKER = "codex-security-review-finding:v1"
+# AGENTS.md, Review guidelines: only P0 and P1 findings block a merge.
+BLOCKING_SEVERITIES = {"P0", "P1"}
+BOLD_RE = re.compile(r"\*\*(.+?)\*\*", re.DOTALL)
+BADGE_MARKUP_RE = re.compile(r"!\[[^\]]*\]\([^)]*\)|</?sub>")
 
 PR_EVENTS = {"pull_request", "pull_request_target", "pull_request_review"}
 
@@ -120,15 +129,17 @@ class GitHub:
             url = next((p.split(";")[0].strip()[1:-1] for p in link.split(",") if 'rel="next"' in p), None)
         return items
 
-    def unresolved_threads(self, repo: str, number: int) -> int:
-        """How many review threads on the pull request are still unresolved."""
+    def review_threads(self, repo: str, number: int) -> dict[int, bool]:
+        """Whether each review thread on the pull request is resolved, keyed by the
+        REST id of the thread's first comment."""
         owner, name = repo.split("/", 1)
         query = (
             "query($o:String!,$n:String!,$p:Int!,$a:String){repository(owner:$o,name:$n){"
             "pullRequest(number:$p){reviewThreads(first:100,after:$a){"
-            "nodes{isResolved} pageInfo{hasNextPage endCursor}}}}}"
+            "nodes{isResolved comments(first:1){nodes{databaseId}}} pageInfo{hasNextPage endCursor}}}}}"
         )
-        count, after = 0, None
+        resolved: dict[int, bool] = {}
+        after = None
         while True:
             data, _ = self._request(
                 "POST", self.api_url + "/graphql",
@@ -137,9 +148,12 @@ class GitHub:
             if not data or data.get("errors"):
                 raise GitHubError(502, f"review threads could not be read: {(data or {}).get('errors')}")
             threads = data["data"]["repository"]["pullRequest"]["reviewThreads"]
-            count += sum(1 for t in threads["nodes"] if not t.get("isResolved"))
+            for t in threads["nodes"]:
+                first = ((t.get("comments") or {}).get("nodes") or [{}])[0] or {}
+                if first.get("databaseId") is not None:
+                    resolved[int(first["databaseId"])] = bool(t.get("isResolved"))
             if not threads["pageInfo"]["hasNextPage"]:
-                return count
+                return resolved
             after = threads["pageInfo"]["endCursor"]
 
     def post(self, path: str, body: dict):
@@ -244,42 +258,164 @@ def check_problems(gh, cfg: Config, sha: str) -> list[str]:
     return problems
 
 
-def count_open_threads(unresolved_threads) -> tuple[int | None, str | None]:
-    """(open thread count or None, read error message or None)."""
+@dataclass
+class Finding:
+    """One inline finding Codex left on the pull request."""
+    comment_id: int | None
+    kind: str  # "code" or "security"
+    severity: str | None  # "P0", "P1", "P2", ... or None when the badge cannot be read
+    commit: str  # the commit Codex reviewed when it raised the finding
+    title: str
+    url: str = ""
+    resolved: bool | None = None  # None when the thread state is unknown
+
+    def describe(self) -> str:
+        what = f"Codex {self.severity} {self.kind} finding" if self.severity else f"Codex {self.kind} finding with no readable severity"
+        link = f" ({self.url})" if self.url else ""
+        return f"{what} \"{self.title}\"{link}"
+
+
+def finding_severity(body: str) -> str | None:
+    """The one P-level badge on a finding, or None when there is none or more than one."""
+    found = {(alt or url).upper() for alt, url in SEVERITY_RE.findall(body)}
+    return found.pop() if len(found) == 1 else None
+
+
+def finding_title(body: str) -> str:
+    """The finding's headline: the bold text that carries its badge, else the first bold text."""
+    bold = [m.group(1) for m in BOLD_RE.finditer(body)]
+    for text in sorted(bold, key=lambda b: "Badge" not in b):
+        title = " ".join(BADGE_MARKUP_RE.sub("", text).split())
+        if title:
+            return title[:120]
+    first = next((line.strip() for line in body.splitlines() if line.strip() and not line.strip().startswith("<!--")), "")
+    return first[:120] or "(no text)"
+
+
+def parse_finding(comment: dict) -> Finding:
+    body = comment.get("body") or ""
+    return Finding(
+        comment_id=comment.get("id"),
+        kind="security" if SECURITY_FINDING_MARKER in body else "code",
+        severity=finding_severity(body),
+        commit=comment.get("original_commit_id") or comment.get("commit_id") or "",
+        title=finding_title(body),
+        url=comment.get("html_url") or "",
+    )
+
+
+def codex_findings(gh, cfg: Config, number: int, sha: str) -> tuple[list[Finding], str | None]:
+    """Every inline finding Codex left, with whether its thread is resolved, and a note
+    saying why thread states are unknown (None when they were all read)."""
+    comments = gh.paginate(f"/repos/{cfg.repo}/pulls/{number}/comments")
+    found = [
+        parse_finding(c) for c in comments
+        if (c.get("user") or {}).get("login") == CODEX_LOGIN and not c.get("in_reply_to_id")
+    ]
+    if all(f.commit == sha for f in found):
+        # Findings on this head block on severity alone, so their threads never matter.
+        return found, None
+    reader = getattr(gh, "review_threads", None)
+    if reader is None:
+        return found, "the review threads could not be checked"
     try:
-        return (unresolved_threads() if unresolved_threads else None), None
+        resolved = reader(cfg.repo, number)
     except GitHubError as exc:
-        return None, exc.message
+        return found, f"the review threads could not be read ({exc.message})"
+    for f in found:
+        f.resolved = resolved.get(f.comment_id)
+    return found, "its review thread was not found"
 
 
-def security_problems(state: dict | None, sha: str) -> list[str]:
-    security = (state or {}).get("security_review") or {}
-    if security.get("commit_sha") == sha and security.get("has_unresolved_findings") is True:
-        return [f"Codex security review on {sha[:7]} left unresolved findings."]
-    return []
+def blocking_findings(findings: list[Finding], sha: str, note: str | None, kind: str | None = None) -> tuple[list[str], int]:
+    """(why each P0, P1 or unreadable finding blocks, how many findings are open).
 
-
-def codex_problems(state: dict | None, sha: str, unresolved_threads=None, clean_receipt: bool = False) -> list[str]:
-    """unresolved_threads is a callable returning the number of unresolved
-    review threads on the pull request. It is only called in the cases that
-    need it, see below. clean_receipt says Codex posted a clean code review
-    receipt for this head (has_clean_codex_receipt)."""
+    A finding is open when Codex raised it on this head (resolving its thread does
+    not fix the code) or its thread is unresolved. P2 and lower never block on
+    their own, open or not (AGENTS.md, Review guidelines)."""
     short = sha[:7]
+    problems: list[str] = []
+    open_count = 0
+    for f in findings:
+        if kind and f.kind != kind:
+            continue
+        on_head = f.commit == sha
+        if not on_head and f.resolved is True:
+            continue
+        if on_head or f.resolved is False:
+            open_count += 1
+        if f.severity is not None and f.severity not in BLOCKING_SEVERITIES:
+            continue
+        gap = "" if f.severity else " The gate cannot read its severity, so this is a gap in the review evidence, not a pass."
+        if on_head:
+            problems.append(f"{f.describe()} blocks: Codex raised it on head {short}.{gap}")
+        elif f.resolved is False:
+            problems.append(f"{f.describe()} blocks: its thread from {f.commit[:7] or 'an earlier commit'} is unresolved.{gap}")
+        else:
+            problems.append(
+                f"{f.describe()} from {f.commit[:7] or 'an earlier commit'} may still be open: "
+                f"{note or 'its review thread could not be checked'}.{gap}"
+            )
+    return problems, open_count
+
+
+def unexplained(kind: str, sha: str, findings: list[Finding], note: str | None) -> str:
+    """Codex says findings of this kind are unresolved, but none the gate can read is open."""
+    short = sha[:7]
+    if note and any(f.kind == kind and f.resolved is None and f.commit != sha for f in findings):
+        why = f"{note}, so the gate cannot tell which are open"
+    else:
+        why = f"the gate found no open Codex {kind} finding comment to read their severity from"
+    return f"Codex {kind} review on {short} reports unresolved findings, but {why}."
+
+
+def security_problems(state: dict | None, sha: str, load) -> list[str]:
+    security = (state or {}).get("security_review") or {}
+    if security.get("commit_sha") != sha or security.get("has_unresolved_findings") is not True:
+        return []
+    short = sha[:7]
+    found, note = load()
+    if found is None:
+        return [f"Codex security review on {short} reports unresolved findings, but {note}, so the gate cannot read their severity."]
+    problems, open_count = blocking_findings(found, sha, note, "security")
+    if not problems and open_count == 0:
+        problems.append(unexplained("security", sha, found, note))
+    return problems
+
+
+def codex_problems(state: dict | None, sha: str, findings=None, clean_receipt: bool = False) -> list[str]:
+    """findings is a callable returning (list of Finding, note), see codex_findings.
+    It is called at most once, and only when the aggregate state says findings
+    exist. clean_receipt says Codex posted a clean code review receipt for this
+    head (has_clean_codex_receipt).
+
+    The aggregate booleans in Codex's summary are not a severity. When they say a
+    finding exists, each finding decides: P0, P1 and unreadable ones block, P2 and
+    lower do not."""
+    short = sha[:7]
+    loaded: list = []
+
+    def load() -> tuple[list[Finding] | None, str | None]:
+        if not loaded:
+            if findings is None:
+                loaded.append((None, "the review comments could not be checked"))
+            else:
+                try:
+                    loaded.append(findings())
+                except GitHubError as exc:
+                    loaded.append((None, f"the review comments could not be read ({exc.message})"))
+        return loaded[0]
+
+    problems: list[str] = []
     if clean_receipt and ((state or {}).get("code_review") or {}).get("commit_sha") != sha:
         # The receipt stands in only for a summary that is missing or still on
         # an older commit. A summary that covers this head keeps deciding.
         # The receipt says nothing about findings left open on earlier commits,
-        # and the summary it replaces may be stale, so every review thread must
-        # be resolved before it counts.
-        open_threads, error = count_open_threads(unresolved_threads)
-        if open_threads != 0:
-            if error:
-                why = f"the review threads could not be read ({error})"
-            elif open_threads is None:
-                why = "the review threads could not be checked"
-            else:
-                why = f"{open_threads} review thread(s) are still unresolved"
-            return [f"Codex posted a clean code review receipt for {short}, but {why}."] + security_problems(state, sha)
+        # and the summary it replaces may be stale, so every finding is read.
+        found, note = load()
+        if found is None:
+            return [f"Codex posted a clean code review receipt for {short}, but {note}."] + security_problems(state, sha, load)
+        problems += blocking_findings(found, sha, note)[0]
         state = dict(state or {}, code_review={
             "commit_sha": sha, "status": "completed", "has_unresolved_findings": False,
         })
@@ -290,27 +426,28 @@ def codex_problems(state: dict | None, sha: str, unresolved_threads=None, clean_
     if reviewed != sha:
         covered = reviewed[:7] if reviewed else "no commit"
         return [f"Codex has not reviewed head {short} yet (its last code review covered {covered})."]
-    problems: list[str] = []
+    unresolved = code.get("has_unresolved_findings")
     if code.get("status") != "completed":
         problems.append(f"Codex code review on {short} is {code.get('status')}, not completed.")
-    elif code.get("has_unresolved_findings") is True:
-        problems.append(f"Codex code review on {short} left unresolved findings.")
-    elif code.get("has_unresolved_findings") is None and code.get("has_any_findings") is True:
+    elif unresolved is True or (unresolved is None and code.get("has_any_findings") is True):
         # Once a pull request has ever had findings, Codex reports null instead
         # of false even after every finding is fixed and its thread resolved.
-        # Then the threads themselves decide: every one must be resolved.
-        open_threads, error = count_open_threads(unresolved_threads)
-        if error:
-            problems.append(f"Codex code review on {short} reported no open findings, but the review threads could not be read ({error}).")
-        if open_threads is None:
-            if not problems:
-                problems.append(f"Codex code review on {short} did not report has_unresolved_findings: false.")
-        elif open_threads > 0:
-            problems.append(f"Codex code review on {short} has {open_threads} unresolved review thread(s).")
-    elif code.get("has_unresolved_findings") is not False:
+        found, note = load()
+        if found is None:
+            if unresolved is True:
+                problems.append(f"Codex code review on {short} reports unresolved findings, but {note}, so the gate cannot read their severity.")
+            else:
+                problems.append(f"Codex code review on {short} did not report has_unresolved_findings: false, and {note}.")
+        else:
+            blockers, _ = blocking_findings(found, sha, note)
+            problems += blockers
+            # True claims a finding is open now, so one must be found to read its severity.
+            if unresolved is True and not blockers and blocking_findings(found, sha, note, "code")[1] == 0:
+                problems.append(unexplained("code", sha, found, note))
+    elif unresolved is not False:
         problems.append(f"Codex code review on {short} did not report has_unresolved_findings: false.")
-    problems += security_problems(state, sha)
-    return problems
+    problems += security_problems(state, sha, load)
+    return list(dict.fromkeys(problems))
 
 
 def mergeable_problems(pr: dict) -> list[str]:
@@ -493,7 +630,6 @@ def evaluate(gh, cfg: Config, number: int) -> Decision:
         label.get("name") for label in pr.get("labels", [])
     }
     issue_number = None
-    issue_number = None
     job_problem = None
     if author == FACTORY_LOGIN and job_issue_number(pr.get("body")) is not None:
         candidate = job_issue_number(pr.get("body"))
@@ -525,21 +661,11 @@ def evaluate(gh, cfg: Config, number: int) -> Decision:
     comments = gh.paginate(f"/repos/{cfg.repo}/issues/{number}/comments")
     reasons = check_problems(gh, cfg, sha)
     reasons += release_file_problems(gh, cfg, number, pr)
-    threads = getattr(gh, "unresolved_threads", None)
-
-    def open_threads():
-        # Resolving a thread is not the same as fixing it. A Codex review on
-        # this exact head that still carries findings keeps the gate shut.
-        reviews = gh.paginate(f"/repos/{cfg.repo}/pulls/{number}/reviews")
-        for review in reviews:
-            if (review.get("user") or {}).get("login") != CODEX_LOGIN or review.get("commit_id") != sha:
-                continue
-            found = gh.paginate(f"/repos/{cfg.repo}/pulls/{number}/reviews/{review['id']}/comments")
-            if found:
-                return len(found)
-        return threads(cfg.repo, number) if threads else None
-
-    reasons += codex_problems(latest_codex_state(comments), sha, open_threads, has_clean_codex_receipt(comments, sha))
+    reasons += codex_problems(
+        latest_codex_state(comments), sha,
+        lambda: codex_findings(gh, cfg, number, sha),
+        has_clean_codex_receipt(comments, sha),
+    )
     reasons += mergeable_problems(pr)
     action = "refuse" if reasons else "merge"
     return Decision(number, action, reasons, sha, issue_number, comments)
