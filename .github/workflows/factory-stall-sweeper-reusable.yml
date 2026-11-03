@@ -1,0 +1,69 @@
+# Reusable stall sweeper for the Chat to Code Loop (Decision Log 2026-11-03, Every code job on
+# the job board goes to Factory now, none sit waiting). tools/stall-sweeper/README.md explains
+# every rule.
+#
+# A repo installs the sweeper with one small caller file. Copy factory-stall-sweeper.yml from
+# this repo, keep its triggers and permissions, set builder_workflow to the file name of that
+# repo's builder caller, and point its uses: line here:
+#
+#   uses: ExpertPartners/expert-partners-skills/.github/workflows/factory-stall-sweeper-reusable.yml@main
+#
+# The sweeper runs on GitHub's schedule, not on anyone's laptop. It takes the script from this
+# repo's main only, so no caller or pull request can swap in its own copy. It uses the
+# workflow's own token and no secret. That token cannot push, because the job never gets
+# contents: write, and the script refuses every write that is not a label, a comment, closing a
+# done job or dispatching the builder. Label changes made with this token start no workflow,
+# which is why the builder is dispatched explicitly. Ember's repository is skipped here and
+# refused again by the script.
+name: Factory Stall Sweeper (reusable)
+"on":
+  workflow_call:
+    inputs:
+      builder_workflow:
+        description: File name of this repo's builder caller workflow, the one the sweeper dispatches
+        type: string
+        required: true
+      dry_run:
+        description: Print what the sweeper would do without doing it
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  sweep:
+    if: "!endsWith(github.repository, '/ember')"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # One sweep at a time per repo, so two sweeps never dispatch the same job. A sweep that
+    # waits loses nothing: it reads the board fresh when it starts.
+    concurrency:
+      group: factory-stall-sweeper-${{ github.repository }}
+      cancel-in-progress: false
+    permissions:
+      actions: write
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Checkout the stall sweeper
+        uses: actions/checkout@v4
+        with:
+          repository: ExpertPartners/expert-partners-skills
+          ref: main
+          path: .factory-stall-sweeper
+          persist-credentials: false
+          sparse-checkout: tools/stall-sweeper
+      - name: Sweep the job board
+        env:
+          SWEEPER_TOKEN: ${{ github.token }}
+          SWEEPER_BUILDER_WORKFLOW: ${{ inputs.builder_workflow }}
+          SWEEPER_REF: ${{ github.event.repository.default_branch }}
+          SWEEPER_DRY_RUN: ${{ inputs.dry_run && '1' || '' }}
+        run: |
+          set -euo pipefail
+          script=.factory-stall-sweeper/tools/stall-sweeper/sweeper.py
+          if [ ! -f "$script" ]; then
+            echo "::notice::The stall sweeper is not on main yet; nothing to do."
+            exit 0
+          fi
+          python3 "$script" sweep
