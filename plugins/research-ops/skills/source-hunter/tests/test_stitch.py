@@ -357,3 +357,92 @@ def test_a_typed_word_that_wraps_to_the_next_line_is_not_repeated():
         lines = screens[0].lines[:len(screens[0].lines) - spinner]
         assert [l.text for l in lines] == MESSAGE[:4] + [start, wrapped]
         assert partial in lines[4].variants
+
+
+BASE = [
+    "Gather the amber pebbles near the willow bank",
+    "Carry the copper lantern past the quiet orchard gate",
+    "Plant the silver turnips before the second frost arrives",
+    "Fold the paper crane twice along the dotted edge",
+    "Sing softly while the kettle hums on the stove",
+]
+ADDED = "Whistle once the lanterns are all lit"
+
+
+def _noisy_frame(changes, missing=(), added=True):
+    lines = [changes.get(n, line) for n, line in enumerate(BASE) if n not in missing]
+    return lines + [ADDED] if added else lines
+
+
+def _assert_one_screen_keeps_every_reading(second):
+    screens = stitch([_frame(0, BASE), _frame(1, second)])
+    assert len(screens) == 1
+    readings = _readings(screens[0])
+    for line in BASE + second:
+        assert line in readings
+    return screens[0]
+
+
+def test_a_stray_digit_in_a_long_steady_line_still_grows_the_screen():
+    second = _noisy_frame({1: "Carry the copper lantern 1 past the quiet orchard gate"})
+    screen = _assert_one_screen_keeps_every_reading(second)
+    assert [l.text for l in screen.lines] == BASE + [ADDED]
+
+
+def test_heavy_ocr_noise_on_a_long_middle_line_still_grows_the_screen():
+    second = _noisy_frame({2: "Plamt tne sliver tumlps bcfere tha secamd fncst anives"})
+    screen = _assert_one_screen_keeps_every_reading(second)
+    assert len(screen.lines) == len(BASE) + 1
+    assert screen.lines[-1].text == ADDED
+
+
+def test_a_steady_middle_line_missing_from_one_frame_is_kept():
+    second = _noisy_frame({}, missing={2})
+    screen = _assert_one_screen_keeps_every_reading(second)
+    assert [l.text for l in screen.lines] == BASE + [ADDED]
+
+
+def test_a_line_cut_at_a_different_place_still_grows_the_screen():
+    second = _noisy_frame({3: "Saved Notes Search the paper crane twice along the"})
+    screen = _assert_one_screen_keeps_every_reading(second)
+    assert len(screen.lines) == len(BASE) + 1
+    assert screen.lines[-1].text == ADDED
+
+
+def test_a_long_line_really_rewritten_still_starts_a_new_screen():
+    # Review on PR 197. A real edit is not OCR noise, even when the two lines look alike.
+    second = _noisy_frame({3: "Fold the paper swan thrice along the painted rim"})
+    screens = stitch([_frame(0, BASE), _frame(1, second)])
+    assert len(screens) == 2
+
+
+def test_a_repeat_frame_whose_top_line_has_a_stray_digit_adds_nothing():
+    second = _noisy_frame({0: "Gather the amber 1 pebbles near the willow bank"}, added=False)
+    screen = _assert_one_screen_keeps_every_reading(second)
+    assert [l.text for l in screen.lines] == BASE
+
+
+def test_a_noisy_top_line_and_a_stray_digit_still_grow_the_screen():
+    second = _noisy_frame({
+        0: "Gathor tho ambar pebblcs ncar tne wlllow bamk",
+        1: "Carry the copper 1 lantern past the quiet orchard gate",
+    })
+    screen = _assert_one_screen_keeps_every_reading(second)
+    assert len(screen.lines) == len(BASE) + 1
+    assert screen.lines[-1].text == ADDED
+
+
+def test_a_long_numbered_line_whose_number_changes_still_starts_a_new_screen():
+    shared = [
+        "Calls are recorded for replay each week",
+        "Bring one question each time you join us",
+        "Notes go in the shared folder after class",
+    ]
+    a = shared + ["Week 1 call recording link for the spring cohort"]
+    for b in (
+        shared + ["Week 2 call recording link for the spring cohort"],
+        shared + ["Week 2 call recording link for the spring cohort", "Office hours run on the side"],
+    ):
+        screens = stitch([_frame(0, a), _frame(1, b)])
+        assert len(screens) == 2
+        assert [l.text for l in screens[1].lines] == b

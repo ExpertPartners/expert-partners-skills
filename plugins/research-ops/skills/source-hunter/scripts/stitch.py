@@ -9,6 +9,10 @@ are the current screen plus added lines, with a small upward shift of the
 pane, a cut off top or bottom line, and a short spinner or status line that
 reads differently in every frame. That changing line stays one line and keeps
 its other readings as variants.
+
+Real OCR misreads a few steady lines in most frames. A frame that keeps most of
+the screen in order still joins it, and every misread or missing reading is
+kept, so noise never loses a line.
 """
 
 from __future__ import annotations
@@ -27,6 +31,18 @@ RESEMBLANCE = 0.6
 MIN_PREFIX_CHARS = 10
 GROW_MIN_ANCHORS = 3
 GROW_MAX_CHANGED = 3
+# A line this long or longer, digits left out, is long enough that OCR noise on it
+# reads as noise rather than as a different line.
+LONG_LINE_CHARS = 30
+# How closely a misread long line must read like its other reading.
+NEAR_MISS = 0.5
+# A changed word still counts as the same word misread at this likeness.
+WORD_MISREAD = 0.6
+# A line cut at another place still shares at least this much of its words in the middle.
+CUT_KEEP = 0.6
+# More changed lines than GROW_MAX_CHANGED are noise, not a different screen, only
+# when at least this share of the compared lines still match in order.
+KEPT_SHARE = 2 / 3
 
 
 @dataclass
@@ -79,7 +95,7 @@ def _similar_normalized(na: str, nb: str, threshold: float = SIMILARITY) -> bool
     if na == nb:
         return True
     # Numbered lines (Week 1, Week 2) score as near matches but are different lines.
-    if re.findall(r"\b\d+\b", na) != re.findall(r"\b\d+\b", nb):
+    if not _numbers_agree(na, nb, r"\b\d+\b"):
         return False
     matcher = SequenceMatcher(None, na, nb, autojunk=False)
     # The quick ratios are upper bounds on ratio, so they only skip sure misses.
@@ -235,6 +251,85 @@ def _numbers(normalized: str) -> list[str]:
     return re.findall(r"\d+", normalized)
 
 
+def _letters(normalized: str) -> str:
+    return " ".join(re.sub(r"\d+", "", normalized).split())
+
+
+def _long(normalized: str) -> bool:
+    return len(_letters(normalized)) >= LONG_LINE_CHARS
+
+
+def _numbers_agree(na: str, nb: str, pattern: str = r"\d+") -> bool:
+    """True unless the numbers in two normalized readings mark them as different lines.
+
+    Numbers that differ mark different lines (Week 1, Week 2) when the line is
+    otherwise short, or when one number reads as another. On a long line, a lone
+    digit that only one reading has is OCR noise, as a stray 1 or 0 often is.
+    """
+    a, b = re.findall(pattern, na), re.findall(pattern, nb)
+    if a == b:
+        return True
+    if len(a) == len(b) or not (_long(na) and _long(nb)):
+        return False
+    fewer, more = (a, nb) if len(a) < len(b) else (b, na)
+    wanted = list(fewer)
+    for token in more.split():
+        found = re.findall(pattern, token)
+        if not found:
+            continue
+        if wanted[: len(found)] == found:
+            wanted = wanted[len(found) :]
+        elif not (len(token) == 1 and token.isdigit()):
+            return False
+    return not wanted
+
+
+def _ocr_damage(na: str, nb: str) -> bool:
+    """True when every word that differs looks misread, not rewritten.
+
+    OCR damage swaps, drops or splits letters inside a word, or cuts the line at
+    another place. An edit swaps a word for a different word. So words may only
+    differ at either end around a long shared middle, each other changed
+    stretch must keep about the same number of words, and each changed word
+    must still read like its partner.
+    """
+    wa, wb = re.sub(r"\d+", "", na).split(), re.sub(r"\d+", "", nb).split()
+    codes = SequenceMatcher(None, wa, wb, autojunk=False).get_opcodes()
+    same = sum(i2 - i1 for tag, i1, i2, _, _ in codes if tag == "equal")
+    cut = same >= CUT_KEEP * min(len(wa), len(wb))
+    for tag, i1, i2, j1, j2 in codes:
+        if tag == "equal":
+            continue
+        # Words that differ only at either end, around a long shared middle, are
+        # the line cut at another place or a neighbor's words run into it.
+        if cut and (i1 == 0 and j1 == 0 or i2 == len(wa) and j2 == len(wb)):
+            continue
+        a, b = wa[i1:i2], wb[j1:j2]
+        if abs(len(a) - len(b)) > 1:
+            return False
+        if len(a) != len(b):
+            # A word split or joined by the OCR reads the same once spaces go.
+            if SequenceMatcher(None, "".join(a), "".join(b), autojunk=False).ratio() < WORD_MISREAD:
+                return False
+            continue
+        for x, y in zip(a, b):
+            if SequenceMatcher(None, x, y, autojunk=False).ratio() < WORD_MISREAD:
+                return False
+    return True
+
+
+def _near_miss(old: Line, fresh: Line) -> bool:
+    """True when two readings of a long line differ only as OCR noise does."""
+    na, nb = normalize(old.text), normalize(fresh.text)
+    return (_long(na) and _long(nb) and _numbers_agree(na, nb)
+            and _resemblance(old.text, fresh.text) >= NEAR_MISS and _ocr_damage(na, nb))
+
+
+def _keeps_most(steady: int, changed: int) -> bool:
+    """True when most of the compared lines still match in order."""
+    return steady >= GROW_MIN_ANCHORS and steady >= KEPT_SHARE * (steady + changed)
+
+
 def _is_prefix(na: str, nb: str) -> bool:
     """True when one normalized reading is a long enough start of the other."""
     shorter, longer = sorted((na, nb), key=len)
@@ -318,19 +413,20 @@ def _short(line: Line) -> bool:
 def _pair_gap(old: list[Line], fresh: list[Line], bottom: bool) -> tuple[dict[int, int], set[int]]:
     """Pair lines that changed between two matched lines, in order.
 
-    A line pairs with a later reading that resembles it. Failing that, a short
+    A line pairs with a later reading that resembles it, or with a misread
+    reading of a long line that is a near miss. Failing that, a short
     line pairs with the short line at the same distance from the next matched
     line or the bottom of the frame, which is where a spinner or status word
     sits from frame to frame. Lines whose numbers differ are different lines
-    (Week 1, Week 2), except a short last line at the bottom of both frames,
-    which is where a running counter sits.
+    (Week 1, Week 2), except a stray digit on a long line, and a short last
+    line at the bottom of both frames, which is where a running counter sits.
 
     Returns the pairs and the old indexes paired by place alone.
     """
 
     def allowed(di: int, ni: int) -> bool:
         na, nb = normalize(old[di].text), normalize(fresh[ni].text)
-        if _numbers(na) == _numbers(nb) or _is_prefix(na, nb):
+        if _numbers_agree(na, nb) or _is_prefix(na, nb):
             return True
         return (
             bottom
@@ -349,7 +445,8 @@ def _pair_gap(old: list[Line], fresh: list[Line], bottom: bool) -> tuple[dict[in
             if not allowed(di, ni):
                 continue
             score = _resemblance(line.text, fresh[ni].text)
-            if score >= RESEMBLANCE and (best is None or score > best[0]):
+            enough = NEAR_MISS if _near_miss(line, fresh[ni]) else RESEMBLANCE
+            if score >= enough and (best is None or score > best[0]):
                 best = (score, ni)
         if best is not None:
             pairs[di] = best[1]
@@ -404,6 +501,12 @@ def _grow(doc: list[Line], new: list[Line]) -> list[Line] | None:
     line, or extend one, unless every changed line was already seen changing,
     so a static slide whose title or number changed still starts a new screen.
 
+    Real OCR misreads a few steady lines in every frame, so the frame is also
+    judged by how much of the screen it keeps in order. When most compared
+    lines match in order, a long line that is a near miss of its earlier
+    reading joins it, and a line missing from new between matched lines, with
+    nothing in its place, is kept. Neither counts as a change new must add to.
+
     A screen too short to hold GROW_MIN_ANCHORS steady lines, as at the start
     of a message, joins only when new repeats every line of it in place, apart
     from short lines such as a status word that read differently in place,
@@ -418,7 +521,7 @@ def _grow(doc: list[Line], new: list[Line]) -> list[Line] | None:
         return None
     bounds = [(-1, -1), *anchors, (len(window), len(new))]
     out = list(doc[:start])
-    changed = added = grown = unseen = 0
+    changed = added = grown = unseen = tolerated = 0
     for k in range(len(bounds) - 1):
         (a0, b0), (a1, b1) = bounds[k], bounds[k + 1]
         old, fresh = window[a0 + 1 : a1], new[b0 + 1 : b1]
@@ -439,22 +542,28 @@ def _grow(doc: list[Line], new: list[Line]) -> list[Line] | None:
         else:
             changed += len(old)
             allowed = [len(old) - 1] if tail and old and _short(old[-1]) else []
-            if any(di not in allowed for di in lone_old):
+            missing = [di for di in lone_old if di not in allowed]
+            if missing and lone_new:
+                # A line replaced by a different line, not a line the OCR dropped.
                 return None
             if early and tail and old:
                 last = len(old) - 1
                 if last not in pairs or (last in by_place and not old[last].volatile):
                     return None
-            unseen += len(lone_old)
+            tolerated += len(missing)
+            unseen += len(lone_old) - len(missing)
             added += len(lone_new)
         for di, ni in pairs.items():
             if _continues(old[di], fresh[ni]):
                 grown += 1
             elif not old[di].volatile:
                 status_like = not head and _short(old[di]) and _short(fresh[ni])
-                if not status_like and _complete(old[di], fresh[ni]) is None:
+                if status_like or _complete(old[di], fresh[ni]) is not None:
+                    unseen += 1
+                elif _near_miss(old[di], fresh[ni]):
+                    tolerated += 1
+                else:
                     return None
-                unseen += 1
         dpos = npos = 0
         for di, ni in [*sorted(pairs.items()), (len(old), len(fresh))]:
             out += old[dpos:di]
@@ -473,7 +582,7 @@ def _grow(doc: list[Line], new: list[Line]) -> list[Line] | None:
             following = new[b1 + 1] if b1 + 1 < len(new) else None
             keep = new[b1] if _wrapped(window[a1], new[b1], following) else None
             out.append(_combine(window[a1], new[b1], keep=keep))
-    if changed > GROW_MAX_CHANGED:
+    if (changed > GROW_MAX_CHANGED or tolerated) and not _keeps_most(len(anchors), changed):
         return None
     if early and added < 1:
         return None
