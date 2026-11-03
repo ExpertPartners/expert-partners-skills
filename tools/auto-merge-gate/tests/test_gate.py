@@ -3,6 +3,7 @@
 Run from the repo root: python3 -m unittest discover -s tools/auto-merge-gate/tests -v
 """
 
+import base64
 import copy
 import importlib.util
 import json
@@ -55,6 +56,7 @@ def passing_routes(number=7, issue=126):
             {"name": "auto-merge-gate", "status": "in_progress", "conclusion": None},
         ],
         f"/repos/{REPO}/commits/{HEAD}/status": {"state": "pending", "statuses": []},
+        f"/repos/{REPO}/pulls/{number}/files": [{"filename": ".changeset/126-change.md", "status": "added"}],
         f"/repos/{REPO}/pulls": [],
     }
 
@@ -589,6 +591,144 @@ class LabelFallbackAndHeadFindings(unittest.TestCase):
         reader = FakeGitHub(routes)
         reader.unresolved_threads = lambda repo, n: 0
         self.assertEqual(gate.evaluate(reader, CFG, 7).action, "merge")
+
+
+MERGE_BASE = "d" * 40
+BASE_TIP = "e" * 40
+MARKET = {"name": "expert-partners", "plugins": [
+    {"name": "operating-doctrine", "source": "./plugins/operating-doctrine", "version": "2.78.0", "description": "d"},
+    {"name": "brand-voice", "source": "./plugins/brand-voice", "description": "d", "version": "0.6.7"},
+]}
+MANIFEST = "plugins/brand-voice/.claude-plugin/plugin.json"
+LOG = "plugins/operating-doctrine/CHANGELOG.md"
+OLD_LOG = "## 2.78.0 - 2026-11-02\n\nNewest.\n## 2.77.0 - 2026-11-01\n\nOlder.\n"
+
+
+def market(**versions):
+    data = json.loads(json.dumps(MARKET))
+    for p in data["plugins"]:
+        if p["name"] in versions:
+            p["version"] = versions[p["name"]]
+    return json.dumps(data, indent=2) + "\n"
+
+
+def manifest(version="0.6.7"):
+    return json.dumps({"name": "brand-voice", "version": version}, indent=2) + "\n"
+
+
+def content(text):
+    return {"type": "file", "encoding": "base64", "content": base64.b64encode(text.encode()).decode()}
+
+
+def release_routes(files, before=None, after=None, routes=None):
+    """files is a list of (filename, status). before and after map a path to its text
+    at the merge base and at the head."""
+    routes = routes or passing_routes()
+    routes[f"/repos/{REPO}/pulls/7"]["base"]["sha"] = BASE_TIP
+    routes[f"/repos/{REPO}/pulls/7/files"] = [{"filename": n, "status": s} for n, s in files]
+    routes[f"/repos/{REPO}/compare/{BASE_TIP}...{HEAD}"] = {"merge_base_commit": {"sha": MERGE_BASE}}
+    for ref, texts in ((MERGE_BASE, before or {}), (HEAD, after or {})):
+        for path, text in texts.items():
+            routes[f"/repos/{REPO}/contents/{path}?ref={ref}"] = content(text)
+    return routes
+
+
+class ReleaseFiles(Base):
+    """Builders add a note in .changeset/; the release step on main owns versions and CHANGELOG tops."""
+
+    def test_changeset_note_alone_merges_without_reading_files(self):
+        routes = release_routes([(".changeset/159-one-owner.md", "added"), ("tools/release/release.py", "added")])
+        gh = FakeGitHub(routes)
+        self.assertEqual(gate.evaluate(gh, CFG, 7).action, "merge")
+        self.assertFalse([c for c in gh.calls if "/contents/" in c[1] or "/compare/" in c[1]])
+
+    def test_plugin_manifest_version_edit_refuses(self):
+        routes = release_routes([(MANIFEST, "modified")], {MANIFEST: manifest()}, {MANIFEST: manifest("0.6.8")})
+        self.assert_refused(routes, f"`{MANIFEST}` changes the brand-voice version from 0.6.7 to 0.6.8.")
+
+    def test_marketplace_version_edit_refuses(self):
+        path = ".claude-plugin/marketplace.json"
+        routes = release_routes([(path, "modified")], {path: market()}, {path: market(**{"operating-doctrine": "2.79.0"})})
+        body = self.assert_refused(routes, "changes the operating-doctrine version from 2.78.0 to 2.79.0")
+        self.assertIn("add a note in `.changeset/` instead", body)
+
+    def test_marketplace_edit_that_keeps_every_version_merges(self):
+        path = ".claude-plugin/marketplace.json"
+        after = market().replace('"description": "d"', '"description": "new words"', 1)
+        routes = release_routes([(path, "modified")], {path: market()}, {path: after})
+        self.assertEqual(self.evaluate(routes).action, "merge")
+
+    def test_removing_a_version_counts_as_an_edit(self):
+        after = json.dumps({"name": "brand-voice"}, indent=2) + "\n"
+        routes = release_routes([(MANIFEST, "modified")], {MANIFEST: manifest()}, {MANIFEST: after})
+        self.assert_refused(routes, "changes the brand-voice version from 0.6.7 to None")
+
+    def test_a_new_plugin_may_carry_its_first_version(self):
+        path = ".claude-plugin/marketplace.json"
+        data = json.loads(market())
+        data["plugins"].append({"name": "new-plugin", "source": "./plugins/new-plugin", "version": "0.1.0"})
+        new_manifest = "plugins/new-plugin/.claude-plugin/plugin.json"
+        routes = release_routes(
+            [(path, "modified"), (new_manifest, "added")],
+            {path: market()},
+            {path: json.dumps(data, indent=2) + "\n", new_manifest: '{"name": "new-plugin", "version": "0.1.0"}\n'})
+        self.assertEqual(self.evaluate(routes).action, "merge")
+
+    def test_branch_cut_before_a_release_is_judged_against_its_merge_base(self):
+        # main has since released 0.6.8, but the branch never touched the version.
+        routes = release_routes([(MANIFEST, "modified")], {MANIFEST: manifest()},
+                                {MANIFEST: json.dumps({"name": "brand-voice", "version": "0.6.7", "description": "x"}, indent=2) + "\n"})
+        routes[f"/repos/{REPO}/contents/{MANIFEST}?ref={BASE_TIP}"] = content(manifest("0.6.8"))
+        self.assertEqual(self.evaluate(routes).action, "merge")
+
+    def test_new_changelog_entry_refuses(self):
+        after = "## 2.79.0 - 2026-11-03\n\nBuilder wrote this.\n" + OLD_LOG
+        routes = release_routes([(LOG, "modified")], {LOG: OLD_LOG}, {LOG: after})
+        self.assert_refused(routes, f"`{LOG}` adds a CHANGELOG entry.")
+
+    def test_editing_the_top_changelog_entry_refuses(self):
+        routes = release_routes([(LOG, "modified")], {LOG: OLD_LOG}, {LOG: OLD_LOG.replace("Newest.", "Newest, edited.")})
+        self.assert_refused(routes, f"`{LOG}` edits the top CHANGELOG entry.")
+
+    def test_editing_an_older_changelog_entry_merges(self):
+        routes = release_routes([(LOG, "modified")], {LOG: OLD_LOG}, {LOG: OLD_LOG.replace("Older.", "Older, corrected.")})
+        self.assertEqual(self.evaluate(routes).action, "merge")
+
+    def test_a_new_changelog_refuses(self):
+        path = "plugins/brand-voice/CHANGELOG.md"
+        routes = release_routes([(path, "added")], {}, {path: "## 0.6.8 - 2026-11-03\n\nX.\n"})
+        self.assert_refused(routes, f"`{path}` is a new CHANGELOG.")
+
+    def test_removed_files_are_not_version_edits(self):
+        routes = release_routes([(LOG, "removed"), (MANIFEST, "removed")])
+        self.assertEqual(self.evaluate(routes).action, "merge")
+
+    def test_invalid_json_refuses(self):
+        routes = release_routes([(MANIFEST, "modified")], {MANIFEST: manifest()}, {MANIFEST: "{ not json"})
+        self.assert_refused(routes, "is not valid JSON")
+
+    def test_unreadable_file_fails_the_run_instead_of_merging(self):
+        routes = release_routes([(MANIFEST, "modified")], {MANIFEST: manifest()}, {})
+        errors = []
+        self.assertEqual(gate.run_plan(FakeGitHub(routes), CFG, "pull_request_target",
+                                       {"pull_request": {"number": 7}}, "", errors), [])
+        self.assertEqual(len(errors), 1)
+
+    def test_every_problem_is_listed_with_the_others(self):
+        routes = release_routes([(MANIFEST, "modified"), (LOG, "modified")],
+                                {MANIFEST: manifest(), LOG: OLD_LOG},
+                                {MANIFEST: manifest("0.7.0"), LOG: "## 2.79.0 - x\n\nY.\n" + OLD_LOG})
+        routes[f"/repos/{REPO}/commits/{HEAD}/check-runs"][1]["conclusion"] = "failure"
+        body = self.assert_refused(routes, "changes the brand-voice version")
+        self.assertIn("adds a CHANGELOG entry", body)
+        self.assertIn("finished as failure", body)
+
+    def test_label_route_is_held_to_the_same_rule(self):
+        routes = release_routes([(MANIFEST, "modified")], {MANIFEST: manifest()}, {MANIFEST: manifest("0.6.8")},
+                                routes=labelled_routes())
+        d = gate.evaluate(FakeGitHub(routes), LCFG, 7)
+        self.assertEqual(d.action, "refuse")
+        self.assertTrue(any("changes the brand-voice version" in r for r in d.reasons))
 
 
 if __name__ == "__main__":

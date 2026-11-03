@@ -7,8 +7,10 @@ A pull request is eligible when either
     Closes #N where #N is an issue labeled job), or
   - GATE_MERGE_LABEL is set and the pull request carries that label. Repos whose
     builders push as a person (Factory missions, Claude Code) mark finished work this way.
-Either way it merges only when every check on the head commit passed, Codex's code review
-covers that exact head with no unresolved findings, and GitHub says it can merge.
+Either way it merges only when every check on the head commit passed, the pull request
+leaves plugin versions and the top of every CHANGELOG.md to the release step
+(tools/release, fed by notes in .changeset/), Codex's code review covers that exact head
+with no unresolved findings, and GitHub says it can merge.
 
 Two subcommands, run by .github/workflows/auto-merge-gate.yml:
 
@@ -26,6 +28,7 @@ Standard library only.
 
 from __future__ import annotations
 
+import base64
 import json
 import os
 import re
@@ -47,6 +50,11 @@ CODEX_STATE_RE = re.compile(r"<!--\s*codex-review-state:v1\s+(\{.*?\})\s*-->", r
 MARKER_RE = re.compile(r"<!-- auto-merge-gate:v1 head=([0-9a-f]{40}) -->")
 
 PR_EVENTS = {"pull_request", "pull_request_target", "pull_request_review"}
+
+MARKETPLACE_PATH = ".claude-plugin/marketplace.json"
+PLUGIN_MANIFEST_RE = re.compile(r"^plugins/([^/]+)/\.claude-plugin/plugin\.json$")
+CHANGELOG_RE = re.compile(r"(^|/)CHANGELOG\.md$")
+RELEASE_HINT = "The release step owns versions and CHANGELOG entries; add a note in `.changeset/` instead."
 
 
 class GitHubError(Exception):
@@ -251,6 +259,75 @@ def mergeable_problems(pr: dict) -> list[str]:
     return []
 
 
+def file_text(gh, cfg: Config, path: str, ref: str) -> str:
+    data = gh.get(f"/repos/{cfg.repo}/contents/{urllib.parse.quote(path)}?ref={ref}")
+    if not isinstance(data, dict) or data.get("encoding") != "base64":
+        raise GitHubError(502, f"{path} at {ref[:7]} could not be read")
+    return base64.b64decode(data.get("content") or "").decode("utf-8")
+
+
+def listed_versions(path: str, text: str) -> dict:
+    """Plugin name to version for a marketplace file or a plugin manifest."""
+    data = json.loads(text)
+    if path == MARKETPLACE_PATH:
+        return {p.get("name"): p.get("version") for p in data.get("plugins", []) if isinstance(p, dict)}
+    return {PLUGIN_MANIFEST_RE.match(path).group(1): data.get("version")}
+
+
+def changelog_shape(text: str) -> tuple[list[str], int]:
+    """The top entry (everything above the second ## heading) and how many entries there are."""
+    lines = text.splitlines()
+    heads = [i for i, line in enumerate(lines) if line.startswith("## ")]
+    return lines[: heads[1] if len(heads) > 1 else len(lines)], len(heads)
+
+
+def release_file_problems(gh, cfg: Config, number: int, pr: dict) -> list[str]:
+    """A pull request may not edit a plugin version or the top of a CHANGELOG.md.
+    Brand new plugins and edits to older CHANGELOG entries are allowed."""
+    files = gh.paginate(f"/repos/{cfg.repo}/pulls/{number}/files")
+    watched = [
+        f for f in files
+        if f.get("status") != "removed" and (
+            f.get("filename") == MARKETPLACE_PATH
+            or PLUGIN_MANIFEST_RE.match(f.get("filename", ""))
+            or CHANGELOG_RE.search(f.get("filename", "")))
+    ]
+    if not watched:
+        return []
+    head = (pr.get("head") or {}).get("sha", "")
+    # Compare against the merge base, not the base tip, so a release that landed on
+    # main after the branch was cut is not mistaken for an edit by this branch.
+    compare = gh.get(f"/repos/{cfg.repo}/compare/{(pr.get('base') or {}).get('sha', '')}...{head}")
+    merge_base = compare["merge_base_commit"]["sha"]
+    problems: list[str] = []
+    for f in watched:
+        path = f["filename"]
+        added = f.get("status") == "added"
+        before_path = f.get("previous_filename") or path
+        if CHANGELOG_RE.search(path):
+            if added:
+                problems.append(f"`{path}` is a new CHANGELOG. {RELEASE_HINT}")
+                continue
+            old_top, old_count = changelog_shape(file_text(gh, cfg, before_path, merge_base))
+            new_top, new_count = changelog_shape(file_text(gh, cfg, path, head))
+            if new_count > old_count:
+                problems.append(f"`{path}` adds a CHANGELOG entry. {RELEASE_HINT}")
+            elif new_top != old_top:
+                problems.append(f"`{path}` edits the top CHANGELOG entry. {RELEASE_HINT}")
+            continue
+        try:
+            after = listed_versions(path, file_text(gh, cfg, path, head))
+            before = {} if added else listed_versions(path, file_text(gh, cfg, before_path, merge_base))
+        except ValueError:
+            problems.append(f"`{path}` is not valid JSON, so the gate cannot tell whether it changes a version.")
+            continue
+        for name in sorted(set(before) & set(after), key=str):
+            if before[name] != after[name]:
+                problems.append(
+                    f"`{path}` changes the {name} version from {before[name]} to {after[name]}. {RELEASE_HINT}")
+    return problems
+
+
 def evaluate(gh, cfg: Config, number: int) -> Decision:
     pr = gh.get(f"/repos/{cfg.repo}/pulls/{number}")
 
@@ -299,6 +376,7 @@ def evaluate(gh, cfg: Config, number: int) -> Decision:
     sha = (pr.get("head") or {}).get("sha", "")
     comments = gh.paginate(f"/repos/{cfg.repo}/issues/{number}/comments")
     reasons = check_problems(gh, cfg, sha)
+    reasons += release_file_problems(gh, cfg, number, pr)
     threads = getattr(gh, "unresolved_threads", None)
 
     def open_threads():
