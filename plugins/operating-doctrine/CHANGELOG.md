@@ -1,3 +1,6 @@
+## 2.82.1 - 2026-11-03
+
+Build Standard lists AI employees beyond Ember may run unattended once proven among the rulings behind it, by title only, so a builder following Check first step 1 reads that Decision Log entry live before relying on it. The Test plan and the report already cite it.
 ## 2.82.0 - 2026-11-03
 
 New skill business-brain-foundations v1.0, Week 0 tool 2, built from the approved spec [HQ][V1.0]
