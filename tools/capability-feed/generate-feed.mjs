@@ -24,8 +24,27 @@ import { readInputs, FeedSourceError } from './lib/sources.mjs';
 import { buildRecords, buildEnvelope, sameRecords, serialize } from './lib/build-feed.mjs';
 import { contractIssues } from './lib/hq-contract.mjs';
 
+/** @typedef {import('./lib/hq-contract.mjs').WorkforceEnvelope} WorkforceEnvelope */
+
 const argv = process.argv.slice(2);
-const has = flag => argv.includes(flag);
+const has = /** @param {string} flag */ flag => argv.includes(flag);
+/**
+ * @overload
+ * @param {string} flag
+ * @returns {string | undefined}
+ */
+/**
+ * @template {string | null} F
+ * @overload
+ * @param {string} flag
+ * @param {F} fallback
+ * @returns {string | F}
+ */
+/**
+ * @param {string} flag
+ * @param {string | null} [fallback]
+ * @returns {string | null | undefined}
+ */
 function arg(flag, fallback) {
   const i = argv.indexOf(flag);
   return i !== -1 && argv[i + 1] ? argv[i + 1] : fallback;
@@ -36,6 +55,11 @@ const repoRoot = path.resolve(arg('--repo', path.join(scriptDir, '..', '..')));
 const outFile = path.resolve(repoRoot, arg('--out', 'tools/capability-feed/ai-workforce-feed.json'));
 const now = arg('--now', null) ?? new Date().toISOString();
 
+/**
+ * The committed feed as parsed JSON (not yet checked against HQ's contract),
+ * null when absent, undefined when not JSON.
+ * @returns {unknown}
+ */
 function readExisting() {
   if (!fs.existsSync(outFile)) return null;
   try { return JSON.parse(fs.readFileSync(outFile, 'utf8')); } catch { return undefined; }
@@ -63,7 +87,7 @@ function main() {
       console.error(`DRIFT: ${rel} does not satisfy HQ's contract:\n  ${existing === undefined ? 'not valid JSON' : contractIssues(existing).join('\n  ')}`);
       return 1;
     }
-    if (!sameRecords(existing, envelope)) {
+    if (!sameRecords(/** @type {WorkforceEnvelope} */ (existing), envelope)) {
       console.error(`DRIFT: ${rel} is stale or hand-edited; it differs from what the canonical sources produce. Run: node tools/capability-feed/generate-feed.mjs --write`);
       return 1;
     }
@@ -72,7 +96,7 @@ function main() {
   }
 
   if (has('--write')) {
-    if (existingValid && sameRecords(existing, envelope)) {
+    if (existingValid && sameRecords(/** @type {WorkforceEnvelope} */ (existing), envelope)) {
       console.log(`${rel} unchanged (${records.length} records: ${counts}).`);
       return 0;
     }

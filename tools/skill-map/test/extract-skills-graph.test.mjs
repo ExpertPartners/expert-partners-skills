@@ -31,12 +31,26 @@ import { fileURLToPath } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const EXTRACTOR = path.join(here, '..', 'extract-skills-graph.mjs');
 
-const headerLines = (canonical, stamp = 'v1.0', date = '2026-09-04') => [
+/** @typedef {import('../extract-skills-graph.mjs').SkillNode} SkillNode */
+/** @typedef {import('../extract-skills-graph.mjs').DeployedMount} DeployedMount */
+/** @typedef {import('../layout-skills-graph.mjs').LaidOutGraph['edges'][number]} RoutedEdge */
+/** @typedef {import('../layout-skills-graph.mjs').Point} Point */
+
+const headerLines = (/** @type {string} */ canonical, stamp = 'v1.0', date = '2026-09-04') => [
   `# DEPLOYED COPY (${date}, skill-deploy pipeline): the canonical home is`,
   `# ${canonical}. Deployed at ${stamp}.`,
   '# Edit the canonical copy first, then redeploy via tools/skill-deploy.',
 ];
 
+/**
+ * @param {string} root
+ * @param {string} relDir
+ * @param {object} skill
+ * @param {string} skill.name
+ * @param {Record<string, string | string[] | undefined>} [skill.fields]
+ * @param {string[]} [skill.extraHeader]
+ * @param {string} [skill.body]
+ */
 function writeSkill(root, relDir, { name, fields = {}, extraHeader = [], body = 'Instructions.' }) {
   const dir = path.join(root, relDir);
   fs.mkdirSync(dir, { recursive: true });
@@ -61,6 +75,11 @@ function writeSkill(root, relDir, { name, fields = {}, extraHeader = [], body = 
 // Deploy a mirror exactly as tools/skill-deploy/deploy-skill.sh render() does:
 // take the canonical bytes and insert the three header lines before the closing
 // '---' of the frontmatter. Nothing else changes, which is what pass 3 verifies.
+/**
+ * @param {string} canonicalFile
+ * @param {string} destDir
+ * @param {string} canonicalLabel
+ */
 function deployMirror(canonicalFile, destDir, canonicalLabel, stamp = 'v1.0', date = '2026-09-04') {
   const text = fs.readFileSync(canonicalFile, 'utf8');
   const lines = text.split('\n');
@@ -78,6 +97,7 @@ function makeRepos() {
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'skills-graph-test-'));
   const eps = path.join(base, 'eps');
   fs.mkdirSync(path.join(eps, 'tools', 'skill-map'), { recursive: true });
+  /** @type {Record<string, string>} */
   const files = {};
   files.doctrine = writeSkill(eps, 'plugins/operating-doctrine/skills/operating-doctrine', {
     name: 'operating-doctrine',
@@ -88,13 +108,14 @@ function makeRepos() {
   return { base, eps, files, out: path.join(base, 'graph.json') };
 }
 
+/** @param {{ eps: string, out: string }} repos */
 function run({ eps, out }) {
   const r = spawnSync(process.execPath, [EXTRACTOR, '--eps', eps, '--out', out], { encoding: 'utf8' });
   const graph = r.status === 0 && fs.existsSync(out) ? JSON.parse(fs.readFileSync(out, 'utf8')) : null;
   return { status: r.status, stdout: r.stdout, stderr: r.stderr, graph };
 }
 
-const ids = graph => graph.nodes.map(n => n.id).sort();
+const ids = (/** @type {{ nodes: SkillNode[] }} */ graph) => graph.nodes.map(n => n.id).sort();
 
 test('baseline: canonical skills map, nothing deployed', () => {
   const r = run(makeRepos());
@@ -131,7 +152,7 @@ test('legitimate deployed mirrors under .agents/skills do NOT create duplicates'
   assert.deepEqual(ids(r.graph), ['alpha', 'beta', 'operating-doctrine'], 'mirrors are never nodes');
   const mounts = r.graph.flags.deployedMounts;
   assert.equal(mounts.length, 2);
-  assert.deepEqual(mounts.map(m => [m.id, m.canonical, m.mount]), [
+  assert.deepEqual(mounts.map((/** @type {DeployedMount} */ m) => [m.id, m.canonical, m.mount]), [
     ['alpha', 'eps:skills/alpha/SKILL.md', 'eps:.agents/skills/'],
     ['beta', 'eps:skills/beta/SKILL.md', 'eps:.agents/skills/'],
   ]);
@@ -149,7 +170,7 @@ test('mirror classification is independent of walk order (.agents sorts before s
   const r = run(repos);
   assert.equal(r.status, 0, r.stderr);
   assert.equal(r.graph.flags.deployedMounts.length, 1);
-  assert.equal(r.graph.nodes.find(n => n.id === 'beta').source, 'eps:skills/beta/SKILL.md');
+  assert.equal(r.graph.nodes.find((/** @type {SkillNode} */ n) => n.id === 'beta').source, 'eps:skills/beta/SKILL.md');
 });
 
 test('a copy under the mount root WITHOUT the pipeline header fails as corruption, not as a duplicate', () => {
@@ -288,7 +309,7 @@ test('a pipeline header outside a mount root also marks a deployed copy (no hand
   const r = run(repos);
   assert.equal(r.status, 0, r.stderr);
   assert.deepEqual(ids(r.graph), ['alpha', 'beta', 'operating-doctrine']);
-  assert.deepEqual(r.graph.flags.deployedMounts.map(m => [m.path, m.mount]),
+  assert.deepEqual(r.graph.flags.deployedMounts.map((/** @type {DeployedMount} */ m) => [m.path, m.mount]),
     [['eps:.claude/skills/alpha/SKILL.md', null]]);
 });
 
@@ -313,7 +334,7 @@ test('declared duplicate pointer is still recorded, not mapped', () => {
   const r = run(repos);
   assert.equal(r.status, 0, r.stderr);
   assert.deepEqual(r.graph.flags.declaredDuplicates, ['eps:operating-doctrine/SKILL.md']);
-  assert.equal(r.graph.nodes.filter(n => n.id === 'operating-doctrine').length, 1);
+  assert.equal(r.graph.nodes.filter((/** @type {SkillNode} */ n) => n.id === 'operating-doctrine').length, 1);
 });
 
 test('a declared duplicate whose keep path is no longer the mapped canonical fails', () => {
@@ -351,18 +372,29 @@ test('born-dressed strict mode still fails an unzoned canonical skill', () => {
 
 // --- canonical-first delivery: proof is an exact historical pipeline render ---
 const DEPLOY_SCRIPT = path.join(here, '..', '..', 'skill-deploy', 'deploy-skill.sh');
+/**
+ * @param {string} root
+ * @param {...string} args
+ */
 function gitRun(root, ...args) {
   const r = spawnSync('git', ['-C', root, ...args], { encoding: 'utf8' });
   assert.equal(r.status, 0, r.stderr);
   return r.stdout.trim();
 }
+/**
+ * @param {string} root
+ * @param {string} message
+ */
 function commitFiles(root, message) {
   gitRun(root, 'add', '.');
   gitRun(root, 'commit', '-m', message);
   return gitRun(root, 'rev-parse', 'HEAD');
 }
+/** @param {string} dir */
 function rewriteManifest(dir) {
+  /** @type {string[]} */
   const files = [];
+  /** @param {string} at */
   function visit(at, prefix = '') {
     for (const e of fs.readdirSync(at, { withFileTypes: true })) {
       const rel = prefix + e.name;
@@ -371,7 +403,7 @@ function rewriteManifest(dir) {
     }
   }
   visit(dir);
-  const digest = bytes => createHash('sha256').update(bytes).digest('hex');
+  const digest = (/** @type {Buffer} */ bytes) => createHash('sha256').update(bytes).digest('hex');
   const text = files.sort((a, b) => Buffer.compare(Buffer.from(a), Buffer.from(b)))
     .map(rel => `${digest(fs.readFileSync(path.join(dir, rel)))}  ./${rel}\n`).join('');
   fs.writeFileSync(path.join(dir, 'checksums.sha256'), text);
@@ -411,6 +443,10 @@ function committedDeployment({ treeStamped = false, plugin = false } = {}) {
   const dir = path.join(mount, name);
   return { ...repos, root, source, prior, blob, canonicalPath, dir, file: path.join(dir, 'SKILL.md') };
 }
+/**
+ * @param {{ eps: string, out: string }} repos
+ * @param {RegExp} pattern
+ */
 function assertFatal(repos, pattern) {
   const r = run(repos);
   assert.equal(r.status, 1, r.stderr);
@@ -424,12 +460,12 @@ test('exact prior committed pipeline deployment is VERIFIED STALE with proof and
   const r = run(repos);
   assert.equal(r.status, 0, r.stderr);
   assert.match(r.stderr, /VERIFIED STALE \/ awaiting redeploy/);
-  const mount = r.graph.flags.deployedMounts.find(m => m.id === 'alpha');
+  const mount = r.graph.flags.deployedMounts.find((/** @type {DeployedMount} */ m) => m.id === 'alpha');
   assert.equal(mount.status, 'VERIFIED STALE');
   assert.equal(mount.awaitingRedeploy, true);
   assert.equal(mount.verifiedCanonicalCommit, repos.prior);
   assert.equal(mount.verifiedCanonicalBlob, repos.blob);
-  assert.equal(r.graph.nodes.filter(n => n.id === 'alpha').length, 1);
+  assert.equal(r.graph.nodes.filter((/** @type {SkillNode} */ n) => n.id === 'alpha').length, 1);
   // The canonical graph allowance does NOT change the dedicated deployment gate.
   const verify = spawnSync('bash', [path.join(repos.eps, 'tools/skill-deploy/deploy-skill.sh'),
     'alpha', '--to', path.dirname(repos.dir), '--verify'], { encoding: 'utf8' });
@@ -441,7 +477,7 @@ test('tree-stamped prior committed deployment is also provable', () => {
   const repos = committedDeployment({ treeStamped: true });
   const r = run(repos);
   assert.equal(r.status, 0, r.stderr);
-  const mount = r.graph.flags.deployedMounts.find(m => m.id === 'beta');
+  const mount = r.graph.flags.deployedMounts.find((/** @type {DeployedMount} */ m) => m.id === 'beta');
   assert.match(mount.stamp, /^tree sha256 [a-f0-9]{12}$/);
   assert.equal(mount.verifiedCanonicalCommit, repos.prior);
 });
@@ -450,7 +486,7 @@ test('plugin deployment proves historical plugin release as well as skill bytes'
   const repos = committedDeployment({ plugin: true });
   const r = run(repos);
   assert.equal(r.status, 0, r.stderr);
-  assert.equal(r.graph.flags.deployedMounts.find(m => m.id === 'gamma').stamp, '1.2.3');
+  assert.equal(r.graph.flags.deployedMounts.find((/** @type {DeployedMount} */ m) => m.id === 'gamma').stamp, '1.2.3');
 });
 
 test('a changed stale body is fatal even with a recomputed checksum manifest', () => {
@@ -503,7 +539,7 @@ test('a false historical version stamp is fatal despite an exact old body', () =
 test('a moved pipeline header is fatal despite an exact stripped historical body', () => {
   const repos = committedDeployment();
   let text = fs.readFileSync(repos.file, 'utf8');
-  const block = text.match(/^# DEPLOYED COPY \([\s\S]*?# Edit the canonical copy first, then redeploy via tools\/skill-deploy\.\n/m)[0];
+  const block = /** @type {RegExpMatchArray} */ (text.match(/^# DEPLOYED COPY \([\s\S]*?# Edit the canonical copy first, then redeploy via tools\/skill-deploy\.\n/m))[0];
   text = text.replace(block, '').replace('name: alpha\n', `name: alpha\n${block}`);
   fs.writeFileSync(repos.file, text);
   rewriteManifest(repos.dir);
@@ -573,12 +609,12 @@ test('cross-zone calls and defers-to extract with visible routes and unchanged z
   });
   const r = run(repos);
   assert.equal(r.status, 0, r.stderr);
-  assert.equal(r.graph.nodes.find(n => n.id === 'new-project').zone, 'routing');
-  assert.equal(r.graph.nodes.find(n => n.id === 'alpha').zone, 'hands');
+  assert.equal(r.graph.nodes.find((/** @type {SkillNode} */ n) => n.id === 'new-project').zone, 'routing');
+  assert.equal(r.graph.nodes.find((/** @type {SkillNode} */ n) => n.id === 'alpha').zone, 'hands');
   for (const [to, type] of [['alpha', 'calls'], ['operating-doctrine', 'defers-to']]) {
-    const e = r.graph.edges.find(e => e.from === 'new-project' && e.to === to && e.type === type);
+    const e = r.graph.edges.find((/** @type {RoutedEdge} */ e) => e.from === 'new-project' && e.to === to && e.type === type);
     assert.ok(e?.points?.length >= 2, `${type} must render in the static SVG`);
-    assert.ok(e.points.every(p => Number.isFinite(p.x) && Number.isFinite(p.y)));
+    assert.ok(e.points.every((/** @type {Point} */ p) => Number.isFinite(p.x) && Number.isFinite(p.y)));
   }
 });
 

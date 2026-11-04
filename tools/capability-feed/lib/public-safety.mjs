@@ -26,6 +26,11 @@ export const LEAK_RULES = [
   { id: 'tailnet-address', rx: /\b100\.(?:6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.\d{1,3}\.\d{1,3}\b/ },
 ];
 
+/**
+ * @param {unknown} value
+ * @param {string} at
+ * @returns {Generator<[string, string]>}
+ */
 function* strings(value, at) {
   if (typeof value === 'string') { yield [at, value]; return; }
   if (Array.isArray(value)) { for (let i = 0; i < value.length; i++) yield* strings(value[i], `${at}[${i}]`); return; }
@@ -37,8 +42,16 @@ function* strings(value, at) {
   }
 }
 
-/** Every leak finding in the value, as { rule, at, excerpt }. Excerpts are masked. */
+/** @typedef {{ rule: string, at: string, excerpt: string }} LeakFinding */
+
+/**
+ * Every leak finding in the value, as { rule, at, excerpt }. Excerpts are masked.
+ * @param {unknown} value
+ * @param {string} [root]
+ * @returns {LeakFinding[]}
+ */
 export function scanForLeaks(value, root = '$') {
+  /** @type {LeakFinding[]} */
   const findings = [];
   for (const [at, text] of strings(value, root)) {
     for (const rule of LEAK_RULES) {
@@ -50,11 +63,15 @@ export function scanForLeaks(value, root = '$') {
 }
 
 // Never echo a full matched secret into CI logs.
+/** @param {string} s */
 function mask(s) {
   return s.length <= 8 ? '****' : `${s.slice(0, 4)}...${s.slice(-2)} (${s.length} chars)`;
 }
 
-/** A public link is https, carries no credentials, and does not point into a private repo. */
+/**
+ * A public link is https, carries no credentials, and does not point into a private repo.
+ * @param {string} url
+ */
 export function isPublicSafeUrl(url) {
   let u;
   try { u = new URL(url); } catch { return false; }

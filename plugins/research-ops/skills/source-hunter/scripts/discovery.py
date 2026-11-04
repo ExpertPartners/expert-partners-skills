@@ -10,8 +10,12 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any
 
-from evidence import Hunt
+from evidence import Hunt, Route
+
+# The summary video-discovery writes is read back as untyped JSON.
+JSONDict = dict[str, Any]
 
 DEFAULT_SCRIPT = Path(__file__).resolve().parents[2] / "video-discovery" / "scripts" / "video_discovery.py"
 
@@ -37,7 +41,7 @@ def _arg_value(args: list[str], flag: str) -> str | None:
 
 
 def run_video_discovery(hunt: Hunt, args: list[str], script: str | Path | None = None,
-                        python: str = sys.executable, timeout: float | None = None) -> dict:
+                        python: str = sys.executable, timeout: float | None = None) -> Route:
     """Run video_discovery.py with args, writing its output inside the hunt."""
     args = list(args)
     if args and args[0] == "--":
@@ -46,31 +50,33 @@ def run_video_discovery(hunt: Hunt, args: list[str], script: str | Path | None =
         raise DiscoveryError("Do not pass --output. Source Hunter puts video-discovery output in the evidence folder.")
     script = Path(script or DEFAULT_SCRIPT)
     target = _arg_value(args, "--creator") or " ".join(args) or "no arguments"
-    route = {"route": "unlisted video discovery", "target": target}
+    route: Route = {"route": "unlisted video discovery", "target": target}
     if not script.is_file():
-        route.update(status="failed", problems=[f"video-discovery command not found at {script}"],
-                     missing=["Unlisted videos for this target"])
+        route.update({"status": "failed", "problems": [f"video-discovery command not found at {script}"],
+                      "missing": ["Unlisted videos for this target"]})
         return hunt.record_route(route)
     if "--resume" in args:
         # video-discovery resumes from the budgets and evidence in its earlier output folder.
         out_dir = hunt.latest_dir("videos/run")
         if out_dir is None:
-            route.update(status="failed", problems=["--resume was given but this hunt has no earlier video run"],
-                         missing=["Unlisted videos for this target"])
+            route.update({"status": "failed", "problems": ["--resume was given but this hunt has no earlier video run"],
+                          "missing": ["Unlisted videos for this target"]})
             return hunt.record_route(route)
     else:
         out_dir = hunt.fresh_dir("videos/run")
     cmd = [python, str(script), *args, "--output", str(out_dir)]
+    code: int | None
     try:
         proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
         code, stdout, stderr = proc.returncode, proc.stdout, proc.stderr
     except subprocess.TimeoutExpired as exc:
-        code, stdout, stderr = None, exc.stdout or "", f"timed out after {timeout} seconds"
-        stdout = stdout.decode() if isinstance(stdout, bytes) else stdout
+        raw = exc.stdout or ""
+        code, stderr = None, f"timed out after {timeout} seconds"
+        stdout = raw.decode() if isinstance(raw, bytes) else raw
     console = hunt.write_text(out_dir / "source-hunter-console.txt",
                               f"exit code: {code}\n\n--- stdout ---\n{stdout}\n--- stderr ---\n{stderr}\n")
     summary_path = out_dir / "summary.json"
-    summary: dict = {}
+    summary: JSONDict = {}
     summary_problems: list[str] = []
     if summary_path.exists():
         try:
@@ -82,6 +88,8 @@ def run_video_discovery(hunt: Hunt, args: list[str], script: str | Path | None =
     found = [f"{summary[key]} {label}" for key, label in SUMMARY_FIELDS if key in summary]
     evidence = [hunt.rel(p) for p in (out_dir / "findings.md", out_dir / "catalog.json", summary_path) if p.exists()]
     evidence.append(hunt.rel(console))
+    missing: list[str]
+    problems: list[str]
     if code == 0:
         # Seeds are videos we already had, so only records beyond them count as found.
         new = summary.get("new_candidates", summary.get("candidates", 0))
@@ -93,7 +101,8 @@ def run_video_discovery(hunt: Hunt, args: list[str], script: str | Path | None =
         missing = ["Unlisted videos for this target"]
         last = (stderr or "").strip().splitlines()
         problems = [f"video-discovery exited with code {code}" + (f", {last[-1][:300]}" if last else "")]
-    route.update(status=status, found=found, missing=missing, problems=problems + summary_problems, evidence=evidence,
-                 text_files=[e for e in evidence if e.endswith("findings.md")], output_dir=hunt.rel(out_dir),
-                 counts={k: summary[k] for k, _ in SUMMARY_FIELDS if k in summary})
+    route.update({"status": status, "found": found, "missing": missing, "problems": problems + summary_problems,
+                  "evidence": evidence, "text_files": [e for e in evidence if e.endswith("findings.md")],
+                  "output_dir": hunt.rel(out_dir),
+                  "counts": {k: summary[k] for k, _ in SUMMARY_FIELDS if k in summary}})
     return hunt.record_route(route)

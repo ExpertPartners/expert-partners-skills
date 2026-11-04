@@ -16,6 +16,7 @@ from collections import Counter, deque
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import TYPE_CHECKING, Any, Protocol, TypedDict
 from urllib.parse import parse_qsl, urlencode, urljoin, urlsplit, urlunsplit, unquote
 
 import requests
@@ -26,18 +27,26 @@ from protego import Protego
 
 from operational_logging import OperationalRun
 
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from typing import Unpack
+
+    from playwright.sync_api import Route
+
+JSONDict = dict[str, Any]
+
 UA = 'PublicVideoDiscovery/0.1 (bounded read-only public research)'
 
 class NoAccountAuth(requests.auth.AuthBase):
     """Keep environment proxy support without implicitly loading account netrc."""
-    def __call__(self, request):
+    def __call__(self, request: requests.PreparedRequest) -> requests.PreparedRequest:
         return request
 
 
-def request_delay(http, url):
+def request_delay(http: PublicHTTP, url: str) -> float:
     p = urlsplit(url)
     origin = urlunsplit((p.scheme, p.netloc, '', '', ''))
-    policy = getattr(http, 'robots', {}).get(origin)
+    policy: Protego | None = getattr(http, 'robots', {}).get(origin)
     return max(http.delay, (policy.crawl_delay(UA) or 0) if policy else 0)
 
 PSL = tldextract.TLDExtract(suffix_list_urls=())
@@ -46,15 +55,15 @@ VIDEO_ID = re.compile(r'^[A-Za-z0-9_-]{11}$')
 MEDIA_EXT = re.compile(r'\.(?:mp4|webm|mov|m4v|m3u8|mpd)(?:$|\?)', re.I)
 BINARY_EXT = re.compile(r'\.(?:png|jpe?g|gif|webp|svg|ico|woff2?|ttf|zip|pdf|mp3|wav)(?:$|\?)', re.I)
 
-def now():
+def now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
-def domain(url):
+def domain(url: str) -> str:
     h = urlsplit(url).hostname or ''
     e = PSL(h)
     return e.top_domain_under_public_suffix or h
 
-def normalize_url(value, base=''):
+def normalize_url(value: object, base: str = '') -> str:
     if not isinstance(value, str) or not value.strip():
         return ''
     value = html.unescape(value.strip()).replace('\\/', '/')
@@ -83,7 +92,7 @@ def normalize_url(value, base=''):
     # Do not lowercase paths or strip Vimeo privacy hashes / signed query parameters.
     return urlunsplit((p.scheme.lower(), netloc, p.path or '/', urlencode(query), ''))
 
-def decode_text(text):
+def decode_text(text: str) -> str:
     for _ in range(2):
         text = html.unescape(text).replace('\\/', '/')
         text = re.sub(r'\\u([0-9a-fA-F]{4})', lambda m: chr(int(m[1], 16)), text)
@@ -97,13 +106,13 @@ class Reference:
     url: str
 
 
-def identify_url(url):
+def identify_url(url: object) -> Reference | None:
     url = normalize_url(url)
     if not url:
         return None
     p = urlsplit(url)
     h, parts, q = p.hostname, p.path.strip('/').split('/'), dict(parse_qsl(p.query))
-    vid = None
+    vid: str | None = None
     if h in {'youtube.com', 'www.youtube.com', 'm.youtube.com', 'music.youtube.com',
              'youtube-nocookie.com', 'www.youtube-nocookie.com', 'youtu.be'}:
         if h == 'youtu.be':
@@ -136,7 +145,7 @@ def identify_url(url):
     return None
 
 
-def extract_references(text, base=''):
+def extract_references(text: str, base: str = '') -> list[Reference]:
     text = decode_text(text)
     urls = re.findall(r'''(?:https?:)?//[^\s<>"'\\]+''', text)
     soup = BeautifulSoup(text if '<' in text and not text.lstrip().startswith('<?xml') else '', 'html.parser')
@@ -145,7 +154,7 @@ def extract_references(text, base=''):
             v = node.get(attr)
             if isinstance(v,str):
                 urls.append(normalize_url(v,base))
-    found = {}
+    found: dict[tuple[str, str, str], Reference] = {}
     for u in urls:
         u = normalize_url(u.rstrip('),;]}'))
         if not u:continue
@@ -184,19 +193,29 @@ class Record:
     credited_publisher: str = ''
     sample_viewable: bool = False
     verification_checked_at: str = ''
-    verification_evidence: list = field(default_factory=list)
-    source_pages: list = field(default_factory=list)
-    discovery_methods: list = field(default_factory=list)
-    references: list = field(default_factory=list)
-    metadata: list = field(default_factory=list)
-    checks: list = field(default_factory=list)
-    captions: list = field(default_factory=list)
+    verification_evidence: list[JSONDict] = field(default_factory=list)
+    source_pages: list[str] = field(default_factory=list)
+    discovery_methods: list[str] = field(default_factory=list)
+    references: list[dict[str, str]] = field(default_factory=list)
+    metadata: list[JSONDict] = field(default_factory=list)
+    checks: list[JSONDict] = field(default_factory=list)
+    captions: list[dict[str, str]] = field(default_factory=list)
+
+class AddOptions(TypedDict, total=False):
+    seed: bool
+    title: str
+    excerpt: str
+    associated: bool
+
+class YDLRequest(Protocol):
+    url: str
 
 class Catalog:
-    def __init__(self):
-        self.records = {}
+    def __init__(self) -> None:
+        self.records: dict[tuple[str, str], Record] = {}
 
-    def add(self, ref, source, method, seed=False, title='', excerpt='', associated=False):
+    def add(self, ref: Reference, source: str, method: str, seed: bool = False, title: str = '',
+            excerpt: str = '', associated: bool = False) -> Record:
         key = (ref.platform,ref.video_id)
         r = self.records.setdefault(key, Record(ref.platform,ref.video_id,ref.url))
         r.seed |= seed
@@ -214,15 +233,15 @@ class Catalog:
             r.association = 'search_mention_unverified'
         return r
 
-    def ingest(self,text,source,method,**kwargs):
+    def ingest(self,text: str,source: str,method: str,**kwargs: Unpack[AddOptions]) -> list[Record]:
         return [self.add(ref,source,method,**kwargs) for ref in extract_references(text,source)]
 
 
-def classify(checks, has_metadata=False):
+def classify(checks: list[JSONDict], has_metadata: bool = False) -> str:
     """Only explicit platform evidence determines private/deleted/unlisted status."""
     states = {c.get('result') for c in checks}
     if 'private' in states and 'deleted' in states: return 'conflicting_evidence'
-    restricted = states & {'private','deleted'}
+    restricted = {'private','deleted'} & states
     if restricted and states & {'playback_observed','media_endpoint_accessible','viewable_sample_confirmed'}:
         return 'conflicting_evidence'
     if restricted: return next(iter(restricted))
@@ -243,18 +262,20 @@ class Fetch:
     result: str
     status: int | None = None
     text: str = ''
-    headers: dict = field(default_factory=dict)
+    headers: dict[str, str] = field(default_factory=dict)
     evidence: str = ''
 
 class PublicHTTP:
     """Shared request budget, robots gate, redirect checks, and domain circuit breakers."""
-    def __init__(self,out,limit=100,delay=1.5,timeout=20,blocked=(),public_check=True,resume=False):
+    def __init__(self,out: str | Path,limit: int = 100,delay: float = 1.5,timeout: float = 20,blocked: Iterable[str] = (),
+                 public_check: bool = True,resume: bool = False) -> None:
         self.out = Path(out); (self.out/'evidence').mkdir(parents=True,exist_ok=True)
         self.limit = min(max(limit,1),100)
         self.delay = max(delay,1.0)
         self.timeout = timeout
-        self.counts = Counter(); self.last = {}; self.stopped = {d:'preexisting blocking response' for d in blocked}
-        self.robots = {}; self.cache = {}; self.log = []
+        self.counts: Counter[str] = Counter(); self.last: dict[str, float] = {}
+        self.stopped = {d:'preexisting blocking response' for d in blocked}
+        self.robots: dict[str, Protego | None] = {}; self.cache: dict[tuple[str, str], Fetch] = {}; self.log: list[JSONDict] = []
         self.public_check = public_check
         self.offline = False
         self.session = requests.Session(); self.session.headers['User-Agent'] = UA
@@ -263,13 +284,13 @@ class PublicHTTP:
         if resume:
             self.restore()
 
-    def record(self, f, method='GET', detail=''):
+    def record(self, f: Fetch, method: str = 'GET', detail: str = '') -> Fetch:
         item = dict(time=now(),method=method,url=f.url,result=f.result,status=f.status,evidence=f.evidence,headers=f.headers,detail=detail)
         self.log.append(item)
         with (self.out/'requests.jsonl').open('a') as stream: stream.write(json.dumps(item)+'\n')
         return f
 
-    def restore(self):
+    def restore(self) -> None:
         path=self.out/'requests.jsonl'
         if not path.exists():return
         for line in path.read_text().splitlines():
@@ -291,7 +312,7 @@ class PublicHTTP:
                 cached=self.cache.get((item['method'],target))
                 if cached:self.cache[(item['method'],item['url'])]=cached
 
-    def public_url(self,url):
+    def public_url(self,url: str) -> bool:
         p=urlsplit(url)
         if p.scheme not in {'http','https'} or not p.hostname or p.username or p.password:
             return False
@@ -301,7 +322,7 @@ class PublicHTTP:
             return all(ipaddress.ip_address(i[4][0]).is_global for i in socket.getaddrinfo(p.hostname,p.port or 443,type=socket.SOCK_STREAM))
         except (ValueError,OSError): return False
 
-    def allowed(self,url):
+    def allowed(self,url: str) -> tuple[bool, str]:
         # Vimeo's published terms notice prohibits general page scraping. API exceptions are explicit.
         if domain(url)=='vimeo.com':
             return False,'terms_restricted'
@@ -318,7 +339,7 @@ class PublicHTTP:
         if policy is None:return False,'robots_unavailable'
         return (True,'') if policy.can_fetch(url,UA) else (False,'robots_disallowed')
 
-    def fetch(self,url,method='GET',api=False,robots=False,redirects=0):
+    def fetch(self,url: str,method: str = 'GET',api: bool = False,robots: bool = False,redirects: int = 0) -> Fetch:
         url=normalize_url(url)
         key=(method,url)
         if key in self.cache:return self.cache[key]
@@ -368,7 +389,7 @@ class PublicHTTP:
                         if not any(x in ct for x in ('text/','json','xml','javascript')):
                             f.result='nontext_body_not_requested'
                         else:
-                            chunks=[];size=0
+                            chunks: list[bytes]=[];size=0
                             for chunk in resp.iter_content(65536):
                                 size+=len(chunk)
                                 if size>4_000_000:
@@ -393,12 +414,13 @@ class PublicHTTP:
         raise AssertionError('unreachable')
 
 
-def is_api_url(url):
+def is_api_url(url: str) -> bool:
     p=urlsplit(url)
     return (p.hostname=='vimeo.com' and (p.path=='/api/oembed.json' or p.path.startswith('/api/v2/'))) or (p.hostname=='www.youtube.com' and p.path=='/oembed')
 
 
-def apply_metadata(r, data, source, method, youtube_channel_id='', youtube_url='', vimeo_url=''):
+def apply_metadata(r: Record, data: JSONDict, source: str, method: str, youtube_channel_id: str = '',
+                   youtube_url: str = '', vimeo_url: str = '') -> None:
     r.metadata.append(dict(source=source,method=method,data=data))
     title=data.get('title')
     if title:r.title=str(title);r.title_basis=method
@@ -406,7 +428,7 @@ def apply_metadata(r, data, source, method, youtube_channel_id='', youtube_url='
     author_url=data.get('author_url') or data.get('user_url') or data.get('channel_url') or data.get('uploader_url')
     if author:r.creator=str(author)
     if author_url:r.creator_url=str(author_url)
-    def profile(u):return normalize_url(u).rstrip('/').removesuffix('/videos').casefold()
+    def profile(u: str) -> str:return normalize_url(u).rstrip('/').removesuffix('/videos').casefold()
     exact=False;other=False
     if r.platform=='youtube':
         cid=data.get('channel_id')
@@ -429,19 +451,19 @@ def apply_metadata(r, data, source, method, youtube_channel_id='', youtube_url='
     r.checks.append(dict(time=now(),source=source,method=method,result='metadata_available'))
 
 class Investigation:
-    def __init__(self,args):
+    def __init__(self,args: argparse.Namespace) -> None:
         self.args=args;self.catalog=Catalog()
         self.http=PublicHTTP(args.output,args.max_pages,args.delay,blocked=args.blocked_domain,resume=args.resume)
         self.root=domain(normalize_url('https://'+args.website.removeprefix('https://').removeprefix('http://')))
-        self.notes=[];self.visited=set();self.page_titles={}
+        self.notes: list[JSONDict]=[];self.visited: set[str]=set();self.page_titles: dict[str, str]={}
 
-    def owned(self,url):return domain(url)==self.root
+    def owned(self,url: str) -> bool:return domain(url)==self.root
 
-    def metadata(self,r,data,source,method):
+    def metadata(self,r: Record,data: JSONDict,source: str,method: str) -> None:
         apply_metadata(r,data,source,method,self.args.youtube_channel_id,self.args.youtube,self.args.vimeo)
 
-    def import_search(self,path):
-        queue=[]
+    def import_search(self,path: str | Path) -> list[str]:
+        queue: list[str]=[]
         for batch in json.loads(Path(path).read_text()):
             q=batch.get('query','')
             data=batch.get('data',{})
@@ -455,7 +477,7 @@ class Investigation:
             self.notes.append(dict(source='search_index',query=q,result_count=len(data.get('web',[])),import_file=str(path)))
         return queue
 
-    def scan(self,text,url,method):
+    def scan(self,text: str,url: str,method: str) -> tuple[BeautifulSoup, list[Record]]:
         associated=self.owned(url) or (method=='wayback_snapshot' and self.root in url)
         records=self.catalog.ingest(text,url,method,associated=associated)
         soup=BeautifulSoup(text if not text.lstrip().startswith('<?xml') else '', 'html.parser')
@@ -464,12 +486,13 @@ class Investigation:
         # A source page's title is context, never silently presented as a video title.
         for node in soup.select('iframe, video, source'):
             value=node.get('src') or node.get('data-src')
-            ref=identify_url(urljoin(url,value)) if value else None
+            ref=identify_url(urljoin(url,value)) if isinstance(value,str) and value else None
             if ref:
-                self.catalog.add(ref,url,method,title=node.get('title','') or node.get('aria-label',''),associated=associated)
+                title=node.get('title','') or node.get('aria-label','')
+                self.catalog.add(ref,url,method,title=title if isinstance(title,str) else '',associated=associated)
         return soup,records
 
-    def crawl(self,entries):
+    def crawl(self,entries: list[str]) -> None:
         q=deque((normalize_url(u),0,'website_source') for u in entries)
         while q:
             url,depth,method=q.popleft()
@@ -484,9 +507,9 @@ class Investigation:
             if 'xml' in f.headers.get('content-type','') or f.text.lstrip().startswith('<?xml'):
                 try:
                     tree=ElementTree.fromstring(f.text)
-                    for node in tree.iter():
-                        if node.tag.rsplit('}',1)[-1]=='loc' and node.text:
-                            q.append((normalize_url(node.text),depth,'sitemap_page'))
+                    for element in tree.iter():
+                        if element.tag.rsplit('}',1)[-1]=='loc' and element.text:
+                            q.append((normalize_url(element.text),depth,'sitemap_page'))
                 except ElementTree.ParseError: self.notes.append(dict(source=url,result='invalid_xml'))
             for node in soup.select('a[href], iframe[src], iframe[data-src], script[src]'):
                 value=node.get('href') or node.get('src') or node.get('data-src')
@@ -505,7 +528,7 @@ class Investigation:
                 for sm in policy.sitemaps or []:
                     if self.owned(sm):q.append((normalize_url(sm),depth,'sitemap'))
 
-    def vimeo_legacy(self):
+    def vimeo_legacy(self) -> None:
         slug=urlsplit(normalize_url(self.args.vimeo)).path.strip('/').split('/')[0]
         if not re.fullmatch(r'[A-Za-z0-9_-]+',slug):return
         # Legacy endpoint is optional and bounded to three documented pages.
@@ -523,7 +546,7 @@ class Investigation:
                     self.metadata(r,item,url,'vimeo_legacy_api')
             if len(data)<20:break
 
-    def archives(self):
+    def archives(self) -> None:
         if getattr(self.args, 'archive_mode', 'sampled') == 'full':
             from discovery_extensions import full_archives
             full_archives(self)
@@ -536,7 +559,7 @@ class Investigation:
                 data=json.loads(f.text);rows=[dict(zip(data[0],row)) for row in data[1:]] if data else []
             except (ValueError,TypeError):rows=[]
             # Prefer distinct path names over tracking variants; newest sample among returned records.
-            selected={}
+            selected: dict[str, JSONDict]={}
             for row in rows:
                 original=normalize_url(row.get('original',''))
                 if not self.owned(original):continue
@@ -565,7 +588,7 @@ class Investigation:
                 self.notes.append(dict(source=url,result=f.result,coverage='index references only; WARC bodies not retrieved'))
                 if f.result!='ok':break
 
-    def platform_discovery(self):
+    def platform_discovery(self) -> None:
         # Public YouTube pages, playlists and RSS only when ordinary access is allowed.
         base=normalize_url(self.args.youtube).rstrip('/')
         for suffix in ('/videos','/shorts','/streams','/playlists'):
@@ -589,7 +612,7 @@ class Investigation:
         if f.result=='ok':self.catalog.ingest(f.text,filmot,'filmot_public_index')
         self.notes.append(dict(source=filmot,result=f.result,cli='baba20o/filmot-cli evaluated; API credentials required, not provisioned'))
 
-    def validate(self):
+    def validate(self) -> None:
         for r in self.catalog.records.values():
             if r.platform in {'youtube','vimeo'}:
                 endpoint='https://www.youtube.com/oembed' if r.platform=='youtube' else 'https://vimeo.com/api/oembed.json'
@@ -615,17 +638,21 @@ class Investigation:
             r.accessibility=classify(r.checks,bool(r.metadata))
             print(f'Validate {r.platform}:{r.video_id}: {r.accessibility}',flush=True)
 
-    def ytdlp(self,r):
+    def ytdlp(self,r: Record) -> None:
         import yt_dlp
-        from yt_dlp.networking import Response
+        from yt_dlp.networking.common import Response
         http=self.http
         class GuardedYDL(yt_dlp.YoutubeDL):
-            def urlopen(self,req):
+            def __init__(self,params: JSONDict) -> None:
+                # Named, not super(): mypy's untyped_calls_exclude only recognizes a named method.
+                yt_dlp.YoutubeDL.__init__(self,params)
+            def urlopen(self,req: str | YDLRequest) -> Response:
                 method=req.method if hasattr(req,'method') else 'GET'
                 url=req if isinstance(req,str) else req.url
                 if method not in {'GET','HEAD'}:raise RuntimeError('Only GET/HEAD are permitted')
                 f=http.fetch(url,method=method)
                 if f.result!='ok':raise RuntimeError('Public retrieval stopped: '+f.result)
+                if f.status is None:raise RuntimeError('Public retrieval returned no status')
                 return Response(io.BytesIO(f.text.encode()),url=f.url,headers=f.headers,status=f.status)
         try:
             with GuardedYDL({'skip_download':True,'quiet':True,'no_warnings':True,'noplaylist':True,'retries':0,'extractor_retries':0,'socket_timeout':15,'cachedir':False}) as ydl:
@@ -637,7 +664,7 @@ class Investigation:
         except Exception as exc:
             r.checks.append(dict(time=now(),source=r.url,method='yt_dlp',result='extractor_unavailable',detail=str(exc)[:400]))
 
-    def render(self,url):
+    def render(self,url: str) -> None:
         """Optional fresh browser, no media: all HTTP goes through the same policy/budget."""
         if not self.owned(url):raise ValueError('Render only a supplied creator website URL')
         try:from playwright.sync_api import sync_playwright
@@ -647,7 +674,7 @@ class Investigation:
             with sync_playwright() as pw:
                 browser=pw.chromium.launch(headless=True)
                 context=browser.new_context(service_workers='block')
-                def route_handler(route):
+                def route_handler(route: Route) -> None:
                     request=route.request
                     if request.method!='GET' or request.resource_type in {'media','image','font','websocket'} or not self.owned(request.url):
                         route.abort();return
@@ -662,7 +689,7 @@ class Investigation:
                 browser.close()
         except Exception as exc:self.notes.append(dict(source=url,result='render_failed',detail=str(exc)[:300]))
 
-    def run(self):
+    def run(self) -> None:
         for path in self.args.seeds:
             for item in json.loads(Path(path).read_text()):
                 ref=identify_url(item['url'])
@@ -680,7 +707,7 @@ class Investigation:
         self.validate()
         self.export()
 
-    def export(self):
+    def export(self) -> None:
         out=Path(self.args.output)
         records=sorted(self.catalog.records.values(),key=lambda r:(r.platform,r.video_id))
         summary=dict(creator=self.args.creator,checked_at=now(),candidates=len(records),seed_records=sum(r.seed for r in records),
@@ -707,7 +734,7 @@ class Investigation:
                'Ownership requires an exact platform profile/channel match. Creator-site references may include third-party interviews or testimonials. Search snippets remain unverified unless independently corroborated. Unknown fields are left blank; no inaccessible ID is automatically labeled deleted/private. Missing from a profile does not prove unlisted status.', '',
                '| Platform / ID | Title | Ownership / association | Accessibility | Discovery sources |',
                '|---|---|---|---|---|']
-        def clean(s):return str(s).replace('|','\\|').replace('\n',' ')
+        def clean(s: str) -> str:return str(s).replace('|','\\|').replace('\n',' ')
         for r in records:
             sources='<br>'.join(f'[{clean(m)}]({s})' for m,s in dict.fromkeys((x['method'],x['source']) for x in r.references))
             lines.append(f'| [{r.platform}:{r.video_id}]({r.url}) | {clean(r.title or "Unknown")} | {r.ownership}; {r.association} | {r.accessibility} | {sources} |')
@@ -717,7 +744,7 @@ class Investigation:
         print(json.dumps(summary,indent=2))
 
 
-def parser():
+def parser() -> argparse.ArgumentParser:
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--resume',action='store_true',help='Reuse evidence and request budgets from an interrupted run')
     p.add_argument('--creator',required=True);p.add_argument('--youtube',required=True);p.add_argument('--vimeo',required=True);p.add_argument('--website',required=True)
@@ -739,7 +766,7 @@ def parser():
     return p
 
 
-def main():
+def main() -> None:
     args=parser().parse_args()
     with OperationalRun('discovery') as op:
         args.output.mkdir(parents=True,exist_ok=True)

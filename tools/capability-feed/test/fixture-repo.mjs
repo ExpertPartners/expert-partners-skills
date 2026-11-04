@@ -5,12 +5,59 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
+/**
+ * @typedef {object} SkillMdSpec
+ * @property {string} name
+ * @property {string} description
+ * @property {string} [status]
+ * @property {string} [zone]
+ * @property {string} [tier]
+ * @property {string | null} [subtitle]
+ * @property {string} [extra]
+ * @property {string | null} [heading]
+ * @property {string[]} [calls]
+ * @property {string[]} [defersTo]
+ */
+
+/**
+ * A skill graph node; graphFor fills the fields left out from NODE_DEFAULTS.
+ * @typedef {object} FixtureNode
+ * @property {string} id
+ * @property {string} source
+ * @property {string} repo
+ * @property {string} [status]
+ * @property {string} [zone]
+ * @property {string} [tier]
+ * @property {string | null} [subtitle]
+ * @property {string[]} [inherits]
+ * @property {string[]} [calls]
+ * @property {string[]} [defersTo]
+ */
+
+/**
+ * Everything a fixture repo is written from.
+ * @typedef {object} FixtureSpec
+ * @property {{ name: string, owner: { name: string }, plugins: { name: string, source: string, version: string, description: string }[] }} marketplace
+ * @property {Record<string, { name: string, version: string, description: string, author?: { name: string } }>} manifests plugin.json by package name
+ * @property {Record<string, string>} readmes README.md by package name
+ * @property {Record<string, string>} skills SKILL.md text by skill directory
+ * @property {FixtureNode[]} nodes
+ * @property {{ packages: Record<string, { presentAs?: string, portable?: boolean, evidence?: string }>, capabilityRecordSources: { path: string }[] }} config
+ * @property {Record<string, { schema: string, records: object[] }>} capabilityRecords capability record documents by repo-relative path
+ */
+
+/**
+ * @param {string} root
+ * @param {string} rel
+ * @param {string | object} content text, or a value written as JSON
+ */
 function write(root, rel, content) {
   const abs = path.join(root, rel);
   fs.mkdirSync(path.dirname(abs), { recursive: true });
   fs.writeFileSync(abs, typeof content === 'string' ? content : `${JSON.stringify(content, null, 2)}\n`);
 }
 
+/** @param {SkillMdSpec} spec */
 export function skillMd({ name, description, status = 'live', zone = 'content', tier = 'plugin', subtitle = null, extra = '', heading = null, calls = [], defersTo = [] }) {
   return [
     '---',
@@ -33,6 +80,7 @@ export function skillMd({ name, description, status = 'live', zone = 'content', 
 
 const NODE_DEFAULTS = { tier: 'plugin', zone: 'content', status: 'live', inherits: ['operating-doctrine'], calls: [], defersTo: [], brandScope: [], subtitle: null, renderNote: null };
 
+/** @param {FixtureNode[]} nodes */
 export function graphFor(nodes) {
   return {
     schema: 'skill-map/v1',
@@ -47,7 +95,11 @@ export function graphFor(nodes) {
   };
 }
 
-/** Build a fixture repo; `mutate` may edit the spec before it is written. Returns the root path. */
+/**
+ * Build a fixture repo; `mutate` may edit the spec before it is written. Returns the root path.
+ * @param {(spec: FixtureSpec) => FixtureSpec} [mutate]
+ * @returns {string}
+ */
 export function makeRepo(mutate = s => s) {
   const spec = mutate({
     marketplace: {
