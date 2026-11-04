@@ -122,8 +122,11 @@ BARE_FILENAMES = {"Makefile", "Dockerfile", "CODEOWNERS", "LICENSE", "Procfile",
 
 
 class GitHubError(Exception):
-    def __init__(self, status: int, message: str):
-        super().__init__(f"HTTP {status}: {message}")
+    def __init__(self, status: int, message: str, method: str = "", path: str = ""):
+        self.method = method
+        self.path = urllib.parse.urlsplit(path).path
+        context = f" {method} {self.path}" if method and self.path else ""
+        super().__init__(f"HTTP {status}{context}: {message}")
         self.status = status
         self.message = message
 
@@ -155,7 +158,7 @@ class GitHub:
                 detail = json.loads(detail).get("message", detail)
             except ValueError:
                 pass
-            raise GitHubError(exc.code, detail) from None
+            raise GitHubError(exc.code, detail, method, url) from None
         return (json.loads(raw) if raw else None), link
 
     def get(self, path: str, params: dict | None = None):
@@ -401,6 +404,12 @@ class Config:
     reopened: bool = False
 
 
+@dataclass
+class GateAttempt:
+    # Retain the ordering boundary even after this run removes its temporary claim.
+    claim_id: int | None = None
+
+
 def labels_of(item: dict) -> set[str]:
     # GitHub matches label names without regard to case, so a repo whose label is spelled
     # In-Progress or Parked must be read the same as the lowercase names above.
@@ -613,9 +622,19 @@ def from_repo(source: dict, repo: str) -> bool:
 def job_delivery(gh, cfg: Config, number: int) -> Delivery:
     """Open builder pull requests that close the job, from the pull request list, and merged
     ones, from the issue's timeline, where GitHub records every pull request that names it."""
+    default = (gh.get(f"/repos/{cfg.repo}") or {}).get("default_branch")
+    if not isinstance(default, str) or not default:
+        raise ValueError("repository default branch is unavailable")
+
+    def targets_default(pr):
+        base = pr.get("base") or {}
+        return (base.get("ref") == default
+                and (base.get("repo") or {}).get("full_name") == cfg.repo)
+
     opened = sorted(
         (p for p in gh.paginate(f"/repos/{cfg.repo}/pulls", {"state": "open"})
-         if is_builder_pr(p) and head_branch(p, cfg.repo) and number in closes(p.get("body"))),
+         if is_builder_pr(p) and head_branch(p, cfg.repo)
+         and number in closes(p.get("body"))),
         key=lambda p: int(p["number"]))
     reopened: list[str] = []
     candidates: set[int] = set()
@@ -629,7 +648,8 @@ def job_delivery(gh, cfg: Config, number: int) -> Delivery:
     merged = []
     for n in sorted(candidates - {int(p["number"]) for p in opened}):
         p = gh.get(f"/repos/{cfg.repo}/pulls/{n}") or {}
-        if p.get("merged_at") and is_builder_pr(p) and head_branch(p, cfg.repo) and number in closes(p.get("body")):
+        if (p.get("merged_at") and is_builder_pr(p) and head_branch(p, cfg.repo)
+                and targets_default(p) and number in closes(p.get("body"))):
             merged.append(p)
     merged.sort(key=lambda p: p["merged_at"], reverse=True)
     after = bool(merged) and any(t > merged[0]["merged_at"] for t in reopened)
@@ -641,6 +661,11 @@ def job_delivery(gh, cfg: Config, number: int) -> Delivery:
         base = merged[0].get("merge_commit_sha") or ""
         kept = []
         for p in opened:
+            if not targets_default(p):
+                # A retargeted or unreadable base is still existing owned work, but it
+                # cannot execute or deliver this default-branch job.
+                kept.append((p, None))
+                continue
             has = head_contains(gh, cfg, p, base)
             if has is False:
                 stale.append(p)
@@ -650,7 +675,8 @@ def job_delivery(gh, cfg: Config, number: int) -> Delivery:
         eligible = bool(kept) and kept[0][1] is True
     # Only the oldest existing PR is eligible. Never bypass its owner by starting a
     # newer PR or creating a duplicate when its current head is not authenticated.
-    target = opened[0] if opened and eligible and trusted_head(gh, cfg, opened[0]) else None
+    target = (opened[0] if opened and eligible and targets_default(opened[0])
+              and trusted_head(gh, cfg, opened[0]) else None)
     return Delivery(opened, merged, after, target, stale)
 
 
@@ -660,16 +686,16 @@ def trust_wait(gh, cfg: Config, number: int, delivery: Delivery) -> None:
     upsert_comment(gh, cfg, number, "\n".join([
         MARKER,
         f"Existing pull request #{delivery.open[0]['number']} remains with its current owner. "
-        "Its current head has no matching authenticated Factory ref activity"
+        "Its base is not the current repository default, or its current head has no matching authenticated Factory ref activity"
         f"{' or could not be shown to contain the merged result' if delivery.reopened_after_merge else ''}. "
         "Factory will not execute this head with build secrets or create another pull request. "
         "The current owner can finish it; automatic continuation requires a verified Factory-produced head.",
     ]))
 
 
-def live_owner(gh, cfg: Config, number: int, before: int | None = None) -> str | None:
-    """Another run that already builds this job and can still write: its recorded build, or a
-    claim posted before this run's claim (any claim when before is None)."""
+def live_owner(gh, cfg: Config, number: int, before: int | None = None, *, include_current: bool = False) -> str | None:
+    """A recorded build or claim that can still write, normally excluding this gate's run.
+    Admission considers older claims; redispatch includes every run, even its own."""
     for c in gh.paginate(f"/repos/{cfg.repo}/issues/{number}/comments"):
         if (c.get("user") or {}).get("login") != COMMENT_AUTHOR:
             continue
@@ -678,7 +704,7 @@ def live_owner(gh, cfg: Config, number: int, before: int | None = None) -> str |
         if found is None and (before is None or int(c["id"]) < before):
             found = CLAIM_RE.search(body)
         run = found.group(1) if found else None
-        if run and run != cfg.run_id and run_is_live(gh, cfg, run, number):
+        if run and (include_current or run != cfg.run_id) and run_is_live(gh, cfg, run, number):
             return run
     return None
 
@@ -726,10 +752,16 @@ def follow(gh, cfg: Config, number: int, owner: str, claim_id: int | None = None
         f"({run_url(cfg, owner)}). One job has one writer, so this run follows that build.",
     ])
     print(f"overlap-check: #{number} is already being built by run {owner}, so run {me} follows it and does not build.")
-    if claim_id is not None:
-        gh.patch(f"/repos/{cfg.repo}/issues/comments/{claim_id}", {"body": body})
-    else:
-        gh.post(f"/repos/{cfg.repo}/issues/{number}/comments", {"body": body})
+    try:
+        if claim_id is not None:
+            gh.patch(f"/repos/{cfg.repo}/issues/comments/{claim_id}", {"body": body})
+        else:
+            gh.post(f"/repos/{cfg.repo}/issues/{number}/comments", {"body": body})
+    except Exception as exc:
+        # Reporting the follower cannot transfer the actual owner's lease or labels.
+        # An unchanged follower claim stops being live when this gate finishes.
+        print(f"::warning::overlap-check: follower receipt for #{number} could not be saved "
+              f"({type(exc).__name__}); existing owner and labels are preserved.")
 
 
 def delivered_body(winner: dict, run_id: str | None, still_open: list[dict] | None = None) -> str:
@@ -851,7 +883,7 @@ def hold(gh, cfg: Config, number: int, v: Verdict, labels: set[str]) -> None:
     upsert_comment(gh, cfg, number, comment_body(v))
 
 
-def run_check(gh, cfg: Config, number: int, sleep=time.sleep) -> bool:
+def run_check(gh, cfg: Config, number: int, sleep=time.sleep, attempt: GateAttempt | None = None) -> bool:
     """True when the build may start. Leaves the issue labeled for what happened."""
     issue = gh.get(f"/repos/{cfg.repo}/issues/{number}")
     labels = labels_of(issue)
@@ -887,7 +919,9 @@ def run_check(gh, cfg: Config, number: int, sleep=time.sleep) -> bool:
     if not first.start:
         hold(gh, cfg, number, first, labels)
         return False
-    claim_id = post_claim(gh, cfg, number)
+    if attempt is None:
+        attempt = GateAttempt()
+    claim_id = attempt.claim_id = post_claim(gh, cfg, number)
     add_labels(gh, cfg, number, [JOB_LABEL, IN_PROGRESS_LABEL])
     # Two jobs judged at the same moment both see a clear path, label themselves
     # in-progress and would collide. After a pause each looks again, and only the newer
@@ -961,6 +995,16 @@ def run_next(gh, cfg: Config, dispatch, skip: set[int] = frozenset()) -> list[in
     prs = open_builder_prs(gh, cfg)
     holders = in_progress_issues(gh, cfg)
     building = {h.number for h in holders}
+    # Failed gate cleanup can restore waiting before its leftover claim stops being
+    # live. Do not consume that label only to dispatch a gate that follows the old
+    # claim and leaves no waiting label. Collect all such holds before judging even
+    # older jobs, so unsettled admissions keep their actual file scope protected.
+    for issue in waiting:
+        number = int(issue["number"])
+        if "pull_request" not in issue and not is_stopped(issue) and number not in building:
+            if live_owner(gh, cfg, number, include_current=True):
+                holders.append(Holder(number, "issue", parse_scope(issue.get("body"))))
+                building.add(number)
     sent: list[int] = []
     for issue in sorted((i for i in waiting if "pull_request" not in i), key=lambda i: int(i["number"])):
         number = int(issue["number"])
@@ -972,7 +1016,7 @@ def run_next(gh, cfg: Config, dispatch, skip: set[int] = frozenset()) -> list[in
             continue
         if number in building:
             print(f"overlap-check: waiting job #{number} is still being built (in-progress, or its "
-                  "recorded build can still write), so it is not sent again.")
+                  "recorded build or admission claim can still write), so it is not sent again.")
             continue
         delivery = job_delivery(gh, cfg, number)
         if delivery.open and not delivery.target and not delivery.winner:
@@ -981,6 +1025,11 @@ def run_next(gh, cfg: Config, dispatch, skip: set[int] = frozenset()) -> list[in
         v = evaluate(number, parse_scope(issue.get("body")), prs, holders)
         if not v.start:
             print(f"overlap-check: waiting job #{number} still waits: {'; '.join(v.lines())}")
+            continue
+        # Another gate may have claimed after the initial holder collection.
+        if live_owner(gh, cfg, number, include_current=True):
+            holders.append(Holder(number, "issue", v.scope))
+            building.add(number)
             continue
         if not claim(gh, cfg, number):
             print(f"overlap-check: waiting job #{number} was already taken by another run.")
@@ -1162,18 +1211,46 @@ def main(argv: list[str]) -> int:
 
     if argv[0] == "check":
         number = None
+        attempt = GateAttempt()
         try:
             number = issue_number()
-            start = run_check(gh, cfg, number)
+            start = run_check(gh, cfg, number, attempt=attempt)
         except Exception as exc:  # any failure must leave the job where a restart finds it
             print(f"::error::overlap-check: #{number or os.environ.get('OVERLAP_ISSUE')} could not be checked: {exc!r}")
             write_output("start", "false")
             if number is not None:
+                def cleanup_is_safe():
+                    if live_owner(gh, cfg, number, before=attempt.claim_id):
+                        raise LeaseMoved("owner changed")
+                    try:
+                        current = gh.get(f"/repos/{cfg.repo}/issues/{number}")
+                    except Exception:
+                        # Comments/run metadata already proved no other live writer.
+                        # Recover an unowned failed read without removing any stop label.
+                        current = None
+                    if current is not None and is_stopped(current) and attempt.claim_id is None:
+                        # This gate never claimed, so it did not add an in-progress label
+                        # to retire. Leave an already-stopped issue exactly as found.
+                        raise LeaseMoved("stop state changed")
+
                 try:
-                    remove_label(gh, cfg, number, IN_PROGRESS_LABEL)
-                    add_labels(gh, cfg, number, [JOB_LABEL, WAITING_LABEL])
+                    # A duplicate gate must not follow this failed gate while it exits.
+                    # Older claims and any recorded new admission retain ownership; a
+                    # younger undecided claim settles after these guarded cleanup writes.
+                    drop_claim(gh, cfg, attempt.claim_id)
+                except Exception as claim_error:
+                    # A leftover claim dies with this run. Recover the waiting label
+                    # anyway, after independently proving no other writer owns it.
+                    print(f"::warning::overlap-check: #{number} failed gate claim could not be removed "
+                          f"({type(claim_error).__name__}); guarded recovery still checks other owners.")
+                try:
+                    # An unreadable owner proves no right to alter labels. A new
+                    # admission between cleanup writes also stops the old cleanup.
+                    guarded = LeaseGuard(gh, cleanup_is_safe)
+                    remove_label(guarded, cfg, number, IN_PROGRESS_LABEL)
+                    add_labels(guarded, cfg, number, [JOB_LABEL, WAITING_LABEL])
                 except Exception:
-                    pass
+                    print(f"::warning::overlap-check: #{number} cleanup could not prove ownership; labels preserved.")
             return 1
         write_output("start", "true" if start else "false")
         return 0
