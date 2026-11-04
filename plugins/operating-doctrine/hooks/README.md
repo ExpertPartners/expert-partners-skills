@@ -37,9 +37,15 @@ The hook reads a URL the way browsers do, following the WHATWG URL Standard rath
 
 The map needs the columns System, Hosts, Headless route, 1Password item, Status and No-API reason. Hosts can hold several hosts separated by commas or spaces. Status is read loosely: anything starting with live (Live, Live - API) counts as live, setting up, set up, setup and in progress count as setting up, and no API, no and none count as no API. Any other status lets the call through and is logged, and `--refresh` names the rows that carry one. The map holds 1Password item names only. The hook never reads a secret, and if a map value looks like one (a known token prefix such as an AWS, Stripe, GitHub, GitLab, Slack or Google key, a private key, a password or bearer value, credentials in a URL, a long unbroken run of letters and digits, or a long word that mixes upper case, lower case and digits) it prints `[withheld, not an item name]` instead. MCP tool names, `op://` paths and item names print as written.
 
+### Unresolved rows and the host projection
+
+The rows that carry hosts form the complete host projection the hook decides from. A system whose host evidence is still unresolved stays on the map as declared evidence: give the row the status setting up and leave Hosts empty. Such a row is kept in the cache, is named with its count in every refresh report as still needing real host evidence, and never matches a navigation, so it is neither decided as no API nor treated as complete. A hostless row with any other status fails the refresh, because a live or no API row without hosts can only be a half-finished edit.
+
+The projection is checked against the last good copy on every refresh. When a row that protected hosts in the cache is still on the map but no longer lists all of them, the refresh fails, names the dropped hosts, and keeps the last good copy, so a half-edited row that lost its hosts cannot lift a protection quietly. Lifting a protection on purpose stays possible in two ways: mark the row no API and keep its hosts listed, or delete the whole row. When the host evidence for an unresolved system arrives, put the hosts on its row and the next refresh protects them.
+
 ### The cache
 
-The hook reads only a local copy of the map, so a browser call never waits on Drive. After the hook has printed its decision, it starts one background refresh if the last refresh attempt is more than an hour old. A failed refresh keeps the last good copy. A refresh also fails, and keeps the last good copy, when a row that is not wholly blank has no System, Hosts or Status, so a half-finished edit to the sheet never drops a protected host from the cache. Wholly blank rows are skipped. Run a refresh by hand with:
+The hook reads only a local copy of the map, so a browser call never waits on Drive. After the hook has printed its decision, it starts one background refresh if the last refresh attempt is more than an hour old. A failed refresh keeps the last good copy. A refresh also fails, and keeps the last good copy, when a row that is not wholly blank has no System or Status, or has no Hosts without the status setting up, so a half-finished edit to the sheet never drops a protected host from the cache. Wholly blank rows are skipped. Run a refresh by hand with:
 
 ```
 python3 plugins/operating-doctrine/hooks/headless_route_check.py --refresh
