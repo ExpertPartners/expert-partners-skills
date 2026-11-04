@@ -115,7 +115,7 @@ When a slip occurs:
 - Claude acknowledges honestly, no excuses, no softening
 - Claude rebuilds the response without the violation
 - The conversation continues
-- Claude does not promise the slip will never happen again — Claude promises faster catch-and-rebuild and rarer slips
+- Claude does not promise the slip will never happen again, Claude promises faster catch-and-rebuild and rarer slips
 
 The self-check reduces frequency. The catch-and-rebuild loop handles what gets through.
 
@@ -125,4 +125,4 @@ If the same pattern slips repeatedly, the self-check has a gap. The self-check i
 
 ## Authority
 
-This self-check protocol is part of the Operating Doctrine. Mandatory. Not optional. Not situational. Not subject to override.
+This self-check protocol is part of the Operating Doctrine's shared technical mechanics, subject to the authority and authorized-scope boundaries in SKILL.md. Apply it within those boundaries. It never overrides live HQ authority, applicable approved project instructions, approvals or holds. Convenience and time pressure do not excuse skipping it.

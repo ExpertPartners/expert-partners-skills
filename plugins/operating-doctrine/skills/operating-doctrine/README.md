@@ -1,16 +1,18 @@
-# Operating Doctrine — README
+# Operating Doctrine README
 
 ## What This Is
 
-The Operating Doctrine is the non-negotiable standard for how Claude operates within the Expert Partners AI Operating System. It governs every decision, every response, every recommendation.
+The Operating Doctrine supplies the shared technical standard for how Claude operates within the Expert Partners AI Operating System, subject to current live HQ authority and the assignment's authorized scope.
 
 It exists because the default behavior of LLMs (presenting multiple paths, hedging with options, deferring to user judgment, softening with fallbacks, treating manual workarounds as legitimate options, calling complex things impossible, hiding labor inside humans and calling the result simple) is incompatible with running an enterprise-grade system without creating future chaos.
 
-The doctrine overrides default LLM training. It is the highest-authority instruction in the system.
+Live Organization Instructions, the HQ Rulebook and newest applicable Decision Log entries govern the doctrine. Its technical mechanics take precedence over default LLM habits and convenience within those boundaries. See Authority And Conflict Resolution in SKILL.md for the shared authority contract, including approved project instructions and applicable approvals, holds and scope boundaries.
 
 ## Who This Applies To
 
 Every Claude instance operating within Expert Partners:
+
+The names below are historical examples, not a verified current deployment roster or assignment of ownership.
 
 - Aura (strategic advisor in Cowork)
 - Ember, Atlas, Cortex, Muse, Aria (production agents)
@@ -30,36 +32,18 @@ It does not eliminate slips with 100% certainty. LLM behavior is statistical. Th
 
 ## The Files
 
-- SKILL.md — The canonical doctrine. The standard, the principles, the exception test, the impossibility definition, the uncertainty protocol, the user-versus-system domain separation, the operating posture.
-- forbidden-language.md — Explicit list of banned phrases and behavioral patterns with examples of reframes.
-- decision-self-check.md — The internal twelve-question check Claude runs before any response that proposes a path forward.
-- README.md — This file.
+- SKILL.md, the canonical doctrine. The standard, the principles, the exception test, the impossibility definition, the uncertainty protocol, the user-versus-system domain separation, the operating posture.
+- forbidden-language.md, explicit list of banned phrases and behavioral patterns with examples of reframes.
+- decision-self-check.md, the internal twelve-question check Claude runs before any response that proposes a path forward.
+- README.md, this file.
 
 ## How It Gets Loaded
 
-The doctrine loads at the start of every session in every surface where Claude operates:
-
-- Aura's system prompt (highest priority insert at the top)
-- Every Cowork project instructions
-- Claude Code's user-level CLAUDE.md
-- Every skill's YAML frontmatter references it
-- Every agent's SOUL.md / MEMORY.md
-- Claude.ai project knowledge for Aura (active for all conversations in the project)
-
-When a session starts, the doctrine is in context before any other instruction. It cannot be skipped.
+Follow the canonical skill's Where This Doctrine Lives section and the repository's current deployment guidance. Verify the actual installed version and loaded instructions on each supported surface. This README does not establish instruction priority or prove that a session loaded the skill. Source publication, destination receipt and actual installed use are separate checks.
 
 ## How It Gets Updated
 
-Only Allison can authorize a doctrine update. Updates follow this protocol:
-
-1. Allison states what needs to change and why.
-2. The doctrine is rewritten in a draft.
-3. Allison reviews and approves.
-4. Version bumped (v2.0 → v2.1, etc.).
-5. Doctrine redeployed to all the surfaces where it lives.
-6. Change documented in CHANGELOG.md.
-
-No other person, agent, or process can modify the doctrine.
+Follow current live authority and existing approvals. Authorized workers correct canonical source through normal independent review and protected merge, add a changeset, and use the normal release and deployment producers. Preserve applicable approvals and holds. Follow an already approved current instruction immediately, without requiring a new doctrine rewrite request or waiting for redeployment. A technical amendment creates no business authority and expands no assignment's scope.
 
 ## When It Fails
 
@@ -92,4 +76,4 @@ Manual is not a fallback, it is a failure condition unless proven otherwise.
 
 That sentence is the lock on the door.
 
-— Allison Gaddy, May 1, 2026
+Allison Gaddy, May 1, 2026
