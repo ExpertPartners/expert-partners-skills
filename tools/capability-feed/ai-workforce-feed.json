@@ -1,8 +1,8 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-11-03T23:56:46Z",
-  "verifiedAt": "2026-11-03T23:56:46Z",
+  "generatedAt": "2026-11-04T00:29:31Z",
+  "verifiedAt": "2026-11-04T00:29:31Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
@@ -497,11 +497,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the research-ops plugin, version 0.6.0, in the expert-partners plugin marketplace.",
+        "Packaged as the research-ops plugin, version 0.6.1, in the expert-partners plugin marketplace.",
         "Contains 11 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.6.0.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.6.1.",
       "containsSkillIds": [
         "capability-currency",
         "capability-refresh",
@@ -519,7 +519,7 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/research-ops",
-        "packageVersion": "0.6.0",
+        "packageVersion": "0.6.1",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
         "skillCount": "11"
@@ -1742,7 +1742,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.0.",
+        "Packaged in the Research Ops plugin, version 0.6.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1757,7 +1757,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -1803,7 +1803,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.0.",
+        "Packaged in the Research Ops plugin, version 0.6.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1818,7 +1818,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -3960,7 +3960,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.0.",
+        "Packaged in the Research Ops plugin, version 0.6.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3975,7 +3975,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "cataloging",
-        "packaging": "research-ops plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6527,7 +6527,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.0.",
+        "Packaged in the Research Ops plugin, version 0.6.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6542,7 +6542,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "cataloging",
-        "packaging": "research-ops plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7016,7 +7016,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.0.",
+        "Packaged in the Research Ops plugin, version 0.6.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7031,7 +7031,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "cataloging",
-        "packaging": "research-ops plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7135,7 +7135,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.0.",
+        "Packaged in the Research Ops plugin, version 0.6.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7150,7 +7150,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "cataloging",
-        "packaging": "research-ops plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7192,7 +7192,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.0.",
+        "Packaged in the Research Ops plugin, version 0.6.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7208,7 +7208,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "video-discovery"
       },
@@ -7596,7 +7596,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.0.",
+        "Packaged in the Research Ops plugin, version 0.6.1.",
         "Do not use for new work."
       ],
       "sourceLinks": [],
@@ -7611,7 +7611,7 @@
         "lifecycle": "retired",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7648,7 +7648,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.0.",
+        "Packaged in the Research Ops plugin, version 0.6.1.",
         "Do not use for new work."
       ],
       "sourceLinks": [],
@@ -7663,7 +7663,7 @@
         "lifecycle": "retired",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7699,7 +7699,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.0.",
+        "Packaged in the Research Ops plugin, version 0.6.1.",
         "Do not use for new work."
       ],
       "sourceLinks": [],
@@ -7714,7 +7714,7 @@
         "lifecycle": "retired",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7812,7 +7812,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.0.",
+        "Packaged in the Research Ops plugin, version 0.6.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7827,7 +7827,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.6.0 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
