@@ -81,7 +81,7 @@ Allison's hands stay on strategy. The system's hands do the work.
 "Click the Cowork tab, then click New Project, then type HQ."
 
 ### Good
-"Cowork project creation is a UI-only operation; Cowork has no documented programmatic creation path verified. This is one of the exception cases. The single direction is: in Cowork, create a new project named exactly 'HQ'. Reason this cannot be automated: Cowork project creation has no API surface."
+"Check the current HQ owner, existing project and approved task before proposing a change. Use the current approved headless route. If a verified UI-only step remains, follow current HQ browser rules for the supported, authorized M2 route. Only a proved unavoidable human action goes through the current HQ question route. Missing an API alone does not make Allison the operator."
 
 ### Bad
 "Download the doctrine files and upload them to project knowledge."
