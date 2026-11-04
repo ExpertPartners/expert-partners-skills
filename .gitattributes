@@ -2,3 +2,6 @@
 /tools/skill-map/skills-graph.json linguist-generated=true
 # Produced by tools/capability-feed/generate-feed.mjs; source guidance is in its README.
 /tools/capability-feed/ai-workforce-feed.json linguist-generated=true
+# npm produces each tooling lock from its sibling package.json.
+/tools/skill-map/package-lock.json linguist-generated=true
+/tools/capability-feed/package-lock.json linguist-generated=true

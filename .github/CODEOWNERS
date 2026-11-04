@@ -21,3 +21,7 @@
 /tools/skill-map/extract-skills-graph.mjs @AllisonGaddy
 /tools/skill-map/layout-skills-graph.mjs @AllisonGaddy
 /tools/capability-feed/generate-feed.mjs @AllisonGaddy
+
+# Tooling dependency locks keep the existing repository review owner.
+/tools/skill-map/package-lock.json @AllisonGaddy
+/tools/capability-feed/package-lock.json @AllisonGaddy
