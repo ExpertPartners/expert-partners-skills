@@ -22,8 +22,9 @@ lock's directory:
   still counts as usage and still must be declared
 - stub: a ``types-<pkg>`` pin is used when <pkg> itself is pinned or imported
 
-An import in scope that no pin in the governing lock's closure provides fails as
-undeclared, imports behind try/except included. EXCEPTIONS below waives only the
+An import in scope must be pinned and named in a Direct header in the governing
+lock's closure; a transitive pin alone is not a declaration. Imports behind
+try/except are included. EXCEPTIONS below waives only the
 named lazy integrations, with evidence; each entry fails once its finding is gone.
 
 Offline: the checker reads the tree and runs the installed knip binary. It never
@@ -247,6 +248,19 @@ def closure_pins(locks: dict[str, Lock], lock: Lock, seen: frozenset[str] = froz
     return pins
 
 
+def closure_direct_names(locks: dict[str, Lock], lock: Lock,
+                         seen: frozenset[str] = frozenset()) -> set[str]:
+    """Direct declarations in this layer and the locks it includes."""
+    if lock.path in seen:
+        return set()
+    direct = set(lock.direct)
+    for include in lock.includes:
+        target = locks.get(include)
+        if target is not None:
+            direct |= closure_direct_names(locks, target, seen | {lock.path})
+    return direct
+
+
 def python_scope(root: Path) -> list[str]:
     path = root / PYPROJECT
     if not path.is_file():
@@ -377,7 +391,8 @@ def check_python(root: Path, report: Report) -> list[Finding]:
     for lock in locks.values():
         by_dir.setdefault(lock.directory, []).append(lock)
     declared_by_dir = {
-        directory: {name for lock in group for pin in closure_pins(locks, lock)
+        directory: {name for lock in group
+                    for pin in closure_direct_names(locks, lock) & closure_pins(locks, lock)
                     for name in import_names(pin)}
         for directory, group in by_dir.items()
     }
@@ -389,7 +404,8 @@ def check_python(root: Path, report: Report) -> list[Finding]:
         if use.module in declared_by_dir.get(governing_dir(use.path, lock_dirs), set()):
             continue
         findings.append(Finding(use.path, use.line, "import", use.module,
-                                "imported but no pin in the governing lock's closure provides it"
+                                "imported but not directly declared and pinned in the governing "
+                                "lock's closure"
                                 + (" (optional import behind try/except; it still needs a "
                                    "declaration)" if use.optional else "")))
 

@@ -119,6 +119,9 @@ This policy covers build dependencies only. Plugin versions are the release step
 direct dependency with its kind and evidence, one `FAIL` line per problem, and ends
 with `unused-dependencies: PASS` (exit 0) or `FAIL` (exit 1).
 `.github/workflows/tooling-unused-dependencies.yml` runs the check and the tests.
+Both pull requests and pushes to main run it when inspected tooling Python sources
+or either JavaScript producer's sources change, as well as when their declarations,
+locks or detector configuration change.
 
 JavaScript: knip reads the one shared configuration, `tools/dead-code/knip.json`
 (the dead-code job owns it; no second knip config exists). The runner reports the
@@ -141,9 +144,11 @@ that the lock's directory governs; the root lock governs the rest):
 | `runtime, optional` / `test, optional` | the import sits behind `try: ... except ImportError` |
 | `stub` | a `types-<pkg>` pin whose <pkg> a lock pins or a scoped source imports |
 
-An import in scope that no pin in the governing lock's closure provides fails as
-undeclared, and an import behind try/except is not excused: optional integrations must
-still be declared. `EXCEPTIONS` in `check_unused.py` waives only the named lazy
+An import in scope must be pinned and named in a `# Direct: ...` header in the
+governing lock or a layer it includes. A transitive pin alone does not declare an
+import; an unimported transitive pin is still allowed. An import behind try/except is
+not excused: optional integrations must still be declared. `EXCEPTIONS` in
+`check_unused.py` waives only the named lazy
 integrations (the Google client and Playwright, installed on the founder Mac outside
 the repo locks), each with its evidence, and an entry fails once its import is gone.
 Nothing is removed or disabled because a detector cannot see a use; add an evidenced

@@ -12,6 +12,7 @@ Run from the repo root: python3 -m unittest discover -s tools/dependency-policy/
 """
 
 import contextlib
+import fnmatch
 import importlib.util
 import io
 import json
@@ -262,6 +263,37 @@ class PythonDetectorTest(Fixture):
         self.assertNotIn("urllib3", {u.name for u in report.uses})
         self.assert_clean(report)
 
+    def test_import_of_a_transitive_pin_needs_a_direct_declaration(self):
+        self.append("tools/demo/cli.py", "\nimport urllib3\n")
+        report = self.check("python")
+        self.assertEqual(self.keys(report), {"tools/demo/cli.py:import:urllib3"})
+        code, out = self.run_cli("--only", "python")
+        self.assertEqual(code, 1, out)
+        self.assertIn("urllib3", out)
+        self.assertIn("unused-dependencies: FAIL", out)
+
+    def test_optional_import_of_a_transitive_pin_needs_a_direct_declaration(self):
+        self.append("tools/demo/cli.py",
+                    "\ntry:\n    import urllib3\nexcept ImportError:\n    urllib3 = None\n")
+        report = self.check("python")
+        self.assertEqual(self.keys(report), {"tools/demo/cli.py:import:urllib3"})
+        self.assertIn("try/except", report.findings[0].message)
+
+    def test_included_transitive_pin_is_not_a_declaration_until_promoted_to_direct(self):
+        pins = ["pillow==13.0.0", "urllib3==2.8.0"]
+        self.write("skill/requirements.txt", lock_text(["pillow"], pins))
+        self.append("skill/tests/test_work.py", "\nimport urllib3\n")
+        report = self.check("python")
+        self.assertEqual(self.keys(report), {"skill/tests/test_work.py:import:urllib3"})
+        # The included runtime layer can declare it directly without changing pins.
+        self.write("skill/requirements.txt", lock_text(["pillow", "urllib3"], pins))
+        self.assert_clean(self.check("python"))
+
+    def test_direct_declaration_in_an_unrelated_scope_does_not_cover_an_import(self):
+        self.append("skill/scripts/work.py", "\nimport yaml\n")
+        report = self.check("python")
+        self.assertEqual(self.keys(report), {"skill/scripts/work.py:import:yaml"})
+
     def test_lock_without_a_direct_header_is_refused(self):
         self.write("requirements-tooling.txt",
                    "# Hash-locked fixture lock.\nrequests==2.34.2 \\\n"
@@ -372,6 +404,22 @@ class RepositoryConfigTest(unittest.TestCase):
         self.assertIn("npm ci --ignore-scripts", text)
         self.assertNotRegex(text, r"\bnpm\s+install\b")
         self.assertNotRegex(text, r"\bpip[\d.]*\s+install\b(?!.*-r )")
+
+    def test_workflow_runs_when_inspected_python_or_javascript_sources_change(self):
+        text = Path(WORKFLOW).read_text(encoding="utf-8")
+        changed_paths = ("tools/capability-currency/drive_docs.py",
+                         "tools/plugin-sync/drift-check.py", "tools/demo/new.py",
+                         "tools/capability-feed/generate-feed.mjs",
+                         "tools/capability-feed/test/new.test.mjs",
+                         "tools/skill-map/extract-skills-graph.mjs")
+        for event in ("pull_request", "push"):
+            section = re.search(r"(?ms)^  " + event + r":\n(.*?)(?=^  \w|\Z)", text)
+            self.assertIsNotNone(section, event)
+            patterns = re.findall(r"^      - '([^']+)'$", section.group(1), re.M)
+            for path in changed_paths:
+                with self.subTest(event=event, path=path):
+                    self.assertTrue(any(fnmatch.fnmatchcase(path, pattern) for pattern in patterns),
+                                    f"{event} does not run for {path}")
 
     def test_repository_python_dependencies_are_used_and_declared(self):
         report = unused.check(Path(ROOT), languages=("python",))
