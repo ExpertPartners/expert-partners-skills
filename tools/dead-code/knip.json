@@ -1,0 +1,14 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignoreExportsUsedInFile": true,
+  "workspaces": {
+    "tools/capability-feed": {
+      "entry": ["generate-feed.mjs", "test/*.test.mjs"],
+      "project": ["**/*.mjs"]
+    },
+    "tools/skill-map": {
+      "entry": ["extract-skills-graph.mjs", "test/*.test.mjs"],
+      "project": ["**/*.mjs"]
+    }
+  }
+}

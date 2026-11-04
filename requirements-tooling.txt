@@ -1,7 +1,7 @@
-# Hash-locked Python dependencies: repository tooling, CI lint gates and the type checker.
+# Hash-locked Python dependencies: repository tooling, CI lint gates, the type checker and the unused-code detector.
 # Every package, direct and transitive, is pinned with == and carries its sha256
 # hashes, so pip installs in --require-hashes mode and refuses anything unlisted.
-# Direct: pyyaml, mypy, types-defusedxml, types-pyyaml, types-requests. Any other entry is a transitive dependency.
+# Direct: pyyaml, mypy, types-defusedxml, types-pyyaml, types-requests, vulture. Any other entry is a transitive dependency.
 # Change or regenerate: tools/dependency-policy/README.md
 ast-serialize==0.13.1 \
     --hash=sha256:02686b281ec9b8e9614f6f0db27e12e4cac515f336c5d05b678bc9eb73ff2af5 \
@@ -347,3 +347,6 @@ typing-extensions==4.16.0 \
 urllib3==2.8.0 \
     --hash=sha256:0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3 \
     --hash=sha256:63bf2ead4c879426ebf22ef2a781eeb4aa3b4ae798a0435506f8687fd5bb9b63
+vulture==2.16 \
+    --hash=sha256:6e0f1c312cef1c87856957e5c2ca9608834a7c794c2180477f30bf0e4cc58eee \
+    --hash=sha256:f8d9f6e2af03011664a3c6c240c9765b3f392917d3135fddca6d6a68d359f717

@@ -1,4 +1,4 @@
-# Type-check configuration only; nothing here is a package build.
+# Type-check and unused-code configuration only; nothing here is a package build.
 # Strict check:   python -m mypy   (install: pip install --require-hashes -r requirements-tooling.txt
 #                 -r plugins/research-ops/skills/video-discovery/requirements-verification.txt)
 # JavaScript:     tools/skill-map/node_modules/.bin/tsc -p jsconfig.json   (after npm ci in both producers)
@@ -36,3 +36,18 @@ follow_untyped_imports = true
 [[tool.mypy.overrides]]
 module = ["googleapiclient.*", "google.oauth2.*", "playwright.*"]
 ignore_missing_imports = true
+
+# Unused-code detector: tools/dead-code/check_dead_code.py runs vulture over these paths
+# and adds module reachability from a source-based entrypoint inventory.
+# .github/workflows/tooling-dead-code.yml runs it; tools/dead-code/README.md explains it.
+# python -m vulture prints vulture's raw list, data names included; the runner is the gate.
+[tool.vulture]
+paths = [
+    "tools",
+    "plugins/research-ops/skills/source-hunter/scripts",
+    "plugins/research-ops/skills/source-hunter/tests",
+    "plugins/research-ops/skills/video-discovery/scripts",
+    "plugins/research-ops/skills/video-discovery/tests",
+]
+min_confidence = 60
+exclude = ["*/node_modules/*"]
