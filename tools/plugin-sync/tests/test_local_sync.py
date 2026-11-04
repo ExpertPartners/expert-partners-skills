@@ -21,7 +21,7 @@ HERE = Path(__file__).resolve().parents[1]
 MK = "expert-partners"
 LABELS = {"codex": "com.expertpartners.codex-plugin-sync",
           "claude-code": "com.expertpartners.claude-code-plugin-sync"}
-SYNC_FILES = ["codex-sync.sh", "claude-code-sync.sh", "install.sh", "codex-skip.txt",
+SYNC_FILES = ["codex-sync.sh", "claude-code-sync.sh", "install.sh", "codex-skip.txt", "legacy-skills.py",
               f"{LABELS['codex']}.plist", f"{LABELS['claude-code']}.plist"]
 
 # One stub plays both CLIs. It keeps the catalog it last refreshed and the installed
@@ -57,7 +57,8 @@ STUB = textwrap.dedent('''\
             die("list failed")
         if tool == "claude":
             rows = [{"id": f"{n}@{MK}", "version": p["version"], "scope": "user",
-                     "enabled": p["enabled"], "installPath": "/x"} for n, p in state["installed"].items()]
+                     "enabled": p["enabled"], "installPath": p.get("installPath", "/x")}
+                    for n, p in state["installed"].items()]
             rows.append({"id": "other@else", "version": "9", "scope": "user", "enabled": True, "installPath": "/x"})
             avail = [{"pluginId": f"{n}@{MK}", "name": n, "marketplaceName": MK, "version": v}
                      for n, v in state["catalog"].items() if n not in state["installed"]]
@@ -80,8 +81,55 @@ STUB = textwrap.dedent('''\
         if f"{args[1]}:{name}" in fail or mk != MK or name not in state["catalog"]:
             die(f"{args[1]} {args[2]} failed")
         old = state["installed"].get(name, {"enabled": True})
-        state["installed"][name] = {"version": state["catalog"][name], "enabled": old["enabled"]}
+        state["installed"][name] = dict(old, version=state["catalog"][name], enabled=old["enabled"])
         save()
+    elif tool == "codex" and args == ["app-server", "--listen", "stdio://"]:
+        # The skills/list and skills/config/write shapes of codex-rs app-server-protocol v2.
+        if "app-server" in fail:
+            die("app-server failed to start")
+        home = os.environ["HOME"]
+        codex_home = os.environ.get("CODEX_HOME") or os.path.join(home, ".codex")
+        real = os.path.realpath
+
+        def listing():
+            off = {real(p) for p in state.get("codex_disabled", [])}
+            root = os.path.join(home, ".agents", "skills")
+            rows = []
+            for n in sorted(os.listdir(root)) if os.path.isdir(root) else []:
+                p = os.path.join(root, n, "SKILL.md")
+                if os.path.isfile(p):
+                    rows.append({"name": n, "description": "", "path": p, "scope": "user",
+                                 "enabled": real(p) not in off, "pluginId": None})
+            for s in state.get("codex_plugin_skills", []):
+                rows.append(dict(s, description="", scope="user", enabled=s["enabled"] and real(s["path"]) not in off))
+            return {"data": [{"cwd": home, "skills": rows, "errors": []}]}
+
+        for line in sys.stdin:
+            msg = json.loads(line)
+            if "id" not in msg:
+                continue
+            method, params = msg["method"], msg.get("params") or {}
+            with open(os.environ["STUB_CALLS"], "a") as f:
+                f.write(json.dumps({"tool": tool, "args": ["app-server", method, params]}) + "\\n")
+            if method == "initialize":
+                result = {"userAgent": "stub", "codexHome": codex_home}
+            elif method == "skills/list":
+                result = listing()
+            elif method == "skills/config/write":
+                if "skills-write" in fail:
+                    print(json.dumps({"id": msg["id"], "error": {"code": -32603, "message": "write refused"}}), flush=True)
+                    continue
+                if "skills-write-ignored" not in fail:
+                    state.setdefault("codex_disabled", []).append(params["path"])
+                    save()
+                    os.makedirs(codex_home, exist_ok=True)
+                    with open(os.path.join(codex_home, "config.toml"), "a") as f:
+                        f.write('\\n[[skills.config]]\\npath = "%s"\\nenabled = false\\n' % params["path"])
+                result = {"effectiveEnabled": "skills-write-ignored" in fail}
+            else:
+                print(json.dumps({"id": msg["id"], "error": {"code": -32600, "message": "unknown variant"}}), flush=True)
+                continue
+            print(json.dumps({"id": msg["id"], "result": result}), flush=True)
     else:
         die("unexpected " + " ".join(args))
 ''')

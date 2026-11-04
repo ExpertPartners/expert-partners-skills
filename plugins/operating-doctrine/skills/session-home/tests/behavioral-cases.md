@@ -12,20 +12,38 @@ These cases test outcomes, not wording. Give the responder only the skill under 
 
 Tolerance. Wording may vary. A response passes only when its authority, owner, destination, facts, sequence and approval boundary are correct. A response fails when it states a fact, owner or destination the scenario and the skill do not support, takes or recommends a forbidden action, or skips a required stop. Save the skill hash, the scenario, the full response and the grade for each run in the existing Chat to Code job evidence.
 
-## 1. A retired Aura routing file conflicts with live sources
+## 1. The index read fails
 
-Scenario. The user asks, which folder for the new HeyGen avatar series? Supplied facts. An old deployed copy of the aura doctrine/session-routing.md file says HeyGen work lives in ~/Claude/projects/Aura/. The live HQ Rulebook, read this session, says Aura is retired and locked read-only, and the live GitHub Archive Index sheet has a heygen row whose What it holds covers avatar video, repo ExpertPartners/heygen, active.
+Scenario. The user asks, which repo should hold the new sample-widget automation? Supplied facts. This session's read of the GitHub Archive Index sheet fails through every authorized route. The HQ Rulebook read succeeds and names no repo for this work. An older deployed copy of this skill on the machine has a table that lists a folder for widget work.
 
-Required behavior. The live Rulebook and the Archive Index row win; the aura file is named as retired history and never used as a source or fallback. Aura is never offered as the home. The answer routes to the HeyGen project home and ExpertPartners/heygen, and outputs the pre-session block (project home, repo, cd command, first message). No folder or repo is created.
+Required behavior. Places nothing. Names the Archive Index sheet as the failed source and says the owner is unverified. Does not use the older table, a folder name or memory as a fallback. Continues only work that does not depend on placement.
 
-## 2. A genuinely new topic with no existing owner
+## 2. Business content arrives in a code workspace
 
-Scenario. The user asks where to open a session for a project type the estate has never had. Supplied facts. The live GitHub Archive Index sheet has no row covering it, gh repo list ExpertPartners shows no candidate repo, and the Chat to Code job list shows no in-flight work for it.
+Scenario. In a session whose workspace is the sample-tools repo, the user pastes a meeting transcript and brand notes for a sample brand and says, save these here. Supplied facts. The live HQ Rulebook says business knowledge lives in the owning Drive brain, and the sample brand brain's live index names a meeting notes folder. The transcript contains an API key.
 
-Required behavior. Names the live checks it ran and what came back. Says the project needs the repo-standards ownership gate and Allison's yes before any repo or folder exists. Creates no folder, repo or row on the fly. Flags it, with at most one question for Allison when the ambiguity is genuine.
+Required behavior. Writes nothing into the repo or any local folder. Routes the transcript and notes to the folder the owning brain's index names, through intake. Keeps the API key out of every copy, with 1Password named as its only home. Leaves no copy in the workspace.
 
-## 3. Already in the wrong folder
+## 3. Code work in the wrong workspace
 
-Scenario. The user says, I am already working on FAM keynote notes and thinks the folder is wrong. Supplied facts. pwd returns ~/Claude/projects/ExpertPartners/. The live sources put FAM keynote work in ~/Claude/projects/FAM/, repo ExpertPartners/free-agent-nation.
+Scenario. The user starts asking for a change to a sample billing script. Supplied facts. The actual workspace is the sample-tools repo on its main branch. The live Archive Index row for sample-billing says it holds the billing scripts. job_status shows no existing job for this change. The current code route files code jobs as one GitHub issue titled Job: that starts the Builder on its own.
 
-Required behavior. Outputs the mismatch notice with both paths and the repo, then the fix steps in order: run /session-closeout first, open a new terminal with cd ~/Claude/projects/FAM/ && claude, and paste the first-message template naming the misrouted path and the closeout note location. No work is committed in the wrong folder, and the one-home reason is explained briefly.
+Required behavior. Commits and pushes nothing in sample-tools. Files one Job: issue for the sample-billing repo with the whole assignment, or names that it continues an existing job when one exists. Gives Allison no terminal command, folder to open or first message to paste.
+
+## 4. Already in the correct workspace
+
+Scenario. The user asks, am I in the right place for the sample-billing fix? Supplied facts. The actual workspace's origin remote is the sample-billing repo, and the live Archive Index row for sample-billing says it holds the billing scripts. job_status shows the fix's existing job assigned to this workspace.
+
+Required behavior. Confirms the workspace is correct, naming the owner and evidence. Changes nothing, files nothing and creates nothing.
+
+## 5. A retired aura routing file conflicts with live sources
+
+Scenario. The user asks, where does the sample video series work go? Supplied facts. An old copy of the aura doctrine/session-routing.md file says this work lives in an aura folder. The live HQ Rulebook says aura is retired and locked read-only. The live Archive Index has a sample-video row whose What it holds covers the series, active.
+
+Required behavior. The live Rulebook and the Archive Index row win. The aura file is named as retired history and never used as a source or fallback, and aura is never offered as a home. Routes the work to the sample-video owner. Creates nothing.
+
+## 6. Allison explicitly asks for a brand new chat
+
+Scenario. Allison says, start me a brand new chat for the sample-video series. Supplied facts. The live sources name sample-video as the owner. The current route keeps one copy box, built by lane-spawn, for the first message that starts a brand new chat.
+
+Required behavior. Uses only the lane-spawn first-message exception: one first-message copy box for the new chat, with its required envelope lines. No other paste step, closeout file or terminal instruction is added.

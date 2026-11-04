@@ -1,12 +1,14 @@
 ---
 name: new-project
 description: >
-  Run a new Expert Partners project through repo-standards before bootstrapping.
-  Uses live creation Stage A, creates nothing on USE EXISTING REPO, and proceeds
-  only on NEW REPO JUSTIFIED. After creation, runs Stage B and registers the
-  GitHub Archive Index row before reporting birth complete. Use when Allison
-  says /new-project followed by a name, "new project: NAME", "bootstrap a new
-  project called NAME", or the session-wrap new-project variant fires.
+  Run a new Expert Partners project through repo-standards before anything is
+  built. Uses live creation Stage A, creates nothing on USE EXISTING REPO or a
+  failed live read, and proceeds only on NEW REPO JUSTIFIED with the required
+  creation authorization. Files the build as one GitHub Job issue on the current
+  code route, never a local script, a copy box or a new repo made to hold the
+  job. Reports birth complete only after Stage B and an independent readback of
+  the GitHub Archive Index row. Use when Allison says /new-project followed by a
+  name, "new project: NAME", or "bootstrap a new project called NAME".
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Adopted into canonical 2026-08-05 (Skill Map Rulings lane, flags item 9) as a
 # user-tier source; migrated into the marketplace 2026-11-04 (Chat to Code job,
@@ -19,20 +21,24 @@ zone: routing
 status: designed
 calls:
   - repo-standards
-subtitle: "run the repo-standards gate, then bootstrap a justified project"
+subtitle: "run the repo-standards gate, then file a justified build as a job"
 ---
 
 # New-Project Skill
 
 Runs `repo-standards`, the one repository standard implementation. This skill
-supplies bootstrap mechanics; Repo rules and Project ownership govern.
-Load current canonical `expert-partners-skills plugins/operating-doctrine/skills/repo-standards/SKILL.md`
-for every run. If it cannot be reached live, create nothing and name the failed
-source. A local script or an older deployed skill never substitutes for the gate.
+adds only the order of steps and the hand-off to the current code route; Repo
+rules and Project ownership govern. Load current canonical
+`expert-partners-skills plugins/operating-doctrine/skills/repo-standards/SKILL.md`
+and `plugins/operating-doctrine/skills/code-block-routing/SKILL.md` for every
+run. If either cannot be reached live, create nothing and name the failed
+source.
 
 Provenance. This skill carries forward useful method from the user-tier
-new-project skill adopted into canonical on 2026-08-05. It is the existing host
-runner of the repo-standards creation gate, not a second gate.
+new-project skill adopted into canonical on 2026-08-05. It is the existing
+runner of the repo-standards creation gate, not a second gate. The legacy local
+bootstrap script, the copy box for another implementation session and any older
+deployed copy that describes them are history, never a route.
 
 <!-- RULED-BY: history in GitHub Archive date:2026-08-07 -->
 <!-- RULED-BY: history in GitHub Archive date:2026-08-27 -->
@@ -40,81 +46,77 @@ runner of the repo-standards creation gate, not a second gate.
 
 ## Steps
 
-1. **Parse input without creating anything.** Extract the proposed project home
-   name (PascalCase, e.g., `ExampleProject`) and optional script type (`brand` or
-   `standalone`, default `standalone`). Script type is a bootstrap option, not
-   the Manifest's entity type. Identify the durable job and Project context.
+1. **Parse input without creating anything.** Extract the proposed project
+   name and the durable job it would hold. Identify the Project context and any
+   existing Chat to Code job or GitHub Job issue that already carries this
+   request, through job_status and the candidate repos' issues, so the run
+   continues that record instead of starting a second one.
 
 2. **Run repo-standards creation Stage A live.** Read its authorities and the
    GitHub Archive Index sheet, then complete the ownership gate.
    Proceed only on `NEW REPO JUSTIFIED`. On `USE EXISTING REPO`, stop, report
-   the owner and supporting Archive Index row, and create nothing: no repo, local home,
-   bootstrap commit, or pending registration. An archived owner is a revival
-   candidate, not permission to create a duplicate or unarchive it. If the gate
-   cannot return a verdict, stop before bootstrap and name the missing evidence.
+   the owner and supporting Archive Index row, and create nothing: no repo, no
+   scaffold, no creation job, no pending registration. Work that belongs to that
+   owner follows the normal code route for that repo. An archived owner is a
+   revival candidate, not permission to create a duplicate or unarchive it. If
+   the gate cannot return a verdict because a live read failed, stop, name the
+   failed source and the missing evidence, and create nothing. A local script,
+   an older deployed skill or memory of what repos exist never substitutes for
+   the gate.
 
-3. **Bootstrap only the justified repo.** Verify the proposed slug and local
-   home do not already exist, then inspect the current script and its side
-   effects before running:
-   ```bash
-   bash ~/scripts/new-project.sh <ProjectHome> [type]
-   ```
-   The script is scaffolding, not a readiness verdict. Capture its actual
-   output, new repo URL, local home, initial commit, and any pending-registration
-   file it changed. Its `DONE` message or template TODO never proves a complete
-   birth. If it partially fails, inspect what it created and resume that repo's
-   Stage B; do not blindly rerun creation. If the script is absent or unsuitable,
-   any replacement bootstrap still requires the same live Stage A verdict and
-   Stage B completion. Do not modify unrelated host scripts in this run.
+3. **Confirm creation authorization.** A justified verdict is not permission.
+   Confirm the creation authorization that repo-standards and the current HQ
+   Rulebook require is present and covers this repository. If it is missing,
+   stop creation and report the verdict with the one missing authorization and
+   a recommendation. When it truly needs Allison, raise it the way the HQ
+   Rulebook and Decision Log route questions (on the GitHub issue or the
+   existing Chat to Code job), never as a question the run waits on in chat,
+   and keep working on anything that does not depend on it.
 
-4. **Run repo-standards Stage B on the new repo.** Bring the scaffold to the live
-   Repo rules baseline, replace placeholder identity with the verified job, record
-   the Project relationship per Project ownership, and add the Archive Index row
-   through Stage B item 8. The birth report is the Stage B report. Until the row
-   is on the sheet and independently read back, birth is incomplete.
+4. **File the build on the current code route.** With `NEW REPO JUSTIFIED` and
+   authorization both present, file the creation and scaffold work as one code
+   job exactly as code-block-routing describes: one GitHub issue titled `Job:`,
+   carrying its five parts, with the Stage A verdict and evidence, the
+   authorization, and the Stage B checklist in the acceptance checks. The issue
+   starts the Builder on its own. File it where the current route takes code
+   jobs, continuing an existing Job issue when one already carries the request.
+   Never create a repository only so that a job has somewhere to land, never
+   run a local bootstrap script, and never hand Allison or another session a
+   copy box to carry the build. If the current route does not say where this
+   job lands, stop creation and raise it as a decision the way step 3 routes
+   questions (HQ Rulebook, No new homes just to finish setup) instead of
+   inventing a destination. The build follows code-block-routing's dedupe and worktree isolation rules.
 
-5. **Reconcile downstream routing.** The Archive Index row is topology
-   registration. Check the row's scan profile and declared consumers. The
-   Estate Brain door is retiring (Decision Log 2026-10-13), so no door
-   registration is requested for a new repo.
+5. **Gate birth on repo-standards Stage B.** The new repo reaches the live Repo
+   rules baseline, its Project relationship is recorded per Project ownership,
+   and its Archive Index row is added through Stage B item 8. Read the sheet
+   back independently, outside the job's own claim, before anything says birth
+   complete. A merged scaffold, a repo URL, an open issue or a pending entry
+   without the landed row is an incomplete birth.
 
-   The inspected legacy script appends to the retired aura repo's
-   `project-knowledge/pending-canonical-repos.md`. aura is read-only history, so
-   treat any such write as a stray side effect. Report it, do not commit it, and
-   never treat it as registration or an active automatic sync. The Archive Index
-   row is the only registration. The old "S1 CANONICAL_REPOS sync" wording
-   referred to a completed Synapse worker lane, not a Make scenario. Never
-   promise that a retired worker or queue will index the repo automatically.
+6. **Reconcile downstream routing.** The Archive Index row is the only
+   registration. Check the row's scan profile and declared consumers. The Estate
+   Brain door is retiring (Decision Log 2026-10-13), so no door registration is
+   requested. Never promise that a retired worker or queue will index the repo
+   automatically. If intake routing needs a new brain mapping, change its
+   canonical source (`expert-partners-skills plugins/operating-doctrine/skills/intake/SKILL.md`)
+   from the Archive Index row through the normal pull request path, never by
+   hand-editing a deployed copy.
 
-   If intake routing needs a new brain mapping, update its canonical skill
-   source (`expert-partners-skills plugins/operating-doctrine/skills/intake/SKILL.md`)
-   from the Archive Index row, then use the deployment pipeline under the current
-   rollout scope. Never hand-edit a deployed copy such as
-   `~/.claude/skills/intake/SKILL.md`. Routing tables remain downstream consumers
-   of topology, and intake itself resolves owners live rather than from a frozen
-   map.
-
-6. **Report the Stage B result with evidence.** Include the Stage A verdict,
-   repo URL, local home, baseline evidence, Project relationship, landed Entity
-   row commit and readback, and routing status.
-   Name remaining gaps explicitly. A pending queue entry, script success, or
-   repo URL without the Archive Index row cannot be reported as a completed birth.
+7. **Report the Stage B result with evidence.** Include the Stage A verdict,
+   the authorization, the Job issue, repo URL, baseline evidence, Project
+   relationship, the Archive Index row and its readback date, and routing
+   status. Name remaining gaps explicitly.
 
 ## Rules
 
-- Never creates a repo the gate did not justify. repo-standards is the one
-  standard; this skill is a runner of it, never a second one.
-- Never create a project home that already exists on disk.
+- Never creates a repo the gate did not justify or the required authorization
+  does not cover. repo-standards is the one standard; this skill is a runner of
+  it, never a second one.
+- Never create a repository whose name already exists in the org, active or
+  archived.
 - ag-vault is never a valid project name here.
 - Never use em dashes in any content this skill writes (org standard).
-- Run the sibling-session visibility check before any commit to shared repos.
-
-## New-project variant (from claude.ai)
-
-If the session-wrap new-project prompt fires in claude.ai, the output is a
-`/new-project <ProjectHome> [type]` block for the implementation session. That
-session starts at step 1 and runs Stage A before any script; a handoff never
-counts as a prior gate verdict.
 
 ## Test cases
 

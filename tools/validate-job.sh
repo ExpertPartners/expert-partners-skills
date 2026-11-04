@@ -28,6 +28,7 @@ else
 fi
 
 python3 .ep/skill-description-lint.py --selftest
+python3 tools/plugin-sync/chatgpt-import-check.py
 
 if command -v gitleaks >/dev/null 2>&1; then
   gitleaks git . --redact --config .gitleaks.toml

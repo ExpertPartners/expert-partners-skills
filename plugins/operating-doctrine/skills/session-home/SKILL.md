@@ -1,14 +1,17 @@
 ---
 name: session-home
 description: |
-  Look up the correct Claude Code project home and GitHub repo for any topic, then
-  output the exact cd + claude command and a first-action prompt template.
-  Use BEFORE opening a new session to avoid landing in the wrong folder.
-  Also handles "I'm already in the wrong folder" -- runs a lightweight closeout and
-  gives the redirect steps.
-  Trigger when: user asks "where should I open a new session for X", "which folder
-  for X", "am I in the right folder", or starts describing work that doesn't match
-  the current working directory.
+  Check that a piece of work is happening in its current owning home. Resolves
+  the owner live from the HQ Rulebook (Where things live, Project ownership), the
+  GitHub Archive Index row, Chat to Code jobs through job_status and the owning
+  brain's index, then reads the actual host and workspace. Confirms an
+  already-correct workspace and changes nothing. Routes business material to its
+  indexed Drive brain home, never a repo or folder. Code work found in the wrong
+  workspace is not committed there; it goes on the current code route for the
+  owning repo, never as a terminal-and-paste step for Allison. A failed live read
+  stops placement. Trigger when the user asks where work should happen, which
+  repo or folder for X, am I in the right place, or starts work that does not
+  match the current workspace.
 argument-hint: "[topic or description of the work]"
 allowed-tools: Bash, Read
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
@@ -23,108 +26,57 @@ zone: routing
 status: designed
 inherits: operating-doctrine
 brand-scope: null
-subtitle: "route work to the right project home"
+subtitle: "route work to its current owning home"
 ---
 
-# Session Home -- project routing
+# Session Home
 
-You are enforcing current project ownership so no work ends up in the wrong folder or the wrong GitHub repo.
+One job. Before work lands, confirm it is happening in the home that currently owns it, so nothing is committed to the wrong repo and no business material ends up outside its brain.
 
-Provenance. This skill carries forward useful method from the user-tier session-home skill adopted into canonical on 2026-08-05. Ownership resolves from live current sources. The retired aura `doctrine/session-routing.md` is history, never a source, and no table in this skill is authority.
+Provenance. This skill carries forward useful method from the user-tier session-home skill adopted into canonical on 2026-08-05. The fixed topic-to-folder table, the hard-coded local folder layout and the closeout-then-paste redirect in that source are retired. The retired aura `doctrine/session-routing.md` is history, never a source. This skill carries no ownership table, folder path or repo roster of its own.
 
-## Resolve ownership live first
+## Step 1. Name the work
 
-Read the live HQ Rulebook (Where things live, Project ownership) first, then the project's row in the GitHub Archive Index sheet, its jobs in the Chat to Code job list through job_status, and its Job Tracker row for older work. Those sources are authoritative. The table below is a quick-reference copy carried forward from the adopted canonical source; it is not authority, the live sources win over it on any discrepancy, and a row not confirmed against a live read this session is unverified. There is no default home folder: Claude Code opens in the repo the work lives in.
+Use the work described in the request. If none is described, ask one short question about what the work is. Then sort it:
 
-| Topic | Project home | GitHub repo |
-|---|---|---|
-| Cross-brand strategy, rules, decisions | No project home. These live in the Drive business brains (HQ Rulebook, Decision Log). | none, Drive only |
-| AG personal brand, YouTube, speaking | `~/Claude/projects/AGPersonalBrand/` | `ExpertPartners/ag-personal-brand` |
-| Free Agent Movement, Free Agent Nation, FAM keynotes, cohorts | `~/Claude/projects/FAM/` | `ExpertPartners/free-agent-nation` |
-| Expert Partners, EPIC, coaching programs | `~/Claude/projects/ExpertPartners/` | `ExpertPartners/expert-partners` |
-| Moxie Signature Group brand + marketing, North Dallas RE | `~/Claude/projects/MoxieSignatureGroup/` | `ExpertPartners/moxie` |
-| Moxie website build + engineering (Next.js, RETS, deploys, code) | `~/Claude/projects/Moxie Website Builder Partner/` | `ExpertPartners/moxie-signature-group-website` |
-| PartnerSync, GHL sync, Make.com S1-S10 | `~/Claude/projects/PartnerSync/` | `ExpertPartners/partnersync` |
-| GHL automation, workflows, pipelines (ghl-automation retired 2026-09-08; reference in partnersync, executable source in partnersync-automation-backend) | `~/Claude/projects/PartnerSync/` (reference) or `~/Claude/projects/partnersync-automation-backend/` (executable) | `ExpertPartners/partnersync` / `ExpertPartners/partnersync-automation-backend` |
-| Book "You've Got a Friend" manuscript | `~/Claude/projects/book/` | `ExpertPartners/youve-got-a-friend-book` |
-| HeyGen avatar video | `~/Claude/projects/HeyGen/` | `ExpertPartners/heygen` |
-| eXp Explained 2.0 | `~/Claude/projects/eXpExplained2/` | `ExpertPartners/exp-explained-2` |
-| Azulio Partnership | `~/Claude/projects/AzulioPartnership/` | `ExpertPartners/azulio-partnership` |
+- **Code**: changes to a repository's files, tooling, skills or automation.
+- **Business material**: rules, decisions, brand notes, plans, meeting notes, transcripts, research and other knowledge.
+- **Both**: split them, and route each part on its own.
 
-## Step 1 -- Determine the correct home
+## Step 2. Resolve the owner live
 
-If the user passed a topic as args, use it. If not, ask one short question: "What is this session going to work on?"
+Read these live this session, each found by its title or its current tool, never from memory:
 
-Match the topic against the live sources, using the table only as a fast path when it agrees with them. If a topic spans multiple projects (rare), split into separate sessions or anchor in the HQ Business Brain in Drive if the output is truly cross-brand. When the table and a live source disagree, the live source wins, and the table row gets corrected through this canonical source, never through a deployed copy.
+1. The HQ Rulebook sections Where things live and Project ownership.
+2. For code, the owning repo's row in the GitHub Archive Index sheet (What it holds, Pile), checked against the live org.
+3. In-flight work through job_status on the Chat to Code job list, and the owning repo's open Job issues. The Job Tracker covers older work.
+4. For business material, the owning brain's `00 START HERE` index, which names its folder for that kind of content.
 
-## Step 2 -- Check current location
+The newest applicable Decision Log entry wins over older text. Never infer an owner from a repo name, a folder name or a deployed copy of this skill.
 
-Run: `pwd` to get the current working directory.
+If a read that placement depends on fails through every authorized route, stop placement. Name the failed source, say what is verified and what is not, and place nothing. No table, aura file, memory, older deployed copy or folder name stands in for the failed read. Continue only work that does not depend on placement.
 
-Compare against the correct home. Then output one of two paths:
+## Step 3. Read the actual workspace
 
-### Path A: Current session is already in the right place
+Read where this session actually runs instead of assuming a folder layout: the host, the working directory, and for a Git workspace its top level, `origin` remote, branch and worktree list. Compare that with the owner from Step 2.
 
-Output:
-```
-You are in the right folder: <current-path>
-GitHub repo: <repo>
-Nothing to change.
-```
+## Step 4. Act on the result
 
-### Path B: Current session is in the wrong place
-
-Output ALL of the following:
-
-**1. Mismatch notice:**
-```
-Mismatch detected:
-  Current location: <cwd>
-  Correct location: <correct-path>
-  GitHub repo:      <repo>
-```
-
-**2. Steps to fix (in order):**
-```
-1. Run /session-closeout in this session first (captures everything in an archive note).
-2. Then open a new terminal and run:
-
-   cd <correct-path> && claude
-
-3. Paste this as your first message in the new session:
-
-   Read session-state.md and working/ for current context.
-   We're continuing <topic> from a session that was misrouted to <wrong-path>.
-   The closeout note is at <wrong-path>/archive/session-<name>-closeout-YYYY-MM-DD.md.
-   [Describe the first action you want done here.]
-```
-
-**3. Why this matters:**
-Explain briefly: work committed in the wrong folder goes into the wrong GitHub repo. Rules, decisions, and knowledge files in the wrong place break the one-home rule, because each thing has one home, in the Drive business brains or the owning repo.
-
-## Step 3 -- Pre-session routing (before any work starts)
-
-If the user is asking this BEFORE opening a new session (most common case), output:
-
-```
-Project home:  <correct-path>
-GitHub repo:   <repo>
-Command:       cd <correct-path> && claude
-
-First message to paste when Claude Code loads:
------
-Read session-state.md. I'm starting a new session on [topic].
-First action: [describe it here].
------
-```
-
-Keep the output tight. No explanation beyond what is listed above.
+- **Already in the right home.** Say so, name the owner and the evidence, and change nothing.
+- **Business material.** It goes to the folder the owning brain's index names, filed through the intake skill, never into a repo or a local folder, and no copy stays in the workspace. Secrets and credentials go to 1Password only and are never copied into notes, transcripts, Docs or repos.
+- **Code work in the wrong workspace.** Commit and push nothing here. If an existing Chat to Code job or Job issue already carries the work, continue it there. Otherwise file it on the current code route for the owning repo, as code-block-routing describes: one GitHub issue titled `Job:` with the whole assignment, which starts the Builder on its own. Name any edits already made in the wrong workspace in the report and carry what the job needs into its body; do not discard them without consent. Never hand Allison a terminal command, a folder to open or a first message to paste for this.
+- **Allison explicitly asks to start a brand new chat.** Only then does the one first-message copy box apply, built by lane-spawn under code-block-routing. Ordinary routing and mismatch handling never become a paste task.
+- **No owner exists yet.** Report the live checks and what came back. The work needs the repo-standards creation gate (run through new-project) before any repo or folder exists. Create nothing on the fly.
 
 ## Edge cases
 
-- **Aura as a home (wrong):** Aura is retired and locked read-only. It is never a session home, never a knowledge source, and never a fallback. Cross-brand rules and decisions live in the Drive business brains.
-- **"I don't know where this belongs":** Check existing ownership first in the GitHub Archive Index sheet, the Chat to Code job list through job_status, the Job Tracker for older work, and the owning brain's index. When genuinely ambiguous (new project type never seen before), ask Allison one question and record her answer in the Decision Log.
-- **New project with no existing folder:** Check `gh repo list ExpertPartners` to see if a repo exists. If not, it needs the repo-standards ownership gate and Allison's yes before creating new repos. Flag it; do not create folders or repos on the fly.
+- **Aura as a home.** Aura is retired and locked read-only. It is never a home, a source or a fallback.
+- **Work spanning owners.** Split it by owner. Cross-brand rules and decisions live in the HQ Business Brain in Drive.
+- **Genuinely unclear ownership.** Bring Allison one question with a recommendation, routed the way the HQ Rulebook and Decision Log route questions, and keep working on everything that does not depend on the answer.
+
+## Why it matters
+
+Work committed in the wrong workspace lands in the wrong repo, and knowledge stored outside its brain breaks the one-home rule. Each thing has one home, in the owning Drive brain or the owning repo.
 
 ## Test cases
 
