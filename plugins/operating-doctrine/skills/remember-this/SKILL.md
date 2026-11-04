@@ -112,7 +112,7 @@ No daemon, no sweeper, no cron, no queue, no dashboard, no second registry. If a
 - Never capture without a live-resolved room.
 - Never create a second durable entry for an obligation that already has one.
 - Never route to a room that does not own the work to have a destination.
-- Never promote a captured item into canon. A decision is saved only when Allison clearly decides it, under decision 0101, never because this skill captured something.
+- Never promote a captured item into canon. A decision is saved only when Allison clearly decides it, through the current live HQ Decision Log capture and verification workflow in Drive, never because this skill captured something.
 - Never write a secret into a job.
 - Never claim a capture that was not read back.
 - Never turn a capture into a side quest, a lane, or a re-scope of the open mission.
