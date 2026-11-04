@@ -6,8 +6,11 @@ Run from the repo root: python3 -m unittest discover -s tools/overlap-check/test
 
 import importlib.util
 import os
+import random
+import subprocess
 import sys
 import tempfile
+import threading
 import unittest
 from unittest import mock
 
@@ -38,18 +41,25 @@ def pr(number, files, closes=None, author="factory-droid[bot]", ref=None):
     return oc.Holder(number, "pr", list(files), {closes} if closes else set()), {
         "number": number,
         "user": {"login": author},
-        "head": {"ref": ref or f"job/{closes or number}-work"},
+        "head": {"ref": ref or f"job/{closes or number}-work", "sha": f"{number:040x}", "repo": {"full_name": REPO}},
         "body": f"Closes #{closes}\n\nwork" if closes else "work",
         "files": list(files),
     }
 
 
+def merged_pr(number, closes, merged_at="2026-11-04T01:21:00Z", ref=None):
+    _, p = pr(number, ["tools/a.py"], closes=closes, ref=ref)
+    return dict(p, state="closed", merged_at=merged_at, merge_commit_sha=f"{number:040x}"[::-1])
+
+
 class FakeGitHub:
     """Holds issues, pull requests and comments, and answers the calls overlap_check makes."""
 
-    def __init__(self, issues=(), prs=()):
+    def __init__(self, issues=(), prs=(), closed_prs=()):
         self.issues = {i["number"]: dict(i, labels=[{"name": n} for n in i.get("labels", [])]) for i in issues}
-        self.prs = list(prs)
+        self.prs = list(prs)  # open
+        self.closed_prs = list(closed_prs)  # closed or merged, with merged_at when merged
+        self.timeline = {}  # issue -> extra timeline events, such as reopened
         self.comments = {}
         self.calls = []
         self.next_comment_id = 100
@@ -79,6 +89,12 @@ class FakeGitHub:
             if build is not None:
                 listed.insert(1, {"name": "builder / build", "status": build})
             return {"total_count": len(listed), "jobs": listed}
+        if path.startswith(f"/repos/{REPO}/pulls/"):
+            number = int(path.rsplit("/", 1)[-1])
+            found = next((p for p in self.prs + self.closed_prs if p["number"] == number), None)
+            if found is None:
+                raise oc.GitHubError(404, "Not Found")
+            return {k: v for k, v in found.items() if k != "files"}
         number = int(path.rsplit("/", 1)[-1])
         if number not in self.issues:
             raise oc.GitHubError(404, "Not Found")
@@ -100,7 +116,15 @@ class FakeGitHub:
                      and state in ("all", i.get("state", "open"))]
             return sorted(found, key=lambda i: i["number"])
         if path.endswith("/comments"):
-            return list(self.comments.get(int(path.split("/")[-2]), []))
+            return [dict(c) for c in self.comments.get(int(path.split("/")[-2]), [])]
+        if path.endswith("/timeline"):
+            # GitHub records a cross-reference on the issue for every pull request naming it.
+            number = int(path.split("/")[-2])
+            events = [{"event": "cross-referenced", "source": {"type": "issue", "issue": {
+                "number": p["number"], "body": p["body"], "pull_request": {"url": "x"},
+                "repository": {"full_name": REPO}}}}
+                for p in self.prs + self.closed_prs if number in oc.closes(p.get("body"))]
+            return events + list(self.timeline.get(number, []))
         raise oc.GitHubError(404, f"Not Found: {path}")
 
     def post(self, path, body):
@@ -112,8 +136,9 @@ class FakeGitHub:
             issue["labels"] += [{"name": n} for n in body["labels"] if n not in have]
         elif path.endswith("/comments"):
             self.next_comment_id += 1
-            self.comments.setdefault(int(parts[-2]), []).append(
-                {"id": self.next_comment_id, "user": {"login": "github-actions[bot]"}, "body": body["body"]})
+            made = {"id": self.next_comment_id, "user": {"login": "github-actions[bot]"}, "body": body["body"]}
+            self.comments.setdefault(int(parts[-2]), []).append(made)
+            return dict(made)
         return {}
 
     def patch(self, path, body):
@@ -128,6 +153,13 @@ class FakeGitHub:
     def delete(self, path):
         self.calls.append(("DELETE", path, None))
         parts = path.split("/")
+        if "/issues/comments/" in path:
+            cid = int(parts[-1])
+            for number, comments in self.comments.items():
+                if any(c["id"] == cid for c in comments):
+                    self.comments[number] = [c for c in comments if c["id"] != cid]
+                    return None
+            raise oc.GitHubError(404, "Not Found")
         issue = self.issues[int(parts[-3])]
         name = parts[-1]
         if name not in {label["name"] for label in issue["labels"]}:
@@ -660,7 +692,7 @@ class ParkedWhileBuilding(unittest.TestCase):
 
     def test_a_restart_runs_after_the_release_of_a_stopped_job(self):
         gh = self.start_201("parked")
-        code, out = Main.run_main(self, gh, ["release"], OVERLAP_ISSUE="201", BUILD_RESULT="success")
+        code, out = Main.run_main(self, gh, ["release"], OVERLAP_ISSUE="201", GITHUB_RUN_ID="9001", BUILD_RESULT="success")
         self.assertEqual((code, out), (0, "restart=true\n"))
         # A release that keeps in-progress, because the job's own pull request holds its
         # files, frees nothing and restarts nothing.
@@ -713,7 +745,7 @@ class ActiveWriter(unittest.TestCase):
             gh = self.building_201(state)
             # The droid has stopped. The run stays in progress while its release job runs.
             gh.builds[9001] = "completed"
-            code, out = Main.run_main(self, gh, ["release"], OVERLAP_ISSUE="201", BUILD_RESULT="success")
+            code, out = Main.run_main(self, gh, ["release"], OVERLAP_ISSUE="201", GITHUB_RUN_ID="9001", BUILD_RESULT="success")
             self.assertEqual((code, out), (0, "restart=true\n"), state)
             self.assertNotIn("in-progress", gh.labels(201), state)
             # The restart step in the same release job sends #179.
@@ -759,7 +791,7 @@ class ActiveWriter(unittest.TestCase):
     def test_a_failed_build_restarts_the_others_but_not_itself(self):
         gh = self.building_201("open")
         gh.builds[9001] = "completed"
-        code, out = Main.run_main(self, gh, ["release"], OVERLAP_ISSUE="201", BUILD_RESULT="failure")
+        code, out = Main.run_main(self, gh, ["release"], OVERLAP_ISSUE="201", GITHUB_RUN_ID="9001", BUILD_RESULT="failure")
         self.assertEqual((code, out), (0, "restart=true\n"))
         self.assertEqual(gh.labels(201), {"job", "waiting"})
         code, out = Main.run_main(self, gh, ["next"], OVERLAP_ISSUE="201", BUILDER_WORKFLOW_REF=self.WORKFLOW)
@@ -805,8 +837,9 @@ class RunRelease(unittest.TestCase):
 class Main(unittest.TestCase):
     def run_main(self, gh, argv, **env):
         with tempfile.NamedTemporaryFile("r", suffix=".out") as out:
+            # GITHUB_RUN_ID is set on a real runner, so each test names the run it plays.
             base = {"GITHUB_REPOSITORY": REPO, "OVERLAP_TOKEN": "t", "GITHUB_OUTPUT": out.name,
-                    "OVERLAP_SETTLE_SECONDS": "0"}
+                    "OVERLAP_SETTLE_SECONDS": "0", "GITHUB_RUN_ID": ""}
             with mock.patch.dict(os.environ, {**base, **env}), mock.patch.object(oc, "GitHub", return_value=gh):
                 code = oc.main(argv)
             return code, open(out.name, encoding="utf-8").read()
@@ -856,8 +889,32 @@ class Workflows(unittest.TestCase):
         # A ref the caller or a pull request could set would let pull request code run in
         # the privileged pull_request_target redispatch job.
         text = self.read("factory-builder-reusable.yml")
-        self.assertEqual(text.count("ref: main"), 3)
+        checkouts = [block.split("      - name:", 1)[0] for block in text.split("uses: actions/checkout@v4")[1:]]
+        tools = [block for block in checkouts if "sparse-checkout: tools/overlap-check" in block]
+        self.assertEqual(len(tools), 4, "gate, build owner check, release and redispatch")
+        for block in tools:
+            self.assertIn("repository: ExpertPartners/expert-partners-skills\n", block)
+            self.assertIn("ref: main\n", block)
+            self.assertIn("persist-credentials: false\n", block)
         self.assertNotIn("tools_ref", text)
+
+    def test_build_confirms_ownership_before_it_checks_out_or_writes(self):
+        text = self.read("factory-builder-reusable.yml")
+        build = text.split("  build:", 1)[1].split("  release:", 1)[0]
+        steps = [line.strip()[len("- name: "):] for line in build.splitlines() if line.strip().startswith("- name: ")]
+        self.assertEqual(steps[:3], ["Checkout the overlap check", "Confirm this run still owns the job", "Checkout"])
+        self.assertIn('python3 "$script" owner', build)
+        self.assertIn("ref: ${{ steps.owner.outputs.branch }}", build)
+        self.assertLess(steps.index("Write automation prompt"), steps.index("Continue the job's existing pull request"))
+        self.assertLess(steps.index("Continue the job's existing pull request"), steps.index("Run Factory Droid"))
+        self.assertIn("if: steps.owner.outputs.note == 'true'", build)
+        permissions = build.split("    permissions:\n", 1)[1].split("    steps:", 1)[0]
+        self.assertEqual(sorted(line.strip() for line in permissions.splitlines() if ":" in line and not line.strip().startswith("#")),
+                         ["actions: read", "contents: read", "id-token: write", "issues: read", "pull-requests: read"],
+                         "the build's own token gains reads only")
+        # The access preflight stays exactly where it was, after the caller checkout.
+        self.assertLess(steps.index("Checkout"), steps.index("Assert clean caller checkout before access setup"))
+        self.assertLess(steps.index("Verify and configure Factory ledger access"), steps.index("Run Factory Droid"))
 
     def test_failed_builds_are_released(self):
         text = self.read("factory-builder-reusable.yml")
@@ -910,6 +967,480 @@ class Workflows(unittest.TestCase):
         self.assertIn("uses: ./.github/workflows/factory-builder-reusable.yml", text)
         self.assertIn("FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}", text)
         self.assertNotIn("droid exec", text)
+
+
+
+NOOP = lambda s: None
+
+
+def run_cfg(run_id):
+    return oc.Config(repo=REPO, settle_seconds=0, run_id=str(run_id))
+
+
+def receipts(gh, number):
+    return [b for b in gh.comment_bodies(number) if oc.RECEIPT_MARKER in b]
+
+
+def claims(gh, number):
+    return [b for b in gh.comment_bodies(number) if oc.CLAIM_RE.search(b)]
+
+
+class LockedGitHub(FakeGitHub):
+    """FakeGitHub for runs on separate threads. Each call is atomic, as each REST call is, and a
+    short random pause before it lets the runs interleave differently every time."""
+
+    def __init__(self, *args, jitter=0.0, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.lock = threading.Lock()
+        self.jitter = jitter
+        self.claim_gate = None  # a Barrier every claim waits on before it is posted
+
+    def _call(self, method, *args):
+        if self.jitter:
+            threading.Event().wait(random.random() * self.jitter)
+        with self.lock:
+            return method(self, *args)
+
+    def get(self, *a):
+        return self._call(FakeGitHub.get, *a)
+
+    def paginate(self, *a):
+        return self._call(FakeGitHub.paginate, *a)
+
+    def post(self, path, body):
+        if self.claim_gate and "factory-overlap-claim" in (body or {}).get("body", ""):
+            self.claim_gate.wait(timeout=5)
+        return self._call(FakeGitHub.post, path, body)
+
+    def patch(self, *a):
+        return self._call(FakeGitHub.patch, *a)
+
+    def delete(self, *a):
+        return self._call(FakeGitHub.delete, *a)
+
+
+def race(gh, gates, sleep=NOOP):
+    """Run each (run id, issue) gate on its own thread at once. Returns run id -> started."""
+    results, errors = {}, []
+
+    def one(run_id, number):
+        try:
+            results[run_id] = oc.run_check(gh, run_cfg(run_id), number, sleep=sleep)
+        except Exception as exc:  # surfaced below
+            errors.append(exc)
+
+    threads = [threading.Thread(target=one, args=g) for g in gates]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join(10)
+    if errors:
+        raise errors[0]
+    return results
+
+
+class OneJobOneWriter(unittest.TestCase):
+    """However many events start the builder for one issue, one run builds it at a time, and
+    every other run leaves a receipt naming the run it follows."""
+
+    SCOPE = ".github/workflows/skills-graph.yml"
+
+    def test_issue_237_replay_a_dispatch_during_the_build_follows_it(self):
+        # Nov 4: run 41749627386 (job label) started #237 at 00:49:21. A manual dispatch,
+        # run 41749736944, passed its own gate at 00:50:19 because a job's own in-progress
+        # never held itself, and its droid opened the competing pull request #242.
+        first, second = "41749627386", "41749736944"
+        gh = FakeGitHub([issue(237, self.SCOPE)])
+        self.assertTrue(oc.run_check(gh, run_cfg(first), 237, sleep=NOOP))
+        gh.runs[int(first)] = "in_progress"
+        before = len(gh.writes())
+        self.assertFalse(oc.run_check(gh, run_cfg(second), 237, sleep=NOOP))
+        self.assertEqual([(c[0], c[1]) for c in gh.writes()[before:]],
+                         [("POST", f"/repos/{REPO}/issues/237/comments")],
+                         "the follower writes its receipt and nothing else: no claim, no label")
+        self.assertEqual(oc.recorded_run(gh, CFG, 237), first, "the first run keeps the job")
+        self.assertEqual(gh.labels(237), {"job", "in-progress"})
+        [receipt] = receipts(gh, 237)
+        self.assertIn(f"Run {second} did not build this job, because run {first} is already building it", receipt)
+        self.assertIn(f"/actions/runs/{first}", receipt)
+        # Even reached by a re-run of failed jobs, the second run's build step refuses.
+        owns, why, _ = oc.run_owner(gh, run_cfg(second), 237)
+        self.assertFalse(owns)
+        self.assertIn(f"admitted for run {first}", why)
+
+        # The first run opens #240 and ends. Allison's review finding then re-runs the
+        # second run in full, which continues #240 instead of opening another.
+        gh.prs = [pr(240, [self.SCOPE], closes=237, ref="job/237-skills-graph-race-safe-writer")[1]]
+        gh.builds[int(first)] = "completed"
+        self.assertEqual(oc.run_release(gh, run_cfg(first), 237, "success"), "kept")
+        gh.runs[int(first)] = "completed"
+        self.assertTrue(oc.run_check(gh, run_cfg(second), 237, sleep=NOOP))
+        self.assertIn("This build continues pull request #240", gh.comment_bodies(237)[0])
+        owns, why, d = oc.run_owner(gh, run_cfg(second), 237)
+        self.assertTrue(owns, why)
+        self.assertEqual(d.target["number"], 240)
+        note = oc.continuation_note(237, d, REPO)
+        self.assertIn("open pull request #240 on branch job/237-skills-graph-race-safe-writer", note)
+        self.assertIn("Do not open another pull request or branch for this job", note)
+
+    def test_near_simultaneous_events_for_one_job_start_one_build(self):
+        # Both gates take every look before either claims, then both claim, then both settle.
+        gh = LockedGitHub([issue(245, self.SCOPE)])
+        gh.claim_gate = threading.Barrier(2)
+        settle = threading.Barrier(2)
+        for run in (501, 502):
+            gh.runs[run] = "in_progress"
+        results = race(gh, [("501", 245), ("502", 245)], sleep=lambda s: settle.wait(timeout=5))
+        self.assertEqual(sorted(results.values()), [False, True], results)
+        winner = next(r for r, started in results.items() if started)
+        loser = next(r for r, started in results.items() if not started)
+        self.assertEqual(oc.recorded_run(gh, CFG, 245), winner)
+        [receipt] = receipts(gh, 245)
+        self.assertIn(f"Run {loser} did not build this job, because run {winner} is already building it", receipt)
+        self.assertEqual(claims(gh, 245), [], "the winner's claim is gone and the loser's became its receipt")
+        self.assertEqual(gh.labels(245), {"job", "in-progress"})
+
+    def test_any_interleaving_of_three_events_starts_exactly_one_build(self):
+        for seed in range(40):
+            random.seed(seed)
+            gh = LockedGitHub([issue(245, self.SCOPE, labels=("job", "waiting"))], jitter=0.002)
+            for run in (601, 602, 603):
+                gh.runs[run] = "in_progress"
+            results = race(gh, [("601", 245), ("602", 245), ("603", 245)],
+                           sleep=lambda s: threading.Event().wait(random.random() * 0.004))
+            started = [r for r, ok in results.items() if ok]
+            self.assertEqual(len(started), 1, (seed, results))
+            self.assertEqual(oc.recorded_run(gh, CFG, 245), started[0], seed)
+            self.assertEqual(len(receipts(gh, 245)), 2, seed)
+            self.assertEqual(claims(gh, 245), [], seed)
+            self.assertEqual(gh.labels(245), {"job", "in-progress"}, seed)
+
+    def test_distinct_jobs_still_build_at_once(self):
+        gh = LockedGitHub([issue(301, "tools/a/x.py"), issue(302, "tools/b/y.py")])
+        settle = threading.Barrier(2)
+        for run in (701, 702):
+            gh.runs[run] = "in_progress"
+        results = race(gh, [("701", 301), ("702", 302)], sleep=lambda s: settle.wait(timeout=5))
+        self.assertEqual(results, {"701": True, "702": True}, "a claim on one job never holds another")
+        self.assertEqual(receipts(gh, 301) + receipts(gh, 302), [])
+        self.assertEqual(oc.recorded_run(gh, CFG, 301), "701")
+        self.assertEqual(oc.recorded_run(gh, CFG, 302), "702")
+
+    def test_colliding_jobs_judged_at_once_still_start_only_the_older(self):
+        gh = LockedGitHub([issue(301, "AGENTS.md"), issue(302, "AGENTS.md")])
+        gh.claim_gate = threading.Barrier(2)  # both first looks come before either label
+        settle = threading.Barrier(2)
+        results = race(gh, [("701", 301), ("702", 302)], sleep=lambda s: settle.wait(timeout=5))
+        self.assertEqual(results, {"701": True, "702": False})
+        self.assertIn("Waiting on #301, same file", gh.comment_bodies(302)[0])
+
+    def test_a_claim_or_record_from_a_run_that_stopped_holds_nothing(self):
+        gh = FakeGitHub([issue(245, self.SCOPE)])
+        gh.post(f"/repos/{REPO}/issues/245/comments", {"body": "<!-- factory-overlap-claim:v1 run=77 -->\nRun 77 ..."})
+        gh.post(f"/repos/{REPO}/issues/245/comments", {"body": oc.comment_body(oc.Verdict(True), "78")})
+        gh.runs[78] = "in_progress"
+        gh.builds[78] = "completed"  # only its release is left, so it no longer writes
+        # Run 77 crashed during its gate and is gone.
+        self.assertTrue(oc.run_check(gh, run_cfg(79), 245, sleep=NOOP))
+        self.assertEqual(oc.recorded_run(gh, CFG, 245), "79")
+        self.assertEqual(receipts(gh, 245), [])
+
+    def test_an_unreadable_owner_run_still_counts_as_writing(self):
+        gh = FakeGitHub([issue(245, self.SCOPE)])
+        self.assertTrue(oc.run_check(gh, run_cfg(80), 245, sleep=NOOP))
+        gh.runs[80] = oc.GitHubError(502, "Bad Gateway")
+        self.assertFalse(oc.run_check(gh, run_cfg(81), 245, sleep=NOOP))
+        self.assertEqual(oc.recorded_run(gh, CFG, 245), "80")
+
+    def test_a_full_re_run_of_the_admitted_run_is_the_same_writer(self):
+        gh = FakeGitHub([issue(245, self.SCOPE)])
+        self.assertTrue(oc.run_check(gh, run_cfg(90), 245, sleep=NOOP))
+        gh.runs[90] = "in_progress"
+        self.assertTrue(oc.run_check(gh, run_cfg(90), 245, sleep=NOOP), "attempt 2 of run 90 is still run 90")
+        self.assertEqual(receipts(gh, 245), [])
+
+
+class ExistingPullRequest(unittest.TestCase):
+    """A later build of a job with an open builder pull request continues that pull request."""
+
+    BRANCH = "job/237-skills-graph-race-safe-writer"
+
+    def admitted(self, prs, run="900"):
+        gh = FakeGitHub([issue(237, ".github/workflows/skills-graph.yml")], prs)
+        self.assertTrue(oc.run_check(gh, run_cfg(run), 237, sleep=NOOP))
+        return gh
+
+    def test_review_findings_continue_the_open_pull_request(self):
+        _, open_pr = pr(240, [".github/workflows/skills-graph.yml"], closes=237, ref=self.BRANCH)
+        gh = self.admitted([open_pr])
+        code, out = Main.run_main(self, gh, ["owner"], OVERLAP_ISSUE="237", GITHUB_RUN_ID="900",
+                                  OVERLAP_NOTE_FILE=os.devnull)
+        self.assertEqual(code, 0)
+        self.assertEqual(out, f"pr=240\nbranch={self.BRANCH}\nhead={240:040x}\nnote=true\n")
+        # The release keeps the job on its pull request, which holds its files.
+        code, out = Main.run_main(self, gh, ["release"], OVERLAP_ISSUE="237", GITHUB_RUN_ID="900", BUILD_RESULT="success")
+        self.assertEqual((code, out), (0, "restart=false\n"))
+        self.assertEqual(gh.labels(237), {"job", "in-progress"})
+
+    def test_with_two_open_pull_requests_the_oldest_is_continued_and_the_other_kept(self):
+        _, a = pr(240, ["x/a.py"], closes=237, ref=self.BRANCH)
+        _, b = pr(242, ["x/b.py"], closes=237, ref="job/237-skills-graph-reliable")
+        gh = self.admitted([b, a])
+        owns, _, d = oc.run_owner(gh, run_cfg(900), 237)
+        self.assertTrue(owns)
+        self.assertEqual(d.target["number"], 240)
+        note = oc.continuation_note(237, d, REPO)
+        self.assertIn("Pull requests #242 also close #237. Leave them as they are", note)
+        self.assertIn("do not close any pull request or delete any branch", note)
+        self.assertNotIn("DELETE", {c[0] for c in gh.writes() if "/git/refs" in c[1] or "/pulls/" in c[1]})
+
+    def test_a_pull_request_from_another_repository_is_never_checked_out(self):
+        _, fork = pr(240, ["x/a.py"], closes=237)
+        fork["head"]["repo"] = {"full_name": "someone/fork"}
+        gh = self.admitted([fork])
+        code, out = Main.run_main(self, gh, ["owner"], OVERLAP_ISSUE="237", GITHUB_RUN_ID="900")
+        self.assertEqual(out, "pr=\nbranch=\nhead=\nnote=false\n")
+        self.assertIsNone(oc.head_branch(dict(fork, head={"ref": "job/1-x; rm -rf /", "repo": {"full_name": REPO}}), REPO))
+        self.assertIsNone(oc.head_branch(dict(fork, head={"ref": "job/../main", "repo": {"full_name": REPO}}), REPO))
+
+    def test_no_pull_request_builds_as_before(self):
+        gh = self.admitted([])
+        with tempfile.TemporaryDirectory() as d:
+            note = os.path.join(d, "note.txt")
+            code, out = Main.run_main(self, gh, ["owner"], OVERLAP_ISSUE="237", GITHUB_RUN_ID="900", OVERLAP_NOTE_FILE=note)
+            self.assertEqual((code, out), (0, "pr=\nbranch=\nhead=\nnote=false\n"))
+            self.assertFalse(os.path.exists(note))
+
+    def test_the_branch_handed_to_checkout_is_the_pull_request_head(self):
+        # A temporary origin with main and the job's pull request branch. The branch the owner
+        # check hands to checkout must check out at the head the pull request reports, and a
+        # continuation commit pushed there moves that same branch, with no new branch.
+        with tempfile.TemporaryDirectory() as d:
+            env = dict(os.environ, GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@example.invalid",
+                       GIT_COMMITTER_NAME="t", GIT_COMMITTER_EMAIL="t@example.invalid")
+
+            def git(*args, cwd=d):
+                return subprocess.run(["git", *args], cwd=cwd, env=env, check=True,
+                                      capture_output=True, text=True).stdout.strip()
+
+            origin, work = os.path.join(d, "origin.git"), os.path.join(d, "work")
+            git("init", "-q", "--bare", "-b", "main", origin)
+            git("clone", "-q", origin, work)
+            git("commit", "-q", "--allow-empty", "-m", "main", cwd=work)
+            git("push", "-q", "origin", "HEAD:main", cwd=work)
+            git("checkout", "-q", "-b", self.BRANCH, cwd=work)
+            git("commit", "-q", "--allow-empty", "-m", "first build", cwd=work)
+            git("push", "-q", "origin", self.BRANCH, cwd=work)
+            head = git("rev-parse", "HEAD", cwd=work)
+
+            _, open_pr = pr(240, ["x/a.py"], closes=237, ref=self.BRANCH)
+            open_pr["head"]["sha"] = head
+            gh = self.admitted([open_pr])
+            note = os.path.join(d, "note.txt")
+            code, out = Main.run_main(self, gh, ["owner"], OVERLAP_ISSUE="237", GITHUB_RUN_ID="900", OVERLAP_NOTE_FILE=note)
+            self.assertEqual(code, 0)
+            outputs = dict(line.split("=", 1) for line in out.splitlines())
+            self.assertIn(head, open(note, encoding="utf-8").read())
+
+            build = os.path.join(d, "build")
+            git("clone", "-q", "--branch", outputs["branch"], origin, build)
+            self.assertEqual(git("rev-parse", "HEAD", cwd=build), outputs["head"])
+            git("commit", "-q", "--allow-empty", "-m", "fix review finding", cwd=build)
+            git("push", "-q", "origin", "HEAD", cwd=build)
+            heads = git("for-each-ref", "--format=%(refname:short)", "refs/heads", cwd=origin).split()
+            self.assertEqual(sorted(heads), sorted(["main", self.BRANCH]))
+            self.assertEqual(git("rev-parse", f"{self.BRANCH}~1", cwd=origin), head, "the old head is kept")
+
+
+class MergedWinner(unittest.TestCase):
+    """A job whose builder pull request merged is delivered. Nothing builds it again unless it
+    was reopened after that merge."""
+
+    def test_a_dispatch_after_the_merge_does_not_build_again(self):
+        gh = FakeGitHub([issue(237, "x/a.py", labels=("job", "waiting"))], closed_prs=[merged_pr(240, 237)])
+        self.assertFalse(oc.run_check(gh, run_cfg(1000), 237, sleep=NOOP))
+        self.assertEqual(gh.labels(237), {"job"}, "not waiting, so no restart sends it again")
+        self.assertIn("Already delivered. Pull request #240 merged this job into main", gh.comment_bodies(237)[0])
+        self.assertEqual(claims(gh, 237), [])
+        self.assertFalse([c for c in gh.writes() if c[0] == "POST" and c[1].endswith("/labels")], "never in-progress")
+        self.assertEqual(oc.run_next(gh, CFG, [].append), [])
+
+    def test_the_merged_result_wins_over_a_redundant_open_pull_request(self):
+        # After #240 merged, #242 was still open for the same job.
+        _, redundant = pr(242, ["x/a.py"], closes=237, ref="job/237-skills-graph-reliable")
+        gh = FakeGitHub([issue(237, "x/a.py")], [redundant], closed_prs=[merged_pr(240, 237)])
+        self.assertFalse(oc.run_check(gh, run_cfg(1000), 237, sleep=NOOP))
+        body = gh.comment_bodies(237)[0]
+        self.assertIn("Pull request #240 merged", body)
+        self.assertIn("Pull request #242 also closes this job and is still open. It is left as it is.", body)
+        self.assertEqual([c for c in gh.writes() if c[0] == "DELETE"], [], "nothing is closed or deleted")
+
+    def test_a_closed_unmerged_pull_request_is_not_a_delivery(self):
+        _, closed = pr(242, ["x/a.py"], closes=237)
+        gh = FakeGitHub([issue(237, "x/a.py")], closed_prs=[dict(closed, state="closed", merged_at=None)])
+        self.assertTrue(oc.run_check(gh, run_cfg(1000), 237, sleep=NOOP))
+
+    def test_a_job_reopened_after_its_merge_builds_on_top_of_it(self):
+        gh = FakeGitHub([issue(237, "x/a.py")], closed_prs=[merged_pr(240, 237, merged_at="2026-11-04T01:21:00Z")])
+        gh.timeline[237] = [{"event": "reopened", "created_at": "2026-11-04T01:00:00Z"}]
+        self.assertFalse(oc.run_check(gh, run_cfg(1000), 237, sleep=NOOP), "reopened before the merge")
+        gh.timeline[237].append({"event": "reopened", "created_at": "2026-11-04T03:00:00Z"})
+        self.assertTrue(oc.run_check(gh, run_cfg(1001), 237, sleep=NOOP))
+        owns, _, d = oc.run_owner(gh, run_cfg(1001), 237)
+        self.assertTrue(owns)
+        self.assertIn("Pull request #240 already merged earlier work", oc.continuation_note(237, d, REPO))
+
+    def test_a_build_after_its_job_merged_does_not_write_and_its_release_does_not_queue_it(self):
+        gh = FakeGitHub([issue(237, "x/a.py")])
+        self.assertTrue(oc.run_check(gh, run_cfg(1000), 237, sleep=NOOP))
+        gh.closed_prs = [merged_pr(240, 237)]  # another path merged the job meanwhile
+        code, _ = Main.run_main(self, gh, ["owner"], OVERLAP_ISSUE="237", GITHUB_RUN_ID="1000")
+        self.assertEqual(code, 1)
+        code, out = Main.run_main(self, gh, ["release"], OVERLAP_ISSUE="237", GITHUB_RUN_ID="1000", BUILD_RESULT="failure")
+        self.assertEqual((code, out), (0, "restart=true\n"))
+        self.assertEqual(gh.labels(237), {"job"})
+        self.assertIn("Already delivered", gh.comment_bodies(237)[0])
+        self.assertEqual(oc.recorded_run(gh, CFG, 237), "1000", "provenance stays")
+
+
+class FailedBeforeBuild(unittest.TestCase):
+    """A build that fails before the droid writes (preflight, provider wait) goes back to
+    waiting with its run still recorded. Re-running that same run may build again; a newer
+    admission replaces it; neither ever makes two writers or retries itself at once."""
+
+    SCOPE = "tools/overlap-check/overlap_check.py"
+    X = "41756696385"  # #245's first run, refused at the ledger preflight
+
+    def failed_once(self):
+        gh = FakeGitHub([issue(245, self.SCOPE), issue(250, self.SCOPE, labels=("job",))])
+        self.assertTrue(oc.run_check(gh, run_cfg(self.X), 245, sleep=NOOP))
+        gh.runs[int(self.X)] = "in_progress"
+        gh.builds[int(self.X)] = "completed"  # the build job failed after eight seconds
+        code, out = Main.run_main(self, gh, ["release"], OVERLAP_ISSUE="245", GITHUB_RUN_ID=self.X, BUILD_RESULT="failure")
+        self.assertEqual((code, out), (0, "restart=true\n"))
+        self.assertEqual(gh.labels(245), {"job", "waiting"})
+        self.assertIn("did not finish (result: failure)", gh.comment_bodies(245)[0])
+        self.assertEqual(oc.recorded_run(gh, CFG, 245), self.X, "the run stays recorded")
+        return gh
+
+    def test_a_failed_run_is_not_a_false_live_owner(self):
+        gh = self.failed_once()
+        # Its release is still running, but its build job ended, so it writes nothing.
+        self.assertEqual([h.number for h in oc.in_progress_issues(gh, CFG)], [])
+        self.assertTrue(oc.run_check(gh, run_cfg(250250), 250, sleep=NOOP), "#250 no longer waits on it")
+
+    def test_its_release_never_restarts_itself_at_once(self):
+        gh = self.failed_once()
+        code, out = Main.run_main(self, gh, ["next"], OVERLAP_ISSUE="245", BUILDER_WORKFLOW_REF=ActiveWriter.WORKFLOW)
+        self.assertEqual((code, out), (0, "dispatched=\n"))
+
+    def test_re_running_the_failed_run_builds_with_one_writer(self):
+        gh = self.failed_once()
+        # "Re-run failed jobs" repeats build and release, not the gate.
+        gh.runs[int(self.X)], gh.builds[int(self.X)] = "in_progress", "in_progress"
+        owns, why, _ = oc.run_owner(gh, run_cfg(self.X), 245)
+        self.assertTrue(owns, why)
+        # While it writes it holds its files, though it is labeled waiting.
+        self.assertFalse(oc.run_check(gh, run_cfg(250250), 250, sleep=NOOP))
+        self.assertIn("Waiting on #245, same file", gh.comment_bodies(250)[0])
+        # No restart sends it again, and a dispatch that does arrive follows it.
+        self.assertEqual(oc.run_next(gh, CFG, [].append), [])
+        self.assertIn("waiting", gh.labels(245))
+        self.assertFalse(oc.run_check(gh, run_cfg(245245), 245, sleep=NOOP))
+        self.assertIn(f"because run {self.X} is already building it", receipts(gh, 245)[0])
+        # The re-run opens its pull request and ends.
+        gh.prs = [pr(260, [self.SCOPE], closes=245)[1]]
+        gh.builds[int(self.X)] = "completed"
+        self.assertEqual(oc.run_release(gh, run_cfg(self.X), 245, "success"), "kept")
+
+    def test_a_newer_admission_replaces_the_failed_run(self):
+        gh = self.failed_once()
+        gh.runs[int(self.X)] = "completed"
+        sent = []
+        self.assertEqual(oc.run_next(gh, CFG, sent.append), [245], "any later restart sends it")
+        self.assertTrue(oc.run_check(gh, run_cfg(7777), 245, sleep=NOOP))
+        gh.runs[7777] = "in_progress"
+        self.assertEqual(oc.recorded_run(gh, CFG, 245), "7777")
+        # Someone re-runs the old failed run after that. It must not write beside 7777.
+        gh.runs[int(self.X)], gh.builds[int(self.X)] = "in_progress", "in_progress"
+        code, _ = Main.run_main(self, gh, ["owner"], OVERLAP_ISSUE="245", GITHUB_RUN_ID=self.X)
+        self.assertEqual(code, 1)
+        before = gh.labels(245)
+        code, out = Main.run_main(self, gh, ["release"], OVERLAP_ISSUE="245", GITHUB_RUN_ID=self.X, BUILD_RESULT="failure")
+        self.assertEqual((code, out), (0, "restart=false\n"))
+        self.assertEqual(gh.labels(245), before, "the old run's release leaves 7777's labels alone")
+        self.assertEqual(oc.recorded_run(gh, CFG, 245), "7777")
+
+    def test_ownership_that_cannot_be_read_never_writes(self):
+        gh = self.failed_once()
+        gh.get = mock.Mock(side_effect=TimeoutError("timed out"))
+        code, _ = Main.run_main(self, gh, ["owner"], OVERLAP_ISSUE="245", GITHUB_RUN_ID=self.X)
+        self.assertEqual(code, 1)
+
+    def test_a_parked_job_is_not_built_by_a_re_run(self):
+        gh = self.failed_once()
+        gh.post(f"/repos/{REPO}/issues/245/labels", {"labels": ["parked"]})
+        owns, why, _ = oc.run_owner(gh, run_cfg(self.X), 245)
+        self.assertFalse(owns)
+        self.assertIn("closed, parked or done", why)
+
+
+class BuildStepCommands(unittest.TestCase):
+    """Run the build job's new shell steps for real, with a stand-in for the check."""
+
+    WORKFLOW = os.path.join(ROOT, ".github", "workflows", "factory-builder-reusable.yml")
+
+    def step(self, name):
+        with open(self.WORKFLOW, encoding="utf-8") as fh:
+            text = fh.read()
+        step = text.split("      - name: " + name + "\n", 1)[1].split("\n      - name:", 1)[0]
+        lines = []
+        for line in step.split("        run: |\n", 1)[1].splitlines():
+            if line and not line.startswith("          "):
+                break
+            lines.append(line[10:])
+        return "\n".join(lines)
+
+    def test_the_owner_step_leaves_the_caller_checkout_clean(self):
+        with tempfile.TemporaryDirectory() as d:
+            workspace, runner_temp = os.path.join(d, "ws"), os.path.join(d, "tmp")
+            os.mkdir(runner_temp)
+            subprocess.run(["git", "init", "-q", workspace], check=True)
+            stub = os.path.join(workspace, ".factory-builder-tools", "tools", "overlap-check", "overlap_check.py")
+            os.makedirs(os.path.dirname(stub))
+            with open(stub, "w", encoding="utf-8") as fh:
+                fh.write("import os, sys\nopen(os.environ['RECEIPT'], 'w').write(sys.argv[1] + ' ' + os.environ['OVERLAP_NOTE_FILE'])\n")
+            env = dict(os.environ, GITHUB_WORKSPACE=workspace, RUNNER_TEMP=runner_temp, RECEIPT=os.path.join(d, "receipt"))
+            subprocess.run(["bash", "-e", "-o", "pipefail", "-c", self.step("Confirm this run still owns the job")],
+                           cwd=workspace, env=env, check=True)
+            with open(os.path.join(d, "receipt"), encoding="utf-8") as fh:
+                self.assertEqual(fh.read(), f"owner {runner_temp}/factory-continuation.txt")
+            status = subprocess.run(["git", "status", "--porcelain=v1", "--untracked-files=all"], cwd=workspace,
+                                    check=True, capture_output=True).stdout
+            self.assertEqual(status, b"", "the access preflight's clean-checkout assertion still holds")
+
+    def test_the_owner_step_fails_the_build_when_the_check_refuses(self):
+        with tempfile.TemporaryDirectory() as d:
+            workspace, runner_temp = os.path.join(d, "ws"), os.path.join(d, "tmp")
+            os.mkdir(runner_temp)
+            stub = os.path.join(workspace, ".factory-builder-tools", "tools", "overlap-check", "overlap_check.py")
+            os.makedirs(os.path.dirname(stub))
+            with open(stub, "w", encoding="utf-8") as fh:
+                fh.write("import sys\nsys.exit(1)\n")
+            result = subprocess.run(["bash", "-e", "-o", "pipefail", "-c", self.step("Confirm this run still owns the job")],
+                                    cwd=workspace, env=dict(os.environ, GITHUB_WORKSPACE=workspace, RUNNER_TEMP=runner_temp))
+            self.assertNotEqual(result.returncode, 0)
+
+    def test_the_continuation_note_is_appended_to_the_prompt(self):
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, "factory-automation-prompt.txt"), "w", encoding="utf-8") as fh:
+                fh.write("base prompt")
+            with open(os.path.join(d, "factory-continuation.txt"), "w", encoding="utf-8") as fh:
+                fh.write("Continue #240.\n")
+            subprocess.run(["bash", "-e", "-o", "pipefail", "-c", self.step("Continue the job's existing pull request")],
+                           env=dict(os.environ, RUNNER_TEMP=d), check=True)
+            with open(os.path.join(d, "factory-automation-prompt.txt"), encoding="utf-8") as fh:
+                self.assertEqual(fh.read(), "base prompt\n\nContinue #240.\n")
 
 
 if __name__ == "__main__":
