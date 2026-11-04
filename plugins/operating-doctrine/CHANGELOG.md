@@ -1,3 +1,6 @@
+## 2.84.5 - 2026-11-04
+
+Use the supported needs-allison job outcome for genuine founder decisions while preserving unfinished work and AI-owned recovery. Treat the retired Aura governance scan as historical evidence and verify the current topology-check owner before claiming coverage.
 ## 2.84.4 - 2026-11-04
 
 Business Brain Foundations now states the Ideal Client file's exact literal labels. The title is the one line Research Report: [Problem / Market], never split into a title and a separate topic line, and each pain point's severity field is labeled exactly Severity Score (1-10), so runs keep the colon and the 1-10 scale in the saved file.

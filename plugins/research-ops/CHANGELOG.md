@@ -1,3 +1,6 @@
+## 0.6.2 - 2026-11-04
+
+Use the supported needs-allison job outcome for genuine founder decisions while preserving unfinished work and AI-owned recovery. Treat the retired Aura governance scan as historical evidence and verify the current topology-check owner before claiming coverage.
 ## 0.6.1 - 2026-11-04
 
 The Source Hunter and Video Discovery scripts now carry full type annotations and pass `mypy --strict`, which `.github/workflows/tooling-typecheck.yml` runs on every change to them. Runtime behavior is unchanged.
