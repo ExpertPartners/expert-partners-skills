@@ -468,12 +468,29 @@ class WorkflowContract(unittest.TestCase):
         self.assertEqual(env["SKILLS_GRAPH_CI_CHECKOUT"], "${{ github.workspace }}/eps")
 
     def test_permissions_concurrency_and_durable_retry(self):
-        self.assertEqual(self.doc["permissions"], {"contents": "write"})
+        self.assertEqual(self.doc["permissions"], {"contents": "read"})
         self.assertEqual(self.doc["concurrency"], {"group": "skills-graph-${{ github.ref }}", "cancel-in-progress": True})
         triggers = self.doc[True] if True in self.doc else self.doc["on"]
         self.assertTrue(triggers["schedule"])
         self.assertIn("**", triggers["push"]["branches"])
         self.assertIn("tools/skills-graph-ci/**", triggers["push"]["paths"])
+
+    def test_every_job_inherits_a_read_only_github_token(self):
+        # A job-level permissions key replaces the workflow-level one, so check what each
+        # job effectively gets, not just the top of the file.
+        for job_id, job in self.doc["jobs"].items():
+            effective = job.get("permissions", self.doc["permissions"])
+            self.assertEqual(effective, {"contents": "read"}, job_id)
+        self.assertNotIn("write", json.dumps(self.doc.get("permissions")))
+        self.assertNotRegex(self.raw, r"\$\{\{\s*(github\.token|secrets\.GITHUB_TOKEN)")
+
+    def test_main_writer_authenticates_with_the_app_token_only(self):
+        mint = self.step("Mint skills-graph app token")
+        self.assertEqual(mint["uses"].split("@")[0], "actions/create-github-app-token")
+        self.assertEqual(mint["with"]["private-key"], "${{ secrets.SKILLS_GRAPH_APP_PRIVATE_KEY }}")
+        publish = self.step("Commit regenerated graph and AI Workforce feed (main only)")
+        self.assertNotIn("GITHUB_TOKEN", json.dumps(publish))
+        self.assertIn("x-access-token:%s", (TOOL / "publish.sh").read_text())
 
     def test_committed_feed_is_still_verified_after_publishing(self):
         names = [s.get("name") for s in self.steps]

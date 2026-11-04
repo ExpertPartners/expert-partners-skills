@@ -46,8 +46,13 @@ on:
     - cron: "41 * * * *"
   workflow_dispatch:
 
+# The automatic GITHUB_TOKEN stays read-only on every ref: any action can read it through
+# github.token even when it is not passed (docs.github.com, Use GITHUB_TOKEN for
+# authentication in workflows, verified 2026-11-04), and persist-credentials: false does
+# not lower its scope. Main publishes with the skills-graph app token, whose access comes
+# from the app installation, not from this key.
 permissions:
-  contents: write
+  contents: read
 
 # A superseded run is pure waste -- the newer push's run rebuilds the full
 # graph anyway -- so cancel it instead of letting it lose the push race and
