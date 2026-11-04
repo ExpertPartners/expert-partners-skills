@@ -3,7 +3,7 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "^mcp__.*__(browser_navigate|navigate|tabs_create_mcp|browser_run_code_unsafe|browser_run_code|browser_evaluate)$",
+        "matcher": "^mcp__.*__(browser_navigate|navigate|tabs_create_mcp|browser_tabs|browser_run_code_unsafe|browser_run_code|browser_evaluate)$",
         "hooks": [
           {
             "type": "command",

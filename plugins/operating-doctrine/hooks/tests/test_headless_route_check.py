@@ -78,10 +78,12 @@ class HookCase(unittest.TestCase):
         self.state.mkdir(parents=True, exist_ok=True)
         (self.state / hrc.STAMP_FILE).touch()
 
-    def run_hook(self, url, tool="mcp__playwright-ember__browser_navigate", tool_input=None):
+    def run_hook(self, url, tool="mcp__playwright-ember__browser_navigate", tool_input=None, cwd=None):
         if tool_input is None:
             tool_input = {"url": url}
         payload = {"hook_event_name": "PreToolUse", "tool_name": tool, "tool_input": tool_input}
+        if cwd is not None:
+            payload["cwd"] = cwd
         result = subprocess.run(
             [sys.executable, str(HOOK)], input=json.dumps(payload), capture_output=True,
             text=True, env=self.env, timeout=20,
@@ -232,6 +234,115 @@ class Decisions(HookCase):
             with self.subTest(tool=tool, tool_input=tool_input):
                 self.assertIn("GoHighLevel contacts", self.assertDenied(self.run_hook(None, tool, tool_input)))
 
+    def test_urls_are_read_the_way_browsers_read_them(self):
+        # Each of these opens app.gohighlevel.com in a browser (WHATWG URL Standard), and
+        # urlsplit reads none of them that way.
+        urls = (
+            "https:///app.gohighlevel.com/x",
+            "https:app.gohighlevel.com/x",
+            "https:\\\\app.gohighlevel.com/x",
+            "https://app.gohighlevel.com\\@evil.example/",
+            "https://user@evil.example@app.gohighlevel.com/",
+            "https://app%2Egohighlevel%2Ecom/",
+            "HTTPS://APP.GoHighLevel.COM.:443/",
+            "https://\uff41\uff50\uff50\uff0egohighlevel\u3002com/",
+            " \thttps://app.gohigh\nlevel.com/\n",
+            "view-source:https://app.gohighlevel.com/",
+            "/app.gohighlevel.com/x",
+        )
+        for url in urls:
+            with self.subTest(url=url):
+                self.assertEqual(hrc.target_host(url), "app.gohighlevel.com")
+                self.assertIn("GoHighLevel contacts", self.assertDenied(self.run_hook(url)))
+        # The reverse: urlsplit says app.gohighlevel.com, a browser opens evil.example.
+        self.assertEqual(hrc.target_host("https://evil.example\\@app.gohighlevel.com/"), "evil.example")
+        self.assertAllowed(self.run_hook("https://evil.example\\@app.gohighlevel.com/"))
+
+    def test_escaped_strings_in_browser_code_are_read_as_javascript_reads_them(self):
+        bodies = (
+            "await page.goto('https:\\/\\/app.gohighlevel.com/x');",
+            "await page.goto('https://app.goh\\x69ghlevel.com/');",
+            "await page.goto(\"https://app.gohighlevel.com/it\\\"s\");",
+            "location.href = 'https://app.gohighlevel.com\\u002fx';",
+            "window.open(`https://app.gohighlevel.com\\u{2f}x`);",
+        )
+        for body in bodies:
+            with self.subTest(code=body):
+                reason = self.assertDenied(self.run_hook(
+                    None, "mcp__playwright-ember__browser_run_code_unsafe", {"code": f"async (page) => {{ {body} }}"}))
+                self.assertIn("GoHighLevel contacts", reason)
+
+    def test_relative_code_navigation_is_refused(self):
+        bodies = (
+            "location.href = '/contacts';",
+            "location = 'contacts';",
+            "location.assign('?page=2');",
+            "window.open('#top');",
+            "location.href = 'https:contacts';",
+            "await page.goto(`${base}/contacts`);",
+            "await page.goto(`https://${host}/contacts`);",
+        )
+        for body in bodies:
+            with self.subTest(code=body):
+                reason = self.assertDenied(self.run_hook(
+                    None, "mcp__playwright-ember__browser_evaluate", {"function": f"() => {{ {body} }}"}))
+                self.assertIn("full https:// URL", reason)
+        self.assertIn("unresolved-denied", self.read(hrc.HOOK_LOG_FILE))
+        self.assertEqual(self.read(hrc.UNKNOWN_HOSTS_FILE), "")
+
+    def test_a_live_host_is_named_before_a_relative_target(self):
+        code = "() => { location.href = '/x'; window.open('https://app.gohighlevel.com/'); }"
+        reason = self.assertDenied(self.run_hook(None, "mcp__playwright-ember__browser_evaluate", {"function": code}))
+        self.assertIn("GHL Private Integration Token", reason)
+
+    def test_code_in_a_file_is_checked(self):
+        folder = Path(self.tmp.name) / "workspace"
+        folder.mkdir()
+        (folder / "job.js").write_text("async (page) => { await page.goto('https://app.gohighlevel.com/'); }",
+                                       encoding="utf-8")
+        tool = "mcp__playwright-ember__browser_run_code_unsafe"
+        cases = (
+            ("absolute", {"filename": str(folder / "job.js"), "code": "async (page) => {}"}, None),
+            ("relative to cwd", {"filename": "job.js"}, str(folder)),
+        )
+        for name, tool_input, cwd in cases:
+            with self.subTest(case=name):
+                self.assertIn("GoHighLevel contacts", self.assertDenied(self.run_hook(None, tool, tool_input, cwd=cwd)))
+        reason = self.assertDenied(self.run_hook(None, tool, {"filename": str(folder / "missing.js")}))
+        self.assertIn("file the hook cannot open", reason)
+        # browser_evaluate saves its result to filename, so that file is not read as code.
+        self.assertIsNone(self.run_hook(None, "mcp__playwright-ember__browser_evaluate",
+                                        {"function": "() => document.title", "filename": str(folder / "missing.js")}))
+
+    def test_browser_tabs_new_with_a_url_is_checked(self):
+        tool = "mcp__playwright-ember__browser_tabs"
+        self.assertIn("GoHighLevel contacts",
+                      self.assertDenied(self.run_hook(None, tool, {"action": "new", "url": "https://app.gohighlevel.com/"})))
+        self.assertIsNone(self.run_hook(None, tool, {"action": "new"}))
+        self.assertIsNone(self.run_hook(None, tool, {"action": "list"}))
+
+    def test_history_steps_open_no_new_site(self):
+        for step in ("back", "forward"):
+            with self.subTest(step=step):
+                self.assertIsNone(self.run_hook(step, "mcp__claude-in-chrome__navigate"))
+        self.assertEqual(self.read(hrc.UNKNOWN_HOSTS_FILE), "")
+
+    def test_rows_with_one_status_on_one_host_name_every_route(self):
+        twin_a = "Twin A,twin.example,Twin A API,Twin A key,Live,\n"
+        twin_b = "Twin B,twin.example,Twin B API,Twin B key,Live,\n"
+        reasons = []
+        for name, csv_text in (("sheet order", MAP_CSV + twin_a + twin_b),
+                               ("reversed", REVERSED_MAP_CSV + twin_b + twin_a)):
+            with self.subTest(order=name):
+                self.write_cache(csv_text)
+                reason = self.assertDenied(self.run_hook("https://twin.example/"))
+                for part in ("Twin A: Twin A API with the 1Password item Twin A key",
+                             "Twin B: Twin B API with the 1Password item Twin B key"):
+                    self.assertIn(part, reason)
+                reasons.append(reason)
+        self.assertEqual(reasons[0], reasons[1])
+        self.assertIn("map-conflict\ttwin.example decided by Twin A, Twin B live", self.read(hrc.HOOK_LOG_FILE))
+
     def test_browser_code_without_a_mapped_navigation_is_allowed(self):
         code = "async (page) => { await page.goto('https://portal.vendor.example/'); return page.title(); }"
         self.assertAllowed(self.run_hook(None, "mcp__playwright-ember__browser_run_code_unsafe", {"code": code}))
@@ -264,6 +375,13 @@ class MissingCache(HookCase):
         note = self.assertAllowed(self.run_hook("https://app.gohighlevel.com/"))
         self.assertIn("Headless route checked, app.gohighlevel.com, not checked, no cached access map", note)
         self.assertIn("no-cache-allowed\tapp.gohighlevel.com", self.read(hrc.HOOK_LOG_FILE))
+
+    def test_relative_code_navigation_without_a_cache_is_allowed_and_logged(self):
+        self.fresh_stamp()
+        note = self.assertAllowed(self.run_hook(None, "mcp__playwright-ember__browser_evaluate",
+                                                {"function": "() => { location.href = '/contacts'; }"}))
+        self.assertIn("not checked, no cached access map", note)
+        self.assertIn("no-cache-allowed\tunresolved target", self.read(hrc.HOOK_LOG_FILE))
 
     def test_corrupt_cache_is_allowed_and_logged(self):
         self.fresh_stamp()
@@ -435,7 +553,8 @@ class HooksJson(unittest.TestCase):
         matcher = re.compile(group["matcher"])
         for tool in ("mcp__playwright-ember__browser_navigate", "mcp__playwright-allison__browser_navigate",
                      "mcp__claude-in-chrome__navigate", "mcp__claude-in-chrome__tabs_create_mcp",
-                     "mcp__playwright-ember__browser_run_code_unsafe", "mcp__playwright-ember__browser_evaluate"):
+                     "mcp__playwright-ember__browser_run_code_unsafe", "mcp__playwright-ember__browser_evaluate",
+                     "mcp__playwright-ember__browser_tabs"):
             self.assertTrue(matcher.search(tool), tool)
         for tool in ("mcp__playwright-ember__browser_snapshot", "Bash", "WebFetch"):
             self.assertFalse(matcher.search(tool), tool)

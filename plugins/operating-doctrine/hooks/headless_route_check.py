@@ -38,6 +38,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -107,11 +108,29 @@ UNBROKEN_RUN_RE = re.compile(r"[A-Za-z0-9+=]{24,}")
 MIXED_WORD_RE = re.compile(r"[A-Za-z0-9_.+=-]{20,}")
 
 # Navigation written into browser code: page.goto("..."), location.href = "...", and so on.
+# A string literal is captured with its escapes, and js_string_value reads it as JavaScript does.
 CODE_KEYS = ("code", "function", "script", "expression")
+# These run the code in filename instead of code when it is given. browser_evaluate's filename
+# is where its result is saved, so it is not code.
+RUN_CODE_TOOLS = ("browser_run_code_unsafe", "browser_run_code")
+MAX_CODE_FILE_BYTES = 1 << 20
+JS_STRING = r"""(?:'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"|`((?:[^`\\]|\\.)*)`)"""
 CODE_CALL_RE = re.compile(
-    r"""(?:\.goto|\blocation\.assign|\blocation\.replace|\bwindow\.open)\s*\(\s*(['"`])(.+?)\1"""
+    r"(?:\.goto|\blocation\.assign|\blocation\.replace|\bwindow\.open)\s*\(\s*" + JS_STRING, re.S
 )
-CODE_ASSIGN_RE = re.compile(r"""\blocation(?:\.href)?\s*=\s*(['"`])(.+?)\1""")
+CODE_ASSIGN_RE = re.compile(r"\blocation(?:\.href)?\s*=\s*" + JS_STRING, re.S)
+JS_ESCAPE_RE = re.compile(r"\\(?:x([0-9A-Fa-f]{2})|u\{([0-9A-Fa-f]+)\}|u([0-9A-Fa-f]{4})|(\r\n|.))", re.S)
+JS_SINGLE_ESCAPES = {"n": "\n", "r": "\r", "t": "\t", "b": "\b", "f": "\f", "v": "\v", "0": "\0"}
+JS_LINE_CONTINUATIONS = ("\r\n", "\n", "\r", "\u2028", "\u2029")
+
+# URLs are read the way the WHATWG URL Standard reads them, which is what browsers do.
+C0_CONTROL_OR_SPACE = "".join(chr(code) for code in range(0x21))
+SCHEME_RE = re.compile(r"^([A-Za-z][A-Za-z0-9+.-]*):")
+# example.com:8080 parses as the scheme example.com, but the navigation tools read it as a host.
+HOST_PORT_RE = re.compile(r"^[^:/?#\\]+:\d+(?:[/?#\\]|$)")
+WEB_SCHEMES = ("http", "https")
+# claude-in-chrome navigate takes back and forward as history steps, not hosts.
+HISTORY_STEPS = ("back", "forward")
 
 
 def now_iso() -> str:
@@ -207,10 +226,33 @@ def split_hosts(cell: str) -> list[str]:
                 wildcard, raw = True, raw[2:]
             else:
                 raw = raw[1:]
-        raw = raw.rstrip(".")
+        raw = canonical_domain(raw)
         if raw:
             hosts.append("*." + raw if wildcard else raw)
     return hosts
+
+
+def canonical_domain(name: str) -> str:
+    """A host name as the URL Standard's host parser leaves it, or "" when it cannot be one.
+
+    Percent-decoded, case folded, full-width forms and ideographic full stops read as ASCII,
+    non-ASCII labels in Punycode, and no trailing dot. Map hosts and target hosts both pass
+    through here, so they compare in one form.
+    """
+    try:
+        name = urllib.parse.unquote_to_bytes(name).decode("utf-8")
+    except UnicodeDecodeError:
+        return ""
+    name = unicodedata.normalize("NFKC", name).replace("\u3002", ".").lower()
+    labels = []
+    for label in name.split("."):
+        if label and not label.isascii():
+            try:
+                label = label.encode("idna").decode("ascii")
+            except UnicodeError:
+                pass
+        labels.append(label)
+    return ".".join(labels).rstrip(".")
 
 
 def parse_map(csv_text: str) -> list[dict]:
@@ -402,39 +444,116 @@ def start_background_refresh() -> None:
         log_event("refresh-not-started", type(error).__name__)
 
 
-def target_urls(tool_input: object) -> list[str]:
-    """The URL a navigation tool opens, plus any URL that browser code navigates to."""
+def read_code_file(filename: str, cwd: str) -> str | None:
+    path = Path(filename).expanduser()
+    if not path.is_absolute():
+        if not cwd:
+            return None
+        path = Path(cwd) / path
+    try:
+        with open(path, "rb") as handle:
+            data = handle.read(MAX_CODE_FILE_BYTES + 1)
+    except OSError:
+        return None
+    if len(data) > MAX_CODE_FILE_BYTES:
+        return None
+    return data.decode("utf-8", errors="replace")
+
+
+def js_string_value(body: str) -> str:
+    """The value of a JavaScript string literal body, so '\\x2f' and '\\/' read as /."""
+
+    def unescape(match: re.Match) -> str:
+        code = match.group(1) or match.group(2) or match.group(3)
+        if code:
+            try:
+                return chr(int(code, 16))
+            except (ValueError, OverflowError):
+                return ""
+        char = match.group(4)
+        if char in JS_LINE_CONTINUATIONS:
+            return ""
+        return JS_SINGLE_ESCAPES.get(char, char)
+
+    return JS_ESCAPE_RE.sub(unescape, body)
+
+
+def target_urls(tool_input: object, tool_name: str = "", cwd: str = "") -> list[tuple[str | None, bool]]:
+    """Each URL the call navigates to, paired with True when browser code holds it.
+
+    A URL of None stands for code in a file the hook could not read.
+    """
     if not isinstance(tool_input, dict):
         return []
-    urls = []
+    targets: list[tuple[str | None, bool]] = []
     for key in ("url", "uri", "href"):
         value = tool_input.get(key)
         if isinstance(value, str) and value.strip():
-            urls.append(value.strip())
+            targets.append((value, False))
             break
-    for key in CODE_KEYS:
-        code = tool_input.get(key)
-        if isinstance(code, str):
-            for pattern in (CODE_CALL_RE, CODE_ASSIGN_RE):
-                urls.extend(match.group(2).strip() for match in pattern.finditer(code))
-    return urls
+    filename = tool_input.get("filename")
+    if tool_name.rsplit("__", 1)[-1] in RUN_CODE_TOOLS and isinstance(filename, str) and filename.strip():
+        code = read_code_file(filename.strip(), cwd)
+        if code is None:
+            return targets + [(None, True)]
+        codes: list[object] = [code]
+    else:
+        codes = [tool_input.get(key) for key in CODE_KEYS]
+    for code in codes:
+        if not isinstance(code, str):
+            continue
+        for pattern in (CODE_CALL_RE, CODE_ASSIGN_RE):
+            for match in pattern.finditer(code):
+                body = next(group for group in match.groups() if group is not None)
+                value = js_string_value(body)
+                if value.strip(C0_CONTROL_OR_SPACE):
+                    targets.append((value, True))
+    return targets
 
 
-def target_host(url: str) -> str:
-    """The host a navigation goes to, or "" when it is not a web site (about:, file:, local)."""
-    # Protocol-relative, as browsers read it: //host/x, and \\host/x since they treat \ as /.
-    if re.match(r"^[/\\]{2}", url):
-        url = "https://" + url.lstrip("/\\")
-    elif not re.match(r"^[a-zA-Z][a-zA-Z0-9+.-]*:", url) or re.match(r"^[^:/]+:\d", url):
-        url = "https://" + url
-    try:
-        parts = urllib.parse.urlsplit(url)
-        host = (parts.hostname or "").rstrip(".").lower()
-    except ValueError:
+def target_host(url: str, in_code: bool = False) -> str | None:
+    """The host a navigation opens, "" when it opens no web site, or None when it cannot be told.
+
+    The URL is read as the WHATWG URL Standard reads it, because urlsplit does not: it keeps
+    a \\ or %2E in the host, needs // before the host and lets the first @ end the user info.
+    A navigation tool's URL has no base, and one with no scheme gets https://, as the tools do.
+    A URL in browser code resolves against the current page, which the hook cannot see, so a
+    relative one, or one whose host is built at run time, gives None.
+    """
+    url = re.sub(r"[\t\n\r]", "", url.strip(C0_CONTROL_OR_SPACE))
+    if not url:
         return ""
-    if parts.scheme not in ("http", "https") or not host:
+    if not in_code and url.lower() in HISTORY_STEPS:
         return ""
-    if host == "localhost" or host.endswith(".localhost"):
+    match = SCHEME_RE.match(url)
+    if match and not HOST_PORT_RE.match(url):
+        scheme = match.group(1).lower()
+        rest = url[match.end():]
+        if scheme == "view-source":
+            return target_host(rest, in_code)
+        if scheme not in WEB_SCHEMES:
+            return ""
+        rest = rest.replace("\\", "/")
+        # https:path against a page with the same scheme is a path on that page.
+        if in_code and not rest.startswith("/"):
+            return None
+    elif not in_code or HOST_PORT_RE.match(url) or re.match(r"^[/\\]{2}", url):
+        rest = url.replace("\\", "/")
+    else:
+        return None
+    # Any run of slashes before the host is skipped, and the host ends at / ? or #.
+    authority = re.split(r"[/?#]", rest.lstrip("/"), maxsplit=1)[0]
+    if "${" in authority:
+        return None
+    host = authority.rpartition("@")[2]
+    if host.startswith("["):
+        host = host[1:].split("]", 1)[0]
+        try:
+            return "" if ipaddress.ip_address(host).is_loopback else host.lower()
+        except ValueError:
+            return ""
+    host = canonical_domain(host.split(":", 1)[0])
+    if not host or host == "localhost" or host.endswith(".localhost"):
         return ""
     try:
         if ipaddress.ip_address(host).is_loopback:
@@ -461,11 +580,16 @@ def match_rank(host: str, pattern: str) -> tuple[int, int] | None:
     return None
 
 
-def find_system(host: str, systems: list[dict]) -> tuple[dict | None, bool]:
-    """The map entry that decides the host, and whether equally specific entries disagreed.
+def status_rank(entry: dict) -> int:
+    return STATUS_TIE_ORDER.get(entry.get("status"), 1)
 
-    Equally specific entries that disagree are settled by status, never by row order. No API
-    wins, because one feature with no API on a shared host needs the browser.
+
+def find_systems(host: str, systems: list[dict]) -> tuple[list[dict], bool]:
+    """The map entries that decide the host, and whether equally specific entries differed.
+
+    Equally specific entries are settled by status, never by row order. No API wins, because
+    one feature with no API on a shared host needs the browser. Every entry with the winning
+    status comes back, sorted, so a refusal names each route rather than the first row's.
     """
     best: list[dict] = []
     best_rank = None
@@ -479,9 +603,15 @@ def find_system(host: str, systems: list[dict]) -> tuple[dict | None, bool]:
         elif rank == best_rank:
             best.append(entry)
     if not best:
-        return None, False
-    chosen = min(best, key=lambda entry: STATUS_TIE_ORDER.get(entry.get("status"), 1))
-    conflict = len({entry.get("status") for entry in best}) > 1
+        return [], False
+    top = min(status_rank(entry) for entry in best)
+    unique: dict[tuple[str, ...], dict] = {}
+    for entry in best:
+        if status_rank(entry) == top:
+            key = tuple(str(entry.get(field, "")) for field in ("system", "route", "item", "reason", "status"))
+            unique.setdefault(key, entry)
+    chosen = [unique[key] for key in sorted(unique)]
+    conflict = len({entry.get("status") for entry in best}) > 1 or len(chosen) > 1
     return chosen, conflict
 
 
@@ -500,12 +630,35 @@ def log_unknown_host(host: str, tool_name: str) -> None:
         pass
 
 
-def deny_reason(entry: dict, host: str) -> str:
+def route_parts(entry: dict) -> tuple[str, str, str]:
     system = safe(entry.get("system", ""))
     route = safe(entry.get("route", "")) or "the headless route on the access map"
     item = safe(entry.get("item", ""))
     item_part = f"with the 1Password item {item}" if item else "(the access map lists no 1Password item)"
-    if entry.get("status") == LIVE:
+    return system, route, item_part
+
+
+def deny_reason(entries: list[dict], host: str) -> str:
+    live = entries[0].get("status") == LIVE
+    if len(entries) > 1:
+        choices = "; ".join("{}: {} {}".format(*route_parts(entry)) for entry in entries)
+        if live:
+            return (
+                f"Headless route check: {host} belongs to more than one system with headless "
+                f"access on the access map, so the browser is refused. Use the route for the "
+                f"system this work is in instead. {choices}. Decision Log 2026-11-03, Headless "
+                f"access comes first. Report it as: Headless route checked, <system>, live, used "
+                f"<route>."
+            )
+        return (
+            f"Headless route check: {host} belongs to more than one system whose headless access "
+            f"is being set up, so the browser is refused. The setup job comes first. Finish or "
+            f"file the setup job for the system this work is in, then do this work headlessly. "
+            f"{choices}. Decision Log 2026-11-03, Headless access comes first. Report it as: "
+            f"Headless route checked, <system>, setting up, setup job filed first."
+        )
+    system, route, item_part = route_parts(entries[0])
+    if live:
         return (
             f"Headless route check: {system} has headless access, so the browser is refused for "
             f"{host}. Use {route} {item_part} instead. Decision Log 2026-11-03, Headless access "
@@ -518,6 +671,15 @@ def deny_reason(entry: dict, host: str) -> str:
         f"Headless access comes first. Report it as: Headless route checked, {system}, setting "
         f"up, setup job filed first."
     )
+
+
+UNRESOLVED_REASON = (
+    "Headless route check: this browser code navigates to a target whose host the hook cannot "
+    "read, so the browser is refused. That is a relative URL such as '/contacts', which resolves "
+    "against the current page the hook cannot see, a URL whose host is built at run time, or code "
+    "in a file the hook cannot open. Write each navigation target in the code as a full https:// "
+    "URL, give the code inline or as an absolute filename, and call again."
+)
 
 
 def allow_note(host: str, entry: dict | None, cached: bool) -> str:
@@ -554,36 +716,43 @@ def allow_note(host: str, entry: dict | None, cached: bool) -> str:
 
 def decide(payload: dict) -> tuple[str, str] | None:
     """("deny", reason) or ("allow", note) for this tool call, or None when no site is opened."""
-    hosts = []
-    for url in target_urls(payload.get("tool_input")):
-        host = target_host(url)
-        if host and host not in hosts:
-            hosts.append(host)
-    if not hosts:
-        return None
     tool_name = str(payload.get("tool_name", ""))
+    hosts: list[str] = []
+    unresolved = False
+    for url, in_code in target_urls(payload.get("tool_input"), tool_name, str(payload.get("cwd") or "")):
+        host = None if url is None else target_host(url, in_code)
+        if host is None:
+            unresolved = True
+        elif host and host not in hosts:
+            hosts.append(host)
+    if not hosts and not unresolved:
+        return None
     systems = load_cache()
     if systems is None:
-        log_event("no-cache-allowed", f"{' '.join(hosts)} {tool_name}")
-        return "allow", "\n".join(allow_note(host, None, cached=False) for host in hosts)
+        log_event("no-cache-allowed", f"{' '.join(hosts) or 'unresolved target'} {tool_name}")
+        labels = hosts + (["the browser code's target"] if unresolved else [])
+        return "allow", "\n".join(allow_note(label, None, cached=False) for label in labels)
     notes = []
     for host in hosts:
-        entry, conflict = find_system(host, systems)
-        if entry is None:
+        entries, conflict = find_systems(host, systems)
+        if not entries:
             log_unknown_host(host, tool_name)
             notes.append(allow_note(host, None, cached=True))
             continue
-        status = entry.get("status")
+        status = entries[0].get("status")
+        names = ", ".join(safe(entry.get("system", "")) for entry in entries)
         if conflict:
-            log_event("map-conflict", f"{host} decided by {safe(entry.get('system', ''))} {safe(status)}")
+            log_event("map-conflict", f"{host} decided by {names} {safe(status)}")
         if status in (LIVE, SETTING_UP):
-            log_event("denied", f"{host} {safe(entry.get('system', ''))} {status}")
-            return "deny", deny_reason(entry, host)
+            log_event("denied", f"{host} {names} {status}")
+            return "deny", deny_reason(entries, host)
         if status != NO_API:
-            log_event("unknown-status-allowed", f"{host} {safe(entry.get('system', ''))} {safe(status)}")
-        notes.append(allow_note(host, entry, cached=True))
+            log_event("unknown-status-allowed", f"{host} {names} {safe(status)}")
+        notes.extend(allow_note(host, entry, cached=True) for entry in entries)
+    if unresolved:
+        log_event("unresolved-denied", tool_name)
+        return "deny", UNRESOLVED_REASON
     return "allow", "\n".join(notes)
-
 
 def hook_output(decision: tuple[str, str] | None) -> dict | None:
     if decision is None:

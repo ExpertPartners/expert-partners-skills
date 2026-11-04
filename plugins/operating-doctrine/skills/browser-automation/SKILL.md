@@ -54,15 +54,16 @@ applies.
 
 The access map, a Google Sheet owned by Keys and Sign-Ins, lists each system, its hosts, its
 headless route, its 1Password item and its status. The plugin's headless route check hook
-(`hooks/headless_route_check.py`) checks browser navigation against it, and the URLs that
-`browser_run_code_unsafe` and `browser_evaluate` code navigates to. It refuses a host whose
-system is live and names the route and item to use. It refuses a host whose system is
-setting up, because the setup job comes first. It lets a vendor with no API through, and it
-lets an unmapped host through and logs it for Star's nightly miss check. It cannot see a URL
-that code builds at run time, and a host shared with a feature that has no API stays open,
-so the order above binds even when the hook lets a call through. A refusal is the answer,
-not a blocker. Switch to the route it names, and never get around it with another browser
-tool.
+(`hooks/headless_route_check.py`) checks browser navigation and `browser_tabs` new tabs
+against it, and the URLs that `browser_run_code_unsafe` and `browser_evaluate` code
+navigates to. It refuses a host whose system is live and names the route and item to use.
+It refuses a host whose system is setting up, because the setup job comes first. It lets a
+vendor with no API through, and it lets an unmapped host through and logs it for Star's
+nightly miss check. In browser code, write every navigation target as a full `https://`
+URL, because the hook refuses a relative one it cannot resolve. It cannot see a URL held in
+a variable, and a host shared with a feature that has no API stays open, so the order above
+binds even when the hook lets a call through. A refusal is the answer, not a blocker.
+Switch to the route it names, and never get around it with another browser tool.
 
 ## Rule 1. Signed-in Chrome only, through the shared connector
 
