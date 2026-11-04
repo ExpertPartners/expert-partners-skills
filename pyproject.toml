@@ -52,3 +52,18 @@ paths = [
 ]
 min_confidence = 60
 exclude = ["*/node_modules/*"]
+
+# Coverage floors: .github/workflows/tooling-coverage.yml measures each scope with
+# coverage.py (Python, settings below) and node --test (JavaScript, each producer's
+# "coverage" script) and fails when a scope drops under its declared floor.
+# tools/readiness/tests/test_coverage_gate.py proves the scopes and that a fixture under
+# each floor fails. Nothing is omitted: the gate's --include lists name every source.
+[tool.coverage.run]
+branch = true
+# Tests run some scripts as child processes; those runs count toward coverage too.
+patch = ["subprocess"]
+relative_files = true
+
+[tool.coverage.report]
+show_missing = true
+precision = 2
