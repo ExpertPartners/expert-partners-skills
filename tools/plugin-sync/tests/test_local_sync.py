@@ -29,11 +29,12 @@ SYNC_FILES = ["codex-sync.sh", "claude-code-sync.sh", "install.sh", "codex-skip.
 # call to STUB_CALLS. STUB_FAIL holds comma separated failure points.
 STUB = textwrap.dedent('''\
     #!/usr/bin/env python3
-    import json, os, sys, time
+    import json, os, shutil, sys, tempfile, time
     tool = os.path.basename(sys.argv[0])
     args = sys.argv[1:]
+    cwd = os.getcwd()
     with open(os.environ["STUB_CALLS"], "a") as f:
-        f.write(json.dumps({"tool": tool, "args": args, "path": os.environ.get("PATH", "")}) + "\\n")
+        f.write(json.dumps({"tool": tool, "args": args, "path": os.environ.get("PATH", ""), "cwd": cwd}) + "\\n")
     fail = set(filter(None, os.environ.get("STUB_FAIL", "").split(",")))
     state_path = os.environ["STUB_STATE"]
     state = json.load(open(state_path))
@@ -50,6 +51,15 @@ STUB = textwrap.dedent('''\
         time.sleep(float(os.environ.get("STUB_SLEEP", "0")))
         if "marketplace" in fail or args[3:4] != [MK]:
             die("network unreachable")
+        if os.environ.get("STUB_REPLACE_CHECKOUT") == "1":
+            # Native refresh may replace the entire checkout, even while the
+            # updater's parent process has it as its current directory.
+            checkout = os.environ["STUB_CHECKOUT"]
+            with tempfile.TemporaryDirectory(dir=os.path.dirname(checkout)) as stage:
+                replacement = os.path.join(stage, "checkout")
+                shutil.copytree(checkout, replacement, symlinks=True)
+                shutil.rmtree(checkout)
+                os.rename(replacement, checkout)
         state["catalog"] = json.load(open(os.environ["STUB_CATALOG"]))
         save()
     elif args[:2] == ["plugin", "list"]:
@@ -230,6 +240,7 @@ class Machine:
     def env(self, **extra):
         env = {"HOME": str(self.home), "PATH": f"{self.bin}:/usr/bin:/bin",
                "STUB_STATE": str(self.state), "STUB_CATALOG": str(self.catalog),
+               "STUB_CHECKOUT": str(self.checkout),
                "STUB_CALLS": str(self.calls), "STUB_LAUNCHCTL": str(self.root / "launchctl.txt"),
                "GIT_CONFIG_GLOBAL": str(self.root / "gitconfig"), "LANG": "C",
                "CLAUDE_BIN": str(self.bin / "claude"), "CODEX_BIN": str(self.bin / "codex"),
@@ -240,9 +251,9 @@ class Machine:
     def real_cli_runs(self):
         return self.real_calls.read_text() if self.real_calls.exists() else ""
 
-    def sync(self, surface, *args, **extra):
+    def sync(self, surface, *args, cwd=None, **extra):
         return subprocess.run(["/bin/bash", str(self.checkout / "tools" / "plugin-sync" / f"{surface}-sync.sh"), *args],
-                              env=self.env(**extra), capture_output=True, text=True, timeout=120)
+                              cwd=cwd, env=self.env(**extra), capture_output=True, text=True, timeout=120)
 
     def take_calls(self):
         if not self.calls.exists():
@@ -297,6 +308,7 @@ class Templates(unittest.TestCase):
             self.assertTrue(all(set(e) == {"Minute"} for e in d["StartCalendarInterval"]))
             self.assertEqual(d["ProgramArguments"], ["/bin/bash", f"@CHECKOUT@/tools/plugin-sync/{surface}-sync.sh"])
             self.assertEqual(d["EnvironmentVariables"]["HOME"], "@HOME@")
+            self.assertEqual(d["WorkingDirectory"], "@HOME@")
             for banned in ("allisongaddy", ".nvm", "v24", "|| true", "git pull", "Hour"):
                 self.assertNotIn(banned, raw)
 
@@ -336,7 +348,7 @@ class Install(unittest.TestCase):
                     raw = (dest / f"{label}.plist").read_bytes()
                     d = plistlib.loads(raw)
                     self.assertSamePath(d["ProgramArguments"][1], m.checkout / "tools" / "plugin-sync" / f"{surface}-sync.sh")
-                    self.assertSamePath(d["WorkingDirectory"], m.checkout)
+                    self.assertSamePath(d["WorkingDirectory"], m.home)
                     self.assertSamePath(d["EnvironmentVariables"]["HOME"], m.home)
                     for key in ("StandardOutPath", "StandardErrorPath"):
                         self.assertSamePath(os.path.dirname(d[key]), m.home / "Library" / "Logs" / "plugin-sync")
@@ -417,6 +429,14 @@ class Discovery(Base):
         self.assertEqual(self.m.receipt("claude-code-delivery.json")["status"], "failed")
         self.assertIn("claude binary not found", self.m.receipt("claude-code-delivery.json")["failures"])
 
+    def test_relative_binary_overrides_survive_a_change_of_working_directory(self):
+        for surface, tool, key in (("claude-code", "claude", "CLAUDE_BIN"), ("codex", "codex", "CODEX_BIN")):
+            with self.subTest(surface=surface):
+                relative = os.path.relpath(self.m.bin / tool, self.m.checkout)
+                r = self.m.sync(surface, cwd=self.m.checkout, **{key: relative})
+                self.assertEqual(r.returncode, 0, self.m.log(surface))
+                self.assertEqual(self.m.receipt(f"{surface}-delivery.json")["status"], "ok")
+
 
 class Delivery(Base):
     def release(self):
@@ -476,6 +496,40 @@ class Delivery(Base):
         self.assertEqual(r.returncode, 0, self.m.log("codex"))
         self.assertNotIn(["plugin", "add", f"c@{MK}"], [c["args"] for c in self.m.take_calls()])
         self.assertEqual(self.m.receipt("codex-delivery.json")["plugins"]["c"]["state"], "skipped, codex-skip.txt")
+
+
+class ReplacementCwd(Base):
+    def assert_replacement_delivery(self, surface, relative_cwd):
+        sha = self.m.publish({"a": "1.1.0", "b": "1.1.0", "c": "1.1.0"}, add_marker)
+        previous_inode = self.m.checkout.stat().st_ino
+        r = self.m.sync(surface, cwd=self.m.checkout / relative_cwd, STUB_REPLACE_CHECKOUT="1")
+        self.assertNotEqual(self.m.checkout.stat().st_ino, previous_inode, "refresh must really replace the checkout")
+        self.assertEqual(r.returncode, 0, self.m.log(surface) + r.stderr)
+        self.assertEqual(self.m.head(), sha)
+        self.assertTrue((self.m.home / "new-code-ran").exists(), "self-reexecution still runs the new source")
+        self.assertEqual(self.m.installed(), {"a": {"version": "1.1.0", "enabled": True},
+                                              "b": {"version": "1.0.0", "enabled": False},
+                                              "c": {"version": "1.1.0", "enabled": True}})
+        rec = self.m.receipt(f"{surface}-delivery.json")
+        self.assertEqual((rec["status"], rec["commit"]), ("ok", sha))
+        self.assertEqual(rec["plugins"]["a"]["state"], "current")
+        self.assertEqual(rec["plugins"]["b"]["state"], "disabled, left alone")
+        calls = [c for c in self.m.take_calls() if "cwd" in c]
+        self.assertTrue(calls)
+        self.assertTrue(all(os.path.realpath(c["cwd"]) == os.path.realpath(self.m.home) for c in calls),
+                        "every native invocation stays outside the replaceable checkout")
+
+    def test_claude_code_refresh_replaces_its_starting_checkout(self):
+        self.assert_replacement_delivery("claude-code", Path("."))
+
+    def test_claude_code_refresh_replaces_its_starting_subdirectory(self):
+        self.assert_replacement_delivery("claude-code", Path("tools/plugin-sync"))
+
+    def test_codex_refresh_replaces_its_starting_checkout(self):
+        self.assert_replacement_delivery("codex", Path("."))
+
+    def test_codex_refresh_replaces_its_starting_subdirectory(self):
+        self.assert_replacement_delivery("codex", Path("tools/plugin-sync"))
 
 
 class Failures(Base):

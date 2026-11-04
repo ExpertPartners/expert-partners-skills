@@ -45,7 +45,7 @@ There are tasks that no system can perform on Allison's behalf. These are the on
 - Authenticating into a service for the first time when no credentials exist for the system to use
 - Approving an OAuth flow that requires human confirmation
 - Making a strategic or business judgment that only Allison can make
-- Confirming visual state in an interface that has no API exposure
+- Confirming visual state only when verified constraints prevent supported, authorized inspection, including the assigned M2 browser route; missing API exposure alone is insufficient
 - Operating a UI feature that has no programmatic equivalent and where verification confirms no automated path exists
 - Physical actions (moving hardware, changing physical connections)
 - Decisions that require Allison's voice, taste, or values

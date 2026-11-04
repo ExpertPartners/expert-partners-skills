@@ -5,6 +5,7 @@ Run from the repo root: python3 -m unittest discover -s tools/overlap-check/test
 """
 
 import importlib.util
+import io
 import json
 import os
 import random
@@ -45,6 +46,7 @@ def pr(number, files, closes=None, author="factory-droid[bot]", ref=None):
         "number": number,
         "user": {"login": author},
         "head": {"ref": ref or f"job/{closes or number}-work", "sha": f"{number:040x}", "repo": {"full_name": REPO}},
+        "base": {"ref": "main", "repo": {"full_name": REPO}},
         "body": f"Closes #{closes}\n\nwork" if closes else "work",
         "files": list(files),
     }
@@ -212,6 +214,22 @@ class FakeGitHub:
 
 def issue(number, *paths, labels=("job",)):
     return {"number": number, "body": job_body(*paths), "labels": list(labels)}
+
+
+class GitHubDiagnostics(unittest.TestCase):
+    def test_http_error_reports_only_method_and_path_as_request_context(self):
+        endpoint = f"https://api.github.com/repos/{REPO}/issues/237/labels?private=query-value"
+        failure = oc.urllib.error.HTTPError(endpoint, 403, "Forbidden", {},
+                                            io.BytesIO(b'{"message":"Resource not accessible by integration"}'))
+        client = oc.GitHub("credential-must-never-appear")
+        with mock.patch.object(oc.urllib.request, "urlopen", side_effect=failure):
+            with self.assertRaises(oc.GitHubError) as caught:
+                client._request("POST", endpoint, {"private": "body-must-never-appear"})
+        diagnostic = str(caught.exception)
+        self.assertEqual(caught.exception.status, 403)
+        self.assertIn(f"HTTP 403 POST /repos/{REPO}/issues/237/labels:", diagnostic)
+        for private in ("query-value", "body-must-never-appear", "credential-must-never-appear", "Authorization", "https://"):
+            self.assertNotIn(private, diagnostic)
 
 
 class ParseScope(unittest.TestCase):
@@ -957,6 +975,33 @@ class Workflows(unittest.TestCase):
         self.assertIn("if: always() && needs.gate.outputs.start == 'true'", text)
         self.assertIn("BUILD_RESULT: ${{ needs.build.result }}", text)
         self.assertIn('python3 "$script" release', text)
+
+    def test_redispatch_permissions_cover_actual_claim_restore_and_technical_wait_writes(self):
+        text = self.read("factory-builder-reusable.yml").split("  redispatch:", 1)[1]
+        permissions = text.split("    permissions:\n", 1)[1].split("    steps:", 1)[0]
+        granted = dict(line.strip().split(": ", 1) for line in permissions.splitlines()
+                       if ": " in line and not line.strip().startswith("#"))
+        self.assertEqual(granted, {"actions": "write", "contents": "read", "issues": "write", "pull-requests": "read"})
+        gh = FakeGitHub([issue(237, "x/a.py", labels=("job", "waiting"))])
+        for name in ("post", "patch", "delete"):
+            method = getattr(gh, name)
+            def authorized(path, *args, _method=method):
+                if "/issues/" in path and granted["issues"] != "write":
+                    raise oc.GitHubError(403, "Resource not accessible by integration")
+                return _method(path, *args)
+            setattr(gh, name, authorized)
+        self.assertEqual(oc.run_next(gh, CFG, NOOP), [237])
+        self.assertIn(("DELETE", f"/repos/{REPO}/issues/237/labels/waiting", None), gh.writes())
+        gh.post(f"/repos/{REPO}/issues/237/labels", {"labels": ["waiting"]})
+        with self.assertRaises(RuntimeError):
+            oc.run_next(gh, CFG, mock.Mock(side_effect=RuntimeError("dispatch failed")))
+        self.assertIn("waiting", gh.labels(237), "failed dispatch can restore its claim")
+        p = pr(240, ["x/a.py"], closes=237)[1]
+        gh.prs = [p]
+        gh.activities[p["head"]["ref"]] = []
+        self.assertEqual(oc.run_next(gh, CFG, NOOP), [])
+        self.assertTrue(gh.comment_bodies(237), "a provenance wait can write its precise receipt")
+
 
     def test_restarts_on_closed_issues_and_removed_in_progress(self):
         text = self.read("factory-builder-reusable.yml")
@@ -1805,3 +1850,322 @@ class BuildStepCommands(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ActiveOwnerErrorRecovery(unittest.TestCase):
+    def owned(self):
+        gh = FakeGitHub([issue(245, "x/a.py")])
+        self.assertTrue(oc.run_check(gh, run_cfg(80), 245, sleep=NOOP))
+        gh.runs[80] = "in_progress"
+        return gh
+
+    def test_follower_receipt_post_failure_preserves_the_existing_owner(self):
+        gh = self.owned()
+        before = list(gh.writes())
+        original = gh.post
+        def fail_receipt(path, body):
+            if oc.RECEIPT_MARKER in body.get("body", ""):
+                raise oc.GitHubError(503, "Receipt unavailable")
+            return original(path, body)
+        gh.post = fail_receipt
+        code, output = Main.run_main(self, gh, ["check"], OVERLAP_ISSUE="245", GITHUB_RUN_ID="81")
+        self.assertEqual((code, output), (0, "start=false\n"))
+        self.assertEqual(gh.labels(245), {"job", "in-progress"})
+        self.assertEqual(oc.recorded_run(gh, CFG, 245), "80")
+        self.assertEqual(gh.writes(), before)
+
+    def test_unreadable_ownership_never_authorizes_label_cleanup(self):
+        gh = self.owned()
+        before = list(gh.writes())
+        gh.paginate = mock.Mock(side_effect=TimeoutError("Owner metadata unavailable"))
+        code, output = Main.run_main(self, gh, ["check"], OVERLAP_ISSUE="245", GITHUB_RUN_ID="81")
+        self.assertEqual((code, output), (1, "start=false\n"))
+        self.assertEqual(gh.labels(245), {"job", "in-progress"})
+        self.assertEqual(gh.writes(), before)
+
+    def test_follow_receipt_patch_failure_leaves_labels_and_owner_untouched(self):
+        gh = FakeGitHub([issue(245, "x/a.py", labels=("job", "in-progress"))])
+        gh.post(f"/repos/{REPO}/issues/245/comments", {"body": oc.comment_body(oc.Verdict(True), "80")})
+        gh.post(f"/repos/{REPO}/issues/245/comments", {"body": "<!-- factory-overlap-claim:v1 run=81 -->"})
+        before = list(gh.writes())
+        gh.patch = mock.Mock(side_effect=oc.GitHubError(503, "Receipt unavailable"))
+        oc.follow(gh, run_cfg(81), 245, "80", claim_id=101)
+        self.assertEqual(gh.labels(245), {"job", "in-progress"})
+        self.assertEqual(oc.recorded_run(gh, CFG, 245), "80")
+        self.assertEqual(gh.writes(), before)
+
+
+    def test_takeover_between_error_cleanup_writes_preserves_new_owner(self):
+        gh = FakeGitHub([issue(245, "x/a.py", labels=("job", "in-progress"))])
+        original = gh.delete
+        def new_owner_after_delete(path):
+            result = original(path)
+            if path.endswith("/labels/in-progress"):
+                gh.post(f"/repos/{REPO}/issues/245/comments", {"body": oc.comment_body(oc.Verdict(True), "82")})
+                gh.runs[82] = "in_progress"
+                gh.post(f"/repos/{REPO}/issues/245/labels", {"labels": ["in-progress"]})
+            return result
+        gh.delete = new_owner_after_delete
+        with mock.patch.object(oc, "run_check", side_effect=TimeoutError("Failed gate")):
+            code, output = Main.run_main(self, gh, ["check"], OVERLAP_ISSUE="245", GITHUB_RUN_ID="81")
+        self.assertEqual((code, output), (1, "start=false\n"))
+        self.assertEqual(gh.labels(245), {"job", "in-progress"})
+        self.assertEqual(oc.recorded_run(gh, CFG, 245), "82")
+        self.assertFalse(any(c[0] == "POST" and "waiting" in (c[2] or {}).get("labels", []) for c in gh.writes()))
+
+    def test_error_cleanup_preserves_parked_and_done_stops(self):
+        for label in ("parked", "done"):
+            gh = FakeGitHub([issue(245, "x/a.py", labels=("job", label))])
+            with mock.patch.object(oc, "run_check", side_effect=TimeoutError("Failed gate")):
+                code, output = Main.run_main(self, gh, ["check"], OVERLAP_ISSUE="245", GITHUB_RUN_ID="81")
+            self.assertEqual((code, output), (1, "start=false\n"))
+            self.assertEqual(gh.labels(245), {"job", label})
+            self.assertEqual(gh.writes(), [])
+
+
+class DeliveryDefaultBase(unittest.TestCase):
+    def test_retargeted_pr_keeps_ownership_after_reopen_and_before_newer_pr(self):
+        earlier = merged_pr(230, 237)
+        retargeted = pr(240, ["x/a.py"], closes=237)[1]
+        retargeted["base"]["ref"] = "release"
+        newer = pr(241, ["x/a.py"], closes=237)[1]
+        gh = FakeGitHub([issue(237, "x/a.py")], [retargeted, newer], [earlier])
+        gh.timeline[237] = [{"event": "reopened", "created_at": "2026-11-04T02:00:00Z"}]
+        gh.compares[newer["head"]["sha"]] = "ahead"
+        delivery = oc.job_delivery(gh, CFG, 237)
+        self.assertEqual([p["number"] for p in delivery.open], [240, 241])
+        self.assertIsNone(delivery.target)
+        self.assertEqual(delivery.predates_merge, [])
+        self.assertFalse(oc.run_check(gh, run_cfg(1000), 237, sleep=NOOP))
+        self.assertEqual(gh.labels(237), {"job", "waiting"})
+
+    def test_nondefault_open_pr_waits_without_a_duplicate_gate_or_owner(self):
+        for base in ({"ref": "release", "repo": {"full_name": REPO}},
+                     {"ref": "main", "repo": {"full_name": "outside/repo"}}, {}):
+            with self.subTest(base=base):
+                p = pr(240, ["x/a.py"], closes=237)[1]
+                p["base"] = base
+                gh = FakeGitHub([issue(237, "x/a.py")], [p])
+                self.assertFalse(oc.run_check(gh, run_cfg(1000), 237, sleep=NOOP))
+                self.assertEqual(gh.labels(237), {"job", "waiting"})
+                self.assertEqual(claims(gh, 237), [])
+                self.assertIsNone(oc.recorded_run(gh, CFG, 237))
+                self.assertEqual(oc.run_release(gh, CFG, 237, "success"), "waiting")
+                self.assertFalse(oc.run_owner(gh, run_cfg(1000), 237)[0])
+
+    def test_open_nondefault_or_crossrepo_bases_cannot_be_continued(self):
+        for base in ({"ref": "release", "repo": {"full_name": REPO}},
+                     {"ref": "main", "repo": {"full_name": "outside/repo"}}, {}):
+            with self.subTest(base=base):
+                p = pr(240, ["x/a.py"], closes=237)[1]
+                p["base"] = base
+                gh = FakeGitHub([issue(237, "x/a.py")], [p])
+                delivery = oc.job_delivery(gh, CFG, 237)
+                self.assertEqual([p["number"] for p in delivery.open], [240],
+                                 "ineligible continuation still preserves existing ownership")
+                self.assertIsNone(delivery.target)
+                self.assertEqual(oc.open_builder_prs(gh, CFG)[0].files, ["x/a.py"],
+                                 "base eligibility does not discard actual file holds")
+
+    def test_merged_nondefault_or_crossrepo_bases_do_not_deliver(self):
+        for base in ({"ref": "release", "repo": {"full_name": REPO}},
+                     {"ref": "main", "repo": {"full_name": "outside/repo"}}, {}):
+            with self.subTest(base=base):
+                p = merged_pr(240, 237)
+                p["base"] = base
+                gh = FakeGitHub([issue(237, "x/a.py")], closed_prs=[p])
+                self.assertIsNone(oc.job_delivery(gh, CFG, 237).winner)
+                self.assertTrue(oc.run_check(gh, run_cfg(1000), 237, sleep=NOOP))
+                self.assertNotIn("done", gh.labels(237))
+
+    def test_current_default_is_read_instead_of_assuming_main(self):
+        p = pr(240, ["x/a.py"], closes=237)[1]
+        p["base"]["ref"] = "trunk"
+        gh = FakeGitHub([issue(237, "x/a.py")], [p])
+        original = gh.get
+        gh.get = lambda path, params=None: {"default_branch": "trunk"} if path == f"/repos/{REPO}" else original(path, params)
+        self.assertEqual(oc.job_delivery(gh, CFG, 237).target["number"], 240)
+
+
+class FailedGateClaimRecovery(unittest.TestCase):
+    def test_claim_arriving_after_redispatch_snapshot_keeps_waiting(self):
+        gh = FakeGitHub([issue(245, "x/a.py", labels=("job", "waiting"))])
+        original = oc.job_delivery
+        def claimed_during_delivery(api, cfg, number):
+            result = original(api, cfg, number)
+            oc.post_claim(gh, run_cfg(80), number)
+            gh.runs[80], gh.builds[80] = "in_progress", None
+            return result
+        with mock.patch.object(oc, "job_delivery", side_effect=claimed_during_delivery):
+            self.assertEqual(oc.run_next(gh, run_cfg(82), [].append), [])
+        self.assertEqual(gh.labels(245), {"job", "waiting"})
+
+    def test_unreadable_claim_run_keeps_waiting_and_does_not_dispatch(self):
+        gh = FakeGitHub([issue(245, "x/a.py", labels=("job", "waiting"))])
+        oc.post_claim(gh, run_cfg(80), 245)
+        gh.runs[80] = oc.GitHubError(503, "run metadata unavailable")
+        self.assertEqual(oc.run_next(gh, run_cfg(82), [].append), [])
+        self.assertEqual(gh.labels(245), {"job", "waiting"})
+
+    def test_redispatch_preserves_waiting_while_a_failed_claim_is_live(self):
+        for caller in (80, 82):
+            with self.subTest(caller=caller):
+                gh = FakeGitHub([issue(245, "x/a.py", labels=("job", "waiting"))])
+                oc.post_claim(gh, run_cfg(80), 245)
+                gh.runs[80], gh.builds[80] = "in_progress", None
+                sent = []
+                def dispatch(number):
+                    sent.append(number)
+                    oc.run_check(gh, run_cfg(81), number, sleep=NOOP)
+                self.assertEqual(oc.run_next(gh, run_cfg(caller), dispatch), [])
+                self.assertEqual(sent, [])
+                self.assertEqual(gh.labels(245), {"job", "waiting"})
+                gh.runs[80] = "completed"
+                self.assertEqual(oc.run_next(gh, run_cfg(caller), dispatch), [245])
+                self.assertEqual(sent, [245])
+                self.assertEqual(oc.recorded_run(gh, CFG, 245), "81")
+
+    def test_unsettled_waiting_claim_holds_its_scope_for_older_jobs_too(self):
+        gh = FakeGitHub([issue(244, "x/a.py", labels=("job", "waiting")),
+                         issue(245, "x/a.py", labels=("job", "waiting")),
+                         issue(246, "unrelated/a.py", labels=("job", "waiting"))])
+        oc.post_claim(gh, run_cfg(80), 245)
+        gh.runs[80], gh.builds[80] = "in_progress", None
+        self.assertEqual(oc.run_next(gh, run_cfg(82), [].append), [246])
+        self.assertEqual(gh.labels(244), {"job", "waiting"})
+        self.assertEqual(gh.labels(245), {"job", "waiting"})
+
+    def test_stop_and_claim_delete_failure_never_clear_a_new_recorded_owner(self):
+        gh = FakeGitHub([issue(245, "x/a.py")])
+        original_delete, original_judge = gh.delete, oc.judge
+        def delete(path):
+            if "/issues/comments/" in path:
+                raise oc.GitHubError(503, "claim delete failed")
+            return original_delete(path)
+        def takeover_then_fail(api, cfg, current, only_older_issues=False):
+            if only_older_issues:
+                gh.post(f"/repos/{REPO}/issues/245/labels", {"labels": ["parked"]})
+                gh.post(f"/repos/{REPO}/issues/245/comments", {"body": oc.comment_body(oc.Verdict(True), "81")})
+                gh.runs[81] = "in_progress"
+                raise TimeoutError("gate failed after takeover")
+            return original_judge(api, cfg, current, only_older_issues)
+        gh.delete = delete
+        with mock.patch.object(oc, "judge", side_effect=takeover_then_fail):
+            code, out = Main.run_main(self, gh, ["check"], OVERLAP_ISSUE="245", GITHUB_RUN_ID="80")
+        self.assertEqual((code, out), (1, "start=false\n"))
+        self.assertEqual(gh.labels(245), {"job", "parked", "in-progress"})
+        self.assertEqual(oc.recorded_run(gh, CFG, 245), "81")
+
+    def test_a_stop_during_failed_admission_keeps_its_hold_and_can_resume(self):
+        for stop in ("parked", "done", "closed"):
+            with self.subTest(stop=stop):
+                gh = FakeGitHub([issue(245, "x/a.py")])
+                gh.runs[80] = "in_progress"
+                original = oc.judge
+                def stop_then_fail(api, cfg, current, only_older_issues=False):
+                    if only_older_issues:
+                        if stop == "closed":
+                            gh.issues[245]["state"] = "closed"
+                        else:
+                            gh.post(f"/repos/{REPO}/issues/245/labels", {"labels": [stop]})
+                        raise TimeoutError("gate failed while stopped")
+                    return original(api, cfg, current, only_older_issues)
+                with mock.patch.object(oc, "judge", side_effect=stop_then_fail):
+                    code, out = Main.run_main(self, gh, ["check"], OVERLAP_ISSUE="245", GITHUB_RUN_ID="80")
+                self.assertEqual((code, out), (1, "start=false\n"))
+                self.assertNotIn("in-progress", gh.labels(245))
+                self.assertIn("waiting", gh.labels(245))
+                self.assertTrue(oc.is_stopped(gh.issues[245]))
+                gh.runs[80] = "completed"
+                self.assertEqual(oc.run_next(gh, CFG, [].append), [])
+                # Only an explicit later removal of the hold/reopen permits dispatch.
+                if stop == "closed":
+                    gh.issues[245]["state"] = "open"
+                else:
+                    oc.remove_label(gh, CFG, 245, stop)
+                sent = []
+                self.assertEqual(oc.run_next(gh, CFG, sent.append), [245])
+                self.assertEqual(sent, [245])
+
+    def test_claim_delete_errors_do_not_strand_an_unowned_failed_gate(self):
+        for failure in (oc.GitHubError(503, "unavailable"), oc.GitHubError(403, "limited"),
+                        TimeoutError("claim delete timed out")):
+            with self.subTest(failure=type(failure).__name__):
+                gh = FakeGitHub([issue(245, "x/a.py")])
+                original_delete, original_judge = gh.delete, oc.judge
+                def delete(path):
+                    if "/issues/comments/" in path:
+                        raise failure
+                    return original_delete(path)
+                def fail_second(api, cfg, current, only_older_issues=False):
+                    if only_older_issues:
+                        raise TimeoutError("gate failure")
+                    return original_judge(api, cfg, current, only_older_issues)
+                gh.delete = delete
+                with mock.patch.object(oc, "judge", side_effect=fail_second):
+                    code, out = Main.run_main(self, gh, ["check"], OVERLAP_ISSUE="245", GITHUB_RUN_ID="80")
+                self.assertEqual((code, out), (1, "start=false\n"))
+                self.assertEqual(gh.labels(245), {"job", "waiting"})
+                self.assertEqual(len(claims(gh, 245)), 1)
+                gh.runs[80] = "completed"
+                self.assertEqual(oc.run_next(gh, CFG, [].append), [245])
+
+    def test_newer_claim_cannot_follow_a_failed_gate_or_strand_in_progress(self):
+        gh = FakeGitHub([issue(245, "x/a.py")])
+        gh.runs.update({80: "in_progress", 81: "in_progress"})
+        gh.builds.update({80: None, 81: None})
+        original_judge = oc.judge
+        def failure_after_newer_claim(api, cfg, current, only_older_issues=False):
+            if cfg.run_id == "80" and only_older_issues:
+                oc.post_claim(gh, run_cfg(81), 245)
+                raise TimeoutError("failed gate before admission")
+            return original_judge(api, cfg, current, only_older_issues)
+        with mock.patch.object(oc, "judge", side_effect=failure_after_newer_claim):
+            code, out = Main.run_main(self, gh, ["check"], OVERLAP_ISSUE="245", GITHUB_RUN_ID="80")
+        self.assertEqual((code, out), (1, "start=false\n"))
+        self.assertEqual(gh.labels(245), {"job", "waiting"})
+        self.assertFalse(any("run=80" in b for b in claims(gh, 245)))
+        self.assertIsNone(oc.live_owner(gh, run_cfg(81), 245, before=102))
+        self.assertTrue(oc.run_check(gh, run_cfg(81), 245, sleep=NOOP))
+        self.assertEqual(gh.labels(245), {"job", "in-progress"})
+        self.assertEqual(receipts(gh, 245), [])
+
+    def test_failed_claim_removal_still_recovers_the_waiting_label(self):
+        gh = FakeGitHub([issue(245, "x/a.py")])
+        original_delete = gh.delete
+        def failed_delete(path):
+            if "/issues/comments/" in path:
+                raise oc.GitHubError(503, "claim deletion unavailable")
+            return original_delete(path)
+        gh.delete = failed_delete
+        original_judge = oc.judge
+        def failed_second(api, cfg, current, only_older_issues=False):
+            if only_older_issues:
+                raise TimeoutError("failed gate")
+            return original_judge(api, cfg, current, only_older_issues)
+        with mock.patch.object(oc, "judge", side_effect=failed_second):
+            code, out = Main.run_main(self, gh, ["check"], OVERLAP_ISSUE="245", GITHUB_RUN_ID="80")
+        self.assertEqual((code, out), (1, "start=false\n"))
+        self.assertEqual(gh.labels(245), {"job", "waiting"})
+
+    def test_newer_gate_admitted_after_claim_drop_keeps_its_labels(self):
+        gh = FakeGitHub([issue(245, "x/a.py")])
+        gh.runs.update({80: "in_progress", 81: "in_progress"})
+        original_judge, original_delete = oc.judge, gh.delete
+        def failed_second(api, cfg, current, only_older_issues=False):
+            if cfg.run_id == "80" and only_older_issues:
+                raise TimeoutError("failed gate")
+            return original_judge(api, cfg, current, only_older_issues)
+        def admit_after_delete(path):
+            result = original_delete(path)
+            if path.endswith("/issues/comments/101"):
+                self.assertTrue(oc.run_check(gh, run_cfg(81), 245, sleep=NOOP))
+            return result
+        gh.delete = admit_after_delete
+        with mock.patch.object(oc, "judge", side_effect=failed_second):
+            code, out = Main.run_main(self, gh, ["check"], OVERLAP_ISSUE="245", GITHUB_RUN_ID="80")
+        self.assertEqual((code, out), (1, "start=false\n"))
+        self.assertEqual(gh.labels(245), {"job", "in-progress"})
+        self.assertEqual(oc.recorded_run(gh, CFG, 245), "81")
+        self.assertFalse(any(c[0] == "POST" and "waiting" in (c[2] or {}).get("labels", [])
+                             for c in gh.writes()))
