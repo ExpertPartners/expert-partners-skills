@@ -1,0 +1,32 @@
+# Dependabot version updates for the hash-locked Python requirements and the two
+# JavaScript producers under tools/. Dependabot only opens pull requests for review.
+# Nothing merges them automatically: the auto-merge gate considers Factory job pull
+# requests only, so a person reviews and merges each one.
+#
+# group-by: dependency-name puts one dependency's update for every listed directory in
+# a single pull request, so a package two locks share (Pillow, gray-matter, zod) moves
+# together, as tools/dependency-policy/README.md requires.
+#
+# tools/dependency-policy/tests/test_update_config.py checks coverage and options.
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directories:
+      - "/"
+      - "/plugins/research-ops/skills/source-hunter"
+      - "/plugins/research-ops/skills/video-discovery"
+    schedule:
+      interval: "weekly"
+    groups:
+      python-locks:
+        group-by: "dependency-name"
+
+  - package-ecosystem: "npm"
+    directories:
+      - "/tools/capability-feed"
+      - "/tools/skill-map"
+    schedule:
+      interval: "weekly"
+    groups:
+      javascript-producers:
+        group-by: "dependency-name"

@@ -107,3 +107,48 @@ package.json files the same way, run `npm install` in each, and commit both lock
 
 This policy covers build dependencies only. Plugin versions are the release step's
 (`tools/release`), not this check's.
+
+## Dependency update pull requests
+
+`.github/dependabot.yml` asks GitHub's built-in Dependabot version updates for weekly
+pull requests. It changes no setting, installs no app and grants no permission.
+
+Coverage:
+
+| Ecosystem | Directories |
+|---|---|
+| `pip` | `/`, `/plugins/research-ops/skills/source-hunter`, `/plugins/research-ops/skills/video-discovery` |
+| `npm` | `/tools/capability-feed`, `/tools/skill-map` |
+
+These are every directory that holds a `requirements*.txt` lock and every
+`tools/*/package.json` producer, found the same way `check_versions.py` finds them.
+`group-by: dependency-name` puts one dependency's update for all listed directories in
+one pull request, so a package two locks share (Pillow, gray-matter, zod) moves together.
+
+`tests/test_update_config.py` checks the file offline, with no PyYAML, network or
+GitHub call. It fails when an ecosystem or directory is dropped, when a new lock
+directory or producer is not listed, or when the file gains a merge instruction, a
+credential or secret reference, a permission, `open-pull-requests-limit`, `cooldown` or
+an option nobody has reviewed. It also fails when a workflow merges or approves
+Dependabot pull requests. A new lock directory or producer therefore needs a line in
+`.github/dependabot.yml` in the same pull request. The `dependency-policy` workflow's
+path filter does not list `.github/dependabot.yml`, so run the tests by hand when only
+that file changes.
+
+Activation limits:
+
+- GitHub reads the file from main. Nothing runs until it merges, and this repository has
+  not yet seen an update run, so future update activity is unverified.
+- Runs also depend on the repository's and the organization's Dependabot settings, which
+  this file does not read or change. If they turn version updates off, turning them on
+  is a settings change for Allison and is not made here.
+- Update pull requests are never merged automatically. The auto-merge gate considers only
+  Factory job pull requests (`factory-droid[bot]`, body starting `Closes #N`), and no
+  workflow merges or approves Dependabot pull requests. A person reviews and merges each.
+- Dependabot adds its default labels (`dependencies` and an ecosystem label) and creates
+  them in the repository if they are missing.
+- There are no `.in` files, so Dependabot edits a lock's pins and hashes in place and does
+  not re-resolve the transitive set. When an update needs a transitive package the lock
+  does not list, the `locks install exactly as written` job fails on that pull request;
+  re-resolve it as [Changing a Python dependency](#changing-a-python-dependency) says.
+- Security update pull requests are a separate repository setting, not this file.
