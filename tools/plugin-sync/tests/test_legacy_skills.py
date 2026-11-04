@@ -3,12 +3,14 @@ claude-code-sync.sh. Each test runs the actual sync script against the stub CLIs
 local git remotes from test_local_sync, with old deployed copies under a fake home, so it
 touches no real machine, setting or network."""
 import importlib.util
+import hashlib
 import json
 import os
 import shutil
 import stat
 import sys
 import unittest
+from unittest import mock
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -119,40 +121,53 @@ class Legacy(ls.Base, unittest.TestCase):
 
     # -------------------------------------------------------------- Claude Code
 
-    def test_claude_first_migration_keeps_unrelated_settings_and_backs_up(self):
+    def test_claude_first_migration_archives_only_known_files_and_keeps_settings(self):
         self.release_replacement()
         self.claude_installed()
         self.settings.write_text(json.dumps({"model": "opus", "enabledPlugins": {f"a@{MK}": True},
                                              "skillOverrides": {"my-own": "name-only"}}, indent=4))
         before = self.settings.read_bytes()
+        extra = self.home / ".claude/skills/intake/my-notes.txt"
+        extra.write_text("user resource")
         r = self.m.sync("claude-code")
         self.assertEqual(r.returncode, 0, self.m.log("claude-code"))
-        got = json.loads(self.settings.read_text())
-        self.assertEqual(got["model"], "opus")
-        self.assertEqual(got["enabledPlugins"], {f"a@{MK}": True})
-        self.assertEqual(got["skillOverrides"], {"my-own": "name-only", "intake": "off",
-                                                 "new-project": "off", "session-home": "off"})
+        self.assertEqual(self.settings.read_bytes(), before, "shared settings are never rewritten")
+        self.assertEqual(extra.read_text(), "user resource")
         rec = self.legacy("claude-code")
-        self.assertEqual(rec["status"], "ok")
-        self.assertEqual(rec["skills"]["intake"]["state"], "turned off")
+        self.assertEqual(rec["status"], "attention", "the unknown fourth copy is not fully retired")
+        self.assertEqual(rec["skills"]["intake"]["state"], "archived")
         self.assertIn("left alone, not recognized", rec["skills"]["verify-docs"]["state"])
-        [backup] = rec["backups"]
-        bpath = Path(backup["path"])
-        self.assertEqual(bpath.read_bytes(), before)
-        self.assertEqual(stat.S_IMODE(bpath.stat().st_mode), 0o600)
-        self.assertEqual(stat.S_IMODE(bpath.parent.stat().st_mode), 0o700)
-        self.assertEqual(self.m.receipt("claude-code-delivery.json")["legacy_skills"]["status"], "ok")
+        self.assertEqual(len(rec["backups"]), 3)
+        manifests = []
+        for backup in rec["backups"]:
+            bpath = Path(backup["path"])
+            manifest = Path(backup["manifest"])
+            self.assertEqual(json.loads(manifest.read_text()), backup)
+            self.assertEqual(stat.S_IMODE(manifest.stat().st_mode), 0o600)
+            manifests.append((manifest, manifest.read_bytes()))
+            self.assertEqual(bpath.read_bytes(), self.originals[Path(backup["source"])])
+            self.assertEqual(Path(backup["archive"]).read_bytes(), bpath.read_bytes())
+            self.assertEqual(stat.S_IMODE(bpath.stat().st_mode), 0o600)
+            self.assertEqual(stat.S_IMODE(bpath.parent.stat().st_mode), 0o700)
+            self.assertEqual(stat.S_IMODE(Path(backup["archive"]).parent.stat().st_mode), 0o700)
+            self.assertFalse(Path(backup["source"]).exists())
+        for path, data in self.originals.items():
+            if path.parent.name in ("intake", "new-project", "session-home") and path.parent.parent == self.home / ".claude/skills":
+                self.assertFalse(path.exists())
+            else:
+                self.assertEqual(path.read_bytes(), data)
+        self.assertEqual(self.m.receipt("claude-code-delivery.json")["status"], "ok")
+        self.assertEqual(self.m.receipt("claude-code-delivery.json")["legacy_skills"]["status"], "attention")
         self.assertIn("legacy verify-docs: left alone", self.m.log("claude-code"))
-        self.assertCopiesUntouched()
 
-        after = self.settings.read_bytes()
         r = self.m.sync("claude-code", PLUGIN_SYNC_FORCE="1")
         self.assertEqual(r.returncode, 0, self.m.log("claude-code"))
-        self.assertEqual(self.settings.read_bytes(), after, "a rerun changes nothing")
+        self.assertEqual(self.settings.read_bytes(), before, "a rerun changes no settings")
         rec = self.legacy("claude-code")
-        self.assertEqual(rec["skills"]["intake"]["state"], "already off")
-        self.assertEqual(rec["backups"], [])
-        self.assertEqual(len(list(bpath.parent.iterdir())), 1, "no second backup")
+        self.assertEqual(rec["skills"]["intake"]["state"], "no old copy")
+        self.assertEqual(rec["backups"], [], "no second backup")
+        for manifest, original in manifests:
+            self.assertEqual(manifest.read_bytes(), original, "reruns retain durable rollback metadata")
 
     def test_claude_no_replacement_then_offline_then_reconnect(self):
         r = self.m.sync("claude-code")
@@ -171,10 +186,8 @@ class Legacy(ls.Base, unittest.TestCase):
         ls.sh("git", "-C", str(self.m.checkout), "remote", "set-url", "origin", str(self.m.origin))
         r = self.m.sync("claude-code")
         self.assertEqual(r.returncode, 0, self.m.log("claude-code"))
-        got = json.loads(self.settings.read_text())
-        self.assertEqual(got, {"skillOverrides": {"intake": "off", "new-project": "off", "session-home": "off"}})
-        self.assertEqual(stat.S_IMODE(self.settings.stat().st_mode), 0o600)
-        self.assertCopiesUntouched()
+        self.assertFalse(self.settings.exists(), "migration never creates shared settings")
+        self.assertEqual(self.legacy("claude-code")["skills"]["intake"]["state"], "archived")
 
     def test_claude_wrong_bytes_waits_for_that_skill_only(self):
         self.release_replacement()
@@ -185,8 +198,9 @@ class Legacy(ls.Base, unittest.TestCase):
         rec = self.legacy("claude-code")
         self.assertEqual(rec["status"], "waiting")
         self.assertIn("does not match the repo", rec["skills"]["intake"]["state"])
-        self.assertEqual(json.loads(self.settings.read_text())["skillOverrides"],
-                         {"new-project": "off", "session-home": "off"})
+        self.assertFalse(self.settings.exists())
+        self.assertTrue((self.home / ".claude/skills/intake/SKILL.md").exists())
+        self.assertEqual(rec["skills"]["new-project"]["state"], "archived")
 
     def test_claude_disabled_replacement_leaves_the_old_copies_on(self):
         self.release_replacement()
@@ -223,18 +237,35 @@ class Legacy(ls.Base, unittest.TestCase):
         self.settings.write_text("{}")
         r = self.m.sync("claude-code")  # same commit, so only the failed migration forces the full run
         self.assertEqual(r.returncode, 0, self.m.log("claude-code"))
-        self.assertEqual(json.loads(self.settings.read_text())["skillOverrides"]["intake"], "off")
+        self.assertEqual(self.settings.read_text(), "{}")
+        self.assertEqual(self.legacy("claude-code")["skills"]["intake"]["state"], "archived")
 
-    def test_claude_symlinked_settings_are_not_replaced(self):
+    def test_claude_symlinked_settings_are_read_but_never_replaced(self):
         self.release_replacement()
         self.claude_installed()
         real = self.m.root / "dotfiles-settings.json"
         real.write_text("{}")
         self.settings.parent.mkdir(parents=True, exist_ok=True)
         self.settings.symlink_to(real)
-        self.assertEqual(self.m.sync("claude-code").returncode, 1)
+        self.assertEqual(self.m.sync("claude-code").returncode, 0)
         self.assertTrue(self.settings.is_symlink())
         self.assertEqual(real.read_text(), "{}")
+
+    def test_waiting_same_commit_retries_next_slot_after_replacement_bytes_arrive(self):
+        self.release_replacement()
+        for surface, install, expected in (("claude-code", self.claude_installed, "archived"),
+                                           ("codex", self.codex_installed, "turned off")):
+            with self.subTest(surface=surface):
+                path = install()
+                skill = path / "skills/intake/SKILL.md"
+                skill.write_text("incomplete local delivery\n")
+                self.assertEqual(self.m.sync(surface).returncode, 0, self.m.log(surface))
+                self.assertEqual(self.legacy(surface)["status"], "waiting")
+                before_head = ls.sh("git", "-C", str(self.m.checkout), "rev-parse", "HEAD").stdout
+                shutil.copy2(self.m.seed / "plugins/operating-doctrine/skills/intake/SKILL.md", skill)
+                self.assertEqual(self.m.sync(surface).returncode, 0, self.m.log(surface))
+                self.assertEqual(ls.sh("git", "-C", str(self.m.checkout), "rev-parse", "HEAD").stdout, before_head)
+                self.assertEqual(self.legacy(surface)["skills"]["intake"]["state"], expected)
 
     # -------------------------------------------------------------- Codex
 
@@ -252,7 +283,7 @@ class Legacy(ls.Base, unittest.TestCase):
                           for n in ("intake", "new-project", "session-home"))
         self.assertEqual(sorted(self.writes()), expected, "only recognized copies, by exact path")
         rec = self.legacy("codex")
-        self.assertEqual(rec["status"], "ok")
+        self.assertEqual(rec["status"], "attention")
         self.assertIn("left alone, not recognized", rec["skills"]["verify-docs"]["state"])
         [backup] = rec["backups"]
         self.assertEqual(Path(backup["path"]).read_bytes(), before)
@@ -310,34 +341,99 @@ class Legacy(ls.Base, unittest.TestCase):
         self.assertCopiesUntouched()
 
 
-class SettingsWrite(unittest.TestCase):
-    """set_claude_overrides directly: a write that races Claude Code starts over."""
-
-    def test_a_concurrent_edit_is_kept_and_the_update_is_redone(self):
+class ArchiveSafety(unittest.TestCase):
+    def setUp(self):
         spec = importlib.util.spec_from_file_location("legacy_skills", HERE.parent / "legacy-skills.py")
-        mod = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(mod)
-        tmp = Path(ls.tempfile.mkdtemp())
-        self.addCleanup(shutil.rmtree, tmp, True)
-        settings = tmp / "settings.json"
+        self.mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(self.mod)
+        self.tmp = Path(ls.tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.tmp, True)
+        self.copy = self.tmp / "skills/intake/SKILL.md"
+        self.copy.parent.mkdir(parents=True)
+        self.data = b"known old body\n"
+        self.copy.write_bytes(self.data)
+        self.digest = hashlib.sha256(self.data).hexdigest()
+        self.backups = []
+
+    def archive(self):
+        return self.mod.archive_claude_copy(str(self.copy), self.digest,
+                                           str(self.tmp / "backups"), self.backups)
+
+    def test_archive_never_rewrites_concurrent_settings_and_rollback_is_no_clobber(self):
+        settings = self.tmp / "settings.json"
         settings.write_text(json.dumps({"theme": "dark"}))
-        real_read = mod.read_or_none
-        calls = []
+        real_rename = self.mod.os.rename
 
-        def racing_read(path):
-            calls.append(path)
-            if len(calls) == 2:  # the pre-replace check of the first attempt
-                settings.write_text(json.dumps({"theme": "dark", "model": "set meanwhile"}))
-            return real_read(path)
+        def racing_rename(source, destination):
+            settings.write_text(json.dumps({"theme": "dark", "model": "concurrent",
+                                             "permissions": {"allow": ["Read"]}}))
+            return real_rename(source, destination)
 
-        mod.read_or_none = racing_read
-        backups = []
-        states = mod.set_claude_overrides(str(settings), ["intake"], str(tmp / "b"), backups)
-        self.assertEqual(states, {"intake": "turned off"})
+        with mock.patch.object(self.mod.os, "rename", racing_rename):
+            result = self.archive()
+        self.assertEqual(result["state"], "archived")
         self.assertEqual(json.loads(settings.read_text()),
-                         {"theme": "dark", "model": "set meanwhile", "skillOverrides": {"intake": "off"}})
-        self.assertEqual(len(backups), 2, "each attempt backs up the bytes it read")
-        self.assertFalse(list(tmp.glob("*.tmp")), "no temporary file is left behind")
+                         {"theme": "dark", "model": "concurrent", "permissions": {"allow": ["Read"]}})
+        self.assertFalse(self.copy.exists())
+        backup = self.backups[0]
+        self.mod.restore_archive(json.loads(Path(backup["manifest"]).read_text()))
+        self.assertEqual(self.copy.read_bytes(), self.data)
+        self.copy.write_bytes(b"new user copy")
+        with self.assertRaises(FileExistsError):
+            self.mod.restore_archive(backup)
+        self.assertEqual(self.copy.read_bytes(), b"new user copy")
+        self.assertEqual(Path(backup["path"]).read_bytes(), self.data, "rollback keeps private evidence")
+
+    def test_changed_source_before_archive_is_left_untouched(self):
+        self.copy.write_bytes(b"unrecognized edit")
+        with self.assertRaisesRegex(self.mod.MigrationError, "changed after classification"):
+            self.archive()
+        self.assertEqual(self.copy.read_bytes(), b"unrecognized edit")
+        self.assertEqual(self.backups, [])
+
+    def test_replacement_in_the_rename_window_is_restored_without_data_loss(self):
+        real_rename = self.mod.os.rename
+
+        def racing_rename(source, destination):
+            other = self.copy.with_name("new.tmp")
+            other.write_bytes(b"concurrent changed body")
+            os.replace(other, self.copy)
+            return real_rename(source, destination)
+
+        with mock.patch.object(self.mod.os, "rename", racing_rename):
+            with self.assertRaisesRegex(self.mod.MigrationError, "changed during archive"):
+                self.archive()
+        self.assertEqual(self.copy.read_bytes(), b"concurrent changed body")
+        self.assertEqual(Path(self.backups[0]["path"]).read_bytes(), self.data)
+        self.assertEqual(Path(self.backups[0]["archive"]).read_bytes(), b"concurrent changed body")
+
+    def test_new_copy_after_rename_is_preserved_and_reports_attention(self):
+        real_rename = self.mod.os.rename
+
+        def racing_rename(source, destination):
+            result = real_rename(source, destination)
+            self.copy.write_bytes(b"new source copy")
+            return result
+
+        with mock.patch.object(self.mod.os, "rename", racing_rename):
+            result = self.archive()
+        self.assertTrue(result["state"].startswith("attention"))
+        self.assertEqual(self.copy.read_bytes(), b"new source copy")
+        self.assertEqual(Path(result["archive"]).read_bytes(), self.data)
+
+    def test_exact_render_fingerprint_works_without_history_and_unknown_bytes_do_not(self):
+        # Public synthetic bytes exercise the same bounded hash lookup without publishing
+        # the private historical deployment bodies. Native audit separately checks all 8.
+        class ShallowRepo:
+            def history_blobs(self, path):
+                return set()
+        with mock.patch.dict(self.mod.DEPLOYED_SHA256, {"intake": {self.digest}}):
+            kind, detail = self.mod.classify(ShallowRepo(), "intake", str(self.copy.parent.parent))
+            self.assertEqual(kind, "trusted")
+            self.assertEqual(detail, "sha256:" + self.digest)
+            self.copy.write_bytes(self.data + b"changed")
+            self.assertEqual(self.mod.classify(ShallowRepo(), "intake", str(self.copy.parent.parent))[0],
+                             "unrecognized")
 
 if __name__ == "__main__":
     unittest.main()

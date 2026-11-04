@@ -7,21 +7,22 @@ into ~/.claude/skills and ~/.agents/skills. They now ship in the operating-doctr
 the old copies, so they stay discoverable. codex-sync.sh and claude-code-sync.sh call this
 after each full delivery run. For each old name it:
 
-1. recognizes the copy: its SKILL.md, with any skill-deploy DEPLOYED COPY header naming
+1. recognizes the copy by an exact audited deployment fingerprint, or its SKILL.md with
+   any skill-deploy DEPLOYED COPY header naming
    expert-partners-skills skills/<name>/SKILL.md removed, must equal a committed version
    of that file in this checkout's first-parent history. Anything else is left alone and
    reported;
 2. proves the replacement: the operating-doctrine plugin is installed and enabled on this
    surface and its skill folder holds exactly the bytes committed at HEAD;
-3. turns off only the old copy through the surface's own per-skill setting, after a
-   private, verified backup: Claude Code user settings skillOverrides <name> = "off"
-   (plugin skills are unaffected, code.claude.com/docs/en/skills, read 2026-11-04), and
+3. retires only that old copy after a private, verified backup: Claude Code's old SKILL.md
+   moves to a private archive without rewriting shared settings, and Codex uses
    Codex app-server skills/config/write with the exact SKILL.md path and enabled false
    (codex-rs app-server-protocol v2, read 2026-11-04);
-4. reads the setting back and writes a receipt.
+4. checks the archive or reads the native setting back and writes a receipt.
 
-No file under ~/.claude/skills or ~/.agents/skills is moved, edited or deleted, and no
-plugin cache is written. A failure is reported in the receipt and fails the run, so the
+The Claude archive preserves the exact original bytes, path and rollback information;
+other files in that folder are untouched. No plugin cache is written. A failure is
+reported in the receipt and fails the run, so the
 next five-minute slot retries it. A replacement that is not yet proven leaves the old copy
 on and is checked again on the next full run.
 """
@@ -34,7 +35,9 @@ import os
 import queue
 import re
 import signal
+import stat
 import subprocess
+import tempfile
 import threading
 import time
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple
@@ -49,6 +52,27 @@ LEGACY = {
     "session-home": "session-home",
     "verify-docs": "research-before-guessing",
 }
+# Exact whole-file SHA256s of the eight previously deployed copies inspected by the
+# migration audit. They include platform-specific renders absent from a shallow clone.
+# This is a bounded compatibility input, never a name-only or header-only trust rule.
+DEPLOYED_SHA256 = {
+    "intake": {
+        "1396a1db2775e46fe781867ff0e41d8367fb76bba6c11454be901b6da85ce669",
+        "5ac7a43b3e4b2b060acb24b9ab24d8827df14e55aa83f9887ecce74b8764f3e4",
+    },
+    "new-project": {
+        "fc9314ae70c7209505dcfc95418ef8a9311bc5905109b9cc8f92e25d49d07d22",
+        "47022cf4aa60b910bce8a51b0571dd021e537be610756e53398f917713e5cd9a",
+    },
+    "session-home": {
+        "4bd7bc488b0c24221a971c5ba57ad8bbb2fade0c13d03a6d75197e3100ff3b52",
+        "6a2dabdb8bebf70b24ecc28bb2e3d99f7a0564f3c935a589095d41a4ca8a47c3",
+    },
+    "verify-docs": {
+        "579ea9935ce9ed7d0bb013fae70bd663d2d9832e69e855f36316cafbca778423",
+        "ca06b3f4506cf917faeed9c4587c2629f0deb216cbf63a75525f92ae3a811b08",
+    },
+}
 HEADER = re.compile(
     rb"^# DEPLOYED COPY \(\d{4}-\d{2}-\d{2}, skill-deploy pipeline\): the canonical home is\n"
     rb"# (\S+) (\S+?SKILL\.md)\. Deployed at [^\n]+?\.\n"
@@ -56,7 +80,8 @@ HEADER = re.compile(
     re.M,
 )
 JUNK = {".DS_Store", "checksums.sha256"}
-NOTE = ("Turns off only the old user-tier copies through each surface's own per-skill setting. "
+NOTE = ("Retires only recognized old user-tier copies after proving their replacements. "
+        "Claude copies are privately archived without rewriting settings; Codex uses its native setting. "
         "Runtime use is unverified until a new or reloaded session lists the skills.")
 LOCK_WAIT = 60.0
 REQUEST_TIMEOUT = 60.0
@@ -115,7 +140,7 @@ def classify(repo: Repo, name: str, skills_root: str) -> Tuple[str, str]:
     """('absent' | 'trusted' | 'unrecognized', detail) for one old copy."""
     folder = os.path.join(skills_root, name)
     path = os.path.join(folder, "SKILL.md")
-    if not os.path.lexists(folder):
+    if not os.path.lexists(folder) or not os.path.lexists(path):
         return "absent", ""
     if os.path.islink(folder) or os.path.islink(path):
         return "unrecognized", "it is a symlink, not a copy this producer made"
@@ -123,6 +148,9 @@ def classify(repo: Repo, name: str, skills_root: str) -> Tuple[str, str]:
         return "unrecognized", "it has no regular SKILL.md"
     with open(path, "rb") as f:
         data = f.read()
+    digest = hashlib.sha256(data).hexdigest()
+    if digest in DEPLOYED_SHA256.get(name, set()):
+        return "trusted", f"sha256:{digest}"
     source = f"skills/{name}/SKILL.md"
     m = HEADER.search(data)
     if m:
@@ -131,7 +159,7 @@ def classify(repo: Repo, name: str, skills_root: str) -> Tuple[str, str]:
         data = data[:m.start()] + data[m.end():]
     blob = blob_id(data)
     if blob in repo.history_blobs(source):
-        return "trusted", blob
+        return "trusted", f"sha256:{digest}"
     return "unrecognized", f"its bytes match no committed version of {source}"
 
 
@@ -192,61 +220,95 @@ def read_or_none(path: str) -> Optional[bytes]:
         return None
 
 
-def set_claude_overrides(settings: str, names: List[str], backup_dir: str,
-                         backups: List[Dict[str, str]]) -> Dict[str, str]:
-    """Set skillOverrides <name> = "off" for each name, keeping every other field.
+def claude_choices(settings: str) -> Dict[str, Any]:
+    """Read existing choices only. A separate native writer owns this shared file."""
+    raw = read_or_none(settings)
+    try:
+        data = json.loads(raw) if raw and raw.strip() else {}
+    except ValueError as e:
+        raise MigrationError(f"{settings} is not valid JSON, left unchanged: {e}")
+    if not isinstance(data, dict):
+        raise MigrationError(f"{settings} is not a JSON object, left unchanged")
+    overrides = data.get("skillOverrides", {})
+    if not isinstance(overrides, dict):
+        raise MigrationError(f"{settings} skillOverrides is not an object, left unchanged")
+    return overrides
 
-    Claude Code can write the same file, so the new file only replaces the bytes it was
-    computed from; when they changed underneath, it starts over."""
-    if os.path.islink(settings):
-        raise MigrationError(f"{settings} is a symlink, left unchanged")
-    for _ in range(5):
-        raw = read_or_none(settings)
+
+def archive_claude_copy(path: str, expected_sha256: str, backup_dir: str,
+                        backups: List[Dict[str, str]]) -> Dict[str, str]:
+    """Archive a single proven obsolete SKILL.md, leaving shared settings untouched.
+
+    Re-check the moved inode and bytes. A concurrent replacement is restored without
+    clobbering any new source path; both files and the original backup survive a conflict.
+    """
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+    with os.fdopen(fd, "rb") as source:
+        before = os.fstat(source.fileno())
+        if not stat.S_ISREG(before.st_mode):
+            raise MigrationError(f"{path} is no longer a regular file, left unchanged")
+        data = source.read()
+    if hashlib.sha256(data).hexdigest() != expected_sha256:
+        raise MigrationError(f"{path} changed after classification, left unchanged")
+    backup = private_backup(backup_dir, "claude-" + os.path.basename(os.path.dirname(path)), data)
+    archive_dir = tempfile.mkdtemp(prefix="claude-retired-", dir=backup_dir)
+    archived = os.path.join(archive_dir, "SKILL.md")
+    backup.update({"source": path, "archive": archived, "original_mode": oct(stat.S_IMODE(before.st_mode))})
+    manifest = os.path.join(archive_dir, "restore.json")
+    backup["manifest"] = manifest
+    # The per-run receipt may later report no work. Keep rollback metadata beside the
+    # archived copy for its entire lifetime, not only in that replaceable receipt.
+    manifest_bytes = (json.dumps(backup, indent=2) + "\n").encode("utf-8")
+    fd = os.open(manifest, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    with os.fdopen(fd, "wb") as record:
+        record.write(manifest_bytes)
+        record.flush()
+        os.fsync(record.fileno())
+    if read_or_none(manifest) != manifest_bytes:
+        raise MigrationError(f"{manifest} did not read back, original file left unchanged")
+    backups.append(backup)
+    os.rename(path, archived)
+    moved = os.lstat(archived)
+    matches = (stat.S_ISREG(moved.st_mode) and moved.st_dev == before.st_dev
+               and moved.st_ino == before.st_ino)
+    if matches:
+        fd = os.open(archived, os.O_RDONLY | os.O_NOFOLLOW)
+        with os.fdopen(fd, "rb") as source:
+            matches = source.read() == data
+    if not matches:
         try:
-            data = json.loads(raw) if raw and raw.strip() else {}
-        except ValueError as e:
-            raise MigrationError(f"{settings} is not valid JSON, left unchanged: {e}")
-        if not isinstance(data, dict):
-            raise MigrationError(f"{settings} is not a JSON object, left unchanged")
-        overrides = data.get("skillOverrides", {})
-        if not isinstance(overrides, dict):
-            raise MigrationError(f"{settings} skillOverrides is not an object, left unchanged")
-        states: Dict[str, str] = {}
-        todo = []
-        for n in names:
-            v = overrides.get(n)
-            if v == "off":
-                states[n] = "already off"
-            elif v is not None:
-                states[n] = f"left alone, skillOverrides already sets it to {v!r}"
-            else:
-                todo.append(n)
-        if not todo:
-            return states
-        if raw is not None:
-            backups.append(private_backup(backup_dir, "claude-settings.json", raw))
-        new = dict(data)
-        new["skillOverrides"] = dict(overrides, **{n: "off" for n in todo})
-        text = json.dumps(new, indent=2, ensure_ascii=False) + "\n"
-        mode = os.stat(settings).st_mode & 0o777 if raw is not None else 0o600
-        os.makedirs(os.path.dirname(settings), exist_ok=True)
-        tmp = f"{settings}.{os.getpid()}.legacy-skills.tmp"
-        fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, mode)
-        with os.fdopen(fd, "w", encoding="utf-8") as f:
-            f.write(text)
+            os.link(archived, path, follow_symlinks=False)
+            restored = "restored the changed copy without overwriting any source file"
+        except FileExistsError:
+            restored = "a new source file exists; preserved both it and the moved copy"
+        raise MigrationError(f"{path} changed during archive; {restored}; moved copy at {archived}")
+    os.chmod(archived, 0o600)
+    if os.path.lexists(path):
+        return {"state": "attention, a new source copy appeared after archive", "archive": archived}
+    return {"state": "archived", "archive": archived}
+
+
+def restore_archive(backup: Dict[str, str]) -> None:
+    """Restore verified original bytes without replacing an existing source path.
+
+    A private temporary sibling and a no-clobber link publish the complete file at once.
+    The original backup and archive remain available after rollback.
+    """
+    source = backup["source"]
+    with open(backup["path"], "rb") as f:
+        data = f.read()
+    if hashlib.sha256(data).hexdigest() != backup["sha256"]:
+        raise MigrationError("the rollback backup does not match its recorded SHA256")
+    fd, temp = tempfile.mkstemp(prefix=".legacy-restore-", dir=os.path.dirname(source))
+    try:
+        with os.fdopen(fd, "wb") as f:
+            f.write(data)
             f.flush()
             os.fsync(f.fileno())
-        if read_or_none(settings) != raw:
-            os.unlink(tmp)
-            time.sleep(0.2)
-            continue
-        os.replace(tmp, settings)
-        back = read_or_none(settings)
-        if back is None or json.loads(back) != new:
-            raise MigrationError(f"{settings} did not read back with the new skillOverrides")
-        states.update({n: "turned off" for n in todo})
-        return states
-    raise MigrationError(f"{settings} kept changing during the update")
+        os.chmod(temp, int(backup["original_mode"], 8))
+        os.link(temp, source)
+    finally:
+        os.unlink(temp)
 
 
 # ------------------------------------------------------------------ Codex app-server client
@@ -377,7 +439,8 @@ def run(surface: str, repo_root: str, state_dir: str, head: str, log: Log,
                 skills[name] = {"copy": path, "state": f"left alone, not recognized: {detail}"}
                 log(f"legacy {name}: left alone, {detail}")
             else:
-                skills[name] = {"copy": path, "matched_blob": detail}
+                skills[name] = {"copy": path, "matched_source": detail,
+                                "source_sha256": detail.removeprefix("sha256:")}
                 trusted.append(name)
         if trusted:
             act(repo, trusted, skills, backups)
@@ -389,7 +452,9 @@ def run(surface: str, repo_root: str, state_dir: str, head: str, log: Log,
         if str(row.get("state", "")).startswith("failed"):
             failures.append(f"{name}: {row['state']}")
     waiting = [n for n, row in skills.items() if str(row.get("state", "")).startswith("waiting")]
-    status = "failed" if failures else "waiting" if waiting else "ok"
+    attention = [n for n, row in skills.items()
+                 if str(row.get("state", "")).startswith(("left alone", "attention"))]
+    status = "failed" if failures else "waiting" if waiting else "attention" if attention else "ok"
     receipt = {"surface": surface, "commit": head, "status": status, "failures": failures,
                "skills": skills, "backups": backups, "checked_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
                "note": NOTE}
@@ -433,9 +498,18 @@ def claude_migrate(repo_root: str, state_dir: str, head: str, log: Log, claude: 
             else:
                 proven.append(name)
         if proven:
-            for name, state in set_claude_overrides(settings, proven, os.path.join(state_dir, "legacy-skill-backups"), backups).items():
-                skills[name]["state"] = state
-                skills[name]["setting"] = f"{settings} skillOverrides.{name}"
+            for name in proven:
+                # Read immediately before retirement, but never rewrite this shared
+                # settings file. A producer lock cannot coordinate unrelated writers.
+                value = claude_choices(settings).get(name)
+                if value == "off":
+                    skills[name]["state"] = "already off"
+                elif value is not None:
+                    skills[name]["state"] = f"left alone, skillOverrides already sets it to {value!r}"
+                else:
+                    skills[name].update(archive_claude_copy(
+                        skills[name]["copy"], skills[name]["source_sha256"],
+                        os.path.join(state_dir, "legacy-skill-backups"), backups))
 
     return run("claude-code", repo_root, state_dir, head, log,
                os.path.join(config, "skills"), act)

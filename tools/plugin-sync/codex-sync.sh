@@ -297,7 +297,7 @@ try:
 except (OSError, ValueError):
     prev = {}
 if (force != "1" and prev.get("status") == "ok" and prev.get("commit") == head
-        and (prev.get("legacy_skills") or {}).get("status") != "failed"
+        and (prev.get("legacy_skills") or {}).get("status") not in ("failed", "waiting")
         and time.time() - prev.get("checked_epoch", 0) < RECHECK_SECONDS):
     sys.exit(0)
 

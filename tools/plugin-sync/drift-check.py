@@ -57,6 +57,8 @@ Run: drift-check.py            reads GitHub, prints the JSON report, records dea
      drift-check.py --offline  reads publication from the local checkout (--repo, --ref); no
                                GitHub, no Google credentials, no writes of any kind
 """
+from __future__ import annotations
+
 import argparse
 import glob
 import hashlib
