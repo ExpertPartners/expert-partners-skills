@@ -315,7 +315,9 @@ When Allison types S or s alone, it means sent, and no other single letter does.
 
 ## The Job Report And Archive Readiness
 
-Use job_create or job_claim for the receiving AI's work and job_status for ownership and status. Use job_finish with the summary and result link only when the assignment is genuinely completed. An unfinished wrap preserves progress and its nonterminal state in the same job through an authorized operation from the live tool schema, never job_finish. If that operation or the job list is unavailable, report the blocker and keep the reporting obligation open. Verify the saved result before claiming completion. Follow the current HQ Rulebook section Session lifecycle for archive consent and session-steward for unfinished work.
+Use job_create or job_claim for the receiving AI's work and job_status for ownership and status. Use job_finish with outcome `done`, the summary and result link only when the assignment is genuinely completed. A true founder-only decision on an affected non-code job is a separate supported outcome. Follow the current HQ Rulebook question path and live tool schema, using job_finish with outcome `needs-allison` and a `Recommend:` summary even while that assignment is unfinished. This records a decision request, never completion or archive readiness. Do not use it for an AI-owned retrieval or technical gap, or to finish an unrelated job.
+
+An ordinary unfinished progress report or wrap preserves the job's open state through an authorized operation from the live tool schema. Never call job_finish merely to record progress or wrap unfinished work. If that operation or the job list is unavailable, report the blocker and keep the reporting obligation open rather than inventing a tool or claiming completion. Verify the saved result before claiming completion. Follow the current HQ Rulebook section Session lifecycle for archive consent and session-steward for unfinished work.
 
 ---
 
