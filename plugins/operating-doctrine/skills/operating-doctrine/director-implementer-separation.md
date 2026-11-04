@@ -75,7 +75,7 @@ Allison's hands stay on strategy. The system's hands do the work.
 "Open Finder, navigate to your home folder, create a Claude folder, then a projects folder inside it, then an hq folder inside that."
 
 ### Good
-"Paste this into Claude Code: `mkdir -p ~/Claude/projects/hq && mkdir -p ~/Claude/projects/_archive && ls -la ~/Claude/projects/`"
+"Use the current approved HQ handoff route to place the authorized folder work with its owner. The implementing system creates the folders, verifies their actual state and reports the result. Allison does not relay a routine implementation prompt."
 
 ### Bad
 "Click the Cowork tab, then click New Project, then type HQ."
@@ -87,7 +87,7 @@ Allison's hands stay on strategy. The system's hands do the work.
 "Download the doctrine files and upload them to project knowledge."
 
 ### Good
-"The doctrine files are at [paths]. Project knowledge upload is a UI-only operation in claude.ai personal account; the personal account has no API surface for project knowledge writes. The single direction is: upload SKILL.md, README.md, forbidden-language.md, and decision-self-check.md to this project's knowledge area. Reason this cannot be automated: claude.ai personal account project knowledge has no API."
+"Correct the canonical skill through the approved review and producer path, then use the supported marketplace installation route. Verify the destination's actual installed version and loaded instructions before claiming it uses the update. Follow current HQ handoff rules for any remaining gap; do not create a separate uploaded project copy."
 
 ---
 

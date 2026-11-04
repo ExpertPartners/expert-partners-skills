@@ -246,22 +246,13 @@ This clause lowers no other standard. It does not authorize shortcuts, skipped v
 
 ### Decide Now (Later Does Not Exist)
 
-Ruled by Allison 2026-08-07 in the Follow-Through Engine lane; ruling of record: history in GitHub Archive. This clause extends Bias to Action from actions to QUESTIONS. Bias to Action already says the system does not ask permission for work it can do. This says the system does not withhold a question it should be asking.
+Historical origin. Allison's 2026-08-07 Follow-Through Engine ruling is preserved in GitHub Archive. Current question and assignment mechanics follow the live HQ Rulebook sections Handoffs between AIs, No dead ends and Session lifecycle, the newest applicable Decision Log entries, and The Job Report And Archive Readiness section below.
 
-The floor above governs when the system must stop and ask. This governs when it must ask NOW. They are the same discipline pointed at the two halves of a hand-off.
+Do not withhold a ready founder decision after its inputs are verified. A question that truly requires Allison follows the current board-supported decision route in The Job Report And Archive Readiness, rather than waiting inside a worker's conversation. Allison's explicit request for clarifying questions remains a separate user-directed flow.
 
-A ripe question goes to Allison immediately, in order, in the live conversation, and gets decided there. Ripe means its inputs are complete: the system has done the verification, the research, and the state check, and nothing remains but the judgment that is hers. Holding a ripe question back to batch it, to be polite about her attention, or to avoid interrupting a thread is a failure, and it is the failure this clause exists to kill. Her attention is not protected by hiding decisions from her; it is protected by never bringing her the same one twice.
+Decide how to handle a finding before treating it as a founder question. Finish contained work that is already authorized. An independent body of work does not automatically need Allison's judgment. Check its existing owner and route its next action through the current approved job path. Bring only the unresolved founder decision through the current decision route.
 
-Every item is exactly one of two things, and there is no third:
-
-- Ripe. The question comes now.
-- Waiting. It waits on a named condition, a third party, elapsed time, Allison's hands, or a running process, and it carries the date it goes stale. It lives in the lane ledger's waiting-on column, the estate's waiting register, per The No Later Commandment. No named condition means it is not waiting. It is a ripe question hiding.
-
-A finding is dispositioned before it is a question. A contained finding is in-lane cleanup, finished inside the open work with no trip to Allison. A finding that has become an independent body of work becomes a ripe question and comes to her now, carried by the scope explanation (what we found, why it matters, scope in concrete shape, cleanup or project, recommendation). A valid finding she deliberately does not activate is preserved with its detailed context in its owning artifact, and, when guaranteed mechanical resurfacing is required, one open GitHub issue in the owning repo carries RETURN WHEN: <condition> as the wake token and points to that artifact. One detailed owner, one mechanical wake token when needed, no duplicated fact set. That is a decision made and recorded, not the banned later. When a repo, project, or workstream wakes (an initiative touching it is approved for activation, a lane opens on it, resume-work fires, or its named trigger is observed), the opening move includes reading that owning repo's open RETURN WHEN issues. A fired condition surfaces through the scope explanation. An unfired condition stays preserved and silent, and silence is the healthy state.
-
-Banned outright, in every surface and every session. "We can decide that later." "We do not have to decide that now." "Nothing needed tonight." "Something to think about." "Flagging for later." "Let us circle back." "I will bring this up when it matters." Every equivalent, however softly phrased. These sentences all do the same thing, they move a decision out of the only place it can be made and into nowhere. There is no later to move it to. Later is not a container; it is the absence of one.
-
-The trade is named, not hidden: dated waits rely on the lockstep march, the discipline of the next session actually reading the register, and not on a robot. Allison accepted that trade with the cost stated. The answer to a missed wait is a better march, never a nudge machine.
+Keep a genuine wait with its existing work record, owner, named return condition, next action and stale date under current HQ rules. Use the current approved follow-through route and report meaningful changes without repeating unchanged status. Preserve deliberate sequencing and current holds. Do not replace ownership with a vague promise, duplicate record or new watcher.
 
 ---
 
@@ -269,17 +260,11 @@ The trade is named, not hidden: dated waits rely on the lockstep march, the disc
 
 Authored by Allison Gaddy, 2026-08-03. Ruled live in Aura: Strategic Advisor / Repo Walk. Canonical record: ADR 0050, history in GitHub Archive.
 
-A ruling is not recorded until its consequences are in motion. When Allison issues a ruling on any surface (Claude chat, Cowork, Claude Code), the system executes the writable portion of that ruling immediately, in the same turn, from the surface it is on, using the access it already holds. Chat and Cowork are execution surfaces, not note-taking surfaces. If the surface holds a connector that can make the change (GitHub, Notion, GHL, Drive), the change is made on the spot and reported with its commit hash, link, or record ID.
+Execute the currently authorized writable portion of a ruling in the same turn when the surface can do it, and verify the actual result before reporting it. Existing approvals and holds remain in force. Do not substitute a queue entry or promise for work the system can already complete.
 
-What cannot be executed from the current surface splits exactly two ways, and both move in the same turn the ruling closes:
+For work this surface cannot finish, follow the current live HQ Rulebook sections Handoffs between AIs, No dead ends and Session lifecycle, the newest applicable Decision Log entries, and The Job Report And Archive Readiness below. Use the current approved owner and job route rather than the former per-action Claude Code session and paste-block machinery. A genuine founder-only decision or unavoidable human action uses the current HQ route, not a new approval ceremony invented by this skill.
 
-1. Irreversible or destructive actions (deletions, history rewrites, archive flag flips where the surface's tooling lacks the switch, machine-level changes). These go to a gated Claude Code session, one session per action, and the paste block ships in the same message the ruling closes, per the code-block-routing and lane-spawn skills. Gated never means parked.
-
-2. Actions only Allison's hands can perform (admin UI uploads, settings panels with no API, after the exception test proves it). Named explicitly with the direct URL, once, and tracked as the awaited item.
-
-Banned under this cadence: closing a ruling with only a queue entry when a writable action existed; batching executable rulings to the end of a lane; "queued" or "recorded" as a substitute for a commit hash; deciding and moving to the next topic with nothing in motion.
-
-The permanence chain for rulings themselves: chat is not memory. A ruling becomes permanent only when it lands in canon (an entry in the Decision Log in Drive, or a doctrine or skill amendment in this repo) in the same session it was made. The system writes that canon itself when it holds the access, and the execution of a ruling includes writing its record.
+Record business rulings through the current HQ Decision Log capture and verification workflow in Drive. A repository commit records a technical source change and its evidence. It does not by itself record or create a business decision.
 
 ---
 
@@ -331,21 +316,13 @@ One canonical owner, many pointers or generated views. Before creating any new r
 
 ## The No Later Commandment (Nothing Rides Untracked)
 
-Ruled by Allison 2026-08-06 at commandment tier; ruling of record: history in GitHub Archive. Part Two amended by Allison 2026-08-06 after research review; amendment record: history in GitHub Archive.
+Historical origin. The 2026-08-06 ruling and 2026-08-07 amendments remain in GitHub Archive. Their former lane-ledger, pasted-kickoff, board-card and sweep mechanics are historical, not current routing instructions.
 
-Part one. There is no later. When a session finds work its surface cannot finish itself, the hand-off block ships in the same conversation, in the same turn, before the session moves on. Deferring routed work to a next session is a failure condition.
+For work that cannot finish on this surface, follow the live HQ Rulebook sections Handoffs between AIs, No dead ends and Session lifecycle, the newest applicable Decision Log entries, and The Job Report And Archive Readiness above. Complete the authorized next action or place it with its current approved owner through that route, and verify the saved assignment before reporting it. Do not require Allison to relay a routine handoff by hand.
 
-Part two. Nothing rides untracked. Genuinely blocked work means blocked on a third party, on elapsed time, on Allison's hands, or on a running process, nothing else. Everything else executes now. Every wait stays in its existing Chat to Code job, with what it waits on, what moves next, and the date it goes stale. No reason, no wait. Work Allison has ruled paused carries her ruling instead of a date; the robot counts it healthy and never reports it; it wakes only on her word. The board holds missions and genuinely far-horizon markers only, work Allison chose. Blocked residue never lands on the board and no card is minted for routed work.
+Keep waiting work in its existing approved record with an owner, return condition, next action and stale date under current HQ rules. Preserve current holds and quiet unchanged state without suppressing meaningful changes or founder decisions. Use the current approved follow-through mechanism. A legitimate current job or decision request is not prohibited working-state clutter. Avoid duplicate or ownerless records, parallel registries and ad hoc watchers instead.
 
-Part two amended 2026-08-07 by the Follow-Through Engine recharter (ruling of record: history in GitHub Archive), then corrected the same day in the Board Walk lane (ruling of record: history in GitHub Archive). The recharter's "not on robots" wording was broader than what it meant and read as retiring the register sweep entirely. What is banned is stated positively here, and this is the operative text.
-
-Two things are banned, permanently. No card is minted for routed work or for any flag; the board holds missions and genuinely far-horizon markers only, and blocked residue never lands on it. No per-item alert, reminder, or nudge fires; daily nagging on many items trains alert deafness, which is the failure the ban exists to prevent.
-
-One thing is kept. The register sweep stays, as one exceptions-only pass inside the existing morning digest, never as its own robot and never as its own message. It reads the existing job list through job_status and reports only work past its recorded stale date. Silence is the healthy state: when nothing is stale the pass emits nothing at all. It never mints a card, never pages per item, and never sends anything itself.
-
-The march and the machine are complements, not substitutes. The march is the discipline of reading the register at each session open, and it stays primary. The sweep is the backstop for the wait that goes stale between marches. Flags still travel by staged kickoff, session-wrap v1.3 step 4: every flag leaves its wrap as a ready-to-paste block that births its own conversation, and the open conversation IS the tracking. Allison pulls them at her own tempo, and she ruled that five flags opening five conversations is fine and manageable.
-
-The Follow-Through Engine (card #90, history in GitHub Archive) is the shipped implementation of this paragraph and is accepted; it went live 2026-08-07 at commit 32d0cd5 on ExpertPartners/allison-founder-command-center.
+The former Follow-Through Engine on ExpertPartners/allison-founder-command-center, including historical commit 32d0cd5, is implementation history only. That record and this skill establish no current execution or coverage. Resolve and verify the currently approved owner and producer before relying on follow-through. Do not reactivate old machinery or create a replacement from this paragraph.
 
 ---
 
@@ -413,7 +390,7 @@ These behaviors are forbidden within the Expert Partners AI Operating System. Th
 - Holding a ripe question back to batch it, or to spare her attention she did not ask to be spared
 - Recording a wait with no named condition and no stale date
 - Granting, revoking, or transferring access on any permission surface without her word, including changes the system judges to be strict transfers or strict tightenings
-- Minting a board card for a flag, a routed item, or any other piece of working state
+- Creating duplicate or ownerless work records instead of using the current approved job and decision routes
 - Handing Allison a navigation path when a full URL exists, or leaving a page in a browser pane in place of giving her the address
 
 - Prescribing an install, build, migration, or configuration without first

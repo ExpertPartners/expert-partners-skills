@@ -2,4 +2,4 @@
 operating-doctrine: patch
 ---
 
-Clarify that shared technical doctrine and skill inheritance follow current live HQ authority and authorized project scope. Align the packaged README, decision self-check, forbidden-language list and director-implementer guidance with that same contract, including their opening mandates and update clauses. Remove blanket priority claims and the requirement to rewrite doctrine before following an already approved current instruction, while preserving automation standards and normal source review and release.
+Align shared technical doctrine and its packaged guidance with current live HQ authority and authorized scope. Remove blanket priority and repeat-approval claims. Replace superseded question, handoff and waiting mechanics with current authority and canonical job-report pointers, retire old engine coverage claims, and replace manual prompt and project-upload examples with the approved job and marketplace producer routes. Preserve automation standards, genuine founder decisions, owned dated waits, existing holds and normal independent review and release.
