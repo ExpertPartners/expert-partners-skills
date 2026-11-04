@@ -3,9 +3,14 @@
 `check_versions.py` keeps the build and test tooling reproducible. It reads files in
 the tree only. It never contacts a package index or registry and never runs a resolver.
 
+`check_unused.py` flags declared dependencies nothing uses and imports nothing
+declares. It reads the tree and runs the installed knip binary. It never contacts a
+registry, fetches a package, or edits a file.
+
 ```bash
-python3 tools/dependency-policy/check_versions.py           # check this repository
-python3 tools/dependency-policy/check_versions.py --root DIR
+python3 tools/dependency-policy/check_versions.py           # reproducibility rules
+python3 tools/dependency-policy/check_unused.py             # usage rules
+python3 tools/dependency-policy/check_unused.py --only python   # or --only javascript
 python3 -m unittest discover -s tools/dependency-policy/tests -v
 ```
 
@@ -107,6 +112,44 @@ package.json files the same way, run `npm install` in each, and commit both lock
 
 This policy covers build dependencies only. Plugin versions are the release step's
 (`tools/release`), not this check's.
+
+## Dependency usage
+
+`check_unused.py` is the usage half of the policy. It prints one `USED` line per
+direct dependency with its kind and evidence, one `FAIL` line per problem, and ends
+with `unused-dependencies: PASS` (exit 0) or `FAIL` (exit 1).
+`.github/workflows/tooling-unused-dependencies.yml` runs the check and the tests.
+
+JavaScript: knip reads the one shared configuration, `tools/dead-code/knip.json`
+(the dead-code job owns it; no second knip config exists). The runner reports the
+dependency issue types the dead-code gate leaves out: unused `dependencies` and
+`devDependencies`, unused optional peer dependencies and binaries, and `unlisted`
+imports, meaning an import package.json never declares. knip has no
+unused-optionalDependencies report: an optional dependency is a declared integration
+point, and this check never asks to remove one.
+
+Python: each lock's `# Direct: ...` header names the direct dependencies; every other
+pin is transitive and is never expected to be imported. A direct dependency must show
+one kind of evidence in the lock's scope (the [tool.vulture] paths in pyproject.toml
+that the lock's directory governs; the root lock governs the rest):
+
+| Kind | Evidence |
+|---|---|
+| `runtime` | imported by a non-test module in scope |
+| `test` | imported only by test modules in scope |
+| `cli` | run as `python -m <name>` or a `node_modules/.bin/<name>` path by a workflow, shell script or plist |
+| `runtime, optional` / `test, optional` | the import sits behind `try: ... except ImportError` |
+| `stub` | a `types-<pkg>` pin whose <pkg> a lock pins or a scoped source imports |
+
+An import in scope that no pin in the governing lock's closure provides fails as
+undeclared, and an import behind try/except is not excused: optional integrations must
+still be declared. `EXCEPTIONS` in `check_unused.py` waives only the named lazy
+integrations (the Google client and Playwright, installed on the founder Mac outside
+the repo locks), each with its evidence, and an entry fails once its import is gone.
+Nothing is removed or disabled because a detector cannot see a use; add an evidenced
+exception instead. A distribution whose import name differs from its normalized pin
+name (pyyaml to yaml, pillow to PIL, beautifulsoup4 to bs4, yt-dlp to yt_dlp) is mapped
+in `IMPORT_NAMES`.
 
 ## Dependency update pull requests
 

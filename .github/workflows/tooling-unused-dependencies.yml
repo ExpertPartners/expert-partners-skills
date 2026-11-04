@@ -1,0 +1,61 @@
+name: tooling-unused-dependencies
+
+# Declared dependencies nothing uses, and imports nothing declares, in the canonical
+# tooling. tools/dependency-policy/check_unused.py runs knip (the shared detector
+# configured in tools/dead-code/knip.json) over each producer's dependency issue types
+# and checks each requirements*.txt lock's direct dependencies against the imports,
+# CLI invocations and optional integrations in the canonical Python scope. Everything
+# runs offline: the tests use synthetic fixtures and fetch no package.
+# tools/dependency-policy/README.md explains the rules.
+
+on:
+  pull_request:
+    paths:
+      - 'pyproject.toml'
+      - 'requirements-tooling.txt'
+      - 'tools/dependency-policy/**'
+      - 'tools/dead-code/knip.json'
+      - 'tools/*/package.json'
+      - 'tools/*/package-lock.json'
+      - 'plugins/research-ops/**'
+      - '.github/workflows/**'
+  push:
+    branches: [main]
+    paths:
+      - 'pyproject.toml'
+      - 'requirements-tooling.txt'
+      - 'tools/dependency-policy/**'
+      - 'tools/dead-code/knip.json'
+      - 'tools/*/package.json'
+      - 'tools/*/package-lock.json'
+      - 'plugins/research-ops/**'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unused-dependencies:
+    name: unused and undeclared dependencies (knip and AST, offline)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install the JavaScript producers (lockfiles)
+        run: |
+          set -euo pipefail
+          for producer in tools/capability-feed tools/skill-map; do
+            (cd "$producer" && npm ci --ignore-scripts --no-audit --no-fund)
+          done
+      - name: Unused dependency check
+        run: python tools/dependency-policy/check_unused.py
+      - name: Fixture tests
+        env:
+          UNUSED_REQUIRE_TOOLS: "1"
+        run: python -m unittest discover -s tools/dependency-policy/tests -v
