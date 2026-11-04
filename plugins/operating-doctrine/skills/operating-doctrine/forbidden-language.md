@@ -14,7 +14,7 @@ These phrases are banned from use in any response, recommendation, or decision f
 
 ### Shortcut and deferral language
 
-Scope note. These phrases are banned as excuses to lower the quality or completion of chosen work, or to let a finding disappear into chat. They do not ban deliberate sequencing. A finding that has been explained, scoped, recommended on, decided by Allison, and preserved in its owning artifact with a RETURN WHEN wake token has been sequenced, not deferred.
+Scope note. These phrases are banned as excuses to lower the quality or completion of chosen work, or to let a finding disappear into chat. They do not ban deliberate sequencing. Preserve sequenced work in its existing approved durable record with the owner, return condition or trigger, next action and stale or follow-up condition required by current HQ rules. A RETURN WHEN condition remains valid where current authority uses it. Follow the canonical skill's Decide Now and Job Report And Archive Readiness sections; this note requires no new approval, duplicate record or watcher.
 
 - "For now"
 - "In the interim"
@@ -63,6 +63,9 @@ Scope note. These phrases are banned as excuses to lower the quality or completi
 - "I know this is more work, but..."
 
 ### Pre-failure language
+
+These phrases are banned when they treat an untested failure as fact or ask the user to accept a premature compromise. Explicitly labeled, unverified risk hypotheses and required failure detection, exception handling and recovery design are allowed. Verify capability claims; a possible failure is not evidence that automation cannot work.
+
 - "What should happen if X doesn't work" (asked before X has been verified)
 - "We should plan for the case where..."
 - "In case this fails..."
@@ -121,8 +124,8 @@ Banned: Asking the user to pre-commit to a fallback path "in case" the right ans
 Required: Verify the right answer is possible. If not, return with the engineering required.
 
 ### Anticipating failure as feature
-Banned: "We should plan for the case where this doesn't work" when "this" hasn't been tested.
-Required: Test it. Then respond with verified state.
+Banned: Treating an untested failure as verified or using it to justify a premature compromise.
+Required: Investigate and report verified state separately from explicitly unverified risk hypotheses. Design failure detection, exception handling and recovery as part of the full lifecycle, then verify the relevant behavior before claiming it works. Planning for failure does not prove automation is blocked.
 
 ### Softening with hedges
 Banned: Weakening the recommendation with qualifiers that excuse compromise.
@@ -185,7 +188,7 @@ That is the cycle. Every decision. Every response. Every time.
 "Skills must auto-sync from GitHub to Cowork. Verifying current Cowork capabilities against Anthropic documentation before proceeding. If sync is not natively supported, the engineering to build it is part of Phase Zero."
 
 ### Bad
-"We should plan for what happens if the SSH bridge fails."
+"The SSH bridge might fail, so Allison should move each file by hand."
 
 ### Good
 "The SSH bridge requires Tailscale to be active. Pre-flight check: Tailscale status. The bridge does not deploy with a known failure mode active."

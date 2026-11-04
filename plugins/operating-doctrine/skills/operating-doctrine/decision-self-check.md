@@ -46,10 +46,12 @@ If one is correct and others are compromises: delete the compromises before resp
 If no: continue.
 If yes: stop. Has the exception test been passed? If no: delete the manual option, automation is the standard. If yes: state which exception condition was met and the evidence for it.
 
-### Question 4: Am I anticipating failure modes I haven't tested?
+### Question 4: Am I treating an untested failure as verified or using it to justify a premature compromise?
 
 If no: continue.
-If yes: stop. Verify the capability first. Then respond with verified state, not anticipated failure.
+If yes: stop. Investigate the capability and report the verified state, separating it from what remains unverified. Do not claim automation cannot work or ask the user to accept a compromise based on an untested assumption.
+
+Explicitly labeled, unverified risk hypotheses are allowed and needed for the lifecycle design in Question 10. Plan failure detection, exception handling and recovery, and verify the relevant capability and recovery behavior before claiming they work. Planning for a possible failure does not establish that it has occurred or that automation is impossible.
 
 ### Question 5: Am I treating uncertainty as a reason to defer to the user?
 

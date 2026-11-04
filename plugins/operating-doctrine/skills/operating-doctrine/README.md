@@ -35,6 +35,7 @@ It does not eliminate slips with 100% certainty. LLM behavior is statistical. Th
 - SKILL.md, the canonical doctrine. The standard, the principles, the exception test, the impossibility definition, the uncertainty protocol, the user-versus-system domain separation, the operating posture.
 - forbidden-language.md, explicit list of banned phrases and behavioral patterns with examples of reframes.
 - decision-self-check.md, the internal twelve-question check Claude runs before any response that proposes a path forward.
+- director-implementer-separation.md, the boundary between Allison's direction and system implementation, including verified manual exceptions.
 - README.md, this file.
 
 ## How It Gets Loaded
