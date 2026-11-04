@@ -461,17 +461,19 @@ If a pattern slips repeatedly, the doctrine has a gap, and the doctrine itself g
 
 ## Where This Doctrine Lives
 
-- Canonical: `ExpertPartners/expert-partners-skills/plugins/operating-doctrine/skills/operating-doctrine/SKILL.md` (this file, the one true copy per the 2026-08-05 ruling; the old repo-root path is a pointer file). Live, version-controlled.
-- Cowork project Instructions panel: the old aura system prompt (`aura/bootstrap/cowork.md`) is retired history and no longer a source. What the panel carries now is Allison's to confirm, and it cannot be verified from this machine.
-- Cowork project instructions: claude.ai-side panels. Not verifiable from this machine; a propagation target confirmed by Allison at re-upload, never an assumed state.
-- Claude Code user CLAUDE.md: `~/.claude/CLAUDE.md`, mirrored to `ExpertPartners/allison-claude-doctrine`. Live.
-- Every other skill in the repo: YAML frontmatter references this doctrine.
-- SOUL.md: `ember-workspace/SOUL.md` (Ember, the production brain) Aura's `aura/SOUL.md` is retired with the aura repo and is history. Atlas, Cortex, Muse, and Aria were removed from this list: archived 2026-06-04, dark by design.
-- Claude.ai Aura project knowledge: the old uploaded file is retired history. Not verifiable from this machine, and never an assumed state.
+The canonical source is `ExpertPartners/expert-partners-skills/plugins/operating-doctrine/skills/operating-doctrine/SKILL.md`. The old repository-root path is a pointer, not another editable copy.
 
-The doctrine is not stored in one place. It is propagated to every surface listed here. Five of these surfaces are verified live; two (Cowork project instructions and any claude.ai project knowledge) cannot be verified from this machine and are named as unverifiable rather than claimed as covered.
+Approved changes use the normal reviewed changeset and release process described in `.changeset/README.md` and `tools/release/README.md`, then the supported GitHub marketplace producer for the destination. Local client catch-up and delivery receipts follow `tools/plugin-sync/README.md`. Do not hand-upload this skill into project knowledge or maintain an independent instruction mirror.
 
-Propagation rule: on every version bump, this surface list gets verified against reality (files read, processes checked, claims tested) before the new version ships. A checklist that names dead surfaces reports success it did not achieve.
+Resolve the actual supported destinations, installation settings and current producer from live HQ authority, current assignments and the destination's existing configuration. A historical surface list, old repository mirror or remembered machine path is not current deployment evidence.
+
+Verify these stages separately for each relevant destination:
+
+1. **Publication:** the approved canonical source and release version were published.
+2. **Delivery:** the destination received the matching installed manifest and content, with its enabled state checked.
+3. **Active use:** the relevant runtime actually loaded the installed instructions. Check current supported reload or new-session behavior rather than assuming an existing conversation refreshed.
+
+A merge, file listing or installation receipt does not prove active use. Record the actual checks and any unavailable evidence in the existing work record; this skill does not certify a fixed number of live surfaces.
 
 ---
 
