@@ -121,7 +121,8 @@ class FakeGitHub:
     """Holds the board and answers the calls the sweeper makes. An unexpected call fails."""
 
     def __init__(self, issues=(), prs=(), runs=(), comments=None, jobs=None, logs=None, timeline=None,
-                 events=None, commits=None, reviews=None, threads=None, extra=None, pulls=None):
+                 events=None, commits=None, reviews=None, threads=None, extra=None, pulls=None,
+                 reactions=None, connector=False):
         self.issues = {i["number"]: i for i in issues}
         self.extra = {i["number"]: i for i in (extra or [])}
         self.prs = list(prs)
@@ -135,6 +136,10 @@ class FakeGitHub:
         self.commits = commits or {}
         self.reviews = reviews or {}
         self.threads = threads or {}
+        self.reactions = {k: list(v) for k, v in (reactions or {}).items()}
+        # A stand-in for the Codex connector: it puts its eyes on an @codex review comment
+        # from a person and ignores one from a bot account, as it did live on Nov 4 2026.
+        self.connector = connector
         self.calls = []
 
     def get(self, path, params=None):
@@ -165,6 +170,8 @@ class FakeGitHub:
             return list(self.events.get(int(parts[-2]), []))
         if path.endswith("/reviews"):
             return list(self.reviews.get(int(parts[-2]), []))
+        if path.startswith(f"/repos/{REPO}/issues/comments/") and path.endswith("/reactions"):
+            return list(self.reactions.get(int(parts[-2]), []))
         if path == f"/repos/{REPO}/actions/workflows/{WORKFLOW}/runs":
             assert key == "workflow_runs"
             return list(self.runs)
@@ -207,7 +214,10 @@ class FakeGitHub:
             have = {label["name"] for label in item["labels"]}
             item["labels"] += [{"name": n} for n in body["labels"] if n not in have]
         elif path.endswith("/comments"):
-            self.comments.setdefault(int(parts[-2]), []).append(comment(body["body"], at=0))
+            posted = comment(body["body"], at=0)
+            self.comments.setdefault(int(parts[-2]), []).append(posted)
+            if self.connector and body["body"].startswith("@codex review") and not posted["user"]["login"].endswith("[bot]"):
+                self.reactions.setdefault(posted["id"], []).append(codex_eyes())
         return None
 
     def patch(self, path, body):
@@ -254,12 +264,18 @@ def failing_label_writes(gh):
     return real_post
 
 
+def codex_eyes():
+    return {"user": {"login": "chatgpt-codex-connector[bot]"}, "content": "eyes"}
+
+
 def removed_needs_allison(at=0):
     return {"event": "unlabeled", "label": {"name": "needs-allison"}, "created_at": ago(at)}
 
 
-def sweep(gh, dry_run=False, repo=REPO):
-    s = sw.Sweeper(gh, sw.Config(repo=repo, builder_workflow=WORKFLOW, ref="main", dry_run=dry_run), NOW)
+def sweep(gh, dry_run=False, repo=REPO, later=0):
+    """later moves the sweep that many minutes past NOW, as the next scheduled sweeps would."""
+    s = sw.Sweeper(gh, sw.Config(repo=repo, builder_workflow=WORKFLOW, ref="main", dry_run=dry_run),
+                   NOW + dt.timedelta(minutes=later))
     with contextlib.redirect_stdout(io.StringIO()):
         s.sweep()
     assert not s.errors, s.errors
@@ -623,6 +639,111 @@ class Rule6CodexReview(unittest.TestCase):
         gh = self.board(draft=True)
         sweep(gh)
         self.assertEqual(gh.writes(), [])
+
+
+class Rule6CodexAcknowledgement(unittest.TestCase):
+    """A review request is delivered only when the Codex connector acknowledges it."""
+
+    def board(self, comments=(), reactions=None, head=HEAD):
+        return FakeGitHub(
+            issues=[issue(12, "job")],
+            prs=[pr(60, 12, head=head, created=90)],
+            comments={60: list(comments), 12: []},
+            commits={head: {"commit": {"committer": {"date": ago(40)}}}},
+            reactions=reactions,
+            connector=True,
+        )
+
+    @staticmethod
+    def ask(sha=HEAD, attempt=1, at=20, cid=601):
+        tag = f" attempt={attempt}" if attempt > 1 else ""
+        return comment(f"@codex review\n\n<!-- {sw.MARK} codex-review head={sha}{tag} -->", cid=cid, at=at)
+
+    def asks(self, gh):
+        return [b for b in gh.comment_bodies(60) if b.startswith("@codex review")]
+
+    def blockers(self, gh):
+        return [b for b in gh.comment_bodies(60) if b.startswith("Review service blocker")]
+
+    def test_a_request_from_a_bot_identity_is_ignored_and_not_counted_as_delivered(self):
+        gh = self.board()
+        sweep(gh)
+        self.assertEqual(len(self.asks(gh)), 1)
+        posted = gh.comments[60][-1]
+        self.assertTrue(posted["user"]["login"].endswith("[bot]"))
+        self.assertEqual(gh.reactions.get(posted["id"], []), [], "the connector ignores a bot's request")
+        gh.calls.clear()
+        s = sweep(gh, later=10)
+        self.assertTrue(any(c[1].endswith(f"/issues/comments/{posted['id']}/reactions") for c in gh.calls),
+                        "the sweeper checks for the acknowledgement instead of assuming it")
+        self.assertEqual(len(self.asks(gh)), 2, "an ignored request is not marked done")
+        self.assertIn("did not acknowledge", s.actions[0])
+        self.assertIn("github-actions[bot]", s.actions[0])
+
+    def test_an_acknowledged_request_is_not_asked_again(self):
+        gh = self.board(comments=[self.ask()], reactions={601: [codex_eyes()]})
+        for later in (0, 10, 60):
+            sweep(gh, later=later)
+            self.assertEqual(gh.writes(), [], f"once per head, {later} minutes later")
+
+    def test_a_review_state_comment_for_the_head_is_an_acknowledgement(self):
+        state = comment('<!-- codex-review-state:v1 {"code_review": {"commit_sha": "%s", "status": "running"}} -->' % HEAD,
+                        login="chatgpt-codex-connector[bot]")
+        gh = self.board(comments=[self.ask(), state])
+        sweep(gh, later=30)
+        self.assertEqual(gh.writes(), [])
+        self.assertFalse(any(c[1].endswith("/reactions") for c in gh.calls), "no reaction read is needed")
+
+    def test_an_unacknowledged_request_is_retried_once_then_reported_as_a_blocker(self):
+        gh = self.board()
+        sweep(gh)
+        self.assertEqual(len(self.asks(gh)), 1)
+        self.assertIn(f"codex-review head={HEAD} -->", self.asks(gh)[0])
+        # The next sweep finds no acknowledgement and asks once more.
+        s = sweep(gh, later=10)
+        self.assertEqual(len(self.asks(gh)), 2)
+        self.assertIn(f"codex-review head={HEAD} attempt=2 -->", self.asks(gh)[1])
+        self.assertEqual(self.blockers(gh), [])
+        self.assertIn("asked Codex again", s.actions[0])
+        # The retry is ignored too, so the sweep after reports a blocker instead of asking again.
+        s = sweep(gh, later=20)
+        self.assertEqual(len(self.asks(gh)), 2, "retried only once")
+        blockers = self.blockers(gh)
+        self.assertEqual(len(blockers), 1)
+        self.assertIn(f"head `{HEAD[:7]}`", blockers[0])
+        self.assertIn("github-actions[bot]", blockers[0])
+        self.assertIn(f"codex-blocked head={HEAD}", blockers[0])
+        self.assertIn("review service blocker", s.actions[0])
+        self.assertEqual(gh.dispatches(), [])
+        # Reported once; later sweeps leave it alone.
+        gh.calls.clear()
+        sweep(gh, later=30)
+        self.assertEqual(gh.writes(), [])
+
+    def test_the_retry_waits_for_the_acknowledgement_window(self):
+        gh = self.board(comments=[self.ask(at=2)])
+        sweep(gh)
+        self.assertEqual(gh.writes(), [])
+        self.assertFalse(any(c[1].endswith("/reactions") for c in gh.calls))
+
+    def test_a_late_acknowledgement_of_the_first_request_stops_the_blocker(self):
+        gh = self.board(comments=[self.ask(at=30), self.ask(attempt=2, at=20, cid=602)],
+                        reactions={601: [codex_eyes()]})
+        sweep(gh)
+        self.assertEqual(gh.writes(), [])
+
+    def test_a_codex_review_on_the_head_stops_the_retry(self):
+        gh = self.board(comments=[self.ask()])
+        gh.reviews[60] = [{"user": {"login": "chatgpt-codex-connector[bot]"}, "commit_id": HEAD}]
+        sweep(gh)
+        self.assertEqual(gh.writes(), [])
+
+    def test_a_new_head_after_a_blocker_starts_over(self):
+        blocked = comment(f"Review service blocker: x\n\n<!-- {sw.MARK} codex-blocked head={HEAD} -->", cid=603, at=30)
+        gh = self.board(comments=[self.ask(at=50), self.ask(attempt=2, at=40, cid=602), blocked], head=NEW_HEAD)
+        sweep(gh)
+        self.assertEqual(len(self.asks(gh)), 3)
+        self.assertIn(f"codex-review head={NEW_HEAD} -->", self.asks(gh)[-1])
 
 
 class Rule7Refused(unittest.TestCase):
