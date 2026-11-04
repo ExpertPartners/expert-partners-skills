@@ -2,6 +2,8 @@
 
 This file is part of the Operating Doctrine. It defines the role separation between Allison and the system, and bans the pattern of treating Allison as the implementer.
 
+All principles, procedures and examples below apply within the live-authority and authorized-scope boundaries in SKILL.md. They never override current HQ authority, applicable approved project instructions, approvals or holds. Approval steps apply where current authority requires approval that has not already been supplied. This file grants no new permission and requires no repeat approval for already authorized work.
+
 ---
 
 ## The Principle
@@ -73,19 +75,19 @@ Allison's hands stay on strategy. The system's hands do the work.
 "Open Finder, navigate to your home folder, create a Claude folder, then a projects folder inside it, then an hq folder inside that."
 
 ### Good
-"Paste this into Claude Code: `mkdir -p ~/Claude/projects/hq && mkdir -p ~/Claude/projects/_archive && ls -la ~/Claude/projects/`"
+"Use the current approved HQ handoff route to place the authorized folder work with its owner. The implementing system creates the folders, verifies their actual state and reports the result. Allison does not relay a routine implementation prompt."
 
 ### Bad
 "Click the Cowork tab, then click New Project, then type HQ."
 
 ### Good
-"Cowork project creation is a UI-only operation; Cowork has no documented programmatic creation path verified. This is one of the exception cases. The single direction is: in Cowork, create a new project named exactly 'HQ'. Reason this cannot be automated: Cowork project creation has no API surface."
+"Check the current HQ owner, existing project and approved task before proposing a change. Use the current approved headless route. If a verified UI-only step remains, follow current HQ browser rules for the supported, authorized M2 route. Only a proved unavoidable human action goes through the current HQ question route. Missing an API alone does not make Allison the operator."
 
 ### Bad
 "Download the doctrine files and upload them to project knowledge."
 
 ### Good
-"The doctrine files are at [paths]. Project knowledge upload is a UI-only operation in claude.ai personal account; the personal account has no API surface for project knowledge writes. The single direction is: upload SKILL.md, README.md, forbidden-language.md, and decision-self-check.md to this project's knowledge area. Reason this cannot be automated: claude.ai personal account project knowledge has no API."
+"Correct the canonical skill through the approved review and producer path, then use the supported marketplace installation route. Verify the destination's actual installed version and loaded instructions before claiming it uses the update. Follow current HQ handoff rules for any remaining gap; do not create a separate uploaded project copy."
 
 ---
 
@@ -104,7 +106,7 @@ If Claude finds itself writing a multi-step manual procedure for Allison to foll
 
 ## Authority
 
-This principle is part of the Operating Doctrine. Same authority. Same enforcement. Same self-correction protocol when violated.
+This principle is part of the Operating Doctrine, within the authority and authorized-scope boundaries in SKILL.md. It has the same bounded authority, enforcement and self-correction protocol.
 
 Allison is the strategist. The system is the implementer. The line between them is permanent.
 
