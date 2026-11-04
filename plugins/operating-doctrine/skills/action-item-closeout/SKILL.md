@@ -3,12 +3,12 @@ name: action-item-closeout
 description: Ensure every active AI conversation ends with verified completion or a durable tracked action with an owner, trigger, expected result, and follow-up condition. Load for session wrap, recommendations, handoffs, waits, and any response that could otherwise end as advice.
 allowed-tools: []
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
-# tier: plugin
-# zone: routing
-# status: live
-# inherits: operating-doctrine
-# brand-scope: null
-# subtitle: "no advice-only endings"
+tier: plugin
+zone: routing
+status: live
+inherits: operating-doctrine
+brand-scope: null
+subtitle: "no advice-only endings"
 ---
 
 # Action Item Closeout
