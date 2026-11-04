@@ -173,7 +173,9 @@ An automatic readiness evaluation never silently repairs, renames, archives, con
 
 ## Topology drift, and who watches it
 
-Drift surfacing belongs to the EXISTING weekly governance scan (`aura tools/governance/aura-governance-scan.py`, ADR 0033, which lives in the retired aura repo and has no named Drive-era owner yet), never to a second watcher, daemon, registry, or dashboard. Verify whether it still runs before relying on it. Compare the sheet against the live org: an active org repo with no row is `UNREGISTERED REPO`, a row for a repo that is gone is `ORPHAN POINTER`, and an archived or locked repo shown open, or the reverse, is `STATUS MISMATCH`. The scan still reads the aura Manifest until it is repointed at the sheet, so verify the current implementation before claiming it emits these findings. The scan stays read-and-flag-only, proposes while the owning session or Allison disposes, and this skill reads its findings without building a parallel mechanism.
+The former Aura weekly governance scan (`aura tools/governance/aura-governance-scan.py`, ADR 0033) is retired historical machinery, not the current topology-check owner or producer. Do not reactivate it. Resolve the current approved owner and producer from live HQ records and the existing work list, then verify its implementation and running state before relying on its findings. If that ownership or execution is unverified, report the gap to the existing work item's steward without claiming coverage or creating a second watcher, daemon, registry, or dashboard.
+
+Compare the sheet against the live org: an active org repo with no row is `UNREGISTERED REPO`, a row for a repo that is gone is `ORPHAN POINTER`, and an archived or locked repo shown open, or the reverse, is `STATUS MISMATCH`. Keep the assessment read-and-flag-only, proposing while the owning session or Allison disposes. Do not claim Star or another replacement emits these findings until its actual implementation and current ownership are verified.
 
 ## Deployed copies and this skill's own hygiene
 

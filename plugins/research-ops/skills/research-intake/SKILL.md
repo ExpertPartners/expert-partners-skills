@@ -110,9 +110,12 @@ Where the question goes depends on where this skill is running.
 - **Claude chat or Cowork**: ask in chat and wait for her answer.
 - **Factory, Codex or Claude Code**: never wait inside the app. Follow the
   HQ Rulebook question path: post the question as a comment starting
-  `Question for Allison` on the GitHub issue for the work, or mark the
-  existing Chat to Code job needs-allison with one line starting
-  `Recommend:` through the job tool's nonterminal path, never job_finish.
+  `Question for Allison` on the code job's GitHub issue, or use
+  `job_finish` with outcome `needs-allison` for the affected non-code job
+  and one line starting `Recommend:` in its summary, following the live
+  tool schema. This requests a decision, not completion. Never use `done`
+  for unfinished work or finish an unrelated job. Retrieval and technical
+  gaps stay AI owned unless an actual founder decision is missing.
   Keep working on everything that does not depend on this report, and file
   it where she says once she answers.
 
