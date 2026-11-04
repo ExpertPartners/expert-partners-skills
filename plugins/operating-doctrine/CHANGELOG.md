@@ -1,3 +1,6 @@
+## 2.84.9 - 2026-11-04
+
+Point current decision-capture instructions in operating-doctrine, estate-memory-router, remember-this and session-wrap to the live HQ Decision Log workflow instead of the retired Decision 0101 procedure, preserving clear decisions without magic phrases, honest approval evidence and existing approvals and holds.
 ## 2.84.8 - 2026-11-04
 
 Clarify that verified capability claims and labeled risk hypotheses serve different purposes, preserving required failure and recovery planning. Align companion sequencing and approval instructions with current approved records and existing authorization, and inventory all five doctrine files.
