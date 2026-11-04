@@ -15,7 +15,7 @@
       "name": "brand-voice",
       "source": "./plugins/brand-voice",
       "description": "Canonical brand context for the Estate brand registry (Expert Partners, EPIC, AG Personal Brand, AG Luxury, FAM, Don Hobbs)",
-      "version": "0.6.7"
+      "version": "0.6.8"
     },
     {
       "name": "content-engines",
