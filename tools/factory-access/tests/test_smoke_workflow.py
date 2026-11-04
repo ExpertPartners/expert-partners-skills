@@ -1,4 +1,5 @@
 """Run the manual smoke workflow's real inline Python with harmless stand-ins."""
+import json
 import os
 from pathlib import Path
 import subprocess
@@ -9,6 +10,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[3]
 WORKFLOW = ROOT / ".github/workflows/factory-access-smoke.yml"
 CANARY = "SYNTHETIC-PRIVATE-PROVIDER-CANARY-7935"
+CONNECTED_ROW = "  factory-ledger  connected  user  http  11  2025-11-25"
 
 
 def inline_python(step):
@@ -18,7 +20,8 @@ def inline_python(step):
 
 
 class ManualSmokeTests(unittest.TestCase):
-    def invoke(self, lines, preflight_code=0, cli_code=0, has_api_key=True, slow_cli=False):
+    def invoke(self, lines, preflight_code=0, cli_code=0, has_api_key=True, slow_cli=False,
+               cli_stream="stdout", extra_error=""):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             helper = root / "tools/factory-access/preflight.py"
@@ -35,11 +38,12 @@ class ManualSmokeTests(unittest.TestCase):
             droid = root / "droid"
             droid.write_text(
                 "#!" + sys.executable + "\nimport os,sys\n"
+                "if sys.argv[1:]==['--version']:\n    print('1.2.0'); raise SystemExit(0)\n"
                 "assert sys.argv[1:]==['mcp','list']\n"
                 "assert os.environ['FACTORY_API_KEY']\n"
                 "assert os.environ['FACTORY_LEDGER_MCP_TOKEN']\n"
-                "print(" + repr(lines) + ")\n"
-                "print(" + repr(CANARY) + ",file=sys.stderr)\n"
+                "print(" + repr(lines) + ",file=sys." + cli_stream + ")\n"
+                "print(" + repr(CANARY + extra_error) + ",file=sys.stderr)\n"
                 + ("import time; time.sleep(10)\n" if slow_cli else "") +
                 "raise SystemExit(" + str(cli_code) + ")\n"
             )
@@ -58,16 +62,50 @@ class ManualSmokeTests(unittest.TestCase):
             )
             self.assertNotIn(CANARY, result.stdout + result.stderr)
             self.assertEqual(result.stderr, "")
-            self.assertTrue(all(line.endswith((": PASS", ": FAIL")) for line in result.stdout.splitlines()))
+            for line in result.stdout.splitlines():
+                if line.startswith("Factory access smoke diagnostic: "):
+                    data = json.loads(line.split(": ", 1)[1])
+                    self.assertEqual(set(data), {"stage", "cli_exit", "version", "stdout_candidates",
+                                                 "stderr_candidates", "status", "auth_state"})
+                    self.assertIn(data["stage"], {"credentials", "preflight", "cli_version", "cli", "row_contract"})
+                    self.assertIn(data["status"], {"unknown", "no_candidate", "ambiguous", "not_connected", "connected"})
+                    self.assertIn(data["auth_state"], {"unknown", "auth_required", "no_auth_error_detected"})
+                    self.assertIn(data["version"], {"unknown", "1.2.0"})
+                    self.assertIsInstance(data["stdout_candidates"], int)
+                    self.assertIsInstance(data["stderr_candidates"], int)
+                else:
+                    self.assertTrue(line.endswith((": PASS", ": FAIL")))
             return result
 
     def test_exact_connected_line_passes_without_provider_output(self):
-        result = self.invoke("factory-ledger: https://example.invalid/mcp (HTTP) - Connected\n" + CANARY)
+        result = self.invoke(CONNECTED_ROW + "\n" + CANARY)
         self.assertEqual(result.returncode, 0)
         self.assertEqual(result.stdout, "Factory exact-job ledger read: PASS\nFactory native ledger MCP: PASS\n")
 
     def test_ansi_connected_line_passes(self):
-        self.assertEqual(self.invoke("\x1b[32m✓ factory-ledger: Connected\x1b[0m").returncode, 0)
+        self.assertEqual(self.invoke("\x1b[32m" + CONNECTED_ROW + "\x1b[0m").returncode, 0)
+
+    def test_connected_table_on_stderr_passes_without_raw_output(self):
+        self.assertEqual(self.invoke(CONNECTED_ROW, cli_stream="stderr").returncode, 0)
+
+    def test_authenticated_connected_table_passes(self):
+        row = CONNECTED_ROW.replace("connected", "connected (authenticated)")
+        self.assertEqual(self.invoke(row).returncode, 0)
+
+    def test_table_failure_and_malformed_columns_fail(self):
+        for row in (CONNECTED_ROW.replace("connected", "disconnected"),
+                    CONNECTED_ROW.replace("connected", "connected, tools unavailable"),
+                    CONNECTED_ROW.replace("11", "0", 1),
+                    CONNECTED_ROW.replace("user", "unexpected-source"),
+                    CONNECTED_ROW.replace("factory-ledger", "factory-ledger-extra"),
+                    CONNECTED_ROW + "\n" + CONNECTED_ROW):
+            with self.subTest(row=row):
+                self.assertEqual(self.invoke(row).returncode, 1)
+
+    def test_auth_error_with_connected_row_does_not_pass(self):
+        result = self.invoke(CONNECTED_ROW, extra_error=" authentication required")
+        self.assertEqual(result.returncode, 1)
+        self.assertIn('"auth_state": "auth_required"', result.stdout)
 
     def test_disconnected_or_wrong_server_never_passes(self):
         for output in ("factory-ledger: Disconnected", "factory-ledger: Not Connected", "factory-ledger: Connecting",
@@ -80,20 +118,22 @@ class ManualSmokeTests(unittest.TestCase):
                 self.assertNotIn("Factory native ledger MCP: PASS", result.stdout)
 
     def test_failure_exit_with_connected_text_fails(self):
-        self.assertEqual(self.invoke("factory-ledger: Connected", cli_code=1).returncode, 1)
+        self.assertEqual(self.invoke(CONNECTED_ROW, cli_code=1).returncode, 1)
 
     def test_preflight_failure_is_redacted_and_never_runs_cli_proof(self):
-        result = self.invoke("factory-ledger: Connected", preflight_code=1)
+        result = self.invoke(CONNECTED_ROW, preflight_code=1)
         self.assertEqual(result.returncode, 1)
-        self.assertEqual(result.stdout, "Factory access smoke: FAIL\n")
+        self.assertTrue(result.stdout.endswith("Factory access smoke: FAIL\n"))
+        self.assertIn('"stage": "preflight"', result.stdout)
 
     def test_missing_factory_key_fails_closed(self):
-        result = self.invoke("factory-ledger: Connected", has_api_key=False)
+        result = self.invoke(CONNECTED_ROW, has_api_key=False)
         self.assertEqual(result.returncode, 1)
-        self.assertEqual(result.stdout, "Factory access smoke: FAIL\n")
+        self.assertTrue(result.stdout.endswith("Factory access smoke: FAIL\n"))
+        self.assertIn('"stage": "credentials"', result.stdout)
 
     def test_timed_out_cli_fails_without_exposing_captured_output(self):
-        result = self.invoke("factory-ledger: Connected\n" + CANARY, slow_cli=True)
+        result = self.invoke(CONNECTED_ROW + "\n" + CANARY, slow_cli=True)
         self.assertEqual(result.returncode, 1)
         self.assertNotIn("Factory native ledger MCP: PASS", result.stdout)
 
