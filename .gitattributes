@@ -1,0 +1,4 @@
+# Produced by tools/skill-map/extract-skills-graph.mjs and layout-skills-graph.mjs.
+/tools/skill-map/skills-graph.json linguist-generated=true
+# Produced by tools/capability-feed/generate-feed.mjs; source guidance is in its README.
+/tools/capability-feed/ai-workforce-feed.json linguist-generated=true
