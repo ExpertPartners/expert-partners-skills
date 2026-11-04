@@ -16,7 +16,9 @@ with Job: and whose author is on the builder's allowlist, it applies the first r
   5. in-progress with no builder run in progress and no open pull request for 45 minutes:
      remove in-progress and dispatch the builder.
   6. Its factory-droid pull request is open and Codex has not reviewed the current head after
-     30 minutes: comment @codex review once per head.
+     30 minutes: comment @codex review. A request counts as delivered only once the Codex
+     connector acknowledges it; an unacknowledged one is asked once more on the next sweep, then
+     reported on the pull request as a review service blocker. Once per head after that.
   7. Its pull request is refused by the auto-merge gate for a blocking Codex finding or a
      failing check, and no builder run started in the last 30 minutes: comment what to fix and
      dispatch the builder. When a Codex finding comes back after it was fixed (Decision Log
@@ -68,6 +70,11 @@ DEFAULT_AUTHORS = ("AllisonGaddy", "expertpartners", "expertpartners-ember", "ex
 RECENT_RUN = dt.timedelta(minutes=30)
 IN_PROGRESS_QUIET = dt.timedelta(minutes=45)
 CODEX_WAIT = dt.timedelta(minutes=30)
+# The connector acknowledges a request it accepts within seconds, so a request still
+# unacknowledged on a later sweep was ignored.
+CODEX_ACK_WAIT = dt.timedelta(minutes=5)
+# The first request and one retry.
+CODEX_ASKS = 2
 # A build can run 60 minutes after its gate, so look back far enough to see it.
 RUN_LOOKBACK = dt.timedelta(hours=3)
 ACTIVE_STATUSES = {"queued", "in_progress", "waiting", "requested", "pending"}
@@ -75,7 +82,8 @@ ACTIVE_STATUSES = {"queued", "in_progress", "waiting", "requested", "pending"}
 MARK = "factory-stall-sweeper:v1"
 LABELED_MARK = f"<!-- {MARK} labeled -->"
 CLOSED_RE = re.compile(rf"<!-- {MARK} closed pr=(\d+) -->")
-CODEX_ASK_RE = re.compile(rf"<!-- {MARK} codex-review head=([0-9a-f]{{40}}) -->")
+CODEX_ASK_RE = re.compile(rf"<!-- {MARK} codex-review head=([0-9a-f]{{40}})(?: attempt=\d+)? -->")
+CODEX_BLOCKED_RE = re.compile(rf"<!-- {MARK} codex-blocked head=([0-9a-f]{{40}}) -->")
 FIX_RE = re.compile(rf"<!-- {MARK} fix head=([0-9a-f]{{40}}) digest=([0-9a-f]+) findings=(\S*) -->")
 RETURNED_RE = re.compile(rf"<!-- {MARK} returned head=([0-9a-f]{{40}}) -->")
 REBUILT_MARK = f"<!-- {MARK} rebuilt-no-pr -->"
@@ -840,27 +848,81 @@ class Sweeper:
         idle = f"{minutes(self.now - since)} minutes" if since else "an unknown time"
         self.act(f"#{number} in-progress removed and dispatched: no builder run and no pull request for {idle}.")
 
+    def codex_review_on(self, number: int, sha: str) -> bool:
+        reviews = self.gh.paginate(f"/repos/{self.cfg.repo}/pulls/{number}/reviews")
+        return any(login_of(r) == CODEX_LOGIN and r.get("commit_id") == sha for r in reviews)
+
+    def codex_acknowledged(self, asks: list) -> bool:
+        """Whether the Codex connector reacted (its eyes) to any of these requests. It ignores
+        requests from accounts it does not answer, such as github-actions[bot], and leaves no
+        reaction on them."""
+        for c in asks:
+            if not c.get("id"):
+                continue
+            reactions = self.gh.paginate(f"/repos/{self.cfg.repo}/issues/comments/{c['id']}/reactions")
+            if any(login_of(r) == CODEX_LOGIN for r in reactions):
+                return True
+        return False
+
+    def ask_codex(self, number: int, sha: str, attempt: int) -> None:
+        tag = f" attempt={attempt}" if attempt > 1 else ""
+        self.comment(number, f"@codex review\n\n<!-- {MARK} codex-review head={sha}{tag} -->")
+
     def rule_codex_review(self, issue: dict, pr: dict) -> None:
         if login_of(pr) != FACTORY_LOGIN or pr.get("draft"):
             return
         number, sha = int(pr["number"]), (pr.get("head") or {}).get("sha") or ""
         comments = self.comments(number)
-        if any((m := CODEX_ASK_RE.search(b)) and m.group(1) == sha for b in self.my_comments(number)):
-            return
+        # A review-state comment or receipt for the head is the connector's acknowledgement.
         if codex_reviewed(comments, sha):
             return
+        mine = [c for c in comments if login_of(c) == ACTIONS_LOGIN]
+        if any((m := CODEX_BLOCKED_RE.search(c.get("body") or "")) and m.group(1) == sha for c in mine):
+            return
+        asks = [c for c in mine if (m := CODEX_ASK_RE.search(c.get("body") or "")) and m.group(1) == sha]
+        if asks:
+            return self.follow_up_codex_ask(issue, pr, asks)
         commit = self.gh.get(f"/repos/{self.cfg.repo}/commits/{sha}") or {}
         committed = parse_time((((commit.get("commit") or {}).get("committer")) or {}).get("date"))
         times = [t for t in (committed, parse_time(pr.get("created_at"))) if t]
         since = max(times) if times else None
         if since and self.now - since < CODEX_WAIT:
             return
-        reviews = self.gh.paginate(f"/repos/{self.cfg.repo}/pulls/{number}/reviews")
-        if any(login_of(r) == CODEX_LOGIN and r.get("commit_id") == sha for r in reviews):
+        if self.codex_review_on(number, sha):
             return
-        self.comment(number, f"@codex review\n\n<!-- {MARK} codex-review head={sha} -->")
+        self.ask_codex(number, sha, 1)
         waited = f"{minutes(self.now - since)} minutes" if since else "over 30 minutes"
         self.act(f"#{number} (job #{issue['number']}) asked Codex to review head {sha[:7]}, unreviewed for {waited}.")
+
+    def follow_up_codex_ask(self, issue: dict, pr: dict, asks: list) -> None:
+        """The sweeper already asked for this head. An acknowledged request is done, once per
+        head. An unacknowledged one is asked once more, then reported as a blocker, so a pull
+        request never sits silently with no review."""
+        number, sha = int(pr["number"]), (pr.get("head") or {}).get("sha") or ""
+        times = [t for t in (parse_time(c.get("created_at")) for c in asks) if t]
+        if times and self.now - max(times) < CODEX_ACK_WAIT:
+            return
+        if self.codex_acknowledged(asks) or self.codex_review_on(number, sha):
+            return
+        poster = login_of(asks[-1]) or ACTIONS_LOGIN
+        if len(asks) < CODEX_ASKS:
+            self.ask_codex(number, sha, len(asks) + 1)
+            self.act(f"#{number} (job #{issue['number']}) asked Codex again to review head {sha[:7]}: "
+                     f"the connector did not acknowledge the request {poster} posted.")
+            return
+        self.comment(number, "\n".join([
+            f"Review service blocker: Codex has not acknowledged the stall sweeper's review request "
+            f"for head `{sha[:7]}`. The sweeper asked {len(asks)} times as {poster}, and the Codex "
+            "connector left no reaction and no review for this head. The connector does not answer "
+            f"review requests from {poster}, and the sweeper has no other account to ask with.",
+            "",
+            "Someone whose GitHub account Codex answers must comment `@codex review` on this pull "
+            "request. The sweeper does not ask again for this head; a new push starts over.",
+            "",
+            f"<!-- {MARK} codex-blocked head={sha} -->",
+        ]))
+        self.act(f"#{number} (job #{issue['number']}) reported a review service blocker: Codex did not "
+                 f"acknowledge {len(asks)} review requests for head {sha[:7]} from {poster}.")
 
     def codex_threads(self, pr_number: int) -> list[Finding]:
         """Every review thread Codex opened on the pull request, resolved or not."""

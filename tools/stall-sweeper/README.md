@@ -5,7 +5,7 @@ Finds every Chat to Code job that has stalled and pushes it back into Factory, e
 | File | What it does |
 |---|---|
 | `sweeper.py` | The sweep. Python standard library only. |
-| `tests/test_sweeper.py` | Unit tests for all seven rules, the clean board, the safety limits, one dispatch per issue, the dry run and the workflow wiring. All GitHub calls are mocked. |
+| `tests/test_sweeper.py` | Unit tests for all seven rules, Codex acknowledging a review request, the clean board, the safety limits, one dispatch per issue, the dry run and the workflow wiring. All GitHub calls are mocked. |
 | `../../.github/workflows/factory-stall-sweeper-reusable.yml` | The reusable workflow that runs the sweep. |
 | `../../.github/workflows/factory-stall-sweeper.yml` | This repo's caller, the one small file other repos copy. |
 
@@ -24,10 +24,12 @@ It reads every open issue whose title begins with `Job:` and whose author is on 
 | 3 | Carries `waiting`, every issue or pull request the overlap check says it waits on no longer holds it, and no builder run for it started in the last 30 minutes. | Removes `waiting` and dispatches the builder. |
 | 4 | Carries `job`, with no `in-progress`, no `waiting`, no open pull request and no builder run in the last 30 minutes. | Dispatches the builder. After a build that finished with no pull request, it says so on the issue first. |
 | 5 | Carries `in-progress`, with no builder run in progress and no open pull request for 45 minutes. | Removes `in-progress`, then dispatches the builder. |
-| 6 | Its `factory-droid[bot]` pull request is open, not a draft, and Codex has not reviewed the current head 30 minutes after it was pushed. | Comments `@codex review`, once per head. |
+| 6 | Its `factory-droid[bot]` pull request is open, not a draft, and Codex has not reviewed the current head 30 minutes after it was pushed. | Comments `@codex review`. If Codex does not acknowledge it, asks once more on the next sweep, then comments a review service blocker on the pull request. |
 | 7 | Its pull request is refused by the auto-merge gate on the current head for a blocking Codex finding or a failing check, and no builder run for it started in the last 30 minutes. | Comments on the issue what to fix (the gate's reasons and each blocking Codex thread), then dispatches the builder. |
 
 A holder no longer holds a waiting job when it is closed, parked or done, or, for a job issue, when it has lost `in-progress`. That is the same test the overlap check uses. An open pull request holds until it closes. The 30-minute pause in rule 3 matters after a failed build: the overlap check puts the job back to waiting with no holder, and without the pause a failing job would rebuild every 10 minutes.
+
+Rule 6 counts a review request as delivered only when the Codex connector acknowledges it: its eyes reaction on the request, a Codex review-state comment or receipt for that head, or a Codex review of that head. The connector acknowledges a request it accepts within seconds. A request still unacknowledged 5 minutes later was ignored, so the next sweep asks once more. If that request is ignored too, the sweep after it comments `Review service blocker:` on the pull request, saying which account asked and that someone whose account Codex answers must comment `@codex review`. After an acknowledged request or a blocker, the sweeper does not ask again for that head. A new push starts over.
 
 Rule 7 keeps sending the builder back round after round. It stops only when a Codex finding comes back after it was fixed: the same file and finding title on a new review thread, after the sweeper already asked for the old thread to be fixed, and only when every thread the builder was asked to fix for that finding is now resolved. A second thread beside a first one that is still open is the same unfixed finding, so the builder is sent back again. When a finding comes back, the sweeper adds `needs-allison` and comments one line starting `Recommend:`. If Allison removes `needs-allison`, the next sweep sends the builder back for another round.
 
@@ -63,7 +65,7 @@ An issue-event run whose gate was skipped (an issue closing, or losing `in-progr
 
 - The workflow token allows 1,000 API calls an hour per repository, shared with the repo's other workflows. A sweep reads the issues, pull requests and recent builder runs, then only what a rule needs. A builder run is tied to its job only when a rule can use it: it is queued or running, started in the last 30 minutes, or ended in the last 45. Older runs cost no extra call.
 - A network error on one issue is logged and the sweep moves on to the next issue.
-- Codex may ignore an `@codex review` comment from `github-actions[bot]`. If it does, rule 6 leaves one comment per head and nothing more.
+- The Codex connector ignores an `@codex review` comment from `github-actions[bot]` (seen live on Nov 4 2026), and the workflow token is the sweeper's only account. So rule 6 can make the problem visible but cannot get the review itself: each unreviewed head gets two requests and then a review service blocker comment for a person to act on.
 - A Codex finding reworded on its way back is not recognized as the same finding, so rule 7 sends the builder back once more instead of stopping.
 
 ## Installing in another repo
