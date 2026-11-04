@@ -12,6 +12,7 @@ files = [
     "tools/auto-merge-gate/gate.py",
     "tools/plugin-sync/chatgpt-import-check.py",
     "tools/plugin-sync/drift-check.py",
+    "tools/plugin-sync/legacy-skills.py",
     "tools/capability-currency/drive_docs.py",
     "plugins/research-ops/skills/source-hunter/scripts",
     "plugins/research-ops/skills/video-discovery/scripts",

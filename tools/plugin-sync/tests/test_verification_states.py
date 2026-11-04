@@ -14,6 +14,7 @@ from unittest import mock
 spec = importlib.util.spec_from_file_location(
     "drift_states", os.path.join(os.path.dirname(__file__), "..", "drift-check.py"))
 drift = importlib.util.module_from_spec(spec)
+sys.modules[spec.name] = drift
 spec.loader.exec_module(drift)
 
 NOW = 1_800_000_000.0
@@ -433,6 +434,32 @@ class States(unittest.TestCase):
         self.assertEqual(report["surfaces"]["chatgpt"]["plugins"]["alpha"]["delivery"]["state"], "unknown")
         self.assertEqual(report["surfaces"]["codex"]["plugins"]["alpha"]["delivery"]["state"], "unknown")
         self.assertEqual(walk(), before)
+
+    @unittest.skipUnless(shutil.which("git"), "git is not installed")
+    def test_offline_entrypoint_emits_json_with_the_running_interpreter(self):
+        repo = os.path.join(self.tmp, "cli-repo")
+        make_plugin(os.path.join(repo, "plugins"), "alpha", "1.0.0")
+        write_json(os.path.join(repo, ".claude-plugin", "marketplace.json"),
+                   {"plugins": [{"name": "alpha", "version": "1.0.0", "source": "./plugins/alpha"}]})
+        git = ["git", "-C", repo, "-c", "user.name=t", "-c", "user.email=t@example.invalid"]
+        subprocess.run(["git", "init", "-q", repo], check=True)
+        subprocess.run(git + ["add", "-A"], check=True)
+        subprocess.run(git + ["commit", "-qm", "fixture"], check=True)
+        codex = os.path.join(self.tmp, "codex-stub")
+        write(codex, '#!/bin/sh\nprintf \'%s\\n\' \'{"installed": [], "available": []}\'\n')
+        os.chmod(codex, 0o755)
+        before = sorted((p, read_bytes(os.path.join(p, f))) for p, _, fs in os.walk(self.home) for f in fs)
+        result = subprocess.run([sys.executable, spec.origin, "--offline", "--repo", repo, "--home", self.home],
+                                env=dict(os.environ, CODEX_BIN=codex), capture_output=True, text=True, timeout=30)
+        self.assertEqual(result.returncode, 2, result.stderr)
+        report = json.loads(result.stdout)
+        self.assertEqual(report["mode"], "offline")
+        self.assertEqual(report["publication"]["plugins"]["alpha"]["state"], "published")
+        self.assertEqual(report["surfaces"]["codex"]["plugins"]["alpha"]["delivery"]["state"], "missing")
+        self.assertEqual(report["surfaces"]["chatgpt"]["plugins"]["alpha"]["delivery"]["state"], "unknown")
+        self.assertEqual(report["surfaces"]["codex"]["plugins"]["alpha"]["runtime"]["state"], "unverified")
+        self.assertEqual(sorted((p, read_bytes(os.path.join(p, f)))
+                                for p, _, fs in os.walk(self.home) for f in fs), before)
 
     JOB_ROW = [drift.JOB, "HQ", "job", "Not started", "w", "n", "2026-10-01", "2026-10-01"]
 
