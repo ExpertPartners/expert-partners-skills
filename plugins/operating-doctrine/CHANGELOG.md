@@ -1,3 +1,6 @@
+## 2.84.2 - 2026-11-04
+
+The headless route check reads an optional Host evidence column on the access map. A live row whose browser host is still unknown can now leave Hosts empty by declaring Host evidence unresolved, instead of failing the whole refresh. It keeps its live status in the cache, is counted and named in every refresh report as still needing real host evidence, and never matches a navigation. Setting up rows with empty Hosts work as before. A hostless live row without the declaration still fails as a half-finished edit, and a row that loses hosts the last good copy protects still keeps the last good copy, even when it now declares Host evidence unresolved.
 ## 2.84.1 - 2026-11-04
 
 The headless route check no longer rejects the whole access map when a row declares its host evidence unresolved (status setting up with no hosts yet). Such rows stay in the cache and in the refresh report as evidence that still needs real hosts, never match a navigation, and are not treated as no API or complete. A refresh that would drop hosts a cached row protects still fails and keeps the last good copy, so first installs can load a map that carries unresolved rows without weakening the half-edited-row guard. hooks/README.md documents the projection contract, including the two deliberate ways to lift a protection.

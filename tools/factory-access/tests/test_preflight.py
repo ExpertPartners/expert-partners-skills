@@ -57,7 +57,7 @@ class PreflightTests(unittest.TestCase):
         preflight.prove_access(preflight.Client(URL, TOKEN, opener), 42, "ExpertPartners/example")
         bodies = [json.loads(request.data) for request in opener.requests]
         self.assertEqual([body["method"] for body in bodies], ["initialize", "notifications/initialized", "tools/list", "tools/list", "tools/call"])
-        self.assertEqual(bodies[-1]["params"], {"name": "job_status", "arguments": {"job_id": 42, "mission": ""}})
+        self.assertEqual(bodies[-1]["params"], {"name": "job_status", "arguments": {"job_id": 42, "mission": "", "repo": "ExpertPartners/example"}})
         self.assertEqual(opener.requests[-1].get_header("Mcp-session-id"), "test-session")
         self.assertEqual(opener.requests[-1].get_header("Authorization"), "Bearer " + TOKEN)
 
@@ -65,6 +65,27 @@ class PreflightTests(unittest.TestCase):
         for kwargs in [{"repo": "Other/repository"}, {"job": 43}]:
             with self.subTest(kwargs=kwargs), self.assertRaises(preflight.PreflightError):
                 preflight.prove_access(preflight.Client(URL, TOKEN, Opener(responses(**kwargs))), 42, "ExpertPartners/example")
+
+    def test_same_issue_number_in_another_repository_stays_fail_closed(self):
+        repository = "ExpertPartners/target-repository"
+        opener = Opener(responses(repo="ExpertPartners/other-repository", job=42))
+        with self.assertRaises(preflight.PreflightError):
+            preflight.prove_access(preflight.Client(URL, TOKEN, opener), 42, repository)
+        call = json.loads(opener.requests[-1].data)
+        self.assertEqual(call["params"]["arguments"], {"job_id": 42, "mission": "", "repo": repository})
+
+    def test_repository_qualified_read_still_requires_exact_job(self):
+        repository = "ExpertPartners/target-repository"
+        opener = Opener(responses(repo=repository, job=43))
+        with self.assertRaises(preflight.PreflightError):
+            preflight.prove_access(preflight.Client(URL, TOKEN, opener), 42, repository)
+        self.assertEqual(json.loads(opener.requests[-1].data)["params"]["arguments"]["repo"], repository)
+
+    def test_repository_qualified_read_accepts_only_matching_result(self):
+        repository = "ExpertPartners/target-repository"
+        opener = Opener(responses(repo=repository, job=42))
+        preflight.prove_access(preflight.Client(URL, TOKEN, opener), 42, repository)
+        self.assertEqual(json.loads(opener.requests[-1].data)["params"]["arguments"]["repo"], repository)
 
     def test_tool_error_fails(self):
         with self.assertRaises(preflight.PreflightError):
