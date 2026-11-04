@@ -20,11 +20,11 @@ Sections, in this order (R16).
 
 ## 2. Ideal Client (R17)
 
-The file title is Research Report, then the problem or market it studies (R17). The file is named Ideal Client (B5).
+The file title is one line, written exactly as Research Report: [Problem / Market], with the problem or market it studies in place of [Problem / Market]. Research Report, the colon and the problem or market stay together on that one line, never split into a title and a separate topic line (R17). The file is named Ideal Client (B5).
 
 Sections, in this order, with the numbers and markers the template gives them (R17).
 
-- 🔥 1. Pain Point Analysis. Five to seven pain points. Each one has its name, a Description, a Severity Score from 1 to 10, three Exact Quotes from buyers, its Frequency and its Emotional Triggers (R17).
+- 🔥 1. Pain Point Analysis. Five to seven pain points. Each one has its name, a Description, a Severity Score (1-10), three Exact Quotes from buyers, its Frequency and its Emotional Triggers. The severity field's label is exactly Severity Score (1-10), with the scale kept inside the label, and its value is a score from 1 to 10 (R17).
 - 🗣️ 2. Buyer Language Patterns. Ten or more phrases buyers actually use, word for word, each with What it really means (R17).
 - 🟢 3. Ready-to-Buy Signals. People asking about, Price ranges mentioned, Urgency indicators, and Current workarounds with why each falls short (R17).
 - 🎯 4. Ideal Customer Profile (ICP). Who they are, Context & environment, Psychographics, Behaviors, Jobs-to-be-done, Buying triggers and Key objections. Together these cover the buyer's role and segment, where they work and with what tools, what drives them, how they solve problems and decide, the outcome they want, what makes them buy and what makes them hesitate (R17).
