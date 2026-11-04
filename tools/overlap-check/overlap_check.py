@@ -616,9 +616,19 @@ def from_repo(source: dict, repo: str) -> bool:
 def job_delivery(gh, cfg: Config, number: int) -> Delivery:
     """Open builder pull requests that close the job, from the pull request list, and merged
     ones, from the issue's timeline, where GitHub records every pull request that names it."""
+    default = (gh.get(f"/repos/{cfg.repo}") or {}).get("default_branch")
+    if not isinstance(default, str) or not default:
+        raise ValueError("repository default branch is unavailable")
+
+    def targets_default(pr):
+        base = pr.get("base") or {}
+        return (base.get("ref") == default
+                and (base.get("repo") or {}).get("full_name") == cfg.repo)
+
     opened = sorted(
         (p for p in gh.paginate(f"/repos/{cfg.repo}/pulls", {"state": "open"})
-         if is_builder_pr(p) and head_branch(p, cfg.repo) and number in closes(p.get("body"))),
+         if is_builder_pr(p) and head_branch(p, cfg.repo) and targets_default(p)
+         and number in closes(p.get("body"))),
         key=lambda p: int(p["number"]))
     reopened: list[str] = []
     candidates: set[int] = set()
@@ -632,7 +642,8 @@ def job_delivery(gh, cfg: Config, number: int) -> Delivery:
     merged = []
     for n in sorted(candidates - {int(p["number"]) for p in opened}):
         p = gh.get(f"/repos/{cfg.repo}/pulls/{n}") or {}
-        if p.get("merged_at") and is_builder_pr(p) and head_branch(p, cfg.repo) and number in closes(p.get("body")):
+        if (p.get("merged_at") and is_builder_pr(p) and head_branch(p, cfg.repo)
+                and targets_default(p) and number in closes(p.get("body"))):
             merged.append(p)
     merged.sort(key=lambda p: p["merged_at"], reverse=True)
     after = bool(merged) and any(t > merged[0]["merged_at"] for t in reopened)
@@ -729,10 +740,16 @@ def follow(gh, cfg: Config, number: int, owner: str, claim_id: int | None = None
         f"({run_url(cfg, owner)}). One job has one writer, so this run follows that build.",
     ])
     print(f"overlap-check: #{number} is already being built by run {owner}, so run {me} follows it and does not build.")
-    if claim_id is not None:
-        gh.patch(f"/repos/{cfg.repo}/issues/comments/{claim_id}", {"body": body})
-    else:
-        gh.post(f"/repos/{cfg.repo}/issues/{number}/comments", {"body": body})
+    try:
+        if claim_id is not None:
+            gh.patch(f"/repos/{cfg.repo}/issues/comments/{claim_id}", {"body": body})
+        else:
+            gh.post(f"/repos/{cfg.repo}/issues/{number}/comments", {"body": body})
+    except Exception as exc:
+        # Reporting the follower cannot transfer the actual owner's lease or labels.
+        # An unchanged follower claim stops being live when this gate finishes.
+        print(f"::warning::overlap-check: follower receipt for #{number} could not be saved "
+              f"({type(exc).__name__}); existing owner and labels are preserved.")
 
 
 def delivered_body(winner: dict, run_id: str | None, still_open: list[dict] | None = None) -> str:
@@ -1172,11 +1189,26 @@ def main(argv: list[str]) -> int:
             print(f"::error::overlap-check: #{number or os.environ.get('OVERLAP_ISSUE')} could not be checked: {exc!r}")
             write_output("start", "false")
             if number is not None:
+                def cleanup_is_safe():
+                    if live_owner(gh, cfg, number):
+                        raise LeaseMoved("owner changed")
+                    try:
+                        current = gh.get(f"/repos/{cfg.repo}/issues/{number}")
+                    except Exception:
+                        # Comments/run metadata already proved no other live writer.
+                        # Recover an unowned failed read without removing any stop label.
+                        current = None
+                    if current is not None and is_stopped(current):
+                        raise LeaseMoved("stop state changed")
+
                 try:
-                    remove_label(gh, cfg, number, IN_PROGRESS_LABEL)
-                    add_labels(gh, cfg, number, [JOB_LABEL, WAITING_LABEL])
+                    # An unreadable owner proves no right to alter labels. A new
+                    # admission between cleanup writes also stops the old cleanup.
+                    guarded = LeaseGuard(gh, cleanup_is_safe)
+                    remove_label(guarded, cfg, number, IN_PROGRESS_LABEL)
+                    add_labels(guarded, cfg, number, [JOB_LABEL, WAITING_LABEL])
                 except Exception:
-                    pass
+                    print(f"::warning::overlap-check: #{number} cleanup could not prove ownership; labels preserved.")
             return 1
         write_output("start", "true" if start else "false")
         return 0

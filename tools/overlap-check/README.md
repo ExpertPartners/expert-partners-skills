@@ -112,3 +112,7 @@ python3 -m unittest discover -s tools/overlap-check/tests -v
 ```
 
 The redispatch job needs `issues: write` for `next` to claim a waiting label, restore it after a failed dispatch, and record technical waits; its other permissions remain unchanged. This permission stays within the caller's existing issue-write grant. API errors identify the HTTP method and endpoint path, excluding request queries, headers and bodies, so a failed endpoint can be diagnosed without exposing credentials. An older run's generic 403 without an endpoint is not proof that any particular permission mismatch caused that run's failure.
+
+Delivery and continuation require the exact caller repository as both head and base, with the base ref matching the current default branch read from GitHub. A merge into a release or staging branch does not deliver the job. Nondefault-base PRs still retain their actual file holds for overlap checks.
+
+A follower receipt failure leaves the actual owner's labels and lease untouched. Admission-error cleanup rereads ownership and stop state before each label write; an unreadable owner, new live claim or parked/done state prevents cleanup. A takeover between cleanup writes suppresses later writes. These are per-request checks, not transactional GitHub label updates.

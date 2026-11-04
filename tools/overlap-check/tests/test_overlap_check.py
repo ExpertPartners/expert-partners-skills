@@ -46,6 +46,7 @@ def pr(number, files, closes=None, author="factory-droid[bot]", ref=None):
         "number": number,
         "user": {"login": author},
         "head": {"ref": ref or f"job/{closes or number}-work", "sha": f"{number:040x}", "repo": {"full_name": REPO}},
+        "base": {"ref": "main", "repo": {"full_name": REPO}},
         "body": f"Closes #{closes}\n\nwork" if closes else "work",
         "files": list(files),
     }
@@ -1849,3 +1850,108 @@ class BuildStepCommands(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ActiveOwnerErrorRecovery(unittest.TestCase):
+    def owned(self):
+        gh = FakeGitHub([issue(245, "x/a.py")])
+        self.assertTrue(oc.run_check(gh, run_cfg(80), 245, sleep=NOOP))
+        gh.runs[80] = "in_progress"
+        return gh
+
+    def test_follower_receipt_post_failure_preserves_the_existing_owner(self):
+        gh = self.owned()
+        before = list(gh.writes())
+        original = gh.post
+        def fail_receipt(path, body):
+            if oc.RECEIPT_MARKER in body.get("body", ""):
+                raise oc.GitHubError(503, "Receipt unavailable")
+            return original(path, body)
+        gh.post = fail_receipt
+        code, output = Main.run_main(self, gh, ["check"], OVERLAP_ISSUE="245", GITHUB_RUN_ID="81")
+        self.assertEqual((code, output), (0, "start=false\n"))
+        self.assertEqual(gh.labels(245), {"job", "in-progress"})
+        self.assertEqual(oc.recorded_run(gh, CFG, 245), "80")
+        self.assertEqual(gh.writes(), before)
+
+    def test_unreadable_ownership_never_authorizes_label_cleanup(self):
+        gh = self.owned()
+        before = list(gh.writes())
+        gh.paginate = mock.Mock(side_effect=TimeoutError("Owner metadata unavailable"))
+        code, output = Main.run_main(self, gh, ["check"], OVERLAP_ISSUE="245", GITHUB_RUN_ID="81")
+        self.assertEqual((code, output), (1, "start=false\n"))
+        self.assertEqual(gh.labels(245), {"job", "in-progress"})
+        self.assertEqual(gh.writes(), before)
+
+    def test_follow_receipt_patch_failure_leaves_labels_and_owner_untouched(self):
+        gh = FakeGitHub([issue(245, "x/a.py", labels=("job", "in-progress"))])
+        gh.post(f"/repos/{REPO}/issues/245/comments", {"body": oc.comment_body(oc.Verdict(True), "80")})
+        gh.post(f"/repos/{REPO}/issues/245/comments", {"body": "<!-- factory-overlap-claim:v1 run=81 -->"})
+        before = list(gh.writes())
+        gh.patch = mock.Mock(side_effect=oc.GitHubError(503, "Receipt unavailable"))
+        oc.follow(gh, run_cfg(81), 245, "80", claim_id=101)
+        self.assertEqual(gh.labels(245), {"job", "in-progress"})
+        self.assertEqual(oc.recorded_run(gh, CFG, 245), "80")
+        self.assertEqual(gh.writes(), before)
+
+
+    def test_takeover_between_error_cleanup_writes_preserves_new_owner(self):
+        gh = FakeGitHub([issue(245, "x/a.py", labels=("job", "in-progress"))])
+        original = gh.delete
+        def new_owner_after_delete(path):
+            result = original(path)
+            if path.endswith("/labels/in-progress"):
+                gh.post(f"/repos/{REPO}/issues/245/comments", {"body": oc.comment_body(oc.Verdict(True), "82")})
+                gh.runs[82] = "in_progress"
+                gh.post(f"/repos/{REPO}/issues/245/labels", {"labels": ["in-progress"]})
+            return result
+        gh.delete = new_owner_after_delete
+        with mock.patch.object(oc, "run_check", side_effect=TimeoutError("Failed gate")):
+            code, output = Main.run_main(self, gh, ["check"], OVERLAP_ISSUE="245", GITHUB_RUN_ID="81")
+        self.assertEqual((code, output), (1, "start=false\n"))
+        self.assertEqual(gh.labels(245), {"job", "in-progress"})
+        self.assertEqual(oc.recorded_run(gh, CFG, 245), "82")
+        self.assertFalse(any(c[0] == "POST" and "waiting" in (c[2] or {}).get("labels", []) for c in gh.writes()))
+
+    def test_error_cleanup_preserves_parked_and_done_stops(self):
+        for label in ("parked", "done"):
+            gh = FakeGitHub([issue(245, "x/a.py", labels=("job", label))])
+            with mock.patch.object(oc, "run_check", side_effect=TimeoutError("Failed gate")):
+                code, output = Main.run_main(self, gh, ["check"], OVERLAP_ISSUE="245", GITHUB_RUN_ID="81")
+            self.assertEqual((code, output), (1, "start=false\n"))
+            self.assertEqual(gh.labels(245), {"job", label})
+            self.assertEqual(gh.writes(), [])
+
+
+class DeliveryDefaultBase(unittest.TestCase):
+    def test_open_nondefault_or_crossrepo_bases_cannot_be_continued(self):
+        for base in ({"ref": "release", "repo": {"full_name": REPO}},
+                     {"ref": "main", "repo": {"full_name": "outside/repo"}}, {}):
+            with self.subTest(base=base):
+                p = pr(240, ["x/a.py"], closes=237)[1]
+                p["base"] = base
+                gh = FakeGitHub([issue(237, "x/a.py")], [p])
+                delivery = oc.job_delivery(gh, CFG, 237)
+                self.assertEqual(delivery.open, [])
+                self.assertIsNone(delivery.target)
+                self.assertEqual(oc.open_builder_prs(gh, CFG)[0].files, ["x/a.py"],
+                                 "base eligibility does not discard actual file holds")
+
+    def test_merged_nondefault_or_crossrepo_bases_do_not_deliver(self):
+        for base in ({"ref": "release", "repo": {"full_name": REPO}},
+                     {"ref": "main", "repo": {"full_name": "outside/repo"}}, {}):
+            with self.subTest(base=base):
+                p = merged_pr(240, 237)
+                p["base"] = base
+                gh = FakeGitHub([issue(237, "x/a.py")], closed_prs=[p])
+                self.assertIsNone(oc.job_delivery(gh, CFG, 237).winner)
+                self.assertTrue(oc.run_check(gh, run_cfg(1000), 237, sleep=NOOP))
+                self.assertNotIn("done", gh.labels(237))
+
+    def test_current_default_is_read_instead_of_assuming_main(self):
+        p = pr(240, ["x/a.py"], closes=237)[1]
+        p["base"]["ref"] = "trunk"
+        gh = FakeGitHub([issue(237, "x/a.py")], [p])
+        original = gh.get
+        gh.get = lambda path, params=None: {"default_branch": "trunk"} if path == f"/repos/{REPO}" else original(path, params)
+        self.assertEqual(oc.job_delivery(gh, CFG, 237).target["number"], 240)
