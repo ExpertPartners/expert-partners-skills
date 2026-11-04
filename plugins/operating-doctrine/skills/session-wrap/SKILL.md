@@ -112,7 +112,7 @@ Run the `estate-memory-router` gate once over the closing session, after the can
 
 What the sweep asks, exactly once, over the whole session: is there anything here a cold future worker would need, or whose loss would cause drift, rework, contradiction, or lost provenance, that has NOT been given a durable home by the record, the continuity note, the existing job, or a staged kickoff?
 
-Route each qualifying item to its existing destination under the router's six routes. A future obligation goes to `remember-this` and stays in its existing Chat to Code job with a mechanical `RETURN WHEN` condition. For code work that same job is a GitHub issue labeled job, not a second wake record. Evidence and working knowledge go to the owning repo's intake. A founder decision Allison clearly made is saved as made under decision 0101 and needs no phrase. One she has not clearly made is preserved as a candidate and is never promoted on the AI's own say-so. A canon or rule change fires `canon-sync-protocol`, which step 5's promotion gate already requires.
+Route each qualifying item to its existing destination under the router's six routes. A future obligation goes to `remember-this` and stays in its existing Chat to Code job with a mechanical `RETURN WHEN` condition. For code work that same job is a GitHub issue labeled job, not a second wake record. Evidence and working knowledge go to the owning repo's intake. A founder decision Allison clearly made is saved as made through the current live HQ Decision Log capture and verification workflow in Drive and needs no phrase. One she has not clearly made is preserved as a candidate and is never promoted on the AI's own say-so. A canon or rule change fires `canon-sync-protocol`, which step 5's promotion gate already requires.
 
 Bounds, all load-bearing:
 
@@ -145,7 +145,7 @@ Sequencing note so this does not fight the one-block-per-response rule in code-b
 
 Before finite work may reach Mission achieved, the wrap runs five substantive obligations. Each clears with evidence or blocks the verdict.
 
-One. Every clear decision Allison made in this table was saved under decision 0101 through its readback, reported as Saved and read back, Saved with the shared reader blocked, or Not saved. The obligation is her real clear decisions, never quoted source material, pasted prompts, examples, AI recommendations, or discussion of a topic. No phrase is required or checked for. This check verifies completion only and never re-litigates or reinterprets a decision.
+One. Every clear decision Allison made in this table was saved through the current live HQ Decision Log workflow in Drive for capture, retrieval verification and the receipt, reported as Saved and read back, Saved with the shared reader blocked, or Not saved. The obligation is her real clear decisions, never quoted source material, pasted prompts, examples, AI recommendations, or discussion of a topic. No phrase is required or checked for. This check verifies completion only and never re-litigates or reinterprets a decision.
 
 Two. Finite work does not close over an execution session it still owns. Every dispatched execution session must complete decision 0070's closure loop, release its monitors, check-ins, subscriptions, scheduled wakeups, and background agents, and leave durable state truthful. Ownership is never silently transferred to permit closure. Cloud-worker registration remains mandatory where the platform requires it; a visible Worker name does not.
 
