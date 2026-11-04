@@ -43,6 +43,12 @@ MAP_CSV = (
 )
 MAP_HEADER, _, MAP_ROWS = MAP_CSV.partition("\n")
 REVERSED_MAP_CSV = MAP_HEADER + "\n" + "\n".join(reversed(MAP_ROWS.strip().split("\n"))) + "\n"
+# The fictional public fixture for a live row whose browser host is still unresolved.
+EVIDENCE_HEADER = "System,Hosts,Headless route,1Password item,Status,No-API reason,Host evidence\n"
+EVIDENCE_ROWS = (
+    "Known route,example.test,Known API,,live,,verified\n"
+    "Native integration,,Existing native connector,,live,,unresolved\n"
+)
 LEAKY_ROWS = (
     "Leaky row,leaky.example,Leaky API," + WITHHELD_SAMPLE + ",Live,\n"
     "Hex row,hex.example,Hex API," + HEX_SAMPLE + ",Live,\n"
@@ -575,6 +581,90 @@ class Refresh(HookCase):
         self.assertTrue(ok, message)
         self.assertNotIn("unresolved", message)
         self.assertIn("Future CRM", self.assertDenied(self.run_hook("https://future-crm.example/")))
+
+    def test_live_row_with_unresolved_host_evidence_is_kept_as_evidence(self):
+        self.fresh_stamp()
+        self.configure_fetch(EVIDENCE_HEADER + EVIDENCE_ROWS)
+        ok, message = hrc.refresh()
+        self.assertTrue(ok, message)
+        self.assertIn("1 unresolved, still needing real host evidence", message)
+        self.assertIn("Native integration (live, Host evidence unresolved)", message)
+        systems = json.loads(self.read(hrc.CACHE_FILE))["systems"]
+        self.assertEqual([row["system"] for row in systems], ["Known route", "Native integration"])
+        self.assertEqual(systems[0]["evidence"], "verified")
+        native = systems[1]
+        self.assertEqual(
+            {key: native[key] for key in ("hosts", "route", "item", "status", "reason", "evidence")},
+            {"hosts": [], "route": "Existing native connector", "item": "", "status": "live",
+             "reason": "", "evidence": "unresolved"},
+        )
+        self.assertIn("Known route", self.assertDenied(self.run_hook("https://example.test/page")))
+        note = self.assertAllowed(self.run_hook("https://native.example/"))
+        self.assertIn("not on the access map", note)
+        self.assertNotIn("Native integration", note)
+
+    def test_setting_up_rows_still_declare_unresolved_with_the_host_evidence_column(self):
+        self.configure_fetch(EVIDENCE_HEADER + EVIDENCE_ROWS
+                             + "Future CRM,,,,Setting up,,\nLater CRM,,,,Setting up,,Unresolved\n")
+        ok, message = hrc.refresh()
+        self.assertTrue(ok, message)
+        self.assertIn("3 unresolved, still needing real host evidence", message)
+        self.assertIn("Future CRM (setting up, no host yet)", message)
+        self.assertIn("Later CRM (setting up, Host evidence unresolved)", message)
+
+    def test_hostless_row_without_declared_unresolved_evidence_still_fails(self):
+        cases = (
+            ("live, Host evidence blank", "Half edit,,Some API,,live,,\n"),
+            ("live, Host evidence verified", "Half edit,,Some API,,live,,verified\n"),
+            ("live, another wording", "Half edit,,Some API,,live,,not resolved yet\n"),
+            ("setting up, Host evidence verified", "Half edit,,Some API,,setting up,,verified\n"),
+            ("no API, Host evidence unresolved", "Half edit,,,,no API,No API at all,unresolved\n"),
+            ("unrecognized status, Host evidence unresolved", "Half edit,,,,Maybe later,,unresolved\n"),
+        )
+        for name, row in cases:
+            with self.subTest(case=name):
+                self.configure_fetch(EVIDENCE_HEADER + EVIDENCE_ROWS + row)
+                ok, message = hrc.refresh()
+                self.assertFalse(ok)
+                self.assertIn("row 4 has no Hosts", message)
+                self.assertEqual(self.read(hrc.CACHE_FILE), "")
+
+    def test_a_protected_row_declaring_unresolved_evidence_keeps_the_last_good_copy(self):
+        self.fresh_stamp()
+        self.configure_fetch(EVIDENCE_HEADER + EVIDENCE_ROWS)
+        ok, message = hrc.refresh()
+        self.assertTrue(ok, message)
+        before = self.read(hrc.CACHE_FILE)
+        cases = (
+            ("live", "Known route,,Known API,,live,,unresolved\n"),
+            ("setting up", "Known route,,Known API,,setting up,,unresolved\n"),
+        )
+        for name, row in cases:
+            with self.subTest(case=name):
+                self.configure_fetch(EVIDENCE_HEADER + row + EVIDENCE_ROWS.split("\n", 1)[1])
+                ok, message = hrc.refresh()
+                self.assertFalse(ok)
+                self.assertIn("the new map drops 1 host(s) the last good copy protects: example.test", message)
+                self.assertEqual(self.read(hrc.CACHE_FILE), before)
+                self.assertIn("Known route", self.assertDenied(self.run_hook("https://example.test/page")))
+
+    def test_unresolved_host_evidence_becoming_a_verified_host_updates_protection(self):
+        self.fresh_stamp()
+        self.configure_fetch(EVIDENCE_HEADER + EVIDENCE_ROWS)
+        ok, message = hrc.refresh()
+        self.assertTrue(ok, message)
+        self.assertAllowed(self.run_hook("https://native.example/"))
+        resolved = EVIDENCE_ROWS.replace(
+            "Native integration,,Existing native connector,,live,,unresolved",
+            "Native integration,native.example,Existing native connector,,live,,verified",
+        )
+        self.configure_fetch(EVIDENCE_HEADER + resolved)
+        ok, message = hrc.refresh()
+        self.assertTrue(ok, message)
+        self.assertNotIn("unresolved", message)
+        reason = self.assertDenied(self.run_hook("https://native.example/"))
+        self.assertIn("Native integration has headless access", reason)
+        self.assertIn("Existing native connector", reason)
 
     def test_no_configuration_fails_without_a_cache(self):
         ok, message = hrc.refresh()
