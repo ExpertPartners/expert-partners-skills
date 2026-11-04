@@ -4,6 +4,8 @@ This repository holds the skills marketplace and its tooling. skills holds stand
 
 Business knowledge, rules, and decisions do not live here. They live in the business brains in Google Drive, starting with the HQ Rulebook and the Decision Log in HQ Business Brain, Company Core. Read those before acting on anything that could depend on a prior decision, an owner, a brand, or an operating rule. If a brain cannot be reached, say so and separate verified fact from unverified reasoning. Do not add knowledge files here.
 
+Follow the live AI Implementation SOP in HQ Business Brain: use headless access first; browser or screen work is permitted only when no headless route exists and uses the assigned signed-in Chrome profile on Ember's M2, never Allison's M4.
+
 Working here
 
 - Read the skill you are changing and the canonical operating-doctrine skill first.
