@@ -1988,6 +1988,53 @@ class DeliveryDefaultBase(unittest.TestCase):
 
 
 class FailedGateClaimRecovery(unittest.TestCase):
+    def test_claim_arriving_after_redispatch_snapshot_keeps_waiting(self):
+        gh = FakeGitHub([issue(245, "x/a.py", labels=("job", "waiting"))])
+        original = oc.job_delivery
+        def claimed_during_delivery(api, cfg, number):
+            result = original(api, cfg, number)
+            oc.post_claim(gh, run_cfg(80), number)
+            gh.runs[80], gh.builds[80] = "in_progress", None
+            return result
+        with mock.patch.object(oc, "job_delivery", side_effect=claimed_during_delivery):
+            self.assertEqual(oc.run_next(gh, run_cfg(82), [].append), [])
+        self.assertEqual(gh.labels(245), {"job", "waiting"})
+
+    def test_unreadable_claim_run_keeps_waiting_and_does_not_dispatch(self):
+        gh = FakeGitHub([issue(245, "x/a.py", labels=("job", "waiting"))])
+        oc.post_claim(gh, run_cfg(80), 245)
+        gh.runs[80] = oc.GitHubError(503, "run metadata unavailable")
+        self.assertEqual(oc.run_next(gh, run_cfg(82), [].append), [])
+        self.assertEqual(gh.labels(245), {"job", "waiting"})
+
+    def test_redispatch_preserves_waiting_while_a_failed_claim_is_live(self):
+        for caller in (80, 82):
+            with self.subTest(caller=caller):
+                gh = FakeGitHub([issue(245, "x/a.py", labels=("job", "waiting"))])
+                oc.post_claim(gh, run_cfg(80), 245)
+                gh.runs[80], gh.builds[80] = "in_progress", None
+                sent = []
+                def dispatch(number):
+                    sent.append(number)
+                    oc.run_check(gh, run_cfg(81), number, sleep=NOOP)
+                self.assertEqual(oc.run_next(gh, run_cfg(caller), dispatch), [])
+                self.assertEqual(sent, [])
+                self.assertEqual(gh.labels(245), {"job", "waiting"})
+                gh.runs[80] = "completed"
+                self.assertEqual(oc.run_next(gh, run_cfg(caller), dispatch), [245])
+                self.assertEqual(sent, [245])
+                self.assertEqual(oc.recorded_run(gh, CFG, 245), "81")
+
+    def test_unsettled_waiting_claim_holds_its_scope_for_older_jobs_too(self):
+        gh = FakeGitHub([issue(244, "x/a.py", labels=("job", "waiting")),
+                         issue(245, "x/a.py", labels=("job", "waiting")),
+                         issue(246, "unrelated/a.py", labels=("job", "waiting"))])
+        oc.post_claim(gh, run_cfg(80), 245)
+        gh.runs[80], gh.builds[80] = "in_progress", None
+        self.assertEqual(oc.run_next(gh, run_cfg(82), [].append), [246])
+        self.assertEqual(gh.labels(244), {"job", "waiting"})
+        self.assertEqual(gh.labels(245), {"job", "waiting"})
+
     def test_stop_and_claim_delete_failure_never_clear_a_new_recorded_owner(self):
         gh = FakeGitHub([issue(245, "x/a.py")])
         original_delete, original_judge = gh.delete, oc.judge

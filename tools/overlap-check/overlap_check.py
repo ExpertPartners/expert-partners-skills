@@ -693,9 +693,9 @@ def trust_wait(gh, cfg: Config, number: int, delivery: Delivery) -> None:
     ]))
 
 
-def live_owner(gh, cfg: Config, number: int, before: int | None = None) -> str | None:
-    """Another run that already builds this job and can still write: its recorded build, or a
-    claim posted before this run's claim (any claim when before is None)."""
+def live_owner(gh, cfg: Config, number: int, before: int | None = None, *, include_current: bool = False) -> str | None:
+    """A recorded build or claim that can still write, normally excluding this gate's run.
+    Admission considers older claims; redispatch includes every run, even its own."""
     for c in gh.paginate(f"/repos/{cfg.repo}/issues/{number}/comments"):
         if (c.get("user") or {}).get("login") != COMMENT_AUTHOR:
             continue
@@ -704,7 +704,7 @@ def live_owner(gh, cfg: Config, number: int, before: int | None = None) -> str |
         if found is None and (before is None or int(c["id"]) < before):
             found = CLAIM_RE.search(body)
         run = found.group(1) if found else None
-        if run and run != cfg.run_id and run_is_live(gh, cfg, run, number):
+        if run and (include_current or run != cfg.run_id) and run_is_live(gh, cfg, run, number):
             return run
     return None
 
@@ -995,6 +995,16 @@ def run_next(gh, cfg: Config, dispatch, skip: set[int] = frozenset()) -> list[in
     prs = open_builder_prs(gh, cfg)
     holders = in_progress_issues(gh, cfg)
     building = {h.number for h in holders}
+    # Failed gate cleanup can restore waiting before its leftover claim stops being
+    # live. Do not consume that label only to dispatch a gate that follows the old
+    # claim and leaves no waiting label. Collect all such holds before judging even
+    # older jobs, so unsettled admissions keep their actual file scope protected.
+    for issue in waiting:
+        number = int(issue["number"])
+        if "pull_request" not in issue and not is_stopped(issue) and number not in building:
+            if live_owner(gh, cfg, number, include_current=True):
+                holders.append(Holder(number, "issue", parse_scope(issue.get("body"))))
+                building.add(number)
     sent: list[int] = []
     for issue in sorted((i for i in waiting if "pull_request" not in i), key=lambda i: int(i["number"])):
         number = int(issue["number"])
@@ -1006,7 +1016,7 @@ def run_next(gh, cfg: Config, dispatch, skip: set[int] = frozenset()) -> list[in
             continue
         if number in building:
             print(f"overlap-check: waiting job #{number} is still being built (in-progress, or its "
-                  "recorded build can still write), so it is not sent again.")
+                  "recorded build or admission claim can still write), so it is not sent again.")
             continue
         delivery = job_delivery(gh, cfg, number)
         if delivery.open and not delivery.target and not delivery.winner:
@@ -1015,6 +1025,11 @@ def run_next(gh, cfg: Config, dispatch, skip: set[int] = frozenset()) -> list[in
         v = evaluate(number, parse_scope(issue.get("body")), prs, holders)
         if not v.start:
             print(f"overlap-check: waiting job #{number} still waits: {'; '.join(v.lines())}")
+            continue
+        # Another gate may have claimed after the initial holder collection.
+        if live_owner(gh, cfg, number, include_current=True):
+            holders.append(Holder(number, "issue", v.scope))
+            building.add(number)
             continue
         if not claim(gh, cfg, number):
             print(f"overlap-check: waiting job #{number} was already taken by another run.")
