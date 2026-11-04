@@ -1,3 +1,6 @@
+## 2.84.8 - 2026-11-04
+
+Clarify that verified capability claims and labeled risk hypotheses serve different purposes, preserving required failure and recovery planning. Align companion sequencing and approval instructions with current approved records and existing authorization, and inventory all five doctrine files.
 ## 2.84.7 - 2026-11-04
 
 Replace the frozen doctrine propagation roster and manual re-upload target with the current canonical release and supported marketplace producer guidance. Keep publication, destination delivery and active runtime use separate, and require verified automation constraints before treating visual inspection as a human-only task.
