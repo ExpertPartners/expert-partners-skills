@@ -14,11 +14,43 @@ import { parseShelves, parseProvenance, firstHeading } from './sources.mjs';
 import { WORKFORCE_FEED_SCHEMA, WORKFORCE_STATUSES, contractIssues } from './hq-contract.mjs';
 import { scanForLeaks, isPublicSafeUrl } from './public-safety.mjs';
 
+/** @typedef {import('./hq-contract.mjs').WorkforceRecord} WorkforceRecord */
+/** @typedef {import('./hq-contract.mjs').WorkforceEnvelope} WorkforceEnvelope */
+/** @typedef {import('./sources.mjs').FeedInputs} FeedInputs */
+/** @typedef {import('./sources.mjs').PluginInput} PluginInput */
+/** @typedef {import('./sources.mjs').PackageRule} PackageRule */
+/** @typedef {import('./sources.mjs').Shelf} Shelf */
+/** @typedef {import('./sources.mjs').Provenance} Provenance */
+/** @typedef {import('./sources.mjs').CapabilityRecordFile} CapabilityRecordFile */
+
+/**
+ * A record while it is assembled: written field by field by name, and carrying
+ * two internal markers that are deleted before the record is emitted.
+ * @typedef {WorkforceRecord & { _packageId?: string, _isPackage?: boolean, [field: string]: unknown }} DraftRecord
+ */
+
+/**
+ * A marketplace package with its presentation policy. heading, shelves and
+ * provenance are filled from the package README before any skill reads them.
+ * @typedef {object} FeedPackage
+ * @property {PluginInput} p
+ * @property {string} name
+ * @property {PackageRule} rule
+ * @property {string} presentAs
+ * @property {string | undefined} version
+ * @property {string} id
+ * @property {string[]} skillIds
+ * @property {string | null} heading
+ * @property {Shelf[]} shelves
+ * @property {Provenance | null} provenance
+ */
+
 export const GRAPH_SCHEMA = 'skill-map/v1';
 export const CAPABILITY_RECORD_SCHEMA = 'expert-partners-capability-record/v1';
 export const INHERIT_ROOT = 'operating-doctrine';
 
 // Canonical lifecycle (skill-map frontmatter `status`) to HQ status.
+/** @type {Record<string, string>} */
 export const LIFECYCLE_STATUS = {
   live: 'Unknown',
   designed: 'Designed',
@@ -27,6 +59,7 @@ export const LIFECYCLE_STATUS = {
   sleeping: 'Unknown',
 };
 
+/** @type {Record<string, string>} */
 const REPO_NAMES = { eps: 'expert-partners-skills' };
 const ID_RX = /^[a-z0-9-]+$/;
 const PRESENT_AS = ['plugin', 'collection', 'excluded'];
@@ -48,7 +81,7 @@ const RECORD_REPLACE_FIELDS = [
   'verifiedSurfaces', 'invocationInstructions', 'sourceLinks', 'lastVerified', 'replacedBy',
   'replaces', 'accessNote', 'bestFor', 'useCases', 'askExamples', 'outcome', 'portable',
 ];
-const RECORD_UNION_FIELDS = ['relatedIds', 'keywords'];
+const RECORD_UNION_FIELDS = /** @type {const} */ (['relatedIds', 'keywords']);
 const NEW_RECORD_KINDS = ['capability', 'agent'];
 
 const STOPWORDS = new Set(['the', 'and', 'for', 'with', 'your', 'from', 'that', 'this', 'into', 'are', 'you', 'one', 'any', 'all', 'its', 'per', 'not', 'but', 'how', 'what', 'who', 'every', 'skill', 'skills']);
@@ -56,6 +89,7 @@ const STOPWORDS = new Set(['the', 'and', 'for', 'with', 'your', 'from', 'that', 
 // ---------- text helpers ----------
 
 const SMALL_WORDS = new Set(['a', 'an', 'and', 'or', 'of', 'to', 'in', 'on', 'by', 'for', 'the']);
+/** @param {string} id */
 export function titleCase(id) {
   return id.split('-').filter(Boolean).map((w, i) => {
     if (i > 0 && SMALL_WORDS.has(w)) return w;
@@ -64,15 +98,20 @@ export function titleCase(id) {
   }).join(' ');
 }
 
+/** @param {string} s */
 function collapse(s) { return String(s).replace(/\s+/g, ' ').trim(); }
 
-/** First sentence of published prose, whitespace collapsed. */
+/**
+ * First sentence of published prose, whitespace collapsed.
+ * @param {string} text
+ */
 export function firstSentence(text) {
   const t = collapse(text);
   const m = t.match(/^(.+?[.!?])(?=\s+[A-Z0-9"'(]|$)/);
   return (m ? m[1] : t).trim();
 }
 
+/** @param {string} fragment */
 function asSentence(fragment) {
   const t = collapse(fragment);
   if (!t) return t;
@@ -84,6 +123,8 @@ function asSentence(fragment) {
  * A display name from a document heading: markdown emphasis removed, and any
  * version stamp, tagline, or trailing parenthetical cut, so
  * "Pin -- v4.10 (2026-09-08)" reads "Pin".
+ * @param {string | null | undefined} h
+ * @returns {string | null}
  */
 export function displayName(h) {
   if (!h) return null;
@@ -96,6 +137,8 @@ export function displayName(h) {
 /**
  * The published "Use when ..." sentence of a description, verbatim, or null.
  * Quoted as written rather than parsed into fragments, so nothing is invented.
+ * @param {string | null | undefined} description
+ * @returns {string | null}
  */
 export function useWhenSentence(description) {
   if (!description) return null;
@@ -103,8 +146,13 @@ export function useWhenSentence(description) {
   return sentences.find(t => /^Use (?:it |this )?when(?:ever)?\b/.test(t)) ?? null;
 }
 
-/** Search keywords: words from the parts in priority order, capped, then sorted. */
+/**
+ * Search keywords: words from the parts in priority order, capped, then sorted.
+ * @param {...(string | string[] | null | undefined)} parts
+ * @returns {string[]}
+ */
 export function keywordsFrom(...parts) {
+  /** @type {Set<string>} */
   const out = new Set();
   for (const part of parts.flat()) {
     if (!part) continue;
@@ -116,6 +164,7 @@ export function keywordsFrom(...parts) {
   return [...out].sort();
 }
 
+/** @param {string | Date} date */
 export function isoSeconds(date) {
   const d = date instanceof Date ? date : new Date(date);
   if (Number.isNaN(d.getTime())) throw new FeedSourceError(`not a valid timestamp: ${date}`);
@@ -124,6 +173,10 @@ export function isoSeconds(date) {
 
 // ---------- status wording ----------
 
+/**
+ * @param {string} status
+ * @param {string[]} surfaces
+ */
 function accessNoteFor(status, surfaces) {
   switch (status) {
     case 'Active': return `Verified available on: ${surfaces.join(', ')}.`;
@@ -134,11 +187,16 @@ function accessNoteFor(status, surfaces) {
   }
 }
 
+/** @param {string} status */
 function usageLineFor(status) {
   if (status === 'Retired' || status === 'Deprecated') return 'Do not use for new work.';
   return 'Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose.';
 }
 
+/**
+ * @param {string[]} statuses
+ * @returns {string}
+ */
 export function aggregateStatus(statuses) {
   if (!statuses.length) return 'Unknown';
   const current = statuses.filter(s => s !== 'Retired' && s !== 'Deprecated');
@@ -146,16 +204,26 @@ export function aggregateStatus(statuses) {
   return current.every(s => s === current[0]) ? current[0] : 'Unknown';
 }
 
+/**
+ * @param {DraftRecord} rec
+ * @returns {WorkforceRecord}
+ */
 function ordered(rec) {
+  /** @type {Record<string, unknown>} */
   const out = {};
   for (const k of KEY_ORDER) if (rec[k] !== undefined) out[k] = rec[k];
-  return out;
+  return /** @type {WorkforceRecord} */ (out);
 }
 
 // ---------- builder ----------
 
-/** Build the HQ records from canonical inputs. Throws FeedSourceError when a source is invalid. */
+/**
+ * Build the HQ records from canonical inputs. Throws FeedSourceError when a source is invalid.
+ * @param {FeedInputs} inputs
+ * @returns {WorkforceRecord[]}
+ */
 export function buildRecords(inputs) {
+  /** @type {string[]} */
   const problems = [];
   const { config, graph, marketplace, plugins, skillDocs, capabilityRecords = [] } = inputs;
 
@@ -165,12 +233,13 @@ export function buildRecords(inputs) {
   if (problems.length) throw new FeedSourceError(problems);
 
   const zoneLabels = new Map((graph.layout?.zones ?? []).map(z => [z.id, z.label]));
-  const zoneLabel = zone => zoneLabels.get(zone) ?? titleCase(zone);
+  const zoneLabel = /** @param {string} zone */ zone => zoneLabels.get(zone) ?? titleCase(zone);
   const marketplaceName = marketplace.name ?? 'expert-partners';
   const marketplaceOwner = marketplace.owner?.name;
 
   // Packages and their presentation policy.
   const policy = config?.packages ?? {};
+  /** @type {Map<string, FeedPackage>} */
   const pkgByDir = new Map();
   for (const p of plugins) {
     const name = p.entry.name;
@@ -184,7 +253,7 @@ export function buildRecords(inputs) {
       problems.push(`version mismatch for "${name}": marketplace.json ${p.entry.version}, plugin.json ${p.manifest.version}`);
     }
     if (!version) problems.push(`plugin "${name}" declares no version`);
-    pkgByDir.set(p.dir, { p, name, rule, presentAs, version, id: presentAs === 'collection' ? name : `${name}-plugin`, skillIds: [] });
+    pkgByDir.set(p.dir, /** @type {FeedPackage} */ ({ p, name, rule, presentAs, version, id: presentAs === 'collection' ? name : `${name}-plugin`, skillIds: /** @type {string[]} */ ([]) }));
   }
   for (const [name, rule] of Object.entries(policy)) {
     if (!plugins.some(p => p.entry.name === name)) problems.push(`feed.config.json names package "${name}", which is not in marketplace.json`);
@@ -210,7 +279,9 @@ export function buildRecords(inputs) {
   }
 
   const excluded = new Set(skills.filter(s => s.pkg?.presentAs === 'excluded').map(s => s.n.id));
+  /** @type {Map<string, DraftRecord>} */
   const records = new Map();
+  /** @type {Set<string>} */
   const explicitStatus = new Set();
 
   // Collection shelves and provenance, from the package README.
@@ -243,6 +314,7 @@ export function buildRecords(inputs) {
     const invocationInstructions = [packaging, usageLineFor(status)];
     if (portable === true && status !== 'Retired') invocationInstructions.push('Works with any AI assistant that can load skills or read a text file.');
 
+    /** @type {Record<string, string>} */
     const technicalDetail = {
       canonicalSource: `${REPO_NAMES[n.repo]}/${n.source.slice(n.repo.length + 1)}`,
       lifecycle: n.status,
@@ -292,7 +364,7 @@ export function buildRecords(inputs) {
     if (pkg.presentAs === 'excluded') continue;
     const isCollection = pkg.presentAs === 'collection';
     let contains = [...pkg.skillIds].sort();
-    let categories = [...new Set(contains.map(id => records.get(id).categories[0]))].sort();
+    let categories = [...new Set(contains.map(id => /** @type {DraftRecord} */ (records.get(id)).categories[0]))].sort();
     if (isCollection) {
       for (const shelf of pkg.shelves) {
         for (const id of shelf.skillIds) if (!pkg.skillIds.includes(id)) problems.push(`collection "${pkg.name}" README shelf "${shelf.name}" lists "${id}", which is not a skill in the package`);
@@ -348,7 +420,7 @@ export function buildRecords(inputs) {
   // Package status is the honest aggregate of what it contains, unless a canonical
   // capability record set it explicitly.
   for (const rec of records.values()) {
-    if (rec._isPackage && !explicitStatus.has(rec.id)) rec.status = aggregateStatus(rec.containsSkillIds.map(id => records.get(id)?.status).filter(Boolean));
+    if (rec._isPackage && !explicitStatus.has(rec.id)) rec.status = aggregateStatus(/** @type {string[]} */ (rec.containsSkillIds.map(id => records.get(id)?.status).filter(Boolean)));
     if (!rec.accessNote) rec.accessNote = accessNoteFor(rec.status, rec.verifiedSurfaces);
   }
 
@@ -358,8 +430,8 @@ export function buildRecords(inputs) {
     if (rec._packageId) related.add(rec._packageId);
     related.delete(rec.id);
     rec.relatedIds = [...related].filter(id => records.has(id)).sort();
-    for (const field of ['replacedBy', 'replaces']) {
-      if (rec[field] !== undefined && !records.has(rec[field])) problems.push(`record "${rec.id}" ${field} "${rec[field]}" does not resolve to a record in the feed`);
+    for (const field of /** @type {const} */ (['replacedBy', 'replaces'])) {
+      if (rec[field] !== undefined && !records.has(/** @type {string} */ (rec[field]))) problems.push(`record "${rec.id}" ${field} "${rec[field]}" does not resolve to a record in the feed`);
     }
     for (const id of rec.containsSkillIds) {
       const target = records.get(id);
@@ -379,9 +451,20 @@ export function buildRecords(inputs) {
     .sort((a, b) => (KIND_ORDER.indexOf(a.kind) - KIND_ORDER.indexOf(b.kind)) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
 
+/**
+ * @param {unknown} v
+ * @returns {v is string[]}
+ */
 function isStringList(v) { return Array.isArray(v) && v.every(x => typeof x === 'string'); }
 
+/**
+ * @param {Map<string, DraftRecord>} records
+ * @param {CapabilityRecordFile[]} sources
+ * @param {Set<string>} explicitStatus
+ * @param {string[]} problems
+ */
 function applyCapabilityRecords(records, sources, explicitStatus, problems) {
+  /** @type {Map<string, string>} */
   const claimed = new Map();
   for (const { file, doc } of sources) {
     if (doc?.schema !== CAPABILITY_RECORD_SCHEMA || !Array.isArray(doc.records)) {
@@ -396,10 +479,10 @@ function applyCapabilityRecords(records, sources, explicitStatus, problems) {
 
       let rec = records.get(r.id);
       if (!rec) {
-        if (!NEW_RECORD_KINDS.includes(r.kind)) { problems.push(`${where}: a new record must have kind ${NEW_RECORD_KINDS.join(' or ')}`); continue; }
+        if (!/** @type {readonly unknown[]} */ (NEW_RECORD_KINDS).includes(r.kind)) { problems.push(`${where}: a new record must have kind ${NEW_RECORD_KINDS.join(' or ')}`); continue; }
         if (typeof r.humanName !== 'string' || typeof r.summary !== 'string') { problems.push(`${where}: a new record needs humanName and summary`); continue; }
         rec = {
-          id: r.id, humanName: r.humanName, kind: r.kind, summary: r.summary, status: 'Unknown',
+          id: r.id, humanName: r.humanName, kind: /** @type {string} */ (r.kind), summary: r.summary, status: 'Unknown',
           collectionIds: [], categories: [], portable: 'unknown', verifiedSurfaces: [], invocationInstructions: [],
           sourceLinks: [], lastVerified: 'Not yet verified on any platform.', containsSkillIds: [], relatedIds: [],
           accessNote: '', technicalDetail: { canonicalSource: file }, keywords: keywordsFrom(r.id, r.humanName),
@@ -419,22 +502,22 @@ function applyCapabilityRecords(records, sources, explicitStatus, problems) {
         if (r[field] === undefined) continue;
         const v = r[field];
         const okString = typeof v === 'string';
-        const valid = {
+        const valid = /** @type {Record<string, boolean>} */ ({
           status: okString && WORKFORCE_STATUSES.includes(v),
           portable: v === true || v === false || v === 'unknown',
           categories: isStringList(v), verifiedSurfaces: isStringList(v), invocationInstructions: isStringList(v),
           bestFor: isStringList(v), useCases: isStringList(v), askExamples: isStringList(v),
           sourceLinks: Array.isArray(v) && v.every(l => l && typeof l.label === 'string' && typeof l.url === 'string' && isPublicSafeUrl(l.url)),
-        }[field] ?? okString;
+        })[field] ?? okString;
         if (!valid) { problems.push(`${where}: field "${field}" has an invalid value`); continue; }
-        rec[field] = field === 'sourceLinks' ? v.map(l => ({ label: l.label, url: l.url })) : (Array.isArray(v) ? [...v] : v);
+        rec[field] = field === 'sourceLinks' ? /** @type {{ label: string, url: string }[]} */ (v).map(l => ({ label: l.label, url: l.url })) : (Array.isArray(v) ? [...v] : v);
         if (field === 'status') explicitStatus.add(r.id);
       }
       for (const field of RECORD_UNION_FIELDS) {
         if (r[field] === undefined) continue;
         if (!isStringList(r[field])) { problems.push(`${where}: field "${field}" must be a list of strings`); continue; }
-        rec[field] = field === 'keywords' ? keywordsFrom(rec.keywords, r.keywords) : [...new Set([...rec[field], ...r[field]])];
-        if (field === 'relatedIds') for (const id of r[field]) if (!records.has(id)) problems.push(`${where}: relatedIds names "${id}", which is not in the feed`);
+        rec[field] = field === 'keywords' ? keywordsFrom(rec.keywords, /** @type {string[]} */ (r.keywords)) : [...new Set([...rec[field], .../** @type {string[]} */ (r[field])])];
+        if (field === 'relatedIds') for (const id of /** @type {string[]} */ (r[field])) if (!records.has(id)) problems.push(`${where}: relatedIds names "${id}", which is not in the feed`);
       }
       if (r.verifiedAt !== undefined) rec.technicalDetail = { ...rec.technicalDetail, verifiedAt: String(r.verifiedAt) };
 
@@ -455,10 +538,17 @@ function applyCapabilityRecords(records, sources, explicitStatus, problems) {
 // that size so a reader on the default media type never gets an empty body.
 export const MAX_FEED_BYTES = 900 * 1024;
 
-/** Wrap records in the HQ envelope, then refuse it unless it passes HQ's contract, the public-safety scan, and the size limit. */
+/**
+ * Wrap records in the HQ envelope, then refuse it unless it passes HQ's contract, the public-safety scan, and the size limit.
+ * @param {WorkforceRecord[]} records
+ * @param {{ generatedAt: string | Date, maxBytes?: number }} options
+ * @returns {WorkforceEnvelope}
+ */
 export function buildEnvelope(records, { generatedAt, maxBytes = MAX_FEED_BYTES }) {
   const at = isoSeconds(generatedAt);
+  /** @type {WorkforceEnvelope} */
   const envelope = { schema: WORKFORCE_FEED_SCHEMA, source: 'canonical', generatedAt: at, verifiedAt: at, records };
+  /** @type {string[]} */
   const problems = [];
   for (const issue of contractIssues(envelope)) problems.push(`HQ contract: ${issue}`);
   for (const f of scanForLeaks(envelope)) problems.push(`public-safety: ${f.rule} at ${f.at} (${f.excerpt})`);
@@ -468,11 +558,16 @@ export function buildEnvelope(records, { generatedAt, maxBytes = MAX_FEED_BYTES 
   return envelope;
 }
 
-/** True when two envelopes carry identical records (timestamps are not compared). */
+/**
+ * True when two envelopes carry identical records (timestamps are not compared).
+ * @param {{ records?: unknown } | null | undefined} a
+ * @param {{ records?: unknown } | null | undefined} b
+ */
 export function sameRecords(a, b) {
   return JSON.stringify(a?.records ?? null) === JSON.stringify(b?.records ?? null);
 }
 
+/** @param {WorkforceEnvelope} envelope */
 export function serialize(envelope) {
   return `${JSON.stringify(envelope, null, 2)}\n`;
 }

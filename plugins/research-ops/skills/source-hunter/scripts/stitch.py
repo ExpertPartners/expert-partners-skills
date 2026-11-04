@@ -75,7 +75,7 @@ class Screen:
     first_time: float = 0.0
     last_time: float = 0.0
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "first_time": self.first_time,
             "last_time": self.last_time,
@@ -111,7 +111,8 @@ def _similar_normalized(na: str, nb: str, threshold: float = SIMILARITY) -> bool
     )
 
 
-def find_overlap(doc: list[Line], new: list[Line], max_head_skip: int = 2, max_tail_skip: int = 2):
+def find_overlap(doc: list[Line], new: list[Line], max_head_skip: int = 2,
+                 max_tail_skip: int = 2) -> tuple[int, int, int, int] | None:
     """Find where new continues doc.
 
     Returns (i, j, t, tail) where doc[i:i+t] matches new[j:j+t], or None.
@@ -120,7 +121,7 @@ def find_overlap(doc: list[Line], new: list[Line], max_head_skip: int = 2, max_t
     bottom of the previous frame) or when new is used up, meaning new is a
     window already inside doc.
     """
-    best = None
+    best: tuple[tuple[int, int, int], tuple[int, int, int, int]] | None = None
     for j in range(min(max_head_skip, len(new) - 1) + 1):
         for i in range(len(doc)):
             t = 0

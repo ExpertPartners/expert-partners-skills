@@ -20,6 +20,7 @@ The key stays where it is (never copied, never printed).
 import os
 import re
 import sys
+from typing import Any
 
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -30,37 +31,42 @@ SCOPES = ["https://www.googleapis.com/auth/documents",
           "https://www.googleapis.com/auth/drive.readonly"]
 STYLE = {"# ": "HEADING_1", "## ": "HEADING_2", "### ": "HEADING_3"}
 
+# googleapiclient is untyped, so its service objects and the JSON they return are Any.
+JSONDict = dict[str, Any]
+Service = Any
 
-def clients():
+
+def clients() -> tuple[Service, Service]:
     creds = service_account.Credentials.from_service_account_file(
         KEY, scopes=SCOPES, subject=SUBJECT)
     return (build("docs", "v1", credentials=creds, cache_discovery=False).documents(),
             build("drive", "v3", credentials=creds, cache_discovery=False))
 
 
-def find_doc_id(drive, title):
+def find_doc_id(drive: Service, title: str) -> str:
     q = f"name contains '{title}' and mimeType='application/vnd.google-apps.document' and trashed=false"
-    found = drive.files().list(q=q, fields="files(id,name)", pageSize=50, supportsAllDrives=True,
-                               includeItemsFromAllDrives=True).execute().get("files", [])
+    found: list[dict[str, str]] = drive.files().list(q=q, fields="files(id,name)", pageSize=50, supportsAllDrives=True,
+                                                     includeItemsFromAllDrives=True).execute().get("files", [])
     hits = [f for f in found if re.fullmatch(r"(\[[^\]]+\])+ " + re.escape(title), f["name"])]
     if len(hits) != 1:
         sys.exit(f"expected one Doc titled {title}, found {len(hits)}")
     return hits[0]["id"]
 
 
-def paragraphs(doc):
-    return doc["body"]["content"]
+def paragraphs(doc: JSONDict) -> list[JSONDict]:
+    content: list[JSONDict] = doc["body"]["content"]
+    return content
 
 
-def text_of(doc):
-    out = []
+def text_of(doc: JSONDict) -> str:
+    out: list[str] = []
     for el in paragraphs(doc):
         for run in el.get("paragraph", {}).get("elements", []):
             out.append(run.get("textRun", {}).get("content", ""))
     return "".join(out)
 
 
-def build_insert(raw, at):
+def build_insert(raw: str, at: int) -> list[dict[str, object]]:
     lines = raw.rstrip("\n").split("\n")
     parsed = []
     for line in lines:
@@ -70,12 +76,12 @@ def build_insert(raw, at):
                 style, line = name, line[len(mark):]
                 break
         parsed.append((style, line))
-    reqs = [{"insertText": {"location": {"index": at},
-                            "text": "".join(t + "\n" for _, t in parsed)}}]
+    reqs: list[dict[str, object]] = [{"insertText": {"location": {"index": at},
+                                                        "text": "".join(t + "\n" for _, t in parsed)}}]
     pos = at
     for style, t in parsed:
         end = pos + len(t) + 1
-        ps = {"namedStyleType": style}
+        ps: dict[str, object] = {"namedStyleType": style}
         fields = "namedStyleType"
         if style == "NORMAL_TEXT":
             ps["spaceBelow"] = {"magnitude": 12, "unit": "PT"}
@@ -87,13 +93,13 @@ def build_insert(raw, at):
     return reqs
 
 
-def main(argv):
+def main(argv: list[str]) -> None:
     if len(argv) < 3 or argv[1] not in ("read", "prepend", "replace"):
         sys.exit(__doc__)
     cmd, title = argv[1], argv[2]
     d, drive = clients()
     doc_id = find_doc_id(drive, title)
-    doc = d.get(documentId=doc_id).execute()
+    doc: JSONDict = d.get(documentId=doc_id).execute()
     if cmd == "read":
         sys.stdout.write(text_of(doc))
         return

@@ -27,6 +27,7 @@ import re
 import subprocess
 import sys
 import time
+from typing import Any, Literal
 
 REPO = "ExpertPartners/expert-partners-skills"
 MARKETPLACE = "expert-partners"
@@ -40,18 +41,21 @@ KEY = os.path.join(HOME, ".openclaw/.secrets/service-account.json")
 SUBJECT = "allison@expertpartners.com"
 GRACE_SECONDS = 24 * 3600
 
+# googleapiclient is untyped, so its service objects are Any.
+Service = Any
 
-def run(cmd, timeout=60):
+
+def run(cmd: list[str], timeout: int = 60) -> tuple[int, str, str]:
     r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
     return r.returncode, r.stdout, r.stderr
 
 
-def versions_from_marketplace(raw):
+def versions_from_marketplace(raw: str) -> dict[str, str]:
     d = json.loads(raw)
     return {p["name"]: p.get("version", "") for p in d.get("plugins", [])}
 
 
-def repo_head():
+def repo_head() -> tuple[str, int, dict[str, str]]:
     """(sha, committed_epoch, {plugin: version}) from GitHub."""
     rc, out, _ = run(["gh", "api", f"repos/{REPO}/commits/main", "--jq", '.sha + " " + .commit.committer.date'])
     if rc != 0:
@@ -65,16 +69,16 @@ def repo_head():
     return sha, epoch, versions_from_marketplace(out)
 
 
-def git_head(path):
+def git_head(path: str) -> str | None:
     rc, out, _ = run(["git", "-C", path, "rev-parse", "HEAD"])
     return out.strip() if rc == 0 else None
 
 
-def claude_code_state():
+def claude_code_state() -> tuple[str | None, dict[str, str]]:
     """(clone_sha, {plugin: installed_version}) for plugins installed from our marketplace."""
     clone = os.path.join(HOME, ".claude/plugins/marketplaces", MARKETPLACE)
     sha = git_head(clone)
-    installed = {}
+    installed: dict[str, str] = {}
     f = os.path.join(HOME, ".claude/plugins/installed_plugins.json")
     if os.path.exists(f):
         d = json.load(open(f))
@@ -85,9 +89,10 @@ def claude_code_state():
     return sha, installed
 
 
-def parse_codex_list(text):
+def parse_codex_list(text: str) -> dict[str, str | None]:
     """{plugin: version or None} for our marketplace block of `codex plugin list`."""
-    out, inblock = {}, False
+    out: dict[str, str | None] = {}
+    inblock = False
     for line in text.splitlines():
         if line.startswith("Marketplace `"):
             inblock = line.startswith(f"Marketplace `{MARKETPLACE}`")
@@ -103,16 +108,16 @@ def parse_codex_list(text):
     return out
 
 
-def codex_state():
+def codex_state() -> tuple[str | None, dict[str, str | None] | None]:
     snap = os.path.join(HOME, ".codex/.tmp/marketplaces", MARKETPLACE)
     sha = git_head(snap)
     rc, out, _ = run([CODEX, "plugin", "list"], timeout=120)
     return sha, (parse_codex_list(out) if rc == 0 else None)
 
 
-def claude_ai_state():
+def claude_ai_state() -> dict[str, str]:
     """{plugin: synced_version} from the copies Claude Code syncs from claude.ai."""
-    out = {}
+    out: dict[str, str] = {}
     for d in glob.glob(os.path.join(HOME, ".claude/plugins/synced/*/")):
         for pj in glob.glob(os.path.join(d, "*/.claude-plugin/plugin.json")):
             try:
@@ -123,26 +128,27 @@ def claude_ai_state():
     return out
 
 
-def chatgpt_state():
+def chatgpt_state() -> str | None:
     f = os.path.join(HOME, ".claude/plugin-sync/chatgpt-last-sync.json")
     if not os.path.exists(f):
         return None
-    return json.load(open(f)).get("commit")
+    commit: str | None = json.load(open(f)).get("commit")
+    return commit
 
 
-def short(sha):
+def short(sha: str | None) -> str:
     return (sha or "unknown")[:7]
 
 
-def missing_in_claude_code(head_versions, installed):
+def missing_in_claude_code(head_versions: dict[str, str], installed: dict[str, str]) -> list[str]:
     """Plugins in the repo that Claude Code has not installed from the marketplace."""
     return sorted(n for n in head_versions if n not in installed)
 
 
-def find_behind(head_sha, head_epoch, head_versions, now=None):
+def find_behind(head_sha: str, head_epoch: float, head_versions: dict[str, str], now: float | None = None) -> list[str]:
     """Return a list of plain-words lines, empty when every surface matches."""
     now = now or time.time()
-    behind = []
+    behind: list[str] = []
 
     cc_sha, cc_installed = claude_code_state()
     if cc_sha != head_sha:
@@ -160,7 +166,7 @@ def find_behind(head_sha, head_epoch, head_versions, now=None):
     if cx_list is None:
         behind.append("Codex plugin list could not be read")
     else:
-        skip = set()
+        skip: set[str] = set()
         sf = os.path.join(os.path.dirname(os.path.abspath(__file__)), "codex-skip.txt")
         if os.path.exists(sf):
             skip = {l.strip() for l in open(sf) if l.strip() and not l.startswith("#")}
@@ -188,19 +194,19 @@ def find_behind(head_sha, head_epoch, head_versions, now=None):
     return behind
 
 
-def find_sheet_id(drive, title):
+def find_sheet_id(drive: Service, title: str) -> str:
     """Find the one Sheet whose name is title behind its bracketed tag and version, such as
     [HQ][V1.0] Job Tracker. Zero or several matches stop the check, it never guesses."""
     q = f"name contains '{title}' and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false"
-    found = drive.files().list(q=q, fields="files(id,name)", pageSize=50, supportsAllDrives=True,
-                               includeItemsFromAllDrives=True).execute().get("files", [])
+    found: list[dict[str, str]] = drive.files().list(q=q, fields="files(id,name)", pageSize=50, supportsAllDrives=True,
+                                                     includeItemsFromAllDrives=True).execute().get("files", [])
     hits = [f for f in found if re.fullmatch(r"(\[[^\]]+\])+ " + re.escape(title), f["name"])]
     if len(hits) != 1:
         raise RuntimeError(f"expected one Sheet titled {title}, found {len(hits)}")
     return hits[0]["id"]
 
 
-def sheets():
+def sheets() -> tuple[Service, str]:
     """Returns the Sheets values API and the id of the Sheet found by title."""
     from google.oauth2 import service_account
     from googleapiclient.discovery import build
@@ -212,7 +218,9 @@ def sheets():
     return values, find_sheet_id(drive, SHEET_TITLE)
 
 
-def plan_row(rows, behind, head_sha, today):
+def plan_row(
+    rows: list[list[str]], behind: list[str], head_sha: str, today: str
+) -> tuple[Literal["append", "update", "none"], int | None, list[str] | None]:
     """Pure: decide the sheet write. Returns (action, row_number_or_None, values_or_None)."""
     idx = next((i for i, r in enumerate(rows) if r and r[0] == JOB), None)
     is_open = idx is not None and (len(rows[idx]) < 4 or rows[idx][3] != "Done")
@@ -224,14 +232,14 @@ def plan_row(rows, behind, head_sha, today):
                                       waiting, nxt, today, today])
         row = rows[idx] + [""] * (8 - len(rows[idx]))
         return ("update", idx + 1, [row[0], row[1], row[2], "Not started", waiting, nxt, row[6], today])
-    if is_open:
+    if idx is not None and is_open:
         row = rows[idx] + [""] * (8 - len(rows[idx]))
         return ("update", idx + 1, [row[0], row[1], row[2], "Done", "None",
                                     f"Every surface matched {short(head_sha)} on {today}", row[6], today])
     return ("none", None, None)
 
 
-def main(argv):
+def main(argv: list[str]) -> int:
     dry = "--dry-run" in argv
     today = time.strftime("%Y-%m-%d")
     head_sha, head_epoch, head_versions = repo_head()

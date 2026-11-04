@@ -16,7 +16,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from discovery import DiscoveryError, run_video_discovery  # noqa: E402
-from evidence import EvidenceError, Hunt  # noqa: E402
+from evidence import EvidenceError, Hunt, Route  # noqa: E402
 from frames import FrameError, FrameOptions, recover_frames  # noqa: E402
 from report import write_report  # noqa: E402
 from sweep import sweep  # noqa: E402
@@ -74,7 +74,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     hunt.add_wants(args.want)
     hunt.add_notes(args.note)
-    routes = []
+    routes: list[Route] = []
     try:
         if args.command == "frames":
             options = FrameOptions(lang=args.lang, psm=args.psm, ocr_scale=args.ocr_scale, min_conf=args.min_conf,

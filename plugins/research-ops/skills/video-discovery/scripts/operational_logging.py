@@ -12,6 +12,7 @@ import re
 import secrets
 import sys
 import time
+import typing
 
 SCHEMA = 'video-discovery.operational.v1'
 OUTCOMES = frozenset({'success', 'failure'})
@@ -35,18 +36,23 @@ class OperationalLogError(ValueError):
     """Raised with a fixed message only; never carries the rejected input."""
 
 
-def new_run_id():
+class Stream(typing.Protocol):
+    def write(self, text: str, /) -> object: ...
+    def flush(self) -> object: ...
+
+
+def new_run_id() -> str:
     return secrets.token_hex(16)
 
 
-def _bounded_int(value, maximum):
+def _bounded_int(value: object, maximum: int) -> int:
     # bool is an int subclass; True must not pass as a count.
     if type(value) is not int or value < 0:
         raise OperationalLogError('operational field value rejected')
     return min(value, maximum)
 
 
-def build_event(event, run_id, **fields):
+def build_event(event: str, run_id: str, **fields: object) -> dict[str, str | int]:
     """Return the validated event as a dict, or raise OperationalLogError."""
     if not isinstance(event, str) or event not in EVENTS:
         raise OperationalLogError('operational event rejected')
@@ -57,7 +63,7 @@ def build_event(event, run_id, **fields):
         raise OperationalLogError('operational field rejected')
     if not REQUIRED[event] <= fields.keys():
         raise OperationalLogError('operational field missing')
-    record = {'schema': SCHEMA, 'event': event, 'run_id': run_id}
+    record: dict[str, str | int] = {'schema': SCHEMA, 'event': event, 'run_id': run_id}
     for key, value in fields.items():
         if key == 'outcome':
             if not isinstance(value, str) or value not in OUTCOMES:
@@ -70,11 +76,11 @@ def build_event(event, run_id, **fields):
     return record
 
 
-def format_event(event, run_id, **fields):
+def format_event(event: str, run_id: str, **fields: object) -> str:
     return json.dumps(build_event(event, run_id, **fields), sort_keys=True, separators=(',', ':'))
 
 
-def emit(event, run_id, stream=None, **fields):
+def emit(event: str, run_id: str, stream: Stream | None = None, **fields: object) -> str:
     """Validate, then write one line. Raises OperationalLogError before writing anything."""
     line = format_event(event, run_id, **fields)
     stream = sys.stderr if stream is None else stream
@@ -94,32 +100,36 @@ class OperationalRun:
     Logging problems never change the script: an invalid event is omitted.
     """
 
-    def __init__(self, kind, stream=None, clock=time.monotonic, run_id=None):
+    def __init__(self, kind: str, stream: Stream | None = None, clock: typing.Callable[[], float] = time.monotonic,
+                 run_id: str | None = None) -> None:
         if kind not in COUNT_FIELDS:
             raise OperationalLogError('operational run kind rejected')
         self.kind = kind
         self.stream = stream
         self.clock = clock
         self.run_id = run_id or new_run_id()
-        self.counts = {}
-        self.started = None
+        self.counts: dict[str, int] = {}
+        self.started: float | None = None
 
-    def record(self, **counts):
+    def record(self, **counts: int) -> None:
         self.counts.update(counts)
 
-    def _emit(self, event, **fields):
+    def _emit(self, event: str, **fields: object) -> str | None:
         try:
             return emit(event, self.run_id, stream=self.stream, **fields)
         except OperationalLogError:
             return None
 
-    def __enter__(self):
+    def __enter__(self) -> 'OperationalRun':
         self.started = self.clock()
         self._emit(self.kind + '_started')
         return self
 
-    def __exit__(self, exc_type, exc, tb):
-        success = exc_type is None or (issubclass(exc_type, SystemExit) and exc.code in (None, 0))
+    def __exit__(self, exc_type: type[BaseException] | None, exc: BaseException | None,
+                 tb: object) -> typing.Literal[False]:
+        success = exc_type is None or (isinstance(exc, SystemExit) and exc.code in (None, 0))
+        if self.started is None:
+            raise TypeError('OperationalRun exited before it was entered')
         elapsed = max(0, int(round((self.clock() - self.started) * 1000)))
         fields = dict(outcome='success' if success else 'failure', duration_ms=elapsed)
         if self._emit(self.kind + '_finished', **fields, **self.counts) is None and self.counts:

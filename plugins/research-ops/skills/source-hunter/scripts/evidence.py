@@ -12,12 +12,44 @@ import os
 import re
 import shutil
 import subprocess
+from collections.abc import Iterable
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Required, TypedDict
 
 HUNT_FILE = "hunt.json"
 ROUTES_FILE = "routes.jsonl"
 REPORT_FILE = "report.md"
+
+
+class Note(TypedDict):
+    at: str
+    note: str
+
+
+class HuntMeta(TypedDict, total=False):
+    name: str
+    created_at: str
+    wants: list[str]
+    notes: list[Note]
+
+
+class Route(TypedDict, total=False):
+    """One route record as written to routes.jsonl."""
+
+    route: Required[str]
+    target: Required[str]
+    number: int
+    recorded_at: str
+    method: str
+    status: str
+    found: list[str]
+    missing: list[str]
+    problems: list[str]
+    evidence: list[str]
+    text_files: list[str]
+    output_dir: str
+    counts: dict[str, int]
 
 
 class EvidenceError(RuntimeError):
@@ -40,7 +72,7 @@ def _nearest_existing(path: Path) -> Path:
     return current
 
 
-def git_work_tree_for(path: str | os.PathLike) -> Path | None:
+def git_work_tree_for(path: str | os.PathLike[str]) -> Path | None:
     """Return the git working tree that contains path, or None.
 
     The path may not exist yet. Its nearest existing ancestor is checked, both
@@ -67,7 +99,7 @@ def git_work_tree_for(path: str | os.PathLike) -> Path | None:
     return None
 
 
-def guard_evidence_folder(path: str | os.PathLike) -> Path:
+def guard_evidence_folder(path: str | os.PathLike[str]) -> Path:
     """Resolve the evidence folder and refuse it if it is inside a git working tree."""
     if not os.fspath(path):
         raise EvidenceError("An evidence folder is required.")
@@ -83,7 +115,7 @@ def guard_evidence_folder(path: str | os.PathLike) -> Path:
 class Hunt:
     """One hunt, kept in one evidence folder."""
 
-    def __init__(self, evidence: str | os.PathLike, name: str | None = None):
+    def __init__(self, evidence: str | os.PathLike[str], name: str | None = None):
         self.root = guard_evidence_folder(evidence)
         self.root.mkdir(parents=True, exist_ok=True)
         meta = self._load_meta()
@@ -94,7 +126,7 @@ class Hunt:
 
     # Paths and writes
 
-    def path(self, relative: str | os.PathLike) -> Path:
+    def path(self, relative: str | os.PathLike[str]) -> Path:
         target = (self.root / relative).resolve()
         if target != self.root and self.root not in target.parents:
             raise EvidenceError(f"Refusing to write outside the evidence folder: {relative}")
@@ -103,7 +135,7 @@ class Hunt:
     def rel(self, path: Path) -> str:
         return Path(path).resolve().relative_to(self.root).as_posix()
 
-    def mkdir(self, relative: str | os.PathLike) -> Path:
+    def mkdir(self, relative: str | os.PathLike[str]) -> Path:
         target = self.path(relative)
         target.mkdir(parents=True, exist_ok=True)
         return target
@@ -123,19 +155,20 @@ class Hunt:
             number += 1
         return latest
 
-    def write_text(self, relative: str | os.PathLike, content: str) -> Path:
+    def write_text(self, relative: str | os.PathLike[str], content: str) -> Path:
         target = self.path(relative)
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(content, encoding="utf-8")
         return target
 
-    def write_json(self, relative: str | os.PathLike, data) -> Path:
+    def write_json(self, relative: str | os.PathLike[str], data: object) -> Path:
         return self.write_text(relative, json.dumps(data, indent=2, ensure_ascii=False) + "\n")
 
     # Hunt metadata
 
-    def _load_meta(self) -> dict:
+    def _load_meta(self) -> HuntMeta:
         meta_path = self.root / HUNT_FILE
+        meta: HuntMeta
         if meta_path.exists():
             meta = json.loads(meta_path.read_text(encoding="utf-8"))
         else:
@@ -151,14 +184,14 @@ class Hunt:
     def name(self) -> str:
         return self.meta.get("name") or self.root.name
 
-    def add_wants(self, wants) -> None:
+    def add_wants(self, wants: Iterable[str] | None) -> None:
         for want in wants or []:
             want = want.strip()
             if want and want not in self.meta["wants"]:
                 self.meta["wants"].append(want)
         self._save_meta()
 
-    def add_notes(self, notes) -> None:
+    def add_notes(self, notes: Iterable[str] | None) -> None:
         for note in notes or []:
             note = note.strip()
             if note:
@@ -167,14 +200,14 @@ class Hunt:
 
     # Routes
 
-    def routes(self) -> list[dict]:
+    def routes(self) -> list[Route]:
         routes_path = self.root / ROUTES_FILE
         if not routes_path.exists():
             return []
         return [json.loads(line) for line in routes_path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
-    def record_route(self, route: dict) -> dict:
-        record = {"number": len(self.routes()) + 1, "recorded_at": now_iso(), **route}
+    def record_route(self, route: Route) -> Route:
+        record: Route = {"number": len(self.routes()) + 1, "recorded_at": now_iso(), **route}
         record.setdefault("found", [])
         record.setdefault("missing", [])
         record.setdefault("problems", [])

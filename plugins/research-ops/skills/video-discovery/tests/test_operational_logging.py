@@ -194,7 +194,7 @@ def test_logger_imports_only_local_stdlib():
             imported |= {a.name.split('.')[0] for a in node.names}
         elif isinstance(node, ast.ImportFrom):
             imported.add((node.module or '').split('.')[0])
-    assert imported == {'json', 're', 'secrets', 'sys', 'time'}
+    assert imported == {'json', 're', 'secrets', 'sys', 'time', 'typing'}
 
 
 @pytest.fixture

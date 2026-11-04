@@ -7,7 +7,9 @@ It points to the evidence files instead.
 
 from __future__ import annotations
 
-from evidence import REPORT_FILE, Hunt, now_iso
+from pathlib import Path
+
+from evidence import REPORT_FILE, Hunt, Route, now_iso
 from stitch import normalize, similar
 
 
@@ -28,7 +30,7 @@ def text_contains(want: str, text: str, threshold: float = 0.85) -> bool:
     return False
 
 
-def where_found(hunt: Hunt, want: str, routes: list[dict]) -> list[str]:
+def where_found(hunt: Hunt, want: str, routes: list[Route]) -> list[str]:
     hits = []
     for route in routes:
         for rel in route.get("text_files") or []:
@@ -99,5 +101,5 @@ def build_report(hunt: Hunt) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
-def write_report(hunt: Hunt):
+def write_report(hunt: Hunt) -> Path:
     return hunt.write_text(REPORT_FILE, build_report(hunt))

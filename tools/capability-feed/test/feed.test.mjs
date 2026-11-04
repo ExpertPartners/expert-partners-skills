@@ -14,19 +14,40 @@ import { parseWorkforceEnvelope, contractIssues } from '../lib/hq-contract.mjs';
 import { scanForLeaks } from '../lib/public-safety.mjs';
 import { makeRepo, skillMd } from './fixture-repo.mjs';
 
+/** @typedef {import('../lib/hq-contract.mjs').WorkforceRecord} WorkforceRecord */
+/** @typedef {import('../lib/hq-contract.mjs').WorkforceEnvelope} WorkforceEnvelope */
+/** @typedef {import('./fixture-repo.mjs').FixtureSpec} FixtureSpec */
+/**
+ * Records by id. Tests only look up ids they expect in the feed, so a missing one
+ * fails the test at the lookup.
+ * @typedef {{ get(id: string): WorkforceRecord } & Map<string, WorkforceRecord>} RecordsById
+ */
+
 const here = path.dirname(fileURLToPath(import.meta.url));
 const CLI = path.join(here, '..', 'generate-feed.mjs');
 const LIVE_REPO = path.resolve(here, '..', '..', '..');
 const NOW = '2026-10-03T12:00:00Z';
 
+/**
+ * @param {string} root
+ * @param {string} [now]
+ */
 function generate(root, now = NOW) {
   return buildEnvelope(buildRecords(readInputs(root)), { generatedAt: now });
 }
-function byId(env) { return new Map(env.records.map(r => [r.id, r])); }
+/**
+ * @param {WorkforceEnvelope} env
+ * @returns {RecordsById}
+ */
+function byId(env) { return /** @type {RecordsById} */ (new Map(env.records.map(r => [r.id, r]))); }
+/**
+ * @param {string} root
+ * @param {...string} args
+ */
 function cli(root, ...args) {
   return spawnSync(process.execPath, [CLI, '--repo', root, ...args], { encoding: 'utf8' });
 }
-const feedPath = root => path.join(root, 'tools/capability-feed/ai-workforce-feed.json');
+const feedPath = /** @param {string} root */ root => path.join(root, 'tools/capability-feed/ai-workforce-feed.json');
 
 describe('1. deterministic generation', () => {
   test('same inputs and clock produce byte-identical output', () => {
@@ -55,6 +76,7 @@ describe('1. deterministic generation', () => {
 });
 
 describe('2. invalid source data fails safely', () => {
+  /** @type {[name: string, mutate: (s: FixtureSpec) => FixtureSpec, reason: RegExp][]} */
   const cases = [
     ['graph with the wrong schema', s => s, /schema is "skill-map\/v0"/],
     ['unknown lifecycle status', s => { s.nodes[0].status = 'shipping'; return s; }, /unknown lifecycle status/],
@@ -228,7 +250,7 @@ describe('6. unknown deployment state is never promoted to Active', () => {
     assert.ok(![...recs.values()].some(r => r.status === 'Active'));
   });
 
-  const withRecord = rec => makeRepo(s => {
+  const withRecord = /** @param {object} rec */ rec => makeRepo(s => {
     s.config.capabilityRecordSources = [{ path: 'capability-records' }];
     s.capabilityRecords['capability-records/curator.json'] = { schema: 'expert-partners-capability-record/v1', records: [rec] };
     return s;
