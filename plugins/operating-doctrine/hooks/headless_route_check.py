@@ -1,0 +1,802 @@
+#!/usr/bin/env python3
+"""Headless route check, a Claude Code PreToolUse hook for browser navigation.
+
+Refuses browser navigation to any system that already has headless access (an API, CLI,
+MCP server, connector or 1Password item) and tells the session which headless route to use
+instead. Browser code tools are checked too, for URLs their code navigates to. When the call
+is let through, the hook still hands the session its Headless route checked report line.
+
+The access map is a Google Sheet owned by Keys and Sign-Ins. The hook reads only a local
+cache of it, so a browser call never waits on Drive. When the cache is more than an hour
+old, the hook starts one background refresh after it has printed its decision. A failed
+refresh keeps the last good copy. With no copy at all, the hook allows and logs.
+
+  status live        deny, naming the headless route and the 1Password item
+  status setting up  deny, saying the setup job comes first
+  status no API      allow
+  host not on map    allow, and append the host to unknown-hosts.log for the nightly check
+
+The map holds 1Password item names only. The hook never reads a secret, and it withholds
+any map value that looks like one instead of printing it.
+
+Usage:
+  headless_route_check.py             hook mode, reads the PreToolUse JSON on stdin
+  headless_route_check.py --refresh   refresh the cache now and print the result
+
+Python 3.9 or later, standard library only. hooks/README.md explains the setup.
+"""
+
+from __future__ import annotations
+
+import csv
+import io
+import ipaddress
+import json
+import os
+import re
+import subprocess
+import sys
+import tempfile
+import time
+import unicodedata
+import urllib.error
+import urllib.parse
+import urllib.request
+from datetime import datetime, timezone
+from pathlib import Path
+
+REFRESH_SECONDS = 3600
+FETCH_TIMEOUT_SECONDS = 30
+
+CACHE_FILE = "access-map.json"
+STAMP_FILE = "refresh-attempt"
+UNKNOWN_HOSTS_FILE = "unknown-hosts.log"
+HOOK_LOG_FILE = "hook.log"
+
+# Normalized header text -> field. The sheet may word its headers a little differently.
+HEADER_FIELDS = {
+    "system": "system",
+    "hosts": "hosts",
+    "host": "hosts",
+    "domains": "hosts",
+    "headless route": "route",
+    "route": "route",
+    "1password item": "item",
+    "1password": "item",
+    "status": "status",
+    "no api reason": "reason",
+    "reason": "reason",
+}
+REQUIRED_FIELDS = ("system", "hosts", "status")
+
+LIVE = "live"
+SETTING_UP = "setting up"
+NO_API = "no api"
+
+STATUS_TIE_ORDER = {NO_API: 0, SETTING_UP: 2, LIVE: 3}  # any other status ranks 1
+
+SECRET_RE = re.compile(
+    r"-----BEGIN"
+    r"|\b(?:sk|pk|rk)-[A-Za-z0-9_-]{8,}"
+    r"|\b(?:sk|pk|rk)_(?:live|test)_[A-Za-z0-9]{6,}"
+    r"|\bwhsec_[A-Za-z0-9]{8,}"
+    r"|\b(?:AKIA|ASIA|AGPA|AIDA|AROA|ANPA|ANVA|AIPA)[A-Z0-9]{16}\b"
+    r"|\bgh[pousr]_[A-Za-z0-9]{20,}"
+    r"|\bgithub_pat_[A-Za-z0-9_]{20,}"
+    r"|\bglpat-[A-Za-z0-9_-]{16,}"
+    r"|\bxox[a-z]-"
+    r"|\bxapp-"
+    r"|\beyJ[A-Za-z0-9_-]{10,}"
+    r"|\bops_[A-Za-z0-9]"
+    r"|\bAIza[A-Za-z0-9_-]{20,}"
+    r"|\bya29\.[A-Za-z0-9_-]{10,}"
+    r"|\bGOCSPX-"
+    r"|\bSG\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}"
+    r"|\bnpm_[A-Za-z0-9]{20,}"
+    r"|\bhf_[A-Za-z0-9]{20,}"
+    r"|\bshp(?:at|ca|pa|ss)_[A-Fa-f0-9]{16,}"
+    r"|\bdo[opr]_v1_[A-Fa-f0-9]{16,}"
+    r"|\b[A-Za-z][A-Za-z0-9+.-]*://[^/\s:@]+:[^/\s@]+@"
+    r"|(?i:\b(?:password|passwd|pwd|secret|token|api[_ -]?key|access[_ -]?key)\s*[:=]\s*\S)"
+    r"|(?i:\bbearer\s+[A-Za-z0-9._~+/-]{12,})"
+)
+# Long runs of letters and digits with no separator. Names (MCP tool names, op:// paths,
+# item slugs) break into short words at _ - / and spaces, while a key or hex token does not.
+UNBROKEN_RUN_RE = re.compile(r"[A-Za-z0-9+=]{24,}")
+# A word that mixes upper case, lower case and digits even across _ - . separators, the shape
+# of a generated key with a vendor prefix this list does not know. Names rarely look like it.
+MIXED_WORD_RE = re.compile(r"[A-Za-z0-9_.+=-]{20,}")
+
+# Navigation written into browser code: page.goto("..."), location.href = "...", and so on.
+# A string literal is captured with its escapes, and js_string_value reads it as JavaScript does.
+CODE_KEYS = ("code", "function", "script", "expression")
+# These run the code in filename instead of code when it is given. browser_evaluate's filename
+# is where its result is saved, so it is not code.
+RUN_CODE_TOOLS = ("browser_run_code_unsafe", "browser_run_code")
+MAX_CODE_FILE_BYTES = 1 << 20
+JS_STRING = r"""(?:'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"|`((?:[^`\\]|\\.)*)`)"""
+CODE_CALL_RE = re.compile(
+    r"(?:\.goto|\blocation\.assign|\blocation\.replace|\bwindow\.open)\s*\(\s*" + JS_STRING, re.S
+)
+CODE_ASSIGN_RE = re.compile(r"\blocation(?:\.href)?\s*=\s*" + JS_STRING, re.S)
+JS_ESCAPE_RE = re.compile(r"\\(?:x([0-9A-Fa-f]{2})|u\{([0-9A-Fa-f]+)\}|u([0-9A-Fa-f]{4})|(\r\n|.))", re.S)
+JS_SINGLE_ESCAPES = {"n": "\n", "r": "\r", "t": "\t", "b": "\b", "f": "\f", "v": "\v", "0": "\0"}
+JS_LINE_CONTINUATIONS = ("\r\n", "\n", "\r", "\u2028", "\u2029")
+
+# URLs are read the way the WHATWG URL Standard reads them, which is what browsers do.
+C0_CONTROL_OR_SPACE = "".join(chr(code) for code in range(0x21))
+SCHEME_RE = re.compile(r"^([A-Za-z][A-Za-z0-9+.-]*):")
+# example.com:8080 parses as the scheme example.com, but the navigation tools read it as a host.
+HOST_PORT_RE = re.compile(r"^[^:/?#\\]+:\d+(?:[/?#\\]|$)")
+WEB_SCHEMES = ("http", "https")
+# claude-in-chrome navigate takes back and forward as history steps, not hosts.
+HISTORY_STEPS = ("back", "forward")
+
+
+def now_iso() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def state_dir() -> Path:
+    override = os.environ.get("EP_HEADLESS_ROUTE_DIR")
+    if override:
+        return Path(override)
+    base = os.environ.get("XDG_CACHE_HOME") or os.path.join(os.path.expanduser("~"), ".cache")
+    return Path(base) / "expert-partners" / "headless-route"
+
+
+def config_path() -> Path:
+    override = os.environ.get("EP_HEADLESS_ROUTE_CONFIG")
+    if override:
+        return Path(override)
+    base = os.environ.get("XDG_CONFIG_HOME") or os.path.join(os.path.expanduser("~"), ".config")
+    return Path(base) / "expert-partners" / "headless-route.json"
+
+
+def ensure_dir(path: Path) -> None:
+    path.mkdir(parents=True, exist_ok=True, mode=0o700)
+
+
+def log_event(event: str, detail: str = "") -> None:
+    try:
+        directory = state_dir()
+        ensure_dir(directory)
+        with open(directory / HOOK_LOG_FILE, "a", encoding="utf-8") as handle:
+            handle.write(f"{now_iso()}\t{event}\t{one_line(detail)}\n")
+    except OSError:
+        pass
+
+
+def one_line(value: object, limit: int = 300) -> str:
+    return " ".join(str(value).split())[:limit]
+
+
+def looks_like_secret(text: str) -> bool:
+    if SECRET_RE.search(text):
+        return True
+    if any(
+        sum(char.isdigit() for char in run) >= 2 and any(char.isalpha() for char in run)
+        for run in UNBROKEN_RUN_RE.findall(text)
+    ):
+        return True
+    return any(
+        sum(char.isdigit() for char in word) >= 3
+        and any(char.isupper() for char in word)
+        and any(char.islower() for char in word)
+        for word in MIXED_WORD_RE.findall(text)
+    )
+
+
+def safe(value: object) -> str:
+    """A map value fit to print. Anything shaped like a secret is withheld."""
+    text = one_line(value, 200)
+    if looks_like_secret(text):
+        return "[withheld, not an item name]"
+    return text
+
+
+def normalize_header(header: str) -> str:
+    return " ".join(re.sub(r"[^a-z0-9]+", " ", header.lower()).split())
+
+
+def normalize_status(status: str) -> str:
+    """One of live, setting up or no api for the wordings people use, otherwise the text."""
+    text = " ".join(re.sub(r"[^a-z0-9]+", " ", status.lower()).split())
+    if re.match(r"(?:no api|no|none)\b", text):
+        return NO_API
+    if re.search(r"\b(?:setting up|set up|setup|in progress)\b", text):
+        return SETTING_UP
+    if re.match(r"live\b", text):
+        return LIVE
+    return text
+
+
+def split_hosts(cell: str) -> list[str]:
+    hosts = []
+    for raw in re.split(r"[\s,;]+", cell or ""):
+        raw = raw.strip().lower()
+        if not raw:
+            continue
+        if "://" in raw:
+            raw = urllib.parse.urlsplit(raw).hostname or ""
+        raw = raw.split("/", 1)[0].split(":", 1)[0]
+        wildcard = False
+        while raw.startswith("*.") or raw.startswith("."):
+            if raw.startswith("*."):
+                wildcard, raw = True, raw[2:]
+            else:
+                raw = raw[1:]
+        raw = canonical_domain(raw)
+        if raw:
+            hosts.append("*." + raw if wildcard else raw)
+    return hosts
+
+
+def canonical_domain(name: str) -> str:
+    """A host name as the URL Standard's host parser leaves it, or "" when it cannot be one.
+
+    Percent-decoded, case folded, full-width forms and ideographic full stops read as ASCII,
+    non-ASCII labels in Punycode, and no trailing dot. Map hosts and target hosts both pass
+    through here, so they compare in one form.
+    """
+    try:
+        name = urllib.parse.unquote_to_bytes(name).decode("utf-8")
+    except UnicodeDecodeError:
+        return ""
+    name = unicodedata.normalize("NFKC", name).replace("\u3002", ".").lower()
+    labels = []
+    for label in name.split("."):
+        if label and not label.isascii():
+            try:
+                label = label.encode("idna").decode("ascii")
+            except UnicodeError:
+                pass
+        labels.append(label)
+    return ".".join(labels).rstrip(".")
+
+
+def parse_map(csv_text: str) -> list[dict]:
+    """Rows of the access map as dicts with system, hosts, route, item, status, reason."""
+    rows = list(csv.reader(io.StringIO(csv_text)))
+    if not rows:
+        raise ValueError("the access map is empty")
+    columns: dict[str, int] = {}
+    for index, header in enumerate(rows[0]):
+        field = HEADER_FIELDS.get(normalize_header(header))
+        if field and field not in columns:
+            columns[field] = index
+    missing = [field for field in REQUIRED_FIELDS if field not in columns]
+    if missing:
+        raise ValueError("the access map is missing the column(s) " + ", ".join(missing))
+
+    def cell(row: list[str], field: str) -> str:
+        index = columns.get(field)
+        return row[index].strip() if index is not None and index < len(row) else ""
+
+    systems = []
+    for number, row in enumerate(rows[1:], start=2):
+        if not any(value.strip() for value in row):
+            continue
+        system = cell(row, "system")
+        hosts = split_hosts(cell(row, "hosts"))
+        status = cell(row, "status")
+        # A half-edited row must fail the refresh, so the last good copy keeps protecting its
+        # hosts instead of the row silently dropping out of the map.
+        blank = [name for name, value in (("System", system), ("Hosts", hosts), ("Status", status))
+                 if not value]
+        if blank:
+            raise ValueError(f"access map row {number} has no {', '.join(blank)}")
+        systems.append({
+            "system": system,
+            "hosts": hosts,
+            "route": cell(row, "route"),
+            "item": cell(row, "item"),
+            "status": normalize_status(status),
+            "reason": cell(row, "reason"),
+        })
+    if not systems:
+        raise ValueError("the access map has no rows with a system and hosts")
+    return systems
+
+
+def unknown_statuses(systems: list[dict]) -> list[str]:
+    return [safe(entry["system"]) for entry in systems if entry.get("status") not in STATUS_TIE_ORDER]
+
+
+def load_cache() -> list[dict] | None:
+    try:
+        with open(state_dir() / CACHE_FILE, encoding="utf-8") as handle:
+            data = json.load(handle)
+        systems = data["systems"]
+        if not isinstance(systems, list):
+            raise ValueError("systems is not a list")
+        return systems
+    except FileNotFoundError:
+        return None
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        log_event("cache-unreadable", type(error).__name__)
+        return None
+
+
+def write_cache(systems: list[dict]) -> None:
+    directory = state_dir()
+    ensure_dir(directory)
+    payload = {"fetched_at": now_iso(), "systems": systems}
+    fd, temp_path = tempfile.mkstemp(prefix=".access-map-", dir=directory)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            json.dump(payload, handle, indent=2)
+            handle.write("\n")
+        os.replace(temp_path, directory / CACHE_FILE)
+    except BaseException:
+        try:
+            os.unlink(temp_path)
+        except OSError:
+            pass
+        raise
+
+
+def load_config() -> dict:
+    config: dict = {}
+    path = config_path()
+    if path.exists():
+        with open(path, encoding="utf-8") as handle:
+            config = json.load(handle)
+        if not isinstance(config, dict):
+            raise ValueError(f"{path} must hold a JSON object")
+    if os.environ.get("EP_ACCESS_MAP_SHEET_ID"):
+        config["sheet_id"] = os.environ["EP_ACCESS_MAP_SHEET_ID"]
+    return config
+
+
+def run_command(argv: object, what: str) -> str:
+    if not isinstance(argv, list) or not argv or not all(isinstance(part, str) for part in argv):
+        raise ValueError(f"{what} must be a list of strings")
+    result = subprocess.run(
+        argv, stdin=subprocess.DEVNULL, capture_output=True, text=True,
+        timeout=FETCH_TIMEOUT_SECONDS,
+    )
+    if result.returncode != 0:
+        # stderr is left out on purpose, a token command can echo what it was handling.
+        raise RuntimeError(f"{what} exited {result.returncode}")
+    return result.stdout
+
+
+def fetch_map_csv(config: dict) -> str:
+    if config.get("fetch_command"):
+        return run_command(config["fetch_command"], "fetch_command")
+    sheet_id = config.get("sheet_id")
+    if not sheet_id:
+        raise ValueError(f"no access map is configured, set sheet_id in {config_path()}")
+    url = ("https://docs.google.com/spreadsheets/d/"
+           + urllib.parse.quote(str(sheet_id), safe="") + "/export?format=csv")
+    if config.get("gid") not in (None, ""):
+        url += "&gid=" + urllib.parse.quote(str(config["gid"]), safe="")
+    request = urllib.request.Request(url)
+    if config.get("token_command"):
+        token = run_command(config["token_command"], "token_command").strip()
+        if not token:
+            raise RuntimeError("token_command printed nothing")
+        request.add_header("Authorization", "Bearer " + token)
+    try:
+        with urllib.request.urlopen(request, timeout=FETCH_TIMEOUT_SECONDS) as response:
+            body = response.read().decode("utf-8-sig")
+            content_type = response.headers.get("Content-Type", "")
+    except urllib.error.HTTPError as error:
+        if error.code in (401, 403):
+            raise RuntimeError(
+                f"the sheet export answered HTTP {error.code}, so the token cannot read the sheet. "
+                "It needs a Drive scope, see Setup on each machine in hooks/README.md"
+            ) from None
+        raise RuntimeError(f"the sheet export answered HTTP {error.code}") from None
+    except urllib.error.URLError as error:
+        raise RuntimeError(f"the sheet export could not be reached ({one_line(error.reason, 80)})") from None
+    if "text/html" in content_type:
+        raise RuntimeError(
+            "the sheet export returned a sign-in or sharing page, not CSV. The token needs a Drive "
+            "scope and access to the sheet, see Setup on each machine in hooks/README.md"
+        )
+    return body
+
+
+def touch_stamp() -> None:
+    directory = state_dir()
+    ensure_dir(directory)
+    (directory / STAMP_FILE).touch()
+
+
+def refresh() -> tuple[bool, str]:
+    """Fetch the map and replace the cache. A failure leaves the last good copy in place."""
+    try:
+        touch_stamp()
+        systems = parse_map(fetch_map_csv(load_config()))
+        write_cache(systems)
+    except Exception as error:  # noqa: BLE001, every failure keeps the last good copy
+        message = f"{type(error).__name__}: {one_line(error, 300)}"
+        log_event("refresh-failed", message)
+        return False, message
+    message = f"{len(systems)} systems"
+    unknown = unknown_statuses(systems)
+    if unknown:
+        message += (f", {len(unknown)} with a status that is not live, setting up or no API, so "
+                    f"the browser is let through for them: {', '.join(unknown)}")
+    log_event("refresh-ok", message)
+    return True, message
+
+
+def refresh_due() -> bool:
+    try:
+        age = time.time() - (state_dir() / STAMP_FILE).stat().st_mtime
+    except OSError:
+        return True
+    return age >= REFRESH_SECONDS
+
+
+def start_background_refresh() -> None:
+    try:
+        touch_stamp()
+        subprocess.Popen(
+            [sys.executable, os.path.abspath(__file__), "--refresh"],
+            stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            start_new_session=True, close_fds=True,
+        )
+    except OSError as error:
+        log_event("refresh-not-started", type(error).__name__)
+
+
+def read_code_file(filename: str, cwd: str) -> str | None:
+    path = Path(filename).expanduser()
+    if not path.is_absolute():
+        if not cwd:
+            return None
+        path = Path(cwd) / path
+    try:
+        with open(path, "rb") as handle:
+            data = handle.read(MAX_CODE_FILE_BYTES + 1)
+    except OSError:
+        return None
+    if len(data) > MAX_CODE_FILE_BYTES:
+        return None
+    return data.decode("utf-8", errors="replace")
+
+
+def js_string_value(body: str) -> str:
+    """The value of a JavaScript string literal body, so '\\x2f' and '\\/' read as /."""
+
+    def unescape(match: re.Match) -> str:
+        code = match.group(1) or match.group(2) or match.group(3)
+        if code:
+            try:
+                return chr(int(code, 16))
+            except (ValueError, OverflowError):
+                return ""
+        char = match.group(4)
+        if char in JS_LINE_CONTINUATIONS:
+            return ""
+        return JS_SINGLE_ESCAPES.get(char, char)
+
+    return JS_ESCAPE_RE.sub(unescape, body)
+
+
+def target_urls(tool_input: object, tool_name: str = "", cwd: str = "") -> list[tuple[str | None, bool]]:
+    """Each URL the call navigates to, paired with True when browser code holds it.
+
+    A URL of None stands for code in a file the hook could not read.
+    """
+    if not isinstance(tool_input, dict):
+        return []
+    targets: list[tuple[str | None, bool]] = []
+    for key in ("url", "uri", "href"):
+        value = tool_input.get(key)
+        if isinstance(value, str) and value.strip():
+            targets.append((value, False))
+            break
+    filename = tool_input.get("filename")
+    if tool_name.rsplit("__", 1)[-1] in RUN_CODE_TOOLS and isinstance(filename, str) and filename.strip():
+        code = read_code_file(filename.strip(), cwd)
+        if code is None:
+            return targets + [(None, True)]
+        codes: list[object] = [code]
+    else:
+        codes = [tool_input.get(key) for key in CODE_KEYS]
+    for code in codes:
+        if not isinstance(code, str):
+            continue
+        for pattern in (CODE_CALL_RE, CODE_ASSIGN_RE):
+            for match in pattern.finditer(code):
+                body = next(group for group in match.groups() if group is not None)
+                value = js_string_value(body)
+                if value.strip(C0_CONTROL_OR_SPACE):
+                    targets.append((value, True))
+    return targets
+
+
+def target_host(url: str, in_code: bool = False) -> str | None:
+    """The host a navigation opens, "" when it opens no web site, or None when it cannot be told.
+
+    The URL is read as the WHATWG URL Standard reads it, because urlsplit does not: it keeps
+    a \\ or %2E in the host, needs // before the host and lets the first @ end the user info.
+    A navigation tool's URL has no base, and one with no scheme gets https://, as the tools do.
+    A URL in browser code resolves against the current page, which the hook cannot see, so a
+    relative one, or one whose host is built at run time, gives None.
+    """
+    url = re.sub(r"[\t\n\r]", "", url.strip(C0_CONTROL_OR_SPACE))
+    if not url:
+        return ""
+    if not in_code and url.lower() in HISTORY_STEPS:
+        return ""
+    match = SCHEME_RE.match(url)
+    if match and not HOST_PORT_RE.match(url):
+        scheme = match.group(1).lower()
+        rest = url[match.end():]
+        if scheme == "view-source":
+            return target_host(rest, in_code)
+        if scheme not in WEB_SCHEMES:
+            return ""
+        rest = rest.replace("\\", "/")
+        # https:path against a page with the same scheme is a path on that page.
+        if in_code and not rest.startswith("/"):
+            return None
+    elif not in_code or HOST_PORT_RE.match(url) or re.match(r"^[/\\]{2}", url):
+        rest = url.replace("\\", "/")
+    else:
+        return None
+    # Any run of slashes before the host is skipped, and the host ends at / ? or #.
+    authority = re.split(r"[/?#]", rest.lstrip("/"), maxsplit=1)[0]
+    if "${" in authority:
+        return None
+    host = authority.rpartition("@")[2]
+    if host.startswith("["):
+        host = host[1:].split("]", 1)[0]
+        try:
+            return "" if ipaddress.ip_address(host).is_loopback else host.lower()
+        except ValueError:
+            return ""
+    host = canonical_domain(host.split(":", 1)[0])
+    if not host or host == "localhost" or host.endswith(".localhost"):
+        return ""
+    try:
+        if ipaddress.ip_address(host).is_loopback:
+            return ""
+    except ValueError:
+        pass
+    return host
+
+
+def match_rank(host: str, pattern: str) -> tuple[int, int] | None:
+    """How specifically a map host covers the target, or None when it does not.
+
+    A longer host ranks higher. At one length the exact host beats *.host, which matches
+    subdomains only, and that beats a plain parent domain.
+    """
+    pattern = pattern.lower()
+    if pattern.startswith("*."):
+        base = pattern[2:]
+        return (len(base), 1) if host.endswith("." + base) else None
+    if host == pattern:
+        return (len(pattern), 2)
+    if host.endswith("." + pattern):
+        return (len(pattern), 0)
+    return None
+
+
+def status_rank(entry: dict) -> int:
+    return STATUS_TIE_ORDER.get(entry.get("status"), 1)
+
+
+def find_systems(host: str, systems: list[dict]) -> tuple[list[dict], bool]:
+    """The map entries that decide the host, and whether equally specific entries differed.
+
+    Equally specific entries are settled by status, never by row order. No API wins, because
+    one feature with no API on a shared host needs the browser. Every entry with the winning
+    status comes back, sorted, so a refusal names each route rather than the first row's.
+    """
+    best: list[dict] = []
+    best_rank = None
+    for entry in systems:
+        ranks = [rank for rank in (match_rank(host, str(p)) for p in entry.get("hosts") or []) if rank]
+        if not ranks:
+            continue
+        rank = max(ranks)
+        if best_rank is None or rank > best_rank:
+            best, best_rank = [entry], rank
+        elif rank == best_rank:
+            best.append(entry)
+    if not best:
+        return [], False
+    top = min(status_rank(entry) for entry in best)
+    unique: dict[tuple[str, ...], dict] = {}
+    for entry in best:
+        if status_rank(entry) == top:
+            key = tuple(str(entry.get(field, "")) for field in ("system", "route", "item", "reason", "status"))
+            unique.setdefault(key, entry)
+    chosen = [unique[key] for key in sorted(unique)]
+    conflict = len({entry.get("status") for entry in best}) > 1 or len(chosen) > 1
+    return chosen, conflict
+
+
+def log_unknown_host(host: str, tool_name: str) -> None:
+    try:
+        directory = state_dir()
+        ensure_dir(directory)
+        path = directory / UNKNOWN_HOSTS_FILE
+        if path.exists():
+            with open(path, encoding="utf-8") as handle:
+                if any(line.split("\t")[1:2] == [host] for line in handle):
+                    return
+        with open(path, "a", encoding="utf-8") as handle:
+            handle.write(f"{now_iso()}\t{host}\t{one_line(tool_name, 120)}\n")
+    except OSError:
+        pass
+
+
+def route_parts(entry: dict) -> tuple[str, str, str]:
+    system = safe(entry.get("system", ""))
+    route = safe(entry.get("route", "")) or "the headless route on the access map"
+    item = safe(entry.get("item", ""))
+    item_part = f"with the 1Password item {item}" if item else "(the access map lists no 1Password item)"
+    return system, route, item_part
+
+
+def deny_reason(entries: list[dict], host: str) -> str:
+    live = entries[0].get("status") == LIVE
+    if len(entries) > 1:
+        choices = "; ".join("{}: {} {}".format(*route_parts(entry)) for entry in entries)
+        if live:
+            return (
+                f"Headless route check: {host} belongs to more than one system with headless "
+                f"access on the access map, so the browser is refused. Use the route for the "
+                f"system this work is in instead. {choices}. Decision Log 2026-11-03, Headless "
+                f"access comes first. Report it as: Headless route checked, <system>, live, used "
+                f"<route>."
+            )
+        return (
+            f"Headless route check: {host} belongs to more than one system whose headless access "
+            f"is being set up, so the browser is refused. The setup job comes first. Finish or "
+            f"file the setup job for the system this work is in, then do this work headlessly. "
+            f"{choices}. Decision Log 2026-11-03, Headless access comes first. Report it as: "
+            f"Headless route checked, <system>, setting up, setup job filed first."
+        )
+    system, route, item_part = route_parts(entries[0])
+    if live:
+        return (
+            f"Headless route check: {system} has headless access, so the browser is refused for "
+            f"{host}. Use {route} {item_part} instead. Decision Log 2026-11-03, Headless access "
+            f"comes first. Report it as: Headless route checked, {system}, live, used {route}."
+        )
+    return (
+        f"Headless route check: headless access to {system} is being set up, so the browser is "
+        f"refused for {host}. The setup job comes first. Finish or file the setup job for "
+        f"{system} ({route} {item_part}), then do this work headlessly. Decision Log 2026-11-03, "
+        f"Headless access comes first. Report it as: Headless route checked, {system}, setting "
+        f"up, setup job filed first."
+    )
+
+
+UNRESOLVED_REASON = (
+    "Headless route check: this browser code navigates to a target whose host the hook cannot "
+    "read, so the browser is refused. That is a relative URL such as '/contacts', which resolves "
+    "against the current page the hook cannot see, a URL whose host is built at run time, or code "
+    "in a file the hook cannot open. Write each navigation target in the code as a full https:// "
+    "URL, give the code inline or as an absolute filename, and call again."
+)
+
+
+def allow_note(host: str, entry: dict | None, cached: bool) -> str:
+    """What the session is told when the browser is let through, with its report line."""
+    if not cached:
+        return (
+            f"Headless route check: {host} was not checked, because this machine has no cached "
+            f"access map. Follow the check order in browser-automation Rule 0 yourself. Report it "
+            f"as: Headless route checked, {host}, not checked, no cached access map."
+        )
+    if entry is None:
+        return (
+            f"Headless route check: {host} is not on the access map, so the browser is let through "
+            f"and the host is logged for the nightly check. Follow the check order in "
+            f"browser-automation Rule 0 before going on. Report it as: Headless route checked, "
+            f"{host}, not on the access map, <what you did>."
+        )
+    system = safe(entry.get("system", ""))
+    if entry.get("status") == NO_API:
+        reason = safe(entry.get("reason", "")) or "the access map gives no reason"
+        return (
+            f"Headless route check: {system} is marked no API on the access map, so the browser is "
+            f"let through for {host}. Report it as: Headless route checked, {system}, no API, "
+            f"{reason}."
+        )
+    status = safe(entry.get("status", "")) or "(blank)"
+    return (
+        f"Headless route check: {system} has the status {status} on the access map, which is not "
+        f"live, setting up or no API, so the browser is let through for {host}. Follow the check "
+        f"order in browser-automation Rule 0 yourself. Report it as: Headless route checked, "
+        f"{system}, not checked, status not recognized."
+    )
+
+
+def decide(payload: dict) -> tuple[str, str] | None:
+    """("deny", reason) or ("allow", note) for this tool call, or None when no site is opened."""
+    tool_name = str(payload.get("tool_name", ""))
+    hosts: list[str] = []
+    unresolved = False
+    for url, in_code in target_urls(payload.get("tool_input"), tool_name, str(payload.get("cwd") or "")):
+        host = None if url is None else target_host(url, in_code)
+        if host is None:
+            unresolved = True
+        elif host and host not in hosts:
+            hosts.append(host)
+    if not hosts and not unresolved:
+        return None
+    systems = load_cache()
+    if systems is None:
+        log_event("no-cache-allowed", f"{' '.join(hosts) or 'unresolved target'} {tool_name}")
+        labels = hosts + (["the browser code's target"] if unresolved else [])
+        return "allow", "\n".join(allow_note(label, None, cached=False) for label in labels)
+    notes = []
+    for host in hosts:
+        entries, conflict = find_systems(host, systems)
+        if not entries:
+            log_unknown_host(host, tool_name)
+            notes.append(allow_note(host, None, cached=True))
+            continue
+        status = entries[0].get("status")
+        names = ", ".join(safe(entry.get("system", "")) for entry in entries)
+        if conflict:
+            log_event("map-conflict", f"{host} decided by {names} {safe(status)}")
+        if status in (LIVE, SETTING_UP):
+            log_event("denied", f"{host} {names} {status}")
+            return "deny", deny_reason(entries, host)
+        if status != NO_API:
+            log_event("unknown-status-allowed", f"{host} {names} {safe(status)}")
+        notes.extend(allow_note(host, entry, cached=True) for entry in entries)
+    if unresolved:
+        log_event("unresolved-denied", tool_name)
+        return "deny", UNRESOLVED_REASON
+    return "allow", "\n".join(notes)
+
+def hook_output(decision: tuple[str, str] | None) -> dict | None:
+    if decision is None:
+        return None
+    kind, message = decision
+    if kind == "deny":
+        return {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "deny",
+            "permissionDecisionReason": message,
+        }
+    # No permissionDecision, so an allowed call still goes through the normal permission flow.
+    return {"hookEventName": "PreToolUse", "additionalContext": message}
+
+
+def hook_main() -> int:
+    try:
+        payload = json.loads(sys.stdin.read() or "{}")
+        if not isinstance(payload, dict):
+            payload = {}
+        specific = hook_output(decide(payload))
+    except Exception as error:  # noqa: BLE001, a broken hook must never stop a browser call
+        log_event("hook-error", type(error).__name__)
+        specific = None
+    if specific:
+        json.dump({"hookSpecificOutput": specific}, sys.stdout)
+        sys.stdout.write("\n")
+    sys.stdout.flush()
+    # The decision is printed before the refresh starts, so the refresh can never delay it.
+    if refresh_due():
+        start_background_refresh()
+    return 0
+
+
+def main(argv: list[str]) -> int:
+    if argv[1:] == ["--refresh"]:
+        ok, message = refresh()
+        print(("access map refreshed, " if ok else "access map refresh failed, ") + message)
+        return 0 if ok else 1
+    if len(argv) > 1:
+        print(__doc__, file=sys.stderr)
+        return 2
+    return hook_main()
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

@@ -31,6 +31,40 @@ the browser, and its Chrome is already signed in to the tools the business runs 
 skill is how any AI session does real work there, especially in GoHighLevel, where much of
 the work has no background API.
 
+## Rule 0. Headless route first
+
+<!-- RULED-BY: HQ Business Brain, [HQ][V1.0] Decision Log, 2026-11-03 entries "Headless access comes first, and no browser is used where headless access exists" and "Standing yes for headless access setup" date:2026-11-03 -->
+
+The rule, what setup needs no ask and its exceptions live in HQ Business Brain: the HQ
+Rulebook section Use the access Allison already gave, and the Decision Log 2026-11-03
+entries Headless access comes first and Standing yes for headless access setup. Read them
+there before acting. They win if this section ever differs.
+
+Before any browser work, check the system in this order and stop at the first step that
+applies.
+
+1. **A connected MCP server or connector.** If one covers the system, use it.
+2. **An API or CLI with its 1Password item.** Use it. Read the secret from 1Password at the
+   moment it is needed and never print it.
+3. **A setup job.** If the system could be reached headlessly but is not set up yet, file
+   the setup job right away as the first job on that system. The Decision Log entry
+   Standing yes for headless access setup says which setup goes ahead without asking.
+4. **The browser, only for a vendor with no API.** Write down why there is no headless
+   route.
+
+The access map, a Google Sheet owned by Keys and Sign-Ins, lists each system, its hosts, its
+headless route, its 1Password item and its status. The plugin's headless route check hook
+(`hooks/headless_route_check.py`) checks browser navigation and `browser_tabs` new tabs
+against it, and the URLs that `browser_run_code_unsafe` and `browser_evaluate` code
+navigates to. It refuses a host whose system is live and names the route and item to use.
+It refuses a host whose system is setting up, because the setup job comes first. It lets a
+vendor with no API through, and it lets an unmapped host through and logs it for Star's
+nightly miss check. In browser code, write every navigation target as a full `https://`
+URL, because the hook refuses a relative one it cannot resolve. It cannot see a URL held in
+a variable, and a host shared with a feature that has no API stays open, so the order above
+binds even when the hook lets a call through. A refusal is the answer, not a blocker.
+Switch to the route it names, and never get around it with another browser tool.
+
 ## Rule 1. Signed-in Chrome only, through the shared connector
 
 Every browser action runs in the signed-in Chrome on Ember's M2, reached through the
@@ -68,7 +102,8 @@ Allison leaves a trail. The Ember Chrome on the M2 is already signed in to the b
 tools, its bookmarks bar goes straight to them, and 1Password holds every login. Asking her
 about access before following that trail is the most common way AI stalls her work.
 
-1. Use the API or connector if one covers the job.
+1. Follow Rule 0. Use the MCP server, connector, API or CLI when the system has one, and
+   file the setup job when it could have one.
 2. Otherwise open the page with the `playwright-ember` tool. You are almost always already signed
    in. Look before you assume you are not.
 3. Only on a real sign-in page, use the saved login that 1Password offers in Chrome, or the
@@ -100,12 +135,13 @@ reaches the M2.
 
 Choose the path that finishes the whole job reliably and quickly.
 
-1. **API or connector when it fully covers the job.** Contacts, tags, custom fields,
-   opportunities, and messages in GHL have API routes and are the most durable path for
-   those. Do not split one job across tools just because one step is easier somewhere.
-2. **Signed-in Chrome for everything else.** Workflow building and editing, contact
-   merges, settings, and any screen without an API. GHL has no public API to create or
-   edit workflows (verified 2026-10-20, still an open request on HighLevel's ideas board).
+1. **Headless whenever the system has it.** Rule 0 decides. Contacts, tags, custom fields,
+   opportunities, and messages in GHL have API routes, so they never go through the
+   browser. Do not split one job across tools just because one step is easier somewhere.
+2. **Signed-in Chrome only where no headless route exists.** Workflow building and editing,
+   contact merges, settings, and any screen without an API, with that reason written in the
+   report. GHL has no public API to create or edit workflows (verified 2026-10-20, still an
+   open request on HighLevel's ideas board).
    Recheck the API for other features at the start of each new kind of job, because GHL
    keeps adding them.
 
@@ -241,3 +277,17 @@ share the M2 at once without stepping on each other.
 Say what ran, where, and what came back, with real output. A page that loaded is not proof
 the change landed. Check the result against what GHL actually shows before calling it done,
 and confirm your tab group is empty.
+
+Every report from a session that used a browser carries these two lines together. A report
+without them is incomplete.
+
+```text
+Headless route checked, <system>, <result>
+Tabs left open, none
+```
+
+The result is one of `live, used <route>`, `setting up, setup job filed first`,
+`no API, <reason>`, `not on the access map, <what you did>`, or `not checked, <why>`. For
+example, `Headless route checked, GoHighLevel workflows, no API, no public workflow API`.
+The headless route check hook hands the session the line to use, both when it refuses a call
+and when it lets one through.
