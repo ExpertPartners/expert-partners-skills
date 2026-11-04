@@ -2,7 +2,6 @@
 # Regenerates tools/skill-map/skills-graph.json whenever a SKILL.md in this repo changes.
 # The extractor exits non-zero on any dangling inherits / calls / defers-to id, duplicate
 # skill id, name/folder mismatch, or frontmatter parse error, which fails this workflow.
-# Branch pushes get validation only; the regenerated graph is committed back on main.
 #
 # The same run regenerates the AI Workforce feed for Expert Partners HQ
 # (tools/capability-feed/README.md) from the graph it just built plus the marketplace,
@@ -10,6 +9,13 @@
 # feed can never lag the graph it is derived from. The feed is refused, and this
 # workflow fails, when a source is invalid, the feed would break HQ's contract, or any
 # value fails the public-safety scan.
+#
+# Two jobs. validate runs on every ref with a read-only token and no secrets, so
+# Dependabot and other branch pushes, which get no Actions secrets (docs.github.com,
+# Troubleshooting Dependabot on GitHub Actions, verified 2026-11-04), validate the same
+# way as everyone else. publish runs only on main: it alone mints the app token and
+# commits, through tools/skills-graph-ci/publish_generated.py, which rebuilds from the
+# newest main on every attempt instead of rebasing an older generated commit.
 name: skills-graph
 
 on:
@@ -33,6 +39,17 @@ on:
       - "plugins/*/.claude-plugin/**"
       - "plugins/*/README.md"
       - "tools/capability-feed/**"
+      # The writer and this workflow.
+      - "tools/skills-graph-ci/**"
+      - ".github/workflows/skills-graph.yml"
+  # The durable later attempt. When main keeps moving through every writer attempt, the
+  # run ends deferred instead of looping, and this hourly run rebuilds from the newest
+  # main. It commits nothing when main is already current. Scheduled runs use the
+  # default branch, can be delayed at the top of the hour, and pause after 60 days
+  # without repository activity (docs.github.com, Events that trigger workflows,
+  # verified 2026-11-04).
+  schedule:
+    - cron: "17 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -46,26 +63,18 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  regenerate:
+  validate:
     name: validate + regenerate skills-graph.json
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      # The regenerated graph is committed to main by this app, the one actor
-      # allowed past the pull request rule on main (Decision Log 2026-10-31).
-      # Client ID is a repository variable, the private key a repository secret.
-      - name: Mint skills-graph app token
-        id: app-token
-        uses: actions/create-github-app-token@v3
-        with:
-          client-id: ${{ vars.SKILLS_GRAPH_APP_CLIENT_ID }}
-          private-key: ${{ secrets.SKILLS_GRAPH_APP_PRIVATE_KEY }}
-
-      - name: Checkout expert-partners-skills
+      - name: Checkout expert-partners-skills (read-only)
         uses: actions/checkout@v6
         with:
-          token: ${{ steps.app-token.outputs.token }}
           path: eps
           fetch-depth: 0 # committed history is required to prove VERIFIED STALE copies
+          persist-credentials: false
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -98,25 +107,30 @@ jobs:
           npm ci
           npm test
 
+      # The main writer against temporary Git remotes (competing generated commits,
+      # main moving during a retry, a real validation failure, an exhausted budget),
+      # and this workflow's secret-free branch path.
+      - name: Writer and workflow tests
+        working-directory: eps
+        run: python3 -m unittest discover -s tools/skills-graph-ci/tests -p 'test_*.py' -v
+
       - name: Extract and validate (fails on any dangling reference)
         working-directory: eps/tools/skill-map
         run: node extract-skills-graph.mjs --eps "$GITHUB_WORKSPACE/eps" --out "$GITHUB_WORKSPACE/eps/tools/skill-map/skills-graph.json"
 
-      # Built from the graph the step above just regenerated. On main the feed file is
-      # rewritten (only when its records change) and committed with the graph below.
-      # On a branch nothing is written: the feed is generated and validated, and a
-      # branch that edits the feed file itself must carry exactly what the generator
-      # produces from that branch's committed sources, so a hand edit fails here.
+      # Built from the graph the step above just regenerated. Nothing is written here:
+      # on main the publish job rebuilds and commits from the newest main. A branch
+      # that edits the feed file itself must carry exactly what the generator produces
+      # from that branch's committed sources, so a hand edit fails here.
       - name: Generate and validate the AI Workforce feed
         working-directory: eps
         run: |
           set -euo pipefail
           FEED=tools/capability-feed/ai-workforce-feed.json
+          node tools/capability-feed/generate-feed.mjs
           if [ "$GITHUB_REF" = "refs/heads/main" ]; then
-            node tools/capability-feed/generate-feed.mjs --write
             exit 0
           fi
-          node tools/capability-feed/generate-feed.mjs
           git show HEAD:tools/skill-map/skills-graph.json > "$RUNNER_TEMP/committed-skills-graph.json"
           if node tools/capability-feed/generate-feed.mjs --check --graph "$RUNNER_TEMP/committed-skills-graph.json"; then
             exit 0
@@ -128,47 +142,60 @@ jobs:
           echo "::error title=AI Workforce feed drift::$FEED differs from what this branch's committed sources produce. It is generated output: run node tools/capability-feed/generate-feed.mjs --write, never hand-edit it."
           exit 1
 
+  publish:
+    name: commit regenerated graph and AI Workforce feed (main only)
+    needs: validate
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      # The regenerated graph is committed to main by this app, the one actor
+      # allowed past the pull request rule on main (Decision Log 2026-10-31).
+      # Client ID is a repository variable, the private key a repository secret.
+      - name: Mint skills-graph app token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.SKILLS_GRAPH_APP_CLIENT_ID }}
+          private-key: ${{ secrets.SKILLS_GRAPH_APP_PRIVATE_KEY }}
+
+      - name: Checkout expert-partners-skills
+        uses: actions/checkout@v6
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          path: eps
+          fetch-depth: 0 # committed history is required to prove VERIFIED STALE copies
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Each attempt checks out the newest main in this job's own checkout, runs the
+      # extractor and feed generator there, verifies the feed, and pushes only the two
+      # generated files. A push rejected because main moved starts over from the new
+      # tip. Exit 75 means main moved through every attempt: the run stays green with a
+      # warning and the scheduled run above catches up. The writer is copied out first
+      # because each attempt replaces the checkout it would otherwise run from.
       - name: Commit regenerated graph and AI Workforce feed (main only)
-        if: github.ref == 'refs/heads/main'
+        id: publish
         working-directory: eps
+        env:
+          SKILLS_GRAPH_CI_DISPOSABLE_CHECKOUT: ${{ github.workspace }}/eps
         run: |
-          GRAPH=tools/skill-map/skills-graph.json
-          FEED=tools/capability-feed/ai-workforce-feed.json
-          git add "$GRAPH" "$FEED"
-          if git diff --cached --quiet -- "$GRAPH" "$FEED"; then
-            echo "skills-graph.json and ai-workforce-feed.json unchanged; nothing to commit."
-            exit 0
-          fi
-          if git diff --cached --quiet -- "$FEED"; then
-            MSG="skills-graph: regenerate from SKILL.md sources [skip ci]"
-          else
-            MSG="skills-graph: regenerate graph and AI Workforce feed from canonical sources [skip ci]"
-          fi
+          set -euo pipefail
           git config user.name "skills-graph-bot"
           git config user.email "actions@users.noreply.github.com"
-          git commit -m "$MSG"
-          # Push race guard: if main moved while
-          # this run was in flight, rebase onto the new tip, regenerate against
-          # the new tree, and retry, instead of failing red on a
-          # non-fast-forward reject.
-          for attempt in 1 2 3; do
-            if git push; then
-              exit 0
-            fi
-            echo "Push rejected, main moved. Rebase and regenerate, attempt ${attempt}."
-            git pull --rebase origin main
-            (cd tools/skill-map && node extract-skills-graph.mjs --eps "$GITHUB_WORKSPACE/eps" --out "$GITHUB_WORKSPACE/eps/tools/skill-map/skills-graph.json")
-            node tools/capability-feed/generate-feed.mjs --write
-            git add "$GRAPH" "$FEED"
-            if ! git diff --cached --quiet; then
-              git commit --amend --no-edit
-            fi
-          done
-          git push
+          cp tools/skills-graph-ci/publish_generated.py "$RUNNER_TEMP/publish_generated.py"
+          rc=0
+          python3 "$RUNNER_TEMP/publish_generated.py" --repo "$GITHUB_WORKSPACE/eps" --expect-ref refs/heads/main || rc=$?
+          if [ "$rc" -eq 75 ]; then
+            exit 0
+          fi
+          exit "$rc"
 
       # What landed on main must be exactly what the canonical sources produce. A
       # stale or hand-edited feed on main fails here, after the bot commit above.
       - name: Verify the committed AI Workforce feed matches its sources (main only)
-        if: github.ref == 'refs/heads/main'
+        if: steps.publish.outputs.result != 'deferred'
         working-directory: eps
         run: node tools/capability-feed/generate-feed.mjs --check
