@@ -6,7 +6,6 @@ Each fake Mac also has the ChatGPT app's codex and a Homebrew claude under a fak
 system root, where a real Mac keeps them. Those copies only record that they ran,
 and every test checks that none did: isolated tests name the fixture CLIs through
 CODEX_BIN and CLAUDE_BIN, and only the Discovery tests let the scripts search."""
-import fcntl
 import json
 import os
 import plistlib

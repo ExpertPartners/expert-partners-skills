@@ -31,5 +31,8 @@ permissions:
 jobs:
   builder:
     uses: ./.github/workflows/factory-builder-reusable.yml
+    with:
+      ledger_access_enabled: true
     secrets:
       FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
+      FACTORY_LEDGER_MCP_TOKEN: ${{ secrets.FACTORY_LEDGER_MCP_TOKEN }}

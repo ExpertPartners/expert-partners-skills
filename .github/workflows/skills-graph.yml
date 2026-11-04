@@ -3,6 +3,9 @@
 # The extractor exits non-zero on any dangling inherits / calls / defers-to id, duplicate
 # skill id, name/folder mismatch, or frontmatter parse error, which fails this workflow.
 # Branch pushes get validation only; the regenerated graph is committed back on main.
+# Branch runs never mint the writer token or hold a write credential: Dependabot pushes
+# get no Actions secrets and a read-only GITHUB_TOKEN (docs.github.com, Dependabot on
+# GitHub Actions, verified 2026-11-04), so validation must not depend on either.
 #
 # The same run regenerates the AI Workforce feed for Expert Partners HQ
 # (tools/capability-feed/README.md) from the graph it just built plus the marketplace,
@@ -33,10 +36,23 @@ on:
       - "plugins/*/.claude-plugin/**"
       - "plugins/*/README.md"
       - "tools/capability-feed/**"
+      - "tools/skills-graph-ci/**"
+      - ".github/workflows/skills-graph.yml"
+  # The durable retry. Scheduled runs use the latest commit on main (docs.github.com,
+  # events that trigger workflows, verified 2026-11-04). A run that ran out of publish
+  # attempts, or a main move that changed no watched path, is repaired within the hour.
+  # An in-sync run commits nothing. Off the top of the hour, when schedules are delayed.
+  schedule:
+    - cron: "41 * * * *"
   workflow_dispatch:
 
+# The automatic GITHUB_TOKEN stays read-only on every ref: any action can read it through
+# github.token even when it is not passed (docs.github.com, Use GITHUB_TOKEN for
+# authentication in workflows, verified 2026-11-04), and persist-credentials: false does
+# not lower its scope. Main publishes with the skills-graph app token, whose access comes
+# from the app installation, not from this key.
 permissions:
-  contents: write
+  contents: read
 
 # A superseded run is pure waste -- the newer push's run rebuilds the full
 # graph anyway -- so cancel it instead of letting it lose the push race and
@@ -53,19 +69,22 @@ jobs:
       # The regenerated graph is committed to main by this app, the one actor
       # allowed past the pull request rule on main (Decision Log 2026-10-31).
       # Client ID is a repository variable, the private key a repository secret.
+      # Minted only on main, so a branch run never needs or receives the secret.
       - name: Mint skills-graph app token
+        if: github.ref == 'refs/heads/main'
         id: app-token
         uses: actions/create-github-app-token@v3
         with:
           client-id: ${{ vars.SKILLS_GRAPH_APP_CLIENT_ID }}
           private-key: ${{ secrets.SKILLS_GRAPH_APP_PRIVATE_KEY }}
 
+      # Read-only checkout on every ref. The writer token reaches only the commit step.
       - name: Checkout expert-partners-skills
         uses: actions/checkout@v6
         with:
-          token: ${{ steps.app-token.outputs.token }}
           path: eps
           fetch-depth: 0 # committed history is required to prove VERIFIED STALE copies
+          persist-credentials: false
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -87,6 +106,7 @@ jobs:
           python3 -m pip install --quiet pyyaml
           (cd tools/skill-map && npm test)
           bash tools/skill-deploy/test/test-deploy-skill.sh
+          python3 -m unittest discover -s tools/skills-graph-ci/tests -p 'test_*.py' -v
 
       # The feed producer's own proofs (determinism, refusal on invalid sources, no
       # leaks, relationships and collection membership resolve, nothing promoted to
@@ -128,43 +148,29 @@ jobs:
           echo "::error title=AI Workforce feed drift::$FEED differs from what this branch's committed sources produce. It is generated output: run node tools/capability-feed/generate-feed.mjs --write, never hand-edit it."
           exit 1
 
+      # tools/skills-graph-ci/publish.sh: each attempt resets this disposable checkout to
+      # the latest main, rebuilds both files with the producers above and pushes one
+      # generated-only commit. When main moves first, the next attempt rebuilds from the
+      # new tip; a generated diff is never rebased. The copy in RUNNER_TEMP keeps the
+      # reset from rewriting the scripts while they run. A scheduled run reconciles: it
+      # commits only when the graph content or the feed is stale.
       - name: Commit regenerated graph and AI Workforce feed (main only)
         if: github.ref == 'refs/heads/main'
         working-directory: eps
+        env:
+          SKILLS_GRAPH_PUSH_TOKEN: ${{ steps.app-token.outputs.token }}
+          SKILLS_GRAPH_PUBLISH_REF: ${{ github.ref }}
+          SKILLS_GRAPH_CI_CHECKOUT: ${{ github.workspace }}/eps
+          SKILLS_GRAPH_INSTALLED_REV: ${{ github.sha }}
         run: |
-          GRAPH=tools/skill-map/skills-graph.json
-          FEED=tools/capability-feed/ai-workforce-feed.json
-          git add "$GRAPH" "$FEED"
-          if git diff --cached --quiet -- "$GRAPH" "$FEED"; then
-            echo "skills-graph.json and ai-workforce-feed.json unchanged; nothing to commit."
-            exit 0
-          fi
-          if git diff --cached --quiet -- "$FEED"; then
-            MSG="skills-graph: regenerate from SKILL.md sources [skip ci]"
-          else
-            MSG="skills-graph: regenerate graph and AI Workforce feed from canonical sources [skip ci]"
-          fi
+          set -euo pipefail
           git config user.name "skills-graph-bot"
           git config user.email "actions@users.noreply.github.com"
-          git commit -m "$MSG"
-          # Push race guard: if main moved while
-          # this run was in flight, rebase onto the new tip, regenerate against
-          # the new tree, and retry, instead of failing red on a
-          # non-fast-forward reject.
-          for attempt in 1 2 3; do
-            if git push; then
-              exit 0
-            fi
-            echo "Push rejected, main moved. Rebase and regenerate, attempt ${attempt}."
-            git pull --rebase origin main
-            (cd tools/skill-map && node extract-skills-graph.mjs --eps "$GITHUB_WORKSPACE/eps" --out "$GITHUB_WORKSPACE/eps/tools/skill-map/skills-graph.json")
-            node tools/capability-feed/generate-feed.mjs --write
-            git add "$GRAPH" "$FEED"
-            if ! git diff --cached --quiet; then
-              git commit --amend --no-edit
-            fi
-          done
-          git push
+          rm -rf "$RUNNER_TEMP/skills-graph-ci"
+          cp -R tools/skills-graph-ci "$RUNNER_TEMP/skills-graph-ci"
+          mode=()
+          if [ "$GITHUB_EVENT_NAME" = "schedule" ]; then mode=(--reconcile); fi
+          "$RUNNER_TEMP/skills-graph-ci/publish.sh" --checkout "$PWD" --regenerate "$RUNNER_TEMP/skills-graph-ci/regenerate.sh" "${mode[@]}"
 
       # What landed on main must be exactly what the canonical sources produce. A
       # stale or hand-edited feed on main fails here, after the bot commit above.
