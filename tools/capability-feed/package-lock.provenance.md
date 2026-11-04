@@ -37,9 +37,14 @@ For an isolated consistency proof, copy only this directory's `package.json` and
 empty user/global npm configuration files and the public npm registry. Run the
 same scripts-disabled command and verify a real `node_modules` install whose
 direct versions match the lock. Both input files must remain byte-identical.
-A changed dependency or missing lock must fail; a cache miss or dry run is not
-a successful install.
+A manifest/lock dependency mismatch or missing lock must fail; a cache miss or
+dry run is not a successful install. Internally consistent updates can pass this
+check. It verifies installation consistency, not approval or an unchanged
+dependency set; the existing source review owns authorization.
 
-An authorized dependency update uses npm to regenerate the lock alongside its
-manifest change. No feed, graph, skill, plugin version, publication or deployment
-is changed by this metadata. Native semantics: [npm ci documentation](https://docs.npmjs.com/cli/v11/commands/npm-ci/).
+An authorized dependency update uses npm to regenerate the lock. When the
+manifest changes, commit its matching lock update. A semver-compatible refresh
+can legitimately change only the lock while preserving the declared ranges.
+No feed, graph, skill, plugin version, publication or deployment is changed by
+this metadata. Native semantics: [npm ci](https://docs.npmjs.com/cli/v11/commands/npm-ci/)
+and [npm update](https://docs.npmjs.com/cli/v11/commands/npm-update/).
