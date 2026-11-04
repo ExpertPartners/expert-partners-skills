@@ -58,9 +58,11 @@ find_claude() {
     [[ -x "$CLAUDE_BIN" ]] && { printf '%s\n' "$CLAUDE_BIN"; return 0; }
     return 1
   fi
-  local c
+  # Tests point PLUGIN_SYNC_SYSTEM_ROOT at a fake root so discovery never reaches this
+  # machine's own Homebrew or /usr/local.
+  local c sys="${PLUGIN_SYNC_SYSTEM_ROOT:-}"
   for c in "$(command -v claude 2>/dev/null)" "$HOME/.local/bin/claude" "$HOME/.claude/local/claude" \
-    /opt/homebrew/bin/claude /usr/local/bin/claude "$HOME/.volta/bin/claude" "$(newest_nvm claude)"; do
+    "$sys/opt/homebrew/bin/claude" "$sys/usr/local/bin/claude" "$HOME/.volta/bin/claude" "$(newest_nvm claude)"; do
     [[ -n "$c" && -f "$c" && -x "$c" ]] && { printf '%s\n' "$c"; return 0; }
   done
   return 1

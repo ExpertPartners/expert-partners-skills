@@ -1,6 +1,11 @@
 """Offline tests for the local plugin updater: codex-sync.sh, claude-code-sync.sh,
 install.sh and the two launch agent templates. Every CLI is a stub and every remote
-is a local bare repository, so nothing here touches a real machine or network."""
+is a local bare repository, so nothing here touches a real machine or network.
+
+Each fake Mac also has the ChatGPT app's codex and a Homebrew claude under a fake
+system root, where a real Mac keeps them. Those copies only record that they ran,
+and every test checks that none did: isolated tests name the fixture CLIs through
+CODEX_BIN and CLAUDE_BIN, and only the Discovery tests let the scripts search."""
 import fcntl
 import json
 import os
@@ -87,6 +92,16 @@ LAUNCHCTL = textwrap.dedent('''\
     echo "$*" >> "$STUB_LAUNCHCTL"
 ''')
 
+# Stands in for a CLI the Mac itself has installed. A test must never run one.
+REAL_CLI = textwrap.dedent('''\
+    #!/bin/sh
+    echo "$0 $*" >> "$REAL_CLI_CALLS"
+    exit 1
+''')
+APP_CODEX = Path("Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex")
+BREW_CLAUDE = Path("opt/homebrew/bin/claude")
+DISCOVER = {"CLAUDE_BIN": "", "CODEX_BIN": ""}
+
 
 def sh(*cmd, cwd=None, env=None, check=True):
     r = subprocess.run(list(cmd), cwd=cwd, env=env, capture_output=True, text=True)
@@ -114,6 +129,8 @@ class Machine:
         self.state = self.root / "stub-state.json"
         self.catalog = self.root / "catalog.json"
         self.calls = self.root / "calls.jsonl"
+        self.system = self.root / "system"
+        self.real_calls = self.root / "real-cli-calls.txt"
         self.home.mkdir(parents=True)
         self.git_env = dict(os.environ, GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@example.com",
                             GIT_COMMITTER_NAME="t", GIT_COMMITTER_EMAIL="t@example.com",
@@ -130,6 +147,8 @@ class Machine:
         write_exe(self.bin / "codex", STUB)
         write_exe(self.bin / "plutil", "#!/bin/sh\nexit 0\n")
         write_exe(self.bin / "launchctl", LAUNCHCTL)
+        write_exe(self.system / APP_CODEX, REAL_CLI)
+        write_exe(self.system / BREW_CLAUDE, REAL_CLI)
         self.set_installed({"a": ("1.0.0", True), "b": ("1.0.0", False)})
         self.catalog.write_text(json.dumps({"a": "1.0.0", "b": "1.0.0", "c": "1.0.0"}))
 
@@ -159,9 +178,14 @@ class Machine:
         env = {"HOME": str(self.home), "PATH": f"{self.bin}:/usr/bin:/bin",
                "STUB_STATE": str(self.state), "STUB_CATALOG": str(self.catalog),
                "STUB_CALLS": str(self.calls), "STUB_LAUNCHCTL": str(self.root / "launchctl.txt"),
-               "GIT_CONFIG_GLOBAL": str(self.root / "gitconfig"), "LANG": "C"}
+               "GIT_CONFIG_GLOBAL": str(self.root / "gitconfig"), "LANG": "C",
+               "CLAUDE_BIN": str(self.bin / "claude"), "CODEX_BIN": str(self.bin / "codex"),
+               "PLUGIN_SYNC_SYSTEM_ROOT": str(self.system), "REAL_CLI_CALLS": str(self.real_calls)}
         env.update(extra)
         return env
+
+    def real_cli_runs(self):
+        return self.real_calls.read_text() if self.real_calls.exists() else ""
 
     def sync(self, surface, *args, **extra):
         return subprocess.run(["/bin/bash", str(self.checkout / "tools" / "plugin-sync" / f"{surface}-sync.sh"), *args],
@@ -205,6 +229,9 @@ class Base(unittest.TestCase):
         self.addCleanup(shutil.rmtree, self.tmp, True)
         self.m = Machine(self.tmp)
 
+    def tearDown(self):
+        self.assertEqual(self.m.real_cli_runs(), "", "a test ran this Mac's own CLI")
+
 
 class Templates(unittest.TestCase):
     def test_both_agents_run_at_login_and_every_five_minutes(self):
@@ -222,10 +249,19 @@ class Templates(unittest.TestCase):
 
 
 class Install(unittest.TestCase):
+    def assertSamePath(self, a, b):
+        self.assertEqual(os.path.realpath(a), os.path.realpath(b))
+
     def install(self, user, rel):
-        tmp = tempfile.mkdtemp()
+        # macOS hands out temp folders under /var, a symlink to /private/var, so git
+        # reports the checkout by its resolved path. A symlinked root gives every OS
+        # that shape.
+        tmp = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, tmp, True)
-        m = Machine(tmp, user, rel)
+        (tmp / "private").mkdir()
+        (tmp / "link").symlink_to(tmp / "private")
+        m = Machine(tmp / "link", user, rel)
+        self.assertNotEqual(str(m.checkout), os.path.realpath(m.checkout))
         dest = m.home / "Library" / "LaunchAgents"
         dest.mkdir(parents=True)
         old = dest / f"{LABELS['codex']}.plist"
@@ -233,6 +269,8 @@ class Install(unittest.TestCase):
         r = subprocess.run(["/bin/bash", str(m.checkout / "tools" / "plugin-sync" / "install.sh")],
                            env=m.env(), capture_output=True, text=True)
         self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn(f"codex binary: {m.bin / 'codex'}", r.stdout)
+        self.assertIn(f"claude-code binary: {m.bin / 'claude'}", r.stdout)
         return m, dest, r
 
     def test_renders_for_either_home_and_checkout(self):
@@ -244,16 +282,19 @@ class Install(unittest.TestCase):
                 for surface, label in LABELS.items():
                     raw = (dest / f"{label}.plist").read_bytes()
                     d = plistlib.loads(raw)
-                    self.assertEqual(d["ProgramArguments"][1], f"{m.checkout}/tools/plugin-sync/{surface}-sync.sh")
-                    self.assertEqual(d["WorkingDirectory"], str(m.checkout))
-                    self.assertEqual(d["EnvironmentVariables"]["HOME"], str(m.home))
-                    self.assertTrue(d["StandardOutPath"].startswith(f"{m.home}/Library/Logs/plugin-sync/"))
+                    self.assertSamePath(d["ProgramArguments"][1], m.checkout / "tools" / "plugin-sync" / f"{surface}-sync.sh")
+                    self.assertSamePath(d["WorkingDirectory"], m.checkout)
+                    self.assertSamePath(d["EnvironmentVariables"]["HOME"], m.home)
+                    for key in ("StandardOutPath", "StandardErrorPath"):
+                        self.assertSamePath(os.path.dirname(d[key]), m.home / "Library" / "Logs" / "plugin-sync")
                     self.assertNotIn(b"@HOME@", raw)
                     self.assertNotIn(b"@CHECKOUT@", raw)
                     self.assertNotIn(b"allisongaddy", raw)
-                calls = (m.root / "launchctl.txt").read_text().splitlines()
+                prefix = f"bootstrap gui/{uid} "
+                booted = [os.path.realpath(c[len(prefix):])
+                          for c in (m.root / "launchctl.txt").read_text().splitlines() if c.startswith(prefix)]
                 for label in LABELS.values():
-                    self.assertIn(f"bootstrap gui/{uid} {dest}/{label}.plist", calls)
+                    self.assertIn(os.path.realpath(dest / f"{label}.plist"), booted)
                 self.assertFalse((dest / "com.expertpartners.plugin-drift-check.plist").exists())
                 backups = list(dest.glob(f"{LABELS['codex']}.plist.bak.*"))
                 self.assertEqual(len(backups), 1)
@@ -262,6 +303,7 @@ class Install(unittest.TestCase):
                                        env=m.env(), capture_output=True, text=True)
                 self.assertEqual(again.returncode, 0, again.stderr)
                 self.assertEqual(len(list(dest.glob("*.bak.*"))), 1, "an unchanged plist is not backed up again")
+                self.assertEqual(m.real_cli_runs(), "")
 
     def test_refuses_a_checkout_of_another_repo(self):
         tmp = tempfile.mkdtemp()
@@ -275,31 +317,45 @@ class Install(unittest.TestCase):
 
 
 class Discovery(Base):
+    """The only tests that let the scripts search. They locate without running, or
+    run a fixture CLI after removing every copy that stands in for the Mac's own."""
+
+    def locate(self, surface, **extra):
+        return self.m.sync(surface, "--locate", **{**DISCOVER, **extra}).stdout.strip()
+
+    def test_claude_on_path_wins_then_homebrew(self):
+        self.assertEqual(self.locate("claude-code"), str(self.m.bin / "claude"))
+        (self.m.bin / "claude").unlink()
+        self.assertEqual(self.locate("claude-code"), str(self.m.system / BREW_CLAUDE))
+
     def test_newest_nvm_claude_wins_by_number_not_by_text(self):
         (self.m.bin / "claude").unlink()
+        (self.m.system / BREW_CLAUDE).unlink()
         for v in ("v9.11.2", "v10.2.0", "v8.0.0"):
             write_exe(self.m.home / ".nvm" / "versions" / "node" / v / "bin" / "claude", STUB)
-        r = self.m.sync("claude-code", "--locate")
-        self.assertEqual(r.stdout.strip(), f"{self.m.home}/.nvm/versions/node/v10.2.0/bin/claude")
+        self.assertEqual(self.locate("claude-code"), f"{self.m.home}/.nvm/versions/node/v10.2.0/bin/claude")
 
     def test_nvm_bin_dir_is_put_on_path_for_the_cli(self):
         (self.m.bin / "claude").unlink()
+        (self.m.system / BREW_CLAUDE).unlink()
         nvm = self.m.home / ".nvm" / "versions" / "node" / "v22.3.0" / "bin"
         write_exe(nvm / "claude", STUB)
-        r = self.m.sync("claude-code")
+        r = self.m.sync("claude-code", **DISCOVER)
         self.assertEqual(r.returncode, 0, self.m.log("claude-code"))
         calls = self.m.take_calls()
         self.assertTrue(calls and all(c["path"].split(":")[0] == str(nvm) for c in calls))
 
-    def test_codex_found_in_the_users_applications_folder_and_override_wins(self):
-        (self.m.bin / "codex").unlink()
-        app = self.m.home / "Applications" / "ChatGPT.app" / "Contents" / "Resources" / "codex-cli" / "bin" / "codex"
+    def test_codex_prefers_the_chatgpt_app_and_override_wins(self):
+        self.assertEqual(self.locate("codex"), str(self.m.system / APP_CODEX), "the app comes before PATH")
+        (self.m.system / APP_CODEX).unlink()
+        app = self.m.home / APP_CODEX
         write_exe(app, STUB)
-        if not Path("/Applications/ChatGPT.app").exists():
-            self.assertEqual(self.m.sync("codex", "--locate").stdout.strip(), str(app))
+        self.assertEqual(self.locate("codex"), str(app))
+        app.unlink()
+        self.assertEqual(self.locate("codex"), str(self.m.bin / "codex"))
         other = self.m.root / "elsewhere" / "codex"
         write_exe(other, STUB)
-        self.assertEqual(self.m.sync("codex", "--locate", CODEX_BIN=str(other)).stdout.strip(), str(other))
+        self.assertEqual(self.locate("codex", CODEX_BIN=str(other)), str(other))
 
     def test_missing_binary_fails_and_says_so(self):
         (self.m.bin / "claude").unlink()

@@ -59,9 +59,11 @@ find_codex() {
     [[ -x "$CODEX_BIN" ]] && { printf '%s\n' "$CODEX_BIN"; return 0; }
     return 1
   fi
-  local c app="ChatGPT.app/Contents/Resources/codex-cli/bin/codex"
-  for c in "/Applications/$app" "$HOME/Applications/$app" "$(command -v codex 2>/dev/null)" \
-    "$HOME/.local/bin/codex" /opt/homebrew/bin/codex /usr/local/bin/codex "$HOME/.volta/bin/codex" \
+  # Tests point PLUGIN_SYNC_SYSTEM_ROOT at a fake root so discovery never reaches this
+  # machine's own /Applications, Homebrew or /usr/local.
+  local c sys="${PLUGIN_SYNC_SYSTEM_ROOT:-}" app="ChatGPT.app/Contents/Resources/codex-cli/bin/codex"
+  for c in "$sys/Applications/$app" "$HOME/Applications/$app" "$(command -v codex 2>/dev/null)" \
+    "$HOME/.local/bin/codex" "$sys/opt/homebrew/bin/codex" "$sys/usr/local/bin/codex" "$HOME/.volta/bin/codex" \
     "$(newest_nvm codex)"; do
     [[ -n "$c" && -f "$c" && -x "$c" ]] && { printf '%s\n' "$c"; return 0; }
   done
