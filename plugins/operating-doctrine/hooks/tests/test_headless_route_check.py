@@ -477,6 +477,105 @@ class Refresh(HookCase):
         self.assertTrue(ok, message)
         self.assertEqual(len(json.loads(self.read(hrc.CACHE_FILE))["systems"]), 11)
 
+    def test_the_issue_fixture_parses(self):
+        fixture = "system,hosts,status\nKnown route,example.test,live\nUnresolved route,,setting up\n"
+        systems = hrc.parse_map(fixture)
+        self.assertEqual([row["system"] for row in systems], ["Known route", "Unresolved route"])
+        self.assertEqual((systems[1]["hosts"], systems[1]["status"]), ([], "setting up"))
+
+    def test_first_install_with_unresolved_rows_caches_and_denies_known_hosts(self):
+        self.fresh_stamp()
+        note = self.assertAllowed(self.run_hook("https://example.test/"))
+        self.assertIn("not checked, no cached access map", note)
+        self.configure_fetch("system,hosts,status\nKnown route,example.test,live\nUnresolved route,,setting up\n")
+        ok, message = hrc.refresh()
+        self.assertTrue(ok, message)
+        self.assertIn("1 unresolved, still needing real host evidence", message)
+        self.assertIn("Unresolved route", message)
+        reason = self.assertDenied(self.run_hook("https://example.test/page"))
+        self.assertIn("Known route", reason)
+        note = self.assertAllowed(self.run_hook("https://elsewhere.example/"))
+        self.assertIn("not on the access map", note)
+
+    def test_declared_unresolved_row_is_kept_as_evidence(self):
+        self.configure_fetch(MAP_CSV + "Future CRM,,,,Setting up,\n")
+        ok, message = hrc.refresh()
+        self.assertTrue(ok, message)
+        self.assertIn("1 unresolved, still needing real host evidence", message)
+        self.assertIn("Future CRM", message)
+        systems = json.loads(self.read(hrc.CACHE_FILE))["systems"]
+        self.assertEqual(len(systems), 12)
+        entry = next(row for row in systems if row["system"] == "Future CRM")
+        self.assertEqual((entry["hosts"], entry["status"]), ([], "setting up"))
+
+    def test_hostless_row_without_setting_up_still_fails(self):
+        cases = (
+            ("live", "NoHost Live,,,,Live,\n", "has no Hosts"),
+            ("no status", "NoHost Blank,,,,\n", "has no Status"),
+            ("unrecognized status", "NoHost Odd,,,,Maybe later,\n", "has no Hosts"),
+        )
+        for name, row, expected in cases:
+            with self.subTest(case=name):
+                self.configure_fetch(MAP_CSV + row)
+                ok, message = hrc.refresh()
+                self.assertFalse(ok)
+                self.assertIn(expected, message)
+                self.assertEqual(self.read(hrc.CACHE_FILE), "")
+
+    def test_a_protected_row_losing_its_hosts_keeps_the_last_good_copy(self):
+        self.write_cache()
+        self.fresh_stamp()
+        before = self.read(hrc.CACHE_FILE)
+        ghl_row = MAP_ROWS.split("\n")[0]
+        cases = (
+            ("hostless", "the new map drops 2 host(s)",
+             "GoHighLevel contacts,,,,Setting up,"),
+            ("shrunk", "app.gohighlevel.com",
+             'GoHighLevel contacts,*.leadconnectorhq.com,GHL API v2 through the n8n connector,GHL Private Integration Token,Live,'),
+        )
+        for name, expected, row in cases:
+            with self.subTest(case=name):
+                self.configure_fetch(MAP_CSV.replace(ghl_row, row, 1))
+                ok, message = hrc.refresh()
+                self.assertFalse(ok)
+                self.assertIn(expected, message)
+                self.assertIn("mark the row no API or delete the whole row", message)
+                self.assertEqual(self.read(hrc.CACHE_FILE), before)
+                self.assertDenied(self.run_hook("https://app.gohighlevel.com/v2/contacts"))
+
+    def test_marking_a_row_no_api_lifts_protection_on_purpose(self):
+        self.write_cache()
+        self.fresh_stamp()
+        ghl_row = MAP_ROWS.split("\n")[0]
+        retired = ('GoHighLevel contacts,"app.gohighlevel.com, *.leadconnectorhq.com",'
+                   ",GHL Private Integration Token,No API,Route retired")
+        self.configure_fetch(MAP_CSV.replace(ghl_row, retired, 1))
+        ok, message = hrc.refresh()
+        self.assertTrue(ok, message)
+        note = self.assertAllowed(self.run_hook("https://app.gohighlevel.com/v2/contacts"))
+        self.assertIn("GoHighLevel contacts, no API, Route retired", note)
+
+    def test_deleting_a_row_lifts_protection_on_purpose(self):
+        self.write_cache()
+        self.fresh_stamp()
+        ghl_row = MAP_ROWS.split("\n")[0]
+        self.configure_fetch(MAP_CSV.replace(ghl_row + "\n", "", 1))
+        ok, message = hrc.refresh()
+        self.assertTrue(ok, message)
+        note = self.assertAllowed(self.run_hook("https://app.gohighlevel.com/v2/contacts"))
+        self.assertIn("not on the access map", note)
+
+    def test_an_unresolved_row_gaining_hosts_updates_protection(self):
+        self.configure_fetch(MAP_CSV + "Future CRM,,,,Setting up,\n")
+        ok, message = hrc.refresh()
+        self.assertTrue(ok, message)
+        self.assertIn("1 unresolved", message)
+        self.configure_fetch(MAP_CSV + "Future CRM,future-crm.example,Future CRM API,Future CRM key,Live,\n")
+        ok, message = hrc.refresh()
+        self.assertTrue(ok, message)
+        self.assertNotIn("unresolved", message)
+        self.assertIn("Future CRM", self.assertDenied(self.run_hook("https://future-crm.example/")))
+
     def test_no_configuration_fails_without_a_cache(self):
         ok, message = hrc.refresh()
         self.assertFalse(ok)
