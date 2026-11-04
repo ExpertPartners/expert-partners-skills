@@ -1,8 +1,8 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-11-04T03:49:14Z",
-  "verifiedAt": "2026-11-04T03:49:14Z",
+  "generatedAt": "2026-11-04T03:52:12Z",
+  "verifiedAt": "2026-11-04T03:52:12Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
@@ -683,7 +683,7 @@
       "id": "ag-luxury-brand",
       "humanName": "AG Luxury Brand System",
       "kind": "skill",
-      "summary": "Apply the AG Luxury brand voice to consumer-facing real estate content for Allison Gaddy: listing copy, listing films and video scripts, bios, case studies, press materials, site copy, social, and email aimed at luxury sellers and buyers in North Dallas and the western ranch corridor.",
+      "summary": "Apply current AG Luxury canon to consumer-facing real estate writing and visual briefs for Allison Gaddy, including listings, films, video scripts, bios, case studies, press, websites, social and email.",
       "status": "Unknown",
       "maintainer": "ExpertPartners",
       "collectionIds": [],
@@ -713,47 +713,44 @@
         "brandScope": "ag-luxury"
       },
       "keywords": [
-        "aimed",
         "allison",
         "apply",
         "bios",
         "brand",
-        "buyers",
+        "briefs",
+        "canon",
         "case",
         "consumer",
-        "content",
-        "copy",
-        "corridor",
-        "dallas",
+        "current",
         "email",
         "estate",
         "facing",
         "films",
         "gaddy",
-        "listing",
+        "including",
+        "listings",
         "luxury",
-        "materials",
         "name",
-        "north",
         "press",
-        "ranch",
         "real",
         "scripts",
-        "sellers",
-        "site",
         "social",
         "studies",
         "system",
         "under",
         "video",
+        "visual",
         "voice",
         "voices",
-        "western"
+        "websites",
+        "writing"
       ],
       "bestFor": [
         "luxury real estate voice under Allison’s name"
       ],
-      "useCases": [],
+      "useCases": [
+        "Use when writing or reviewing listings, films, video scripts, bios, case studies, press, websites, social and email for consumer real estate work."
+      ],
       "askExamples": [],
       "example": false
     },
@@ -761,7 +758,7 @@
       "id": "ag-personal-brand",
       "humanName": "AG Personal Brand System",
       "kind": "skill",
-      "summary": "Apply Allison Gaddy's personal brand voice to all outputs.",
+      "summary": "Apply Allison Gaddy's current personal brand canon when drafting or reviewing personal social posts, thought leadership, YouTube content, speaking material, essays and other work in her individual voice.",
       "status": "Unknown",
       "maintainer": "ExpertPartners",
       "collectionIds": [],
@@ -794,20 +791,37 @@
         "allison",
         "apply",
         "brand",
+        "canon",
+        "content",
+        "current",
+        "drafting",
+        "essays",
         "first",
         "gaddy",
-        "outputs",
+        "her",
+        "individual",
+        "leadership",
+        "material",
+        "other",
         "person",
         "personal",
+        "posts",
+        "reviewing",
+        "social",
+        "speaking",
         "system",
+        "thought",
         "voice",
-        "voices"
+        "voices",
+        "when",
+        "work",
+        "youtube"
       ],
       "bestFor": [
         "Allison’s first person voice"
       ],
       "useCases": [
-        "Use when creating content for Allison's YouTube channel (@theallisongaddy), speaking engagements, keynotes, thought leadership pieces, personal essays, LinkedIn, personal social posts, or any content that represents Allison as an individual founder, educator, and public figure -- NOT as Expert Partners, FAM, or Moxie."
+        "Use when drafting personal social posts, thought leadership, YouTube content, speaking material or essays in Allison's individual voice."
       ],
       "askExamples": [],
       "example": false
@@ -1362,7 +1376,7 @@
       "id": "brand-voice",
       "humanName": "Brand Voice",
       "kind": "skill",
-      "summary": "Canonical brand context for the brands in the Estate brand registry operated by Allison Gaddy and Don Hobbs.",
+      "summary": "Route brand-facing writing, editing, review and visual work to the correct brand skill and its current Google Drive canon.",
       "status": "Unknown",
       "maintainer": "ExpertPartners",
       "collectionIds": [],
@@ -1400,24 +1414,31 @@
       "keywords": [
         "0045",
         "adr",
-        "allison",
         "brand",
-        "brands",
+        "canon",
         "canonical",
         "context",
-        "don",
-        "estate",
-        "gaddy",
-        "hobbs",
-        "operated",
+        "correct",
+        "current",
+        "drive",
+        "editing",
+        "facing",
+        "google",
         "registry",
+        "review",
+        "route",
+        "visual",
         "voice",
-        "voices"
+        "voices",
+        "work",
+        "writing"
       ],
       "bestFor": [
         "canonical brand context, registry per ADR 0045"
       ],
-      "useCases": [],
+      "useCases": [
+        "Use when selecting the brand or source route for writing, editing, review or visual work."
+      ],
       "askExamples": [],
       "example": false
     },
@@ -2930,7 +2951,7 @@
       "id": "don-hobbs-brand",
       "humanName": "Don Hobbs Brand Voice",
       "kind": "skill",
-      "summary": "Don Hobbs's voice for anything written as Don, coaching frameworks, keynote and training, EPIC and Free Agent Movement leadership copy, social, email, scripts, bios.",
+      "summary": "Draft or review content written as Don Hobbs, including coaching, keynotes, training, leadership, social, email, scripts and bios.",
       "status": "Unknown",
       "maintainer": "ExpertPartners",
       "collectionIds": [],
@@ -2960,22 +2981,19 @@
         "brandScope": "don-hobbs"
       },
       "keywords": [
-        "agent",
-        "anything",
         "bios",
         "brand",
         "coaching",
-        "copy",
+        "content",
         "don",
+        "draft",
         "email",
-        "epic",
-        "frameworks",
-        "free",
         "hobbs",
-        "keynote",
+        "including",
+        "keynotes",
         "leadership",
-        "movement",
         "personal",
+        "review",
         "scripts",
         "social",
         "training",
@@ -2986,7 +3004,9 @@
       "bestFor": [
         "Don’s personal brand voice"
       ],
-      "useCases": [],
+      "useCases": [
+        "Use when drafting or reviewing coaching, keynotes, training, leadership, social, email, scripts or bios in Don's voice."
+      ],
       "askExamples": [],
       "example": false
     },
@@ -3108,7 +3128,7 @@
       "id": "ep-brand",
       "humanName": "Expert Partners Brand System",
       "kind": "skill",
-      "summary": "Apply Expert Partners (parent organization) brand standards to all written outputs.",
+      "summary": "Apply current Expert Partners company canon to coaching, training, events, email, sales pages, social and other company deliverables.",
       "status": "Unknown",
       "maintainer": "ExpertPartners",
       "collectionIds": [],
@@ -3140,22 +3160,30 @@
       "keywords": [
         "apply",
         "brand",
+        "canon",
+        "coaching",
+        "company",
+        "current",
+        "deliverables",
+        "email",
+        "events",
         "expert",
-        "organization",
-        "outputs",
+        "other",
+        "pages",
         "parent",
         "partners",
-        "standards",
+        "sales",
+        "social",
         "system",
+        "training",
         "voice",
-        "voices",
-        "written"
+        "voices"
       ],
       "bestFor": [
         "Expert Partners parent voice"
       ],
       "useCases": [
-        "Use when creating content for Expert Partners as a company -- coaching programs, training materials, event copy, email campaigns, sales pages, social posts, operator-facing content, or any deliverable representing Expert Partners (not specifically FAM or EPIC)."
+        "Use when creating or reviewing company coaching, training, event, email, sales-page or social deliverables."
       ],
       "askExamples": [],
       "example": false
@@ -3292,7 +3320,7 @@
       "id": "fam-epic-brand",
       "humanName": "FAM / EPIC Brand System",
       "kind": "skill",
-      "summary": "Apply Free Agent Movement (FAM) and EPIC (Expert Partners Inner Circle) brand standards to all written and visual outputs.",
+      "summary": "Apply current Free Agent Movement or EPIC canon to writing and visual briefs such as emails, social posts, scripts, slides, web copy, frameworks and lead magnets.",
       "status": "Unknown",
       "maintainer": "ExpertPartners",
       "collectionIds": [],
@@ -3325,26 +3353,36 @@
         "agent",
         "apply",
         "brand",
-        "circle",
+        "briefs",
+        "canon",
+        "copy",
+        "current",
+        "emails",
         "epic",
-        "expert",
         "fam",
+        "frameworks",
         "free",
-        "inner",
+        "lead",
+        "magnets",
         "movement",
-        "outputs",
-        "partners",
-        "standards",
+        "posts",
+        "scripts",
+        "slides",
+        "social",
+        "such",
         "system",
         "visual",
         "voice",
         "voices",
-        "written"
+        "web",
+        "writing"
       ],
       "bestFor": [
         "FAM and EPIC voice"
       ],
-      "useCases": [],
+      "useCases": [
+        "Use when the task specifically needs Free Agent Movement or EPIC writing or visual briefs, including email, social, scripts, slides, web copy, frameworks or lead magnets."
+      ],
       "askExamples": [],
       "example": false
     },
@@ -7604,7 +7642,7 @@
       "id": "the-strong-ones-brand",
       "humanName": "The Strong Ones Brand System",
       "kind": "skill",
-      "summary": "Apply The Strong Ones brand voice for Allison Gaddy's legacy work.",
+      "summary": "Draft or review The Strong Ones writing for Allison Gaddy, including book, podcast and community work.",
       "status": "Unknown",
       "maintainer": "ExpertPartners",
       "collectionIds": [],
@@ -7635,24 +7673,29 @@
       },
       "keywords": [
         "allison",
-        "apply",
+        "book",
         "brand",
+        "community",
+        "draft",
         "gaddy",
+        "including",
         "inside",
-        "legacy",
         "ones",
         "personal",
+        "podcast",
+        "review",
         "strong",
         "system",
         "voice",
         "voices",
-        "work"
+        "work",
+        "writing"
       ],
       "bestFor": [
         "The Strong Ones voice inside AG Personal Brand"
       ],
       "useCases": [
-        "Use when working on The Strong Ones book, podcast, community content, or The Potent Woman lineage -- Allison's long-term project for women building lives of deep meaning."
+        "Use when writing or reviewing The Strong Ones book, podcast or community material."
       ],
       "askExamples": [],
       "example": false
