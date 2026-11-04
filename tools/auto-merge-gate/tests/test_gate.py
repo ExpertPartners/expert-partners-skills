@@ -6,11 +6,16 @@ Run from the repo root: python3 -m unittest discover -s tools/auto-merge-gate/te
 import base64
 import copy
 import importlib.util
+import io
 import json
 import os
+import shutil
 import sys
+import tempfile
 import unittest
+import urllib.error
 from pathlib import Path
+from unittest import mock
 
 spec = importlib.util.spec_from_file_location(
     "gate", os.path.join(os.path.dirname(__file__), "..", "gate.py"))
@@ -1401,6 +1406,163 @@ class NoteRulesMatchTheReleaseStep(unittest.TestCase):
                     parsed = None
                 self.assertEqual(problem is None, parsed is not None, problem)
                 self.assertEqual(names, list(parsed.bumps) if parsed else [])
+
+
+class FakeResponse:
+    def __init__(self, raw, link=""):
+        self.raw = raw
+        self.headers = {"Link": link} if link else {}
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+    def read(self):
+        return self.raw
+
+
+class RestClient(unittest.TestCase):
+    """The real GitHub client, with urlopen replaced so no request leaves the process."""
+
+    def setUp(self):
+        self.sent = []
+        self.replies = []
+        patcher = mock.patch.object(gate.urllib.request, "urlopen", side_effect=self.fake_urlopen)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        self.gh = gate.GitHub("synthetic-token", "https://api.example.test/")
+
+    def fake_urlopen(self, req, timeout):
+        self.sent.append(req)
+        reply = self.replies.pop(0)
+        if isinstance(reply, Exception):
+            raise reply
+        return reply
+
+    def test_relative_path_gets_api_url_and_auth_headers(self):
+        self.replies.append(FakeResponse(b'{"ok": true}'))
+        self.assertEqual(self.gh.get("/repos/o/r", {"state": "open"}), {"ok": True})
+        req = self.sent[0]
+        self.assertEqual(req.full_url, "https://api.example.test/repos/o/r?state=open")
+        self.assertEqual(req.get_method(), "GET")
+        self.assertEqual(req.get_header("Authorization"), "Bearer synthetic-token")
+        self.assertEqual(req.get_header("Accept"), "application/vnd.github+json")
+        self.assertEqual(req.get_header("X-github-api-version"), "2022-11-28")
+        self.assertIsNone(req.data)
+        self.assertIsNone(req.get_header("Content-type"))
+
+    def test_writes_send_json_and_empty_reply_is_none(self):
+        for call, method in ((self.gh.post, "POST"), (self.gh.put, "PUT"), (self.gh.patch, "PATCH")):
+            with self.subTest(method=method):
+                self.replies.append(FakeResponse(b""))
+                self.assertIsNone(call("/x", {"a": 1}))
+                req = self.sent[-1]
+                self.assertEqual(req.get_method(), method)
+                self.assertEqual(json.loads(req.data), {"a": 1})
+                self.assertEqual(req.get_header("Content-type"), "application/json")
+
+    def test_http_error_carries_status_and_github_message(self):
+        self.replies.append(urllib.error.HTTPError(
+            "https://api.example.test/x", 422, "Unprocessable", {}, io.BytesIO(b'{"message": "Validation Failed"}')))
+        with self.assertRaises(gate.GitHubError) as ctx:
+            self.gh.get("/x")
+        self.assertEqual((ctx.exception.status, ctx.exception.message), (422, "Validation Failed"))
+
+    def test_http_error_with_plain_text_body_keeps_the_text(self):
+        self.replies.append(urllib.error.HTTPError(
+            "https://api.example.test/x", 502, "Bad Gateway", {}, io.BytesIO(b"upstream down")))
+        with self.assertRaises(gate.GitHubError) as ctx:
+            self.gh.put("/x", {})
+        self.assertEqual((ctx.exception.status, ctx.exception.message), (502, "upstream down"))
+
+    def test_paginate_follows_next_links_until_the_last_page(self):
+        nxt = '<https://api.example.test/items?page=2>; rel="next", <https://api.example.test/items?page=2>; rel="last"'
+        self.replies += [
+            FakeResponse(b'{"items": [1, 2]}', nxt),
+            FakeResponse(b'{"items": [3]}', '<https://api.example.test/items?page=1>; rel="prev"'),
+        ]
+        self.assertEqual(self.gh.paginate("/items", key="items", params={"state": "open"}), [1, 2, 3])
+        self.assertEqual([r.full_url for r in self.sent], [
+            "https://api.example.test/items?state=open&per_page=100",
+            "https://api.example.test/items?page=2",
+        ])
+
+
+class EntryPoint(unittest.TestCase):
+    """main() wiring: arguments, environment, GITHUB_OUTPUT and the merge-token rule."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp(prefix="gate-main-")
+        self.addCleanup(shutil.rmtree, self.tmp, True)
+        self.event = os.path.join(self.tmp, "event.json")
+        with open(self.event, "w", encoding="utf-8") as fh:
+            json.dump({"pull_request": {"number": 7}}, fh)
+        self.output = os.path.join(self.tmp, "output")
+        self.env = {
+            "GITHUB_REPOSITORY": REPO, "GATE_TOKEN": "synthetic-read", "GITHUB_API_URL": "https://api.example.test",
+            "GITHUB_EVENT_PATH": self.event, "GITHUB_EVENT_NAME": "pull_request_target", "GITHUB_OUTPUT": self.output,
+        }
+
+
+    def run_main(self, argv, env, plan=None, merge=None):
+        with mock.patch.dict(os.environ, env, clear=True), \
+             mock.patch.object(gate, "run_plan", side_effect=plan) as run_plan, \
+             mock.patch.object(gate, "run_merge", side_effect=merge) as run_merge, \
+             mock.patch("sys.stderr", new_callable=io.StringIO):
+            return gate.main(argv), run_plan, run_merge
+
+    def test_unknown_or_missing_subcommand_is_a_usage_error(self):
+        for argv in ([], ["deploy"], ["plan", "merge"]):
+            with self.subTest(argv=argv):
+                code, run_plan, run_merge = self.run_main(argv, self.env)
+                self.assertEqual(code, 2)
+                run_plan.assert_not_called()
+                run_merge.assert_not_called()
+
+    def test_plan_writes_ready_numbers_and_reads_the_event(self):
+        code, run_plan, _ = self.run_main(["plan"], self.env, plan=lambda *a: [7, 9])
+        self.assertEqual(code, 0)
+        gh, cfg, event_name, event, dispatch, _errors = run_plan.call_args.args
+        self.assertEqual((gh.token, gh.api_url), ("synthetic-read", "https://api.example.test"))
+        self.assertEqual((cfg.repo, cfg.base_branch, cfg.merge_label), (REPO, "main", ""))
+        self.assertEqual((event_name, event, dispatch), ("pull_request_target", {"pull_request": {"number": 7}}, ""))
+        with open(self.output, encoding="utf-8") as fh:
+            self.assertEqual(fh.read(), "merge=7 9\n")
+
+    def test_plan_fails_the_run_when_an_evaluation_errored(self):
+        def plan(gh, cfg, name, event, dispatch, errors):
+            errors.append("#7: HTTP 502: down")
+            return []
+        code, _, _ = self.run_main(["plan"], self.env, plan=plan)
+        self.assertEqual(code, 1)
+        with open(self.output, encoding="utf-8") as fh:
+            self.assertEqual(fh.read(), "merge=\n")
+
+    def test_merge_refuses_without_a_merge_token(self):
+        for token in (None, ""):
+            with self.subTest(token=token):
+                env = dict(self.env, GATE_MERGE_PRS="7")
+                if token is not None:
+                    env["MERGE_TOKEN"] = token
+                code, _, run_merge = self.run_main(["merge"], env)
+                self.assertEqual(code, 1)
+                run_merge.assert_not_called()
+
+    def test_merge_uses_the_merge_token_only_for_the_merger(self):
+        env = dict(self.env, MERGE_TOKEN="synthetic-merge", GATE_MERGE_PRS="7 12")
+        code, _, run_merge = self.run_main(["merge"], env, merge=lambda *a: ["c" * 40])
+        self.assertEqual(code, 0)
+        gh, merger, cfg, numbers, _errors = run_merge.call_args.args
+        self.assertEqual((gh.token, merger.token, numbers), ("synthetic-read", "synthetic-merge", [7, 12]))
+
+    def test_merge_fails_the_run_when_a_pull_request_errored(self):
+        def merge(gh, merger, cfg, numbers, errors):
+            errors.append("#7: HTTP 409: conflict")
+            return []
+        env = dict(self.env, MERGE_TOKEN="synthetic-merge", GATE_MERGE_PRS="7")
+        self.assertEqual(self.run_main(["merge"], env, merge=merge)[0], 1)
 
 
 if __name__ == "__main__":

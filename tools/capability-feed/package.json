@@ -7,7 +7,8 @@
   "scripts": {
     "generate": "node generate-feed.mjs --write",
     "check": "node generate-feed.mjs --check",
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "coverage": "node --test --experimental-test-coverage --test-coverage-include=generate-feed.mjs --test-coverage-include='lib/*.mjs' --test-coverage-lines=97 --test-coverage-branches=80 --test-coverage-functions=95 test/*.test.mjs"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

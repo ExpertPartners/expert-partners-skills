@@ -1,0 +1,90 @@
+name: tooling-coverage
+
+# Coverage floors for the canonical tooling's existing offline test suites. Each step
+# runs one scope's suite under coverage and fails when that scope drops under its floor:
+# coverage.py for Python (settings in [tool.coverage.run] of pyproject.toml, floor in
+# --fail-under below) and node --test's built-in coverage for JavaScript (floors in each
+# producer's "coverage" script in package.json). Every suite uses synthetic fixtures and
+# fakes; nothing here calls a live service.
+#
+# Each floor is the coverage measured on 2026-11-04 (Python 3.12, Node 22), rounded down to
+# a whole percent, minus 2 points. The margin absorbs small refactors and Node version
+# drift; a change that adds untested code or deletes tests falls below it.
+#
+#   Scope            Measured                                   Floor
+#   auto-merge-gate  97.17% statements + branches               95
+#   plugin-sync      84.33% statements + branches               82
+#   capability-feed  lines 99.02, branches 82.19, funcs 97.22   97 / 80 / 95
+#   skill-map        lines 96.70, branches 81.35, funcs 95.71   94 / 79 / 93
+#
+# tools/readiness/tests/test_coverage_gate.py proves the scopes name every source, that
+# nothing is omitted, and that a synthetic fixture one uncovered statement, line, branch
+# or function under each floor fails these exact commands while one at the floor passes.
+# node --test reports only the files a test loads; coverage.py's --source also reports
+# Python files no test imports, at 0%.
+
+on:
+  pull_request:
+    paths:
+      - 'pyproject.toml'
+      - 'requirements-tooling.txt'
+      - 'tools/auto-merge-gate/**'
+      - 'tools/plugin-sync/**'
+      - 'tools/capability-feed/**'
+      - 'tools/skill-map/**'
+      - 'tools/readiness/tests/test_coverage_gate.py'
+      - '.github/workflows/tooling-coverage.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'pyproject.toml'
+      - 'requirements-tooling.txt'
+      - 'tools/auto-merge-gate/**'
+      - 'tools/plugin-sync/**'
+      - 'tools/capability-feed/**'
+      - 'tools/skill-map/**'
+      - 'tools/readiness/tests/test_coverage_gate.py'
+      - '.github/workflows/tooling-coverage.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    name: coverage floors (offline)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install coverage.py (hash-locked)
+        run: python -m pip install --quiet --require-hashes -r requirements-tooling.txt
+      - name: Install the JavaScript producers (lockfiles)
+        run: |
+          set -euo pipefail
+          for producer in tools/capability-feed tools/skill-map; do
+            (cd "$producer" && npm ci --ignore-scripts --no-audit --no-fund)
+          done
+      - name: auto-merge-gate coverage floor (Python)
+        run: |
+          python -m coverage run --data-file=.coverage.auto-merge-gate --source=tools/auto-merge-gate -m unittest discover -s tools/auto-merge-gate/tests -p 'test_*.py'
+          python -m coverage report --data-file=.coverage.auto-merge-gate --include='tools/auto-merge-gate/*.py' --fail-under=95
+      - name: plugin-sync coverage floor (Python)
+        run: |
+          python -m coverage run --data-file=.coverage.plugin-sync --source=tools/plugin-sync -m unittest discover -s tools/plugin-sync/tests -p 'test_*.py'
+          python -m coverage report --data-file=.coverage.plugin-sync --include='tools/plugin-sync/*.py' --fail-under=82
+      - name: capability-feed coverage floor (JavaScript)
+        working-directory: tools/capability-feed
+        run: npm run coverage
+      - name: skill-map coverage floor (JavaScript)
+        working-directory: tools/skill-map
+        run: npm run coverage
+      - name: Scope and below-floor fixture tests
+        env:
+          COVERAGE_REQUIRE_TOOLS: "1"
+        run: python -m unittest tools/readiness/tests/test_coverage_gate.py -v

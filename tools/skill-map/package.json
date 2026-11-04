@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "extract": "node extract-skills-graph.mjs",
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "coverage": "node --test --experimental-test-coverage --test-coverage-include='*.mjs' --test-coverage-lines=94 --test-coverage-branches=79 --test-coverage-functions=93 test/*.test.mjs"
   },
   "dependencies": {
     "elkjs": "^0.12.0",
