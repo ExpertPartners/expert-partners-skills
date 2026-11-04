@@ -1,7 +1,4 @@
----
-operating-doctrine: patch
-systems-map: patch
----
+## 0.6.8 - 2026-11-04
 
 Consolidates useful standalone AI Capability Routing behavior into the designed marketplace skill and Repo Curator behavior into existing repo-standards. Moves intake, new-project and session-home into operating-doctrine, folds verify-docs into research-before-guessing, and removes their unbundled sources while preserving Git history.
 

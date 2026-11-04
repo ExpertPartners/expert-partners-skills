@@ -1,3 +1,14 @@
+## 2.84.3 - 2026-11-04
+
+Consolidates useful standalone AI Capability Routing behavior into the designed marketplace skill and Repo Curator behavior into existing repo-standards. Moves intake, new-project and session-home into operating-doctrine, folds verify-docs into research-before-guessing, and removes their unbundled sources while preserving Git history.
+
+Corrects intake authority, naming, timezone, classification, identical-capture and proven-revision handling. Preserves approved existing access routes and replaces retired project maps, local bootstrap and document-cache authority with current owning-source reads.
+
+Replaces parallel standalone-upload instructions and unsafe personal closeout routing with the existing marketplace release, cloud imports, local producer and current job reporting. Distinguishes published versions, destination delivery and actual session use, and resumes already-approved work without another start confirmation.
+
+Retires only exact recognized personal helper copies after every required canonical replacement is proven. Preserves explicit choices, private original bytes and rollback, leaves unknown copies visibly unverified, avoids rewriting shared Claude settings, retries pending migrations after reconnect, and keeps the verifier compatible with stock Python 3.9.
+
+Replaces the systems map's frozen roster, business rules, provisioning and access claims with a live-source routing procedure. Current owning Drive sources, implementation instructions, account and company identity, vendor capabilities and actual operation results govern each task; missing evidence never becomes a delivery or runtime success claim. New designed skills still await independent HQ certification.
 ## 2.84.2 - 2026-11-04
 
 The headless route check reads an optional Host evidence column on the access map. A live row whose browser host is still unknown can now leave Hosts empty by declaring Host evidence unresolved, instead of failing the whole refresh. It keeps its live status in the cache, is counted and named in every refresh report as still needing real host evidence, and never matches a navigation. Setting up rows with empty Hosts work as before. A hostless live row without the declaration still fails as a half-finished edit, and a row that loses hosts the last good copy protects still keeps the last good copy, even when it now declares Host evidence unresolved.
