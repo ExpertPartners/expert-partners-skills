@@ -20,9 +20,10 @@
 #   build       The Factory droid, unchanged from the single-file builder.
 #   release     After a build the gate started, when no open pull request closes the job,
 #               removes in-progress so the job stops holding its files. A build that did
-#               not succeed goes back to waiting. A job parked or marked done while it
-#               built holds its files until here, then loses in-progress, and every
-#               waiting job that can start now is dispatched.
+#               not succeed goes back to waiting. A job closed, parked or marked done
+#               while it built holds its files until here, then loses in-progress.
+#               Whenever in-progress is removed, every other waiting job that can start
+#               now is dispatched.
 #   redispatch  When a pull request or issue closes, an issue loses in-progress, or an
 #               issue gains or loses parked or done, dispatches every waiting job that can
 #               start now. On pull_request_target it
@@ -62,8 +63,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
-      # Reads the build run recorded for a parked or done job, which holds its files until
-      # that run ends.
+      # Reads the build run recorded for a closed, parked or done job, which holds its files
+      # until that run's build job ends.
       actions: read
       contents: read
       issues: write
@@ -219,21 +220,23 @@ jobs:
             exit 0
           fi
           python3 "$script" release
-      - name: Start every waiting job a parked or done build was holding
+      - name: Start every waiting job this build was holding
         # The release's own label change starts no workflow, so this pass is what lets the
-        # jobs waiting on a parked or done build start once that build can no longer write.
+        # jobs waiting on this build start once it can no longer write. OVERLAP_ISSUE keeps
+        # the released job itself out, so a failing build never restarts itself in a loop.
         if: steps.release.outputs.restart == 'true'
         env:
           OVERLAP_TOKEN: ${{ github.token }}
+          OVERLAP_ISSUE: ${{ github.event.issue.number || github.event.inputs.issue }}
           BUILDER_WORKFLOW_REF: ${{ github.workflow_ref }}
           BUILDER_REF: ${{ github.event.repository.default_branch }}
         run: python3 .factory-builder-tools/tools/overlap-check/overlap_check.py next
 
   redispatch:
     # Each of these can free the files a waiting job needs: a closed pull request, a closed
-    # issue, an issue that loses in-progress, or an issue marked parked or done (a parked or
-    # done job holds nothing while a stale in-progress is still on it; one whose build is
-    # still running holds until the release job above frees it). Removing parked
+    # issue, an issue that loses in-progress, or an issue marked parked or done (a closed,
+    # parked or done job holds nothing while a stale in-progress is still on it; one whose
+    # build is still running holds until the release job above frees it). Removing parked
     # or done puts a waiting job back in line, so that restarts too. Changes made with
     # github.token start no workflow, so the check's own label edits never land here.
     if: >-

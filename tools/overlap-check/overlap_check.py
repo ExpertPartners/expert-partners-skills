@@ -4,9 +4,10 @@ once, and No caps stop work).
 
 A build starts right away unless a file in the issue's Files in scope is also in an open
 builder pull request (its changed files) or in the Files in scope of another Job issue that is
-truly building: open, labeled in-progress, and neither parked nor done, unless the build run
-the gate recorded for it is still running. Shared files (plugin.json, marketplace.json, CHANGELOG.md, AGENTS.md, lockfiles) count
-the same way and are named as shared in the comment. A held issue gets "Waiting on #N, same
+truly building: labeled in-progress and open, neither parked nor done, or any of closed, parked
+or done while the build job the gate recorded for it can still write. Shared files
+(plugin.json, marketplace.json, CHANGELOG.md, AGENTS.md, lockfiles) count the same way and are
+named as shared in the comment. A held issue gets "Waiting on #N, same
 file". There is no cap on how many builds or open pull requests a repo may have.
 
 Three subcommands, run by .github/workflows/factory-builder-reusable.yml:
@@ -19,12 +20,14 @@ Three subcommands, run by .github/workflows/factory-builder-reusable.yml:
   release  After a build the gate started, when no open builder pull request closes
            OVERLAP_ISSUE, drop its in-progress label so it holds nothing. A build that did not
            succeed (BUILD_RESULT) goes back to waiting, so it starts again on its own. A job
-           that was closed, parked or done while it built always loses in-progress, and
-           restart=true is written so the caller runs next.
+           that was closed, parked or done while it built always loses in-progress. Whenever
+           in-progress is dropped, restart=true is written so the caller runs next.
   next     After a pull request or issue closes, in-progress is removed, or an issue gains
            or loses parked or done, dispatch the builder for every waiting Job issue that
            would start now, oldest first. Each one is claimed by removing its waiting label first,
-           so two runs never dispatch the same job. Writes dispatched=<n,n,...>.
+           so two runs never dispatch the same job. OVERLAP_ISSUE, when set (by the release),
+           is never sent, so a failing build does not restart itself in a loop. Writes
+           dispatched=<n,n,...>.
 
 OVERLAP_TOKEN (the workflow's own token) does every read and write, and reads build runs with
 actions: read. Standard library only.
@@ -54,6 +57,9 @@ DONE_LABEL = "done"
 # A parked job is off Factory by Allison's logged decision, and a done job has merged, so
 # neither is building even when a stale in-progress label is still on it.
 NOT_BUILDING_LABELS = {PARKED_LABEL, DONE_LABEL}
+# The job in factory-builder-reusable.yml that runs the droid. Called from a caller's job,
+# the API names it "<caller job> / build".
+BUILD_JOB = "build"
 
 SHARED_BASENAMES = {
     "plugin.json",
@@ -392,12 +398,12 @@ def is_stopped(issue: dict) -> bool:
 
 def holds_files(issue: dict, build_running=lambda issue: False) -> bool:
     """Only a job that is truly building holds its Files in scope. build_running(issue) says
-    whether the build run recorded for a parked or done job is still going."""
-    if "pull_request" in issue or IN_PROGRESS_LABEL not in labels_of(issue) or issue.get("state") == "closed":
+    whether the build job recorded for a closed, parked or done job can still write."""
+    if "pull_request" in issue or IN_PROGRESS_LABEL not in labels_of(issue):
         return False
-    if labels_of(issue) & NOT_BUILDING_LABELS:
-        # Parking a job, or marking it done, does not stop a build already running for it,
-        # and that droid can still push. Its files stay held until the run has ended.
+    if is_stopped(issue):
+        # Closing a job, parking it or marking it done cancels nothing, so a droid already
+        # running for it can still push. Its files stay held until that build job has ended.
         return build_running(issue)
     return True
 
@@ -412,25 +418,43 @@ def recorded_run(gh, cfg: Config, number: int) -> str | None:
 
 
 def build_is_running(gh, cfg: Config, number: int) -> bool:
+    """Whether the build the gate recorded for this job can still write. Only GitHub Actions
+    state proves a writer has stopped, never the issue's state or labels: the run is gone
+    (404), the run is completed, or the latest attempt's build job is completed. Anything
+    else, an unreadable answer included, counts as still writing."""
     run_id = recorded_run(gh, cfg, number)
     if not run_id:
         return False
-    try:
-        run = gh.get(f"/repos/{cfg.repo}/actions/runs/{run_id}")
-    except GitHubError as exc:
-        if exc.status == 404:
-            return False
-        # A run that cannot be read might still be writing, so it keeps holding.
+
+    def unreadable(exc: GitHubError) -> bool:
         print(f"::warning::overlap-check: build run {run_id} of #{number} could not be read "
               f"({exc}), so #{number} still holds its files.")
         return True
-    return (run or {}).get("status") != "completed"
+
+    try:
+        run = gh.get(f"/repos/{cfg.repo}/actions/runs/{run_id}")
+    except GitHubError as exc:
+        return False if exc.status == 404 else unreadable(exc)
+    if (run or {}).get("status") == "completed":
+        return False
+    # The run stays in progress while its release job runs, after the droid has stopped, so
+    # the build job itself decides. filter=latest follows a re-run to its newest attempt.
+    try:
+        jobs = (gh.get(f"/repos/{cfg.repo}/actions/runs/{run_id}/jobs",
+                       {"filter": "latest", "per_page": 100}) or {}).get("jobs") or []
+    except GitHubError as exc:
+        return unreadable(exc)
+    builds = [j for j in jobs if (j.get("name") or "").split("/")[-1].strip() == BUILD_JOB]
+    # No build job listed yet means it has not been created, not that it has ended.
+    return not builds or any(j.get("status") != "completed" for j in builds)
 
 
 def in_progress_issues(gh, cfg: Config) -> list[Holder]:
+    # Closed issues too: one closed while its droid still runs keeps in-progress until the
+    # release, and holds its files until then.
     found = gh.paginate(
         f"/repos/{cfg.repo}/issues",
-        {"state": "open", "labels": f"{JOB_LABEL},{IN_PROGRESS_LABEL}"},
+        {"state": "all", "labels": f"{JOB_LABEL},{IN_PROGRESS_LABEL}"},
     )
 
     def running(i: dict) -> bool:
@@ -541,7 +565,7 @@ def claim(gh, cfg: Config, number: int) -> bool:
     return True
 
 
-def run_next(gh, cfg: Config, dispatch) -> list[int]:
+def run_next(gh, cfg: Config, dispatch, skip: set[int] = frozenset()) -> list[int]:
     """Dispatch every waiting Job issue that would start now, oldest first. Only a job that is
     truly building holds files, so a job held by a closed, parked or done one starts. A job dispatched
     in this pass holds its files for the later ones, so two colliding jobs are never sent
@@ -555,6 +579,9 @@ def run_next(gh, cfg: Config, dispatch) -> list[int]:
     sent: list[int] = []
     for issue in sorted((i for i in waiting if "pull_request" not in i), key=lambda i: int(i["number"])):
         number = int(issue["number"])
+        if number in skip:
+            print(f"overlap-check: waiting job #{number} was just released, so this pass does not send it.")
+            continue
         if is_stopped(issue):
             print(f"overlap-check: waiting job #{number} is closed, parked or done, so it is not sent.")
             continue
@@ -680,8 +707,8 @@ def main(argv: list[str]) -> int:
             print(f"::error::overlap-check: #{os.environ.get('OVERLAP_ISSUE')} could not be released: {exc!r}")
             return 1
         # Removing in-progress with the workflow's own token starts no restart, so the caller
-        # runs next itself once a stopped job's build has ended.
-        write_output("restart", "true" if outcome == "stopped" else "false")
+        # runs next itself whenever the release freed this job's files.
+        write_output("restart", "false" if outcome == "kept" else "true")
         return 0
 
     workflow = workflow_file(os.environ["BUILDER_WORKFLOW_REF"])
@@ -694,7 +721,8 @@ def main(argv: list[str]) -> int:
         )
 
     try:
-        sent = run_next(gh, cfg, dispatch)
+        skip = {issue_number()} if os.environ.get("OVERLAP_ISSUE", "").strip() else set()
+        sent = run_next(gh, cfg, dispatch, skip)
     except Exception as exc:
         print(f"::error::overlap-check: waiting jobs could not be checked: {exc!r}")
         return 1
