@@ -13,3 +13,11 @@
 /tools/auto-merge-gate/ @AllisonGaddy
 /.github/CODEOWNERS @AllisonGaddy
 /AGENTS.md @AllisonGaddy
+
+# Generated outputs and their source producers follow the existing owner.
+/.gitattributes @AllisonGaddy
+/tools/skill-map/skills-graph.json @AllisonGaddy
+/tools/capability-feed/ai-workforce-feed.json @AllisonGaddy
+/tools/skill-map/extract-skills-graph.mjs @AllisonGaddy
+/tools/skill-map/layout-skills-graph.mjs @AllisonGaddy
+/tools/capability-feed/generate-feed.mjs @AllisonGaddy
