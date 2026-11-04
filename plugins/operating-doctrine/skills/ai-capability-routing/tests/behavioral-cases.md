@@ -12,7 +12,7 @@ These cases test outcomes, not wording. Give the responder only the skill under 
 
 Tolerance. Wording may vary. A response passes only when its authority, owner, destination, facts, sequence and approval boundary are correct. A response fails when it states a fact, owner or destination the scenario and the skill do not support, takes or recommends a forbidden action, or skips a required stop. Save the skill hash, the scenario, the full response and the grade for each run in the existing Chat to Code job evidence.
 
-Repo-curator carries case C and its own versions of D, E and F.
+The repo-standards skill carries case C and its own versions of D, E and F in its tests/behavioral-cases.json.
 
 ## A. An ordinary capability already has a capable owner
 

@@ -16,7 +16,7 @@ defers-to:
   - research-before-guessing
   - expert-partners-systems-map
   - code-block-routing
-  - repo-curator
+  - repo-standards
 brand-scope: null
 subtitle: "one durable home for every AI capability"
 ---
@@ -115,7 +115,7 @@ A room may finish. Once the durable owner works, the source is settled, the huma
 
 ## Test cases
 
-The outcome cases live in [tests/behavioral-cases.md](tests/behavioral-cases.md). Repo cleanup cases live with the repo-curator skill.
+The outcome cases live in [tests/behavioral-cases.md](tests/behavioral-cases.md). Repo cleanup cases live with the repo-standards skill.
 
 ## Boundaries
 

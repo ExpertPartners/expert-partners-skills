@@ -1,0 +1,5 @@
+---
+operating-doctrine: patch
+---
+
+Adds the designed ai-capability-routing skill, which carries useful method from the standalone AI Capability Routing skill under current HQ authority. It places an AI outcome in one durable home, checks existing owners first, gives source, owner, runtime, human view and delivery one job each, and proves source, delivery and runtime separately. Useful behavior from the standalone Repo Curator skill goes into the existing repo-standards skill instead of a second skill. Its content assessment now routes each item found in a cleanup to its owning home, with business knowledge going to the owning Drive brain and secrets to 1Password, reads the GitHub Archive Index row instead of the retired Estate Manifest, and keeps an earlier routing as history when newer ownership evidence changes it. Four new repo-standards behavioral cases cover these. Neither change carries the retired Estate Manifest, Estate Brain or estate-knowledge-retrieval routes. ai-capability-routing waits for certification by Claude in HQ and Allison.

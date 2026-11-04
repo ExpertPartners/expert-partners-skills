@@ -2,7 +2,7 @@
 classification: internal
 classification_owner: allison
 classification_date: 2026-09-21
-date: 2026-09-22
+date: 2026-11-04
 source: ADR-0056, ADR-0078, ADR-0025, ADR-0027, Estate Manifest Entity index, Phase Two dispatch
 topic: explicit repository content assessment
 ---
@@ -53,7 +53,7 @@ These labels belong to the audit report, not document frontmatter. Do not treat 
 
 Before editing, populate the audit record with evidence for every item:
 
-- Manifest row and durable one job, owning entity/function, existing Entity type and disposition.
+- GitHub Archive Index row and durable one job, owning entity/function, existing Entity type and disposition. The retired Estate Manifest is history, never the row to read.
 - What it owns, what it consumes by pointer, and what it explicitly does not own.
 - Systems of record outside GitHub, verified from owning canon. A pointer does not authorize migration of operational records, credentials, or media into Git.
 - Current human front door (README or ruled equivalent), AI front door, curated canonical/index mechanism, and generator if any.
@@ -87,6 +87,25 @@ A meeting account is evidence of discussion; identify any separately recorded ac
 
 Do not blanket-exclude all `intake/` paths as non-authoritative: ordinary intake is unreviewed under ADR 0027, but the retired aura repo's dated ruling-of-record files intentionally lived there (history in GitHub Archive). Verify the specific ruling and its status directly. That exception does not promote an ordinary capture or research report.
 
+## Route each item to its owning home
+
+In an explicit cleanup or curation pass, class every governed-looking item before moving or rewriting anything, then route it by the HQ Rulebook section Where things live, read live. GitHub holds code, skills and connected apps. Business knowledge, rules and decisions live in their owning Drive business brain. Secrets live only in 1Password. Point to the Rulebook; do not copy it here.
+
+| Class | Home to prove before any move |
+| --- | --- |
+| Code, skill or app source | This repo when it serves the repo's job; otherwise the repo whose Archive Index row owns that job. |
+| Current business knowledge, policy or brand material | The owning Drive business brain, found through the Rulebook and that brain's start-here index. Compare with what the brain already holds; never copy over it. |
+| Decisions | The Decision Log, through its own save route. A note in a repo is not a decision. |
+| Raw evidence, recordings and transcripts | Their existing system of record or the owning brain's folder for them. Point to them; never copy a raw transcript into Git or a new place. |
+| Research | The owning brain, through the research-intake skill. Evidence, never authority. |
+| Generated output | Its producer, with a pointer to its sources. |
+| History, duplicates and superseded material | Preserve as history or point to the existing owner, using the dispositions below. |
+| Secrets and other sensitive data | Secrets belong only in 1Password. Record the path and handling need, never the value. Removing a secret from Git history or rotating it is gated under path two step 4. |
+
+When the Rulebook and the brain's index do not resolve an item's home, mark it `needs review` and stop work on that item. Never guess a new folder, brain or repo, and never create a business-canon repo or a brand, doctrine or canon folder in a code repo to hold business material. A move into a Drive brain crosses owners: it stays a proposal under the Relocate row below until accepted, and the repo keeps a pointer to the new home.
+
+When newer ownership evidence changes an item's home, reroute only the items it touches. Name the newer source and why it wins, and keep the earlier routing in the audit record as history with the reason it changed.
+
 ## Choose dispositions within existing authority
 
 These are report verbs, not a new Estate-wide vocabulary or permission table. Every executed operation needs the cited existing authority and the smallest reversible diff. Keep the source revision and rollback path in the record.
@@ -111,7 +130,7 @@ Use the current Archive Index row, not a second class registry. These are assess
 
 | Current Entity type | Assessment focus |
 | --- | --- |
-| `brand` | Current brand truth, exclusions, locally owned deltas and shared pointers; use the applicable current brand taxonomy. |
+| `brand` | Pointers to current brand truth in its owning Drive brain, exclusions, locally owned code or skill deltas and shared pointers. Brand truth itself is routed by the table above, never re-homed in Git. |
 | `operating-function` | Shared procedures and reference owned by that function, consumer boundaries and external systems of record. |
 | `product-ip` | Product/manuscript/course sources, claims and provenance, consumer pointers; distinguish IP sources from brand packaging. |
 | `source-corpus` | Original fidelity, custody, provenance and derived works; historical source cannot become current brand doctrine by relocation. |
