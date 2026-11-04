@@ -21,7 +21,7 @@
 #   build       The Factory droid. Its first step confirms that the gate admitted this very
 #               run for the job, so a re-run of a run another admission has replaced never
 #               writes beside it. When the job already has an open builder pull request,
-#               the build checks out that branch and the droid continues that pull request
+#               the build pins its authenticated head and the droid continues that pull request
 #               instead of opening another (one job, one writer, one pull request).
 #   release     After a build the gate started, when no open pull request closes the job,
 #               removes in-progress so the job stops holding its files. A build that did
@@ -58,7 +58,7 @@ permissions:
   contents: read
 jobs:
   gate:
-    # Three ways in, each building an issue once:
+    # Four ways in, each building an issue once:
     # 1. Manual dispatch (also how the redispatch job restarts a waiting job).
     # 2. The job label added to an issue from an allowlisted author. A job label the
     #    Factory app adds to a "Job:" issue is skipped, because path 3 added it and is
@@ -66,9 +66,12 @@ jobs:
     # 3. A "Job:" issue opened by an allowlisted author without the job label. This run
     #    adds the label itself, then builds. An issue opened with the label already on it
     #    is left to path 2, which GitHub starts for that label.
+    # 4. An existing job reopened after delivery. The gate still checks holds and owners.
     # The github context here is the caller's, so these are the caller's event fields.
     if: >-
       github.event_name == 'workflow_dispatch' ||
+      (github.event.action == 'reopened' && contains(github.event.issue.labels.*.name, 'job') &&
+        contains(fromJSON('["AllisonGaddy","expertpartners","expertpartners-ember","expertpartners-aura"]'), github.event.issue.user.login)) ||
       (github.event.action == 'labeled' && github.event.label.name == 'job' &&
         contains(fromJSON('["AllisonGaddy","expertpartners","expertpartners-ember","expertpartners-aura"]'), github.event.issue.user.login) &&
         !(github.event.sender.login == 'factory-droid[bot]' && startsWith(github.event.issue.title, 'Job:'))) ||
@@ -100,13 +103,14 @@ jobs:
         env:
           OVERLAP_TOKEN: ${{ github.token }}
           OVERLAP_ISSUE: ${{ github.event.issue.number || github.event.inputs.issue }}
+          OVERLAP_REOPENED: ${{ github.event_name == 'issues' && github.event.action == 'reopened' }}
         run: |
           set -euo pipefail
           script=.factory-builder-tools/tools/overlap-check/overlap_check.py
           if [ ! -f "$script" ]; then
-            echo "::notice::The overlap check is not on main yet; building without it."
-            echo "start=true" >> "$GITHUB_OUTPUT"
-            exit 0
+            echo "::error::The trusted overlap check is missing."
+            echo "start=false" >> "$GITHUB_OUTPUT"
+            exit 1
           fi
           python3 "$script" check
 
@@ -144,15 +148,32 @@ jobs:
           mv "$GITHUB_WORKSPACE/.factory-builder-tools" "$tools_dir/source"
           script="$tools_dir/source/tools/overlap-check/overlap_check.py"
           if [ ! -f "$script" ]; then
-            echo "::notice::The overlap check is not on main yet; building without it."
-            exit 0
+            echo "::error::The trusted ownership check is missing."
+            exit 1
           fi
           OVERLAP_NOTE_FILE="$RUNNER_TEMP/factory-continuation.txt" python3 "$script" owner
+          printf 'FACTORY_CONTINUATION_CHECK=%s\n' "$script" >> "$GITHUB_ENV"
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # The job's open pull request branch when it has one, otherwise the default.
-          ref: ${{ steps.owner.outputs.branch }}
+          # Pin the authenticated continuation or explicitly resolved default head.
+          ref: ${{ steps.owner.outputs.head }}
+          persist-credentials: false
+      - name: Revalidate immutable checkout before build secrets
+        env:
+          OVERLAP_TOKEN: ${{ github.token }}
+          OVERLAP_ISSUE: ${{ github.event.issue.number || github.event.inputs.issue }}
+          OVERLAP_EXPECTED_PR: ${{ steps.owner.outputs.pr }}
+          OVERLAP_EXPECTED_BRANCH: ${{ steps.owner.outputs.branch }}
+          OVERLAP_EXPECTED_HEAD: ${{ steps.owner.outputs.head }}
+        run: |
+          set -euo pipefail
+          python3 "$FACTORY_CONTINUATION_CHECK" verify
+          if [ -n "$OVERLAP_EXPECTED_BRANCH" ]; then
+            git switch -c "$OVERLAP_EXPECTED_BRANCH"
+            git config "branch.$OVERLAP_EXPECTED_BRANCH.remote" origin
+            git config "branch.$OVERLAP_EXPECTED_BRANCH.merge" "refs/heads/$OVERLAP_EXPECTED_BRANCH"
+          fi
       - name: Install Factory Droid
         run: |
           curl --retry 5 --retry-delay 2 --retry-all-errors -fsSL https://app.factory.ai/cli | sh

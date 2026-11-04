@@ -14,7 +14,7 @@ One job has one writer. However many events start the builder for the same issue
 run builds it at a time, and a later build continues the job's open pull request instead of
 opening another.
 
-Four subcommands, run by .github/workflows/factory-builder-reusable.yml:
+Five subcommands, run by .github/workflows/factory-builder-reusable.yml:
 
   check    Judge OVERLAP_ISSUE. A closed, parked or done issue never builds and is left as
            it is. When another run already builds this job (its recorded build, or an
@@ -28,7 +28,10 @@ Four subcommands, run by .github/workflows/factory-builder-reusable.yml:
   owner    First step of the build job. Fails unless the job is still open, not delivered,
            and its recorded build is this run, so a re-run of a run another admission has
            replaced never writes beside it. Writes pr, branch and head of the job's open
-           builder pull request, and a continuation note to OVERLAP_NOTE_FILE.
+           authenticated builder pull request, or an explicitly resolved default head
+           for new work, and a continuation note to OVERLAP_NOTE_FILE.
+  verify   Before build secrets are supplied, confirms ownership and producer evidence
+           again and checks that the selected immutable SHA is the local checkout.
   release  After a build the gate started, when no open builder pull request closes
            OVERLAP_ISSUE, drop its in-progress label so it holds nothing. A build that did not
            succeed (BUILD_RESULT) goes back to waiting, so it starts again on its own. A job
@@ -54,6 +57,7 @@ import json
 import os
 import re
 import sys
+import subprocess
 import time
 import urllib.error
 import urllib.parse
@@ -393,6 +397,7 @@ class Config:
     repo: str
     settle_seconds: float = 10.0
     run_id: str = ""
+    reopened: bool = False
 
 
 def labels_of(item: dict) -> set[str]:
@@ -509,6 +514,57 @@ def head_branch(pr: dict | None, repo: str) -> str | None:
     return ref
 
 
+def trusted_head(gh, cfg: Config, pr: dict) -> bool:
+    try:
+        return authenticated_head(gh, cfg, pr)
+    except Exception as exc:
+        # An unreadable activity is a technical hold on this PR only, never proof
+        # of absence, and must not prevent independent waiting jobs from running.
+        print(f"::warning::Factory head provenance could not be read ({type(exc).__name__}); continuation refused.")
+        return False
+
+
+def authenticated_head(gh, cfg: Config, pr: dict) -> bool:
+    """GitHub's latest ref activity authenticates the producer of this exact head.
+
+    Do not filter activities by actor or activity type: doing so hides a later human
+    push or deletion. One descending result is sufficient; no missing page is skipped.
+    A PR author, commit email, branch prefix or collaborator permission is not evidence.
+    """
+    branch = head_branch(pr, cfg.repo)
+    sha = (pr.get("head") or {}).get("sha") or ""
+    if not branch or not re.fullmatch(r"[0-9a-f]{40}", sha):
+        return False
+    bot = gh.get("/users/factory-droid%5Bbot%5D")
+    if not (bot.get("login") == FACTORY_LOGIN and bot.get("type") == "Bot"
+            and isinstance(bot.get("id"), int) and bot["id"] > 0
+            and bot.get("html_url") == "https://github.com/apps/factory-droid"):
+        return False
+    ref = f"refs/heads/{branch}"
+    latest = gh.get(f"/repos/{cfg.repo}/activity", {"ref": ref, "direction": "desc", "per_page": 1})
+    if not isinstance(latest, list) or len(latest) != 1:
+        return False
+    activity = latest[0]
+    actor = activity.get("actor") or {}
+    if not (activity.get("ref") == ref and activity.get("after") == sha
+            and activity.get("activity_type") in {"push", "force_push", "branch_creation"}
+            and all(actor.get(k) == bot[k] for k in ("id", "login", "type"))):
+        return False
+    current = gh.get(f"/repos/{cfg.repo}/git/ref/heads/{urllib.parse.quote(branch, safe='')}")
+    return current.get("ref") == ref and (current.get("object") or {}).get("sha") == sha
+
+
+def default_head(gh, cfg: Config) -> str:
+    branch = gh.get(f"/repos/{cfg.repo}")["default_branch"]
+    if not BRANCH_RE.fullmatch(branch) or ".." in branch:
+        raise ValueError("invalid default branch")
+    ref = gh.get(f"/repos/{cfg.repo}/git/ref/heads/{urllib.parse.quote(branch, safe='')}")
+    sha = (ref.get("object") or {}).get("sha") or ""
+    if ref.get("ref") != f"refs/heads/{branch}" or not re.fullmatch(r"[0-9a-f]{40}", sha):
+        raise ValueError("default branch has no immutable head")
+    return sha
+
+
 @dataclass
 class Delivery:
     """The builder pull requests that close one job."""
@@ -536,7 +592,7 @@ def job_delivery(gh, cfg: Config, number: int) -> Delivery:
     ones, from the issue's timeline, where GitHub records every pull request that names it."""
     opened = sorted(
         (p for p in gh.paginate(f"/repos/{cfg.repo}/pulls", {"state": "open"})
-         if is_builder_pr(p) and number in closes(p.get("body"))),
+         if is_builder_pr(p) and head_branch(p, cfg.repo) and number in closes(p.get("body"))),
         key=lambda p: int(p["number"]))
     reopened: list[str] = []
     candidates: set[int] = set()
@@ -554,8 +610,22 @@ def job_delivery(gh, cfg: Config, number: int) -> Delivery:
             merged.append(p)
     merged.sort(key=lambda p: p["merged_at"], reverse=True)
     after = bool(merged) and any(t > merged[0]["merged_at"] for t in reopened)
-    target = next((p for p in opened if head_branch(p, cfg.repo)), None)
+    # Only the oldest existing PR is eligible. Never bypass its owner by starting a
+    # newer PR or creating a duplicate when its current head is not authenticated.
+    target = opened[0] if opened and trusted_head(gh, cfg, opened[0]) else None
     return Delivery(opened, merged, after, target)
+
+
+def trust_wait(gh, cfg: Config, number: int, delivery: Delivery) -> None:
+    remove_label(gh, cfg, number, IN_PROGRESS_LABEL)
+    add_labels(gh, cfg, number, [JOB_LABEL, WAITING_LABEL])
+    upsert_comment(gh, cfg, number, "\n".join([
+        MARKER,
+        f"Existing pull request #{delivery.open[0]['number']} remains with its current owner. "
+        "Its current head has no matching authenticated Factory ref activity. "
+        "Factory will not execute this head with build secrets or create another pull request. "
+        "The current owner can finish it; automatic continuation requires a verified Factory-produced head.",
+    ]))
 
 
 def live_owner(gh, cfg: Config, number: int, before: int | None = None) -> str | None:
@@ -667,10 +737,6 @@ def continuation_note(number: int, d: Delivery, repo: str) -> str:
             names = ", ".join(f"#{p['number']}" for p in others)
             lines.append(f"Pull requests {names} also close #{number}. Leave them as they are and "
                          f"name them in #{t['number']} so a person can decide which work to keep.")
-    elif d.open:
-        names = ", ".join(f"#{p['number']}" for p in d.open)
-        lines.append(f"Pull requests {names} already close #{number} from outside this repository. "
-                     "Do not open another pull request; report on the issue what still needs doing.")
     if d.merged and not d.target:
         m = d.merged[0]
         lines.append(f"Pull request #{m['number']} already merged earlier work for this job into main, "
@@ -696,6 +762,8 @@ def run_owner(gh, cfg: Config, number: int) -> tuple[bool, str, Delivery | None]
                        f"#{d.winner['number']}, so this run does not build it again."), d
     if d.target:
         return True, f"run {cfg.run_id} owns #{number} and continues pull request #{d.target['number']}.", d
+    if d.open:
+        return False, "existing pull request head is not authenticated as Factory-produced; leave it with its current owner.", d
     return True, f"run {cfg.run_id} owns #{number}.", d
 
 
@@ -741,6 +809,14 @@ def run_check(gh, cfg: Config, number: int, sleep=time.sleep) -> bool:
     """True when the build may start. Leaves the issue labeled for what happened."""
     issue = gh.get(f"/repos/{cfg.repo}/issues/{number}")
     labels = labels_of(issue)
+    if cfg.reopened and issue.get("state") != "closed" and "done" in labels and "parked" not in labels:
+        owner = live_owner(gh, cfg, number)
+        if owner:
+            follow(gh, cfg, number, owner)
+            return False
+        remove_label(gh, cfg, number, "done")
+        issue = gh.get(f"/repos/{cfg.repo}/issues/{number}")
+        labels = labels_of(issue)
     if is_stopped(issue):
         # A stopped job holds no files, so building it would let a colliding job build
         # beside it unseen. Parked is the only way a job stays off Factory.
@@ -756,6 +832,9 @@ def run_check(gh, cfg: Config, number: int, sleep=time.sleep) -> bool:
     delivery = job_delivery(gh, cfg, number)
     if delivery.winner:
         deliver(gh, cfg, number, delivery.winner, delivery.open, labels, recorded_run(gh, cfg, number))
+        return False
+    if delivery.open and not delivery.target:
+        trust_wait(gh, cfg, number, delivery)
         return False
     first = judge(gh, cfg, issue)
     report(number, first)
@@ -849,6 +928,10 @@ def run_next(gh, cfg: Config, dispatch, skip: set[int] = frozenset()) -> list[in
             print(f"overlap-check: waiting job #{number} is still being built (in-progress, or its "
                   "recorded build can still write), so it is not sent again.")
             continue
+        delivery = job_delivery(gh, cfg, number)
+        if delivery.open and not delivery.target and not delivery.winner:
+            trust_wait(gh, cfg, number, delivery)
+            continue
         v = evaluate(number, parse_scope(issue.get("body")), prs, holders)
         if not v.start:
             print(f"overlap-check: waiting job #{number} still waits: {'; '.join(v.lines())}")
@@ -921,6 +1004,9 @@ def run_release(gh, cfg: Config, number: int, result: str) -> str:
         # request still open beside the merged one holds its own changed files.
         deliver(gh, cfg, number, delivery.winner, delivery.open, labels_of(issue), cfg.run_id)
         return "delivered"
+    if delivery.open and not delivery.target:
+        trust_wait(gh, cfg, number, delivery)
+        return "waiting"
     if delivery.open:
         print(f"overlap-check: #{number} has an open pull request, which holds its files.")
         return "kept"
@@ -954,13 +1040,14 @@ def issue_number() -> int:
 
 
 def main(argv: list[str]) -> int:
-    if len(argv) != 1 or argv[0] not in ("check", "next", "owner", "release"):
-        print("usage: overlap_check.py check|next|owner|release", file=sys.stderr)
+    if len(argv) != 1 or argv[0] not in ("check", "next", "owner", "verify", "release"):
+        print("usage: overlap_check.py check|next|owner|verify|release", file=sys.stderr)
         return 2
     cfg = Config(
         repo=os.environ["GITHUB_REPOSITORY"],
         settle_seconds=float(os.environ.get("OVERLAP_SETTLE_SECONDS", "10")),
         run_id=os.environ.get("GITHUB_RUN_ID", ""),
+        reopened=os.environ.get("OVERLAP_REOPENED") == "true",
     )
     gh = GitHub(os.environ["OVERLAP_TOKEN"], os.environ.get("GITHUB_API_URL", "https://api.github.com"))
 
@@ -982,7 +1069,7 @@ def main(argv: list[str]) -> int:
         write_output("start", "true" if start else "false")
         return 0
 
-    if argv[0] == "owner":
+    if argv[0] in ("owner", "verify"):
         try:
             number = issue_number()
             owns, why, delivery = run_owner(gh, cfg, number)
@@ -994,9 +1081,27 @@ def main(argv: list[str]) -> int:
             return 1
         print(f"overlap-check: {why}")
         target = delivery.target if delivery else None
+        if argv[0] == "verify":
+            try:
+                expected = os.environ.get("OVERLAP_EXPECTED_HEAD", "")
+                local = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+                expected_pr = os.environ.get("OVERLAP_EXPECTED_PR", "")
+                expected_branch = os.environ.get("OVERLAP_EXPECTED_BRANCH", "")
+                if not re.fullmatch(r"[0-9a-f]{40}", expected) or local != expected:
+                    raise ValueError("caller checkout differs from the admitted immutable head")
+                if target:
+                    if (str(target["number"]) != expected_pr or head_branch(target, cfg.repo) != expected_branch
+                            or target["head"]["sha"] != expected):
+                        raise ValueError("continuation head changed after selection")
+                elif expected_pr or expected_branch:
+                    raise ValueError("continuation pull request disappeared after selection")
+            except Exception as exc:
+                print(f"::error::overlap-check: immutable checkout could not be revalidated: {exc!r}")
+                return 1
+            return 0
         write_output("pr", str(target["number"]) if target else "")
         write_output("branch", head_branch(target, cfg.repo) or "" if target else "")
-        write_output("head", ((target.get("head") or {}).get("sha") or "") if target else "")
+        write_output("head", target["head"]["sha"] if target else default_head(gh, cfg))
         note = continuation_note(number, delivery, cfg.repo) if delivery else ""
         path = os.environ.get("OVERLAP_NOTE_FILE", "")
         if note and path:

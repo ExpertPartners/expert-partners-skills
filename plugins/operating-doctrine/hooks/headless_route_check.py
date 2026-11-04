@@ -16,6 +16,14 @@ refresh keeps the last good copy. With no copy at all, the hook allows and logs.
   status no API      allow
   host not on map    allow, and append the host to unknown-hosts.log for the nightly check
 
+Rows with hosts form the complete host projection the hook decides from. A row that
+declares its host evidence unresolved stays in the cache and in the refresh report, still
+waiting for real host evidence, and never decides a call. It declares that with no hosts and
+either Host evidence unresolved (status live or setting up) or, with Host evidence blank or
+absent, the status setting up. Any other hostless row fails the refresh, and so does a
+refresh that would drop hosts a cached row protects, so a half-edited sheet can never lift
+a protection quietly.
+
 The map holds 1Password item names only. The hook never reads a secret, and it withholds
 any map value that looks like one instead of printing it.
 
@@ -66,8 +74,12 @@ HEADER_FIELDS = {
     "status": "status",
     "no api reason": "reason",
     "reason": "reason",
+    "host evidence": "evidence",
 }
 REQUIRED_FIELDS = ("system", "hosts", "status")
+# The one Host evidence value that lets a hostless row stay on the map. Matched exactly,
+# ignoring case and surrounding spaces, so no other wording can stand in for it.
+UNRESOLVED_EVIDENCE = "unresolved"
 
 LIVE = "live"
 SETTING_UP = "setting up"
@@ -255,8 +267,26 @@ def canonical_domain(name: str) -> str:
     return ".".join(labels).rstrip(".")
 
 
+def declares_unresolved(status: str, evidence: str) -> bool:
+    """Whether a hostless row declares its host evidence unresolved, rather than being half edited.
+
+    Host evidence unresolved declares it for a live or setting up row. A setting up row with
+    Host evidence blank or absent declares it too, as maps without the column always have.
+    """
+    evidence = evidence.strip().lower()
+    if evidence == UNRESOLVED_EVIDENCE:
+        return status in (LIVE, SETTING_UP)
+    return not evidence and status == SETTING_UP
+
+
+def unresolved_reason(entry: dict) -> str:
+    if str(entry.get("evidence", "")).strip().lower() == UNRESOLVED_EVIDENCE:
+        return f"{safe(entry.get('status', ''))}, Host evidence unresolved"
+    return f"{safe(entry.get('status', ''))}, no host yet"
+
+
 def parse_map(csv_text: str) -> list[dict]:
-    """Rows of the access map as dicts with system, hosts, route, item, status, reason."""
+    """Rows of the access map as dicts with system, hosts, route, item, status, reason, evidence."""
     rows = list(csv.reader(io.StringIO(csv_text)))
     if not rows:
         raise ValueError("the access map is empty")
@@ -280,12 +310,20 @@ def parse_map(csv_text: str) -> list[dict]:
         system = cell(row, "system")
         hosts = split_hosts(cell(row, "hosts"))
         status = cell(row, "status")
+        evidence = cell(row, "evidence")
         # A half-edited row must fail the refresh, so the last good copy keeps protecting its
-        # hosts instead of the row silently dropping out of the map.
-        blank = [name for name, value in (("System", system), ("Hosts", hosts), ("Status", status))
-                 if not value]
+        # hosts instead of the row silently dropping out of the map. One declared exception:
+        # a row whose host evidence is still unresolved may carry no hosts yet. It never
+        # matches a navigation, and refresh reports it as still needing real host evidence.
+        blank = [name for name, value in (("System", system), ("Status", status)) if not value]
+        if not hosts and not declares_unresolved(normalize_status(status), evidence):
+            blank.append("Hosts")
         if blank:
-            raise ValueError(f"access map row {number} has no {', '.join(blank)}")
+            message = f"access map row {number} has no {', '.join(blank)}"
+            if "Hosts" in blank:
+                message += (" (a live or setting up row whose hosts are not known yet declares "
+                            "Host evidence unresolved)")
+            raise ValueError(message)
         systems.append({
             "system": system,
             "hosts": hosts,
@@ -293,10 +331,41 @@ def parse_map(csv_text: str) -> list[dict]:
             "item": cell(row, "item"),
             "status": normalize_status(status),
             "reason": cell(row, "reason"),
+            "evidence": evidence,
         })
     if not systems:
-        raise ValueError("the access map has no rows with a system and hosts")
+        raise ValueError("the access map has no rows with a system")
     return systems
+
+
+def normalized_name(system: object) -> str:
+    return " ".join(str(system).lower().split())
+
+
+def lost_protected_hosts(old: list[dict] | None, new: list[dict]) -> list[str]:
+    """Hosts the last good copy protects that the new map no longer lists for the same system.
+
+    A refresh that accepted these would quietly lift a protection, the same damage a
+    half-edited row does, so the refresh fails and keeps the last good copy instead. Lifting
+    a protection on purpose still works: mark the row no API (its hosts stay listed) or
+    delete the whole row.
+    """
+    if not old:
+        return []
+    old_hosts: dict[str, set] = {}
+    for entry in old:
+        if entry.get("status") in (LIVE, SETTING_UP) and entry.get("hosts"):
+            old_hosts.setdefault(normalized_name(entry.get("system", "")), set()).update(entry["hosts"])
+    new_hosts: dict[str, set] = {}
+    for entry in new:
+        if entry.get("hosts"):
+            new_hosts.setdefault(normalized_name(entry.get("system", "")), set()).update(entry["hosts"])
+    lost = []
+    for name, hosts in old_hosts.items():
+        if not any(normalized_name(entry.get("system", "")) == name for entry in new):
+            continue  # the whole row is gone, an explicit removal rather than a partial edit
+        lost.extend(hosts - new_hosts.get(name, set()))
+    return sorted(set(lost))
 
 
 def unknown_statuses(systems: list[dict]) -> list[str]:
@@ -410,12 +479,26 @@ def refresh() -> tuple[bool, str]:
     try:
         touch_stamp()
         systems = parse_map(fetch_map_csv(load_config()))
+        lost = lost_protected_hosts(load_cache(), systems)
+        if lost:
+            shown = ", ".join(safe(host) for host in lost[:5])
+            if len(lost) > 5:
+                shown += f", and {len(lost) - 5} more"
+            raise ValueError(
+                f"the new map drops {len(lost)} host(s) the last good copy protects: {shown}. "
+                "To lift a protection on purpose, mark the row no API or delete the whole row"
+            )
         write_cache(systems)
     except Exception as error:  # noqa: BLE001, every failure keeps the last good copy
         message = f"{type(error).__name__}: {one_line(error, 300)}"
         log_event("refresh-failed", message)
         return False, message
     message = f"{len(systems)} systems"
+    unresolved = [f"{safe(entry['system'])} ({unresolved_reason(entry)})"
+                  for entry in systems if not entry.get("hosts")]
+    if unresolved:
+        message += (f", {len(unresolved)} unresolved, still needing real host evidence and "
+                    f"matched to no navigation: {', '.join(unresolved)}")
     unknown = unknown_statuses(systems)
     if unknown:
         message += (f", {len(unknown)} with a status that is not live, setting up or no API, so "

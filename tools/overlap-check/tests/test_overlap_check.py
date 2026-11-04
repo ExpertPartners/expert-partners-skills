@@ -22,6 +22,8 @@ sys.modules["overlap_check"] = oc
 spec.loader.exec_module(oc)
 
 REPO = "ExpertPartners/expert-partners-skills"
+BOT = {"login": "factory-droid[bot]", "id": 123, "type": "Bot", "html_url": "https://github.com/apps/factory-droid"}
+DEFAULT_HEAD = "a" * 40
 CFG = oc.Config(repo=REPO, settle_seconds=0)
 ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 NEVER_ASK = (
@@ -68,9 +70,30 @@ class FakeGitHub:
         # run id -> the build job's status, None when the run lists no build job yet, or a
         # GitHubError to raise. A run not named here has a build job in the run's status.
         self.builds = {}
+        self.activities = {}
+        self.refs = {}
 
     def get(self, path, params=None):
         self.calls.append(("GET", path, params))
+        if path == "/users/factory-droid%5Bbot%5D":
+            return dict(BOT)
+        if path == f"/repos/{REPO}":
+            return {"default_branch": "main"}
+        if path == f"/repos/{REPO}/activity":
+            branch = params["ref"].removeprefix("refs/heads/")
+            if branch in self.activities:
+                value = self.activities[branch]
+                if isinstance(value, Exception):
+                    raise value
+                return value
+            p = next(p for p in self.prs if p["head"]["ref"] == branch)
+            return [{"ref": params["ref"], "after": p["head"]["sha"], "actor": dict(BOT), "activity_type": "branch_creation"}]
+        if "/git/ref/heads/" in path:
+            branch = oc.urllib.parse.unquote(path.split("/git/ref/heads/", 1)[1])
+            sha = self.refs.get(branch)
+            if sha is None:
+                sha = DEFAULT_HEAD if branch == "main" else next(p["head"]["sha"] for p in self.prs if p["head"]["ref"] == branch)
+            return {"ref": f"refs/heads/{branch}", "object": {"sha": sha}}
         if "/actions/runs/" in path:
             jobs = path.endswith("/jobs")
             number = int(path.split("/actions/runs/", 1)[1].split("/")[0])
@@ -874,7 +897,7 @@ class Workflows(unittest.TestCase):
     def test_reusable_workflow_keeps_the_author_allowlist(self):
         text = self.read("factory-builder-reusable.yml")
         self.assertEqual(
-            text.count('["AllisonGaddy","expertpartners","expertpartners-ember","expertpartners-aura"]'), 2)
+            text.count('["AllisonGaddy","expertpartners","expertpartners-ember","expertpartners-aura"]'), 3)
         self.assertIn("workflow_call:", text)
         self.assertIn('python3 "$script" check', text)
         self.assertIn('python3 "$script" next', text)
@@ -904,7 +927,9 @@ class Workflows(unittest.TestCase):
         steps = [line.strip()[len("- name: "):] for line in build.splitlines() if line.strip().startswith("- name: ")]
         self.assertEqual(steps[:3], ["Checkout the overlap check", "Confirm this run still owns the job", "Checkout"])
         self.assertIn('python3 "$script" owner', build)
-        self.assertIn("ref: ${{ steps.owner.outputs.branch }}", build)
+        self.assertIn("ref: ${{ steps.owner.outputs.head }}", build)
+        self.assertLess(steps.index("Revalidate immutable checkout before build secrets"), steps.index("Verify and configure Factory ledger access"))
+        self.assertLess(steps.index("Revalidate immutable checkout before build secrets"), steps.index("Install Factory Droid"))
         self.assertLess(steps.index("Write automation prompt"), steps.index("Continue the job's existing pull request"))
         self.assertLess(steps.index("Continue the job's existing pull request"), steps.index("Run Factory Droid"))
         self.assertIn("if: steps.owner.outputs.note == 'true'", build)
@@ -1199,7 +1224,7 @@ class ExistingPullRequest(unittest.TestCase):
         fork["head"]["repo"] = {"full_name": "someone/fork"}
         gh = self.admitted([fork])
         code, out = Main.run_main(self, gh, ["owner"], OVERLAP_ISSUE="237", GITHUB_RUN_ID="900")
-        self.assertEqual(out, "pr=\nbranch=\nhead=\nnote=false\n")
+        self.assertEqual(out, f"pr=\nbranch=\nhead={DEFAULT_HEAD}\nnote=false\n")
         self.assertIsNone(oc.head_branch(dict(fork, head={"ref": "job/1-x; rm -rf /", "repo": {"full_name": REPO}}), REPO))
         self.assertIsNone(oc.head_branch(dict(fork, head={"ref": "job/../main", "repo": {"full_name": REPO}}), REPO))
 
@@ -1208,7 +1233,7 @@ class ExistingPullRequest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             note = os.path.join(d, "note.txt")
             code, out = Main.run_main(self, gh, ["owner"], OVERLAP_ISSUE="237", GITHUB_RUN_ID="900", OVERLAP_NOTE_FILE=note)
-            self.assertEqual((code, out), (0, "pr=\nbranch=\nhead=\nnote=false\n"))
+            self.assertEqual((code, out), (0, f"pr=\nbranch=\nhead={DEFAULT_HEAD}\nnote=false\n"))
             self.assertFalse(os.path.exists(note))
 
     def test_the_branch_handed_to_checkout_is_the_pull_request_head(self):
@@ -1243,13 +1268,150 @@ class ExistingPullRequest(unittest.TestCase):
             self.assertIn(head, open(note, encoding="utf-8").read())
 
             build = os.path.join(d, "build")
-            git("clone", "-q", "--branch", outputs["branch"], origin, build)
+            git("clone", "-q", origin, build)
+            git("checkout", "-q", "--detach", outputs["head"], cwd=build)
             self.assertEqual(git("rev-parse", "HEAD", cwd=build), outputs["head"])
+            # Execute the actual verification shell step against the pinned real checkout.
+            # The trusted API check is replaced by a bounded stand-in here; its failure
+            # cases are exercised above against the real Python implementation.
+            verifier = os.path.join(d, "trusted-verifier.py")
+            with open(verifier, "w", encoding="utf-8") as fh:
+                fh.write("import os, subprocess, sys\nassert sys.argv[1] == 'verify'\n"
+                         "assert subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip() == os.environ['OVERLAP_EXPECTED_HEAD']\n")
+            subprocess.run(["bash", "-e", "-o", "pipefail", "-c", BuildStepCommands().step("Revalidate immutable checkout before build secrets")],
+                           cwd=build, env=dict(env, FACTORY_CONTINUATION_CHECK=verifier,
+                                               OVERLAP_EXPECTED_HEAD=head, OVERLAP_EXPECTED_BRANCH=outputs["branch"]), check=True,
+                           capture_output=True)
+            self.assertEqual(git("status", "--porcelain", cwd=build), "", "branch attachment preserves clean access preflight")
             git("commit", "-q", "--allow-empty", "-m", "fix review finding", cwd=build)
             git("push", "-q", "origin", "HEAD", cwd=build)
             heads = git("for-each-ref", "--format=%(refname:short)", "refs/heads", cwd=origin).split()
             self.assertEqual(sorted(heads), sorted(["main", self.BRANCH]))
             self.assertEqual(git("rev-parse", f"{self.BRANCH}~1", cwd=origin), head, "the old head is kept")
+
+
+class AuthenticatedContinuation(unittest.TestCase):
+    def setup_pr(self):
+        p = pr(240, ["x/a.py"], closes=237)[1]
+        gh = FakeGitHub([issue(237, "x/a.py"), issue(238, "y/b.py", labels=("job", "waiting"))], [p])
+        return gh, p
+
+    def activity(self, p, **changes):
+        return dict({"ref": f"refs/heads/{p['head']['ref']}", "after": p["head"]["sha"],
+                     "actor": dict(BOT), "activity_type": "push"}, **changes)
+
+    def verify(self, gh, p, local=None, expected=None):
+        with mock.patch.object(oc.subprocess, "check_output", return_value=(local or p["head"]["sha"]) + "\n"):
+            return Main.run_main(self, gh, ["verify"], GITHUB_RUN_ID="900", OVERLAP_ISSUE="237",
+                                 OVERLAP_EXPECTED_PR="240", OVERLAP_EXPECTED_BRANCH=p["head"]["ref"],
+                                 OVERLAP_EXPECTED_HEAD=expected or p["head"]["sha"])[0]
+
+    def test_genuine_factory_branch_creation_push_and_force_push(self):
+        for kind in ("branch_creation", "push", "force_push"):
+            with self.subTest(kind=kind):
+                gh, p = self.setup_pr()
+                gh.activities[p["head"]["ref"]] = [self.activity(p, activity_type=kind)]
+                self.assertTrue(oc.run_check(gh, run_cfg(900), 237, sleep=NOOP))
+                self.assertEqual(self.verify(gh, p), 0)
+                call = next(c for c in gh.calls if c[1].endswith("/activity"))
+                self.assertEqual(call[2], {"ref": f"refs/heads/{p['head']['ref']}", "direction": "desc", "per_page": 1})
+                self.assertNotIn("actor", call[2], "a human's later push must not be hidden")
+                self.assertNotIn("activity_type", call[2], "branch creation and deletion must remain visible")
+
+    def test_branch_prefix_and_pr_author_do_not_authenticate_the_latest_push(self):
+        for author in ("factory-droid[bot]", "collaborator"):
+            with self.subTest(author=author):
+                gh, p = self.setup_pr()
+                p["user"]["login"] = author
+                gh.activities[p["head"]["ref"]] = [self.activity(p, actor={"id": 456, "login": "collaborator", "type": "User"})]
+                self.assertFalse(oc.run_check(gh, run_cfg(900), 237, sleep=NOOP))
+                self.assertEqual(gh.labels(237), {"job", "waiting"})
+                self.assertIn("remains with its current owner", gh.comment_bodies(237)[0])
+                self.assertFalse(oc.run_owner(gh, run_cfg(900), 237)[0])
+                self.assertEqual(oc.run_next(gh, CFG, NOOP), [238], "an independent job still starts")
+                self.assertEqual(len(gh.prs), 1, "no duplicate PR created")
+
+    def test_missing_ambiguous_stale_or_unreadable_activity_is_never_trust(self):
+        gh, p = self.setup_pr()
+        cases = [[], [self.activity(p), self.activity(p)], [self.activity(p, after="b" * 40)],
+                 [self.activity(p, ref="refs/heads/main")], [self.activity(p, activity_type="branch_deletion")],
+                 [self.activity(p, actor=dict(BOT, id=456))], None,
+                 oc.GitHubError(403, "Forbidden"), TimeoutError("unreadable latest page")]
+        for latest in cases:
+            with self.subTest(latest=type(latest).__name__):
+                gh.activities[p["head"]["ref"]] = latest
+                self.assertFalse(oc.trusted_head(gh, CFG, p))
+        gh.activities[p["head"]["ref"]] = oc.GitHubError(403, "Forbidden")
+        self.assertEqual(oc.run_next(gh, CFG, NOOP), [238])
+
+    def test_canonical_bot_identity_cannot_be_guessed_from_login(self):
+        gh, p = self.setup_pr()
+        original = gh.get
+        for wrong in (dict(BOT, type="User"), dict(BOT, id=0), dict(BOT, html_url="https://example.invalid")):
+            with self.subTest(wrong=wrong):
+                gh.get = lambda path, params=None: wrong if path.startswith("/users/") else original(path, params)
+                self.assertFalse(oc.trusted_head(gh, CFG, p))
+
+    def test_changed_ref_cannot_reuse_older_app_activity(self):
+        gh, p = self.setup_pr()
+        gh.refs[p["head"]["ref"]] = "b" * 40
+        self.assertFalse(oc.trusted_head(gh, CFG, p))
+
+    def test_head_mutation_after_selection_is_rejected_even_if_factory_pushed_it(self):
+        gh, p = self.setup_pr()
+        self.assertTrue(oc.run_check(gh, run_cfg(900), 237, sleep=NOOP))
+        old = p["head"]["sha"]
+        p["head"]["sha"] = "b" * 40
+        self.assertEqual(self.verify(gh, p, local=old, expected=old), 1)
+
+    def test_untrusted_mutation_after_selection_and_wrong_local_checkout_are_rejected(self):
+        gh, p = self.setup_pr()
+        self.assertTrue(oc.run_check(gh, run_cfg(900), 237, sleep=NOOP))
+        self.assertEqual(self.verify(gh, p, local="b" * 40), 1)
+        gh.activities[p["head"]["ref"]] = [self.activity(p, actor=dict(BOT, id=999))]
+        self.assertEqual(self.verify(gh, p), 1)
+
+    def test_default_checkout_is_explicit_and_new_pr_after_selection_cannot_duplicate(self):
+        gh, p = self.setup_pr()
+        gh.prs = []
+        self.assertTrue(oc.run_check(gh, run_cfg(900), 237, sleep=NOOP))
+        with mock.patch.object(oc.subprocess, "check_output", return_value=DEFAULT_HEAD + "\n"):
+            env = dict(GITHUB_RUN_ID="900", OVERLAP_ISSUE="237", OVERLAP_EXPECTED_PR="",
+                       OVERLAP_EXPECTED_BRANCH="", OVERLAP_EXPECTED_HEAD=DEFAULT_HEAD)
+            self.assertEqual(Main.run_main(self, gh, ["verify"], **env)[0], 0)
+            gh.prs = [p]
+            self.assertEqual(Main.run_main(self, gh, ["verify"], **env)[0], 1)
+
+    def test_fork_never_becomes_continuation_or_keeps_the_issue_in_progress(self):
+        gh, p = self.setup_pr()
+        p["head"]["repo"] = {"full_name": "attacker/fork"}
+        self.assertTrue(oc.run_check(gh, run_cfg(900), 237, sleep=NOOP))
+        self.assertEqual(oc.job_delivery(gh, CFG, 237).open, [])
+        self.assertEqual(oc.run_release(gh, run_cfg(900), 237, "success"), "released")
+        self.assertEqual(gh.labels(237), {"job"})
+
+    def test_untrusted_release_drops_stale_in_progress_without_dropping_real_file_holds(self):
+        gh, p = self.setup_pr()
+        self.assertTrue(oc.run_check(gh, run_cfg(900), 237, sleep=NOOP))
+        gh.activities[p["head"]["ref"]] = []
+        self.assertEqual(oc.run_release(gh, run_cfg(900), 237, "failure"), "waiting")
+        self.assertEqual(gh.labels(237), {"job", "waiting"})
+        gh.issues[239] = dict(issue(239, "x/a.py"), labels=[{"name": "job"}])
+        self.assertFalse(oc.run_check(gh, run_cfg(901), 239, sleep=NOOP), "the actual open PR still holds its files")
+        self.assertTrue(oc.run_check(gh, run_cfg(902), 238, sleep=NOOP))
+
+    def test_explicit_reopen_resumes_done_but_preserves_parked_and_live_owners(self):
+        for labels, live, start in ((["job", "done"], False, True), (["job", "done", "parked"], False, False),
+                                    (["job", "done"], True, False)):
+            with self.subTest(labels=labels, live=live):
+                gh = FakeGitHub([issue(237, "x/a.py", labels=labels)])
+                if live:
+                    gh.comments[237] = [{"id": 100, "user": {"login": oc.COMMENT_AUTHOR},
+                                         "body": f"{oc.MARKER}\n<!-- factory-overlap-run:800 -->"}]
+                    gh.runs[800] = "in_progress"
+                cfg = oc.Config(REPO, 0, "900", reopened=True)
+                self.assertEqual(oc.run_check(gh, cfg, 237, sleep=NOOP), start)
+                self.assertEqual("done" in gh.labels(237), not start)
 
 
 class MergedWinner(unittest.TestCase):
@@ -1410,7 +1572,7 @@ class BuildStepCommands(unittest.TestCase):
             os.makedirs(os.path.dirname(stub))
             with open(stub, "w", encoding="utf-8") as fh:
                 fh.write("import os, sys\nopen(os.environ['RECEIPT'], 'w').write(sys.argv[1] + ' ' + os.environ['OVERLAP_NOTE_FILE'])\n")
-            env = dict(os.environ, GITHUB_WORKSPACE=workspace, RUNNER_TEMP=runner_temp, RECEIPT=os.path.join(d, "receipt"))
+            env = dict(os.environ, GITHUB_WORKSPACE=workspace, RUNNER_TEMP=runner_temp, RECEIPT=os.path.join(d, "receipt"), GITHUB_ENV=os.path.join(d, "env"))
             subprocess.run(["bash", "-e", "-o", "pipefail", "-c", self.step("Confirm this run still owns the job")],
                            cwd=workspace, env=env, check=True)
             with open(os.path.join(d, "receipt"), encoding="utf-8") as fh:
@@ -1430,6 +1592,18 @@ class BuildStepCommands(unittest.TestCase):
             result = subprocess.run(["bash", "-e", "-o", "pipefail", "-c", self.step("Confirm this run still owns the job")],
                                     cwd=workspace, env=dict(os.environ, GITHUB_WORKSPACE=workspace, RUNNER_TEMP=runner_temp))
             self.assertNotEqual(result.returncode, 0)
+
+    def test_revalidation_refusal_stops_before_branch_attachment(self):
+        with tempfile.TemporaryDirectory() as d:
+            subprocess.run(["git", "init", "-q", d], check=True)
+            stub = os.path.join(d, "verify.py")
+            with open(stub, "w", encoding="utf-8") as fh:
+                fh.write("import sys\nsys.exit(1)\n")
+            result = subprocess.run(["bash", "-e", "-o", "pipefail", "-c", self.step("Revalidate immutable checkout before build secrets")],
+                                    cwd=d, env=dict(os.environ, FACTORY_CONTINUATION_CHECK=stub, OVERLAP_EXPECTED_BRANCH="job/1-work"),
+                                    capture_output=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertNotIn(b"git switch", result.stderr, "the failure came from the verifier, before branch attachment")
 
     def test_the_continuation_note_is_appended_to_the_prompt(self):
         with tempfile.TemporaryDirectory() as d:

@@ -131,7 +131,7 @@ def prove_access(client, job_id, repository):
         cursor = new_cursor
     else:
         raise PreflightError("Ledger MCP tool pagination exceeded the preflight limit.")
-    result = client.call("tools/call", {"name": "job_status", "arguments": {"job_id": job_id, "mission": ""}})
+    result = client.call("tools/call", {"name": "job_status", "arguments": {"job_id": job_id, "mission": "", "repo": repository}})
     if result.get("isError"):
         raise PreflightError("Read-only job_status failed; the access repair owner must inspect the server privately.")
     payloads = [result.get("structuredContent")]
