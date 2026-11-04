@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Re-extract a completed investigation from saved evidence with no network calls."""
+from __future__ import annotations
+
 import argparse
 import json
 from pathlib import Path
 from video_discovery import Investigation, classify
 
-def main():
+def main() -> None:
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('output',type=Path)
     args=p.parse_args()

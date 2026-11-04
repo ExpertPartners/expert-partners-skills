@@ -1,21 +1,40 @@
 """Optional text-only captions, bounded full CDX inventory and saved metadata imports."""
+from __future__ import annotations
+
 import hashlib
 import io
 import json
 import re
 from pathlib import Path
+from typing import TYPE_CHECKING, Protocol
 from urllib.parse import urlencode, urlsplit
 
 from video_discovery import (BINARY_EXT, MEDIA_EXT, VIDEO_ID, classify, domain,
                              identify_url, normalize_url, now)
 
+if TYPE_CHECKING:
+    from types import TracebackType
 
-def guarded_ydl(http, options):
+    from video_discovery import Investigation, JSONDict, PublicHTTP, Record, Reference, YDLRequest
+
+
+class GuardedYoutubeDL(Protocol):
+    def __enter__(self) -> GuardedYoutubeDL: ...
+    def __exit__(self, exc_type: type[BaseException] | None, exc: BaseException | None,
+                 tb: TracebackType | None) -> bool | None: ...
+    def extract_info(self, url: str, download: bool = ...) -> JSONDict | None: ...
+
+
+def guarded_ydl(http: PublicHTTP, options: JSONDict) -> GuardedYoutubeDL:
     import yt_dlp
-    from yt_dlp.networking import Response
+    from yt_dlp.networking.common import Response
 
     class GuardedYDL(yt_dlp.YoutubeDL):
-        def urlopen(self, request):
+        def __init__(self, params: JSONDict) -> None:
+            # Named, not super(): mypy's untyped_calls_exclude only recognizes a named method.
+            yt_dlp.YoutubeDL.__init__(self, params)
+
+        def urlopen(self, request: str | YDLRequest) -> Response:
             method = getattr(request, 'method', 'GET')
             if method not in {'GET', 'HEAD'}:
                 raise ValueError('Only public GET/HEAD are permitted')
@@ -23,6 +42,8 @@ def guarded_ydl(http, options):
             response = http.fetch(url, method=method)
             if response.result != 'ok':
                 raise ValueError('Public retrieval stopped: ' + response.result)
+            if response.status is None:
+                raise ValueError('Public retrieval returned no status')
             return Response(io.BytesIO(response.text.encode()), url=response.url,
                             headers=response.headers, status=response.status)
 
@@ -30,7 +51,7 @@ def guarded_ydl(http, options):
                           noplaylist=True, retries=0, extractor_retries=0, cachedir=False))
 
 
-def read_captions(inv, record, languages):
+def read_captions(inv: Investigation, record: Record, languages: list[str]) -> None:
     """yt-dlp selects subtitle tracks; our policy client retrieves text only."""
     if record.platform != 'youtube':
         return
@@ -75,7 +96,7 @@ def read_captions(inv, record, languages):
                                   time=now(), detail=str(exc)[:400]))
 
 
-def import_youtube_details(inv, path):
+def import_youtube_details(inv: Investigation, path: str | Path) -> None:
     """Import explicitly attributed saved connector evidence; never call that connector."""
     raw = Path(path).read_bytes()
     if len(raw) > 4_000_000:
@@ -83,7 +104,7 @@ def import_youtube_details(inv, path):
     batches = json.loads(raw)
     if not isinstance(batches, list):
         raise ValueError('Expected an array of saved-detail envelopes')
-    validated = []
+    validated: list[tuple[JSONDict, Reference, JSONDict]] = []
     for envelope in batches:
         if not isinstance(envelope, dict) or envelope.get('provider') != 'firecrawl':
             raise ValueError('Each saved record must identify provider firecrawl')
@@ -102,7 +123,7 @@ def import_youtube_details(inv, path):
     (Path(inv.args.output) / evidence).write_bytes(raw)
     for envelope, ref, data in validated:
         r = inv.catalog.add(ref, envelope['source_url'], 'saved_firecrawl_youtube_details')
-        metadata = {key: data[key] for key in ('title', 'channel_id', 'channel', 'channel_url', 'uploader', 'uploader_url') if key in data}
+        metadata: JSONDict = {key: data[key] for key in ('title', 'channel_id', 'channel', 'channel_url', 'uploader', 'uploader_url') if key in data}
         if data.get('is_unlisted') is True:
             metadata['availability'] = 'unlisted'
         inv.metadata(r, metadata, envelope['source_url'], 'saved_firecrawl_youtube_details')
@@ -120,7 +141,7 @@ def import_youtube_details(inv, path):
         limitation='Imported historical provider claims; no current playback observation or block bypass.'))
 
 
-def parse_cdx(text):
+def parse_cdx(text: str) -> tuple[list[dict[str, str]], str]:
     data, end = json.JSONDecoder().raw_decode(text.lstrip())
     tail = text.lstrip()[end:].strip()
     if not isinstance(data, list) or (data and not isinstance(data[0], list)):
@@ -139,12 +160,12 @@ def parse_cdx(text):
 ARCHIVE_TIMEOUT = 90
 
 
-def canonical(url):
+def canonical(url: str) -> str:
     """Compare archived captures by page: scheme and a leading www do not make a different target."""
     return re.sub(r'^https?://(?:www\.)?', 'https://', url)
 
 
-def full_archives(inv):
+def full_archives(inv: Investigation) -> None:
     """Inventory every returned row; follow resume keys within explicit hard caps."""
     supplied = [normalize_url('https://' + inv.root + '/'), normalize_url(inv.args.vimeo)]
     supplied += [normalize_url(url) for url in inv.args.site]
@@ -160,20 +181,20 @@ def full_archives(inv):
             raise ValueError('Archive target outside supplied public creator/platform scope: ' + target)
         if MEDIA_EXT.search(target) or re.search(r'/(?:login|account|logout|admin)(?:/|$)', urlsplit(target).path):
             raise ValueError('Archive target is not a public page/feed')
-    inventory = []
-    captures = set()
+    inventory: list[dict[str, str]] = []
+    captures: set[tuple[str, str]] = set()
     snapshot_count = 0
-    queues = []
+    queues: list[list[dict[str, str]]] = []
     # Wayback prefix queries are slow; keep the same budget but allow a longer read timeout.
     base_timeout = inv.http.timeout
     inv.http.timeout = max(base_timeout, ARCHIVE_TIMEOUT)
     try:
         for target in targets:
             resume = ''
-            seen_keys = set()
+            seen_keys: set[str] = set()
             exhausted = False
             index_pages = 0
-            queue = []
+            queue: list[dict[str, str]] = []
             for _ in range(max(1, min(inv.args.archive_index_pages, 100))):
                 params = dict(url=target, matchType='prefix', output='json', limit=1000, showResumeKey='true')
                 if resume:

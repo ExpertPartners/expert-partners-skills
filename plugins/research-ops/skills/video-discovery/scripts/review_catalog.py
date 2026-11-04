@@ -1,20 +1,29 @@
 #!/usr/bin/env python3
 """Review a fixed catalog offline, preserving its original evidence in a new directory."""
+from __future__ import annotations
+
 import argparse
 import json
 import shutil
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from video_discovery import Investigation, Record, classify, identify_url, now
 
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
-def verification_category(creator_owned=False, sample_viewable=False, third_party_credit=False):
+    from video_discovery import JSONDict
+
+
+def verification_category(creator_owned: bool = False, sample_viewable: bool = False,
+                          third_party_credit: bool = False) -> str:
     if creator_owned:
         return 'creator_owned_playable' if sample_viewable else 'creator_owned_playback_unconfirmed'
     return 'third_party_or_unrelated' if third_party_credit else 'unresolved'
 
 
-def matching_hits(video_id, batch):
+def matching_hits(video_id: str, batch: JSONDict | None) -> list[JSONDict]:
     hits = []
     for hit in (batch or {}).get('result', {}).get('data', {}).get('web', []):
         ref = identify_url(hit.get('url', ''))
@@ -25,7 +34,7 @@ def matching_hits(video_id, batch):
     return hits
 
 
-def valid_sample(record, sample):
+def valid_sample(record: Record, sample: JSONDict) -> bool:
     """Require bounded decoder evidence for this exact direct URL, never metadata alone."""
     return (
         record.platform == 'direct'
@@ -42,7 +51,8 @@ def valid_sample(record, sample):
     )
 
 
-def review(catalog, destination, samples=(), decisions=()):
+def review(catalog: str | Path, destination: str | Path, samples: Sequence[JSONDict] = (),
+           decisions: Sequence[JSONDict] = ()) -> JSONDict:
     catalog, destination = Path(catalog), Path(destination)
     if destination.exists():
         raise ValueError('Use a fresh output directory to preserve earlier evidence')
@@ -52,7 +62,10 @@ def review(catalog, destination, samples=(), decisions=()):
     records = [Record(**raw) for raw in data['records']]
     keys = {(r.platform, r.video_id) for r in records}
     by_key = {(r.platform, r.video_id): r for r in records}
-    sample_map, decision_map = {}, {}
+    sample_map: dict[tuple[str, str], JSONDict] = {}
+    decision_map: dict[tuple[str, str], JSONDict] = {}
+    sample: JSONDict | None
+    decision: JSONDict | None
     for sample in samples:
         key = ('direct', sample['video_id'])
         if key not in keys or key in sample_map:
@@ -113,10 +126,11 @@ def review(catalog, destination, samples=(), decisions=()):
                 basis = r.verification_basis.replace('|', '\\|').replace('\n', ' ')
                 report.write(f'| [{r.platform}:{r.video_id}]({r.url}) | {r.verification_category} | {basis} |\n')
     (destination / 'review-inputs.json').write_text(json.dumps(dict(samples=list(samples), decisions=list(decisions)), indent=2) + '\n')
-    return json.loads((destination / 'catalog.json').read_text())
+    result: JSONDict = json.loads((destination / 'catalog.json').read_text())
+    return result
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--catalog', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)

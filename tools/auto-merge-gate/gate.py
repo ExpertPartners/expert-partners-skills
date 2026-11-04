@@ -38,7 +38,9 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
+from collections.abc import Callable
 from dataclasses import dataclass, field
+from typing import Any, Protocol
 
 FACTORY_LOGIN = "factory-droid[bot]"
 CODEX_LOGIN = "chatgpt-codex-connector[bot]"
@@ -75,6 +77,9 @@ NOTE_BUMPS = ("patch", "minor", "major")
 NOTE_KEY_RE = re.compile(r"""^\s*(?:"([^"]+)"|'([^']+)'|([A-Za-z0-9._-]+))\s*:\s*(\S+?)\s*$""")
 NOTE_HINT = "The release step would refuse it and hold up every plugin's release; `.changeset/README.md` gives the format."
 
+# One object from the GitHub REST or GraphQL API, decoded from JSON.
+JSONDict = dict[str, Any]
+
 
 class GitHubError(Exception):
     def __init__(self, status: int, message: str):
@@ -90,7 +95,7 @@ class GitHub:
         self.token = token
         self.api_url = api_url.rstrip("/")
 
-    def _request(self, method: str, url: str, body=None):
+    def _request(self, method: str, url: str, body: JSONDict | None = None) -> tuple[Any, str]:
         if not url.startswith("http"):
             url = self.api_url + url
         data = json.dumps(body).encode() if body is not None else None
@@ -113,16 +118,16 @@ class GitHub:
             raise GitHubError(exc.code, detail) from None
         return (json.loads(raw) if raw else None), link
 
-    def get(self, path: str, params: dict | None = None):
+    def get(self, path: str, params: JSONDict | None = None) -> Any:
         if params:
             path += "?" + urllib.parse.urlencode(params)
         return self._request("GET", path)[0]
 
-    def paginate(self, path: str, key: str | None = None, params: dict | None = None) -> list:
+    def paginate(self, path: str, key: str | None = None, params: JSONDict | None = None) -> list[JSONDict]:
         query = dict(params or {})
         query.setdefault("per_page", 100)
-        url = f"{path}?{urllib.parse.urlencode(query)}"
-        items: list = []
+        url: str | None = f"{path}?{urllib.parse.urlencode(query)}"
+        items: list[JSONDict] = []
         while url:
             data, link = self._request("GET", url)
             items.extend(data[key] if key else data)
@@ -139,7 +144,7 @@ class GitHub:
             "nodes{isResolved comments(first:1){nodes{databaseId}}} pageInfo{hasNextPage endCursor}}}}}"
         )
         resolved: dict[int, bool] = {}
-        after = None
+        after: str | None = None
         while True:
             data, _ = self._request(
                 "POST", self.api_url + "/graphql",
@@ -156,14 +161,28 @@ class GitHub:
                 return resolved
             after = threads["pageInfo"]["endCursor"]
 
-    def post(self, path: str, body: dict):
+    def post(self, path: str, body: JSONDict) -> Any:
         return self._request("POST", path, body)[0]
 
-    def put(self, path: str, body: dict):
+    def put(self, path: str, body: JSONDict) -> Any:
         return self._request("PUT", path, body)[0]
 
-    def patch(self, path: str, body: dict):
+    def patch(self, path: str, body: JSONDict) -> Any:
         return self._request("PATCH", path, body)[0]
+
+
+class GitHubAPI(Protocol):
+    """The methods the gate calls on GitHub, met by GitHub and by the tests' fake."""
+
+    def get(self, path: str, params: JSONDict | None = None) -> Any: ...
+
+    def paginate(self, path: str, key: str | None = None, params: JSONDict | None = None) -> list[JSONDict]: ...
+
+    def post(self, path: str, body: JSONDict) -> Any: ...
+
+    def put(self, path: str, body: JSONDict) -> Any: ...
+
+    def patch(self, path: str, body: JSONDict) -> Any: ...
 
 
 @dataclass
@@ -182,7 +201,7 @@ class Decision:
     reasons: list[str] = field(default_factory=list)
     head_sha: str = ""
     issue: int | None = None
-    comments: list = field(default_factory=list)
+    comments: list[JSONDict] = field(default_factory=list)
 
 
 def job_issue_number(body: str | None) -> int | None:
@@ -190,9 +209,10 @@ def job_issue_number(body: str | None) -> int | None:
     return int(m.group(1)) if m else None
 
 
-def latest_codex_state(comments: list) -> dict | None:
+def latest_codex_state(comments: list[JSONDict]) -> JSONDict | None:
     """The codex-review-state JSON from Codex's most recently updated summary comment."""
-    best, best_at = None, ""
+    best: JSONDict | None = None
+    best_at = ""
     for c in comments:
         if (c.get("user") or {}).get("login") != CODEX_LOGIN:
             continue
@@ -209,7 +229,7 @@ def latest_codex_state(comments: list) -> dict | None:
     return best
 
 
-def has_clean_codex_receipt(comments: list, sha: str) -> bool:
+def has_clean_codex_receipt(comments: list[JSONDict], sha: str) -> bool:
     """Whether Codex posted a clean code review receipt for this head.
 
     When Codex's code review finds nothing it posts a codex-review-receipt:v1
@@ -232,7 +252,7 @@ def has_clean_codex_receipt(comments: list, sha: str) -> bool:
     return False
 
 
-def check_problems(gh, cfg: Config, sha: str) -> list[str]:
+def check_problems(gh: GitHubAPI, cfg: Config, sha: str) -> list[str]:
     problems: list[str] = []
     reported = 0
     runs = gh.paginate(f"/repos/{cfg.repo}/commits/{sha}/check-runs", key="check_runs")
@@ -292,7 +312,7 @@ def finding_title(body: str) -> str:
     return first[:120] or "(no text)"
 
 
-def parse_finding(comment: dict) -> Finding:
+def parse_finding(comment: JSONDict) -> Finding:
     body = comment.get("body") or ""
     return Finding(
         comment_id=comment.get("id"),
@@ -304,7 +324,7 @@ def parse_finding(comment: dict) -> Finding:
     )
 
 
-def codex_findings(gh, cfg: Config, number: int, sha: str) -> tuple[list[Finding], str | None]:
+def codex_findings(gh: GitHubAPI, cfg: Config, number: int, sha: str) -> tuple[list[Finding], str | None]:
     """Every inline finding Codex left, with whether its thread is resolved, and a note
     saying why thread states are unknown (None when they were all read)."""
     comments = gh.paginate(f"/repos/{cfg.repo}/pulls/{number}/comments")
@@ -369,7 +389,9 @@ def unexplained(kind: str, sha: str, findings: list[Finding], note: str | None) 
     return f"Codex {kind} review on {short} reports unresolved findings, but {why}."
 
 
-def security_problems(state: dict | None, sha: str, load) -> list[str]:
+def security_problems(
+    state: JSONDict | None, sha: str, load: Callable[[], tuple[list[Finding] | None, str | None]]
+) -> list[str]:
     security = (state or {}).get("security_review") or {}
     if security.get("commit_sha") != sha or security.get("has_unresolved_findings") is not True:
         return []
@@ -383,7 +405,12 @@ def security_problems(state: dict | None, sha: str, load) -> list[str]:
     return problems
 
 
-def codex_problems(state: dict | None, sha: str, findings=None, clean_receipt: bool = False) -> list[str]:
+def codex_problems(
+    state: JSONDict | None,
+    sha: str,
+    findings: Callable[[], tuple[list[Finding], str | None]] | None = None,
+    clean_receipt: bool = False,
+) -> list[str]:
     """findings is a callable returning (list of Finding, note), see codex_findings.
     It is called at most once, and only when the aggregate state says findings
     exist. clean_receipt says Codex posted a clean code review receipt for this
@@ -393,7 +420,7 @@ def codex_problems(state: dict | None, sha: str, findings=None, clean_receipt: b
     finding exists, each finding decides: P0, P1 and unreadable ones block, P2 and
     lower do not."""
     short = sha[:7]
-    loaded: list = []
+    loaded: list[tuple[list[Finding] | None, str | None]] = []
 
     def load() -> tuple[list[Finding] | None, str | None]:
         if not loaded:
@@ -450,7 +477,7 @@ def codex_problems(state: dict | None, sha: str, findings=None, clean_receipt: b
     return list(dict.fromkeys(problems))
 
 
-def mergeable_problems(pr: dict) -> list[str]:
+def mergeable_problems(pr: JSONDict) -> list[str]:
     mergeable = pr.get("mergeable")
     if mergeable is None:
         return ["GitHub is still computing whether the pull request can merge."]
@@ -464,7 +491,7 @@ class FileContentError(ValueError):
     request instead of failing the run, so one odd file never holds up the others."""
 
 
-def file_text(gh, cfg: Config, path: str, ref: str) -> str:
+def file_text(gh: GitHubAPI, cfg: Config, path: str, ref: str) -> str:
     data = gh.get(f"/repos/{cfg.repo}/contents/{urllib.parse.quote(path)}?ref={ref}")
     # Directories, symlinks, submodules and files over 1 MB come back without base64 content.
     if not isinstance(data, dict) or data.get("encoding") != "base64":
@@ -475,7 +502,7 @@ def file_text(gh, cfg: Config, path: str, ref: str) -> str:
         raise FileContentError(f"`{path}` at {ref[:7]} is not UTF-8 text, so it cannot be checked.") from None
 
 
-def listed_versions(path: str, text: str) -> dict:
+def listed_versions(path: str, text: str) -> dict[str, object]:
     """Plugin name to version for a marketplace file or a plugin manifest."""
     try:
         data = json.loads(text)
@@ -484,9 +511,13 @@ def listed_versions(path: str, text: str) -> dict:
     plugins = data.get("plugins", []) if isinstance(data, dict) else None
     if not isinstance(data, dict) or (path == MARKETPLACE_PATH and not isinstance(plugins, list)):
         raise FileContentError(f"`{path}` is not the JSON object it should be, so the gate cannot read the plugins in it.")
-    if path == MARKETPLACE_PATH:
+    # plugins is always a list here for the marketplace, the check above made sure.
+    if path == MARKETPLACE_PATH and isinstance(plugins, list):
         return {p["name"]: p.get("version") for p in plugins if isinstance(p, dict) and isinstance(p.get("name"), str)}
-    return {PLUGIN_MANIFEST_RE.match(path).group(1): data.get("version")}
+    manifest = PLUGIN_MANIFEST_RE.match(path)
+    if manifest is None:
+        raise FileContentError(f"`{path}` is neither the marketplace file nor a plugin manifest, so the gate cannot read the plugins in it.")
+    return {manifest.group(1): data.get("version")}
 
 
 def note_problem(text: str) -> tuple[str | None, list[str]]:
@@ -524,7 +555,7 @@ def note_problem(text: str) -> tuple[str | None, list[str]]:
     return None, names
 
 
-def note_problems(gh, cfg: Config, notes: list, head: str) -> list[str]:
+def note_problems(gh: GitHubAPI, cfg: Config, notes: list[JSONDict], head: str) -> list[str]:
     """A note the release step cannot read would stop every plugin's release on main,
     so the gate refuses it here, before it can merge."""
     problems: list[str] = []
@@ -558,7 +589,7 @@ def changelog_shape(text: str) -> tuple[list[str], int]:
     return lines[: heads[1] if len(heads) > 1 else len(lines)], len(heads)
 
 
-def release_file_problems(gh, cfg: Config, number: int, pr: dict) -> list[str]:
+def release_file_problems(gh: GitHubAPI, cfg: Config, number: int, pr: JSONDict) -> list[str]:
     """A pull request may not edit a plugin version or the top of a CHANGELOG.md.
     Brand new plugins and edits to older CHANGELOG entries are allowed."""
     files = [f for f in gh.paginate(f"/repos/{cfg.repo}/pulls/{number}/files") if f.get("status") != "removed"]
@@ -590,7 +621,7 @@ def release_file_problems(gh, cfg: Config, number: int, pr: dict) -> list[str]:
     return problems + note_problems(gh, cfg, notes, head)
 
 
-def release_file_change(gh, cfg: Config, f: dict, head: str, merge_base: str) -> list[str]:
+def release_file_change(gh: GitHubAPI, cfg: Config, f: JSONDict, head: str, merge_base: str) -> list[str]:
     path = f["filename"]
     added = f.get("status") == "added"
     before_path = f.get("previous_filename") or path
@@ -613,7 +644,7 @@ def release_file_change(gh, cfg: Config, f: dict, head: str, merge_base: str) ->
     ]
 
 
-def evaluate(gh, cfg: Config, number: int) -> Decision:
+def evaluate(gh: GitHubAPI, cfg: Config, number: int) -> Decision:
     pr = gh.get(f"/repos/{cfg.repo}/pulls/{number}")
 
     def skip(why: str) -> Decision:
@@ -685,7 +716,7 @@ def refusal_body(d: Decision) -> str:
     return "\n".join(lines)
 
 
-def post_refusal(gh, cfg: Config, d: Decision) -> None:
+def post_refusal(gh: GitHubAPI, cfg: Config, d: Decision) -> None:
     """One comment per head commit: post it once, then only edit it if the reasons change."""
     body = refusal_body(d)
     for c in d.comments:
@@ -699,7 +730,7 @@ def post_refusal(gh, cfg: Config, d: Decision) -> None:
     gh.post(f"/repos/{cfg.repo}/issues/{d.pr}/comments", {"body": body})
 
 
-def merge(gh, merger, cfg: Config, d: Decision) -> str | None:
+def merge(gh: GitHubAPI, merger: GitHubAPI, cfg: Config, d: Decision) -> str | None:
     try:
         result = merger.put(
             f"/repos/{cfg.repo}/pulls/{d.pr}/merge",
@@ -709,7 +740,7 @@ def merge(gh, merger, cfg: Config, d: Decision) -> str | None:
         d.reasons = [f"GitHub refused the squash merge: {exc.message}"]
         post_refusal(gh, cfg, d)
         return None
-    sha = (result or {}).get("sha", "")
+    sha: str = (result or {}).get("sha", "")
     if d.issue is None:
         return sha
     gh.post(f"/repos/{cfg.repo}/issues/{d.issue}/labels", {"labels": [DONE_LABEL]})
@@ -725,7 +756,7 @@ def merge(gh, merger, cfg: Config, d: Decision) -> str | None:
     return sha
 
 
-def target_prs(gh, cfg: Config, event_name: str, event: dict, dispatch_pr: str = "") -> list[int]:
+def target_prs(gh: GitHubAPI, cfg: Config, event_name: str, event: JSONDict, dispatch_pr: str = "") -> list[int]:
     if event_name in PR_EVENTS:
         return [int(event["pull_request"]["number"])]
     if event_name == "issue_comment":
@@ -735,7 +766,7 @@ def target_prs(gh, cfg: Config, event_name: str, event: dict, dispatch_pr: str =
         return [int(dispatch_pr.strip())]
     # schedule, check_suite and a dispatch without a number sweep every open pull request.
     open_prs = gh.paginate(f"/repos/{cfg.repo}/pulls", params={"state": "open"})
-    def wanted(p: dict) -> bool:
+    def wanted(p: JSONDict) -> bool:
         if (p.get("user") or {}).get("login") == FACTORY_LOGIN:
             return True
         return bool(cfg.merge_label) and cfg.merge_label in {
@@ -750,7 +781,9 @@ def is_excluded_repo(repo: str) -> bool:
     return repo.split("/")[-1].lower() == "ember"
 
 
-def run_plan(gh, cfg: Config, event_name: str, event: dict, dispatch_pr: str = "", errors: list | None = None) -> list[int]:
+def run_plan(
+    gh: GitHubAPI, cfg: Config, event_name: str, event: JSONDict, dispatch_pr: str = "", errors: list[str] | None = None
+) -> list[int]:
     if is_excluded_repo(cfg.repo):
         print(f"auto-merge-gate: {cfg.repo} is excluded; nothing to do.")
         return []
@@ -771,7 +804,7 @@ def run_plan(gh, cfg: Config, event_name: str, event: dict, dispatch_pr: str = "
     return ready
 
 
-def run_merge(gh, merger, cfg: Config, numbers: list[int], errors: list | None = None) -> list[str]:
+def run_merge(gh: GitHubAPI, merger: GitHubAPI, cfg: Config, numbers: list[int], errors: list[str] | None = None) -> list[str]:
     if is_excluded_repo(cfg.repo):
         print(f"auto-merge-gate: {cfg.repo} is excluded; nothing to do.")
         return []

@@ -7,21 +7,32 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 
+/** @param {string | Buffer} bytes */
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
+/** @param {string} a @param {string} b */
 const byteOrder = (a, b) => Buffer.compare(Buffer.from(a), Buffer.from(b));
+/** @type {(root: string, args: string[]) => Buffer} */
 const git = (root, args) => execFileSync('git', ['--no-replace-objects', '-C', root, ...args],
   { stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 32 * 1024 * 1024 });
+/** @param {string} p */
 const safePath = p => p && !path.posix.isAbsolute(p) && !/[\\\r\n\0]/.test(p)
   && p.split('/').every(part => part && part !== '.' && part !== '..');
+/** @param {string} p */
 const junk = p => {
   const parts = p.split('/');
-  const base = parts.at(-1);
+  const base = /** @type {string} */ (parts.at(-1)); // split always yields at least one part
   return ['checksums.sha256', '.DS_Store'].includes(base) || base.startsWith('._')
     || base.endsWith('.pyc') || parts.slice(0, -1).includes('__pycache__');
 };
 
+/**
+ * @param {string} dir
+ * @returns {Map<string, Buffer>}
+ */
 function deployedFiles(dir) {
+  /** @type {Map<string, Buffer>} */
   const files = new Map();
+  /** @param {string} at */
   function visit(at, prefix = '') {
     for (const entry of fs.readdirSync(at, { withFileTypes: true })) {
       const rel = prefix + entry.name;
@@ -37,14 +48,22 @@ function deployedFiles(dir) {
 }
 
 // Byte-for-byte checksum manifest emitted by deploy-skill.sh manifest().
+/** @param {Map<string, Buffer>} files */
 function manifest(files) {
   return [...files.keys()].sort(byteOrder)
-    .map(rel => `${sha256(files.get(rel))}  ./${rel}\n`).join('');
+    .map(rel => `${sha256(/** @type {Buffer} */ (files.get(rel)))}  ./${rel}\n`).join('');
 }
 
+/**
+ * @param {string} root
+ * @param {string} commit
+ * @param {string} dir
+ * @returns {Map<string, Buffer>}
+ */
 function committedFiles(root, commit, dir) {
   const entries = git(root, ['ls-tree', '-r', '-z', commit, '--', `${dir}/`])
     .toString('utf8').split('\0').filter(Boolean);
+  /** @type {Map<string, Buffer>} */
   const files = new Map();
   for (const entry of entries) {
     const match = entry.match(/^(\d+) (\w+) ([a-f0-9]+)\t([\s\S]+)$/);
@@ -62,22 +81,36 @@ function committedFiles(root, commit, dir) {
   return files;
 }
 
+/**
+ * @param {string} root
+ * @param {string} commit
+ * @param {string} canonicalPath
+ * @param {Map<string, Buffer>} files caller has checked it holds SKILL.md
+ * @returns {string}
+ */
 function pipelineStamp(root, commit, canonicalPath, files) {
   // Plugin-only EPS skills use the plugin release; standalone and external
   // skills use the first vX.Y line (all matches on that line), else a tree hash.
   const plugin = canonicalPath.match(/^plugins\/([^/]+)\/skills\/[^/]+\/SKILL\.md$/);
   if (plugin) {
-    const metadata = JSON.parse(git(root,
-      ['show', `${commit}:plugins/${plugin[1]}/.claude-plugin/plugin.json`]).toString('utf8'));
+    const metadata = /** @type {{ version?: unknown }} */ (JSON.parse(git(root,
+      ['show', `${commit}:plugins/${plugin[1]}/.claude-plugin/plugin.json`]).toString('utf8')));
     if (typeof metadata.version !== 'string' || !metadata.version) throw new Error('invalid historical plugin version');
     return metadata.version;
   }
-  const text = files.get('SKILL.md').toString('utf8');
+  const text = /** @type {Buffer} */ (files.get('SKILL.md')).toString('utf8');
   const versionLine = text.split('\n').find(line => /v[0-9]+\.[0-9]+/.test(line));
-  return versionLine ? versionLine.match(/v[0-9]+\.[0-9]+/g).join('\n')
+  return versionLine ? /** @type {RegExpMatchArray} */ (versionLine.match(/v[0-9]+\.[0-9]+/g)).join('\n')
     : `tree sha256 ${sha256(manifest(files)).slice(0, 12)}`;
 }
 
+/**
+ * @param {Buffer} source
+ * @param {string} canonicalLabel
+ * @param {string} stamp
+ * @param {string} date
+ * @returns {Buffer}
+ */
 function renderSkill(source, canonicalLabel, stamp, date) {
   const text = source.toString('utf8');
   if (!Buffer.from(text).equals(source)) throw new Error('historical SKILL.md is not UTF-8');
@@ -93,6 +126,15 @@ function renderSkill(source, canonicalLabel, stamp, date) {
   return Buffer.from(lines.join('\n'));
 }
 
+/**
+ * @param {object} input
+ * @param {string} input.root
+ * @param {string} input.canonicalPath
+ * @param {string} input.canonicalLabel
+ * @param {string} input.deployedDir
+ * @param {{ date: string, stamp: string }} input.header
+ * @param {string} input.stripped
+ */
 export function proveHistoricalDeployment({ root, canonicalPath, canonicalLabel, deployedDir, header, stripped }) {
   try {
     if (!safePath(canonicalPath)) throw new Error('unsafe canonical path');
@@ -124,12 +166,12 @@ export function proveHistoricalDeployment({ root, canonicalPath, canonicalLabel,
       const stamp = pipelineStamp(root, commit, canonicalPath, files);
       if (stamp !== header.stamp) continue;
       files.set('SKILL.md', renderSkill(source, canonicalLabel, stamp, header.date));
-      if (files.size !== deployed.size || [...files].some(([rel, bytes]) => !deployed.has(rel) || !bytes.equals(deployed.get(rel)))) continue;
+      if (files.size !== deployed.size || [...files].some(([rel, bytes]) => !deployed.has(rel) || !bytes.equals(/** @type {Buffer} */ (deployed.get(rel))))) continue;
       const blob = git(root, ['rev-parse', `${commit}:${canonicalPath}`]).toString('utf8').trim();
       return { commit, blob };
     }
     throw new Error('no exact prior committed canonical render in available first-parent history (fetch full history if shallow)');
   } catch (error) {
-    return { error: error.message };
+    return { error: /** @type {Error} */ (error).message };
   }
 }

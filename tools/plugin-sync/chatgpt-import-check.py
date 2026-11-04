@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[2]
 HEX = re.compile(r"^#[0-9A-Fa-f]{6}$")
 
 
-def check_svg(path: Path, errs: list, label: str) -> None:
+def check_svg(path: Path, errs: list[str], label: str) -> None:
     if path.suffix.lower() != ".svg":
         return
     text = path.read_text(encoding="utf-8")
@@ -41,7 +41,7 @@ def check_svg(path: Path, errs: list, label: str) -> None:
         errs.append(f"{label}: svg is smaller than 48x48")
 
 
-def check_agent_yaml(skill: Path, errs: list) -> None:
+def check_agent_yaml(skill: Path, errs: list[str]) -> None:
     f = skill / "agents" / "openai.yaml"
     if not f.exists():
         return
@@ -85,8 +85,8 @@ def check_agent_yaml(skill: Path, errs: list) -> None:
         errs.append(f"{label}: only dependencies.tools is supported")
 
 
-def check_plugin(plug: Path) -> list:
-    errs = []
+def check_plugin(plug: Path) -> list[str]:
+    errs: list[str] = []
     pn = plug.name
     mf = plug / ".claude-plugin" / "plugin.json"
     m = json.loads(mf.read_text(encoding="utf-8"))

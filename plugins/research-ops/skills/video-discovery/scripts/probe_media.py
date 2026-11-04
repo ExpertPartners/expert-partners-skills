@@ -4,6 +4,8 @@
 Never reads a full video. Requires an existing catalog and ffmpeg; shares the saved
 request budget and blocking state. Does not establish end-to-end player playback.
 """
+from __future__ import annotations
+
 import argparse
 import hashlib
 import json
@@ -12,20 +14,24 @@ import shutil
 import subprocess
 import time
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import requests
 from operational_logging import OperationalRun
 from video_discovery import Fetch, Investigation, Record, classify, domain, now, request_delay
 
+if TYPE_CHECKING:
+    from video_discovery import PublicHTTP
 
-def valid_range(headers, requested):
+
+def valid_range(headers: dict[str, str], requested: int) -> bool:
     match=re.fullmatch(r'bytes 0-(\d+)/(\d+)',headers.get('content-range',''))
     if not match:return False
     end,total=map(int,match.groups())
     return end==requested-1 and total>requested*2
 
 
-def sample(http,url,size):
+def sample(http: PublicHTTP,url: str,size: int) -> tuple[bytes | None, str]:
     if not http.public_url(url):return None,'unsafe_or_unresolvable_url'
     d=domain(url)
     if d in http.stopped:return None,'domain_stopped'
@@ -64,7 +70,7 @@ def sample(http,url,size):
     return None,'network_error'
 
 
-def decode_frame(body):
+def decode_frame(body: bytes) -> tuple[bool, str]:
     if not shutil.which('ffmpeg'):return False,'ffmpeg unavailable'
     try:
         proc=subprocess.run(['ffmpeg','-hide_banner','-loglevel','error','-protocol_whitelist','pipe',
@@ -76,14 +82,14 @@ def decode_frame(body):
     except (OSError,subprocess.TimeoutExpired) as exc:return False,str(exc)[:300]
 
 
-def main():
+def main() -> None:
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('output',type=Path);p.add_argument('--max-bytes',type=int,default=524288)
     args=p.parse_args()
     with OperationalRun('probe') as op:probe(args,op)
 
 
-def probe(args,op):
+def probe(args: argparse.Namespace,op: OperationalRun) -> None:
     data=json.loads((args.output/'catalog.json').read_text())
     config=data['configuration'];config['resume']=True;config['output']=str(args.output)
     inv=Investigation(argparse.Namespace(**config))
