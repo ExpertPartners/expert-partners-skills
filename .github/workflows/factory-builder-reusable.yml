@@ -36,7 +36,17 @@ name: Factory Builder (reusable)
         description: Model the Factory droid runs on
         type: string
         default: claude-opus-5-5
+      ledger_access_enabled:
+        description: Require authenticated ledger access for this provisioned caller
+        type: boolean
+        default: false
+      ledger_mcp_url:
+        description: Approved Factory bearer MCP endpoint
+        type: string
+        default: ""
     secrets:
+      FACTORY_LEDGER_MCP_TOKEN:
+        required: false
       FACTORY_API_KEY:
         required: true
 permissions:
@@ -110,6 +120,43 @@ jobs:
         run: |
           curl --retry 5 --retry-delay 2 --retry-all-errors -fsSL https://app.factory.ai/cli | sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Assert clean caller checkout before access setup
+        if: ${{ inputs.ledger_access_enabled }}
+        run: |
+          git status --porcelain=v1 --untracked-files=all > "$RUNNER_TEMP/factory-access-caller-before"
+          if [ -s "$RUNNER_TEMP/factory-access-caller-before" ]; then
+            echo "::error::Caller checkout must be clean before Factory access setup."
+            exit 1
+          fi
+      - name: Checkout canonical Factory access preflight
+        if: ${{ inputs.ledger_access_enabled }}
+        uses: actions/checkout@v4
+        with:
+          repository: ExpertPartners/expert-partners-skills
+          ref: main
+          path: .factory-access-tools
+          persist-credentials: false
+          sparse-checkout: tools/factory-access
+      - name: Stage canonical helper outside caller checkout
+        if: ${{ inputs.ledger_access_enabled }}
+        shell: bash
+        run: |
+          helper_dir=$(mktemp -d "$RUNNER_TEMP/factory-access-tools.XXXXXX")
+          mv "$GITHUB_WORKSPACE/.factory-access-tools" "$helper_dir/source"
+          printf 'FACTORY_ACCESS_PREFLIGHT=%s\n' "$helper_dir/source/tools/factory-access/preflight.py" >> "$GITHUB_ENV"
+          git status --porcelain=v1 --untracked-files=all > "$RUNNER_TEMP/factory-access-caller-after-stage"
+          cmp "$RUNNER_TEMP/factory-access-caller-before" "$RUNNER_TEMP/factory-access-caller-after-stage"
+      - name: Verify and configure Factory ledger access
+        if: ${{ inputs.ledger_access_enabled }}
+        timeout-minutes: 3
+        env:
+          FACTORY_LEDGER_MCP_URL: ${{ inputs.ledger_mcp_url || vars.FACTORY_LEDGER_MCP_URL }}
+          FACTORY_LEDGER_MCP_TOKEN: ${{ secrets.FACTORY_LEDGER_MCP_TOKEN }}
+          FACTORY_LEDGER_JOB_ID: ${{ github.event.issue.number || github.event.inputs.issue }}
+        run: |
+          python3 "$FACTORY_ACCESS_PREFLIGHT"
+          git status --porcelain=v1 --untracked-files=all > "$RUNNER_TEMP/factory-access-caller-after-preflight"
+          cmp "$RUNNER_TEMP/factory-access-caller-before" "$RUNNER_TEMP/factory-access-caller-after-preflight"
       - name: Write automation prompt
         env:
           FACTORY_AUTOMATION_PROMPT: "You are the Builder for Expert Partners' Chat to Code Loop. Act only when this run was started by the label job being added to an issue, by a new issue whose title begins with Job: that this workflow labeled job when it opened, by a comment that begins with Factory, build this job on an issue that carries the label job, or by a manual dispatch whose issue input names such an issue; otherwise exit with no changes. The triggering GitHub event is in the JSON file named by the GITHUB_EVENT_PATH environment variable, read it to find the issue number (for a manual dispatch it is inputs.issue). Read the issue in full. Its body holds the mission, objective, files in scope, acceptance checks and decisions already made. Follow CLAUDE.md and AGENTS.md if present. Add the label in-progress to the issue. Work only inside the files in scope, run tools/validate-job.sh until it prints validate-job: PASS, push a branch named job/<issue number>-<short slug>, and open exactly one pull request into main whose body starts with the line Closes #<issue number> and then lists each acceptance check as PASS or FAIL with the command output as evidence. Never push to main or merge. If anything is unclear, open the pull request as a draft and say exactly what is unclear. Never ask the user inside Factory. Put any question on the GitHub issue as a comment starting Question for Allison, or on the job list as needs-allison with a line starting Recommend:, and keep working on everything else."
@@ -181,10 +228,18 @@ jobs:
           fi
           gh issue edit "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --add-label job
       - name: Run Factory Droid
-        run: droid exec --auto high -m "$FACTORY_MODEL" -f "$RUNNER_TEMP/factory-automation-prompt.txt"
+        shell: bash
+        run: |
+          extra_tools=()
+          if [ "$FACTORY_LEDGER_ACCESS_ENABLED" = "true" ]; then
+            extra_tools=(--add-tools MCP:factory-ledger)
+          fi
+          droid exec --auto high "${extra_tools[@]}" -m "$FACTORY_MODEL" -f "$RUNNER_TEMP/factory-automation-prompt.txt"
         env:
           FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
           FACTORY_MODEL: ${{ inputs.model }}
+          FACTORY_LEDGER_ACCESS_ENABLED: ${{ inputs.ledger_access_enabled }}
+          FACTORY_LEDGER_MCP_TOKEN: ${{ inputs.ledger_access_enabled && secrets.FACTORY_LEDGER_MCP_TOKEN || '' }}
 
   release:
     # A build that ends without a pull request for its job must not keep holding its files.
