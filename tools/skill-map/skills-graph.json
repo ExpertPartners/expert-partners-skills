@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "4ed3e3252a154c731b6d421aa786e9a736200e32"
+    "eps": "a2f72641434f0b9141cfedab8dd423e79d827a7e"
   },
   "zones": [
     "surfaces",
@@ -92,6 +92,33 @@
         "annotationHeight": 15,
         "subtitleLines": [
           "ACN inbox sweep, deadlines first"
+        ]
+      }
+    },
+    {
+      "id": "action-item-closeout",
+      "source": "eps:plugins/operating-doctrine/skills/action-item-closeout/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "no advice-only endings",
+      "renderNote": null,
+      "layout": {
+        "x": 887.5,
+        "y": 6088.2,
+        "width": 192,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "no advice-only endings"
         ]
       }
     },
@@ -221,7 +248,7 @@
       "renderNote": null,
       "layout": {
         "x": 902,
-        "y": 5684.2,
+        "y": 6551.2,
         "width": 163,
         "height": 63,
         "rectHeight": 48,
@@ -251,7 +278,7 @@
       "renderNote": null,
       "layout": {
         "x": 1144,
-        "y": 6045.5,
+        "y": 5583.2,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -509,7 +536,7 @@
       "renderNote": null,
       "layout": {
         "x": 877.5,
-        "y": 6335.2,
+        "y": 6840.2,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -751,8 +778,8 @@
       "subtitle": "paste block routing and the job list",
       "renderNote": null,
       "layout": {
-        "x": 1430,
-        "y": 5850.2,
+        "x": 1420,
+        "y": 5878.8,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -887,7 +914,7 @@
       "renderNote": null,
       "layout": {
         "x": 1165,
-        "y": 5947.5,
+        "y": 5824.8,
         "width": 215,
         "height": 77,
         "rectHeight": 62,
@@ -941,7 +968,7 @@
       "renderNote": null,
       "layout": {
         "x": 1144,
-        "y": 6537.2,
+        "y": 5684.2,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -998,7 +1025,7 @@
       "renderNote": null,
       "layout": {
         "x": 872,
-        "y": 6537.2,
+        "y": 5684.2,
         "width": 252,
         "height": 77,
         "rectHeight": 62,
@@ -1055,7 +1082,7 @@
       "renderNote": null,
       "layout": {
         "x": 843,
-        "y": 6147.2,
+        "y": 6349.2,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -1140,7 +1167,7 @@
       "renderNote": null,
       "layout": {
         "x": 877.5,
-        "y": 7129.2,
+        "y": 6638.2,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1670,7 +1697,7 @@
       "renderNote": null,
       "layout": {
         "x": 877.5,
-        "y": 6840.2,
+        "y": 5496.2,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1698,7 +1725,7 @@
       "renderNote": null,
       "layout": {
         "x": 880.5,
-        "y": 6638.2,
+        "y": 5785.2,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -1726,7 +1753,7 @@
       "renderNote": null,
       "layout": {
         "x": 880.5,
-        "y": 6248.2,
+        "y": 5409.2,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -1756,7 +1783,7 @@
       "renderNote": null,
       "layout": {
         "x": 894,
-        "y": 5872.2,
+        "y": 5886.2,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -2072,8 +2099,8 @@
       "subtitle": "run the repo-standards gate, then bootstrap a justified project",
       "renderNote": null,
       "layout": {
-        "x": 1448,
-        "y": 5735.2,
+        "x": 1438,
+        "y": 5671.3,
         "width": 212,
         "height": 91,
         "rectHeight": 76,
@@ -2256,7 +2283,7 @@
       "renderNote": null,
       "layout": {
         "x": 1171,
-        "y": 5846.5,
+        "y": 6424.5,
         "width": 182,
         "height": 77,
         "rectHeight": 62,
@@ -2393,7 +2420,7 @@
       "renderNote": null,
       "layout": {
         "x": 910.5,
-        "y": 5973.2,
+        "y": 5597.2,
         "width": 146,
         "height": 63,
         "rectHeight": 48,
@@ -2553,7 +2580,7 @@
       "renderNote": null,
       "layout": {
         "x": 872.5,
-        "y": 7042.2,
+        "y": 6262.2,
         "width": 222,
         "height": 63,
         "rectHeight": 48,
@@ -2665,7 +2692,7 @@
       "renderNote": null,
       "layout": {
         "x": 868.5,
-        "y": 6436.2,
+        "y": 5987.2,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -2692,8 +2719,8 @@
       "subtitle": "model and effort fit-check at conversation start",
       "renderNote": null,
       "layout": {
-        "x": 1430,
-        "y": 6058.3,
+        "x": 1420,
+        "y": 5570.3,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -2724,7 +2751,7 @@
       "renderNote": null,
       "layout": {
         "x": 888,
-        "y": 5771.2,
+        "y": 6450.2,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -2752,7 +2779,7 @@
       "renderNote": null,
       "layout": {
         "x": 886.5,
-        "y": 6941.2,
+        "y": 7042.2,
         "width": 194,
         "height": 77,
         "rectHeight": 62,
@@ -3146,7 +3173,7 @@
       "renderNote": null,
       "layout": {
         "x": 871.5,
-        "y": 6060.2,
+        "y": 6175.2,
         "width": 224,
         "height": 63,
         "rectHeight": 48,
@@ -3285,7 +3312,7 @@
       "renderNote": null,
       "layout": {
         "x": 843,
-        "y": 5583.2,
+        "y": 6941.2,
         "width": 281,
         "height": 77,
         "rectHeight": 62,
@@ -3413,6 +3440,12 @@
       "points": null
     },
     {
+      "from": "action-item-closeout",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
       "from": "ag-luxury-brand",
       "to": "operating-doctrine",
       "type": "inherits",
@@ -3437,19 +3470,19 @@
       "points": [
         {
           "x": 1380,
-          "y": 6071.2
+          "y": 5634.5
+        },
+        {
+          "x": 1400,
+          "y": 5634.5
+        },
+        {
+          "x": 1400,
+          "y": 5889.8
         },
         {
           "x": 1420,
-          "y": 6071.2
-        },
-        {
-          "x": 1420,
-          "y": 5916.2
-        },
-        {
-          "x": 1430,
-          "y": 5916.2
+          "y": 5889.8
         }
       ]
     },
@@ -3460,11 +3493,11 @@
       "points": [
         {
           "x": 1380,
-          "y": 6096.8
+          "y": 5608.8
         },
         {
-          "x": 1430,
-          "y": 6096.8
+          "x": 1420,
+          "y": 5608.8
         }
       ]
     },
@@ -3652,11 +3685,11 @@
         },
         {
           "x": 780,
-          "y": 6185.7
+          "y": 6387.7
         },
         {
           "x": 843,
-          "y": 6185.7
+          "y": 6387.7
         }
       ]
     },
@@ -3723,12 +3756,20 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 1430,
-          "y": 5872.2
+          "x": 1420,
+          "y": 5922.8
+        },
+        {
+          "x": 1390,
+          "y": 5922.8
+        },
+        {
+          "x": 1390,
+          "y": 6450.2
         },
         {
           "x": 1353,
-          "y": 5872.2
+          "y": 6450.2
         }
       ]
     },
@@ -3757,19 +3798,19 @@
       "points": [
         {
           "x": 1380,
-          "y": 5986
+          "y": 5863.3
         },
         {
-          "x": 1400,
-          "y": 5986
+          "x": 1390,
+          "y": 5863.3
         },
         {
-          "x": 1400,
-          "y": 5894.2
+          "x": 1390,
+          "y": 5900.8
         },
         {
-          "x": 1430,
-          "y": 5894.2
+          "x": 1420,
+          "y": 5900.8
         }
       ]
     },
@@ -3798,11 +3839,11 @@
       "points": [
         {
           "x": 1124,
-          "y": 6575.7
+          "y": 5722.7
         },
         {
           "x": 1144,
-          "y": 6575.7
+          "y": 5722.7
         }
       ]
     },
@@ -4067,27 +4108,11 @@
       "points": [
         {
           "x": 1124,
-          "y": 5923.5
+          "y": 5911.8
         },
         {
-          "x": 1134,
-          "y": 5923.5
-        },
-        {
-          "x": 1134,
-          "y": 6034.5
-        },
-        {
-          "x": 1410,
-          "y": 6034.5
-        },
-        {
-          "x": 1410,
-          "y": 5905.2
-        },
-        {
-          "x": 1430,
-          "y": 5905.2
+          "x": 1420,
+          "y": 5911.8
         }
       ]
     },
@@ -4098,11 +4123,19 @@
       "points": [
         {
           "x": 1124,
-          "y": 5897.8
+          "y": 5937.5
+        },
+        {
+          "x": 1134,
+          "y": 5937.5
+        },
+        {
+          "x": 1134,
+          "y": 6450.2
         },
         {
           "x": 1171,
-          "y": 5897.8
+          "y": 6450.2
         }
       ]
     },
@@ -4191,15 +4224,15 @@
       "type": "calls",
       "points": [
         {
-          "x": 1660,
-          "y": 5780.7
+          "x": 1650,
+          "y": 5716.8
         },
         {
-          "x": 1697,
-          "y": 5780.7
+          "x": 1687,
+          "y": 5716.8
         },
         {
-          "x": 1697,
+          "x": 1687,
           "y": 8045
         },
         {
@@ -4229,19 +4262,19 @@
       "points": [
         {
           "x": 1353,
-          "y": 5897.8
+          "y": 6475.8
         },
         {
-          "x": 1390,
-          "y": 5897.8
+          "x": 1400,
+          "y": 6475.8
         },
         {
-          "x": 1390,
-          "y": 5883.2
+          "x": 1400,
+          "y": 5933.8
         },
         {
-          "x": 1430,
-          "y": 5883.2
+          "x": 1420,
+          "y": 5933.8
         }
       ]
     },
@@ -4376,19 +4409,27 @@
       "points": [
         {
           "x": 1124,
-          "y": 5796.8
+          "y": 6501.5
         },
         {
-          "x": 1390,
-          "y": 5796.8
+          "x": 1134,
+          "y": 6501.5
         },
         {
-          "x": 1390,
-          "y": 5861.2
+          "x": 1134,
+          "y": 6511.5
         },
         {
-          "x": 1430,
-          "y": 5861.2
+          "x": 1410,
+          "y": 6511.5
+        },
+        {
+          "x": 1410,
+          "y": 5944.8
+        },
+        {
+          "x": 1420,
+          "y": 5944.8
         }
       ]
     },
@@ -4399,19 +4440,11 @@
       "points": [
         {
           "x": 1124,
-          "y": 5822.5
-        },
-        {
-          "x": 1134,
-          "y": 5822.5
-        },
-        {
-          "x": 1134,
-          "y": 5872.2
+          "y": 6475.8
         },
         {
           "x": 1171,
-          "y": 5872.2
+          "y": 6475.8
         }
       ]
     },
@@ -4629,7 +4662,7 @@
   "excluded": [],
   "layout": {
     "engine": "elkjs layered, single INCLUDE_CHILDREN hierarchy over zones and brand rooms, build-time only",
-    "width": 1705,
+    "width": 1695,
     "height": 8053,
     "zones": [
       {
@@ -4751,9 +4784,9 @@
         "label": "Session machinery",
         "caption": "routing, ledgers, session lifecycle",
         "x": 821,
-        "y": 5535.2,
-        "width": 861,
-        "height": 1693,
+        "y": 5361.2,
+        "width": 851,
+        "height": 1780,
         "rooms": []
       },
       {
