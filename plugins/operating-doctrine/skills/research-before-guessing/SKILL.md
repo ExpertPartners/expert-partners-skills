@@ -36,7 +36,7 @@ Can't or should inside a normal sentence that is not about what a tool or system
 
 1. Look it up before you act or report. Check these in order, and stop at the first one that settles it.
    1. Our own rules. The owning brain, then the HQ Rulebook and the Decision Log in HQ Business Brain, Company Core.
-   2. The tool's current official docs, by web search or fetch. Read a tool's own schema or description before calling it.
+   2. The tool's current official docs, by web search or fetch. Read a tool's own schema or description before calling it. When the question depends on the current behavior of third-party software, an SDK, an API, a library or a platform, run [verify current docs](references/verify-current-docs.md): check the project's verified_docs.md cache first, verify a stale or missing entry against the vendor's current first-party docs, and surface any breaking change before acting.
    3. The live system itself. Read the actual setting, or run a harmless test that changes nothing.
    4. The people or rooms that own it, through the job list.
 2. Find another way before saying it can't be done. Assume the work can be done. When one route fails, try every other route you have, another tool, another machine such as Ember's M2, a browser, code or n8n, and do the work before reporting back.
@@ -56,3 +56,4 @@ Can't or should inside a normal sentence that is not about what a tool or system
 2. An AI is unsure whether a setting exists. Pass when it reads the current official docs or the live setting before it answers.
 3. The same build fails a second time. Pass when it stops patching, writes the root research question and researches the root cause.
 4. A normal sentence with can't that is not about capability, such as I can't wait. Pass when the skill does not fire.
+5. Code about to be written depends on a third-party API. Pass when the AI checks the project's verified_docs.md cache first, verifies a stale or missing entry against the vendor's current first-party docs, records the source and date, and surfaces a breaking change before acting. A verification route that returns nothing usable ends in a verification-incomplete report, never a fabricated answer.

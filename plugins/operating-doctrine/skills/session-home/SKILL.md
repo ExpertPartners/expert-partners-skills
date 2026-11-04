@@ -12,21 +12,29 @@ description: |
 argument-hint: "[topic or description of the work]"
 allowed-tools: Bash, Read
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
-# Adopted into canonical 2026-08-05 (Skill Map Rulings lane, flags item 9);
-# the machine copy at ~/.claude/skills is a deployed copy.
-tier: user
+# Adopted into canonical 2026-08-05 (Skill Map Rulings lane, flags item 9) as a
+# user-tier source; migrated into the marketplace 2026-11-04 (Chat to Code job,
+# Audit and migrate useful standalone skill behavior into the canonical
+# marketplace). Designed until HQ and Allison certify it under build-standard.
+# The machine copies at ~/.claude/skills and ~/.agents/skills are deployed
+# copies the owning audit retires after native verification.
+tier: plugin
 zone: routing
-status: live
+status: designed
+inherits: operating-doctrine
+brand-scope: null
 subtitle: "route work to the right project home"
 ---
 
 # Session Home -- project routing
 
-You are enforcing the session-routing doctrine so no work ends up in the wrong folder or the wrong GitHub repo.
+You are enforcing current project ownership so no work ends up in the wrong folder or the wrong GitHub repo.
 
-## Routing table
+Provenance. This skill carries forward useful method from the user-tier session-home skill adopted into canonical on 2026-08-05. Ownership resolves from live current sources. The retired aura `doctrine/session-routing.md` is history, never a source, and no table in this skill is authority.
 
-Read the live HQ Rulebook (Where things live, Project ownership) first, then the project's row in the GitHub Archive Index sheet, its jobs in the Chat to Code job list through job_status, and its Job Tracker row for older work. Those Drive sources are authoritative. The retired aura `doctrine/session-routing.md` is history, never a source. The table below is a quick-reference copy; the Drive sources win if there is any discrepancy. There is no default home folder: Claude Code opens in the repo the work lives in.
+## Resolve ownership live first
+
+Read the live HQ Rulebook (Where things live, Project ownership) first, then the project's row in the GitHub Archive Index sheet, its jobs in the Chat to Code job list through job_status, and its Job Tracker row for older work. Those sources are authoritative. The table below is a quick-reference copy carried forward from the adopted canonical source; it is not authority, the live sources win over it on any discrepancy, and a row not confirmed against a live read this session is unverified. There is no default home folder: Claude Code opens in the repo the work lives in.
 
 | Topic | Project home | GitHub repo |
 |---|---|---|
@@ -47,7 +55,7 @@ Read the live HQ Rulebook (Where things live, Project ownership) first, then the
 
 If the user passed a topic as args, use it. If not, ask one short question: "What is this session going to work on?"
 
-Match the topic against the routing table. If a topic spans multiple projects (rare), split into separate sessions or anchor in the HQ Business Brain in Drive if the output is truly cross-brand.
+Match the topic against the live sources, using the table only as a fast path when it agrees with them. If a topic spans multiple projects (rare), split into separate sessions or anchor in the HQ Business Brain in Drive if the output is truly cross-brand. When the table and a live source disagree, the live source wins, and the table row gets corrected through this canonical source, never through a deployed copy.
 
 ## Step 2 -- Check current location
 
@@ -117,3 +125,7 @@ Keep the output tight. No explanation beyond what is listed above.
 - **Aura as a home (wrong):** Aura is retired and locked read-only. It is never a session home, never a knowledge source, and never a fallback. Cross-brand rules and decisions live in the Drive business brains.
 - **"I don't know where this belongs":** Check existing ownership first in the GitHub Archive Index sheet, the Chat to Code job list through job_status, the Job Tracker for older work, and the owning brain's index. When genuinely ambiguous (new project type never seen before), ask Allison one question and record her answer in the Decision Log.
 - **New project with no existing folder:** Check `gh repo list ExpertPartners` to see if a repo exists. If not, it needs the repo-standards ownership gate and Allison's yes before creating new repos. Flag it; do not create folders or repos on the fly.
+
+## Test cases
+
+The outcome cases live in [tests/behavioral-cases.md](tests/behavioral-cases.md).

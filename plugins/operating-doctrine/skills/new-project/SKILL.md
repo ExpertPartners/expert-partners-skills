@@ -8,11 +8,15 @@ description: >
   says /new-project followed by a name, "new project: NAME", "bootstrap a new
   project called NAME", or the session-wrap new-project variant fires.
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
-# Adopted into canonical 2026-08-05 (Skill Map Rulings lane, flags item 9);
-# the machine copy at ~/.claude/skills is a deployed copy.
-tier: user
+# Adopted into canonical 2026-08-05 (Skill Map Rulings lane, flags item 9) as a
+# user-tier source; migrated into the marketplace 2026-11-04 (Chat to Code job,
+# Audit and migrate useful standalone skill behavior into the canonical
+# marketplace). Designed until HQ and Allison certify it under build-standard.
+# The machine copies at ~/.claude/skills and ~/.agents/skills are deployed
+# copies the owning audit retires after native verification.
+tier: plugin
 zone: routing
-status: live
+status: designed
 calls:
   - repo-standards
 subtitle: "run the repo-standards gate, then bootstrap a justified project"
@@ -25,6 +29,10 @@ supplies bootstrap mechanics; Repo rules and Project ownership govern.
 Load current canonical `expert-partners-skills plugins/operating-doctrine/skills/repo-standards/SKILL.md`
 for every run. If it cannot be reached live, create nothing and name the failed
 source. A local script or an older deployed skill never substitutes for the gate.
+
+Provenance. This skill carries forward useful method from the user-tier
+new-project skill adopted into canonical on 2026-08-05. It is the existing host
+runner of the repo-standards creation gate, not a second gate.
 
 <!-- RULED-BY: history in GitHub Archive date:2026-08-07 -->
 <!-- RULED-BY: history in GitHub Archive date:2026-08-27 -->
@@ -79,10 +87,12 @@ source. A local script or an older deployed skill never substitutes for the gate
    promise that a retired worker or queue will index the repo automatically.
 
    If intake routing needs a new brain mapping, update its canonical skill
-   source (`expert-partners-skills skills/intake/SKILL.md`) from the Archive Index row,
-   then use the deployment pipeline under the current rollout scope. Never
-   hand-edit `~/.claude/skills/intake/SKILL.md`. Routing tables remain
-   downstream consumers of topology.
+   source (`expert-partners-skills plugins/operating-doctrine/skills/intake/SKILL.md`)
+   from the Archive Index row, then use the deployment pipeline under the current
+   rollout scope. Never hand-edit a deployed copy such as
+   `~/.claude/skills/intake/SKILL.md`. Routing tables remain downstream consumers
+   of topology, and intake itself resolves owners live rather than from a frozen
+   map.
 
 6. **Report the Stage B result with evidence.** Include the Stage A verdict,
    repo URL, local home, baseline evidence, Project relationship, landed Entity
@@ -105,3 +115,7 @@ If the session-wrap new-project prompt fires in claude.ai, the output is a
 `/new-project <ProjectHome> [type]` block for the implementation session. That
 session starts at step 1 and runs Stage A before any script; a handoff never
 counts as a prior gate verdict.
+
+## Test cases
+
+The outcome cases live in [tests/behavioral-cases.md](tests/behavioral-cases.md).
