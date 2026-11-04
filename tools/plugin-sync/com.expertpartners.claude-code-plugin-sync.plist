@@ -5,28 +5,75 @@
 	<key>EnvironmentVariables</key>
 	<dict>
 		<key>HOME</key>
-		<string>/Users/allisongaddy</string>
+		<string>@HOME@</string>
 		<key>PATH</key>
-		<string>/Users/allisongaddy/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+		<string>@HOME@/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
 	</dict>
 	<key>Label</key>
 	<string>com.expertpartners.claude-code-plugin-sync</string>
 	<key>ProgramArguments</key>
 	<array>
 		<string>/bin/bash</string>
-		<string>-c</string>
-		<string>cd "$HOME/Claude/projects/ExpertPartnersSkills" &amp;&amp; { git pull -q --ff-only origin main || true; } ; exec /bin/bash tools/plugin-sync/claude-code-sync.sh</string>
+		<string>@CHECKOUT@/tools/plugin-sync/claude-code-sync.sh</string>
 	</array>
+	<key>RunAtLoad</key>
+	<true/>
 	<key>StandardErrorPath</key>
-	<string>/Users/allisongaddy/Library/Logs/plugin-sync/launchd-claude-code-sync.err.log</string>
+	<string>@HOME@/Library/Logs/plugin-sync/launchd-claude-code-sync.err.log</string>
 	<key>StandardOutPath</key>
-	<string>/Users/allisongaddy/Library/Logs/plugin-sync/launchd-claude-code-sync.log</string>
+	<string>@HOME@/Library/Logs/plugin-sync/launchd-claude-code-sync.log</string>
 	<key>StartCalendarInterval</key>
-	<dict>
-		<key>Hour</key>
-		<integer>7</integer>
-		<key>Minute</key>
-		<integer>40</integer>
-	</dict>
+	<array>
+		<dict>
+			<key>Minute</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>Minute</key>
+			<integer>5</integer>
+		</dict>
+		<dict>
+			<key>Minute</key>
+			<integer>10</integer>
+		</dict>
+		<dict>
+			<key>Minute</key>
+			<integer>15</integer>
+		</dict>
+		<dict>
+			<key>Minute</key>
+			<integer>20</integer>
+		</dict>
+		<dict>
+			<key>Minute</key>
+			<integer>25</integer>
+		</dict>
+		<dict>
+			<key>Minute</key>
+			<integer>30</integer>
+		</dict>
+		<dict>
+			<key>Minute</key>
+			<integer>35</integer>
+		</dict>
+		<dict>
+			<key>Minute</key>
+			<integer>40</integer>
+		</dict>
+		<dict>
+			<key>Minute</key>
+			<integer>45</integer>
+		</dict>
+		<dict>
+			<key>Minute</key>
+			<integer>50</integer>
+		</dict>
+		<dict>
+			<key>Minute</key>
+			<integer>55</integer>
+		</dict>
+	</array>
+	<key>WorkingDirectory</key>
+	<string>@CHECKOUT@</string>
 </dict>
 </plist>
