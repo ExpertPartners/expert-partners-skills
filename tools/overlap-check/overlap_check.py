@@ -37,7 +37,8 @@ Five subcommands, run by .github/workflows/factory-builder-reusable.yml:
            succeed (BUILD_RESULT) goes back to waiting, so it starts again on its own. A job
            that was closed, parked or done while it built always loses in-progress, and one
            whose pull request merged loses in-progress and waiting. A run that is no longer
-           the job's recorded build changes nothing. Whenever in-progress is dropped,
+           the job's recorded build, or whose job another live gate has claimed, changes
+           nothing; that is rechecked right before every write. Whenever in-progress is dropped,
            restart=true is written so the caller runs next.
   next     After a pull request or issue closes, in-progress is removed, or an issue gains
            or loses parked or done, dispatch the builder for every waiting Job issue that
@@ -554,6 +555,25 @@ def authenticated_head(gh, cfg: Config, pr: dict) -> bool:
     return current.get("ref") == ref and (current.get("object") or {}).get("sha") == sha
 
 
+def head_contains(gh, cfg: Config, pr: dict, base: str) -> bool | None:
+    """Whether the pull request's head already contains commit base. None when GitHub cannot
+    say, which is never read as either answer."""
+    sha = (pr.get("head") or {}).get("sha") or ""
+    if not re.fullmatch(r"[0-9a-f]{40}", base or "") or not re.fullmatch(r"[0-9a-f]{40}", sha):
+        return None
+    try:
+        status = (gh.get(f"/repos/{cfg.repo}/compare/{base}...{sha}", {"per_page": 1}) or {}).get("status")
+    except Exception as exc:
+        print(f"::warning::overlap-check: whether #{pr.get('number')} contains {base[:12]} could not be read "
+              f"({type(exc).__name__}); continuation refused.")
+        return None
+    if status in ("ahead", "identical"):
+        return True
+    if status in ("behind", "diverged"):
+        return False
+    return None
+
+
 def default_head(gh, cfg: Config) -> str:
     branch = gh.get(f"/repos/{cfg.repo}")["default_branch"]
     if not BRANCH_RE.fullmatch(branch) or ".." in branch:
@@ -572,6 +592,9 @@ class Delivery:
     merged: list[dict] = field(default_factory=list)  # newest merge first
     reopened_after_merge: bool = False
     target: dict | None = None  # the open pull request a new build continues
+    # Open pull requests left beside the merged one whose heads lack that merge. After a
+    # reopen they are neither continued nor a reason to wait; a new build starts from main.
+    predates_merge: list[dict] = field(default_factory=list)
 
     @property
     def winner(self) -> dict | None:
@@ -606,14 +629,29 @@ def job_delivery(gh, cfg: Config, number: int) -> Delivery:
     merged = []
     for n in sorted(candidates - {int(p["number"]) for p in opened}):
         p = gh.get(f"/repos/{cfg.repo}/pulls/{n}") or {}
-        if p.get("merged_at") and is_builder_pr(p) and number in closes(p.get("body")):
+        if p.get("merged_at") and is_builder_pr(p) and head_branch(p, cfg.repo) and number in closes(p.get("body")):
             merged.append(p)
     merged.sort(key=lambda p: p["merged_at"], reverse=True)
     after = bool(merged) and any(t > merged[0]["merged_at"] for t in reopened)
+    stale: list[dict] = []
+    eligible = True
+    if after:
+        # Work reopened after a merge must build on the merged result. A head that cannot be
+        # shown to contain it stays open but is never the continuation target.
+        base = merged[0].get("merge_commit_sha") or ""
+        kept = []
+        for p in opened:
+            has = head_contains(gh, cfg, p, base)
+            if has is False:
+                stale.append(p)
+            else:
+                kept.append((p, has))
+        opened = [p for p, _ in kept]
+        eligible = bool(kept) and kept[0][1] is True
     # Only the oldest existing PR is eligible. Never bypass its owner by starting a
     # newer PR or creating a duplicate when its current head is not authenticated.
-    target = opened[0] if opened and trusted_head(gh, cfg, opened[0]) else None
-    return Delivery(opened, merged, after, target)
+    target = opened[0] if opened and eligible and trusted_head(gh, cfg, opened[0]) else None
+    return Delivery(opened, merged, after, target, stale)
 
 
 def trust_wait(gh, cfg: Config, number: int, delivery: Delivery) -> None:
@@ -622,7 +660,8 @@ def trust_wait(gh, cfg: Config, number: int, delivery: Delivery) -> None:
     upsert_comment(gh, cfg, number, "\n".join([
         MARKER,
         f"Existing pull request #{delivery.open[0]['number']} remains with its current owner. "
-        "Its current head has no matching authenticated Factory ref activity. "
+        "Its current head has no matching authenticated Factory ref activity"
+        f"{' or could not be shown to contain the merged result' if delivery.reopened_after_merge else ''}. "
         "Factory will not execute this head with build secrets or create another pull request. "
         "The current owner can finish it; automatic continuation requires a verified Factory-produced head.",
     ]))
@@ -742,6 +781,13 @@ def continuation_note(number: int, d: Delivery, repo: str) -> str:
         lines.append(f"Pull request #{m['number']} already merged earlier work for this job into main, "
                      "and the job was reopened after that merge. Build only what is still missing, "
                      f"on top of main, and say in your pull request that #{m['number']} delivered the earlier part.")
+    if d.predates_merge:
+        names = ", ".join(f"#{p['number']}" for p in d.predates_merge)
+        branches = ", ".join(head_branch(p, repo) or "unknown" for p in d.predates_merge)
+        lines.append(f"Pull requests {names} also close #{number} but do not contain the merged work, so "
+                     "this build does not continue them. Leave them and their branches "
+                     f"({branches}) as they are, never push to those branches, and name them in your "
+                     "pull request so a person can decide what to do with them.")
     return "\n\n".join(lines)
 
 
@@ -980,16 +1026,79 @@ def release_body(result: str, run_id: str = "") -> str:
     ])
 
 
+class LeaseMoved(Exception):
+    """Another run has taken, or is deciding whether to take, the job a release is freeing."""
+
+
+def lease_taker(gh, cfg: Config, number: int) -> str | None:
+    """A run other than this one that owns the job (the run its overlap comment records) or
+    whose gate is still deciding (a live claim)."""
+    for c in gh.paginate(f"/repos/{cfg.repo}/issues/{number}/comments"):
+        if (c.get("user") or {}).get("login") != COMMENT_AUTHOR:
+            continue
+        body = c.get("body") or ""
+        found = RUN_MARKER_RE.search(body) if MARKER in body else None
+        if found and found.group(1) != cfg.run_id:
+            return found.group(1)
+        found = CLAIM_RE.search(body)
+        if found and found.group(1) != cfg.run_id and run_is_live(gh, cfg, found.group(1), number):
+            return found.group(1)
+    return None
+
+
+class LeaseGuard:
+    """Reads pass through. Every write first rereads the lease and raises LeaseMoved once
+    another run holds or is claiming the job.
+
+    GitHub has no conditional label or comment writes, so the guard relies on the gate's
+    order: a gate posts its claim, waits OVERLAP_SETTLE_SECONDS, then records its run and
+    sets its labels. A write that follows a clear reread by less than that pause lands before
+    any new lease, and the new gate's own label writes come after it."""
+
+    def __init__(self, gh, check):
+        self._gh = gh
+        self._check = check
+
+    def get(self, *args, **kwargs):
+        return self._gh.get(*args, **kwargs)
+
+    def paginate(self, *args, **kwargs):
+        return self._gh.paginate(*args, **kwargs)
+
+    def post(self, *args, **kwargs):
+        self._check()
+        return self._gh.post(*args, **kwargs)
+
+    def patch(self, *args, **kwargs):
+        self._check()
+        return self._gh.patch(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        self._check()
+        return self._gh.delete(*args, **kwargs)
+
+
 def run_release(gh, cfg: Config, number: int, result: str) -> str:
     """After a build the gate started. Returns kept, released, waiting, stopped, delivered or
     superseded."""
-    issue = gh.get(f"/repos/{cfg.repo}/issues/{number}")
-    recorded = recorded_run(gh, cfg, number) if cfg.run_id else None
-    if recorded and recorded != cfg.run_id:
-        # A later gate admitted another run for this job. Its labels and comment are that
-        # run's now, and this release must not free its files or queue it again.
-        print(f"overlap-check: #{number} is now built by run {recorded}, not this run ({cfg.run_id}); nothing changes.")
+
+    def check() -> None:
+        taker = lease_taker(gh, cfg, number) if cfg.run_id else None
+        if taker:
+            raise LeaseMoved(taker)
+
+    try:
+        check()
+        return release_owned(LeaseGuard(gh, check), cfg, number, result)
+    except LeaseMoved as moved:
+        # A later gate admitted, or is admitting, another run for this job. Its labels and
+        # comment are that run's now, and this release must not free its files or queue it again.
+        print(f"overlap-check: #{number} is now built by run {moved}, not this run ({cfg.run_id}); nothing more changes.")
         return "superseded"
+
+
+def release_owned(gh, cfg: Config, number: int, result: str) -> str:
+    issue = gh.get(f"/repos/{cfg.repo}/issues/{number}")
     if is_stopped(issue):
         # The build can no longer write, so a job closed, parked or done while it built stops
         # holding now. A pull request it opened still holds its own changed files.
