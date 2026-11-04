@@ -29,3 +29,13 @@
 /tools/capability-feed/package.json @AllisonGaddy
 /tools/capability-feed/package-lock.json @AllisonGaddy
 /tools/capability-feed/package-lock.provenance.md @AllisonGaddy
+
+# Curated Python hash-lock layers and their existing policy/check source.
+/requirements-tooling.txt @AllisonGaddy
+/plugins/research-ops/skills/source-hunter/requirements.txt @AllisonGaddy
+/plugins/research-ops/skills/source-hunter/requirements-dev.txt @AllisonGaddy
+/plugins/research-ops/skills/video-discovery/requirements.txt @AllisonGaddy
+/plugins/research-ops/skills/video-discovery/requirements-verification.txt @AllisonGaddy
+/plugins/research-ops/skills/video-discovery/requirements-dev.txt @AllisonGaddy
+/tools/dependency-policy/ @AllisonGaddy
+/.github/workflows/dependency-policy.yml @AllisonGaddy
