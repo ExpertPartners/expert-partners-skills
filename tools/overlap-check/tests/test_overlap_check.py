@@ -1988,6 +1988,81 @@ class DeliveryDefaultBase(unittest.TestCase):
 
 
 class FailedGateClaimRecovery(unittest.TestCase):
+    def test_stop_and_claim_delete_failure_never_clear_a_new_recorded_owner(self):
+        gh = FakeGitHub([issue(245, "x/a.py")])
+        original_delete, original_judge = gh.delete, oc.judge
+        def delete(path):
+            if "/issues/comments/" in path:
+                raise oc.GitHubError(503, "claim delete failed")
+            return original_delete(path)
+        def takeover_then_fail(api, cfg, current, only_older_issues=False):
+            if only_older_issues:
+                gh.post(f"/repos/{REPO}/issues/245/labels", {"labels": ["parked"]})
+                gh.post(f"/repos/{REPO}/issues/245/comments", {"body": oc.comment_body(oc.Verdict(True), "81")})
+                gh.runs[81] = "in_progress"
+                raise TimeoutError("gate failed after takeover")
+            return original_judge(api, cfg, current, only_older_issues)
+        gh.delete = delete
+        with mock.patch.object(oc, "judge", side_effect=takeover_then_fail):
+            code, out = Main.run_main(self, gh, ["check"], OVERLAP_ISSUE="245", GITHUB_RUN_ID="80")
+        self.assertEqual((code, out), (1, "start=false\n"))
+        self.assertEqual(gh.labels(245), {"job", "parked", "in-progress"})
+        self.assertEqual(oc.recorded_run(gh, CFG, 245), "81")
+
+    def test_a_stop_during_failed_admission_keeps_its_hold_and_can_resume(self):
+        for stop in ("parked", "done", "closed"):
+            with self.subTest(stop=stop):
+                gh = FakeGitHub([issue(245, "x/a.py")])
+                gh.runs[80] = "in_progress"
+                original = oc.judge
+                def stop_then_fail(api, cfg, current, only_older_issues=False):
+                    if only_older_issues:
+                        if stop == "closed":
+                            gh.issues[245]["state"] = "closed"
+                        else:
+                            gh.post(f"/repos/{REPO}/issues/245/labels", {"labels": [stop]})
+                        raise TimeoutError("gate failed while stopped")
+                    return original(api, cfg, current, only_older_issues)
+                with mock.patch.object(oc, "judge", side_effect=stop_then_fail):
+                    code, out = Main.run_main(self, gh, ["check"], OVERLAP_ISSUE="245", GITHUB_RUN_ID="80")
+                self.assertEqual((code, out), (1, "start=false\n"))
+                self.assertNotIn("in-progress", gh.labels(245))
+                self.assertIn("waiting", gh.labels(245))
+                self.assertTrue(oc.is_stopped(gh.issues[245]))
+                gh.runs[80] = "completed"
+                self.assertEqual(oc.run_next(gh, CFG, [].append), [])
+                # Only an explicit later removal of the hold/reopen permits dispatch.
+                if stop == "closed":
+                    gh.issues[245]["state"] = "open"
+                else:
+                    oc.remove_label(gh, CFG, 245, stop)
+                sent = []
+                self.assertEqual(oc.run_next(gh, CFG, sent.append), [245])
+                self.assertEqual(sent, [245])
+
+    def test_claim_delete_errors_do_not_strand_an_unowned_failed_gate(self):
+        for failure in (oc.GitHubError(503, "unavailable"), oc.GitHubError(403, "limited"),
+                        TimeoutError("claim delete timed out")):
+            with self.subTest(failure=type(failure).__name__):
+                gh = FakeGitHub([issue(245, "x/a.py")])
+                original_delete, original_judge = gh.delete, oc.judge
+                def delete(path):
+                    if "/issues/comments/" in path:
+                        raise failure
+                    return original_delete(path)
+                def fail_second(api, cfg, current, only_older_issues=False):
+                    if only_older_issues:
+                        raise TimeoutError("gate failure")
+                    return original_judge(api, cfg, current, only_older_issues)
+                gh.delete = delete
+                with mock.patch.object(oc, "judge", side_effect=fail_second):
+                    code, out = Main.run_main(self, gh, ["check"], OVERLAP_ISSUE="245", GITHUB_RUN_ID="80")
+                self.assertEqual((code, out), (1, "start=false\n"))
+                self.assertEqual(gh.labels(245), {"job", "waiting"})
+                self.assertEqual(len(claims(gh, 245)), 1)
+                gh.runs[80] = "completed"
+                self.assertEqual(oc.run_next(gh, CFG, [].append), [245])
+
     def test_newer_claim_cannot_follow_a_failed_gate_or_strand_in_progress(self):
         gh = FakeGitHub([issue(245, "x/a.py")])
         gh.runs.update({80: "in_progress", 81: "in_progress"})
@@ -2008,7 +2083,7 @@ class FailedGateClaimRecovery(unittest.TestCase):
         self.assertEqual(gh.labels(245), {"job", "in-progress"})
         self.assertEqual(receipts(gh, 245), [])
 
-    def test_failed_claim_removal_refuses_label_cleanup(self):
+    def test_failed_claim_removal_still_recovers_the_waiting_label(self):
         gh = FakeGitHub([issue(245, "x/a.py")])
         original_delete = gh.delete
         def failed_delete(path):
@@ -2024,7 +2099,7 @@ class FailedGateClaimRecovery(unittest.TestCase):
         with mock.patch.object(oc, "judge", side_effect=failed_second):
             code, out = Main.run_main(self, gh, ["check"], OVERLAP_ISSUE="245", GITHUB_RUN_ID="80")
         self.assertEqual((code, out), (1, "start=false\n"))
-        self.assertEqual(gh.labels(245), {"job", "in-progress"})
+        self.assertEqual(gh.labels(245), {"job", "waiting"})
 
     def test_newer_gate_admitted_after_claim_drop_keeps_its_labels(self):
         gh = FakeGitHub([issue(245, "x/a.py")])

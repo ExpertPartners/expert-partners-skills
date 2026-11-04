@@ -1213,7 +1213,9 @@ def main(argv: list[str]) -> int:
                         # Comments/run metadata already proved no other live writer.
                         # Recover an unowned failed read without removing any stop label.
                         current = None
-                    if current is not None and is_stopped(current):
+                    if current is not None and is_stopped(current) and attempt.claim_id is None:
+                        # This gate never claimed, so it did not add an in-progress label
+                        # to retire. Leave an already-stopped issue exactly as found.
                         raise LeaseMoved("stop state changed")
 
                 try:
@@ -1221,6 +1223,12 @@ def main(argv: list[str]) -> int:
                     # Older claims and any recorded new admission retain ownership; a
                     # younger undecided claim settles after these guarded cleanup writes.
                     drop_claim(gh, cfg, attempt.claim_id)
+                except Exception as claim_error:
+                    # A leftover claim dies with this run. Recover the waiting label
+                    # anyway, after independently proving no other writer owns it.
+                    print(f"::warning::overlap-check: #{number} failed gate claim could not be removed "
+                          f"({type(claim_error).__name__}); guarded recovery still checks other owners.")
+                try:
                     # An unreadable owner proves no right to alter labels. A new
                     # admission between cleanup writes also stops the old cleanup.
                     guarded = LeaseGuard(gh, cleanup_is_safe)
