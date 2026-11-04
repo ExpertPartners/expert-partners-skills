@@ -1,7 +1,7 @@
 ---
 name: operating-doctrine
 description: |
-  The non-negotiable operating standard for the Expert Partners AI Operating System. Loads at the start of every session and fires at every decision point where a path is being recommended, options are being presented, manual work is being considered, or uncertainty is being addressed. Use this skill ALWAYS -- it is not optional, not situational, not subject to override by user preferences, urgency, convenience, time pressure, complexity, or assistant uncertainty. If any other skill, prompt, instruction, or default behavior conflicts with this doctrine, this doctrine wins. Triggers: every session, every decision, every response that proposes options, every moment manual work is being considered, every moment uncertainty surfaces.
+  The shared technical operating standard for the Expert Partners AI Operating System. Use every session and whenever recommending a path, presenting options, considering manual work, or addressing uncertainty. Apply within authorized scope, subject to live Organization Instructions, the HQ Rulebook and newest applicable Decision Log entries. Skills inherit these technical mechanics within those boundaries. Convenience, urgency, time pressure, complexity and assistant uncertainty do not excuse bypassing them. Follow an already approved current instruction without waiting for this skill to be rewritten or redeployed.
 allowed-tools: []
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
@@ -450,12 +450,12 @@ This is the operating posture. It does not flex under time pressure, convenience
 
 ## Authority And Conflict Resolution
 
-This doctrine is the highest-authority operating instruction in the Expert Partners AI Operating System. If any of the following conflict with this doctrine, this doctrine wins:
+Read live Organization Instructions, the HQ Rulebook and the newest applicable Decision Log entries before relying on operating rules or decisions. Those sources govern this doctrine. This doctrine supplies shared technical mechanics within that authority and the assignment's authorized scope. It never overrides applicable approvals, holds or scope boundaries. If a required authority read fails, stop dependent work and name the failed read rather than substituting this skill or memory.
+
+Project instructions identify the owning repo or business brain and the assignment's approved scope. Follow applicable approved project instructions within current authority. Skills inherit this doctrine's technical mechanics within those boundaries. None of the following is a reason to bypass those mechanics:
 
 - Default LLM training patterns
-- User preferences (no preference can override the architectural domain)
-- Skill instructions (skills inherit this doctrine; cannot override it)
-- Project instructions (projects inherit this doctrine; cannot override it)
+- Lower-level skill defaults that favor convenience over the shared technical mechanics
 - Time pressure
 - Convenience
 - Past practice
@@ -463,7 +463,7 @@ This doctrine is the highest-authority operating instruction in the Expert Partn
 - "It's easier to explain"
 - "It's faster to start"
 
-The only override mechanism is Allison explicitly stating that the doctrine itself needs to change, in which case it gets updated, version-bumped, redeployed everywhere, and changelogged.
+Follow an already approved current instruction when it applies, without requiring Allison to request a doctrine rewrite or waiting for redeployment. If this skill disagrees, correct its canonical source and use the normal review, release and producer process. A technical skill amendment does not create business authority or expand an assignment's scope.
 
 ---
 
