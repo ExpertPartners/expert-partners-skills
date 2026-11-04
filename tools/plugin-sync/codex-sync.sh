@@ -76,6 +76,14 @@ mkdir -p "$STATE_DIR" "$LOG_DIR"
 LOG="$LOG_DIR/$SURFACE-sync-$(date '+%Y-%m-%d').log"
 log() { printf '%s %s\n' "$(date '+%H:%M:%S')" "$*" >>"$LOG"; }
 
+# Keep caller-relative overrides usable, then leave the vendor-replaced checkout.
+# All source/state paths above are absolute; every child, including legacy checks
+# and the updated script, must inherit a directory refresh cannot delete.
+if [[ -n "${CODEX_BIN:-}" && "$CODEX_BIN" != /* ]]; then
+  CODEX_BIN="$PWD/$CODEX_BIN"
+fi
+cd "$HOME" || { log "FAILED: cannot enter the user's stable home directory"; exit 1; }
+
 PY="$(command -v python3 2>/dev/null || true)"
 [[ -n "$PY" ]] || { log "FAILED: python3 not found"; exit 1; }
 
