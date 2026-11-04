@@ -55,6 +55,7 @@ jobs:
           FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
         run: |
           python3 - <<'PY'
+          import json
           import os
           import re
           import signal
@@ -67,8 +68,8 @@ jobs:
                   stderr=subprocess.PIPE, start_new_session=True,
               )
               try:
-                  output, _ = child.communicate(timeout=seconds)
-                  return child.returncode, output.decode("utf-8", "replace")
+                  output, error = child.communicate(timeout=seconds)
+                  return child.returncode, output.decode("utf-8", "replace"), error.decode("utf-8", "replace")
               finally:
                   # Stop only this smoke step's owned group, including timed-out children.
                   try:
@@ -77,26 +78,50 @@ jobs:
                       pass
                   child.wait(timeout=5)
 
+          diagnostic = {"stage": "credentials", "cli_exit": None, "version": "unknown",
+                        "stdout_candidates": 0, "stderr_candidates": 0,
+                        "status": "unknown", "auth_state": "unknown"}
           try:
               if not os.environ.get("FACTORY_API_KEY"):
                   raise ValueError("missing runtime credential")
-              code, _ = run_captured([sys.executable, "tools/factory-access/preflight.py"], 125)
+              diagnostic["stage"] = "preflight"
+              code, _, _ = run_captured([sys.executable, "tools/factory-access/preflight.py"], 125)
               if code != 0:
                   raise ValueError("preflight failed")
               print("Factory exact-job ledger read: PASS", flush=True)
-              code, output = run_captured(["droid", "mcp", "list"], 45)
-              output = re.sub(r"\x1b\[[0-?]*[ -/]*[@-~]", "", output)
-              lines = [line for line in output.splitlines()
-                       if re.match(r"^\s*(?:[✓✔●•-]\s*)?factory-ledger(?=\s|:|$)", line)]
+              diagnostic["stage"] = "cli_version"
+              _, output, error = run_captured(["droid", "--version"], 10)
+              version = re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", (output + error).strip())
+              if version:
+                  diagnostic["version"] = version.group()
+              diagnostic["stage"] = "cli"
+              code, output, error = run_captured(["droid", "mcp", "list"], 45)
+              diagnostic["cli_exit"] = code
+              streams = [re.sub(r"\x1b\[[0-?]*[ -/]*[@-~]", "", value) for value in (output, error)]
+              candidates = [[line for line in value.splitlines()
+                             if re.match(r"^\s*factory-ledger(?=\s|:|$)", line)] for value in streams]
+              diagnostic["stdout_candidates"], diagnostic["stderr_candidates"] = map(len, candidates)
+              diagnostic["auth_state"] = "auth_required" if re.search(
+                  r"authentication required|not authenticated|unauthorized|invalid[_ ]api[_ ]key",
+                  "\n".join(streams), re.I) else "no_auth_error_detected"
+              lines = candidates[0] + candidates[1]
+              diagnostic["status"] = "no_candidate" if not lines else "ambiguous" if len(lines) > 1 else "not_connected"
               if code != 0 or len(lines) != 1:
                   raise ValueError("native connection unavailable")
-              words = set(re.findall(r"[a-z]+(?:-[a-z]+)*", lines[0].lower()))
-              connected = re.search(r"(?:^|[\s:|()-])connected(?:\s*\(\d+\s+tools?\))?\s*$", lines[0], re.I)
-              if not connected or words & {"disconnected", "connecting", "failed", "disabled"} or re.search(r"\bnot\s+connected\b", lines[0], re.I):
+              diagnostic["stage"] = "row_contract"
+              # Native list rows: server, status, source, transport, tools, protocol.
+              connected = re.fullmatch(
+                  r"\s*factory-ledger\s+connected(?:\s+\(authenticated\))?\s+"
+                  r"(?:org|runtime|user|project|folder|dynamic|builtin|unknown|—|-)\s+"
+                  r"(?:http|sse|stdio)\s+[1-9][0-9]*\s+[0-9]{4}-[0-9]{2}-[0-9]{2}\s*",
+                  lines[0], re.I)
+              if not connected or diagnostic["auth_state"] == "auth_required":
                   raise ValueError("native connection unavailable")
+              diagnostic["status"] = "connected"
               print("Factory native ledger MCP: PASS")
           except Exception:
               # No provider output, exception, credential, URL, or environment dump.
+              print("Factory access smoke diagnostic: " + json.dumps(diagnostic, sort_keys=True))
               print("Factory access smoke: FAIL")
               sys.exit(1)
           PY
