@@ -1,8 +1,8 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-11-04T02:34:20Z",
-  "verifiedAt": "2026-11-04T02:34:20Z",
+  "generatedAt": "2026-11-04T03:40:54Z",
+  "verifiedAt": "2026-11-04T03:40:54Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
@@ -417,12 +417,13 @@
       "verifiedSurfaces": [],
       "invocationInstructions": [
         "Packaged as the operating-doctrine plugin, version 2.84.2, in the expert-partners plugin marketplace.",
-        "Contains 31 skills. Each one activates when a request matches its purpose."
+        "Contains 35 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
       "lastVerified": "Not yet verified on any platform. Package version 2.84.2.",
       "containsSkillIds": [
         "action-item-closeout",
+        "ai-capability-routing",
         "ask-me-questions",
         "batch-first-execution",
         "book-moment",
@@ -438,15 +439,18 @@
         "ember-browser-routing",
         "estate-memory-router",
         "file-to-knowledge-base-optimizer",
+        "intake",
         "job-list-heartbeat",
         "kindergartner-mode",
         "lane-spawn",
+        "new-project",
         "operating-doctrine",
         "pin",
         "quick-update",
         "remember-this",
         "repo-standards",
         "research-before-guessing",
+        "session-home",
         "session-model-advisor",
         "session-steward",
         "session-wrap",
@@ -461,7 +465,7 @@
         "packageVersion": "2.84.2",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
-        "skillCount": "31"
+        "skillCount": "35"
       },
       "keywords": [
         "brain",
@@ -950,6 +954,75 @@
       ],
       "useCases": [
         "Use when the agent says build my brain, build my profile, set up my profile, teach my AI who I am, or wants to update their existing profile or brain file."
+      ],
+      "askExamples": [],
+      "example": false
+    },
+    {
+      "id": "ai-capability-routing",
+      "humanName": "AI Capability Routing",
+      "kind": "skill",
+      "summary": "Places a new or changing AI capability in its one smallest durable home and launches it there, so the conversation that found it does not become its owner.",
+      "status": "Designed",
+      "maintainer": "Allison Gaddy",
+      "collectionIds": [],
+      "categories": [
+        "Session machinery"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Operating Doctrine plugin, version 2.84.2.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: designed.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "build-standard",
+        "code-block-routing",
+        "connection-first-implementation",
+        "expert-partners-systems-map",
+        "operating-doctrine-plugin",
+        "repo-standards",
+        "research-before-guessing"
+      ],
+      "accessNote": "Designed, not yet deployed. Availability depends on what your AI assistant can load.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/operating-doctrine/skills/ai-capability-routing/SKILL.md",
+        "lifecycle": "designed",
+        "tier": "plugin",
+        "zone": "routing",
+        "packaging": "operating-doctrine plugin v2.84.2 (expert-partners marketplace)",
+        "inherits": "operating-doctrine",
+        "defersTo": "build-standard, connection-first-implementation, research-before-guessing, expert-partners-systems-map, code-block-routing, repo-standards"
+      },
+      "keywords": [
+        "become",
+        "capability",
+        "changing",
+        "conversation",
+        "doctrine",
+        "does",
+        "durable",
+        "found",
+        "home",
+        "launches",
+        "machinery",
+        "new",
+        "operating",
+        "owner",
+        "places",
+        "routing",
+        "session",
+        "smallest",
+        "there"
+      ],
+      "bestFor": [
+        "one durable home for every AI capability"
+      ],
+      "useCases": [
+        "Use when Allison describes an AI outcome or asks where a skill, plugin, bot, agent, AI employee, research process, automation or human view should live, or when a room is incubating something another system should own."
       ],
       "askExamples": [],
       "example": false
@@ -3158,7 +3231,7 @@
       "id": "expert-partners-systems-map",
       "humanName": "Expert Partners Systems Map and Access Map",
       "kind": "skill",
-      "summary": "The canonical map of where every Expert Partners system lives, what each system's one job is, and what access Claude already holds across the stack.",
+      "summary": "Routes questions about systems, storage, ownership and access to their current owning sources.",
       "status": "Unknown",
       "maintainer": "Allison Gaddy",
       "collectionIds": [],
@@ -3187,28 +3260,29 @@
         "inherits": "operating-doctrine"
       },
       "keywords": [
+        "about",
         "access",
-        "across",
-        "already",
         "brain",
-        "can",
-        "canonical",
-        "claude",
-        "each",
+        "current",
         "expert",
-        "holds",
-        "job",
-        "lives",
+        "find",
         "map",
+        "owner",
+        "ownership",
+        "owning",
         "partners",
-        "reach",
-        "stack",
-        "system",
+        "questions",
+        "result",
+        "route",
+        "routes",
+        "sources",
+        "storage",
         "systems",
-        "where"
+        "their",
+        "verified"
       ],
       "bestFor": [
-        "where every system lives and what Claude can reach"
+        "find the current owner, route and verified result"
       ],
       "useCases": [],
       "askExamples": [],
@@ -4345,10 +4419,11 @@
     },
     {
       "id": "intake",
-      "humanName": "Intake Skill",
+      "humanName": "Intake",
       "kind": "skill",
-      "summary": "File a session summary or any captured content into the owning brain's home folder in Google Drive as a Google Doc, so every surface can read it.",
-      "status": "Unknown",
+      "summary": "Files captured content into the one brain that owns it, as a Google Doc in the folder that brain's live index names, so every surface can read it.",
+      "status": "Designed",
+      "maintainer": "Allison Gaddy",
       "collectionIds": [],
       "categories": [
         "Session machinery"
@@ -4356,21 +4431,25 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Standalone skill in the expert-partners-skills repository.",
+        "Packaged in the Operating Doctrine plugin, version 2.84.2.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: designed.",
       "containsSkillIds": [],
-      "relatedIds": [],
-      "accessNote": "Where this is available has not been verified yet.",
+      "relatedIds": [
+        "operating-doctrine-plugin",
+        "research-intake"
+      ],
+      "accessNote": "Designed, not yet deployed. Availability depends on what your AI assistant can load.",
       "technicalDetail": {
-        "canonicalSource": "expert-partners-skills/skills/intake/SKILL.md",
-        "lifecycle": "live",
-        "tier": "user",
+        "canonicalSource": "expert-partners-skills/plugins/operating-doctrine/skills/intake/SKILL.md",
+        "lifecycle": "designed",
+        "tier": "plugin",
         "zone": "routing",
-        "packaging": "standalone",
-        "inherits": "operating-doctrine"
+        "packaging": "operating-doctrine plugin v2.84.2 (expert-partners marketplace)",
+        "inherits": "operating-doctrine",
+        "defersTo": "research-intake"
       },
       "keywords": [
         "brain",
@@ -4378,24 +4457,29 @@
         "captured",
         "content",
         "doc",
+        "doctrine",
         "drive",
         "file",
+        "files",
         "folder",
         "google",
-        "home",
+        "index",
         "intake",
+        "live",
         "machinery",
+        "names",
+        "operating",
         "owning",
+        "owns",
         "read",
         "session",
-        "summary",
         "surface"
       ],
       "bestFor": [
         "file content into the owning brain in Drive"
       ],
       "useCases": [
-        "Use when the user pastes a claude.ai session summary with /intake followed by a project name, or says \"intake this to PROJECT\", \"save this session to PROJECT\", \"file this into BRAIN\"."
+        "Use when Allison pastes a session summary with /intake followed by a project name, or says intake this to PROJECT, save this session to PROJECT, or file this into BRAIN."
       ],
       "askExamples": [],
       "example": false
@@ -5358,8 +5442,9 @@
       "id": "new-project",
       "humanName": "New-Project Skill",
       "kind": "skill",
-      "summary": "Run a new Expert Partners project through repo-standards before bootstrapping.",
-      "status": "Unknown",
+      "summary": "Run a new Expert Partners project through repo-standards before anything is built.",
+      "status": "Designed",
+      "maintainer": "Allison Gaddy",
       "collectionIds": [],
       "categories": [
         "Session machinery"
@@ -5367,34 +5452,40 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Standalone skill in the expert-partners-skills repository.",
+        "Packaged in the Operating Doctrine plugin, version 2.84.2.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: designed.",
       "containsSkillIds": [],
       "relatedIds": [
+        "operating-doctrine-plugin",
         "repo-standards"
       ],
-      "accessNote": "Where this is available has not been verified yet.",
+      "accessNote": "Designed, not yet deployed. Availability depends on what your AI assistant can load.",
       "technicalDetail": {
-        "canonicalSource": "expert-partners-skills/skills/new-project/SKILL.md",
-        "lifecycle": "live",
-        "tier": "user",
+        "canonicalSource": "expert-partners-skills/plugins/operating-doctrine/skills/new-project/SKILL.md",
+        "lifecycle": "designed",
+        "tier": "plugin",
         "zone": "routing",
-        "packaging": "standalone",
+        "packaging": "operating-doctrine plugin v2.84.2 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "repo-standards"
       },
       "keywords": [
+        "anything",
         "before",
-        "bootstrap",
-        "bootstrapping",
+        "build",
+        "built",
+        "doctrine",
         "expert",
+        "file",
         "gate",
+        "job",
         "justified",
         "machinery",
         "new",
+        "operating",
         "partners",
         "project",
         "repo",
@@ -5405,10 +5496,10 @@
         "through"
       ],
       "bestFor": [
-        "run the repo-standards gate, then bootstrap a justified project"
+        "run the repo-standards gate, then file a justified build as a job"
       ],
       "useCases": [
-        "Use when Allison says /new-project followed by a name, \"new project: NAME\", \"bootstrap a new project called NAME\", or the session-wrap new-project variant fires."
+        "Use when Allison says /new-project followed by a name, \"new project: NAME\", or \"bootstrap a new project called NAME\"."
       ],
       "askExamples": [],
       "example": false
@@ -6783,8 +6874,9 @@
       "id": "session-home",
       "humanName": "Session Home",
       "kind": "skill",
-      "summary": "Look up the correct Claude Code project home and GitHub repo for any topic, then output the exact cd + claude command and a first-action prompt template.",
-      "status": "Unknown",
+      "summary": "Check that a piece of work is happening in its current owning home.",
+      "status": "Designed",
+      "maintainer": "Allison Gaddy",
       "collectionIds": [],
       "categories": [
         "Session machinery"
@@ -6792,48 +6884,40 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Standalone skill in the expert-partners-skills repository.",
+        "Packaged in the Operating Doctrine plugin, version 2.84.2.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: designed.",
       "containsSkillIds": [],
-      "relatedIds": [],
-      "accessNote": "Where this is available has not been verified yet.",
+      "relatedIds": [
+        "operating-doctrine-plugin"
+      ],
+      "accessNote": "Designed, not yet deployed. Availability depends on what your AI assistant can load.",
       "technicalDetail": {
-        "canonicalSource": "expert-partners-skills/skills/session-home/SKILL.md",
-        "lifecycle": "live",
-        "tier": "user",
+        "canonicalSource": "expert-partners-skills/plugins/operating-doctrine/skills/session-home/SKILL.md",
+        "lifecycle": "designed",
+        "tier": "plugin",
         "zone": "routing",
-        "packaging": "standalone",
+        "packaging": "operating-doctrine plugin v2.84.2 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
-        "action",
-        "claude",
-        "code",
-        "command",
-        "correct",
-        "exact",
-        "first",
-        "github",
+        "check",
+        "current",
+        "doctrine",
+        "happening",
         "home",
-        "look",
         "machinery",
-        "output",
-        "project",
-        "prompt",
-        "repo",
-        "right",
+        "operating",
+        "owning",
+        "piece",
         "route",
         "session",
-        "template",
-        "then",
-        "topic",
         "work"
       ],
       "bestFor": [
-        "route work to the right project home"
+        "route work to its current owning home"
       ],
       "useCases": [],
       "askExamples": [],
@@ -7801,66 +7885,6 @@
         "retired imported research prompt"
       ],
       "useCases": [],
-      "askExamples": [],
-      "example": false
-    },
-    {
-      "id": "verify-docs",
-      "humanName": "Verify Docs",
-      "kind": "skill",
-      "summary": "Verify the current state of any third-party software, SDK, API, library, or platform before building or recommending integrations.",
-      "status": "Unknown",
-      "collectionIds": [],
-      "categories": [
-        "Session machinery"
-      ],
-      "portable": "unknown",
-      "verifiedSurfaces": [],
-      "invocationInstructions": [
-        "Standalone skill in the expert-partners-skills repository.",
-        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
-      ],
-      "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
-      "containsSkillIds": [],
-      "relatedIds": [],
-      "accessNote": "Where this is available has not been verified yet.",
-      "technicalDetail": {
-        "canonicalSource": "expert-partners-skills/skills/verify-docs/SKILL.md",
-        "lifecycle": "live",
-        "tier": "user",
-        "zone": "routing",
-        "packaging": "standalone",
-        "inherits": "operating-doctrine"
-      },
-      "keywords": [
-        "api",
-        "before",
-        "building",
-        "check",
-        "current",
-        "doc",
-        "docs",
-        "integrations",
-        "library",
-        "live",
-        "machinery",
-        "party",
-        "platform",
-        "recommending",
-        "sdk",
-        "session",
-        "software",
-        "state",
-        "third",
-        "verify"
-      ],
-      "bestFor": [
-        "live-doc check before building"
-      ],
-      "useCases": [
-        "Use whenever a new tool/software/integration enters the working context (HeyGen, GoHighLevel, Make.com, Notion, Cloudflare, Higgsfield, eXp APIs, Fireflies, Gamma, Stripe, OpenAI/Anthropic SDKs, etc.) or before recommending any code or config that depends on third-party docs."
-      ],
       "askExamples": [],
       "example": false
     },

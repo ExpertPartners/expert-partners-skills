@@ -53,11 +53,11 @@ A carry-back ends with exactly one of the four SESSION STATUS lines from `behavi
 - `SESSION STATUS: Waiting on you -- [exact action].`
 - `SESSION STATUS: Still working -- [what remains]. Keep this session open.`
 - `SESSION STATUS: SAFE TO ARCHIVE -- [evidence in one line].`
-- `SESSION STATUS: NOT safe to archive -- [what is open]; run [/session-wrap | /session-closeout | the named action].`
+- `SESSION STATUS: NOT safe to archive -- [what is open]; run canonical session-wrap or the named unfinished action.`
 
 SAFE TO ARCHIVE is a verified claim, never a phrase. It is issued only after all four verify live in the same turn: `git status` clean and pushed on every repo the session touched; the session record, wrap, or closeout note written and pushed when doctrine requires one; every open wait preserved in its existing Chat to Code job with its named condition and stale date, so nothing dies with the archive; and the job report saved through job_finish with a summary and result link, verified through job_status. The evidence goes in the line itself.
 
-NOT safe means the session diagnoses AND prescribes: it names exactly what is open and the single move that closes it, /session-wrap when chat-only decisions or flags are unrecorded, /session-closeout when shipped work has no handoff note on main, or the named open action otherwise. Never leave Allison to work out which.
+NOT safe means the session diagnoses AND prescribes. Name the unfinished action and use canonical session-wrap for missing outcomes, decisions or continuity. Save artifacts in their current owning homes, keep an unfinished assignment nonterminal, and verify the current job report and result link through job_status when genuinely complete. Never write a closeout note directly to a shared main worktree or invoke an older personal helper to bypass that route. Never leave Allison to work out which action is owed.
 
 What stays with the home conversation is acceptance of the returned evidence against its mission. The worker files its own job_finish report; the job list, not a pin or a separate ledger, holds current work state. Archive consent follows the current HQ Rulebook section Session lifecycle.
 

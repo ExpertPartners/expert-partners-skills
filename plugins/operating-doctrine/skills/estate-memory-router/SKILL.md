@@ -87,7 +87,7 @@ A canon doc, doctrine rule, operating rule, project rule, or rule-encoding skill
 
 ## Owner resolution, live, every time
 
-Before any durable write, resolve the owner from live state, never from topic similarity and never from memory of what repos exist. the HQ Rulebook, a Drive search of the owning brain, the `intake` skill's project map, and `gh api orgs/ExpertPartners/repos` when the candidate set is unclear. Name the owner in the receipt so a wrong route is visible immediately and cheap to correct.
+Before any durable write, resolve the owner from live state, never from topic similarity and never from memory of what repos exist. the HQ Rulebook, a Drive search of the owning brain, the owning brain's own index through the `intake` skill's live resolution, and `gh api orgs/ExpertPartners/repos` when the candidate set is unclear. Name the owner in the receipt so a wrong route is visible immediately and cheap to correct.
 
 ## Receipts and failure honesty
 

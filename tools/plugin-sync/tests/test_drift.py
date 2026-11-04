@@ -1,10 +1,12 @@
 import importlib.util
 import os
+import sys
 import unittest
 
 spec = importlib.util.spec_from_file_location(
     "drift", os.path.join(os.path.dirname(__file__), "..", "drift-check.py"))
 drift = importlib.util.module_from_spec(spec)
+sys.modules[spec.name] = drift
 spec.loader.exec_module(drift)
 
 LIST = """Marketplace `openai-bundled`

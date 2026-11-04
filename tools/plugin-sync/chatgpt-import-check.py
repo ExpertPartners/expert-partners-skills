@@ -3,9 +3,15 @@
 
 Rules come from developers.openai.com/plugins/deploy/submission-errors (read
 2026-10-13). Run before a ChatGPT sync. Exit 1 on any error.
+
+It also checks current source coverage: a live SKILL.md (one with name and
+description front matter) outside a marketplace plugin's skills folder is an
+error, because only marketplace bundles reach any surface. Retired pointers,
+deployed copies and git history are not live and stay allowed.
 """
 import io
 import json
+import os
 import re
 import sys
 import zipfile
@@ -140,6 +146,44 @@ def check_plugin(plug: Path) -> list[str]:
     return errs
 
 
+def is_live_skill(text: str) -> bool:
+    """A live skill opens with front matter naming it; retired pointers and deployed copies do not."""
+    if not text.startswith("---"):
+        return False
+    end = text.find("\n---", 3)
+    if end < 0:
+        return False
+    try:
+        fm = yaml.safe_load(text[3:end])
+    except yaml.YAMLError:
+        return False
+    return isinstance(fm, dict) and isinstance(fm.get("name"), str) and isinstance(fm.get("description"), str)
+
+
+def check_coverage(root: Path) -> list[str]:
+    """Every live SKILL.md in the current source must ship in a marketplace plugin bundle."""
+    errs: list[str] = []
+    market = json.loads((root / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8"))
+    delivered = {(root / str(p.get("source", ""))).resolve() for p in market.get("plugins", [])}
+    plugins = root / "plugins"
+    for plug in sorted(plugins.iterdir()) if plugins.is_dir() else []:
+        if (plug / ".claude-plugin" / "plugin.json").exists() and plug.resolve() not in delivered:
+            errs.append(f"plugins/{plug.name}: plugin is not listed in .claude-plugin/marketplace.json")
+    found: list[Path] = []
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = sorted(d for d in dirnames if not d.startswith(".") and d != "node_modules")
+        found += [Path(dirpath) / n for n in filenames if n.lower() == "skill.md"]
+    for md in sorted(found):
+        rel = md.relative_to(root)
+        packaged = (len(rel.parts) == 5 and rel.parts[0] == "plugins" and rel.parts[2] == "skills"
+                    and (plugins / rel.parts[1]).resolve() in delivered)
+        if packaged or not md.is_file():
+            continue
+        if is_live_skill(md.read_text(encoding="utf-8", errors="replace")):
+            errs.append(f"{rel.as_posix()}: live skill has no marketplace plugin bundle")
+    return errs
+
+
 def main() -> int:
     bad = 0
     for plug in sorted((ROOT / "plugins").iterdir()):
@@ -150,6 +194,11 @@ def main() -> int:
         for e in errs:
             print(f"   {e}")
         bad += len(errs)
+    cov = check_coverage(ROOT)
+    print(f"source coverage: {'OK' if not cov else 'FAIL'}")
+    for e in cov:
+        print(f"   {e}")
+    bad += len(cov)
     return 1 if bad else 0
 
 

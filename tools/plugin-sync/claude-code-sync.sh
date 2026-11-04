@@ -181,10 +181,10 @@ if [[ -n "$CLAUDE" ]]; then
   export PATH
 fi
 
-exec "$PY" - "$CLAUDE" "$REPO" "$STATE_DIR" "$LOG" "$SOURCE_SHA" "$CMD_TIMEOUT" "${PLUGIN_SYNC_FORCE:-0}" <<'PY'
-import json, os, subprocess, sys, time
+exec "$PY" - "$CLAUDE" "$REPO" "$STATE_DIR" "$LOG" "$SOURCE_SHA" "$CMD_TIMEOUT" "${PLUGIN_SYNC_FORCE:-0}" "$HERE/legacy-skills.py" <<'PY'
+import importlib.util, json, os, subprocess, sys, time
 
-claude, repo, state_dir, log_path, head, timeout, force = sys.argv[1:8]
+claude, repo, state_dir, log_path, head, timeout, force, legacy_helper = sys.argv[1:9]
 MK = "expert-partners"
 RECEIPT = os.path.join(state_dir, "claude-code-delivery.json")
 RECHECK_SECONDS = 24 * 3600
@@ -237,7 +237,19 @@ def inventory():
     return got
 
 
-def finish(failures, have):
+def retire_legacy():
+    """Turn off the old user-tier copies the operating-doctrine plugin replaced."""
+    try:
+        spec = importlib.util.spec_from_file_location("legacy_skills", legacy_helper)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod.MIGRATIONS["claude-code"](repo, state_dir, head, log, claude, float(timeout))
+    except Exception as e:  # a broken helper must fail the run visibly, never hide delivery
+        log(f"FAILED: legacy skill migration: {e!r}")
+        return {"status": "failed", "failures": [f"legacy skill migration crashed: {e!r}"]}
+
+
+def finish(failures, have, legacy=None):
     plugins = {}
     for name, v in sorted(want.items()):
         version, enabled = (None, None) if have is None else have.get(name, (None, None))
@@ -259,13 +271,15 @@ def finish(failures, have):
                "status": "ok" if ok else "failed", "failures": failures, "plugins": plugins,
                "checked_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "checked_epoch": int(time.time()),
                "note": NOTE}
+    if legacy is not None:
+        receipt["legacy_skills"] = legacy
     tmp = f"{RECEIPT}.{os.getpid()}.tmp"
     with open(tmp, "w") as f:
         json.dump(receipt, f, indent=2)
         f.write("\n")
     os.replace(tmp, RECEIPT)
     log(f"delivered {head[:7]}" if ok else f"FAILED: not delivered at {head[:7]}: " + "; ".join(failures))
-    sys.exit(0 if ok else 1)
+    sys.exit(0 if ok and (legacy or {}).get("status") != "failed" else 1)
 
 
 try:
@@ -274,6 +288,7 @@ try:
 except (OSError, ValueError):
     prev = {}
 if (force != "1" and prev.get("status") == "ok" and prev.get("commit") == head
+        and (prev.get("legacy_skills") or {}).get("status") not in ("failed", "waiting")
         and time.time() - prev.get("checked_epoch", 0) < RECHECK_SECONDS):
     sys.exit(0)
 
@@ -311,5 +326,5 @@ for name in sorted(want):
 after = inventory()
 if after is None:
     failures.append("claude plugin list --json readback failed")
-finish(failures, after)
+finish(failures, after, retire_legacy())
 PY
