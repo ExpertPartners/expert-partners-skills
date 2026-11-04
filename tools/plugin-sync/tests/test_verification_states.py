@@ -250,7 +250,28 @@ class States(unittest.TestCase):
         os.utime(os.path.join(self.home, ".claude/plugins/synced/srv-alpha-z/alpha/.claude-plugin/plugin.json"),
                  (NOW - 60, NOW - 60))
         r = self.rec(self.check(), "claude.ai", "alpha")
-        self.assertEqual((r["supporting"]["newest_version"], r["delivery"]["state"]), ("0.9.0", "stale"))
+        # an old local copy says nothing about the server, so only the cache is stale
+        self.assertEqual((r["supporting"]["newest_version"], r["supporting"]["state"]), ("0.9.0", "stale"))
+        self.assertEqual(r["delivery"]["state"], "unknown")
+
+    def test_old_local_cache_without_a_receipt_is_unknown_cloud_delivery(self):
+        plugins = {n: (self.versions[n], f, True) for n, f in self.folders.items()}
+        self.install_claude_code(plugins)
+        self.install_codex(plugins)
+        for name in self.folders:
+            old = make_plugin(os.path.join(self.tmp, "old"), name, "0.1.0", body="old")
+            self.sync_copy(f"srv-{name}", old, NOW - 30 * DAY)
+        out = self.check()
+        delivery = out.report["summary"]["delivery"]
+        self.assertEqual(delivery["claude-code"], {"delivered": 2})
+        self.assertEqual(delivery["codex"], {"delivered": 2})
+        self.assertEqual(delivery["claude.ai"], {"unknown": 2})
+        self.assertNotIn("stale", delivery["claude.ai"])
+        for name in self.folders:
+            r = self.rec(out, "claude.ai", name)
+            self.assertEqual(r["supporting"]["state"], "stale")
+            self.assertEqual(r["runtime"]["state"], "unverified")
+        self.assertEqual(out.verification, "unverified")
 
     def test_continuous_main_pushes_do_not_reset_the_deadline(self):
         dues, state = [], {}
@@ -413,17 +434,49 @@ class States(unittest.TestCase):
         self.assertEqual(report["surfaces"]["codex"]["plugins"]["alpha"]["delivery"]["state"], "unknown")
         self.assertEqual(walk(), before)
 
+    JOB_ROW = [drift.JOB, "HQ", "job", "Not started", "w", "n", "2026-10-01", "2026-10-01"]
+
     def test_legacy_writer_never_adds_or_reopens_rows(self):
-        job = [drift.JOB, "HQ", "job", "Not started", "w", "n", "2026-10-01", "2026-10-01"]
+        job = self.JOB_ROW
         done = job[:3] + ["Done"] + job[4:]
         lines = ["runtime use unproven for 8 of 8 plugin records"]
-        self.assertEqual(drift.legacy_row_write([["Job"]], lines, C1, "2026-11-04")[0], "none")
-        self.assertEqual(drift.legacy_row_write([["Job"], done], lines, C1, "2026-11-04")[0], "none")
-        action, n, vals = drift.legacy_row_write([["Job"], job], lines, C1, "2026-11-04")
+        write = drift.legacy_row_write
+        self.assertEqual(write([["Job"]], lines, C1, "2026-11-04", "unverified")[0], "none")
+        self.assertEqual(write([["Job"], done], lines, C1, "2026-11-04", "unverified")[0], "none")
+        action, n, vals = write([["Job"], job], lines, C1, "2026-11-04", "unverified")
         self.assertEqual((action, n, vals[3]), ("update", 2, "Not started"))
         self.assertIn("runtime use unproven", vals[5])
-        action, n, vals = drift.legacy_row_write([["Job"], job], [], C1, "2026-11-04")
+        action, n, vals = write([["Job"], job], [], C1, "2026-11-04", "verified")
         self.assertEqual((action, vals[3]), ("update", "Done"))
+
+    def test_legacy_writer_closes_only_on_structured_verification(self):
+        for verification in ("unverified", "behind"):
+            action, n, vals = drift.legacy_row_write([["Job"], self.JOB_ROW], [], C1, "2026-11-04", verification)
+            self.assertEqual((action, vals[3]), ("update", "Not started"))
+            self.assertIn(f"verification is {verification}", vals[5])
+        action, n, vals = drift.legacy_row_write([["Job"], self.JOB_ROW], ["x"], C1, "2026-11-04", "verified")
+        self.assertEqual(vals[3], "Not started")
+
+    def test_cloud_disabled_or_unknown_enabled_never_marks_done(self):
+        path = os.path.join(self.home, ".claude/plugin-sync/chatgpt-last-sync.json")
+        self.deliver_everything()
+        self.runtime()
+        for flag, state in ((False, "disabled"), (None, "unknown")):
+            with self.subTest(enabled=state):
+                receipt = self.fingerprint_receipt()
+                if flag is None:
+                    del receipt["plugins"]["alpha"]["enabled"]
+                else:
+                    receipt["plugins"]["alpha"]["enabled"] = flag
+                write_json(path, receipt)
+                out = self.check()
+                self.assertEqual(self.rec(out, "chatgpt", "alpha")["enabled"], state)
+                self.assertEqual(out.verification, "unverified")
+                self.assertIn("ChatGPT not confirmed enabled: alpha", out.lines)
+                action, _, vals = drift.legacy_row_write([["Job"], self.JOB_ROW], out.lines, out.head,
+                                                         "2026-11-04", out.verification)
+                self.assertEqual((action, vals[3]), ("update", "Not started"))
+                self.assertIn("ChatGPT not confirmed enabled: alpha", vals[5])
 
 
 if __name__ == "__main__":

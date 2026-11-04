@@ -11,9 +11,12 @@ Every surface gets one record per plugin, and each record keeps four questions a
                  pending     a local client differs and its deadline has not passed
                  behind      a local client holds other content past its deadline
                  missing     a local client has not installed the plugin past its deadline
-                 unverified  some evidence, none of it proof (version only, or a cloud cache copy)
-                 stale       the newest evidence describes older content than main publishes
-                 unknown     no evidence at all (no receipt, inventory unreadable)
+                 unverified  some evidence, none of it proof (version only, or a cloud cache copy
+                             that matches main)
+                 stale       the newest destination evidence (installed bytes or a receipt)
+                             describes older content than main publishes
+                 unknown     no evidence about the destination (no receipt, inventory unreadable,
+                             or only a local cache copy older than main)
                  skipped     excluded on purpose by codex-skip.txt
   enabled      enabled, disabled or unknown. A disabled plugin never counts as in use.
   runtime      verified only by a runtime receipt naming the published fingerprint, stale when
@@ -25,7 +28,9 @@ Surfaces:
                install cache ~/.codex/plugins/cache/expert-partners/<plugin>/<version>/
   claude.ai    a human-verified receipt, claude-ai-last-sync.json, is the only proof. The copies
                Claude Code downloads into ~/.claude/plugins/synced are supporting evidence: a
-               fresh download proves neither server inventory nor a loaded conversation.
+               fresh download proves neither server inventory nor a loaded conversation, and an
+               old one only shows that this local client has not refreshed. Without a receipt,
+               an old cache marks the supporting evidence stale and cloud delivery unknown.
   chatgpt      a human-verified receipt, chatgpt-last-sync.json. No read API is documented
                (checked 2026-10-13), so a missing receipt is reported as unknown.
 
@@ -557,23 +562,33 @@ def judge_receipt(receipt: Receipt, name: str, want: Published, at_commit: dict[
     return "stale", who, f"receipt describes older content than main publishes; {when}"
 
 
+def cache_matches(want: Published, copies: list[CacheCopy]) -> bool:
+    newest = max(copies, key=lambda c: c.fetched_at)
+    return bool(want.fingerprint) and newest.fingerprint == want.fingerprint
+
+
 def cache_support(want: Published, copies: list[CacheCopy]) -> dict[str, object]:
     newest = max(copies, key=lambda c: c.fetched_at)
     return {"source": "local synced cache, supporting evidence only",
+            "state": "current" if cache_matches(want, copies) else "stale",
             "copies": len(copies), "versions": sorted({c.version for c in copies}),
             "newest_version": newest.version, "newest_fetched_at": iso(newest.fetched_at),
-            "newest_matches_published": bool(want.fingerprint) and newest.fingerprint == want.fingerprint}
+            "newest_matches_published": cache_matches(want, copies)}
 
 
 def judge_cache(want: Published, copies: list[CacheCopy]) -> Judgment:
+    """Cloud delivery when there is no receipt. The cache shows only what this local client
+    last downloaded, so an old copy is stale supporting evidence, never stale cloud delivery."""
     if not copies:
         return "unknown", "none", "no receipt and no local cache copy"
     newest = max(copies, key=lambda c: c.fetched_at)
     extra = f"; {len(copies)} cached generations" if len(copies) > 1 else ""
-    if want.fingerprint and newest.fingerprint == want.fingerprint:
+    if cache_matches(want, copies):
         return ("unverified", "local cache, supporting only",
                 "no receipt; a fresh local copy proves neither server inventory nor a loaded conversation" + extra)
-    return "stale", "local cache, supporting only", f"no receipt; the newest local copy is {newest.version}{extra}"
+    return ("unknown", "local cache, supporting only",
+            f"no receipt; the newest local copy is {newest.version}, which shows only that this client "
+            f"has not refreshed, not what the server holds{extra}")
 
 
 def local_records(surface: str, pub: Publication, inv: dict[str, Installed] | None, detail: str,
@@ -664,7 +679,7 @@ def summary_lines(records: list[Record]) -> list[str]:
         if counts:
             lines.append(f"{LABELS[surface]} delivery " + ", ".join(f"{n} {s}" for s, n in sorted(counts.items())))
         off = sorted(r.plugin for r in mine if r.delivery != "skipped" and r.enabled != "enabled")
-        if off and surface in ("claude-code", "codex"):
+        if off:
             lines.append(f"{LABELS[surface]} not confirmed enabled: {', '.join(off)}")
     unproven = [r for r in records if r.delivery != "skipped" and r.runtime != "verified"]
     if unproven:
@@ -838,12 +853,15 @@ def plan_row(
 
 
 def legacy_row_write(
-    rows: list[list[str]], lines: list[str], head_sha: str, today: str
+    rows: list[list[str]], lines: list[str], head_sha: str, today: str, verification: Verification
 ) -> tuple[Literal["update", "none"], int | None, list[str] | None]:
     """The legacy writer only maintains an existing open row. New rows stopped with the
-    retired tracker rows, a closed row is never reopened, and the row closes only when
-    every record is verified end to end (lines is empty)."""
-    action, n, values = plan_row(rows, lines, head_sha, today)
+    retired tracker rows, and a closed row is never reopened. The row closes only on the
+    structured verification; empty prose lines alone never prove anything."""
+    reasons = list(lines)
+    if verification != "verified" and not reasons:
+        reasons = [f"verification is {verification}; see the drift-check JSON report"]
+    action, n, values = plan_row(rows, reasons, head_sha, today)
     if action != "update" or n is None:
         return ("none", None, None)
     existing = rows[n - 1]
@@ -852,11 +870,11 @@ def legacy_row_write(
     return ("update", n, values)
 
 
-def update_legacy_row(lines: list[str], head_sha: str, dry: bool) -> None:
+def update_legacy_row(lines: list[str], head_sha: str, verification: Verification, dry: bool) -> None:
     today = time.strftime("%Y-%m-%d")
     vals, sheet_id = sheets()
     got = vals.get(spreadsheetId=sheet_id, range=f"{TAB}!A:H").execute().get("values", [])
-    action, rownum, values = legacy_row_write(got, lines, head_sha, today)
+    action, rownum, values = legacy_row_write(got, lines, head_sha, today, verification)
     if dry or action == "none":
         print(f"legacy row: {action} {rownum} {values}", file=sys.stderr)
         return
@@ -881,7 +899,7 @@ def main(argv: list[str]) -> int:
     if not args.offline:
         if not args.dry_run:
             save_state(args.home, out.state)
-        update_legacy_row(out.lines, out.head, args.dry_run)
+        update_legacy_row(out.lines, out.head, out.verification, args.dry_run)
     return EXIT[out.verification]
 
 
