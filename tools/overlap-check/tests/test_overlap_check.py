@@ -5,6 +5,7 @@ Run from the repo root: python3 -m unittest discover -s tools/overlap-check/test
 """
 
 import importlib.util
+import io
 import json
 import os
 import random
@@ -212,6 +213,22 @@ class FakeGitHub:
 
 def issue(number, *paths, labels=("job",)):
     return {"number": number, "body": job_body(*paths), "labels": list(labels)}
+
+
+class GitHubDiagnostics(unittest.TestCase):
+    def test_http_error_reports_only_method_and_path_as_request_context(self):
+        endpoint = f"https://api.github.com/repos/{REPO}/issues/237/labels?private=query-value"
+        failure = oc.urllib.error.HTTPError(endpoint, 403, "Forbidden", {},
+                                            io.BytesIO(b'{"message":"Resource not accessible by integration"}'))
+        client = oc.GitHub("credential-must-never-appear")
+        with mock.patch.object(oc.urllib.request, "urlopen", side_effect=failure):
+            with self.assertRaises(oc.GitHubError) as caught:
+                client._request("POST", endpoint, {"private": "body-must-never-appear"})
+        diagnostic = str(caught.exception)
+        self.assertEqual(caught.exception.status, 403)
+        self.assertIn(f"HTTP 403 POST /repos/{REPO}/issues/237/labels:", diagnostic)
+        for private in ("query-value", "body-must-never-appear", "credential-must-never-appear", "Authorization", "https://"):
+            self.assertNotIn(private, diagnostic)
 
 
 class ParseScope(unittest.TestCase):
@@ -957,6 +974,33 @@ class Workflows(unittest.TestCase):
         self.assertIn("if: always() && needs.gate.outputs.start == 'true'", text)
         self.assertIn("BUILD_RESULT: ${{ needs.build.result }}", text)
         self.assertIn('python3 "$script" release', text)
+
+    def test_redispatch_permissions_cover_actual_claim_restore_and_technical_wait_writes(self):
+        text = self.read("factory-builder-reusable.yml").split("  redispatch:", 1)[1]
+        permissions = text.split("    permissions:\n", 1)[1].split("    steps:", 1)[0]
+        granted = dict(line.strip().split(": ", 1) for line in permissions.splitlines()
+                       if ": " in line and not line.strip().startswith("#"))
+        self.assertEqual(granted, {"actions": "write", "contents": "read", "issues": "write", "pull-requests": "read"})
+        gh = FakeGitHub([issue(237, "x/a.py", labels=("job", "waiting"))])
+        for name in ("post", "patch", "delete"):
+            method = getattr(gh, name)
+            def authorized(path, *args, _method=method):
+                if "/issues/" in path and granted["issues"] != "write":
+                    raise oc.GitHubError(403, "Resource not accessible by integration")
+                return _method(path, *args)
+            setattr(gh, name, authorized)
+        self.assertEqual(oc.run_next(gh, CFG, NOOP), [237])
+        self.assertIn(("DELETE", f"/repos/{REPO}/issues/237/labels/waiting", None), gh.writes())
+        gh.post(f"/repos/{REPO}/issues/237/labels", {"labels": ["waiting"]})
+        with self.assertRaises(RuntimeError):
+            oc.run_next(gh, CFG, mock.Mock(side_effect=RuntimeError("dispatch failed")))
+        self.assertIn("waiting", gh.labels(237), "failed dispatch can restore its claim")
+        p = pr(240, ["x/a.py"], closes=237)[1]
+        gh.prs = [p]
+        gh.activities[p["head"]["ref"]] = []
+        self.assertEqual(oc.run_next(gh, CFG, NOOP), [])
+        self.assertTrue(gh.comment_bodies(237), "a provenance wait can write its precise receipt")
+
 
     def test_restarts_on_closed_issues_and_removed_in_progress(self):
         text = self.read("factory-builder-reusable.yml")

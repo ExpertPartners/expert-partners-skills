@@ -122,8 +122,11 @@ BARE_FILENAMES = {"Makefile", "Dockerfile", "CODEOWNERS", "LICENSE", "Procfile",
 
 
 class GitHubError(Exception):
-    def __init__(self, status: int, message: str):
-        super().__init__(f"HTTP {status}: {message}")
+    def __init__(self, status: int, message: str, method: str = "", path: str = ""):
+        self.method = method
+        self.path = urllib.parse.urlsplit(path).path
+        context = f" {method} {self.path}" if method and self.path else ""
+        super().__init__(f"HTTP {status}{context}: {message}")
         self.status = status
         self.message = message
 
@@ -155,7 +158,7 @@ class GitHub:
                 detail = json.loads(detail).get("message", detail)
             except ValueError:
                 pass
-            raise GitHubError(exc.code, detail) from None
+            raise GitHubError(exc.code, detail, method, url) from None
         return (json.loads(raw) if raw else None), link
 
     def get(self, path: str, params: dict | None = None):

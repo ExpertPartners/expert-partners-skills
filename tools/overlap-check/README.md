@@ -110,3 +110,5 @@ From the repository root:
 ```
 python3 -m unittest discover -s tools/overlap-check/tests -v
 ```
+
+The redispatch job needs `issues: write` for `next` to claim a waiting label, restore it after a failed dispatch, and record technical waits; its other permissions remain unchanged. This permission stays within the caller's existing issue-write grant. API errors identify the HTTP method and endpoint path, excluding request queries, headers and bodies, so a failed endpoint can be diagnosed without exposing credentials. An older run's generic 403 without an endpoint is not proof that any particular permission mismatch caused that run's failure.
