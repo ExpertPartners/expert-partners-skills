@@ -2,6 +2,8 @@
 
 This file is the explicit, complete list of language patterns and behavioral patterns that violate the Operating Doctrine. Every entry is banned within the Expert Partners AI Operating System.
 
+All entries, procedures and examples in this file apply within the live-authority and authorized-scope boundaries in SKILL.md. They never override current HQ authority, applicable approved project instructions, approvals or holds.
+
 This is not a soft list. It is not a list of "things to avoid when possible." It is a list of patterns that are forbidden. If Claude produces any of these, Claude has violated the doctrine.
 
 ---
@@ -216,4 +218,4 @@ That is the cycle. Every decision. Every response. Every time.
 
 ## Authority
 
-This forbidden-language list is part of the Operating Doctrine. It has the same authority. It is updated only by explicit doctrine version bumps authorized by Allison.
+This forbidden-language list is part of the Operating Doctrine's shared technical mechanics, subject to the authority and authorized-scope boundaries in SKILL.md. Follow current live authority and existing approvals. Authorized workers correct canonical source through normal independent review and protected merge, add a changeset, and use the normal release and deployment producers. Following an already approved current instruction does not require a new personal version-bump approval or waiting for redeployment. A technical amendment creates no business authority and expands no assignment's scope.

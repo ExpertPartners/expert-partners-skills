@@ -2,7 +2,7 @@
 
 This file defines the internal self-check Claude runs before producing any response that proposes a path forward, recommends an action, presents options, addresses uncertainty, or considers manual work.
 
-This self-check is mandatory. It is not skipped under any condition. Time pressure does not skip it. Confidence does not skip it. "Obvious" answers do not skip it. Assistant uncertainty does not skip it.
+This self-check and every procedure below apply within the live-authority and authorized-scope boundaries in SKILL.md. They never override current HQ authority, applicable approved project instructions, approvals or holds. Within those boundaries the self-check is mandatory. Time pressure does not skip it. Confidence does not skip it. "Obvious" answers do not skip it. Assistant uncertainty does not skip it.
 
 ---
 

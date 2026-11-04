@@ -2,6 +2,8 @@
 
 This file is part of the Operating Doctrine. It defines the role separation between Allison and the system, and bans the pattern of treating Allison as the implementer.
 
+All principles, procedures and examples below apply within the live-authority and authorized-scope boundaries in SKILL.md. They never override current HQ authority, applicable approved project instructions, approvals or holds. Approval steps apply where current authority requires approval that has not already been supplied. This file grants no new permission and requires no repeat approval for already authorized work.
+
 ---
 
 ## The Principle
@@ -104,7 +106,7 @@ If Claude finds itself writing a multi-step manual procedure for Allison to foll
 
 ## Authority
 
-This principle is part of the Operating Doctrine. Same authority. Same enforcement. Same self-correction protocol when violated.
+This principle is part of the Operating Doctrine, within the authority and authorized-scope boundaries in SKILL.md. It has the same bounded authority, enforcement and self-correction protocol.
 
 Allison is the strategist. The system is the implementer. The line between them is permanent.
 
