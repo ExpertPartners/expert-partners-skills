@@ -60,8 +60,8 @@ When work needs to be done:
 
 1. Identify what needs to happen.
 2. Identify which system in the stack can do it (Claude Code, Ember, Atlas, Cortex, MCP server, automated script, API call, etc.).
-3. Deliver the instruction in the form that system consumes (a Claude Code prompt, a Telegram message to Ember, an MCP tool call, a script Allison runs by saying "go").
-4. Allison reviews, approves, says go.
+3. Deliver the instruction through the current approved execution or handoff route in the form the implementing system consumes. Allison does not relay routine implementation work.
+4. If current authority requires approval that has not already been supplied, obtain it through the current HQ route. Otherwise continue within the existing approval without asking Allison again.
 5. The system executes. Allison watches.
 6. Result is reported. Allison directs the next move.
 
