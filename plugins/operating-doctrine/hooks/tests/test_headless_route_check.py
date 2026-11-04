@@ -219,6 +219,19 @@ class Decisions(HookCase):
                 reason = self.assertDenied(self.run_hook(None, tool, tool_input))
                 self.assertIn("GoHighLevel contacts", reason)
 
+    def test_protocol_relative_navigation_to_a_live_system_is_denied(self):
+        cases = (
+            ("mcp__playwright-ember__browser_navigate", {"url": "//app.gohighlevel.com/v2/contacts"}),
+            ("mcp__claude-in-chrome__navigate", {"url": "\\\\app.gohighlevel.com/x"}),
+            ("mcp__playwright-ember__browser_evaluate",
+             {"function": "() => { window.location.href = '//app.gohighlevel.com/x'; }"}),
+            ("mcp__playwright-ember__browser_run_code_unsafe",
+             {"code": "async (page) => { await page.goto('//link.leadconnectorhq.com/x'); }"}),
+        )
+        for tool, tool_input in cases:
+            with self.subTest(tool=tool, tool_input=tool_input):
+                self.assertIn("GoHighLevel contacts", self.assertDenied(self.run_hook(None, tool, tool_input)))
+
     def test_browser_code_without_a_mapped_navigation_is_allowed(self):
         code = "async (page) => { await page.goto('https://portal.vendor.example/'); return page.title(); }"
         self.assertAllowed(self.run_hook(None, "mcp__playwright-ember__browser_run_code_unsafe", {"code": code}))
@@ -319,6 +332,32 @@ class Refresh(HookCase):
         self.assertFalse(ok)
         self.assertIn("missing the column", message)
         self.assertEqual(self.read(hrc.CACHE_FILE), before)
+
+    def test_incomplete_row_keeps_the_last_good_copy(self):
+        self.write_cache()
+        self.fresh_stamp()
+        before = self.read(hrc.CACHE_FILE)
+        ghl_row = MAP_ROWS.split("\n")[0]
+        system, hosts, rest = ghl_row.split(",", 1)[0], '"app.gohighlevel.com, *.leadconnectorhq.com"', ghl_row.rsplit('"', 1)[1]
+        cases = (
+            ("no Hosts", "row 2 has no Hosts", system + ',""' + rest),
+            ("no System", "row 2 has no System", "," + hosts + rest),
+            ("no Status", "row 2 has no Status", system + "," + hosts + rest.replace(",Live,", ",,")),
+        )
+        for name, expected, row in cases:
+            with self.subTest(case=name):
+                self.configure_fetch(MAP_CSV.replace(ghl_row, row, 1))
+                ok, message = hrc.refresh()
+                self.assertFalse(ok)
+                self.assertIn(expected, message)
+                self.assertEqual(self.read(hrc.CACHE_FILE), before)
+                self.assertDenied(self.run_hook("https://app.gohighlevel.com/v2/contacts"))
+
+    def test_wholly_blank_rows_are_skipped(self):
+        self.configure_fetch(MAP_CSV + ",,,,,\n,  ,,,,\n")
+        ok, message = hrc.refresh()
+        self.assertTrue(ok, message)
+        self.assertEqual(len(json.loads(self.read(hrc.CACHE_FILE))["systems"]), 11)
 
     def test_no_configuration_fails_without_a_cache(self):
         ok, message = hrc.refresh()

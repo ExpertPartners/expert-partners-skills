@@ -22,7 +22,7 @@ The hook backs the check order in browser-automation Rule 0, which points to whe
 
 Either way the session gets the `Headless route checked` report line to use. A refusal carries it in the deny reason. A call that goes through gets it as `additionalContext`, with no permission decision, so the normal permission flow is unchanged.
 
-A host matches a map entry when it is the entry's host or a subdomain of it, and the most specific entry wins. `about:`, `chrome:`, `file:` and local addresses are never checked.
+A host matches a map entry when it is the entry's host or a subdomain of it, and the most specific entry wins. A protocol-relative target such as `//host/path` is checked as `https://host/path`. `about:`, `chrome:`, `file:` and local addresses are never checked.
 
 - `example.com` covers `example.com` and every subdomain. `*.example.com` covers the subdomains only. For one host name, an exact match beats `*.`, which beats a parent domain.
 - Two rows can share a host, for example one feature with an API and one without. When equally specific rows disagree, the status decides and row order never does: no API wins and the call goes through, because the feature with no API needs the browser. The hook logs `map-conflict` in `hook.log`. The skills' check order still applies, so work the API covers goes through the API.
@@ -31,7 +31,7 @@ The map needs the columns System, Hosts, Headless route, 1Password item, Status 
 
 ### The cache
 
-The hook reads only a local copy of the map, so a browser call never waits on Drive. After the hook has printed its decision, it starts one background refresh if the last refresh attempt is more than an hour old. A failed refresh keeps the last good copy. Run a refresh by hand with:
+The hook reads only a local copy of the map, so a browser call never waits on Drive. After the hook has printed its decision, it starts one background refresh if the last refresh attempt is more than an hour old. A failed refresh keeps the last good copy. A refresh also fails, and keeps the last good copy, when a row that is not wholly blank has no System, Hosts or Status, so a half-finished edit to the sheet never drops a protected host from the cache. Wholly blank rows are skipped. Run a refresh by hand with:
 
 ```
 python3 plugins/operating-doctrine/hooks/headless_route_check.py --refresh

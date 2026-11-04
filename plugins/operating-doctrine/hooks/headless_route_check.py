@@ -232,17 +232,24 @@ def parse_map(csv_text: str) -> list[dict]:
         return row[index].strip() if index is not None and index < len(row) else ""
 
     systems = []
-    for row in rows[1:]:
+    for number, row in enumerate(rows[1:], start=2):
+        if not any(value.strip() for value in row):
+            continue
         system = cell(row, "system")
         hosts = split_hosts(cell(row, "hosts"))
-        if not system or not hosts:
-            continue
+        status = cell(row, "status")
+        # A half-edited row must fail the refresh, so the last good copy keeps protecting its
+        # hosts instead of the row silently dropping out of the map.
+        blank = [name for name, value in (("System", system), ("Hosts", hosts), ("Status", status))
+                 if not value]
+        if blank:
+            raise ValueError(f"access map row {number} has no {', '.join(blank)}")
         systems.append({
             "system": system,
             "hosts": hosts,
             "route": cell(row, "route"),
             "item": cell(row, "item"),
-            "status": normalize_status(cell(row, "status")),
+            "status": normalize_status(status),
             "reason": cell(row, "reason"),
         })
     if not systems:
@@ -415,7 +422,10 @@ def target_urls(tool_input: object) -> list[str]:
 
 def target_host(url: str) -> str:
     """The host a navigation goes to, or "" when it is not a web site (about:, file:, local)."""
-    if not re.match(r"^[a-zA-Z][a-zA-Z0-9+.-]*:", url) or re.match(r"^[^:/]+:\d", url):
+    # Protocol-relative, as browsers read it: //host/x, and \\host/x since they treat \ as /.
+    if re.match(r"^[/\\]{2}", url):
+        url = "https://" + url.lstrip("/\\")
+    elif not re.match(r"^[a-zA-Z][a-zA-Z0-9+.-]*:", url) or re.match(r"^[^:/]+:\d", url):
         url = "https://" + url
     try:
         parts = urllib.parse.urlsplit(url)
