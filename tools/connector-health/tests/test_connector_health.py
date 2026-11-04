@@ -20,6 +20,7 @@ import sys
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 TOOL = os.path.join(HERE, "..", "connector_health.py")
@@ -46,7 +47,13 @@ CANARIES = (
     "canary.expected@example.com",
     "canary-late-echo",
 )
-CONFIG_BYTES = b'[mcp_servers.github]\ncommand = "gh-mcp"\n\n[mcp_servers.github.env]\nTOKEN_NAME = "canary-env-value-alpha"\n'
+CONFIG_BYTES = (
+    b'[mcp_servers.github]\ncommand = "gh-mcp"\n\n'
+    b'[mcp_servers.github.env]\nTOKEN_NAME = "canary-env-value-alpha"\n'
+    b'[mcp_servers.airtable]\nurl = "https://mcp.example/"\n'
+    b'[mcp_servers.browser-controller]\ncommand = "synthetic-browser"\n'
+    b'[mcp_servers.desktop_bridge]\nurl = "https://desktop.example/"\n'
+)
 REPORT_KEYS = {"report", "format", "checked_at", "duration_ms", "state", "error_code", "probes"}
 PROBE_KEYS = {"probe_id", "service", "checked_at", "duration_ms", "state", "error_code"}
 GMAIL_URL = "https://gmail.googleapis.com/gmail/v1/users/me/profile"
@@ -229,6 +236,45 @@ class ClassifyTest(unittest.TestCase):
         self.assertEqual(self.judge(text_result({"success": False})), ("service_error", "status_failed"))
         self.assertEqual(self.judge(text_result("Error: Unauthorized")), ("auth_refused", "auth_error"))
 
+    def test_nested_mcp_errors_override_valid_identity(self):
+        for wrapper in ("result", "response", "data", "body", "payload"):
+            for reason, expected in (
+                ("Unauthorized", ("auth_refused", "auth_error")),
+                ("Forbidden", ("scope_refused", "scope_error")),
+                ("provider failed", ("service_error", "mcp_is_error")),
+            ):
+                nested = {wrapper: {"id": "synthetic-id", **text_result(reason, True)}}
+                with self.subTest(wrapper=wrapper, reason=reason):
+                    self.assertEqual(self.judge(text_result(nested)), expected)
+
+    def test_nested_content_and_structured_errors_are_inspected(self):
+        nested = {"result": {"id": "synthetic-id", "content": [
+            {"type": "text", "text": json.dumps({"error": {"code": 401}})},
+        ]}}
+        self.assertEqual(self.judge(text_result(nested)), ("auth_refused", "http_401"))
+        nested = {"result": {"id": "synthetic-id", "structuredContent": {
+            "response": text_result("Unauthorized", True),
+        }}}
+        self.assertEqual(self.judge(text_result(nested)), ("auth_refused", "auth_error"))
+
+        nested = {"result": {"id": "synthetic-id", "isError": False,
+                             "content": [{"type": "text", "text": "Unauthorized"}]}}
+        self.assertEqual(self.judge(text_result(nested)), ("auth_refused", "auth_error"))
+
+    def test_service_content_field_is_not_a_malformed_mcp_envelope(self):
+        self.assertEqual(self.judge(text_result({"content": "ordinary preference"}),
+                                    probe("get_preferences")), ("ok", None))
+
+    def test_error_envelope_limits_fail_closed_before_identity(self):
+        nested = text_result("Unauthorized", True)
+        for _ in range(20):
+            nested = {"result": nested}
+        self.assertEqual(self.judge(text_result({"id": "synthetic-id", "result": nested})),
+                         ("malformed_result", "envelope_limit"))
+        wide = [{"result": {}} for _ in range(300)]
+        self.assertEqual(self.judge(text_result({"id": "synthetic-id", "result": wide})),
+                         ("malformed_result", "envelope_limit"))
+
     def test_scope_refusal(self):
         body = {"error": {"code": 403, "status": "PERMISSION_DENIED", "message": "Request had insufficient authentication scopes."}}
         self.assertEqual(self.judge(text_result(body)), ("scope_refused", "http_403"))
@@ -272,6 +318,18 @@ class ClassifyTest(unittest.TestCase):
 
 
 class CliParsingTest(unittest.TestCase):
+    def test_isolation_reads_only_saved_user_transport_names(self):
+        with tempfile.TemporaryDirectory() as home:
+            with open(os.path.join(home, "config.toml"), "w", encoding="utf-8") as fh:
+                fh.write('[mcp_servers.user_stdio]\ncommand = "synthetic"\n'
+                         '[mcp_servers.user_http]\nurl = "https://example.invalid/mcp"\n'
+                         '[mcp_servers.partial]\nenabled = false\n')
+            with patch.dict(os.environ, {"CODEX_HOME": home}):
+                saved = ch.saved_transport_names()
+            self.assertEqual(saved, {"user_stdio", "user_http"})
+            args = ch._isolation_args({"user_stdio"}, saved, set())
+            self.assertEqual(args, ["-c", "mcp_servers.user_http.enabled=false"])
+
     def test_mcp_list_keeps_only_names_and_enabled(self):
         raw = json.dumps([
             {"name": "github", "enabled": True, "transport": {"env": {"TOKEN_NAME": CANARIES[0]}}},
@@ -551,9 +609,23 @@ class EndToEndTest(EndToEndBase):
     def test_unsafe_unselected_name_fails_closed(self):
         sc = self.scenario()
         sc["mcp_list"].append({"name": "odd.name", "enabled": True})
+        with open(self.config, "a", encoding="utf-8") as fh:
+            fh.write('\n[mcp_servers."odd.name"]\ncommand = "synthetic"\n')
         rc, report = self.check(sc, self.default_probes())
         self.assertEqual((rc, report["state"], report["error_code"]), (3, "unsupported_protocol", "unsafe_server_name"))
         self.assertEqual(self.launches(), [])
+
+    def test_managed_list_names_never_become_partial_user_registrations(self):
+        sc = self.scenario()
+        sc["mcp_list"].extend([
+            {"name": "managed_app", "enabled": True, "transport": {"type": "managed"}},
+            {"name": "plugin.injected", "enabled": True},
+        ])
+        rc, report = self.check(sc, self.default_probes())
+        self.assertEqual((rc, report["state"]), (0, "ok"))
+        [launch] = self.launches()
+        self.assertFalse(any("managed_app" in arg or "plugin.injected" in arg for arg in launch))
+        self.assertIn("mcp_servers.browser-controller.enabled=false", launch)
 
     def test_server_requests_and_notices_do_not_deadlock(self):
         rc, report = self.check(self.scenario(pre_messages=True), self.default_probes())
@@ -606,6 +678,18 @@ class RealCodexTest(EndToEndBase):
         marker = self.path("bystander-started")
         for name, mode in (("probe", "ok"), ("walled", "forbidden"), ("bystander", "marker:" + marker)):
             subprocess.run([codex, "mcp", "add", name, "--", sys.executable, FAKE_MCP, mode], env=env, check=True, capture_output=True, timeout=60)
+        # Only the list is augmented. Initialization and tool calls still run through
+        # the installed official app-server, with synthetic saved transports only.
+        with open(self.codex, "w", encoding="utf-8") as fh:
+            fh.write(f"#!{sys.executable}\nimport json, os, subprocess, sys\n"
+                     f"real = {codex!r}\n"
+                     "if sys.argv[1:] == ['mcp', 'list', '--json']:\n"
+                     "    out = subprocess.check_output([real, *sys.argv[1:]])\n"
+                     "    entries = json.loads(out)\n"
+                     "    entries.append({'name': 'managed.injected', 'enabled': True})\n"
+                     "    print(json.dumps(entries))\n"
+                     "else:\n"
+                     "    os.execv(real, [real, *sys.argv[1:]])\n")
         with open(self.config, "rb") as fh:
             saved = fh.read()
         with open(self.path("manifest.json"), "wb") as fh:
@@ -614,7 +698,7 @@ class RealCodexTest(EndToEndBase):
                 entry("probe-bases", "probe", "list_bases"),
                 entry("walled-me", "walled", "get_me"),
             ], request_timeout_seconds=30, overall_timeout_seconds=120))
-        out = subprocess.run([sys.executable, TOOL, "--manifest", self.path("manifest.json"), "--codex", codex], capture_output=True, text=True, env=env, timeout=180)
+        out = subprocess.run([sys.executable, TOOL, "--manifest", self.path("manifest.json"), "--codex", self.codex], capture_output=True, text=True, env=env, timeout=180)
         report = json.loads(out.stdout)
         self.assert_safe(report, out.stdout + out.stderr)
         self.assertEqual(out.stderr, "")

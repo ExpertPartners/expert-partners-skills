@@ -4,8 +4,9 @@
 Starts a fresh, checker-owned `codex app-server` over stdio, negotiates the installed
 protocol, opens one ephemeral thread and calls a small allowlist of harmless metadata
 reads with `mcpServer/tool/call`. It never starts a model turn, never writes Codex
-configuration and never reads credential files. Every MCP registration the manifest does
-not select is disabled for this one process with `-c mcp_servers.<name>.enabled=false`.
+configuration and never reads credential files. Saved user MCP transports the manifest
+does not select are disabled for this process with `-c mcp_servers.<name>.enabled=false`.
+Managed and app-injected list entries never become user configuration overrides.
 
 The report holds only allowlisted fields: probe identifier, service, check time, duration,
 state and a bounded error code. Provider content, exception text and stderr never reach it.
@@ -33,6 +34,7 @@ import sys
 import tempfile
 import threading
 import time
+import tomllib
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import IO, Any, Callable
@@ -67,7 +69,7 @@ ERROR_CODES = frozenset(
     {
         # results
         "mcp_is_error", "nested_error", "status_failed", "auth_error", "scope_error", "not_json",
-        "contract_mismatch", "missing_content", "missing_status", "unexpected_status",
+        "contract_mismatch", "missing_content", "missing_status", "unexpected_status", "envelope_limit",
         "missing_identity", "identity_mismatch",
         # runtime
         "rpc_error", "server_unknown", "server_not_configured", "server_disabled",
@@ -75,7 +77,7 @@ ERROR_CODES = frozenset(
         "broken_pipe", "spawn_failed", "schema_unavailable", "method_missing", "param_missing",
         "initialize_invalid", "thread_start_invalid", "ephemeral_not_honored",
         "mcp_list_unavailable", "mcp_list_unparseable", "unsafe_server_name",
-        "features_unavailable", "saved_config_changed", "interrupted", "internal_error",
+        "features_unavailable", "saved_config_changed", "saved_config_unreadable", "interrupted", "internal_error",
         # invocation and manifest
         "python_too_old", "codex_not_executable", "manifest_unreadable", "manifest_too_large",
         "manifest_invalid_json", "duplicate_key", "manifest_invalid", "unknown_field",
@@ -97,6 +99,8 @@ MAX_MANIFEST_BYTES = 64 * 1024
 MAX_PROBES = 32
 MAX_LINE_BYTES = 8 * 1024 * 1024
 MAX_CLI_OUTPUT = 8 * 1024 * 1024
+MAX_ERROR_DEPTH = 8
+MAX_ERROR_NODES = 256
 DEFAULT_REQUEST_TIMEOUT = 30.0
 DEFAULT_OVERALL_TIMEOUT = 180.0
 CLEANUP_GRACE = 2.0
@@ -450,12 +454,31 @@ def _maybe_json(value: Any) -> Any:
     return value
 
 
-def find_error(node: Any, depth: int = 0) -> tuple[str, str] | None:
-    """Find an error signal in a service envelope: explicit status codes or words, ok or
-    success false, a non-empty error or errors member, searched through wrapper members
-    (result, response, data, body, payload). Records inside lists are not envelopes."""
-    if depth > 5 or not isinstance(node, dict):
+def find_error(node: Any, depth: int = 0, budget: list[int] | None = None) -> tuple[str, str] | None:
+    """Inspect bounded service and nested MCP envelopes before accepting any identity.
+
+    The bounds fail closed: an uninspected subtree cannot turn an error into a pass.
+    Provider text is used only for classification and never returned.
+    """
+    node = _maybe_json(node)
+    if not isinstance(node, (dict, list)):
         return None
+    if budget is None:
+        budget = [MAX_ERROR_NODES]
+    if depth > MAX_ERROR_DEPTH or budget[0] <= 0:
+        return MALFORMED, "envelope_limit"
+    budget[0] -= 1
+    if isinstance(node, list):
+        if len(node) > budget[0]:
+            return MALFORMED, "envelope_limit"
+        for item in node:
+            found = find_error(item, depth + 1, budget)
+            if found:
+                return found
+        return None
+    is_error = node.get("isError")
+    if is_error is not None and not isinstance(is_error, bool):
+        return MALFORMED, "missing_content"
     for key in STATUS_KEYS:
         code = _status_int(node.get(key))
         if code is not None and 400 <= code <= 599:
@@ -475,18 +498,43 @@ def find_error(node: Any, depth: int = 0) -> tuple[str, str] | None:
     error = node.get("error")
     if error not in (None, False, "", {}, []):
         error = _maybe_json(error)
-        return find_error(error, depth + 1) or _keyword_state(_strings(error)) or (SERVICE_ERROR, "nested_error")
+        return find_error(error, depth + 1, budget) or _keyword_state(_strings(error)) or (SERVICE_ERROR, "nested_error")
     errors = node.get("errors")
     if isinstance(errors, list) and errors:
-        for item in errors:
-            found = find_error(_maybe_json(item), depth + 1)
-            if found:
-                return found
-        return _keyword_state(_strings(errors)) or (SERVICE_ERROR, "nested_error")
-    for key in ENVELOPE_KEYS:
-        found = find_error(_maybe_json(node.get(key)), depth + 1)
+        found = find_error(errors, depth + 1, budget)
         if found:
             return found
+        return _keyword_state(_strings(errors)) or (SERVICE_ERROR, "nested_error")
+    if "content" in node and (is_error is not None or isinstance(node["content"], list)):
+        content = node["content"]
+        if not isinstance(content, list) or any(not isinstance(item, dict) for item in content):
+            return MALFORMED, "missing_content"
+        if len(content) > budget[0]:
+            return MALFORMED, "envelope_limit"
+        budget[0] -= len(content)
+        for item in content:
+            if item.get("type") == "text":
+                text = item.get("text")
+                if not isinstance(text, str):
+                    return MALFORMED, "missing_content"
+                parsed = _maybe_json(text)
+                if isinstance(parsed, (dict, list)):
+                    found = find_error(parsed, depth + 1, budget)
+                else:
+                    found = _keyword_state([text[:4000]])
+                    if found is None and ERROR_WORDS.search(text[:4000]):
+                        found = SERVICE_ERROR, "nested_error"
+                if found:
+                    return found
+    found = find_error(node.get("structuredContent"), depth + 1, budget)
+    if found:
+        return found
+    for key in ENVELOPE_KEYS:
+        found = find_error(node.get(key), depth + 1, budget)
+        if found:
+            return found
+    if is_error:
+        return _keyword_state(_strings(node)) or (SERVICE_ERROR, "mcp_is_error")
     return None
 
 
@@ -570,11 +618,7 @@ def classify_result(result: Any, probe: Probe) -> tuple[str, str | None]:
                 documents.append(parsed)
             else:
                 raw_texts.append(text[:4000])
-    found: tuple[str, str] | None = None
-    for document in documents:
-        candidates = document if isinstance(document, list) and len(document) == 1 else [document]
-        for candidate in candidates:
-            found = found or find_error(candidate)
+    found = find_error(result)
     if is_error:
         if found:
             return found
@@ -919,6 +963,36 @@ def saved_config_digest() -> str | None:
         return "unreadable"
 
 
+def saved_transport_names() -> set[str]:
+    """Read only saved user entries that actually define a transport.
+
+    `mcp list` also reports managed/app registrations. Inventing a partial user table
+    for those names can prevent app-server initialization. Config values are discarded;
+    only names leave this function, with no environment, command or URL retained.
+    """
+    home = os.environ.get("CODEX_HOME") or os.path.join(os.path.expanduser("~"), ".codex")
+    try:
+        with open(os.path.join(home, "config.toml"), "rb") as fh:
+            raw = fh.read(MAX_CLI_OUTPUT + 1)
+        if len(raw) > MAX_CLI_OUTPUT:
+            raise CheckError(TRANSPORT, "saved_config_unreadable")
+        config = tomllib.loads(raw.decode("utf-8"))
+        servers = config.get("mcp_servers", {})
+        if not isinstance(servers, dict):
+            raise ValueError()
+        return {
+            name for name, entry in servers.items()
+            if isinstance(entry, dict) and any(
+                isinstance(entry.get(key), str) and entry[key].strip()
+                for key in ("command", "url")
+            )
+        }
+    except FileNotFoundError:
+        return set()
+    except (OSError, ValueError, RecursionError):
+        raise CheckError(TRANSPORT, "saved_config_unreadable") from None
+
+
 # ---------------------------------------------------------------------------------------
 # Report
 
@@ -985,12 +1059,12 @@ def build_report(
 # Run
 
 
-def _isolation_args(selected: set[str], configured: dict[str, bool], features: set[str]) -> list[str]:
+def _isolation_args(selected: set[str], saved_transports: set[str], features: set[str]) -> list[str]:
     args: list[str] = []
     for feature in ISOLATING_FEATURES:
         if feature in features:
             args += ["--disable", feature]
-    for name in sorted(configured):
+    for name in sorted(saved_transports):
         if name in selected:
             continue
         if not SERVER_NAME.fullmatch(name):
@@ -1045,7 +1119,7 @@ class Runner:
         del out
 
         selected = {p.server for p in self.manifest.probes}
-        isolation = _isolation_args(selected, configured, features)
+        isolation = _isolation_args(selected, saved_transport_names(), features)
         runnable: list[Probe] = []
         for probe in self.manifest.probes:
             if probe.server not in configured:

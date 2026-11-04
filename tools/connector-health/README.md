@@ -54,7 +54,7 @@ Top-level fields: `report` (always `connector-health`), `format` (always 1), `ch
 | `timeout` | The request (`request_timeout`) or the whole run (`overall_timeout`) ran out of time. |
 | `not_run` | The run was interrupted or failed internally before this probe ran. |
 
-A process starting, a tool being advertised, or login metadata such as `auth_status` is never a passing read. Only a real tool result counts. `isError`, nested `error` and `errors` members, `ok` or `success` set to false, and status codes or status words are read through the wrapper members `result`, `response`, `data`, `body` and `payload`, including JSON carried as a string. A 403 inside a successful MCP envelope is a `scope_refused`, not a pass.
+A process starting, a tool being advertised, or login metadata such as `auth_status` is never a passing read. Only a real tool result counts. `isError`, nested `error` and `errors` members, `ok` or `success` set to false, and status codes or status words are read through the wrapper members `result`, `response`, `data`, `body` and `payload`, including JSON carried as a string. Nested MCP `content` and `structuredContent` are inspected before an identity can pass. Inspection is limited to eight nested levels and 256 nodes; exceeding either limit returns `malformed_result` with `envelope_limit`. A 403 inside a successful MCP envelope is a `scope_refused`, not a pass.
 
 Run-level `state` is `ok` when every probe passed, `degraded` when the run completed with any other probe state, or the run failure (`manifest_invalid`, `unsupported_protocol`, `transport_unavailable`, `timeout`, `interrupted`, `internal_error`).
 
@@ -108,9 +108,9 @@ Anything else is refused before Codex starts, including generation, sending, pub
 
 1. Validates the invocation and the manifest. Nothing starts if either is invalid.
 2. Runs `codex app-server generate-json-schema` into a private temporary directory and proves from that schema that `initialize`, the `initialized` notice, `thread/start` with `ephemeral` and `cwd`, and `mcpServer/tool/call` with `server`, `threadId`, `tool` and `arguments` exist. `sandbox: read-only` is sent only when the schema offers it.
-3. Runs `codex features list` and `codex mcp list --json`. Only server names and their enabled flag are kept. Commands, environment values and URLs are dropped at once and never printed.
+3. Runs `codex features list` and `codex mcp list --json`. Only reported server names and their enabled flag are kept for availability checks. The saved user `config.toml` is separately parsed to retain only the names of entries with an actual `command` or `url` transport definition. Commands, environment values and URLs are dropped at once and never printed. An unreadable or malformed saved config stops the run with `saved_config_unreadable`.
 4. Starts `codex app-server --listen stdio://` in its own process group and a fresh temporary directory, with stderr discarded and:
-   - `-c mcp_servers.<name>.enabled=false` for every registration the manifest does not select, so no other server starts. A registration whose name cannot be passed safely stops the run (`unsafe_server_name`) before anything starts.
+   - `-c mcp_servers.<name>.enabled=false` for every saved user transport the manifest does not select. Managed and app-injected names that appear only in the CLI list never become partial user registrations. The disabled features below control those providers. A saved user registration whose name cannot be passed safely stops the run (`unsafe_server_name`) before anything starts.
    - `--disable` for each of `apps`, `plugins`, `remote_plugin`, `plugin_discovery_prefetch`, `hooks`, `browser_use`, `browser_use_external`, `computer_use`, `in_app_browser`, `skill_mcp_dependency_install`, `memories` and `daemon_auto_start` that the installed CLI lists and has not removed. These can launch browser controllers, desktop integrations, connector bundles, user hooks or a shared background daemon.
 5. Sends `initialize`, `initialized` and `thread/start` with `ephemeral: true`, and refuses a thread that is not ephemeral. It never sends `turn/start`, so no model turn runs and no saved chat is created.
 6. Calls each probe with `mcpServer/tool/call`, one at a time. Notices are read, server requests are answered (elicitations declined, anything else refused), and stale replies to a timed-out request are ignored, so nothing deadlocks.
@@ -125,9 +125,9 @@ The checker never reads OAuth credential files, never queries a keychain, never 
 python3 -m unittest discover -s tools/connector-health/tests -v
 ```
 
-The suite covers hidden and nested authentication errors, scope refusals, a 403 inside a successful MCP envelope, a wrong Gmail identity, valid empty results, unsupported and mutating probes, malformed URLs and manifests, request and overall timeouts, cleanup of an owned process that ignores SIGTERM and of its child, leaving an unrelated process alone, interruption, and redaction checked with synthetic canary values.
+The suite covers saved-user transport isolation with managed list names, bounded nested MCP error envelopes, hidden and nested authentication errors, scope refusals, a 403 inside a successful MCP envelope, a wrong Gmail identity, valid empty results, unsupported and mutating probes, malformed URLs and manifests, request and overall timeouts, cleanup of an owned process that ignores SIGTERM and of its child, leaving an unrelated process alone, interruption, and redaction checked with synthetic canary values.
 
-The optional real-CLI test registers synthetic stdio servers in a throwaway `CODEX_HOME` and runs the checker against an installed Codex. It is skipped unless the variable is set:
+The optional real-CLI test registers synthetic stdio servers in a throwaway `CODEX_HOME` and augments only its reported list with a synthetic managed name. Initialization and calls still run against the installed official app-server, proving no partial user override is created for that name. It is skipped unless the variable is set:
 
 ```sh
 CONNECTOR_HEALTH_REAL_CODEX=/absolute/path/to/codex \
