@@ -4,25 +4,30 @@ once, and No caps stop work).
 
 A build starts right away unless a file in the issue's Files in scope is also in an open
 builder pull request (its changed files) or in the Files in scope of another Job issue that is
-truly building: open, labeled in-progress, and neither parked nor done. Shared files (plugin.json, marketplace.json, CHANGELOG.md, AGENTS.md, lockfiles) count
+truly building: open, labeled in-progress, and neither parked nor done, unless the build run
+the gate recorded for it is still running. Shared files (plugin.json, marketplace.json, CHANGELOG.md, AGENTS.md, lockfiles) count
 the same way and are named as shared in the comment. A held issue gets "Waiting on #N, same
 file". There is no cap on how many builds or open pull requests a repo may have.
 
 Three subcommands, run by .github/workflows/factory-builder-reusable.yml:
 
   check    Judge OVERLAP_ISSUE. A closed, parked or done issue never builds and is left as
-           it is. A clear issue is labeled in-progress (and job) and loses waiting. A held
-           issue is labeled waiting and gets one comment saying what it waits on, edited in
-           place when that changes. Writes start=true|false to GITHUB_OUTPUT.
+           it is. A clear issue is labeled in-progress (and job), loses waiting, and its one
+           comment records this run (GITHUB_RUN_ID) as its build. A held issue is labeled
+           waiting and gets one comment saying what it waits on, edited in place when that
+           changes. Writes start=true|false to GITHUB_OUTPUT.
   release  After a build the gate started, when no open builder pull request closes
            OVERLAP_ISSUE, drop its in-progress label so it holds nothing. A build that did not
-           succeed (BUILD_RESULT) goes back to waiting, so it starts again on its own.
+           succeed (BUILD_RESULT) goes back to waiting, so it starts again on its own. A job
+           that was closed, parked or done while it built always loses in-progress, and
+           restart=true is written so the caller runs next.
   next     After a pull request or issue closes, in-progress is removed, or an issue gains
            or loses parked or done, dispatch the builder for every waiting Job issue that
            would start now, oldest first. Each one is claimed by removing its waiting label first,
            so two runs never dispatch the same job. Writes dispatched=<n,n,...>.
 
-OVERLAP_TOKEN (the workflow's own token) does every read and write. Standard library only.
+OVERLAP_TOKEN (the workflow's own token) does every read and write, and reads build runs with
+actions: read. Standard library only.
 """
 
 from __future__ import annotations
@@ -71,6 +76,7 @@ SHARED_BASENAMES = {
 }
 
 MARKER = "<!-- factory-overlap-check:v1 -->"
+RUN_MARKER_RE = re.compile(r"<!-- factory-overlap-run:(\d+) -->")
 CLOSES_RE = re.compile(r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)\b", re.IGNORECASE)
 HEADING_RE = re.compile(r"^\s*#+\s+\S")
 SCOPE_SECTION = "files in scope"
@@ -329,12 +335,12 @@ def evaluate(issue: int, scope: list[str], prs: list[Holder], issues: list[Holde
     return Verdict(not found, found, len(prs), scope)
 
 
-def comment_body(v: Verdict) -> str:
+def comment_body(v: Verdict, run_id: str = "") -> str:
     if v.start:
-        return "\n".join([
-            MARKER,
-            "Started. No other build touches these files.",
-        ])
+        lines = [MARKER, "Started. No other build touches these files."]
+        if run_id:
+            lines.append(f"<!-- factory-overlap-run:{run_id} -->")
+        return "\n".join(lines)
     lines = [MARKER, *v.lines(), ""]
     for o in v.overlaps:
         what = "pull request" if o.kind == "pr" else "in-progress job"
@@ -356,6 +362,7 @@ def comment_body(v: Verdict) -> str:
 class Config:
     repo: str
     settle_seconds: float = 10.0
+    run_id: str = ""
 
 
 def labels_of(item: dict) -> set[str]:
@@ -383,13 +390,41 @@ def is_stopped(issue: dict) -> bool:
     return issue.get("state") == "closed" or bool(labels_of(issue) & NOT_BUILDING_LABELS)
 
 
-def holds_files(issue: dict) -> bool:
-    """Only a job that is truly building holds its Files in scope."""
-    return (
-        "pull_request" not in issue
-        and IN_PROGRESS_LABEL in labels_of(issue)
-        and not is_stopped(issue)
-    )
+def holds_files(issue: dict, build_running=lambda issue: False) -> bool:
+    """Only a job that is truly building holds its Files in scope. build_running(issue) says
+    whether the build run recorded for a parked or done job is still going."""
+    if "pull_request" in issue or IN_PROGRESS_LABEL not in labels_of(issue) or issue.get("state") == "closed":
+        return False
+    if labels_of(issue) & NOT_BUILDING_LABELS:
+        # Parking a job, or marking it done, does not stop a build already running for it,
+        # and that droid can still push. Its files stay held until the run has ended.
+        return build_running(issue)
+    return True
+
+
+def recorded_run(gh, cfg: Config, number: int) -> str | None:
+    """The build run the gate recorded in the issue's overlap comment when it last started."""
+    for c in gh.paginate(f"/repos/{cfg.repo}/issues/{number}/comments"):
+        if (c.get("user") or {}).get("login") == COMMENT_AUTHOR and MARKER in (c.get("body") or ""):
+            found = RUN_MARKER_RE.search(c.get("body") or "")
+            return found.group(1) if found else None
+    return None
+
+
+def build_is_running(gh, cfg: Config, number: int) -> bool:
+    run_id = recorded_run(gh, cfg, number)
+    if not run_id:
+        return False
+    try:
+        run = gh.get(f"/repos/{cfg.repo}/actions/runs/{run_id}")
+    except GitHubError as exc:
+        if exc.status == 404:
+            return False
+        # A run that cannot be read might still be writing, so it keeps holding.
+        print(f"::warning::overlap-check: build run {run_id} of #{number} could not be read "
+              f"({exc}), so #{number} still holds its files.")
+        return True
+    return (run or {}).get("status") != "completed"
 
 
 def in_progress_issues(gh, cfg: Config) -> list[Holder]:
@@ -397,7 +432,11 @@ def in_progress_issues(gh, cfg: Config) -> list[Holder]:
         f"/repos/{cfg.repo}/issues",
         {"state": "open", "labels": f"{JOB_LABEL},{IN_PROGRESS_LABEL}"},
     )
-    return [Holder(int(i["number"]), "issue", parse_scope(i.get("body"))) for i in found if holds_files(i)]
+
+    def running(i: dict) -> bool:
+        return build_is_running(gh, cfg, int(i["number"]))
+
+    return [Holder(int(i["number"]), "issue", parse_scope(i.get("body"))) for i in found if holds_files(i, running)]
 
 
 def judge(gh, cfg: Config, issue: dict, only_older_issues: bool = False) -> Verdict:
@@ -465,7 +504,15 @@ def run_check(gh, cfg: Config, number: int, sleep=time.sleep) -> bool:
         return False
     if WAITING_LABEL in labels:
         remove_label(gh, cfg, number, WAITING_LABEL)
-    upsert_comment(gh, cfg, number, comment_body(second), create=False)
+    upsert_comment(gh, cfg, number, comment_body(second, cfg.run_id), create=bool(cfg.run_id))
+    # A job parked or marked done before this run was recorded as its build would hold
+    # nothing while the droid writes, so it must not build. From here on the record keeps
+    # its files held until the run ends.
+    if is_stopped(gh.get(f"/repos/{cfg.repo}/issues/{number}")):
+        print(f"overlap-check: #{number} was closed, parked or done before its build began, so it does not build.")
+        remove_label(gh, cfg, number, IN_PROGRESS_LABEL)
+        upsert_comment(gh, cfg, number, stopped_body(), create=False)
+        return False
     return True
 
 
@@ -531,6 +578,13 @@ def run_next(gh, cfg: Config, dispatch) -> list[int]:
     return sent
 
 
+def stopped_body() -> str:
+    return "\n".join([
+        MARKER,
+        "This job is closed, parked or done and no build is running for it, so it holds no files.",
+    ])
+
+
 def release_body(result: str) -> str:
     if result == "success":
         return "\n".join([
@@ -548,15 +602,22 @@ def release_body(result: str) -> str:
 
 
 def run_release(gh, cfg: Config, number: int, result: str) -> str:
-    """After a build the gate started. Returns kept, released or waiting."""
+    """After a build the gate started. Returns kept, released, waiting or stopped."""
+    issue = gh.get(f"/repos/{cfg.repo}/issues/{number}")
+    if is_stopped(issue):
+        # The build can no longer write, so a job closed, parked or done while it built stops
+        # holding now. A pull request it opened still holds its own changed files.
+        remove_label(gh, cfg, number, IN_PROGRESS_LABEL)
+        if issue.get("state") != "closed":
+            upsert_comment(gh, cfg, number, stopped_body(), create=False)
+        print(f"overlap-check: #{number} is closed, parked or done and its build ended; in-progress removed.")
+        return "stopped"
     if any(number in p.closes for p in open_builder_prs(gh, cfg)):
         print(f"overlap-check: #{number} has an open pull request, which holds its files.")
         return "kept"
-    issue = gh.get(f"/repos/{cfg.repo}/issues/{number}")
     remove_label(gh, cfg, number, IN_PROGRESS_LABEL)
-    if result == "success" or issue.get("state") == "closed":
-        if issue.get("state") != "closed":
-            upsert_comment(gh, cfg, number, release_body("success"))
+    if result == "success":
+        upsert_comment(gh, cfg, number, release_body("success"))
         print(f"overlap-check: #{number} built with no pull request; in-progress removed.")
         return "released"
     add_labels(gh, cfg, number, [JOB_LABEL, WAITING_LABEL])
@@ -590,6 +651,7 @@ def main(argv: list[str]) -> int:
     cfg = Config(
         repo=os.environ["GITHUB_REPOSITORY"],
         settle_seconds=float(os.environ.get("OVERLAP_SETTLE_SECONDS", "10")),
+        run_id=os.environ.get("GITHUB_RUN_ID", ""),
     )
     gh = GitHub(os.environ["OVERLAP_TOKEN"], os.environ.get("GITHUB_API_URL", "https://api.github.com"))
 
@@ -613,10 +675,13 @@ def main(argv: list[str]) -> int:
 
     if argv[0] == "release":
         try:
-            run_release(gh, cfg, issue_number(), os.environ.get("BUILD_RESULT", ""))
+            outcome = run_release(gh, cfg, issue_number(), os.environ.get("BUILD_RESULT", ""))
         except Exception as exc:
             print(f"::error::overlap-check: #{os.environ.get('OVERLAP_ISSUE')} could not be released: {exc!r}")
             return 1
+        # Removing in-progress with the workflow's own token starts no restart, so the caller
+        # runs next itself once a stopped job's build has ended.
+        write_output("restart", "true" if outcome == "stopped" else "false")
         return 0
 
     workflow = workflow_file(os.environ["BUILDER_WORKFLOW_REF"])

@@ -54,10 +54,18 @@ class FakeGitHub:
         self.calls = []
         self.next_comment_id = 100
         self.on_sleep = None
+        self.runs = {}  # run id -> status, or a GitHubError to raise
 
     def get(self, path, params=None):
         self.calls.append(("GET", path, params))
         number = int(path.rsplit("/", 1)[-1])
+        if "/actions/runs/" in path:
+            status = self.runs.get(number)
+            if status is None:
+                raise oc.GitHubError(404, "Not Found")
+            if isinstance(status, oc.GitHubError):
+                raise status
+            return {"id": number, "status": status}
         if number not in self.issues:
             raise oc.GitHubError(404, "Not Found")
         return self.issues[number]
@@ -379,6 +387,20 @@ class RunCheck(unittest.TestCase):
         self.assertFalse(oc.run_check(gh, CFG, 157, sleep=lambda s: None))
         self.assertIn("Waiting on #159, same file", gh.comment_bodies(157)[0])
 
+    def test_a_started_build_records_its_run_in_one_comment(self):
+        cfg = oc.Config(repo=REPO, settle_seconds=0, run_id="9001")
+        gh = FakeGitHub([issue(201, "tools/overlap-check/")])
+        self.assertTrue(oc.run_check(gh, cfg, 201, sleep=lambda s: None))
+        self.assertEqual(len(gh.comment_bodies(201)), 1)
+        self.assertIn("Started.", gh.comment_bodies(201)[0])
+        self.assertEqual(oc.recorded_run(gh, cfg, 201), "9001")
+        # A later build records its own run in the same comment.
+        gh.issues[201]["labels"] = [{"name": "job"}]
+        self.assertTrue(oc.run_check(gh, oc.Config(repo=REPO, settle_seconds=0, run_id="9002"), 201,
+                                     sleep=lambda s: None))
+        self.assertEqual(len(gh.comment_bodies(201)), 1)
+        self.assertEqual(oc.recorded_run(gh, cfg, 201), "9002")
+
     def test_issue_with_no_scope_starts(self):
         gh = FakeGitHub([{"number": 170, "body": "## Mission\nNo list.", "labels": ["job"]}])
         self.assertTrue(oc.run_check(gh, CFG, 170, sleep=lambda s: None))
@@ -559,6 +581,76 @@ class StoppedJobs(unittest.TestCase):
         self.assertEqual(gh.comment_bodies(179)[0].splitlines()[1], "Waiting on #211, same file")
 
 
+class ParkedWhileBuilding(unittest.TestCase):
+    """Parking a job, or marking it done, does not stop a build already running for it. Its
+    files stay held until that build can no longer write, and only then does waiting work
+    start."""
+
+    SCOPE = "tools/overlap-check/overlap_check.py"
+
+    def start_201(self, label):
+        cfg = oc.Config(repo=REPO, settle_seconds=0, run_id="9001")
+        gh = FakeGitHub([issue(179, self.SCOPE, labels=("job", "waiting")), issue(201, "tools/overlap-check/")])
+        self.assertTrue(oc.run_check(gh, cfg, 201, sleep=lambda s: None))
+        gh.runs[9001] = "in_progress"
+        gh.post(f"/repos/{REPO}/issues/201/labels", {"labels": [label]})
+        return gh
+
+    def test_a_parked_or_done_build_still_running_holds_until_its_release(self):
+        for label in ("parked", "done"):
+            gh = self.start_201(label)
+            # The redispatch that marking #201 starts sends nothing while #201 still builds.
+            self.assertEqual(oc.run_next(gh, CFG, [].append), [], label)
+            self.assertEqual(gh.labels(179), {"job", "waiting"}, label)
+            self.assertFalse(oc.run_check(gh, CFG, 179, sleep=lambda s: None), label)
+            self.assertIn("Waiting on #201, same file", gh.comment_bodies(179)[0], label)
+
+            # The build job ends. The release runs in the same workflow run, which is still
+            # in progress, and frees #201 so the restart it starts sends #179.
+            self.assertEqual(oc.run_release(gh, CFG, 201, "success"), "stopped", label)
+            self.assertNotIn("in-progress", gh.labels(201), label)
+            self.assertNotIn("waiting", gh.labels(201), label)
+            self.assertIn("holds no files", gh.comment_bodies(201)[0], label)
+            sent = []
+            self.assertEqual(oc.run_next(gh, CFG, sent.append), [179], label)
+            self.assertEqual(sent, [179], label)
+
+    def test_a_parked_build_with_its_pull_request_still_releases_in_progress(self):
+        gh = self.start_201("parked")
+        gh.prs = [pr(214, ["tools/overlap-check/README.md"], closes=201)[1]]
+        self.assertEqual(oc.run_release(gh, CFG, 201, "success"), "stopped")
+        self.assertNotIn("in-progress", gh.labels(201))
+        self.assertEqual(oc.run_next(gh, CFG, [].append), [179], "the pull request holds only its own files")
+
+    def test_a_run_that_ended_without_its_release_holds_nothing(self):
+        gh = self.start_201("parked")
+        gh.runs[9001] = "completed"
+        self.assertEqual(oc.run_next(gh, CFG, [].append), [179])
+
+    def test_a_run_that_cannot_be_read_keeps_holding(self):
+        gh = self.start_201("parked")
+        gh.runs[9001] = oc.GitHubError(403, "Resource not accessible by integration")
+        self.assertEqual(oc.run_next(gh, CFG, [].append), [])
+        gh.runs.pop(9001)  # a deleted run is gone and writes nothing
+        self.assertEqual(oc.run_next(gh, CFG, [].append), [179])
+
+    def test_a_job_parked_during_the_pause_does_not_build(self):
+        cfg = oc.Config(repo=REPO, settle_seconds=0, run_id="9001")
+        gh = FakeGitHub([issue(201, "tools/overlap-check/")])
+        self.assertFalse(oc.run_check(gh, cfg, 201, sleep=lambda s: gh.post(
+            f"/repos/{REPO}/issues/201/labels", {"labels": ["parked"]})))
+        self.assertEqual(gh.labels(201), {"job", "parked"})
+        self.assertIsNone(oc.recorded_run(gh, cfg, 201))
+
+    def test_a_restart_runs_after_the_release_of_a_stopped_job(self):
+        gh = self.start_201("parked")
+        code, out = Main.run_main(self, gh, ["release"], OVERLAP_ISSUE="201", BUILD_RESULT="success")
+        self.assertEqual((code, out), (0, "restart=true\n"))
+        plain = FakeGitHub([issue(159, "tools/a.py", labels=("job", "in-progress"))])
+        code, out = Main.run_main(self, plain, ["release"], OVERLAP_ISSUE="159", BUILD_RESULT="success")
+        self.assertEqual((code, out), (0, "restart=false\n"))
+
+
 class RunRelease(unittest.TestCase):
     def test_failed_build_without_a_pull_request_goes_back_to_waiting(self):
         gh = FakeGitHub([issue(159, "tools/a.py", labels=("job", "in-progress"))])
@@ -673,6 +765,16 @@ class Workflows(unittest.TestCase):
             redispatch)
         gate = text.split("  gate:", 1)[1].split("runs-on:", 1)[0]
         self.assertNotIn("parked", gate, "marking a job parked or done must never build it")
+
+    def test_parked_or_done_builds_are_read_and_restart_after_release(self):
+        text = self.read("factory-builder-reusable.yml")
+        gate = text.split("  gate:", 1)[1].split("  build:", 1)[0]
+        self.assertIn("      actions: read\n", gate)
+        release = text.split("  release:", 1)[1].split("  redispatch:", 1)[0]
+        self.assertIn("      actions: write\n", release)
+        self.assertIn("if: steps.release.outputs.restart == 'true'", release)
+        self.assertIn("overlap_check.py next", release)
+        self.assertIn("BUILDER_WORKFLOW_REF: ${{ github.workflow_ref }}", release)
 
     def test_every_builder_workflow_carries_the_never_ask_line(self):
         for name in ("factory-builder-reusable.yml", "factory-chat-to-code-loop-builder-skills.yml"):
