@@ -14,18 +14,37 @@ import json
 import re
 import shutil
 import subprocess
+from collections.abc import Iterator
 from dataclasses import dataclass
 from fractions import Fraction
 from pathlib import Path
+from typing import NotRequired, TypedDict
 
 from PIL import Image, ImageChops, ImageDraw, ImageFont
 
-from evidence import Hunt, slug
+from evidence import Hunt, Route, slug
 from stitch import Line, Screen, stitch
 
 
 class FrameError(RuntimeError):
     """Frame recovery could not run."""
+
+
+class FrameRecord(TypedDict):
+    index: int
+    time: float
+    kept: bool
+    image: NotRequired[str]
+    duplicate_of: NotRequired[int]
+    first_seen: NotRequired[float]
+    lines: NotRequired[list[dict[str, str | float]]]
+
+
+class _OcrGroup(TypedDict):
+    words: list[str]
+    confs: list[float]
+    top: int
+    bottom: int
 
 
 @dataclass
@@ -144,7 +163,7 @@ def _first_frame_size(ffmpeg: str, video: Path, start: float, options: FrameOpti
 
 
 def iter_gray_frames(video: Path, start: float, end: float, options: FrameOptions, work: Path,
-                     times: dict[int, float] | None = None):
+                     times: dict[int, float] | None = None) -> Iterator[Image.Image]:
     """Yield every decoded frame in [start, end) as a grayscale image.
 
     When times is given, it is filled after decoding with each frame's
@@ -161,15 +180,17 @@ def iter_gray_frames(video: Path, start: float, end: float, options: FrameOption
         yielded = 0
         with log_path.open("w") as log:
             proc = subprocess.Popen([*base, *sync, *tail], stdout=subprocess.PIPE, stderr=log)
+            stdout = proc.stdout
+            assert stdout is not None  # always set, since stdout=PIPE
             try:
                 while True:
-                    chunk = proc.stdout.read(frame_bytes)
+                    chunk = stdout.read(frame_bytes)
                     if len(chunk) < frame_bytes:
                         break
                     yielded += 1
                     yield Image.frombytes("L", (width, height), chunk)
             finally:
-                proc.stdout.close()
+                stdout.close()
                 code = proc.wait()
         message = log_path.read_text(errors="replace")
         if code == 0:
@@ -190,10 +211,11 @@ def changed_pixels(a: Image.Image, b: Image.Image, noise: int) -> int:
 def ocr_lines(image_path: Path, options: FrameOptions, work: Path) -> list[Line]:
     """Read text lines with Tesseract, dropping low confidence lines and lines cut by the frame edge."""
     tesseract = require_tool("tesseract")
+    image: Image.Image
     with Image.open(image_path) as image:
         if options.ocr_scale and options.ocr_scale != 1:
             size = (round(image.width * options.ocr_scale), round(image.height * options.ocr_scale))
-            image = image.resize(size, Image.LANCZOS)
+            image = image.resize(size, Image.Resampling.LANCZOS)
         scaled = work / "ocr-input.png"
         image.save(scaled)
         height = image.height
@@ -204,7 +226,7 @@ def ocr_lines(image_path: Path, options: FrameOptions, work: Path) -> list[Line]
     if result.returncode != 0:
         raise FrameError(f"Tesseract failed: {result.stderr.strip()[-400:]}")
     rows = csv.DictReader(io.StringIO(result.stdout), delimiter="\t", quoting=csv.QUOTE_NONE)
-    grouped: dict[tuple, dict] = {}
+    grouped: dict[tuple[int, int, int], _OcrGroup] = {}
     for row in rows:
         word = (row.get("text") or "").strip()
         try:
@@ -221,7 +243,7 @@ def ocr_lines(image_path: Path, options: FrameOptions, work: Path) -> list[Line]
         entry["top"] = min(entry["top"], top)
         entry["bottom"] = max(entry["bottom"], bottom)
     edge = max(2, round(2 * (options.ocr_scale or 1)))
-    lines = []
+    lines: list[tuple[int, Line]] = []
     for entry in grouped.values():
         text = " ".join(entry["words"])
         conf = sum(entry["confs"]) / len(entry["confs"])
@@ -234,7 +256,7 @@ def ocr_lines(image_path: Path, options: FrameOptions, work: Path) -> list[Line]
     return [line for _, line in lines]
 
 
-def _contact_sheets(hunt: Hunt, out_dir: Path, kept: list[dict], options: FrameOptions) -> list[Path]:
+def _contact_sheets(hunt: Hunt, out_dir: Path, kept: list[FrameRecord], options: FrameOptions) -> list[Path]:
     sheets = []
     per_sheet = options.sheet_columns * options.sheet_rows
     font = ImageFont.load_default()
@@ -275,12 +297,12 @@ def _recovered_markdown(video_name: str, start: float, end: float, screens: list
 
 
 def recover_frames(hunt: Hunt, video: str | Path, start: str | float, end: str | float,
-                   options: FrameOptions | None = None, label: str | None = None) -> dict:
+                   options: FrameOptions | None = None, label: str | None = None) -> Route:
     """Run frame recovery and record it as one route of the hunt."""
     options = options or FrameOptions()
     video = Path(video).expanduser()
-    route = {"route": "frame recovery", "target": f"{video.name}, {start} to {end}"}
-    work = None
+    route: Route = {"route": "frame recovery", "target": f"{video.name}, {start} to {end}"}
+    work: Path | None = None
     try:
         start_s, end_s = parse_time(start), parse_time(end)
         route["target"] = f"{video.name}, {format_time(start_s)} to {format_time(end_s)}"
@@ -297,12 +319,13 @@ def recover_frames(hunt: Hunt, video: str | Path, start: str | float, end: str |
         work = out_dir / ".work"
         work.mkdir()
 
-        records: list[dict] = []
-        kept: list[dict] = []
-        run_start = previous = None
+        records: list[FrameRecord] = []
+        kept: list[FrameRecord] = []
+        run_start: Image.Image | None = None
+        previous: tuple[int, Image.Image] | None = None
         run_members: list[int] = []
 
-        def close_run():
+        def close_run() -> None:
             if previous is None:
                 return
             last_index = run_members[-1]
@@ -338,7 +361,7 @@ def recover_frames(hunt: Hunt, video: str | Path, start: str | float, end: str |
             members = [r for r in records if r.get("duplicate_of") == record["index"]]
             record["first_seen"] = members[0]["time"] if members else record["time"]
 
-        frames_for_stitch = []
+        frames_for_stitch: list[tuple[int, float, float, list[Line]]] = []
         for record in kept:
             lines = ocr_lines(hunt.root / record["image"], options, work)
             record["lines"] = [{"text": l.text, "conf": l.conf} for l in lines]
@@ -358,24 +381,24 @@ def recover_frames(hunt: Hunt, video: str | Path, start: str | float, end: str |
             "options": options.__dict__, "frames": records,
         })
         line_count = sum(len(s.lines) for s in screens)
-        route.update(
-            status="found" if line_count else "nothing found",
-            found=[
+        route.update({
+            "status": "found" if line_count else "nothing found",
+            "found": [
                 f"{len(records)} frames read at {fps:g} frames per second",
                 f"{len(records) - len(kept)} duplicate frames dropped, {len(kept)} distinct frames kept",
                 f"{line_count} lines of text recovered across {len(screens)} screens",
                 f"{len(sheets)} contact sheets saved",
             ],
-            missing=[] if line_count else ["No readable on-screen text in this window"],
-            evidence=[hunt.rel(recovered_md), hunt.rel(out_dir / "recovered.json"), hunt.rel(out_dir / "frames.json"),
-                      *[hunt.rel(p) for p in sheets]],
-            text_files=[hunt.rel(recovered_md)],
-            counts={"frames_read": len(records), "frames_kept": len(kept),
-                    "duplicates_dropped": len(records) - len(kept), "screens": len(screens), "lines": line_count},
-            output_dir=hunt.rel(out_dir),
-        )
+            "missing": [] if line_count else ["No readable on-screen text in this window"],
+            "evidence": [hunt.rel(recovered_md), hunt.rel(out_dir / "recovered.json"), hunt.rel(out_dir / "frames.json"),
+                         *[hunt.rel(p) for p in sheets]],
+            "text_files": [hunt.rel(recovered_md)],
+            "counts": {"frames_read": len(records), "frames_kept": len(kept),
+                       "duplicates_dropped": len(records) - len(kept), "screens": len(screens), "lines": line_count},
+            "output_dir": hunt.rel(out_dir),
+        })
     except FrameError as exc:
-        route.update(status="failed", problems=[str(exc)], missing=["On-screen text for this window"])
+        route.update({"status": "failed", "problems": [str(exc)], "missing": ["On-screen text for this window"]})
     finally:
         if work is not None:
             shutil.rmtree(work, ignore_errors=True)

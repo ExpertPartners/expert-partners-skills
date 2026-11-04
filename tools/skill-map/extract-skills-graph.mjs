@@ -125,6 +125,7 @@ const DEPLOYED_HEADER = /^# DEPLOYED COPY \((\d{4}-\d{2}-\d{2}), skill-deploy pi
 const DEPLOYED_HEADER_BLOCK = /^# DEPLOYED COPY \(\d{4}-\d{2}-\d{2}, skill-deploy pipeline\): the canonical home is\n# \S+ \S+?SKILL\.md\. Deployed at .+?\.\n# Edit the canonical copy first, then redeploy via tools\/skill-deploy\.\n/m;
 // Header repo names -> walk keys. A header naming a repo this walk does not cover
 // cannot be verified and fails the build.
+/** @type {Record<string, string | undefined>} */
 const REPO_NAME_TO_KEY = { 'expert-partners-skills': 'eps' };
 
 // ---------- schema ----------
@@ -151,15 +152,72 @@ const SkillMeta = z.object({
   'render-note': z.string().nullish().default(null),
 }).passthrough(); // existing operational fields (allowed-tools, argument-hint, ...) pass through untouched
 
+// ---------- graph shapes ----------
+
+/**
+ * The parsed DEPLOYED COPY header of a deployed SKILL.md.
+ * @typedef {object} DeployedHeader
+ * @property {string} date
+ * @property {string} repoName
+ * @property {string} canonicalPath
+ * @property {string} stamp
+ */
+
+/**
+ * A mapped canonical skill, as emitted in skills-graph.json (layout adds `layout`).
+ * @typedef {object} SkillNode
+ * @property {string} id
+ * @property {string} source
+ * @property {string} repo
+ * @property {string} tier
+ * @property {string} zone
+ * @property {string} status
+ * @property {string[]} inherits
+ * @property {string[]} calls
+ * @property {string[]} defersTo
+ * @property {string[]} brandScope
+ * @property {string | null} subtitle
+ * @property {string | null} renderNote
+ */
+
+/**
+ * @typedef {object} SkillEdge
+ * @property {string} from
+ * @property {string} to
+ * @property {string} type inherits, calls or defers-to
+ */
+
+/**
+ * A verified deployed copy, recorded under flags.deployedMounts.
+ * @typedef {object} DeployedMount
+ * @property {string} path
+ * @property {string} id
+ * @property {string} canonical
+ * @property {string} deployedAt
+ * @property {string} stamp
+ * @property {string | null} mount
+ * @property {'VERIFIED STALE'} [status]
+ * @property {true} [awaitingRedeploy]
+ * @property {string} [verifiedCanonicalCommit]
+ * @property {string} [verifiedCanonicalBlob]
+ */
+
 // Declared before repo discovery: the missing-checkout guard below calls fail(),
 // and a const declared later sits in its temporal dead zone, so that guard used to
 // die with a ReferenceError instead of printing the clear error it was written to give.
+/** @type {string[]} */
 const errors = [];
+/** @param {string} msg */
 function fail(msg) { console.error(`ERROR: ${msg}`); errors.push(msg); }
 
 // ---------- cli / repo discovery ----------
 
 const argv = process.argv.slice(2);
+/**
+ * @param {string} flag
+ * @param {string} fallback
+ * @returns {string}
+ */
 function arg(flag, fallback) {
   const i = argv.indexOf(flag);
   return i !== -1 && argv[i + 1] ? argv[i + 1] : fallback;
@@ -169,6 +227,7 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const epsRoot = path.resolve(arg('--eps', path.join(scriptDir, '..', '..')));
 const outFile = path.resolve(arg('--out', path.join(epsRoot, 'tools', 'skill-map', 'skills-graph.json')));
 
+/** @type {Record<string, string>} */
 const REPOS = { eps: epsRoot };
 for (const [key, root] of Object.entries(REPOS)) {
   if (!fs.existsSync(root)) fail(`repo checkout missing: ${key} at ${root}`);
@@ -176,6 +235,10 @@ for (const [key, root] of Object.entries(REPOS)) {
 
 // ---------- walk ----------
 
+/**
+ * @param {string} dir
+ * @returns {Generator<string>}
+ */
 function* walk(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const p = path.join(dir, entry.name);
@@ -189,9 +252,13 @@ function* walk(dir) {
 }
 
 
+/** @type {Map<string, SkillNode>} */
 const nodes = new Map();        // id -> node
+/** @type {string[]} */
 const duplicateRecords = [];    // declared duplicates encountered
+/** @type {DeployedMount[]} */
 const deployedMounts = [];      // deployed copies encountered (recorded, never mapped)
+/** @type {string[]} */
 const skippedPaths = [];        // excluded files, recorded for the report
 
 // Pass 1: collect and classify every SKILL.md. Classification never depends on walk
@@ -200,6 +267,10 @@ const skippedPaths = [];        // excluded files, recorded for the report
 const canonicalFiles = [];  // { repoKey, tagged, abs, raw }
 const deployedFiles = [];   // { repoKey, tagged, abs, raw, header, mountRoot }
 
+/**
+ * @param {string} raw
+ * @returns {DeployedHeader | null}
+ */
 function readDeployedHeader(raw) {
   // Only the frontmatter block may carry the header; a stray match in the body is
   // prose about the header, not the header.
@@ -244,7 +315,7 @@ for (const { repoKey, tagged, abs, raw } of canonicalFiles) {
   try {
     parsed = matter(raw);
   } catch (e) {
-    fail(`frontmatter does not parse: ${tagged} -> ${e.message.split('\n')[0]}`);
+    fail(`frontmatter does not parse: ${tagged} -> ${/** @type {Error} */ (e).message.split('\n')[0]}`);
     continue;
   }
 
@@ -274,7 +345,7 @@ for (const { repoKey, tagged, abs, raw } of canonicalFiles) {
   }
 
   if (nodes.has(meta.name)) {
-    fail(`duplicate skill id "${meta.name}": ${tagged} collides with ${nodes.get(meta.name).source}`);
+    fail(`duplicate skill id "${meta.name}": ${tagged} collides with ${/** @type {SkillNode} */ (nodes.get(meta.name)).source}`);
     continue;
   }
 
@@ -307,7 +378,7 @@ for (const { tagged, abs, raw, header, mountRoot } of deployedFiles) {
   try {
     parsed = matter(raw);
   } catch (e) {
-    fail(`frontmatter does not parse: ${tagged} -> ${e.message.split('\n')[0]}`);
+    fail(`frontmatter does not parse: ${tagged} -> ${/** @type {Error} */ (e).message.split('\n')[0]}`);
     continue;
   }
   const declaredName = parsed.data?.name;
@@ -399,6 +470,7 @@ for (const d of DECLARED_DUPLICATES) {
 
 // ---------- reference resolution (the drift gate) ----------
 
+/** @type {SkillEdge[]} */
 const edges = [];
 for (const node of nodes.values()) {
   const refs = [
@@ -424,6 +496,7 @@ for (const node of nodes.values()) {
 // (The former non-fatal "unzoned" holding area is retired: ruling 14 strict mode
 // makes an unzoned skill a build failure above, so the flag can never be non-empty.)
 
+/** @param {string} root */
 function headSha(root) {
   try { return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root }).toString().trim(); }
   catch { return null; }
@@ -454,10 +527,10 @@ const graph = {
 // Stage 2: bake build-time ELK layout (layered, INCLUDE_CHILDREN) into the same
 // regeneration step, so the committed JSON always carries coordinates and the
 // dashboard renderer never runs a layout engine. ELK stays a CI-only dependency.
-await layoutGraph(graph);
+const { layout } = await layoutGraph(graph);
 
 fs.mkdirSync(path.dirname(outFile), { recursive: true });
 fs.writeFileSync(outFile, JSON.stringify(graph, null, 2) + '\n');
 console.log(`skills-graph.json written: ${graph.nodes.length} nodes, ${graph.edges.length} edges (strict mode: zone/tier/status verified on all), ${duplicateRecords.length} declared duplicate(s), ${deployedMounts.length} deployed mount(s) verified against canonical, ${skippedPaths.length} excluded path(s).`);
-console.log(`layout baked: ${graph.layout.width}x${graph.layout.height}, ${graph.layout.zones.length} zones, ${graph.layout.zones.reduce((a, z) => a + z.rooms.length, 0)} brand rooms (elkjs build-time only).`);
+console.log(`layout baked: ${layout.width}x${layout.height}, ${layout.zones.length} zones, ${layout.zones.reduce((a, z) => a + z.rooms.length, 0)} brand rooms (elkjs build-time only).`);
 console.log(`output: ${outFile}`);

@@ -58,13 +58,24 @@ export const workforceEnvelopeSchema = z.object({
   records: z.array(workforceRecordSchema).max(5000),
 });
 
-/** Same behavior as HQ's parseWorkforceEnvelope: the parsed envelope, or null. */
+/** @typedef {import('zod').infer<typeof workforceRecordSchema>} WorkforceRecord */
+/** @typedef {import('zod').infer<typeof workforceEnvelopeSchema>} WorkforceEnvelope */
+
+/**
+ * Same behavior as HQ's parseWorkforceEnvelope: the parsed envelope, or null.
+ * @param {unknown} input
+ * @returns {WorkforceEnvelope | null}
+ */
 export function parseWorkforceEnvelope(input) {
   const result = workforceEnvelopeSchema.safeParse(input);
   return result.success ? result.data : null;
 }
 
-/** The issues HQ's schema would raise for this envelope (empty when it passes). */
+/**
+ * The issues HQ's schema would raise for this envelope (empty when it passes).
+ * @param {unknown} input
+ * @returns {string[]}
+ */
 export function contractIssues(input) {
   const result = workforceEnvelopeSchema.safeParse(input);
   return result.success ? [] : result.error.issues.map(i => `${i.path.join('.') || '(root)'}: ${i.message}`);

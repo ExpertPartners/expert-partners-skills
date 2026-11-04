@@ -14,9 +14,14 @@ import os
 import re
 import urllib.error
 import urllib.request
+from contextlib import AbstractContextManager
+from typing import Any, Protocol
 from urllib.parse import urlparse
 
-from evidence import Hunt, now_iso, slug
+from evidence import Hunt, Route, now_iso, slug
+
+# Firecrawl replies are untyped JSON objects.
+JSONDict = dict[str, Any]
 
 FIRECRAWL_BASE = "https://api.firecrawl.dev/v2"
 KEY_VARIABLE = "FIRECRAWL_API_KEY"
@@ -31,20 +36,36 @@ class SweepError(RuntimeError):
     """The sweep or one of its requests failed."""
 
 
+class _Reply(Protocol):
+    def read(self) -> bytes: ...
+
+
+class Opener(Protocol):
+    """Opens a request the way urllib.request.urlopen does."""
+
+    def __call__(self, request: urllib.request.Request, /, *, timeout: float) -> AbstractContextManager[_Reply]: ...
+
+
+class SweepClient(Protocol):
+    def search(self, query: str, limit: int = 5) -> list[JSONDict]: ...
+
+    def scrape(self, url: str) -> JSONDict: ...
+
+
 class FirecrawlClient:
     """Minimal Firecrawl client for search and scrape."""
 
     def __init__(self, api_key: str | None = None, base_url: str = FIRECRAWL_BASE,
-                 timeout: float = 90, opener=None):
+                 timeout: float = 90, opener: Opener | None = None):
         key = api_key or os.environ.get(KEY_VARIABLE, "")
         if not key.strip():
             raise SweepError(f"{KEY_VARIABLE} is not set. Load it from 1Password into the environment for this run.")
         self._key = key.strip()
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
-        self._open = opener or urllib.request.urlopen
+        self._open: Opener = opener or urllib.request.urlopen
 
-    def _post(self, path: str, payload: dict) -> dict:
+    def _post(self, path: str, payload: dict[str, object]) -> JSONDict:
         request = urllib.request.Request(
             f"{self.base_url}/{path.lstrip('/')}",
             data=json.dumps(payload).encode("utf-8"),
@@ -64,7 +85,7 @@ class FirecrawlClient:
             raise SweepError(f"Firecrawl {path} reported failure: {str(body.get('error') or '')[:200]}")
         return body
 
-    def search(self, query: str, limit: int = 5) -> list[dict]:
+    def search(self, query: str, limit: int = 5) -> list[JSONDict]:
         data = self._post("search", {"query": query, "limit": limit}).get("data") or []
         if not isinstance(data, (dict, list)):
             raise SweepError("Firecrawl search returned an unexpected reply")
@@ -72,7 +93,7 @@ class FirecrawlClient:
             data = data.get("web") or []
         return [item for item in data if isinstance(item, dict) and item.get("url")]
 
-    def scrape(self, url: str) -> dict:
+    def scrape(self, url: str) -> JSONDict:
         body = self._post("scrape", {"url": url, "formats": ["markdown"], "onlyMainContent": True})
         data = body.get("data") or {}
         if not isinstance(data, dict):
@@ -111,8 +132,8 @@ def _page_markdown(title: str, url: str, requested: str, fetched_at: str, body: 
     return "\n".join(header) + body.strip() + "\n"
 
 
-def sweep(hunt: Hunt, targets: list[str], client=None, results_per_name: int = 5,
-          max_pages: int = 25, blocked_domains: list[str] | None = None) -> list[dict]:
+def sweep(hunt: Hunt, targets: list[str], client: SweepClient | None = None, results_per_name: int = 5,
+          max_pages: int = 25, blocked_domains: list[str] | None = None) -> list[Route]:
     """Sweep each target and record one route per target."""
     blocked = list(blocked_domains or [])
     if client is None:
@@ -128,13 +149,18 @@ def sweep(hunt: Hunt, targets: list[str], client=None, results_per_name: int = 5
     seen: set[str] = set()
     saved_total = 0
     fetched_total = 0
-    index: list[dict] = []
-    records = []
+    index: list[dict[str, object]] = []
+    records: list[Route] = []
     for target in targets:
         target = target.strip()
         method = "scrape" if is_url(target) else "search then scrape"
-        route = {"route": "public page sweep", "target": target, "method": method}
-        found, missing, problems, evidence, text_files = [], [], [], [], []
+        route: Route = {"route": "public page sweep", "target": target, "method": method}
+        found: list[str] = []
+        missing: list[str] = []
+        problems: list[str] = []
+        evidence: list[str] = []
+        text_files: list[str] = []
+        candidates: list[JSONDict]
         try:
             if is_url(target):
                 candidates = [{"url": target}]
@@ -197,8 +223,8 @@ def sweep(hunt: Hunt, targets: list[str], client=None, results_per_name: int = 5
         if not candidates and not problems:
             missing.append("no public results for this name")
         status = "found" if saved else ("failed" if problems else "nothing found")
-        route.update(status=status, found=found, missing=missing, problems=problems,
-                     evidence=evidence, text_files=text_files, output_dir=hunt.rel(out_dir))
+        route.update({"status": status, "found": found, "missing": missing, "problems": problems,
+                      "evidence": evidence, "text_files": text_files, "output_dir": hunt.rel(out_dir)})
         records.append(hunt.record_route(route))
     hunt.write_json(out_dir / "pages.json", index)
     return records

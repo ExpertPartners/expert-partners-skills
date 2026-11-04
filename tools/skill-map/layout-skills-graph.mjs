@@ -20,7 +20,67 @@
 //   inheritance edges collapsed): inherits edges are NOT given to ELK and
 //   carry no routed points; only calls and defers-to edges are routed.
 
-import ELK from 'elkjs/lib/elk.bundled.js';
+import ElkBundle from 'elkjs/lib/elk.bundled.js';
+
+// elk.bundled.js assigns the ELK constructor to module.exports, but its .d.ts
+// declares an ES default export, so under nodenext the default import is typed
+// as the module namespace instead of the constructor it is at runtime.
+const ELK = /** @type {typeof import('elkjs/lib/elk-api.js').default} */ (/** @type {unknown} */ (ElkBundle));
+
+/** @typedef {import('elkjs/lib/elk-api.js').ElkNode} ElkNode */
+/**
+ * ELK fills in width and height on every node it returns, the root included.
+ * @typedef {Omit<ElkNode, 'children'> & { width: number, height: number, children?: LaidOutElkNode[] }} LaidOutElkNode
+ */
+
+/** @typedef {{ x: number, y: number }} Point */
+/** @typedef {{ x: number, y: number, width: number, height: number }} Box */
+/**
+ * @typedef {Box & { rectHeight: number, annotationHeight: number, subtitleLines: string[] }} NodeLayout
+ */
+/**
+ * @typedef {Box & { key: string, brands: string[], label: string, parent: string | null }} BrandRoom
+ */
+/**
+ * @typedef {Box & { id: string, label: string, caption: string, rooms: BrandRoom[] }} ZoneLayout
+ */
+/**
+ * @typedef {object} GraphLayout
+ * @property {string} engine
+ * @property {number} width
+ * @property {number} height
+ * @property {ZoneLayout[]} zones
+ */
+/**
+ * @typedef {object} LayoutNode
+ * @property {string} id
+ * @property {string} zone
+ * @property {string[]} brandScope
+ * @property {string | null} [subtitle]
+ * @property {NodeLayout} [layout]
+ */
+/**
+ * @typedef {object} LayoutEdge
+ * @property {string} from
+ * @property {string} to
+ * @property {string} type
+ * @property {Point[] | null} [points]
+ */
+/**
+ * @typedef {object} LayoutInput
+ * @property {Record<string, { parent: string | null }>} brands
+ * @property {LayoutNode[]} nodes
+ * @property {LayoutEdge[]} edges
+ * @property {GraphLayout} [layout]
+ */
+/**
+ * The same graph object after layoutGraph has baked coordinates into it.
+ * @typedef {object} LaidOutGraph
+ * @property {Record<string, { parent: string | null }>} brands
+ * @property {Array<LayoutNode & { layout: NodeLayout }>} nodes
+ * @property {Array<LayoutEdge & { points: Point[] | null }>} edges
+ * @property {GraphLayout} layout
+ */
 
 // ---------- sizing (single source of truth for the renderer: wrapped
 // subtitle lines and all box dimensions are baked into the JSON) ----------
@@ -34,6 +94,10 @@ const ANNOT_H = 15;         // status annotation strip above the node rect
 const SUB_WRAP_AT = 32;     // wrap subtitle lines longer than this many chars
 const CANVAS_PAD = 8;
 
+/**
+ * @param {string | null | undefined} subtitle
+ * @returns {string[]}
+ */
 function wrapSubtitle(subtitle) {
   if (!subtitle) return [];
   if (subtitle.length <= SUB_WRAP_AT) return [subtitle];
@@ -48,6 +112,7 @@ function wrapSubtitle(subtitle) {
   return lines;
 }
 
+/** @param {LayoutNode} node */
 function nodeBox(node) {
   const subtitleLines = wrapSubtitle(node.subtitle);
   const longestSub = subtitleLines.reduce((m, l) => Math.max(m, l.length), 0);
@@ -61,6 +126,7 @@ function nodeBox(node) {
 
 // ---------- zone and room vocabulary (labels are content; colors live in the renderer) ----------
 
+/** @type {Record<string, { label: string, caption: string } | undefined>} */
 const ZONE_LABELS = {
   brain: { label: 'The brain', caption: 'the law and the map of the house' },
   brands: { label: 'The voices', caption: 'one room per brand, registry per ADR 0045' },
@@ -74,6 +140,7 @@ const ZONE_LABELS = {
 // Stable input and output order; ELK positions only populated zone containers.
 const ZONE_ORDER = ['brain', 'brands', 'content', 'hands', 'routing', 'surfaces', 'finance', 'cataloging'];
 
+/** @type {Record<string, string | undefined>} */
 const BRAND_LABELS = {
   'expert-partners': 'Expert Partners',
   epic: 'EPIC',
@@ -90,14 +157,19 @@ const ROOM_PAD = '[top=34,left=16,bottom=16,right=16]';
 
 // ---------- layout ----------
 
+/**
+ * @param {LayoutInput} graph mutated in place and returned
+ * @returns {Promise<LaidOutGraph>}
+ */
 export async function layoutGraph(graph) {
   const nodesById = new Map(graph.nodes.map(n => [n.id, n]));
   const boxes = new Map(graph.nodes.map(n => [n.id, nodeBox(n)]));
 
+  /** @type {Map<string, LayoutNode[]>} */
   const byZone = new Map();
   for (const n of graph.nodes) {
     if (!byZone.has(n.zone)) byZone.set(n.zone, []);
-    byZone.get(n.zone).push(n);
+    /** @type {LayoutNode[]} */ (byZone.get(n.zone)).push(n);
   }
   const zoneIds = ZONE_ORDER.filter(z => byZone.has(z));
 
@@ -109,22 +181,33 @@ export async function layoutGraph(graph) {
   }
   const routedEdges = graph.edges.map((e, i) => ({ ...e, _idx: i })).filter(e => e.type !== 'inherits');
 
+  /**
+   * @param {LayoutNode} n
+   * @returns {ElkNode}
+   */
   function elkNode(n) {
-    const b = boxes.get(n.id);
+    const b = /** @type {ReturnType<typeof nodeBox>} */ (boxes.get(n.id));
     return { id: n.id, width: b.width, height: b.height };
   }
 
   // Brand rooms: key by the brandScope signature (joint room for multi-scope).
+  /** @type {Map<string, { key: string, brands: string[], label: string }>} */
   const roomMeta = new Map(); // elk id -> {key, brands, label}
+  /**
+   * @param {LayoutNode[]} zoneNodes
+   * @returns {ElkNode[]}
+   */
   function buildBrandChildren(zoneNodes) {
+    /** @type {Map<string, LayoutNode[]>} */
     const roomMembers = new Map();
     const loose = [];
     for (const n of zoneNodes) {
       if (n.brandScope.length === 0) { loose.push(n); continue; }
       const key = n.brandScope.join('+');
       if (!roomMembers.has(key)) roomMembers.set(key, []);
-      roomMembers.get(key).push(n);
+      /** @type {LayoutNode[]} */ (roomMembers.get(key)).push(n);
     }
+    /** @type {Map<string, string>} */
     const roomParent = new Map();
     for (const key of roomMembers.keys()) {
       const scope = key.split('+');
@@ -133,6 +216,10 @@ export async function layoutGraph(graph) {
         if (parent && roomMembers.has(parent)) roomParent.set(key, parent);
       }
     }
+    /**
+     * @param {string} key
+     * @returns {ElkNode}
+     */
     function roomElk(key) {
       const scope = key.split('+');
       const label = scope.map(b => BRAND_LABELS[b] ?? b).join(' and ');
@@ -142,7 +229,7 @@ export async function layoutGraph(graph) {
         id: `room:${key}`,
         layoutOptions: { 'elk.padding': ROOM_PAD, 'elk.spacing.nodeNode': '20' },
         children: [
-          ...roomMembers.get(key).map(n => elkNode(n)),
+          ...(/** @type {LayoutNode[]} */ (roomMembers.get(key))).map(n => elkNode(n)),
           ...childRooms.map(k => roomElk(k)),
         ],
       };
@@ -151,6 +238,7 @@ export async function layoutGraph(graph) {
     return [...loose.map(n => elkNode(n)), ...topRooms.map(k => roomElk(k))];
   }
 
+  /** @type {ElkNode} */
   const root = {
     id: 'skill-map',
     layoutOptions: {
@@ -166,19 +254,24 @@ export async function layoutGraph(graph) {
     children: zoneIds.map(zid => ({
       id: `zone:${zid}`,
       layoutOptions: { 'elk.padding': ZONE_PAD, 'elk.spacing.nodeNode': '24' },
-      children: zid === 'brands' ? buildBrandChildren(byZone.get(zid)) : byZone.get(zid).map(elkNode),
+      children: zid === 'brands' ? buildBrandChildren(/** @type {LayoutNode[]} */ (byZone.get(zid)))
+        : /** @type {LayoutNode[]} */ (byZone.get(zid)).map(elkNode),
     })),
     edges: routedEdges.map(e => ({ id: `edge:${e._idx}`, sources: [e.from], targets: [e.to] })),
   };
-  const laid = await new ELK().layout(root);
+  const laid = /** @type {LaidOutElkNode} */ (await new ELK().layout(root));
+  /** @type {Map<string, Box>} */
   const absNodes = new Map();
+  /** @type {Map<string, ZoneLayout>} */
   const zonesById = new Map();
+  /** @type {Map<number, Point[]>} */
   const edgeRoutes = new Map();
+  /** @type {Map<string, Point>} */
   const containerOrigin = new Map();
 
   // ELK node positions and edge sections are relative to their containing
   // compound. Keep a single absolute origin table for zones, rooms and edges.
-  (function walk(el, ox, oy, zone) {
+  (function walk(/** @type {LaidOutElkNode} */ el, /** @type {number} */ ox, /** @type {number} */ oy, /** @type {ZoneLayout | null} */ zone) {
     const x = ox + (el.x ?? 0);
     const y = oy + (el.y ?? 0);
     containerOrigin.set(el.id, { x, y });
@@ -188,20 +281,22 @@ export async function layoutGraph(graph) {
       zone = { id: zid, ...zl, x, y, width: el.width, height: el.height, rooms: [] };
       zonesById.set(zid, zone);
     } else if (roomMeta.has(el.id)) {
-      const m = roomMeta.get(el.id);
-      zone.rooms.push({ key: m.key, brands: m.brands, label: m.label, parent: null, x, y, width: el.width, height: el.height });
+      const m = /** @type {{ key: string, brands: string[], label: string }} */ (roomMeta.get(el.id));
+      // Rooms only exist inside the brands zone container, so a zone is always set here.
+      /** @type {ZoneLayout} */ (zone).rooms.push({ key: m.key, brands: m.brands, label: m.label, parent: null, x, y, width: el.width, height: el.height });
     } else if (nodesById.has(el.id)) {
       absNodes.set(el.id, { x, y, width: el.width, height: el.height });
     }
     for (const c of el.children ?? []) walk(c, x, y, zone);
   })(laid, 0, 0, null);
-  const zonesOut = zoneIds.map(zid => zonesById.get(zid));
+  const zonesOut = zoneIds.map(zid => /** @type {ZoneLayout} */ (zonesById.get(zid)));
 
-  (function collect(el) {
+  (function collect(/** @type {LaidOutElkNode} */ el) {
     for (const e of el.edges ?? []) {
       const idx = Number(e.id.slice(5));
       const origin = containerOrigin.get(e.container ?? el.id);
       if (!origin) throw new Error(`layout missing container for edge ${e.id}`);
+      /** @type {Point[]} */
       const pts = [];
       for (const s of e.sections ?? []) pts.push(s.startPoint, ...(s.bendPoints ?? []), s.endPoint);
       edgeRoutes.set(idx, pts.map(p => ({ x: Math.round((p.x + origin.x) * 10) / 10, y: Math.round((p.y + origin.y) * 10) / 10 })));
@@ -222,10 +317,10 @@ export async function layoutGraph(graph) {
 
   // ---------- bake ----------
 
-  const round = v => Math.round(v * 10) / 10;
+  const round = (/** @type {number} */ v) => Math.round(v * 10) / 10;
   for (const n of graph.nodes) {
     const abs = absNodes.get(n.id);
-    const b = boxes.get(n.id);
+    const b = /** @type {ReturnType<typeof nodeBox>} */ (boxes.get(n.id));
     if (!abs) throw new Error(`layout missing for node ${n.id}`);
     n.layout = {
       x: round(abs.x), y: round(abs.y), width: abs.width, height: abs.height,
@@ -249,5 +344,5 @@ export async function layoutGraph(graph) {
       rooms: z.rooms.map(r => ({ ...r, x: round(r.x), y: round(r.y), width: round(r.width), height: round(r.height) })),
     })),
   };
-  return graph;
+  return /** @type {LaidOutGraph} */ (graph);
 }

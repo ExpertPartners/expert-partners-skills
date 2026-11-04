@@ -1,0 +1,38 @@
+# Type-check configuration only; nothing here is a package build.
+# Strict check:   python -m mypy   (install: pip install --require-hashes -r requirements-tooling.txt
+#                 -r plugins/research-ops/skills/video-discovery/requirements-verification.txt)
+# JavaScript:     tools/skill-map/node_modules/.bin/tsc -p jsconfig.json   (after npm ci in both producers)
+# .github/workflows/tooling-typecheck.yml runs both; tools/readiness/tests/test_typecheck_config.py
+# proves the scope and that a planted error fails.
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = [
+    "tools/auto-merge-gate/gate.py",
+    "tools/plugin-sync/chatgpt-import-check.py",
+    "tools/plugin-sync/drift-check.py",
+    "tools/capability-currency/drive_docs.py",
+    "plugins/research-ops/skills/source-hunter/scripts",
+    "plugins/research-ops/skills/video-discovery/scripts",
+]
+mypy_path = [
+    "plugins/research-ops/skills/source-hunter/scripts",
+    "plugins/research-ops/skills/video-discovery/scripts",
+]
+explicit_package_bases = true
+warn_unreachable = true
+show_error_codes = true
+
+# yt-dlp ships no py.typed marker. mypy reads its source instead of treating it as Any,
+# and its unannotated functions are exempt from the untyped-call rule.
+untyped_calls_exclude = ["yt_dlp"]
+
+[[tool.mypy.overrides]]
+module = ["yt_dlp", "yt_dlp.*"]
+follow_untyped_imports = true
+
+# Imported lazily by code that only runs where they are installed; no lock carries them.
+[[tool.mypy.overrides]]
+module = ["googleapiclient.*", "google.oauth2.*", "playwright.*"]
+ignore_missing_imports = true

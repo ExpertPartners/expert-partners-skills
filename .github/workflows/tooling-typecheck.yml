@@ -1,0 +1,69 @@
+name: tooling-typecheck
+
+# Strict source type checks for the canonical tooling. mypy reads [tool.mypy] in
+# pyproject.toml (strict mode); tsc reads jsconfig.json (checkJs, strict). Both run
+# offline against the hash-locked Python install and the npm lockfiles.
+
+on:
+  pull_request:
+    paths:
+      - 'pyproject.toml'
+      - 'jsconfig.json'
+      - 'requirements-tooling.txt'
+      - 'tools/**'
+      - 'plugins/research-ops/skills/source-hunter/scripts/**'
+      - 'plugins/research-ops/skills/source-hunter/requirements*.txt'
+      - 'plugins/research-ops/skills/video-discovery/scripts/**'
+      - 'plugins/research-ops/skills/video-discovery/requirements*.txt'
+      - '.github/workflows/tooling-typecheck.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'pyproject.toml'
+      - 'jsconfig.json'
+      - 'requirements-tooling.txt'
+      - 'tools/**'
+      - 'plugins/research-ops/skills/source-hunter/scripts/**'
+      - 'plugins/research-ops/skills/source-hunter/requirements*.txt'
+      - 'plugins/research-ops/skills/video-discovery/scripts/**'
+      - 'plugins/research-ops/skills/video-discovery/requirements*.txt'
+      - '.github/workflows/tooling-typecheck.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  typecheck:
+    name: mypy --strict and tsc strict (offline)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # The skill runtime lock is installed beside the checker so mypy reads the real
+      # types of requests, Beautiful Soup, Pillow, PyAV and the rest.
+      - name: Install the checker and the typed runtime (hash-locked)
+        run: python -m pip install --quiet --require-hashes -r requirements-tooling.txt -r plugins/research-ops/skills/video-discovery/requirements-verification.txt
+      - name: Install the JavaScript producers (lockfiles)
+        run: |
+          set -euo pipefail
+          for producer in tools/capability-feed tools/skill-map; do
+            (cd "$producer" && npm ci --ignore-scripts --no-audit --no-fund)
+          done
+      - name: Python strict type check
+        run: |
+          python -m mypy --version
+          python -m mypy
+      - name: JavaScript strict type check
+        run: |
+          tools/skill-map/node_modules/.bin/tsc --version
+          tools/skill-map/node_modules/.bin/tsc -p jsconfig.json
+      - name: Scope and synthetic-error tests
+        env:
+          TYPECHECK_REQUIRE_TOOLS: "1"
+        run: python -m unittest tools/readiness/tests/test_typecheck_config.py -v
