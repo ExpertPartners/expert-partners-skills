@@ -84,7 +84,7 @@ STUB = textwrap.dedent('''\
         state["installed"][name] = dict(old, version=state["catalog"][name], enabled=old["enabled"])
         save()
     elif tool == "codex" and args == ["app-server", "--listen", "stdio://"]:
-        # The skills/list and skills/config/write shapes of codex-rs app-server-protocol v2.
+        # The config/read, skills/list and skills/config/write shapes of app-server-protocol v2.
         if "app-server" in fail:
             die("app-server failed to start")
         home = os.environ["HOME"]
@@ -93,6 +93,7 @@ STUB = textwrap.dedent('''\
 
         def listing():
             off = {real(p) for p in state.get("codex_disabled", [])}
+            off.update(real(s["path"]) for s in state.get("codex_skill_choices", []) if s.get("enabled") is False)
             root = os.path.join(home, ".agents", "skills")
             rows = []
             for n in sorted(os.listdir(root)) if os.path.isdir(root) else []:
@@ -113,6 +114,11 @@ STUB = textwrap.dedent('''\
                 f.write(json.dumps({"tool": tool, "args": ["app-server", method, params]}) + "\\n")
             if method == "initialize":
                 result = {"userAgent": "stub", "codexHome": codex_home}
+            elif method == "config/read":
+                if "config-read" in fail:
+                    print(json.dumps({"id": msg["id"], "error": {"code": -32603, "message": "config read failed"}}), flush=True)
+                    continue
+                result = {"config": {"skills": {"config": state.get("codex_skill_choices", [])}}, "origins": {}}
             elif method == "skills/list":
                 result = listing()
             elif method == "skills/config/write":

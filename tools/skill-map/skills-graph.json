@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "abf8abef86ba13beff6b7a8ec69503bb65b1ebfd"
+    "eps": "af782c92b834884f82e73a4f81251f83b5577a87"
   },
   "zones": [
     "surfaces",
@@ -1226,7 +1226,7 @@
       "calls": [],
       "defersTo": [],
       "brandScope": [],
-      "subtitle": "where every system lives and what Claude can reach",
+      "subtitle": "find the current owner, route and verified result",
       "renderNote": null,
       "layout": {
         "x": 1030,
@@ -1236,8 +1236,8 @@
         "rectHeight": 62,
         "annotationHeight": 15,
         "subtitleLines": [
-          "where every system lives and",
-          "what Claude can reach"
+          "find the current owner, route",
+          "and verified result"
         ]
       }
     },

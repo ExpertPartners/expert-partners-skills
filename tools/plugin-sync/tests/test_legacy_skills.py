@@ -332,6 +332,34 @@ class Legacy(ls.Base, unittest.TestCase):
         self.assertEqual(r.returncode, 0, self.m.log("codex"))
         self.assertEqual(self.legacy("codex")["skills"]["intake"]["state"], "turned off")
 
+    def test_codex_explicit_on_and_off_choices_are_preserved(self):
+        self.release_replacement()
+        self.codex_installed()
+        on = str(self.home / ".agents/skills/intake/SKILL.md")
+        off = str(self.home / ".agents/skills/new-project/SKILL.md")
+        state = json.loads(self.m.state.read_text())
+        state["codex_skill_choices"] = [{"path": on, "enabled": True}, {"path": off, "enabled": False}]
+        self.m.state.write_text(json.dumps(state))
+        self.m.take_calls()
+        self.assertEqual(self.m.sync("codex").returncode, 0, self.m.log("codex"))
+        rec = self.legacy("codex")
+        self.assertEqual(rec["status"], "attention")
+        self.assertIn("explicitly sets enabled=true", rec["skills"]["intake"]["state"])
+        self.assertEqual(rec["skills"]["new-project"]["state"], "already off")
+        writes = self.writes()
+        self.assertNotIn(on, writes)
+        self.assertNotIn(off, writes)
+        self.assertCopiesUntouched()
+
+    def test_codex_failed_native_config_read_never_guesses_a_choice(self):
+        self.release_replacement()
+        self.codex_installed()
+        self.m.take_calls()
+        self.assertEqual(self.m.sync("codex", STUB_FAIL="config-read").returncode, 1)
+        self.assertEqual(self.legacy("codex")["status"], "failed")
+        self.assertEqual(self.writes(), [])
+        self.assertCopiesUntouched()
+
     def test_codex_app_server_failure_is_visible(self):
         self.release_replacement()
         self.codex_installed()
@@ -339,6 +367,114 @@ class Legacy(ls.Base, unittest.TestCase):
         self.assertEqual(r.returncode, 1)
         self.assertEqual(self.legacy("codex")["status"], "failed")
         self.assertCopiesUntouched()
+
+
+class ContinuityOwners(ls.Base, unittest.TestCase):
+    """Real helper/native-protocol fixtures with public synthetic audited bytes.
+
+    Only the compatibility input table is patched in memory; no private deployed bodies
+    or test-only trust hook is shipped in the producer.
+    """
+    def setUp(self):
+        super().setUp()
+        spec = importlib.util.spec_from_file_location("continuity_legacy", HERE.parent / "legacy-skills.py")
+        self.mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(self.mod)
+        self.names = list(self.mod.REQUIRES)
+        self.synthetic = {}
+        for name in self.names:
+            data = legacy_text(name, "continuity").encode()
+            self.synthetic[name] = {hashlib.sha256(data).hexdigest()}
+            for mount in (".claude/skills", ".agents/skills"):
+                path = self.m.home / mount / name / "SKILL.md"
+                path.parent.mkdir(parents=True)
+                path.write_bytes(data)
+        base = self.m.seed / "plugins/operating-doctrine/skills"
+        for skill in {s for n in self.names for s in self.mod.replacements(n)}:
+            path = base / skill / "SKILL.md"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(f"---\nname: {skill}\ndescription: canonical owner\n---\n\nCurrent {skill}.\n")
+        self.m.publish(VERSIONS, message="canonical continuity owners")
+        self.cache = self.m.root / "canonical-cache"
+        shutil.copytree(base.parent, self.cache)
+        self.m.state.write_text(json.dumps({
+            "catalog": VERSIONS,
+            "installed": {"operating-doctrine": {"version": "1.0.0", "enabled": True,
+                                                   "installPath": str(self.cache)}},
+            "codex_plugin_skills": [{"name": f"operating-doctrine:{skill}",
+                                     "path": str(self.cache / "skills" / skill / "SKILL.md"),
+                                     "pluginId": f"operating-doctrine@{MK}", "enabled": True}
+                                    for skill in {s for n in self.names for s in self.mod.replacements(n)}],
+        }))
+
+    def run_migration(self, surface):
+        with mock.patch.dict(os.environ, self.m.env(), clear=True), mock.patch.dict(self.mod.DEPLOYED_SHA256, self.synthetic):
+            head = ls.sh("git", "rev-parse", "HEAD", cwd=self.m.seed).stdout.strip()
+            args = [str(self.m.seed), str(self.m.state_dir), head, lambda line: None]
+            if surface == "claude-code":
+                return self.mod.claude_migrate(*args, str(self.m.bin / "claude"), 10)
+            return self.mod.codex_migrate(*args, str(self.m.bin / "codex"), set())
+
+    def receipt(self, surface):
+        return self.m.receipt(surface + "-legacy-skills.json")
+
+    def test_six_helpers_retire_only_after_all_existing_owners_are_proven(self):
+        for surface, mount, state in (("claude-code", ".claude/skills", "archived"),
+                                      ("codex", ".agents/skills", "turned off")):
+            with self.subTest(surface=surface):
+                self.assertEqual(self.run_migration(surface)["status"], "ok")
+                rec = self.receipt(surface)
+                for name in self.names:
+                    self.assertEqual(rec["skills"][name]["state"], state)
+                    self.assertEqual(rec["skills"][name]["required_replacements"],
+                                     list(self.mod.replacements(name)))
+                    path = self.m.home / mount / name / "SKILL.md"
+                    self.assertEqual(path.exists(), surface == "codex")
+
+    def test_supporting_owner_wrong_bytes_blocks_retirement_then_recovers(self):
+        for surface, mount, state in (("claude-code", ".claude/skills", "archived"),
+                                      ("codex", ".agents/skills", "turned off")):
+            with self.subTest(surface=surface):
+                path = self.cache / "skills/code-block-routing/SKILL.md"
+                original = path.read_bytes()
+                path.write_text("stale unsafe supporting body\n")
+                self.assertEqual(self.run_migration(surface)["status"], "waiting")
+                rec = self.receipt(surface)
+                for name in ("handoff", "resume-work", "implement"):
+                    self.assertIn("code-block-routing", rec["skills"][name]["state"])
+                    self.assertTrue((self.m.home / mount / name / "SKILL.md").exists())
+                path.write_bytes(original)
+                self.assertEqual(self.run_migration(surface)["status"], "ok")
+                for name in ("handoff", "resume-work", "implement"):
+                    self.assertEqual(self.receipt(surface)["skills"][name]["state"], state)
+
+    def test_codex_disabled_supporting_owner_blocks_even_with_enabled_primary(self):
+        data = json.loads(self.m.state.read_text())
+        for row in data["codex_plugin_skills"]:
+            if row["name"] == "operating-doctrine:session-steward":
+                row["enabled"] = False
+        self.m.state.write_text(json.dumps(data))
+        self.assertEqual(self.run_migration("codex")["status"], "waiting")
+        rec = self.receipt("codex")
+        for name in ("park", "session-audit", "session-closeout"):
+            self.assertIn("session-steward is disabled", rec["skills"][name]["state"])
+        writes = [c["args"][2]["path"] for c in self.m.take_calls()
+                  if c["args"][:2] == ["app-server", "skills/config/write"]]
+        self.assertTrue(all(str(self.m.home / ".agents/skills" / n / "SKILL.md") not in writes
+                            for n in ("park", "session-audit", "session-closeout")))
+
+    def test_unaudited_continuity_variant_is_not_trusted_by_history(self):
+        class HistoricalMatch:
+            def history_blobs(self, path):
+                return {self.blob}
+        data = legacy_text("handoff", "unaudited").encode()
+        path = self.m.home / ".agents/skills/handoff/SKILL.md"
+        path.write_bytes(data)
+        repo = HistoricalMatch()
+        repo.blob = self.mod.blob_id(data)
+        with mock.patch.dict(self.mod.DEPLOYED_SHA256, self.synthetic):
+            self.assertEqual(self.mod.classify(repo, "handoff", str(path.parent.parent))[0], "unrecognized")
+        self.assertEqual(path.read_bytes(), data)
 
 
 class ArchiveSafety(unittest.TestCase):

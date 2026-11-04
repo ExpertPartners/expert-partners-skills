@@ -1,8 +1,8 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-11-04T03:26:59Z",
-  "verifiedAt": "2026-11-04T03:26:59Z",
+  "generatedAt": "2026-11-04T03:40:54Z",
+  "verifiedAt": "2026-11-04T03:40:54Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
@@ -3231,7 +3231,7 @@
       "id": "expert-partners-systems-map",
       "humanName": "Expert Partners Systems Map and Access Map",
       "kind": "skill",
-      "summary": "The canonical map of where every Expert Partners system lives, what each system's one job is, and what access Claude already holds across the stack.",
+      "summary": "Routes questions about systems, storage, ownership and access to their current owning sources.",
       "status": "Unknown",
       "maintainer": "Allison Gaddy",
       "collectionIds": [],
@@ -3260,28 +3260,29 @@
         "inherits": "operating-doctrine"
       },
       "keywords": [
+        "about",
         "access",
-        "across",
-        "already",
         "brain",
-        "can",
-        "canonical",
-        "claude",
-        "each",
+        "current",
         "expert",
-        "holds",
-        "job",
-        "lives",
+        "find",
         "map",
+        "owner",
+        "ownership",
+        "owning",
         "partners",
-        "reach",
-        "stack",
-        "system",
+        "questions",
+        "result",
+        "route",
+        "routes",
+        "sources",
+        "storage",
         "systems",
-        "where"
+        "their",
+        "verified"
       ],
       "bestFor": [
-        "where every system lives and what Claude can reach"
+        "find the current owner, route and verified result"
       ],
       "useCases": [],
       "askExamples": [],

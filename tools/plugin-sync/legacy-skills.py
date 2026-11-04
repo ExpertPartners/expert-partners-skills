@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
-"""Retire the four old user-tier helpers once the operating-doctrine plugin replaces them.
+"""Retire audited old user-tier helpers once the operating-doctrine plugin replaces them.
 
-intake, new-project, session-home and verify-docs were once deployed as standalone copies
-into ~/.claude/skills and ~/.agents/skills. They now ship in the operating-doctrine plugin
-(verify-docs as part of research-before-guessing), but native plugin delivery cannot touch
+The intake and continuity helpers were once deployed as standalone copies
+into ~/.claude/skills and ~/.agents/skills. Their useful behavior now ships in the operating-doctrine plugin
+(verify-docs as part of research-before-guessing and continuity helpers in existing owners), but native plugin delivery cannot touch
 the old copies, so they stay discoverable. codex-sync.sh and claude-code-sync.sh call this
 after each full delivery run. For each old name it:
 
-1. recognizes the copy by an exact audited deployment fingerprint, or its SKILL.md with
-   any skill-deploy DEPLOYED COPY header naming
-   expert-partners-skills skills/<name>/SKILL.md removed, must equal a committed version
-   of that file in this checkout's first-parent history. Anything else is left alone and
-   reported;
+1. recognizes an exact audited deployment fingerprint. For the original four helpers
+   only, its SKILL.md with a verified skill-deploy DEPLOYED COPY header removed may
+   instead equal a committed version in this checkout's first-parent history. Anything
+   else is left alone and reported;
 2. proves the replacement: the operating-doctrine plugin is installed and enabled on this
-   surface and its skill folder holds exactly the bytes committed at HEAD;
+   surface and every required owner's skill folder holds the bytes committed at HEAD;
 3. retires only that old copy after a private, verified backup: Claude Code's old SKILL.md
    moves to a private archive without rewriting shared settings, and Codex uses
    Codex app-server skills/config/write with the exact SKILL.md path and enabled false
@@ -45,14 +44,30 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 MK = "expert-partners"
 PLUGIN = "operating-doctrine"
 PLUGIN_ID = f"{PLUGIN}@{MK}"
-# Old user-tier name -> the operating-doctrine skill folder that replaces it.
+# Old user-tier name -> primary operating-doctrine owner; REQUIRES adds supporting owners.
 LEGACY = {
     "intake": "intake",
     "new-project": "new-project",
     "session-home": "session-home",
     "verify-docs": "research-before-guessing",
+    "handoff": "session-wrap",
+    "park": "session-wrap",
+    "resume-work": "session-wrap",
+    "session-audit": "session-steward",
+    "session-closeout": "session-wrap",
+    "implement": "build-standard",
 }
-# Exact whole-file SHA256s of the eight previously deployed copies inspected by the
+# Every required owner must be installed, enabled and byte-equal before retirement.
+# These are existing canonical skills, not new copies of the legacy helpers.
+REQUIRES = {
+    "handoff": ("session-wrap", "code-block-routing"),
+    "park": ("session-wrap", "session-steward"),
+    "resume-work": ("session-wrap", "session-home", "code-block-routing"),
+    "session-audit": ("session-steward", "session-wrap"),
+    "session-closeout": ("session-wrap", "session-steward"),
+    "implement": ("build-standard", "session-home", "code-block-routing", "session-wrap"),
+}
+# Exact whole-file SHA256s of the twenty previously deployed copies inspected by the
 # migration audit. They include platform-specific renders absent from a shallow clone.
 # This is a bounded compatibility input, never a name-only or header-only trust rule.
 DEPLOYED_SHA256 = {
@@ -71,6 +86,30 @@ DEPLOYED_SHA256 = {
     "verify-docs": {
         "579ea9935ce9ed7d0bb013fae70bd663d2d9832e69e855f36316cafbca778423",
         "ca06b3f4506cf917faeed9c4587c2629f0deb216cbf63a75525f92ae3a811b08",
+    },
+    'handoff': {
+        "1319436e39e6b3bf6fb3226e064d30154a5b463d2b4a969ba08bdfcf4906698b",
+        "3b0fbd8f48f2262ee500ca8586dd72d9edf2b946a64b6b4a7a7b5d31c74dea90",
+    },
+    'park': {
+        "e8f95b79c77c60cc61a176470c69b5c2152377eed84c2614563a9ae3766df235",
+        "66f6ae8cc70a28951069a625c5db82f492a6a09799584f8d696ab8d65ddb8c7f",
+    },
+    'resume-work': {
+        "785c57449d1ea47301434f8aaaea6bb8522416d76b40b97e8550eb034b296f5b",
+        "177cab6c3dcca1221687c4753f9c7956b27167f309061bfb571c1716f2c6b939",
+    },
+    'session-audit': {
+        "447886ead5aea9bce31541628e288b3faa88bd89d3649a9f353166ab36f6c51e",
+        "94a2cd416c56dd44c109efdd7be989fd486bfa4a0b2bf3dd3b1781e95caddc4e",
+    },
+    'session-closeout': {
+        "1a4ae080cdf4c0545b516cedc79f340aa53be7a035b679f0aeee15dc275b5858",
+        "4fcb05cc3629e84b94ea36753b8cfb842d30d11d38981e6ee427256aa5ba3d1a",
+    },
+    'implement': {
+        "1a5f7dcf567c5dd146a51b37ffc1361ba90deb87f7c72dc5e42ea3a25f875576",
+        "c216f532ee15490e5a793ef50ee1880d66e981430faf13d2594ad120aa7dba24",
     },
 }
 HEADER = re.compile(
@@ -91,6 +130,10 @@ Log = Callable[[str], None]
 
 class MigrationError(Exception):
     pass
+
+
+def replacements(name: str) -> Tuple[str, ...]:
+    return REQUIRES.get(name, (LEGACY[name],))
 
 
 def blob_id(data: bytes) -> str:
@@ -151,6 +194,8 @@ def classify(repo: Repo, name: str, skills_root: str) -> Tuple[str, str]:
     digest = hashlib.sha256(data).hexdigest()
     if digest in DEPLOYED_SHA256.get(name, set()):
         return "trusted", f"sha256:{digest}"
+    if name in REQUIRES:
+        return "unrecognized", f"its bytes match no audited deployment of {name}"
     source = f"skills/{name}/SKILL.md"
     m = HEADER.search(data)
     if m:
@@ -334,6 +379,7 @@ class AppServer:
                 if isinstance(msg, dict):
                     self.inbox.put(msg)
         finally:
+            self.proc.stdout.close()
             self.inbox.put(None)
 
     def _write(self, msg: Dict[str, Any]) -> None:
@@ -404,6 +450,23 @@ def codex_skills(server: AppServer, cwd: str) -> List[Dict[str, Any]]:
     return skills
 
 
+def codex_choices(server: AppServer, cwd: str) -> Dict[str, bool]:
+    """Read explicit per-path choices through the native API, without a TOML dependency."""
+    result = server.request("config/read", {"cwd": cwd, "includeLayers": False})
+    if not isinstance(result, dict) or not isinstance(result.get("config"), dict):
+        raise MigrationError("codex app-server config/read returned an unexpected shape")
+    skills = result["config"].get("skills", {})
+    if skills is None:
+        skills = {}
+    if not isinstance(skills, dict) or not isinstance(skills.get("config", []), list):
+        raise MigrationError("codex config/read skills.config is not a list")
+    choices: Dict[str, bool] = {}
+    for entry in skills.get("config", []):
+        if isinstance(entry, dict) and isinstance(entry.get("path"), str) and isinstance(entry.get("enabled"), bool):
+            choices[os.path.realpath(entry["path"])] = entry["enabled"]
+    return choices
+
+
 def same_file(a: str, b: str) -> bool:
     return os.path.realpath(a) == os.path.realpath(b)
 
@@ -440,7 +503,8 @@ def run(surface: str, repo_root: str, state_dir: str, head: str, log: Log,
                 log(f"legacy {name}: left alone, {detail}")
             else:
                 skills[name] = {"copy": path, "matched_source": detail,
-                                "source_sha256": detail.removeprefix("sha256:")}
+                                "source_sha256": detail.removeprefix("sha256:"),
+                                "required_replacements": list(replacements(name))}
                 trusted.append(name)
         if trusted:
             act(repo, trusted, skills, backups)
@@ -492,7 +556,11 @@ def claude_migrate(repo_root: str, state_dir: str, head: str, log: Log, claude: 
             elif not enabled:
                 why = f"{PLUGIN} is installed but disabled"
             else:
-                why = tree_mismatch(repo, LEGACY[name], os.path.join(enabled[0]["installPath"], "skills", LEGACY[name])) or ""
+                why = ""
+                for replacement in replacements(name):
+                    why = tree_mismatch(repo, replacement, os.path.join(enabled[0]["installPath"], "skills", replacement)) or ""
+                    if why:
+                        break
             if why:
                 skills[name]["state"] = f"waiting, replacement not proven: {why}"
             else:
@@ -530,22 +598,28 @@ def codex_migrate(repo_root: str, state_dir: str, head: str, log: Log, codex: st
                                                          "title": "plugin-sync legacy skills", "version": "1"}})
             server.notify("initialized")
             listed = codex_skills(server, home)
-            todo: Dict[str, Tuple[str, str]] = {}
+            choices = codex_choices(server, home)
+            todo: Dict[str, Tuple[str, List[str]]] = {}
             for name in trusted:
                 copy = skills[name]["copy"]
-                skill = LEGACY[name]
-                candidates = [s for s in listed if s.get("pluginId") == PLUGIN_ID
-                              and os.path.basename(os.path.dirname(s["path"])) == skill]
-                why = f"{PLUGIN} does not list {skill}" if not candidates else ""
-                replacement = ""
-                for s in candidates:
-                    if s.get("enabled") is not True:
-                        why = f"{PLUGIN} {skill} is disabled"
-                        continue
-                    why = tree_mismatch(repo, skill, os.path.dirname(s["path"])) or ""
-                    if not why:
-                        replacement = s["path"]
+                why = ""
+                replacement_paths = []
+                for skill in replacements(name):
+                    candidates = [s for s in listed if s.get("pluginId") == PLUGIN_ID
+                                  and os.path.basename(os.path.dirname(s["path"])) == skill]
+                    why = f"{PLUGIN} does not list {skill}" if not candidates else ""
+                    replacement = ""
+                    for candidate in candidates:
+                        if candidate.get("enabled") is not True:
+                            why = f"{PLUGIN} {skill} is disabled"
+                            continue
+                        why = tree_mismatch(repo, skill, os.path.dirname(candidate["path"])) or ""
+                        if not why:
+                            replacement = candidate["path"]
+                            break
+                    if why:
                         break
+                    replacement_paths.append(replacement)
                 old = [s for s in listed if same_file(s["path"], copy)]
                 if why:
                     skills[name]["state"] = f"waiting, replacement not proven: {why}"
@@ -553,8 +627,10 @@ def codex_migrate(repo_root: str, state_dir: str, head: str, log: Log, codex: st
                     skills[name]["state"] = "not listed by Codex, nothing to turn off"
                 elif old[0].get("enabled") is False:
                     skills[name]["state"] = "already off"
+                elif choices.get(os.path.realpath(copy)) is True:
+                    skills[name]["state"] = "left alone, skills.config explicitly sets enabled=true"
                 else:
-                    todo[name] = (os.path.abspath(copy), replacement)
+                    todo[name] = (os.path.abspath(copy), replacement_paths)
             if not todo:
                 return
             raw = read_or_none(os.path.join(codex_home, "config.toml"))
@@ -568,15 +644,18 @@ def codex_migrate(repo_root: str, state_dir: str, head: str, log: Log, codex: st
                 skills[name]["state"] = "turned off"
                 skills[name]["setting"] = f"codex skills/config/write path={path} enabled=false"
             after = codex_skills(server, home)
-            for name, (path, replacement) in todo.items():
+            for name, (path, replacement_paths) in todo.items():
                 if skills[name]["state"] != "turned off":
                     continue
                 old = [s for s in after if same_file(s["path"], path)]
-                new = [s for s in after if same_file(s["path"], replacement)]
                 if old and old[0].get("enabled") is not False:
                     skills[name]["state"] = "failed, the old copy still reads back as on"
-                elif not new or new[0].get("enabled") is not True:
-                    skills[name]["state"] = "failed, the replacement no longer reads back as on"
+                else:
+                    for replacement in replacement_paths:
+                        new = [s for s in after if same_file(s["path"], replacement)]
+                        if not new or new[0].get("enabled") is not True:
+                            skills[name]["state"] = "failed, a required replacement no longer reads back as on"
+                            break
         finally:
             server.close()
 
