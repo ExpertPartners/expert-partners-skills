@@ -1924,6 +1924,35 @@ class ActiveOwnerErrorRecovery(unittest.TestCase):
 
 
 class DeliveryDefaultBase(unittest.TestCase):
+    def test_retargeted_pr_keeps_ownership_after_reopen_and_before_newer_pr(self):
+        earlier = merged_pr(230, 237)
+        retargeted = pr(240, ["x/a.py"], closes=237)[1]
+        retargeted["base"]["ref"] = "release"
+        newer = pr(241, ["x/a.py"], closes=237)[1]
+        gh = FakeGitHub([issue(237, "x/a.py")], [retargeted, newer], [earlier])
+        gh.timeline[237] = [{"event": "reopened", "created_at": "2026-11-04T02:00:00Z"}]
+        gh.compares[newer["head"]["sha"]] = "ahead"
+        delivery = oc.job_delivery(gh, CFG, 237)
+        self.assertEqual([p["number"] for p in delivery.open], [240, 241])
+        self.assertIsNone(delivery.target)
+        self.assertEqual(delivery.predates_merge, [])
+        self.assertFalse(oc.run_check(gh, run_cfg(1000), 237, sleep=NOOP))
+        self.assertEqual(gh.labels(237), {"job", "waiting"})
+
+    def test_nondefault_open_pr_waits_without_a_duplicate_gate_or_owner(self):
+        for base in ({"ref": "release", "repo": {"full_name": REPO}},
+                     {"ref": "main", "repo": {"full_name": "outside/repo"}}, {}):
+            with self.subTest(base=base):
+                p = pr(240, ["x/a.py"], closes=237)[1]
+                p["base"] = base
+                gh = FakeGitHub([issue(237, "x/a.py")], [p])
+                self.assertFalse(oc.run_check(gh, run_cfg(1000), 237, sleep=NOOP))
+                self.assertEqual(gh.labels(237), {"job", "waiting"})
+                self.assertEqual(claims(gh, 237), [])
+                self.assertIsNone(oc.recorded_run(gh, CFG, 237))
+                self.assertEqual(oc.run_release(gh, CFG, 237, "success"), "waiting")
+                self.assertFalse(oc.run_owner(gh, run_cfg(1000), 237)[0])
+
     def test_open_nondefault_or_crossrepo_bases_cannot_be_continued(self):
         for base in ({"ref": "release", "repo": {"full_name": REPO}},
                      {"ref": "main", "repo": {"full_name": "outside/repo"}}, {}):
@@ -1932,7 +1961,8 @@ class DeliveryDefaultBase(unittest.TestCase):
                 p["base"] = base
                 gh = FakeGitHub([issue(237, "x/a.py")], [p])
                 delivery = oc.job_delivery(gh, CFG, 237)
-                self.assertEqual(delivery.open, [])
+                self.assertEqual([p["number"] for p in delivery.open], [240],
+                                 "ineligible continuation still preserves existing ownership")
                 self.assertIsNone(delivery.target)
                 self.assertEqual(oc.open_builder_prs(gh, CFG)[0].files, ["x/a.py"],
                                  "base eligibility does not discard actual file holds")
@@ -1955,3 +1985,65 @@ class DeliveryDefaultBase(unittest.TestCase):
         original = gh.get
         gh.get = lambda path, params=None: {"default_branch": "trunk"} if path == f"/repos/{REPO}" else original(path, params)
         self.assertEqual(oc.job_delivery(gh, CFG, 237).target["number"], 240)
+
+
+class FailedGateClaimRecovery(unittest.TestCase):
+    def test_newer_claim_cannot_follow_a_failed_gate_or_strand_in_progress(self):
+        gh = FakeGitHub([issue(245, "x/a.py")])
+        gh.runs.update({80: "in_progress", 81: "in_progress"})
+        gh.builds.update({80: None, 81: None})
+        original_judge = oc.judge
+        def failure_after_newer_claim(api, cfg, current, only_older_issues=False):
+            if cfg.run_id == "80" and only_older_issues:
+                oc.post_claim(gh, run_cfg(81), 245)
+                raise TimeoutError("failed gate before admission")
+            return original_judge(api, cfg, current, only_older_issues)
+        with mock.patch.object(oc, "judge", side_effect=failure_after_newer_claim):
+            code, out = Main.run_main(self, gh, ["check"], OVERLAP_ISSUE="245", GITHUB_RUN_ID="80")
+        self.assertEqual((code, out), (1, "start=false\n"))
+        self.assertEqual(gh.labels(245), {"job", "waiting"})
+        self.assertFalse(any("run=80" in b for b in claims(gh, 245)))
+        self.assertIsNone(oc.live_owner(gh, run_cfg(81), 245, before=102))
+        self.assertTrue(oc.run_check(gh, run_cfg(81), 245, sleep=NOOP))
+        self.assertEqual(gh.labels(245), {"job", "in-progress"})
+        self.assertEqual(receipts(gh, 245), [])
+
+    def test_failed_claim_removal_refuses_label_cleanup(self):
+        gh = FakeGitHub([issue(245, "x/a.py")])
+        original_delete = gh.delete
+        def failed_delete(path):
+            if "/issues/comments/" in path:
+                raise oc.GitHubError(503, "claim deletion unavailable")
+            return original_delete(path)
+        gh.delete = failed_delete
+        original_judge = oc.judge
+        def failed_second(api, cfg, current, only_older_issues=False):
+            if only_older_issues:
+                raise TimeoutError("failed gate")
+            return original_judge(api, cfg, current, only_older_issues)
+        with mock.patch.object(oc, "judge", side_effect=failed_second):
+            code, out = Main.run_main(self, gh, ["check"], OVERLAP_ISSUE="245", GITHUB_RUN_ID="80")
+        self.assertEqual((code, out), (1, "start=false\n"))
+        self.assertEqual(gh.labels(245), {"job", "in-progress"})
+
+    def test_newer_gate_admitted_after_claim_drop_keeps_its_labels(self):
+        gh = FakeGitHub([issue(245, "x/a.py")])
+        gh.runs.update({80: "in_progress", 81: "in_progress"})
+        original_judge, original_delete = oc.judge, gh.delete
+        def failed_second(api, cfg, current, only_older_issues=False):
+            if cfg.run_id == "80" and only_older_issues:
+                raise TimeoutError("failed gate")
+            return original_judge(api, cfg, current, only_older_issues)
+        def admit_after_delete(path):
+            result = original_delete(path)
+            if path.endswith("/issues/comments/101"):
+                self.assertTrue(oc.run_check(gh, run_cfg(81), 245, sleep=NOOP))
+            return result
+        gh.delete = admit_after_delete
+        with mock.patch.object(oc, "judge", side_effect=failed_second):
+            code, out = Main.run_main(self, gh, ["check"], OVERLAP_ISSUE="245", GITHUB_RUN_ID="80")
+        self.assertEqual((code, out), (1, "start=false\n"))
+        self.assertEqual(gh.labels(245), {"job", "in-progress"})
+        self.assertEqual(oc.recorded_run(gh, CFG, 245), "81")
+        self.assertFalse(any(c[0] == "POST" and "waiting" in (c[2] or {}).get("labels", [])
+                             for c in gh.writes()))

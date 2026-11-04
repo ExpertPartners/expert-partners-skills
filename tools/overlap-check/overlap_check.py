@@ -404,6 +404,12 @@ class Config:
     reopened: bool = False
 
 
+@dataclass
+class GateAttempt:
+    # Retain the ordering boundary even after this run removes its temporary claim.
+    claim_id: int | None = None
+
+
 def labels_of(item: dict) -> set[str]:
     # GitHub matches label names without regard to case, so a repo whose label is spelled
     # In-Progress or Parked must be read the same as the lowercase names above.
@@ -627,7 +633,7 @@ def job_delivery(gh, cfg: Config, number: int) -> Delivery:
 
     opened = sorted(
         (p for p in gh.paginate(f"/repos/{cfg.repo}/pulls", {"state": "open"})
-         if is_builder_pr(p) and head_branch(p, cfg.repo) and targets_default(p)
+         if is_builder_pr(p) and head_branch(p, cfg.repo)
          and number in closes(p.get("body"))),
         key=lambda p: int(p["number"]))
     reopened: list[str] = []
@@ -655,6 +661,11 @@ def job_delivery(gh, cfg: Config, number: int) -> Delivery:
         base = merged[0].get("merge_commit_sha") or ""
         kept = []
         for p in opened:
+            if not targets_default(p):
+                # A retargeted or unreadable base is still existing owned work, but it
+                # cannot execute or deliver this default-branch job.
+                kept.append((p, None))
+                continue
             has = head_contains(gh, cfg, p, base)
             if has is False:
                 stale.append(p)
@@ -664,7 +675,8 @@ def job_delivery(gh, cfg: Config, number: int) -> Delivery:
         eligible = bool(kept) and kept[0][1] is True
     # Only the oldest existing PR is eligible. Never bypass its owner by starting a
     # newer PR or creating a duplicate when its current head is not authenticated.
-    target = opened[0] if opened and eligible and trusted_head(gh, cfg, opened[0]) else None
+    target = (opened[0] if opened and eligible and targets_default(opened[0])
+              and trusted_head(gh, cfg, opened[0]) else None)
     return Delivery(opened, merged, after, target, stale)
 
 
@@ -674,7 +686,7 @@ def trust_wait(gh, cfg: Config, number: int, delivery: Delivery) -> None:
     upsert_comment(gh, cfg, number, "\n".join([
         MARKER,
         f"Existing pull request #{delivery.open[0]['number']} remains with its current owner. "
-        "Its current head has no matching authenticated Factory ref activity"
+        "Its base is not the current repository default, or its current head has no matching authenticated Factory ref activity"
         f"{' or could not be shown to contain the merged result' if delivery.reopened_after_merge else ''}. "
         "Factory will not execute this head with build secrets or create another pull request. "
         "The current owner can finish it; automatic continuation requires a verified Factory-produced head.",
@@ -871,7 +883,7 @@ def hold(gh, cfg: Config, number: int, v: Verdict, labels: set[str]) -> None:
     upsert_comment(gh, cfg, number, comment_body(v))
 
 
-def run_check(gh, cfg: Config, number: int, sleep=time.sleep) -> bool:
+def run_check(gh, cfg: Config, number: int, sleep=time.sleep, attempt: GateAttempt | None = None) -> bool:
     """True when the build may start. Leaves the issue labeled for what happened."""
     issue = gh.get(f"/repos/{cfg.repo}/issues/{number}")
     labels = labels_of(issue)
@@ -907,7 +919,9 @@ def run_check(gh, cfg: Config, number: int, sleep=time.sleep) -> bool:
     if not first.start:
         hold(gh, cfg, number, first, labels)
         return False
-    claim_id = post_claim(gh, cfg, number)
+    if attempt is None:
+        attempt = GateAttempt()
+    claim_id = attempt.claim_id = post_claim(gh, cfg, number)
     add_labels(gh, cfg, number, [JOB_LABEL, IN_PROGRESS_LABEL])
     # Two jobs judged at the same moment both see a clear path, label themselves
     # in-progress and would collide. After a pause each looks again, and only the newer
@@ -1182,15 +1196,16 @@ def main(argv: list[str]) -> int:
 
     if argv[0] == "check":
         number = None
+        attempt = GateAttempt()
         try:
             number = issue_number()
-            start = run_check(gh, cfg, number)
+            start = run_check(gh, cfg, number, attempt=attempt)
         except Exception as exc:  # any failure must leave the job where a restart finds it
             print(f"::error::overlap-check: #{number or os.environ.get('OVERLAP_ISSUE')} could not be checked: {exc!r}")
             write_output("start", "false")
             if number is not None:
                 def cleanup_is_safe():
-                    if live_owner(gh, cfg, number):
+                    if live_owner(gh, cfg, number, before=attempt.claim_id):
                         raise LeaseMoved("owner changed")
                     try:
                         current = gh.get(f"/repos/{cfg.repo}/issues/{number}")
@@ -1202,6 +1217,10 @@ def main(argv: list[str]) -> int:
                         raise LeaseMoved("stop state changed")
 
                 try:
+                    # A duplicate gate must not follow this failed gate while it exits.
+                    # Older claims and any recorded new admission retain ownership; a
+                    # younger undecided claim settles after these guarded cleanup writes.
+                    drop_claim(gh, cfg, attempt.claim_id)
                     # An unreadable owner proves no right to alter labels. A new
                     # admission between cleanup writes also stops the old cleanup.
                     guarded = LeaseGuard(gh, cleanup_is_safe)
