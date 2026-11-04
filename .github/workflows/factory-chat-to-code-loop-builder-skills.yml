@@ -15,6 +15,7 @@ name: Chat to Code Loop Builder - Skills
     types:
       - labeled
       - opened
+      - reopened
       # closed and unlabeled (in-progress) only restart waiting jobs.
       - closed
       - unlabeled

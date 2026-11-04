@@ -16,8 +16,13 @@
 #               request cannot loosen it) before every build. A job that changes the same
 #               file as an open builder pull request or another in-progress job waits with
 #               a comment naming it. Nothing else holds a build (Decision Log 2026-11-02,
-#               No caps stop work).
-#   build       The Factory droid, unchanged from the single-file builder.
+#               No caps stop work). A second event for a job another run is still building
+#               follows that run with a receipt comment, so one job has one writer.
+#   build       The Factory droid. Its first step confirms that the gate admitted this very
+#               run for the job, so a re-run of a run another admission has replaced never
+#               writes beside it. When the job already has an open builder pull request,
+#               the build pins its authenticated head and the droid continues that pull request
+#               instead of opening another (one job, one writer, one pull request).
 #   release     After a build the gate started, when no open pull request closes the job,
 #               removes in-progress so the job stops holding its files. A build that did
 #               not succeed goes back to waiting. A job closed, parked or marked done
@@ -53,7 +58,7 @@ permissions:
   contents: read
 jobs:
   gate:
-    # Three ways in, each building an issue once:
+    # Four ways in, each building an issue once:
     # 1. Manual dispatch (also how the redispatch job restarts a waiting job).
     # 2. The job label added to an issue from an allowlisted author. A job label the
     #    Factory app adds to a "Job:" issue is skipped, because path 3 added it and is
@@ -61,9 +66,12 @@ jobs:
     # 3. A "Job:" issue opened by an allowlisted author without the job label. This run
     #    adds the label itself, then builds. An issue opened with the label already on it
     #    is left to path 2, which GitHub starts for that label.
+    # 4. An existing job reopened after delivery. The gate still checks holds and owners.
     # The github context here is the caller's, so these are the caller's event fields.
     if: >-
       github.event_name == 'workflow_dispatch' ||
+      (github.event.action == 'reopened' && contains(github.event.issue.labels.*.name, 'job') &&
+        contains(fromJSON('["AllisonGaddy","expertpartners","expertpartners-ember","expertpartners-aura"]'), github.event.issue.user.login)) ||
       (github.event.action == 'labeled' && github.event.label.name == 'job' &&
         contains(fromJSON('["AllisonGaddy","expertpartners","expertpartners-ember","expertpartners-aura"]'), github.event.issue.user.login) &&
         !(github.event.sender.login == 'factory-droid[bot]' && startsWith(github.event.issue.title, 'Job:'))) ||
@@ -95,13 +103,14 @@ jobs:
         env:
           OVERLAP_TOKEN: ${{ github.token }}
           OVERLAP_ISSUE: ${{ github.event.issue.number || github.event.inputs.issue }}
+          OVERLAP_REOPENED: ${{ github.event_name == 'issues' && github.event.action == 'reopened' }}
         run: |
           set -euo pipefail
           script=.factory-builder-tools/tools/overlap-check/overlap_check.py
           if [ ! -f "$script" ]; then
-            echo "::notice::The overlap check is not on main yet; building without it."
-            echo "start=true" >> "$GITHUB_OUTPUT"
-            exit 0
+            echo "::error::The trusted overlap check is missing."
+            echo "start=false" >> "$GITHUB_OUTPUT"
+            exit 1
           fi
           python3 "$script" check
 
@@ -111,11 +120,60 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
+      # Read only: the owner check reads the job's issue, pull requests and recorded run.
+      actions: read
       contents: read
       id-token: write
+      issues: read
+      pull-requests: read
     steps:
+      - name: Checkout the overlap check
+        uses: actions/checkout@v4
+        with:
+          repository: ExpertPartners/expert-partners-skills
+          ref: main
+          path: .factory-builder-tools
+          persist-credentials: false
+          sparse-checkout: tools/overlap-check
+      - name: Confirm this run still owns the job
+        # A "Re-run failed jobs" repeats this job without the gate, so ownership is checked
+        # here too. The check moves out of the caller checkout before the build checks out.
+        id: owner
+        env:
+          OVERLAP_TOKEN: ${{ github.token }}
+          OVERLAP_ISSUE: ${{ github.event.issue.number || github.event.inputs.issue }}
+        run: |
+          set -euo pipefail
+          tools_dir=$(mktemp -d "$RUNNER_TEMP/factory-builder-tools.XXXXXX")
+          mv "$GITHUB_WORKSPACE/.factory-builder-tools" "$tools_dir/source"
+          script="$tools_dir/source/tools/overlap-check/overlap_check.py"
+          if [ ! -f "$script" ]; then
+            echo "::error::The trusted ownership check is missing."
+            exit 1
+          fi
+          OVERLAP_NOTE_FILE="$RUNNER_TEMP/factory-continuation.txt" python3 "$script" owner
+          printf 'FACTORY_CONTINUATION_CHECK=%s\n' "$script" >> "$GITHUB_ENV"
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Pin the authenticated continuation or explicitly resolved default head.
+          ref: ${{ steps.owner.outputs.head }}
+          persist-credentials: false
+      - name: Revalidate immutable checkout before build secrets
+        env:
+          OVERLAP_TOKEN: ${{ github.token }}
+          OVERLAP_ISSUE: ${{ github.event.issue.number || github.event.inputs.issue }}
+          OVERLAP_EXPECTED_PR: ${{ steps.owner.outputs.pr }}
+          OVERLAP_EXPECTED_BRANCH: ${{ steps.owner.outputs.branch }}
+          OVERLAP_EXPECTED_HEAD: ${{ steps.owner.outputs.head }}
+        run: |
+          set -euo pipefail
+          python3 "$FACTORY_CONTINUATION_CHECK" verify
+          if [ -n "$OVERLAP_EXPECTED_BRANCH" ]; then
+            git switch -c "$OVERLAP_EXPECTED_BRANCH"
+            git config "branch.$OVERLAP_EXPECTED_BRANCH.remote" origin
+            git config "branch.$OVERLAP_EXPECTED_BRANCH.merge" "refs/heads/$OVERLAP_EXPECTED_BRANCH"
+          fi
       - name: Install Factory Droid
         run: |
           curl --retry 5 --retry-delay 2 --retry-all-errors -fsSL https://app.factory.ai/cli | sh
@@ -159,9 +217,14 @@ jobs:
           cmp "$RUNNER_TEMP/factory-access-caller-before" "$RUNNER_TEMP/factory-access-caller-after-preflight"
       - name: Write automation prompt
         env:
-          FACTORY_AUTOMATION_PROMPT: "You are the Builder for Expert Partners' Chat to Code Loop. Act only when this run was started by the label job being added to an issue, by a new issue whose title begins with Job: that this workflow labeled job when it opened, by a comment that begins with Factory, build this job on an issue that carries the label job, or by a manual dispatch whose issue input names such an issue; otherwise exit with no changes. The triggering GitHub event is in the JSON file named by the GITHUB_EVENT_PATH environment variable, read it to find the issue number (for a manual dispatch it is inputs.issue). Read the issue in full. Its body holds the mission, objective, files in scope, acceptance checks and decisions already made. Follow CLAUDE.md and AGENTS.md if present. Add the label in-progress to the issue. Work only inside the files in scope, run tools/validate-job.sh until it prints validate-job: PASS, push a branch named job/<issue number>-<short slug>, and open exactly one pull request into main whose body starts with the line Closes #<issue number> and then lists each acceptance check as PASS or FAIL with the command output as evidence. Never push to main or merge. If anything is unclear, open the pull request as a draft and say exactly what is unclear. Never ask the user inside Factory. Put any question on the GitHub issue as a comment starting Question for Allison, or on the job list as needs-allison with a line starting Recommend:, and keep working on everything else."
+          FACTORY_AUTOMATION_PROMPT: "You are the Builder for Expert Partners' Chat to Code Loop. Act only when this run was started by the label job being added to an issue, by a new issue whose title begins with Job: that this workflow labeled job when it opened, by an existing issue carrying the job label being reopened and admitted by the gate, by a comment that begins with Factory, build this job on an issue that carries the label job, or by a manual dispatch whose issue input names such an issue; otherwise exit with no changes. The triggering GitHub event is in the JSON file named by the GITHUB_EVENT_PATH environment variable, read it to find the issue number (for a manual dispatch it is inputs.issue). Read the issue in full. Its body holds the mission, objective, files in scope, acceptance checks and decisions already made. Follow CLAUDE.md and AGENTS.md if present. Add the label in-progress to the issue. Work only inside the files in scope, run tools/validate-job.sh until it prints validate-job: PASS, push a branch named job/<issue number>-<short slug>, and open exactly one pull request into main whose body starts with the line Closes #<issue number> and then lists each acceptance check as PASS or FAIL with the command output as evidence. Never push to main or merge. If anything is unclear, open the pull request as a draft and say exactly what is unclear. Never ask the user inside Factory. Put any question on the GitHub issue as a comment starting Question for Allison, or on the job list as needs-allison with a line starting Recommend:, and keep working on everything else."
         run: |
           printf '%s' "$FACTORY_AUTOMATION_PROMPT" > "$RUNNER_TEMP/factory-automation-prompt.txt"
+      - name: Continue the job's existing pull request
+        if: steps.owner.outputs.note == 'true'
+        run: |
+          printf '\n\n' >> "$RUNNER_TEMP/factory-automation-prompt.txt"
+          cat "$RUNNER_TEMP/factory-continuation.txt" >> "$RUNNER_TEMP/factory-automation-prompt.txt"
       - name: Get Factory GitHub App token
         shell: bash
         run: |
