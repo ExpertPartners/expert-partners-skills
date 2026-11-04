@@ -5,6 +5,7 @@ Run from the repo root: python3 -m unittest discover -s tools/overlap-check/test
 """
 
 import importlib.util
+import json
 import os
 import random
 import subprocess
@@ -1318,6 +1319,33 @@ class AuthenticatedContinuation(unittest.TestCase):
                 self.assertNotIn("actor", call[2], "a human's later push must not be hidden")
                 self.assertNotIn("activity_type", call[2], "branch creation and deletion must remain visible")
 
+    def test_live_github_activity_schema_accepts_factory_and_rejects_later_maintainer(self):
+        # Sanitized field subset captured from authenticated GitHub.com responses on
+        # 2026-11-04 with API versions 2022-11-28 and 2026-03-10. The docs' response
+        # example uses pusher/push_type; the actual endpoint returns actor/activity_type.
+        # Keep the real ref, immutable commits and producer IDs as the regression.
+        factory = {"id": 48911552142, "activity_type": "branch_creation",
+                   "ref": "refs/heads/job/245-one-branch-per-job",
+                   "after": "11d5357e7ee3ade474f3ebaf793adb89d1b0770a",
+                   "actor": {"id": 138933559, "login": "factory-droid[bot]", "type": "Bot"}}
+        maintainer = {"id": 48916879999, "activity_type": "push", "ref": factory["ref"],
+                      "after": "698cbcc30093723e1808f20cae4a723bf53298ee",
+                      "actor": {"id": 99103536, "login": "AllisonGaddy", "type": "User"}}
+        gh, p = self.setup_pr()
+        p["head"]["ref"] = factory["ref"].removeprefix("refs/heads/")
+        with mock.patch.dict(BOT, factory["actor"]):
+            for record, expected in ((factory, True), (maintainer, False)):
+                with self.subTest(producer=record["actor"]["login"]):
+                    p["head"]["sha"] = record["after"]
+                    gh.activities[p["head"]["ref"]] = [record]
+                    self.assertEqual(oc.trusted_head(gh, CFG, p), expected)
+            # Never guess schema aliases from an example or trust a bot pusher while
+            # the endpoint supplies no authenticated activity_type/actor evidence.
+            p["head"]["sha"] = factory["after"]
+            gh.activities[p["head"]["ref"]] = [{"ref": factory["ref"], "after": factory["after"],
+                                                "push_type": "normal", "pusher": factory["actor"]}]
+            self.assertFalse(oc.trusted_head(gh, CFG, p))
+
     def test_branch_prefix_and_pr_author_do_not_authenticate_the_latest_push(self):
         for author in ("factory-droid[bot]", "collaborator"):
             with self.subTest(author=author):
@@ -1615,6 +1643,24 @@ class BuildStepCommands(unittest.TestCase):
                            env=dict(os.environ, RUNNER_TEMP=d), check=True)
             with open(os.path.join(d, "factory-automation-prompt.txt"), encoding="utf-8") as fh:
                 self.assertEqual(fh.read(), "base prompt\n\nContinue #240.\n")
+
+    def test_reopened_job_is_allowed_by_caller_gate_and_written_droid_prompt(self):
+        with open(self.WORKFLOW, encoding="utf-8") as fh:
+            workflow = fh.read()
+        with open(os.path.join(ROOT, ".github", "workflows", "factory-chat-to-code-loop-builder-skills.yml"), encoding="utf-8") as fh:
+            self.assertIn("      - reopened\n", fh.read())
+        gate = workflow.split("  gate:", 1)[1].split("    runs-on:", 1)[0]
+        self.assertIn("github.event.action == 'reopened'", gate)
+        value = next(line.split("FACTORY_AUTOMATION_PROMPT: ", 1)[1] for line in workflow.splitlines()
+                     if "FACTORY_AUTOMATION_PROMPT: " in line)
+        prompt = json.loads(value)
+        allowed = "by an existing issue carrying the job label being reopened and admitted by the gate"
+        self.assertIn(allowed, prompt.split("otherwise exit with no changes", 1)[0])
+        with tempfile.TemporaryDirectory() as d:
+            subprocess.run(["bash", "-e", "-o", "pipefail", "-c", self.step("Write automation prompt")],
+                           env=dict(os.environ, RUNNER_TEMP=d, FACTORY_AUTOMATION_PROMPT=prompt), check=True)
+            with open(os.path.join(d, "factory-automation-prompt.txt"), encoding="utf-8") as fh:
+                self.assertEqual(fh.read(), prompt)
 
 
 if __name__ == "__main__":
