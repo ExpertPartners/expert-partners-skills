@@ -1,0 +1,102 @@
+name: Factory access smoke
+
+# Manual, read-only acceptance on a fresh runner. No model turn or builder job.
+on:
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: Existing repository job issue for the read-only ledger check
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  access:
+    if: github.ref == 'refs/heads/main' && github.repository == 'ExpertPartners/expert-partners-skills'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Validate existing issue input
+        env:
+          FACTORY_LEDGER_JOB_ID: ${{ inputs.issue }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+          import sys
+          valid = re.fullmatch(r"[1-9][0-9]{0,9}", os.environ.get("FACTORY_LEDGER_JOB_ID", ""))
+          print("Factory access smoke input: " + ("PASS" if valid else "FAIL"))
+          sys.exit(0 if valid else 1)
+          PY
+      - name: Checkout trusted main only
+        uses: actions/checkout@v4
+        with:
+          repository: ExpertPartners/expert-partners-skills
+          ref: main
+          persist-credentials: false
+      - name: Install official Factory Droid
+        shell: bash
+        run: |
+          set +x
+          if timeout --kill-after=5s 90s bash -o pipefail -c 'curl --retry 5 --retry-delay 2 --retry-all-errors -fsSL https://app.factory.ai/cli | sh' >/dev/null 2>&1; then
+            echo "Factory Droid install: PASS"
+          else
+            echo "Factory Droid install: FAIL"
+            exit 1
+          fi
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Verify exact job read and native MCP connection
+        env:
+          FACTORY_LEDGER_JOB_ID: ${{ inputs.issue }}
+          FACTORY_LEDGER_MCP_URL: ${{ vars.FACTORY_LEDGER_MCP_URL }}
+          FACTORY_LEDGER_MCP_TOKEN: ${{ secrets.FACTORY_LEDGER_MCP_TOKEN }}
+          FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+          import signal
+          import subprocess
+          import sys
+
+          def run_captured(arguments, seconds):
+              child = subprocess.Popen(
+                  arguments, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                  stderr=subprocess.PIPE, start_new_session=True,
+              )
+              try:
+                  output, _ = child.communicate(timeout=seconds)
+                  return child.returncode, output.decode("utf-8", "replace")
+              finally:
+                  # Stop only this smoke step's owned group, including timed-out children.
+                  try:
+                      os.killpg(child.pid, signal.SIGKILL)
+                  except ProcessLookupError:
+                      pass
+                  child.wait(timeout=5)
+
+          try:
+              if not os.environ.get("FACTORY_API_KEY"):
+                  raise ValueError("missing runtime credential")
+              code, _ = run_captured([sys.executable, "tools/factory-access/preflight.py"], 125)
+              if code != 0:
+                  raise ValueError("preflight failed")
+              print("Factory exact-job ledger read: PASS", flush=True)
+              code, output = run_captured(["droid", "mcp", "list"], 45)
+              output = re.sub(r"\x1b\[[0-?]*[ -/]*[@-~]", "", output)
+              lines = [line for line in output.splitlines()
+                       if re.match(r"^\s*(?:[✓✔●•-]\s*)?factory-ledger(?=\s|:|$)", line)]
+              if code != 0 or len(lines) != 1:
+                  raise ValueError("native connection unavailable")
+              words = set(re.findall(r"[a-z]+(?:-[a-z]+)*", lines[0].lower()))
+              connected = re.search(r"(?:^|[\s:|()-])connected(?:\s*\(\d+\s+tools?\))?\s*$", lines[0], re.I)
+              if not connected or words & {"disconnected", "connecting", "failed", "disabled"} or re.search(r"\bnot\s+connected\b", lines[0], re.I):
+                  raise ValueError("native connection unavailable")
+              print("Factory native ledger MCP: PASS")
+          except Exception:
+              # No provider output, exception, credential, URL, or environment dump.
+              print("Factory access smoke: FAIL")
+              sys.exit(1)
+          PY
