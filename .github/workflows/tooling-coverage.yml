@@ -34,6 +34,8 @@ on:
       - 'tools/skill-map/**'
       - 'tools/readiness/tests/test_coverage_gate.py'
       - '.github/workflows/tooling-coverage.yml'
+      # tools/auto-merge-gate/tests read this workflow.
+      - '.github/workflows/auto-merge-gate.yml'
   push:
     branches: [main]
     paths:
@@ -45,6 +47,8 @@ on:
       - 'tools/skill-map/**'
       - 'tools/readiness/tests/test_coverage_gate.py'
       - '.github/workflows/tooling-coverage.yml'
+      # tools/auto-merge-gate/tests read this workflow.
+      - '.github/workflows/auto-merge-gate.yml'
   workflow_dispatch:
 
 permissions:
