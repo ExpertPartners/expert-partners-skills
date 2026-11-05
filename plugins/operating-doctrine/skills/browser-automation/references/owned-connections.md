@@ -35,20 +35,75 @@ not application authentication evidence. If the assigned browser or website is
 signed out, follow the existing authorized sign-in route. Never change profiles or
 create a new one to get past the check.
 
-This is one component of the per-job route. The consumer must allocate a distinct,
-long-lived MCP connection for each job and retain that transport and its exact
-working Page reference. Opening another window through a shared connection does
-not implement that ownership. Shared cookies, sign-ins, application state and
-business-record ownership remain outside tab scoping.
+## Per-job MCP route
+
+The packaged `scripts/browser_jobs.py` supplies the per-job stdio MCP route. It
+runs on the browser host around the existing protected launcher. It has no network
+listener, scheduler or background dispatch. The caller starts one browser job per
+task and passes the returned opaque `job_id` on every ordinary browser tool call.
+A missing or unknown handle is refused. There is no shared-current-tab fallback.
+
+- `browser_job_start` takes a short task name and creates a separate persistent
+  MCP connection, Chrome window, extension group and working page.
+- Ordinary browser tools require that job's `job_id`. The current working page is
+  selected from a retained Page reference in that job's private MCP process.
+  `browser_tabs` exposes only working-page indices. The connector has no caller
+  index. Different jobs may execute concurrently; calls within one job serialize.
+- `browser_job_status` returns only that job's lifecycle and ownership receipt.
+- `browser_job_finish` and `browser_close` close only the job's own pages,
+  connector and subprocess group. A peer keeps its connection and pages.
+- `browser_job_recover` first reconciles a failed job's saved pages, then creates
+  a new connection under the same job handle. It closes the old working pages,
+  loses their task state and never replays an action. Inspect uncertain business
+  results before deciding what to do on the new page.
+
+The extension ungroups its pages on disconnect. Failed-job cleanup therefore
+checks the saved browser process generation, exact tab IDs and window, the
+connector's client identity, debugger attachment and the extension's current
+connection claims. A moved, claimed or ambiguous page is refused. Cleanup never
+chooses tabs by color, title, active focus or a guessed blank URL.
+
+Each route checks the existing profile before starting its protected launcher.
+It passes the window adapter as `--executable-path`; the launcher still owns the
+profile-specific credential. It checks the launcher's configured source hash and
+the MCP server version before opening a browser connection. The server reports
+the Playwright core version, which differs from the launcher's MCP package version.
+Do not substitute one for the other when configuring a pin.
+
+The route calls the canonical `headless_route_check.py` policy before forwarding
+URL or browser-code tools. It preserves the policy's host logging and reporting
+notes, refuses a denied host and fails closed on policy execution errors. Native
+consumer hooks stay enabled. Browser installation is not exposed as a job tool.
+
+Local configuration names `host`, `profile`, `expected_account`, `launcher`,
+`launcher_sha256`, `mcp_version`, `headless_hook`, `state_dir` and `bootstrap_lock`.
+All facades on one host must use the same bootstrap lock. Use the hook from the
+same installed operating-doctrine plugin. Run the packaged Python entry point
+with `--config` and the absolute local configuration path, through the existing
+SSH route where needed. Configuration and receipts are private host files. They
+must not contain tokens. The owning SOP records actual installed paths and pins.
+
+Receipts contain only lifecycle and ownership metadata, never connector queries,
+page contents or tool arguments. EOF and normal termination attempt owned-job
+cleanup. After an abrupt facade kill, preserve its receipts and reconcile the
+exact orphan pages under the owning repair procedure. A restarted facade does
+not silently adopt old handles or replay work. If Chrome restarted, saved tab IDs
+are insufficient to authorize cleanup and the route refuses.
+
+Opening another window through a shared connection does not implement ownership.
+Shared cookies, sign-ins, application state and business-record ownership remain
+outside tab scoping. There is no two-job limit or promise of unlimited capacity.
+Report the workload and concurrency actually tested on the target host.
 
 Create the job's window and working page before starting another bootstrap. Once
 both exist, their page operations may run concurrently. Use the direct Page
 reference through navigation. Do not navigate the connector page or move attached
 tabs between groups as a substitute for a new connection.
 
-The private browser pilot records the supervised native results and actual host
-paths. Synthetic checks here exercise the adapter's forwarding, rejection and
-redaction behavior only.
+The private browser pilot records actual runtime results, source hashes and host
+paths. Source tests exercise forwarding, rejection, redaction, ownership routing,
+policy refusal, concurrency and owned-process cleanup. They do not establish
+native consumer adoption.
 
 ```sh
 python3 -m unittest discover -s tools/browser-worker -p 'test_*.py'
@@ -63,12 +118,12 @@ Rollback restores that setting and starts a fresh job connection after the old
 job reaches its own safe boundary. Never restart Chrome to roll back this adapter.
 
 A source change is not an installed route. Verify Codex, Claude Code and Ember
-separately with two distinct connections, windows, groups and owned test pages,
+separately with multiple distinct connections, windows, groups and owned test pages,
 overlapping real page operations, peer-tab exclusion and cleanup that preserves
 the other job. Exercise a supported reconnect path with the original owned-page
 disposition established before replacement. Preserve headless-route policy checks
 and the visited-host feed on every consumer. A terminal helper that bypasses those
 checks is not an accepted integration.
 
-Until those consumer checks are recorded, the adapter is a reviewed rollout
-component rather than proof of automatic per-job allocation or recovery.
+Until those consumer checks are recorded, the route remains a rollout candidate
+and must not be described as installed or certified on every consumer.

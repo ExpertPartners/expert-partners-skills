@@ -236,6 +236,13 @@ receives the current Page, which may initially be the connector rather than the
 working Page. Verify the exact target before acting. Use ordinary browser tools only
 through this job's verified connection.
 
+When the installed route exposes `browser_job_start`, start a new named job for
+this task and pass its returned `job_id` on every browser tool call. Finish it with
+`browser_job_finish` before reporting. Never borrow another task's handle. A failed
+action has an uncertain outcome and is not automatically replayed. The packaged
+route supplies the separate connection and window, retains the working Page and
+checks headless policy internally as well as through native consumer hooks.
+
 The existing-profile window adapter is packaged with this skill. Its
 [connection procedure](references/owned-connections.md) explains its boundaries. Source
 checks do not establish installed transport allocation, headless-policy enforcement,
