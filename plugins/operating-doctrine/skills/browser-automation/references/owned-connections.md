@@ -47,8 +47,10 @@ A missing or unknown handle is refused. There is no shared-current-tab fallback.
   MCP connection, Chrome window, extension group and working page.
 - Ordinary browser tools require that job's `job_id`. The current working page is
   selected from a retained Page reference in that job's private MCP process.
-  `browser_tabs` exposes only working-page indices. The connector has no caller
-  index. Different jobs may execute concurrently; calls within one job serialize.
+  `browser_tabs` uses the same indices shown by ordinary tools' Open tabs and
+  lists only working pages. The connector's index is reserved and cannot be
+  selected or closed. Different jobs may execute concurrently; calls within one
+  job serialize.
 - `browser_job_status` returns only that job's lifecycle and ownership receipt.
 - `browser_job_finish` and `browser_close` close only the job's own pages,
   connector and subprocess group. A peer keeps its connection and pages.
@@ -62,6 +64,17 @@ checks the saved browser process generation, exact tab IDs and window, the
 connector's client identity, debugger attachment and the extension's current
 connection claims. A moved, claimed or ambiguous page is refused. Cleanup never
 chooses tabs by color, title, active focus or a guessed blank URL.
+
+Creation provenance is separate from group membership. The private MCP process
+retains an exact set of Pages it created. New Pages receive a unique nonce
+fragment on a blank page before business navigation; that exact marker binds the
+returned Page to its Chrome tab ID. Later cleanup uses the ID or retained Page,
+not the URL. An opener-owned popup is accepted only through the retained parent,
+and its ID is bound using Chrome's matching opener metadata. Unknown arrivals
+are refused and are never adopted simply because they entered the group. Cleanup
+preserves those unknown pages. An interrupted operation whose page inventory was
+not checkpointed requires explicit reconciliation before recovery; it is never
+reported clean from an incomplete list of IDs.
 
 Each route checks the existing profile before starting its protected launcher.
 It passes the window adapter as `--executable-path`; the launcher still owns the

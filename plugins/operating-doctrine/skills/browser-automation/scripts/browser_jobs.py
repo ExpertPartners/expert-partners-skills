@@ -28,6 +28,7 @@ from job_transport import StdioClient, Refusal
 
 EXTENSION = "chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/connect.html"
 STATE_JS = "const s=Buffer.constructor('return process')().__epBrowserJob;if(!s)throw Error('owned_state_missing');"
+OWNED_SOURCE = Path(__file__).with_name("owned_pages.js").read_text()
 SAFE_ENV = ("HOME", "USER", "LOGNAME", "PATH", "LANG", "LC_ALL", "TMPDIR")
 
 
@@ -154,6 +155,7 @@ class Route:
     def save(self, job):
         # No URLs, credentials, provider results or arbitrary tool inputs on disk.
         row = {k: job[k] for k in ("job_id", "label", "status", "client_name", "generation", "metadata", "updated")}
+        row["ownership_pending"] = job.get("ownership_pending", False)
         path = self.root / (job["job_id"] + ".json")
         tmp = path.with_suffix(".tmp")
         fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
@@ -172,25 +174,29 @@ class Route:
         job["updated"] = time.time()
         self.save(job)
 
-    def metadata(self, client):
-        return code(client, STATE_JS + "return await s.connector.evaluate(async()=>{const t=await chrome.tabs.getCurrent();const g=await chrome.tabGroups.get(t.groupId);const tabs=await chrome.tabs.query({groupId:t.groupId,windowId:t.windowId});return {connectorId:t.id,windowId:t.windowId,groupId:t.groupId,groupTitle:g.title,tabIds:tabs.map(t=>t.id)};});")
+    def metadata(self, client, strict=True):
+        return code(client, STATE_JS + "return await s.snapshot(" + json.dumps(strict) + ");")
 
     def connect(self, job, working=True):
         client = self.client(job["client_name"])
         job["client"] = client
         # State is in this private Node process, not the ephemeral VM globals.
-        initialized = code(client, "const p=Buffer.constructor('return process')();if(p.__epBrowserJob)throw Error('already_attempted');"
+        initialized = code(client, OWNED_SOURCE + "const p=Buffer.constructor('return process')();if(p.__epBrowserJob)throw Error('already_attempted');"
                            "if(page.context().pages().length!==1||!page.url().startsWith(" + json.dumps(EXTENSION + "?") + "))throw Error('not_fresh_connector');"
-                           "p.__epBrowserJob={connector:page,task:null};return {ready:true};")
-        if initialized != {"ready": True}:
+                           "p.__epBrowserJob=await newOwnedState(page);const s=p.__epBrowserJob;return {ready:true,ownership:{...s.initial,tabIds:[...s.ids.values()],unboundOwnedPages:0}};")
+        if initialized.get("ready") is not True:
             raise Refusal("connector_initialization_failed")
-        job["metadata"] = self.metadata(client)
+        job["metadata"] = initialized["ownership"]
         self.checkpoint(job, "connecting")
+        self.verify_connection(job)
         if working:
-            code(client, STATE_JS + "s.task=await s.connector.context().newPage();return {created:!s.task.isClosed()};")
+            job["ownership_pending"] = True
+            self.checkpoint(job)
+            code(client, STATE_JS + "s.task=await s.create();return {created:!s.task.isClosed()};")
             job["metadata"] = self.metadata(client)
             if len(job["metadata"]["tabIds"]) != 2:
                 raise Refusal("owned_page_count_mismatch")
+            job["ownership_pending"] = False
             self.checkpoint(job, "ready")
         return client
 
@@ -199,7 +205,7 @@ class Route:
             raise Refusal("job_name_required")
         job_id = uuid.uuid4().hex
         job = {"job_id": job_id, "label": label.strip(), "status": "starting", "client_name": "EP " + label.strip() + " [" + job_id[:8] + "]",
-               "generation": None, "metadata": None, "updated": time.time(), "client": None, "lock": threading.RLock()}
+               "generation": None, "metadata": None, "updated": time.time(), "ownership_pending": False, "client": None, "lock": threading.RLock()}
         with self.lock:
             self.jobs[job_id] = job
         with job["lock"]:
@@ -244,6 +250,8 @@ class Route:
             tool["description"] = "Within the named browser job only. " + tool.get("description", "")
             if tool["name"] == "browser_close":
                 tool["description"] = "Finish this job; close only its owned pages, connector and transport."
+            if tool["name"] == "browser_tabs":
+                tool["description"] += " Use the same indices shown by ordinary tools' Open tabs. The Welcome connector index is protected and cannot be selected or closed."
         for name, description, props in (
             ("browser_job_start", "Create a separate connection and window in the verified existing signed-in profile for this task. Never reuse another task's job_id.", {"name": {"type": "string", "minLength": 1, "maxLength": 80}}),
             ("browser_job_status", "Read only this job's lifecycle and ownership receipt.", {"job_id": {"type": "string"}}),
@@ -285,22 +293,22 @@ class Route:
         index = args.get("index")
         if index is not None and (type(index) is not int or index < 0):
             raise Refusal("owned_tab_index_invalid")
-        # The caller sees only working-page indices. Connector never gets an
-        # addressable index. A closed working tab is not silently recreated.
-        body = STATE_JS + "let tabs=s.connector.context().pages().filter(p=>p!==s.connector);"
+        # Preserve vendor context indices on every result. Connector retains its
+        # reserved index but can never be selected or closed through this tool.
+        body = STATE_JS + "let all=s.connector.context().pages();let tabs=all.filter(p=>p!==s.connector&&s.created.has(p));"
         if action == "new":
-            body += "s.task=await s.connector.context().newPage();tabs=s.connector.context().pages().filter(p=>p!==s.connector);"
+            body += "s.task=await s.create();all=s.connector.context().pages();tabs=all.filter(p=>p!==s.connector&&s.created.has(p));"
             if args.get("url"):
                 body += "await s.task.goto(" + json.dumps(args["url"]) + ");"
         elif action in ("select", "close"):
-            body += "const target=" + ("s.task" if index is None and action == "close" else "tabs[" + json.dumps(index) + "]") + ";if(!target||target.isClosed())return {error:'Owned tab index not found'};"
+            body += "const target=" + ("s.task" if index is None and action == "close" else "all[" + json.dumps(index) + "]") + ";if(!target||target===s.connector||!s.created.has(target)||target.isClosed())return {error:'Owned tab index not found or protected connector'};"
             if action == "close":
                 body += "await target.close();tabs=tabs.filter(p=>p!==target);if(s.task===target)s.task=tabs[0]||null;"
             else:
                 body += "s.task=target;"
         elif action != "list":
             raise Refusal("owned_tab_action_invalid")
-        body += "return {tabs:await Promise.all(tabs.map(async(p,index)=>({index,current:p===s.task,url:p.url(),title:await p.title()})))};"
+        body += "all=s.connector.context().pages();return {tabs:await Promise.all(tabs.map(async(p)=>({index:all.indexOf(p),current:p===s.task,url:p.url(),title:await p.title()})))};"
         value = code(job["client"], body)
         return result(value, "error" in value)
 
@@ -308,11 +316,14 @@ class Route:
         client = job["client"]
         if self.preflight() != job["generation"]:
             raise Refusal("browser_generation_changed_no_cleanup")
-        self.verify_connection(job)
-        code(client, STATE_JS + "for(const p of s.connector.context().pages())if(p!==s.connector)await p.close();return {closed:true};")
+        observed = self.metadata(client, strict=False)
+        if any(observed[k] != job["metadata"][k] for k in ("connectorId", "windowId", "groupId", "groupTitle")):
+            raise Refusal("connection_ownership_changed")
+        code(client, STATE_JS + "await s.closeCreated();return {closed:true};")
         code(client, STATE_JS + "return await s.connector.evaluate(async()=>{const t=await chrome.tabs.getCurrent();setTimeout(()=>chrome.tabs.remove(t.id),250);return {scheduled:true};});")
         time.sleep(.4)
         client.close()
+        job["ownership_pending"] = False
 
     def dispose_failed(self, job):
         """Use a fresh own connector to reconcile exact unclaimed old IDs only."""
@@ -320,8 +331,6 @@ class Route:
             # Capture any page created just before an interrupted response while
             # this exact live connection can still prove its scope.
             try:
-                job["metadata"] = self.verify_connection(job)
-                self.checkpoint(job)
                 self.dispose_live(job)
                 return
             except Exception:
@@ -330,6 +339,10 @@ class Route:
         old = job["metadata"]
         if not old:
             raise Refusal("creation_outcome_unknown_requires_reconciliation")
+        if job.get("ownership_pending"):
+            raise Refusal("uncheckpointed_page_creation_requires_reconciliation")
+        if old.get("unboundOwnedPages"):
+            raise Refusal("unbound_owned_pages_require_reconciliation")
         if self.preflight() != job["generation"]:
             raise Refusal("browser_generation_changed_requires_reconciliation")
         maintenance = {**job, "client_name": "EP cleanup " + uuid.uuid4().hex, "metadata": None, "client": None}
@@ -409,11 +422,16 @@ class Route:
                     if self.preflight() != job["generation"]:
                         raise Refusal("browser_generation_changed_no_replay")
                     self.verify_connection(job)
+                    job["ownership_pending"] = True
+                    self.checkpoint(job)
                     reply = self.tabs(job, args)
                 else:
                     self.prime(job)
+                    job["ownership_pending"] = True
+                    self.checkpoint(job)
                     reply = job["client"].call("tools/call", {"name": name, "arguments": args})
                 job["metadata"] = self.verify_connection(job)
+                job["ownership_pending"] = False
                 self.checkpoint(job)
                 if note:
                     reply.setdefault("content", []).append({"type": "text", "text": note})

@@ -4,6 +4,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 import threading
@@ -36,7 +37,7 @@ class JobTests(unittest.TestCase):
         route.bootstrap = contextlib.nullcontext
         route.preflight = lambda: {"pid": 123, "started": "synthetic"}
         route.prime = lambda _: None
-        route.metadata = lambda _: {"connectorId": 1, "windowId": 1, "groupId": 1, "groupTitle": "fixture"}
+        route.metadata = lambda _, strict=True: {"connectorId": 1, "windowId": 1, "groupId": 1, "groupTitle": "fixture"}
         return route
 
     def test_required_handle_and_no_shared_fallback(self):
@@ -118,18 +119,89 @@ class JobTests(unittest.TestCase):
             original = route.metadata(None)
             job = {"client": object(), "generation": route.preflight(), "metadata": original.copy()}
             for field, changed in (("windowId", 2), ("groupId", 2), ("connectorId", 2), ("groupTitle", "peer")):
-                route.metadata = lambda _, field=field, changed=changed: {**original, field: changed}
+                route.metadata = lambda _, strict=True, field=field, changed=changed: {**original, field: changed}
                 with patch.object(b, "code") as execute:
                     with self.assertRaises(Refusal):
                         route.dispose_live(job)
                 execute.assert_not_called()
                 self.assertEqual(job["metadata"], original)
 
+    def test_foreign_group_arrival_is_refused_and_never_closed(self):
+        # Execute the shipped JS against actual fake Page references, rather than
+        # mocking away the provenance check that protects cleanup.
+        source = (SCRIPTS / "owned_pages.js").read_text()
+        fixture = r'''
+const assert = require('node:assert/strict');
+let current;
+const tabs = new Map();
+const pages = [];
+function page(id, opener = null) {
+  const tab = {id, windowId: 5, groupId: 7, url: 'about:blank'};
+  tabs.set(id, tab);
+  const p = {closed:false, context:()=>context, isClosed:()=>p.closed,
+    opener:async()=>opener, url:()=>tab.url, title:async()=>String(id),
+    goto:async(url)=>{tab.url=url;},
+    evaluate:async(fn,arg)=>{current=p;return await fn(arg);},
+    close:async()=>{p.closed=true;tabs.delete(id);}};
+  p.id=id;
+  pages.push(p);
+  return p;
+}
+const context = {pages:()=>pages.filter(p=>!p.closed),newPage:async()=>page(10)};
+global.chrome = {tabs:{getCurrent:async()=>tabs.get(current.id),get:async(id)=>{
+  if(!tabs.has(id))throw Error('missing');return tabs.get(id);},
+  query:async(q)=>[...tabs.values()].filter(t=>(q.windowId===undefined||t.windowId===q.windowId)&&(q.groupId===undefined||t.groupId===q.groupId))},
+  tabGroups:{get:async()=>({title:'fixture'})}};
+(async()=>{
+  const connector=page(1);
+  const s=await newOwnedState(connector);
+  s.task=await s.create();
+  assert.deepEqual((await s.snapshot()).tabIds,[1,10]);
+  const foreign=page(999); // Same window and group, no owned opener.
+  await assert.rejects(()=>s.snapshot(),/unproven_page_arrival/);
+  assert.deepEqual((await s.snapshot(false)).tabIds,[1,10]);
+  await s.closeCreated();
+  assert.equal(s.task.closed,true);
+  assert.equal(foreign.closed,false);
+  assert.equal(connector.closed,false);
+})().catch(e=>{console.error(e);process.exitCode=1;});
+'''
+        checked = subprocess.run(["node", "-e", source + fixture], capture_output=True, text=True, timeout=10)
+        self.assertEqual(checked.returncode, 0, checked.stderr)
+
+    def test_tab_indices_agree_with_vendor_responses(self):
+        route = b.Route.__new__(b.Route)
+        # The same literal body sent to the vendor executes against its actual
+        # context order: connector=0, A=1, B=2. Closing advertised A index1 must
+        # never close B through a filtered reindex.
+        captured = []
+        with patch.object(b, "code", side_effect=lambda _, body: captured.append(body) or {}):
+            route.tabs({"client": None}, {"action": "close", "index": 1})
+        fixture = r'''
+const assert = require('node:assert/strict');
+const a={closed:false,isClosed:()=>false,close:async()=>{a.closed=true;},url:()=>'',title:async()=>''};
+const b={closed:false,isClosed:()=>false,close:async()=>{b.closed=true;},url:()=>'',title:async()=>''};
+const connector={context:()=>({pages:()=>[connector,...(a.closed?[]:[a]),b]})};
+process.__epBrowserJob={connector,task:a,created:new Set([connector,a,b])};
+'''
+        script = fixture + "(async()=>{" + captured[0] + "})().then(()=>{assert.equal(a.closed,true);assert.equal(b.closed,false);}).catch(e=>{console.error(e);process.exitCode=1;});"
+        checked = subprocess.run(["node", "-e", script], capture_output=True, text=True, timeout=10)
+        self.assertEqual(checked.returncode, 0, checked.stderr)
+
     def test_connector_credential_redacted_recursively(self):
         url = b.EXTENSION + "?mcpRelayUrl=ws%3A%2F%2F127.0.0.1&token=SYNTHETIC_CANARY"
         actual = json.dumps(b.redact({"content": [{"text": "Welcome [link](" + url + ")"}], "nested": url}))
         self.assertNotIn("SYNTHETIC_CANARY", actual)
         self.assertNotIn("mcpRelayUrl", actual)
+
+    def test_uncheckpointed_inventory_never_claims_failed_cleanup(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            job = {"client": None, "metadata": route.metadata(None), "ownership_pending": True}
+            with patch.object(route, "client", create=True) as connect:
+                with self.assertRaisesRegex(Refusal, "uncheckpointed"):
+                    route.dispose_failed(job)
+            connect.assert_not_called()
 
     def test_owned_transport_reaps_child_and_never_signals_peer(self):
         script = "import sys,json\nfor line in sys.stdin:\n q=json.loads(line); print(json.dumps({'jsonrpc':'2.0','id':q['id'],'result':{'ok':True}}),flush=True)\n"
