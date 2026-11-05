@@ -266,6 +266,12 @@ class Route:
             decision = self.guard.decide({"tool_name": name, "tool_input": arguments, "cwd": os.getcwd()})
         except Exception:
             raise Refusal("headless_policy_failed") from None
+        # Preserve the canonical hook's lazy one-shot refresh. This is policy
+        # maintenance on a call, not a new job scheduler or dispatch timer.
+        due = getattr(self.guard, "refresh_due", None)
+        refresh = getattr(self.guard, "start_background_refresh", None)
+        if callable(due) and callable(refresh) and due():
+            refresh()
         if decision and decision[0] == "deny":
             return result({"headless_route": decision[1]}, True), None
         return None, decision[1] if decision else None

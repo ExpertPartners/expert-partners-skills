@@ -77,6 +77,17 @@ class JobTests(unittest.TestCase):
             self.assertEqual(decode(reply)["headless_route"], "Use connected API")
             prime.assert_not_called()
 
+    def test_canonical_lazy_refresh_is_retained(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            refreshed = []
+            route.guard = SimpleNamespace(decide=lambda _: ("deny", "Use connected API"),
+                                          refresh_due=lambda: True,
+                                          start_background_refresh=lambda: refreshed.append(True))
+            denied, _ = route.policy("browser_navigate", {"url": "https://covered.example.test"})
+            self.assertTrue(denied["isError"])
+            self.assertEqual(refreshed, [True])
+
     def test_distinct_jobs_overlap_same_job_serializes_and_no_replay(self):
         with tempfile.TemporaryDirectory() as root:
             route = self.route(root)
