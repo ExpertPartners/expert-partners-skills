@@ -198,4 +198,3 @@ class StdioClient:
             if self.sel is not None: self.sel.close()
             for stream in (self.proc.stdout, self.proc.stderr):
                 if stream: stream.close()
-
