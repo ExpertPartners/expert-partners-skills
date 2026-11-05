@@ -86,9 +86,10 @@ merges, bulk UI work) follow [browser-automation](../browser-automation/SKILL.md
 which uses the same `playwright-ember` route. Every rule in this skill still applies,
 including exact tab ownership, closing only your own tabs, and never using Allison's M4.
 
-On first use, open your own working tab with `browser_tabs` (new), confirm the
-signed-in account on the page, and keep that tab index for the task. The tab list
-starts with the connector's Welcome tab; leave it alone.
+On first use, obtain the job's own persistent connection through the installed route
+recorded in the SOP. Verify its host, connection, window and owned working page before
+acting. A shared tool name or a tab index is not connection ownership. Retain the
+transport handle and the exact working Page reference throughout the job.
 
 Treat attachment and app rendering as separate checks. First verify the
 expected location/account in the authenticated browser. Then inspect the
@@ -124,12 +125,34 @@ When stopped for one of those reasons, report the exact blocker. **Never fall ba
 
 ## Multiple sessions
 
-Multiple sessions may coexist on Ember's M2.
+Multiple sessions may coexist on Ember's M2 when the installed route proves separate
+connection ownership for those consumers. A different chat, another tab or another
+window alone does not prove that separation.
+
+- Allocate one persistent Playwright connection and one owned Chrome window per job.
+  Create the window before the extension attaches, using the existing signed-in
+  profile. Do not move an attached tab out of its group to create isolation.
+- Bootstrap each connection and its working page as one short owned operation. Once
+  initialized, separate jobs can operate concurrently. Retain direct Page references
+  through navigation instead of borrowing a shared current-tab pointer.
+- Keep the connector page while the job needs its connection. Do not navigate it as
+  the working page. Close the job's own working pages before its own connector and
+  transport. Preserve every pre-existing connector page and every other job.
+- Treat disconnect and task-tab closure as separate operations. After a failure,
+  reconcile exact owned pages before starting a replacement. A new connection using
+  the same client name does not adopt the old pages.
+- Verify Codex, Claude Code and Ember separately after delivery. Source tests, a
+  marketplace version or a successful pilot do not prove all consumers use the route.
 
 - Control only the tab/window belonging to the current assignment.
 - Do not close, repurpose, or navigate another session's tabs or Allison's.
 - Use exact tab selection when the integration supports it.
 - If exact targeting genuinely cannot be established without risking another session, stop on that specific conflict rather than asking whether the whole M2 is available.
+
+The narrow existing-profile window adapter and consumer acceptance checklist are
+[packaged with browser-automation](../browser-automation/references/owned-connections.md). The SOP owns
+the actual installed route and its current acceptance state. Do not copy a trial
+path into instructions or bypass headless-route checks through a terminal helper.
 
 ## Local-screen protection
 

@@ -160,8 +160,9 @@ sessions. This rule follows the HQ Rulebook's Browser tabs stay clean section (D
   for each page.
 - Open a second tab only when you truly need two pages side by side, and close it right
   after.
-- Each connection starts with a "Welcome" connect tab. Navigate it to your first page so
-  it becomes your working tab, rather than leaving it behind.
+- Keep the job's own "Welcome" connector page while its connection is active. Create
+  and retain a separate owned working Page. Do not navigate the connector page as the
+  working page or reuse another job's connector.
 - Close every tab you opened before you report or end your turn. End with `browser_tabs`
   close on each of your tabs.
   `browser_close` alone leaves the tab open in extension mode.
@@ -184,8 +185,9 @@ differ, the SOP wins. Verified live Nov 2, 2026, after the Nov 1 M2 rebuild.
 | Extension token | 1Password, Automation vault, item ID `tzqvnlgilv4evwffp27amnwxw4`. The connector reads an owner-only copy at `~/.config/ember/playwright-extension-token`, because SSH sessions cannot unlock the Keychain |
 | Job runner | None since the rebuild. `pw-run` is gone |
 
-Claude Code and Codex start on Allison's M4 and reach that Chrome through one MCP server,
-`playwright-ember`, registered at user scope in each.
+Claude Code and Codex start on Allison's M4 and reach that Chrome through the named
+`playwright-ember` route. The name does not prove that each chat received a separate
+physical connection. Read the SOP for the installed per-job consumer route.
 
 ```text
 command: ssh
@@ -198,9 +200,12 @@ args:    -T -o BatchMode=yes -o ConnectTimeout=8 ember /Users/ember/maintenance/
 - Never use Claude in Chrome, the Codex browser, Chrome or computer-use plugins, or a local
   Playwright plugin. Each one drives Allison's M4 or a signed-out browser.
 
-Several AIs can share one browser at once, each in its own tab group. Tab groups do not
-stop two AIs from changing the same record at the same time, so give each job to one AI.
-The AI acts as whoever is signed in, and changes show under that person's name.
+Concurrent jobs require distinct persistent connections, owned windows and working
+pages. Create each window before extension attachment. A group color organizes the
+connection's tabs but does not isolate cookies, application identity or business
+records. Each record still has one editor. The AI acts as whoever is signed in, and
+changes show under that person's name. Follow the full ownership and recovery steps
+in [ember-browser-routing](../ember-browser-routing/SKILL.md).
 
 ### Chrome settings that keep the M2 clean
 
@@ -217,10 +222,19 @@ The AI acts as whoever is signed in, and changes show under that person's name.
 
 ### Running a job
 
-Use the `playwright-ember` tools from the session: `browser_tabs` (new) to open your working
-tab, `browser_navigate`, `browser_snapshot`, `browser_evaluate` and the rest, then
-`browser_tabs` close on your tab. For a longer scripted job, `browser_run_code_unsafe`
-runs one function that receives the Playwright `page`.
+Use the installed owned-connection route from the SOP. Keep its transport handle and
+the exact working Page reference for this job. For a scripted job, create that Page
+once from the owned context and retain it through navigation. `browser_run_code_unsafe`
+receives the current Page, which may initially be the connector rather than the
+working Page. Verify the exact target before acting. Use ordinary browser tools only
+through this job's verified connection.
+
+The existing-profile window adapter is packaged with this skill. Its
+[connection procedure](references/owned-connections.md) explains its boundaries. Source
+checks do not establish installed transport allocation, headless-policy enforcement,
+reconnect behavior or native consumer adoption. Verify those on each actual consumer
+before reporting the route ready. Do not replace a failed connection or replay an
+uncertain tab creation until the original owned-page disposition is known.
 
 ### Health check
 
@@ -269,8 +283,10 @@ before reporting anything.
 
 This skill ships in the operating-doctrine plugin of the expert-partners marketplace, which
 Claude Code, Claude surfaces, and Codex load. Claude Code and Codex reach the M2 browser
-through `playwright-ember`. Tab groups are what let several AIs
-share the M2 at once without stepping on each other.
+through the installed per-job `playwright-ember` route. Each job needs a distinct
+retained connection and a window created before attachment. The shared skill teaches
+the procedure, while the installed launcher and consumer prove its actual behavior.
+Verify source publication, local delivery and real use separately.
 
 ## Reporting
 
