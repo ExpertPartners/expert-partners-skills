@@ -9,10 +9,12 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import selectors
 import signal
 import subprocess
 import sys
 import tempfile
+import time
 
 
 HERE = Path(__file__).resolve().parent
@@ -137,15 +139,53 @@ def command(codex, workspace, events, final, marketplace):
     return args + ["-"]
 
 
-def marketplace_registration(plugin):
+def effective_marketplace(codex, workspace):
+    """Read only the effective registration, never persist the rest of config."""
+    process = subprocess.Popen([str(codex), "app-server", "--listen", "stdio://"],
+                               stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                               stderr=subprocess.DEVNULL, text=True, bufsize=1,
+                               start_new_session=True)
+    selector = selectors.DefaultSelector()
+    selector.register(process.stdout, selectors.EVENT_READ)
+
+    def request(number, method, params):
+        process.stdin.write(json.dumps({"id": number, "method": method, "params": params}) + "\n")
+        process.stdin.flush()
+        deadline = time.monotonic() + 20
+        while time.monotonic() < deadline:
+            if not selector.select(max(0, deadline - time.monotonic())):
+                break
+            line = process.stdout.readline()
+            if not line:
+                break
+            response = json.loads(line)
+            if response.get("id") == number:
+                if response.get("error"):
+                    raise ValueError("effective marketplace configuration read rejected")
+                return response["result"]
+        raise ValueError("effective marketplace configuration read unavailable")
+
+    try:
+        request(1, "initialize", {"clientInfo": {"name": "foundations-fixture", "version": "1.0"}})
+        process.stdin.write(json.dumps({"method": "initialized", "params": {}}) + "\n")
+        process.stdin.flush()
+        result = request(2, "config/read", {"includeLayers": False, "cwd": str(workspace)})
+        return result.get("config", {}).get("marketplaces", {}).get("expert-partners", {})
+    finally:
+        selector.close()
+        stop_owned_process(process)
+        process.stdin.close()
+        process.stdout.close()
+
+
+def marketplace_registration(plugin, effective):
     source = plugin.get("marketplaceSource", {})
-    if source.get("sourceType") not in ("git", "local") or not source.get("source"):
-        raise ValueError("existing marketplace registration is missing")
-    registration = {"source_type": source["sourceType"], "source": source["source"]}
-    if source.get("ref"):
-        registration["ref"] = source["ref"]
-    if source.get("sparsePaths"):
-        registration["sparse_paths"] = source["sparsePaths"]
+    if (effective.get("source_type") not in ("git", "local") or not effective.get("source") or
+            source.get("sourceType") != effective["source_type"] or
+            source.get("source") != effective["source"]):
+        raise ValueError("effective marketplace registration is missing or differs from inventory")
+    registration = {key: effective[key] for key in ("source_type", "source", "ref", "sparse_paths")
+                    if effective.get(key) is not None}
     return registration
 
 
@@ -221,7 +261,7 @@ def run(codex, output, timeout):
     source_skill = Path(plugin["source"]["path"]) / "skills" / "business-brain-foundations" / "SKILL.md"
     skill = installed_skill(plugin)
     expected_skill_hash = hashlib.sha256(skill.read_bytes()).hexdigest()
-    registration = marketplace_registration(plugin)
+    registration = marketplace_registration(plugin, effective_marketplace(codex, workspace))
     args = command(codex, workspace, events, final, registration)
     # Strip inherited API credentials, retaining normal subscribed-account auth.
     env = {key: value for key, value in os.environ.items()

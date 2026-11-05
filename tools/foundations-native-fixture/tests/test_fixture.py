@@ -4,6 +4,7 @@ import importlib.util
 import io
 import json
 from pathlib import Path
+import sys
 import tempfile
 import unittest
 
@@ -57,8 +58,9 @@ class Transport(unittest.TestCase):
 
     def test_command_uses_existing_account_marketplace_and_only_fixture_config(self):
         marketplace = runner.marketplace_registration({"marketplaceSource": {
-            "sourceType": "git", "source": "https://example.invalid/existing.git",
-            "ref": "approved", "sparsePaths": ["catalog", "plugin"]}})
+            "sourceType": "git", "source": "https://example.invalid/existing.git"}}, {
+            "source_type": "git", "source": "https://example.invalid/existing.git",
+            "ref": "approved", "sparse_paths": ["catalog", "plugin"]})
         args = runner.command(Path("/synthetic/codex"), Path("/synthetic/work"),
                               Path("/synthetic/events"), Path("/synthetic/final"), marketplace)
         self.assertIn("--ignore-user-config", args)
@@ -74,6 +76,29 @@ class Transport(unittest.TestCase):
         self.assertIn('marketplaces.expert-partners.sparse_paths=["catalog", "plugin"]', args)
         self.assertTrue(runner.PROMPT.startswith("$operating-doctrine:business-brain-foundations\n"))
         self.assertFalse(any('CODEX_HOME=' in item for item in args))
+
+    def test_effective_protocol_preserves_pin_omitted_by_inventory(self):
+        with tempfile.TemporaryDirectory() as folder:
+            codex = Path(folder) / "codex"
+            codex.write_text("#!" + sys.executable + "\n" + '''import json, sys
+for line in sys.stdin:
+    request = json.loads(line)
+    if "id" not in request:
+        continue
+    result = {} if request["method"] == "initialize" else {"config": {"marketplaces": {
+        "expert-partners": {"source_type": "git", "source": "https://example.invalid/existing.git",
+        "ref": "pinned-release", "sparse_paths": ["catalog", "plugin"]}}}}
+    print(json.dumps({"id": request["id"], "result": result}), flush=True)
+''')
+            codex.chmod(0o700)
+            plugin = {"marketplaceSource": {
+                "sourceType": "git", "source": "https://example.invalid/existing.git"}}
+            effective = runner.effective_marketplace(codex, Path(folder))
+            registration = runner.marketplace_registration(plugin, effective)
+            self.assertEqual(registration["ref"], "pinned-release")
+            self.assertEqual(registration["sparse_paths"], ["catalog", "plugin"])
+            with self.assertRaises(ValueError):
+                runner.marketplace_registration(plugin, {**effective, "source": "different"})
 
     def test_native_rejection_is_not_confused_with_intended_storage_error(self):
         reason = "MCP tool call requires approval, but approval policy is never"
