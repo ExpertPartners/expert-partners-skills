@@ -142,6 +142,21 @@ and record the previous executable-path setting before applying a reviewed chang
 Rollback restores that setting and starts a fresh job connection after the old
 job reaches its own safe boundary. Never restart Chrome to roll back this adapter.
 
+The packaged `scripts/install_job_route.py` is the shared-entry producer. Given
+the verified produced skill, private route settings and the exact existing
+launcher hash, it preserves the protected bootstrap byte-for-byte in an
+owner-only backup, writes private configuration, then atomically replaces only
+the entry script. Future MCP starts receive the job facade. Existing transports
+keep running until their own safe boundary. No browser, native app, daemon,
+credential source or scheduler is restarted. The same installer restores the
+original script only after verifying both installed and backup hashes.
+
+Use `--settings`, `--runtime`, `--config` and the existing absolute `--python`
+interpreter path for installation. Use `--config` and `--rollback` to restore
+the entry. Settings contain the existing protected launcher's path and hash;
+the generated private configuration points its child launches at the retained
+bootstrap. Never point a facade's child launcher back at its facade entry.
+
 A source change is not an installed route. Verify Codex, Claude Code and Ember
 separately with multiple distinct connections, windows, groups and owned test pages,
 overlapping real page operations, peer-tab exclusion and cleanup that preserves
