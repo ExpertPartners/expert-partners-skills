@@ -1,5 +1,6 @@
 """Contract tests for job routing, concurrent calls and fail-closed recovery."""
 import contextlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -13,8 +14,10 @@ from unittest.mock import patch
 
 SCRIPTS = Path(__file__).resolve().parents[2] / "plugins/operating-doctrine/skills/browser-automation/scripts"
 sys.path.insert(0, str(SCRIPTS))
-import browser_jobs as b
-from job_transport import StdioClient, Refusal
+spec = importlib.util.spec_from_file_location("owned_browser_job_source", SCRIPTS / "browser_jobs.py")
+b = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(b)
+StdioClient, Refusal = b.StdioClient, b.Refusal
 
 
 def decode(reply):
