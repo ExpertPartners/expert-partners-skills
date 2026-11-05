@@ -6,14 +6,47 @@ The existing launcher still resolves its protected profile-specific credential.
 This wrapper does not implement per-job transport allocation or recovery.
 """
 import os
+import json
 from pathlib import Path
 import re
+import subprocess
 import sys
 from urllib.parse import urlsplit
 
 
 class InvalidLaunch(ValueError):
     pass
+
+
+def existing_signed_in_profile(directory, expected_account, root=None):
+    """Check existing identity metadata; this is not website authentication proof."""
+    if not expected_account or not expected_account.strip():
+        raise InvalidLaunch("Expected account is not configured")
+    root = (Path.home() / "Library/Application Support/Google/Chrome") if root is None else Path(root)
+    if not (root / directory).is_dir():
+        raise InvalidLaunch("Assigned existing profile is unavailable")
+    try:
+        local = json.loads((root / "Local State").read_text())
+        preferences = json.loads((root / directory / "Preferences").read_text())
+        profile = local["profile"]["info_cache"][directory]
+        primary = profile.get("user_name", "").strip().casefold()
+        expected = expected_account.strip().casefold()
+        accounts = {x.get("email", "").strip().casefold() for x in preferences.get("account_info", [])}
+        valid = (primary == expected and expected in accounts
+                 and preferences.get("signin", {}).get("allowed") is not False)
+    except (OSError, ValueError, KeyError, TypeError, AttributeError):
+        raise InvalidLaunch("Assigned profile identity could not be verified") from None
+    if not valid:
+        raise InvalidLaunch("Assigned profile does not hold the expected identity")
+
+
+def chrome_is_running():
+    try:
+        return subprocess.run(["/usr/bin/pgrep", "-x", "Google Chrome"],
+                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                              timeout=3, check=False).returncode == 0
+    except (OSError, subprocess.TimeoutExpired):
+        return False
 
 
 def browser_arguments(arguments):
@@ -37,11 +70,16 @@ def browser_arguments(arguments):
     return ["--new-window", profile, connector]
 
 
-def main(arguments=None, environment=None, execute=os.execv):
+def main(arguments=None, environment=None, execute=os.execv, profile_root=None,
+         running=chrome_is_running):
     arguments = sys.argv[1:] if arguments is None else arguments
     environment = os.environ if environment is None else environment
     try:
         args = browser_arguments(arguments)
+        directory = arguments[0].split("=", 1)[1]
+        existing_signed_in_profile(directory, environment.get("EP_BROWSER_EXPECTED_ACCOUNT"), profile_root)
+        if not running():
+            raise InvalidLaunch("The existing Chrome process is not running")
         binary = environment.get("EP_BROWSER_EXECUTABLE", "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
         path = Path(binary)
         if not path.is_absolute() or not path.is_file() or not os.access(path, os.X_OK):
@@ -50,7 +88,7 @@ def main(arguments=None, environment=None, execute=os.execv):
         return 0
     except (InvalidLaunch, OSError):
         # OSError and argv may contain the credential-bearing connector URL.
-        print("Chrome job window launch refused; check its configured profile, connector and executable", file=sys.stderr)
+        print("Chrome job window launch refused; verify the existing signed-in profile, expected account, running browser and connector", file=sys.stderr)
         return 2
 
 

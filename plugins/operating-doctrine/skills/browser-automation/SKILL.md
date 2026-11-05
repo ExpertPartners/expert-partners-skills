@@ -67,6 +67,13 @@ Switch to the route it names, and never get around it with another browser tool.
 
 ## Rule 1. Signed-in Chrome only, through the shared connector
 
+Before opening any connection, verify the assigned existing profile and expected
+signed-in account through the installed route's preflight. A missing profile, an
+unsigned profile or an account mismatch stops that connection. Never create a
+profile or pick another browser to get past it. A connector page or blank working
+tab is not proof of a website login. Verify the application's own signed-in account
+and intended location before business actions.
+
 Every browser action runs in the signed-in Chrome on Ember's M2, reached through the
 Playwright Extension with the shared connector below.
 

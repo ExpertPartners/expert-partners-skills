@@ -52,6 +52,10 @@ the full rule.
 ## Browser workflow
 
 1. Follow Headless route first above. Use a browser only when that order ends at step 4.
+   The first browser preflight verifies the assigned existing profile and expected
+   signed-in account. Refuse a missing, unsigned or mismatched profile without
+   opening a connection or choosing a fallback. Profile metadata is not proof of a
+   live website session. Verify the target application's own account before acting.
 2. When browser/UI work is required, connect to Ember's M2 through the `playwright-ember` tool, the one browser route (AI Implementation SOP, section 5).
 3. Enumerate the M2 browser targets and select the exact tab/window needed for the current assignment.
 4. Continue without asking Allison whether the M2 is available merely because other tabs, windows, tasks, or sessions are visible.

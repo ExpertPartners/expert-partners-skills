@@ -8,7 +8,14 @@ launcher is changed by this file.
 
 Pass its absolute executable path through the existing launcher's
 `--executable-path` argument. The existing protected launcher still chooses its
-pinned MCP version, profile and credential. `EP_BROWSER_EXECUTABLE` may name the
+pinned MCP version, profile and credential. Configure `EP_BROWSER_EXPECTED_ACCOUNT`
+from the current assigned account before enabling this route. The adapter reads the
+existing profile directory, Chrome's current profile identity metadata and that
+profile's account metadata, and refuses if the expected account is missing or does
+not match. It also refuses while Chrome is stopped. It does not create a profile,
+choose a fallback account, start a stopped browser or perform a sign-in.
+
+`EP_BROWSER_EXECUTABLE` may name the
 already installed Chrome executable when its path differs from the macOS default.
 Do not pass a new user-data directory or use this adapter to launch a fresh profile.
 
@@ -20,6 +27,13 @@ The adapter accepts only an explicit `Default` or `Profile N` directory and the
 Playwright extension's connect page. It forwards the full connector URL unchanged
 and never prints it. Failure messages omit exception details because launch
 arguments can contain a profile-specific token.
+
+Identity metadata is a routing preflight. It does not prove that a website's session
+is live. Before business actions, verify the target application's own signed-in
+account and selected location. A blank connector page or a successful connection is
+not application authentication evidence. If the assigned browser or website is
+signed out, follow the existing authorized sign-in route. Never change profiles or
+create a new one to get past the check.
 
 This is one component of the per-job route. The consumer must allocate a distinct,
 long-lived MCP connection for each job and retain that transport and its exact
