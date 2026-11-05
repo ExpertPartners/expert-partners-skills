@@ -1,3 +1,8 @@
+## 2.84.10 - 2026-11-05
+
+Align current wrap filing and handoff instructions, their record and continuity templates, and the memory router's founder-question route with current HQ ownership and job delivery. Preserve technical GitHub artifacts, active context retrieval, existing approvals and holds, and the genuine first-message exception for a new chat.
+
+Keep genuine founder-question requests distinct from final completion reporting, and bound companion staged-kickoff references by the current approved handoff route.
 ## 2.84.9 - 2026-11-04
 
 Point current decision-capture instructions in operating-doctrine, estate-memory-router, remember-this and session-wrap to the live HQ Decision Log workflow instead of the retired Decision 0101 procedure, preserving clear decisions without magic phrases, honest approval evidence and existing approvals and holds.
