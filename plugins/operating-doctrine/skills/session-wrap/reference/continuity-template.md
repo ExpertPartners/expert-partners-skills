@@ -13,6 +13,6 @@ Its own markdown document, never buried inside the session record. It is what th
 
 ## Hard rules
 
-- The note is a predecessor's interpretation, not ground truth. It must be cheap to verify: prefer pointers (card numbers, file paths, commit refs) over restated state so the next session can reconcile against the live board and repo.
+- The note is a predecessor's interpretation, not ground truth. It must be cheap to verify: prefer pointers to the current owning plan, job, Drive documents and applicable technical files, commits or board records over restated state. The next worker reconciles those pointers against the actual owning sources; a business continuation does not require a repository as its authority.
 - If unsure of a value, say so. Never guess.
 - No secrets, credentials, or PII, ever.
