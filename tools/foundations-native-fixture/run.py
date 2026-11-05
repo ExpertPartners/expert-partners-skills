@@ -143,31 +143,38 @@ def effective_marketplace(codex, workspace):
     """Read only the effective registration, never persist the rest of config."""
     process = subprocess.Popen([str(codex), "app-server", "--listen", "stdio://"],
                                stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                               stderr=subprocess.DEVNULL, text=True, bufsize=1,
+                               stderr=subprocess.DEVNULL, bufsize=0,
                                start_new_session=True)
     selector = selectors.DefaultSelector()
     selector.register(process.stdout, selectors.EVENT_READ)
+    pending = b""
 
     def request(number, method, params):
-        process.stdin.write(json.dumps({"id": number, "method": method, "params": params}) + "\n")
+        nonlocal pending
+        process.stdin.write((json.dumps({"id": number, "method": method, "params": params}) + "\n").encode())
         process.stdin.flush()
         deadline = time.monotonic() + 20
         while time.monotonic() < deadline:
+            # Notifications and responses can share one OS read. Drain complete
+            # buffered lines before polling the descriptor for more bytes.
+            while b"\n" in pending:
+                line, pending = pending.split(b"\n", 1)
+                response = json.loads(line)
+                if response.get("id") == number:
+                    if response.get("error"):
+                        raise ValueError("effective marketplace configuration read rejected")
+                    return response["result"]
             if not selector.select(max(0, deadline - time.monotonic())):
                 break
-            line = process.stdout.readline()
-            if not line:
+            chunk = os.read(process.stdout.fileno(), 65536)
+            if not chunk:
                 break
-            response = json.loads(line)
-            if response.get("id") == number:
-                if response.get("error"):
-                    raise ValueError("effective marketplace configuration read rejected")
-                return response["result"]
+            pending += chunk
         raise ValueError("effective marketplace configuration read unavailable")
 
     try:
         request(1, "initialize", {"clientInfo": {"name": "foundations-fixture", "version": "1.0"}})
-        process.stdin.write(json.dumps({"method": "initialized", "params": {}}) + "\n")
+        process.stdin.write(b'{"method":"initialized","params":{}}\n')
         process.stdin.flush()
         result = request(2, "config/read", {"includeLayers": False, "cwd": str(workspace)})
         return result.get("config", {}).get("marketplaces", {}).get("expert-partners", {})

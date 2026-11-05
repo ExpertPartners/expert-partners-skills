@@ -88,7 +88,12 @@ for line in sys.stdin:
     result = {} if request["method"] == "initialize" else {"config": {"marketplaces": {
         "expert-partners": {"source_type": "git", "source": "https://example.invalid/existing.git",
         "ref": "pinned-release", "sparse_paths": ["catalog", "plugin"]}}}}
-    print(json.dumps({"id": request["id"], "result": result}), flush=True)
+    # Both lines are deliberately flushed together, as authenticated app-server
+    # notifications may precede the matching response in the same pipe read.
+    notice = {"method": "account/updated", "params": {}}
+    response = {"id": request["id"], "result": result}
+    sys.stdout.write(json.dumps(notice) + "\\n" + json.dumps(response) + "\\n")
+    sys.stdout.flush()
 ''')
             codex.chmod(0o700)
             plugin = {"marketplaceSource": {
