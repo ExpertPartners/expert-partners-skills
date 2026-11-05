@@ -1,3 +1,6 @@
+## 2.84.11 - 2026-11-05
+
+Allocate a separate persistent Playwright connection and existing-profile Chrome window for each named browser job. Require the exact job handle on every tool, retain working-page references, preserve headless policy, and provide owned cleanup and fail-closed recovery without replay. Refuse missing, unsigned or mismatched profiles before opening a connection. Distinguish measured concurrency and source delivery from native consumer adoption and certification.
 ## 2.84.10 - 2026-11-05
 
 Align current wrap filing and handoff instructions, their record and continuity templates, and the memory router's founder-question route with current HQ ownership and job delivery. Preserve technical GitHub artifacts, active context retrieval, existing approvals and holds, and the genuine first-message exception for a new chat.
