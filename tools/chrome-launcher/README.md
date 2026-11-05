@@ -2,7 +2,9 @@
 
 `chrome_quiet.py` produces a reusable AppleScript application outside Chrome's signed
 bundle. It requires the existing signed-in Default profile and installs one Dock tile
-and one login launch configuration. It never writes Chrome profile data or credentials
+and one login launch configuration. It reuses the installed `chrome-ai` or `chrome-quiet`
+LaunchAgent and preserves its label. If both exist, it refuses before mutation so their
+ownership can be reconciled instead of adding competing login launches. It never writes Chrome profile data or credentials
 and never quits Chrome. The script is the producer for the generated application and
 launch configuration.
 

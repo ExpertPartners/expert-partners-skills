@@ -55,8 +55,15 @@ def install(home, receipt):
     app = home / 'Applications/Chrome AI.app'
     if not app.is_dir():
         raise RuntimeError('Prepare the launcher first')
+    agent_dir = home / 'Library/LaunchAgents'
+    existing_agents = [agent_dir / name for name in
+        ['com.expertpartners.chrome-ai.plist', 'com.expertpartners.chrome-quiet.plist']
+        if (agent_dir / name).exists()]
+    if len(existing_agents) > 1:
+        raise RuntimeError('Multiple Chrome login agents exist; reconcile their ownership before installation')
+    agent = existing_agents[0] if existing_agents else agent_dir / 'com.expertpartners.chrome-quiet.plist'
+    label = plistlib.loads(agent.read_bytes())['Label'] if agent.exists() else 'com.expertpartners.chrome-quiet'
     receipt.mkdir(parents=True, exist_ok=False)
-    agent = home / 'Library/LaunchAgents/com.expertpartners.chrome-quiet.plist'
     if agent.exists():
         shutil.copy2(agent, receipt / 'launchagent.before.plist')
     before = export_dock()
@@ -86,7 +93,7 @@ def install(home, receipt):
         'dock_tiles_replaced': replaced}, indent=2))
     run('/usr/bin/defaults', 'import', 'com.apple.dock', str(updated))
     agent.parent.mkdir(parents=True, exist_ok=True)
-    agent.write_bytes(plistlib.dumps({'Label': 'com.expertpartners.chrome-quiet',
+    agent.write_bytes(plistlib.dumps({'Label': label,
         'ProgramArguments': ['/usr/bin/open', str(app)], 'RunAtLoad': True}))
     os.chmod(agent, 0o644)
     run('/usr/bin/plutil', '-lint', str(agent))

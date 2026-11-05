@@ -72,6 +72,23 @@ class InstallerTest(unittest.TestCase):
         self.assertEqual(json.loads((receipt / 'manifest.json').read_text())['agent'], str(self.agent))
         self.assertEqual((receipt / 'launchagent.before.plist').read_bytes(), self.old_agent)
 
+    def test_existing_ai_agent_reused_instead_of_duplicate(self):
+        ai = self.agent.with_name('com.expertpartners.chrome-ai.plist')
+        self.agent.rename(ai)
+        with patch.object(q, 'export_dock', return_value=plistlib.dumps(self.dock)), patch.object(q, 'run', side_effect=self.fake_run):
+            q.install(self.home, self.home / 'backup')
+        self.assertFalse(self.agent.exists())
+        self.assertEqual(plistlib.loads(ai.read_bytes())['Label'], 'old')
+        self.assertEqual(json.loads((self.home/'backup/manifest.json').read_text())['agent'],str(ai))
+
+    def test_multiple_agents_refused_before_mutation(self):
+        self.agent.with_name('com.expertpartners.chrome-ai.plist').write_bytes(self.old_agent)
+        with patch.object(q, 'run') as run:
+            with self.assertRaises(RuntimeError):
+                q.install(self.home, self.home / 'backup')
+            run.assert_not_called()
+        self.assertFalse((self.home / 'backup').exists())
+
 
 if __name__ == '__main__':
     unittest.main()
