@@ -150,7 +150,8 @@ function page(id, opener = null) {
 const context = {pages:()=>pages.filter(p=>!p.closed),newPage:async()=>page(10)};
 global.chrome = {tabs:{getCurrent:async()=>tabs.get(current.id),get:async(id)=>{
   if(!tabs.has(id))throw Error('missing');return tabs.get(id);},
-  query:async(q)=>[...tabs.values()].filter(t=>(q.windowId===undefined||t.windowId===q.windowId)&&(q.groupId===undefined||t.groupId===q.groupId))},
+  query:async(q)=>[...tabs.values()].filter(t=>(q.windowId===undefined||t.windowId===q.windowId)&&(q.groupId===undefined||t.groupId===q.groupId)),
+  remove:async(ids)=>{for(const id of ids){tabs.delete(id);for(const p of pages)if(p.id===id)p.closed=true;}}},
   tabGroups:{get:async()=>({title:'fixture'})}};
 (async()=>{
   const connector=page(1);
@@ -160,8 +161,13 @@ global.chrome = {tabs:{getCurrent:async()=>tabs.get(current.id),get:async(id)=>{
   const foreign=page(999); // Same window and group, no owned opener.
   await assert.rejects(()=>s.snapshot(),/unproven_page_arrival/);
   assert.deepEqual((await s.snapshot(false)).tabIds,[1,10]);
+  // Detach/reattach can replace the SDK Page without closing its Chrome tab.
+  // Exact proven ID cleanup must still close that tab, not the foreign arrival.
+  s.task.closed=true;
+  const reattached=page(10);
   await s.closeCreated();
   assert.equal(s.task.closed,true);
+  assert.equal(reattached.closed,true);
   assert.equal(foreign.closed,false);
   assert.equal(connector.closed,false);
 })().catch(e=>{console.error(e);process.exitCode=1;});
@@ -188,6 +194,34 @@ process.__epBrowserJob={connector,task:a,created:new Set([connector,a,b])};
         checked = subprocess.run(["node", "-e", script], capture_output=True, text=True, timeout=10)
         self.assertEqual(checked.returncode, 0, checked.stderr)
 
+    def test_live_cleanup_refuses_a_popup_born_during_parent_close(self):
+        source = (SCRIPTS / "owned_pages.js").read_text()
+        fixture = r'''
+const assert=require('node:assert/strict');
+let current;
+const tabs=new Map();
+const pages=[];
+function page(id){
+  const tab={id,windowId:5,groupId:7,url:'about:blank'};tabs.set(id,tab);
+  const p={id,closed:false,context:()=>context,isClosed:()=>p.closed,opener:async()=>null,
+    url:()=>tab.url,goto:async(u)=>{tab.url=u;},evaluate:async(fn,arg)=>{current=p;return await fn(arg);},
+    close:async()=>{p.closed=true;tabs.delete(id);if(id===10)tabs.set(11,{id:11,openerTabId:10,windowId:6,groupId:-1});}};
+  pages.push(p);return p;
+}
+const context={pages:()=>pages.filter(p=>!p.closed),newPage:async()=>page(10)};
+global.chrome={tabs:{getCurrent:async()=>tabs.get(current.id),get:async(id)=>{
+  if(!tabs.has(id))throw Error('missing');return tabs.get(id);},
+  query:async(q)=>[...tabs.values()].filter(t=>(q.windowId===undefined||t.windowId===q.windowId)&&(q.groupId===undefined||t.groupId===q.groupId)),
+  remove:async(ids)=>{for(const id of ids)tabs.delete(id);}},tabGroups:{get:async()=>({title:'fixture'})}};
+(async()=>{
+  const s=await newOwnedState(page(1));s.task=await s.create();
+  await assert.rejects(()=>s.closeCreated(),/late_owned_popup_cleanup_uncertain/);
+  assert.equal(tabs.has(11),true); // Never silently adopt or delete the late popup.
+})().catch(e=>{console.error(e);process.exitCode=1;});
+'''
+        checked = subprocess.run(["node", "-e", source + fixture], capture_output=True, text=True, timeout=10)
+        self.assertEqual(checked.returncode, 0, checked.stderr)
+
     def test_connector_credential_redacted_recursively(self):
         url = b.EXTENSION + "?mcpRelayUrl=ws%3A%2F%2F127.0.0.1&token=SYNTHETIC_CANARY"
         actual = json.dumps(b.redact({"content": [{"text": "Welcome [link](" + url + ")"}], "nested": url}))
@@ -202,6 +236,45 @@ process.__epBrowserJob={connector,task:a,created:new Set([connector,a,b])};
                 with self.assertRaisesRegex(Refusal, "uncheckpointed"):
                     route.dispose_failed(job)
             connect.assert_not_called()
+
+    def test_late_popup_refuses_disconnected_cleanup_in_any_window(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            own = {"connectorId": 1, "windowId": 5, "groupId": 7, "groupTitle": "fixture", "tabIds": [1, 10]}
+            job = {"client": None, "metadata": own, "generation": route.preflight(), "client_name": "fixture", "ownership_pending": False}
+            captured = []
+
+            def capture(_, body):
+                if "async({old,clientName,connectorOrigin})" in body:
+                    captured.append(body)
+                return {"closed": True}
+
+            with patch.object(route, "client", create=True, return_value=SimpleNamespace(close=lambda: None)), patch.object(b, "code", side_effect=capture), patch.object(b.time, "sleep"):
+                route.dispose_failed(job)
+            self.assertEqual(len(captured), 1)
+            fixture = r'''
+const assert=require('node:assert/strict');
+let unknownWindow=5;
+let parentGone=false;
+let removed=[];
+global.chrome={tabs:{query:async()=>[
+  ...(parentGone?[]:[{id:1,windowId:5,groupId:-1},{id:10,windowId:5,groupId:-1}]),
+  {id:11,openerTabId:10,windowId:unknownWindow,groupId:-1}],
+  remove:async(ids)=>{removed.push(...ids);}}};
+process.__epBrowserJob={connector:{evaluate:async(fn,arg)=>await fn(arg)}};
+'''
+            body = captured[0]
+            # Check both same-window and separate-window late popups, even after
+            # all saved parent tabs have already disappeared.
+            script = fixture + "async function attempt(){" + body + "}\n" + r'''
+(async()=>{for(const w of [5,6])for(const gone of [false,true]){
+  unknownWindow=w;parentGone=gone;removed=[];
+  await assert.rejects(()=>attempt(),/uncheckpointed_page_arrival/);
+  assert.deepEqual(removed,[]);
+}})().catch(e=>{console.error(e);process.exitCode=1;});
+'''
+            checked = subprocess.run(["node", "-e", script], capture_output=True, text=True, timeout=10)
+            self.assertEqual(checked.returncode, 0, checked.stderr)
 
     def test_owned_transport_reaps_child_and_never_signals_peer(self):
         script = "import sys,json\nfor line in sys.stdin:\n q=json.loads(line); print(json.dumps({'jsonrpc':'2.0','id':q['id'],'result':{'ok':True}}),flush=True)\n"

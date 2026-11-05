@@ -70,11 +70,17 @@ retains an exact set of Pages it created. New Pages receive a unique nonce
 fragment on a blank page before business navigation; that exact marker binds the
 returned Page to its Chrome tab ID. Later cleanup uses the ID or retained Page,
 not the URL. An opener-owned popup is accepted only through the retained parent,
-and its ID is bound using Chrome's matching opener metadata. Unknown arrivals
+and its ID is bound using Chrome's matching opener metadata in the original
+window and group. Separate-window or ambiguous popups require reconciliation;
+this route does not claim arbitrary OAuth popup support. Unknown arrivals
 are refused and are never adopted simply because they entered the group. Cleanup
 preserves those unknown pages. An interrupted operation whose page inventory was
 not checkpointed requires explicit reconciliation before recovery; it is never
 reported clean from an incomplete list of IDs.
+Disconnected cleanup also checks for unrecorded arrivals in the isolated window
+and opener descendants across all windows, before and after closing saved IDs.
+Live cleanup checks for late descendants after closing the parent pages. If the
+inventory changed, cleanup stays incomplete and preserves unknown tabs.
 
 Each route checks the existing profile before starting its protected launcher.
 It passes the window adapter as `--executable-path`; the launcher still owns the

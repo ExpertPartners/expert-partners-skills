@@ -351,6 +351,8 @@ class Route:
         try:
             code(client, "const p=Buffer.constructor('return process')();if(page.context().pages().length!==1||!page.url().startsWith(" + json.dumps(EXTENSION + "?") + "))throw Error('not_own_connector');p.__epBrowserJob={connector:page,task:null};return {ready:true};")
             outcome = code(client, STATE_JS + "return await s.connector.evaluate(async({old,clientName,connectorOrigin})=>{"
+                           "const incomplete=tabs=>{const descendants=new Set(old.tabIds);let changed;do{changed=false;for(const t of tabs)if(descendants.has(t.openerTabId)&&!descendants.has(t.id)){descendants.add(t.id);changed=true;}}while(changed);return tabs.some(t=>(t.windowId===old.windowId||descendants.has(t.id))&&!old.tabIds.includes(t.id));};"
+                           "if(incomplete(await chrome.tabs.query({})))throw Error('uncheckpointed_page_arrival');"
                            "const live=[];for(const id of old.tabIds){try{live.push(await chrome.tabs.get(id));}catch{}}"
                            "if(!live.length)return {closed:true,alreadyGone:true};"
                            # The extension intentionally ungroups its tabs after
@@ -362,7 +364,9 @@ class Route:
                            "const targets=await chrome.debugger.getTargets();"
                            "for(const t of live){if(t.windowId!==old.windowId||(t.groupId!==old.groupId&&t.groupId!==-1)||targets.some(x=>x.tabId===t.id&&x.attached)||status.connections.some(c=>c.connectedTabIds.includes(t.id)))throw Error('ownership_changed');"
                            "if(t.groupId!==-1){const g=await chrome.tabGroups.get(t.groupId);if(g.title!==old.groupTitle)throw Error('group_identity_changed');}}"
-                           "await chrome.tabs.remove(live.map(t=>t.id));return {closed:true,count:live.length};}," + json.dumps({"old": old, "clientName": job["client_name"], "connectorOrigin": EXTENSION}) + ");")
+                           "await chrome.tabs.remove(live.map(t=>t.id));"
+                           "const after=await chrome.tabs.query({});if(after.some(t=>old.tabIds.includes(t.id))||incomplete(after))throw Error('owned_cleanup_inventory_uncertain');"
+                           "return {closed:true,count:live.length};}," + json.dumps({"old": old, "clientName": job["client_name"], "connectorOrigin": EXTENSION}) + ");")
             if outcome.get("closed") is not True:
                 raise Refusal("failed_cleanup_uncertain")
         finally:
