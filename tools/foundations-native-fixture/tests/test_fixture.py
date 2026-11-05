@@ -56,8 +56,11 @@ class Transport(unittest.TestCase):
         self.assertEqual(good["other_file_tool_calls"], [])
 
     def test_command_uses_existing_account_marketplace_and_only_fixture_config(self):
+        marketplace = runner.marketplace_registration({"marketplaceSource": {
+            "sourceType": "git", "source": "https://example.invalid/existing.git",
+            "ref": "approved", "sparsePaths": ["catalog", "plugin"]}})
         args = runner.command(Path("/synthetic/codex"), Path("/synthetic/work"),
-                              Path("/synthetic/events"), Path("/synthetic/final"))
+                              Path("/synthetic/events"), Path("/synthetic/final"), marketplace)
         self.assertIn("--ignore-user-config", args)
         self.assertIn("read-only", args)
         self.assertNotIn("--dangerously-bypass-approvals-and-sandbox", args)
@@ -65,6 +68,11 @@ class Transport(unittest.TestCase):
         self.assertTrue(any('apps._default.enabled=false' == item for item in args))
         self.assertIn('mcp_servers.foundations_fixture.default_tools_approval_mode="approve"', args)
         self.assertIn('plugins.operating-doctrine@expert-partners.enabled=true', args)
+        self.assertIn('marketplaces.expert-partners.source_type="git"', args)
+        self.assertIn('marketplaces.expert-partners.source="https://example.invalid/existing.git"', args)
+        self.assertIn('marketplaces.expert-partners.ref="approved"', args)
+        self.assertIn('marketplaces.expert-partners.sparse_paths=["catalog", "plugin"]', args)
+        self.assertTrue(runner.PROMPT.startswith("$operating-doctrine:business-brain-foundations\n"))
         self.assertFalse(any('CODEX_HOME=' in item for item in args))
 
     def test_native_rejection_is_not_confused_with_intended_storage_error(self):
@@ -77,6 +85,17 @@ class Transport(unittest.TestCase):
         failures = runner.runtime_failures([rejected, expected])
         self.assertEqual(len(failures), 1)
         self.assertEqual(failures[0]["error"]["message"], reason)
+        # A later native rejection must block even after earlier storage activity.
+        self.assertEqual(runner.verdict(0, False, False, failures), "UNRUN_RUNTIME_BLOCKED")
+
+    def test_malformed_native_events_are_retained_as_blocking_diagnostics(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "events.jsonl"
+            path.write_text('{"type":"turn.started"}\npartial JSON\n[]\n')
+            diagnostics = []
+            self.assertEqual(runner.read_jsonl(path, diagnostics), [{"type": "turn.started"}])
+            self.assertEqual([item["line"] for item in diagnostics], [2, 3])
+            self.assertEqual(runner.verdict(0, False, False, diagnostics), "UNRUN_RUNTIME_BLOCKED")
 
 
 if __name__ == "__main__":

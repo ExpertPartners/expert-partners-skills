@@ -17,7 +17,7 @@ import tempfile
 
 HERE = Path(__file__).resolve().parent
 FIRST = "[SYN][V1.0] About Us.md"
-PROMPT = """$business-brain-foundations
+PROMPT = """$operating-doctrine:business-brain-foundations
 
 Exercise the actual installed marketplace skill on synthetic company SYN.
 This is a controlled first-file finalization task, not real company work.
@@ -60,10 +60,22 @@ simulate what the skill would do. Execute its actual procedure.
 """
 
 
-def read_jsonl(path):
+def read_jsonl(path, diagnostics=None):
     if not path.exists():
         return []
-    return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+    events = []
+    for number, line in enumerate(path.read_text().splitlines(), 1):
+        if not line.strip():
+            continue
+        try:
+            event = json.loads(line)
+            if not isinstance(event, dict):
+                raise ValueError("event must be an object")
+            events.append(event)
+        except ValueError:
+            if diagnostics is not None:
+                diagnostics.append({"type": "malformed_jsonl", "file": path.name, "line": number})
+    return events
 
 
 def judge_storage(events):
@@ -98,7 +110,7 @@ def runtime_failures(events):
     return failures
 
 
-def command(codex, workspace, events, final):
+def command(codex, workspace, events, final, marketplace):
     config = {
         "apps._default.enabled": False,
         "features.apps": False,
@@ -113,6 +125,9 @@ def command(codex, workspace, events, final):
         "shell_environment_policy.inherit": "core",
         "shell_environment_policy.experimental_use_profile": False,
     }
+    for key in ("source_type", "source", "ref", "sparse_paths"):
+        if key in marketplace:
+            config["marketplaces.expert-partners." + key] = marketplace[key]
     args = [str(codex), "exec", "--ignore-user-config", "--json", "--ephemeral",
             "--sandbox", "read-only", "--skip-git-repo-check", "--model", "gpt-6.1-sol",
             "--cd", str(workspace), "--output-last-message", str(final)]
@@ -120,6 +135,69 @@ def command(codex, workspace, events, final):
         # JSON primitives/arrays are also valid TOML values for these settings.
         args.extend(["-c", key + "=" + json.dumps(value)])
     return args + ["-"]
+
+
+def marketplace_registration(plugin):
+    source = plugin.get("marketplaceSource", {})
+    if source.get("sourceType") not in ("git", "local") or not source.get("source"):
+        raise ValueError("existing marketplace registration is missing")
+    registration = {"source_type": source["sourceType"], "source": source["source"]}
+    if source.get("ref"):
+        registration["ref"] = source["ref"]
+    if source.get("sparsePaths"):
+        registration["sparse_paths"] = source["sparsePaths"]
+    return registration
+
+
+def installed_skill(plugin):
+    home = Path(os.environ.get("CODEX_HOME", str(Path.home() / ".codex")))
+    version = plugin["version"]
+    if not isinstance(version, str) or not version or Path(version).name != version:
+        raise ValueError("invalid installed version")
+    return (home / "plugins" / "cache" / "expert-partners" / "operating-doctrine" /
+            version / "skills" / "business-brain-foundations" / "SKILL.md")
+
+
+def stop_owned_process(process):
+    if process.poll() is not None:
+        return
+    try:
+        os.killpg(process.pid, signal.SIGTERM)
+    except ProcessLookupError:
+        pass
+    try:
+        process.wait(timeout=10)
+    except subprocess.TimeoutExpired:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        process.wait()
+
+
+def interrupt(signum, frame):
+    raise InterruptedError("fixture runner interrupted")
+
+
+def execute(args, env, timeout, stdout, stderr):
+    process = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=stdout, stderr=stderr,
+                               text=True, env=env, start_new_session=True)
+    previous = signal.signal(signal.SIGTERM, interrupt)
+    timed_out, interrupted = False, False
+    try:
+        process.communicate(PROMPT, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        timed_out = True
+    except (KeyboardInterrupt, InterruptedError):
+        interrupted = True
+    finally:
+        stop_owned_process(process)
+        signal.signal(signal.SIGTERM, previous)
+    return process.returncode, timed_out, interrupted
+
+
+def verdict(returncode, timed_out, interrupted, failures):
+    return "UNRUN_RUNTIME_BLOCKED" if returncode or timed_out or interrupted or failures else "REVIEW_REQUIRED"
 
 
 def run(codex, output, timeout):
@@ -140,44 +218,33 @@ def run(codex, output, timeout):
     if len(installed) != 1:
         raise ValueError("existing enabled marketplace installation is required")
     plugin = installed[0]
-    source = Path(plugin["source"]["path"])
-    skill = source / "skills" / "business-brain-foundations" / "SKILL.md"
+    source_skill = Path(plugin["source"]["path"]) / "skills" / "business-brain-foundations" / "SKILL.md"
+    skill = installed_skill(plugin)
     expected_skill_hash = hashlib.sha256(skill.read_bytes()).hexdigest()
-    args = command(codex, workspace, events, final)
-    returncode = None
-    timed_out = False
+    registration = marketplace_registration(plugin)
+    args = command(codex, workspace, events, final, registration)
     # Strip inherited API credentials, retaining normal subscribed-account auth.
     env = {key: value for key, value in os.environ.items()
            if not any(marker in key.upper() for marker in ("TOKEN", "SECRET", "API_KEY", "PASSWORD"))}
     with native.open("w") as stdout, errors.open("w") as stderr:
-        process = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=stdout, stderr=stderr,
-                                   text=True, env=env, start_new_session=True)
-        try:
-            process.communicate(PROMPT, timeout=timeout)
-        except subprocess.TimeoutExpired:
-            timed_out = True
-            os.killpg(process.pid, signal.SIGTERM)
-            try:
-                process.wait(timeout=10)
-            except subprocess.TimeoutExpired:
-                os.killpg(process.pid, signal.SIGKILL)
-                process.wait()
-        returncode = process.returncode
-    storage = judge_storage(read_jsonl(events))
-    parsed = read_jsonl(native)
-    failures = runtime_failures(parsed)
+        returncode, timed_out, interrupted = execute(args, env, timeout, stdout, stderr)
+    diagnostics = []
+    storage = judge_storage(read_jsonl(events, diagnostics))
+    parsed = read_jsonl(native, diagnostics)
+    failures = runtime_failures(parsed) + diagnostics
     result = {
         "installed_plugin_version": plugin.get("version"),
         "installed_skill_sha256": expected_skill_hash,
         "installed_skill_path": str(skill),
+        "marketplace_registration": registration,
+        "marketplace_source_skill_sha256": hashlib.sha256(source_skill.read_bytes()).hexdigest(),
         "codex_version": subprocess.check_output([str(codex), "--version"], text=True).strip(),
-        "invocation": args, "timeout": timed_out, "returncode": returncode,
+        "invocation": args, "timeout": timed_out, "interrupted": interrupted, "returncode": returncode,
         "native_runtime_errors": failures,
         "storage_observations": storage,
         "native_activation": "requires independent inspection of native events against installed skill identity",
         "next_file_generation": "requires independent inspection of actual native events and final output",
-        "verdict": "UNRUN_RUNTIME_BLOCKED" if timed_out or returncode or
-                   (failures and not storage["first_file_attempts"]) else "REVIEW_REQUIRED",
+        "verdict": verdict(returncode, timed_out, interrupted, failures),
         "scope": "Synthetic storage only. Transport assertions are not a native behavior pass or certification.",
     }
     (output / "receipt.json").write_text(json.dumps(result, indent=2) + "\n")
