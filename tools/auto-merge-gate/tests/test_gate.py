@@ -1565,5 +1565,229 @@ class EntryPoint(unittest.TestCase):
         self.assertEqual(self.run_main(["merge"], env, merge=merge)[0], 1)
 
 
+WORKFLOW = Path(__file__).resolve().parents[3] / ".github" / "workflows" / "auto-merge-gate.yml"
+# Pull request #284: a Codex continuation of job #282, pushed as AllisonGaddy, reviewed and
+# green at this head, and skipped by run 42072890922 only because of its author.
+PR284_HEAD = "1d72ba03eb137da636a878d1b41747fc72d4776a"
+PR284_BODY = "The native failure fixture reads the complete effective marketplace registration ...\n\nCloses #282\n"
+PR284_FILES = [
+    {"filename": f"tools/foundations-native-fixture/{n}", "status": "added"}
+    for n in ("README.md", "run.py", "server.py", "tests/test_fixture.py")
+]
+PR284_SKIP_REASON = "author is AllisonGaddy, not factory-droid[bot]"
+
+
+def load_workflow():
+    import yaml  # requirements-tooling.txt; the gate itself stays standard library only
+
+    with open(WORKFLOW, encoding="utf-8") as fh:
+        wf = yaml.safe_load(fh)
+    # YAML 1.1 reads the bare key on as True.
+    wf["on"] = wf.pop(True, wf.get("on"))
+    return wf
+
+
+def gate_step(wf, subcommand):
+    steps = [s for s in wf["jobs"]["gate"]["steps"] if f"gate.py {subcommand}" in (s.get("run") or "")]
+    assert len(steps) == 1, f"expected one step running gate.py {subcommand}, found {len(steps)}"
+    return steps[0]
+
+
+def workflow_config(subcommand, drop=()):
+    """The Config gate.py builds from the literal env the workflow gives that step."""
+    env = {
+        k: str(v) for k, v in gate_step(load_workflow(), subcommand)["env"].items()
+        if "${{" not in str(v) and k not in drop
+    }
+    env["GITHUB_REPOSITORY"] = REPO
+    with mock.patch.dict(os.environ, env, clear=True):
+        return gate.config_from_env()
+
+
+def pr284_routes(routes=None, labels=("auto-merge",)):
+    """Routes for pull request #7 and job #126, rewritten as #284 by a person closing #282."""
+    default_files = routes is None
+    text = json.dumps(routes or passing_routes()).replace(HEAD, PR284_HEAD)
+    text = text.replace("/pulls/7", "/pulls/284").replace("/issues/7/", "/issues/284/").replace("/issues/126", "/issues/282")
+    routes = json.loads(text)
+    pr = routes[f"/repos/{REPO}/pulls/284"]
+    pr.update(number=284, user={"login": "AllisonGaddy"}, body=PR284_BODY, labels=[{"name": n} for n in labels])
+    if default_files:
+        routes[f"/repos/{REPO}/pulls/284/files"] = copy.deepcopy(PR284_FILES)
+    return routes
+
+
+LABELED_284 = {"action": "labeled", "label": {"name": "auto-merge"}, "pull_request": {"number": 284}}
+
+
+class WorkflowEnrollment(unittest.TestCase):
+    """The workflow turns on the merge label route, the same way in plan and merge."""
+
+    def test_plan_and_merge_steps_carry_the_same_literal_label(self):
+        wf = load_workflow()
+        plan, merge = gate_step(wf, "plan")["env"], gate_step(wf, "merge")["env"]
+        self.assertEqual(plan.get("GATE_MERGE_LABEL"), "auto-merge")
+        self.assertEqual(merge.get("GATE_MERGE_LABEL"), plan.get("GATE_MERGE_LABEL"))
+        for key in ("GATE_CHECK_NAME", "GATE_BASE_BRANCH"):
+            self.assertEqual(plan[key], merge[key], key)
+        self.assertEqual(workflow_config("plan"), workflow_config("merge"))
+        self.assertEqual(workflow_config("plan").merge_label, "auto-merge")
+
+    def test_adding_the_label_starts_a_run_and_other_labels_do_not(self):
+        wf = load_workflow()
+        self.assertIn("labeled", wf["on"]["pull_request_target"]["types"])
+        self.assertNotIn("pull_request", wf["on"], "pull request code must never run with secrets")
+        cond = " ".join(wf["jobs"]["gate"]["if"].split())
+        label = gate_step(wf, "plan")["env"]["GATE_MERGE_LABEL"]
+        self.assertIn(f"(github.event.action != 'labeled' || github.event.label.name == '{label}')", cond)
+        self.assertIn("github.repository == 'ExpertPartners/expert-partners-skills'", cond)
+        self.assertIn("(github.event_name != 'issue_comment' || github.event.issue.pull_request)", cond)
+        cfg = workflow_config("plan")
+        self.assertEqual(gate.target_prs(FakeGitHub({}), cfg, "pull_request_target", LABELED_284), [284])
+
+    def test_main_only_checkout_and_merge_credential_are_unchanged(self):
+        wf = load_workflow()
+        steps = wf["jobs"]["gate"]["steps"]
+        checkout = steps[0]
+        self.assertTrue(checkout["uses"].startswith("actions/checkout@"))
+        self.assertEqual(checkout["with"], {"ref": "main", "persist-credentials": False, "sparse-checkout": "tools/auto-merge-gate"})
+        mint = next(s for s in steps if s.get("id") == "app-token")
+        self.assertEqual(mint["if"], "steps.plan.outputs.merge != ''")
+        self.assertEqual(mint["with"], {
+            "client-id": "${{ vars.SKILLS_GRAPH_APP_CLIENT_ID }}",
+            "private-key": "${{ secrets.SKILLS_GRAPH_APP_PRIVATE_KEY }}",
+            "permission-contents": "write",
+        })
+        plan, merge = gate_step(wf, "plan"), gate_step(wf, "merge")
+        self.assertNotIn("MERGE_TOKEN", plan["env"])
+        self.assertEqual(merge["env"]["MERGE_TOKEN"], "${{ steps.app-token.outputs.token }}")
+        self.assertEqual(merge["if"], "steps.plan.outputs.merge != ''")
+        self.assertEqual(merge["env"]["GATE_MERGE_PRS"], "${{ steps.plan.outputs.merge }}")
+
+    def test_pr284_before_the_repair_is_skipped_for_its_author(self):
+        cfg = workflow_config("plan", drop=("GATE_MERGE_LABEL",))
+        self.assertEqual(cfg.merge_label, "")
+        gh = FakeGitHub(pr284_routes())
+        event = {"issue": {"number": 284, "pull_request": {}}}
+        self.assertEqual(gate.run_plan(gh, cfg, "issue_comment", event), [])
+        d = gate.evaluate(gh, cfg, 284)
+        self.assertEqual((d.action, d.reasons), ("skip", [PR284_SKIP_REASON]))
+        self.assertEqual(gh.writes(), [])
+
+    def test_pr284_after_the_repair_merges_pinned_to_its_head(self):
+        reader = FakeGitHub(pr284_routes())
+        merger = FakeGitHub({}, put_result={"sha": "c" * 40, "merged": True})
+        ready = gate.run_plan(reader, workflow_config("plan"), "pull_request_target", LABELED_284)
+        self.assertEqual(ready, [284])
+        self.assertEqual(gate.run_merge(reader, merger, workflow_config("merge"), ready), ["c" * 40])
+        self.assertEqual(merger.calls, [
+            ("PUT", f"/repos/{REPO}/pulls/284/merge", {"merge_method": "squash", "sha": PR284_HEAD}),
+        ])
+        # The label route never treats the author as Factory, so it does not touch job #282.
+        self.assertEqual(reader.writes(), [])
+        self.assertIsNone(gate.evaluate(reader, workflow_config("merge"), 284).issue)
+
+    def test_a_label_set_on_plan_alone_never_merges(self):
+        reader = FakeGitHub(pr284_routes())
+        merger = FakeGitHub({}, put_result={"sha": "c" * 40})
+        self.assertEqual(gate.run_plan(reader, workflow_config("plan"), "pull_request_target", LABELED_284), [284])
+        unlabelled_merge = workflow_config("merge", drop=("GATE_MERGE_LABEL",))
+        self.assertEqual(gate.run_merge(reader, merger, unlabelled_merge, [284]), [])
+        self.assertEqual(merger.calls, [])
+
+    def test_pr284_without_the_label_is_still_left_alone(self):
+        gh = FakeGitHub(pr284_routes(labels=()))
+        d = gate.evaluate(gh, workflow_config("plan"), 284)
+        self.assertEqual(d.action, "skip")
+        self.assertEqual(d.reasons, [f"{PR284_SKIP_REASON}, and it does not carry the auto-merge label"])
+
+    def test_the_label_route_keeps_every_refusal(self):
+        cfg = workflow_config("plan")
+        sha = PR284_HEAD[:7]
+
+        def draft(r):
+            r[f"/repos/{REPO}/pulls/284"]["draft"] = True
+
+        def foreign_base(r):
+            r[f"/repos/{REPO}/pulls/284"]["base"]["ref"] = "release"
+
+        def no_checks(r):
+            r[f"/repos/{REPO}/commits/{PR284_HEAD}/check-runs"] = [{"name": "auto-merge-gate", "status": "in_progress"}]
+
+        def stale_review(r):
+            r[f"/repos/{REPO}/issues/284/comments"] = [codex_comment(sha=OLD)]
+
+        def finding(severity):
+            def apply(r):
+                r[f"/repos/{REPO}/issues/284/comments"] = [codex_comment(sha=PR284_HEAD, unresolved=True)]
+                r[f"/repos/{REPO}/pulls/284/comments"] = [finding_comment(5, severity, PR284_HEAD, title="Guard the head")]
+            return apply
+
+        cases = [
+            ("draft", draft, "skip", "draft"),
+            ("foreign base", foreign_base, "skip", "base is not main"),
+            ("no checks", no_checks, "refuse", "No checks have reported on the head commit yet."),
+            ("stale review", stale_review, "refuse", f"Codex has not reviewed head {sha} yet"),
+            ("P0", finding("P0"), "refuse", f"Codex P0 code finding \"Guard the head\""),
+            ("P1", finding("P1"), "refuse", f"Codex P1 code finding \"Guard the head\""),
+        ]
+        for name, change, action, fragment in cases:
+            with self.subTest(name):
+                routes = pr284_routes()
+                change(routes)
+                reader = FakeGitHub(routes)
+                merger = FakeGitHub({}, put_result={"sha": "c" * 40})
+                self.assertEqual(gate.run_plan(reader, cfg, "pull_request_target", LABELED_284), [])
+                self.assertEqual(gate.run_merge(reader, merger, workflow_config("merge"), [284]), [])
+                self.assertEqual(merger.calls, [])
+                d = gate.evaluate(reader, cfg, 284)
+                self.assertEqual(d.action, action)
+                self.assertTrue(any(fragment in r for r in d.reasons), d.reasons)
+
+    def test_the_label_route_keeps_the_release_file_rule(self):
+        routes = pr284_routes(release_routes([(MANIFEST, "modified")], {MANIFEST: manifest()}, {MANIFEST: manifest("0.6.8")}))
+        reader = FakeGitHub(routes)
+        merger = FakeGitHub({}, put_result={"sha": "c" * 40})
+        self.assertEqual(gate.run_plan(reader, workflow_config("plan"), "pull_request_target", LABELED_284), [])
+        self.assertEqual(gate.run_merge(reader, merger, workflow_config("merge"), [284]), [])
+        self.assertEqual(merger.calls, [])
+        d = gate.evaluate(reader, workflow_config("plan"), 284)
+        self.assertIn(f"`{MANIFEST}` changes the brand-voice version from 0.6.7 to 0.6.8. {gate.RELEASE_HINT}", d.reasons)
+
+    def test_a_push_after_plan_stops_the_merge(self):
+        routes = pr284_routes()
+        reader = FakeGitHub(routes)
+        self.assertEqual(gate.run_plan(reader, workflow_config("plan"), "pull_request_target", LABELED_284), [284])
+        moved = "d" * 40
+        reader.routes[f"/repos/{REPO}/pulls/284"]["head"]["sha"] = moved
+        reader.routes[f"/repos/{REPO}/commits/{moved}/check-runs"] = routes[f"/repos/{REPO}/commits/{PR284_HEAD}/check-runs"]
+        reader.routes[f"/repos/{REPO}/commits/{moved}/status"] = routes[f"/repos/{REPO}/commits/{PR284_HEAD}/status"]
+        merger = FakeGitHub({}, put_result={"sha": "c" * 40})
+        self.assertEqual(gate.run_merge(reader, merger, workflow_config("merge"), [284]), [])
+        self.assertEqual(merger.calls, [])
+        refusal = reader.writes()[0]
+        self.assertEqual(refusal[:2], ("POST", f"/repos/{REPO}/issues/284/comments"))
+        self.assertIn(f"Codex has not reviewed head {moved[:7]} yet", refusal[2]["body"])
+
+    def test_github_rejects_a_merge_whose_head_moved_mid_run(self):
+        reader = FakeGitHub(pr284_routes())
+        merger = FakeGitHub({}, put_error=gate.GitHubError(409, "Head branch was modified. Review and try the merge again."))
+        self.assertEqual(gate.run_merge(reader, merger, workflow_config("merge"), [284]), [])
+        self.assertEqual(merger.calls, [
+            ("PUT", f"/repos/{REPO}/pulls/284/merge", {"merge_method": "squash", "sha": PR284_HEAD}),
+        ])
+        writes = reader.writes()
+        self.assertEqual(len(writes), 1)
+        self.assertIn("Head branch was modified", writes[0][2]["body"])
+
+    def test_ember_stays_excluded_with_the_workflow_label(self):
+        cfg = gate.Config(repo="ExpertPartners/ember", merge_label=workflow_config("plan").merge_label)
+        reader = FakeGitHub(pr284_routes())
+        merger = FakeGitHub({}, put_result={"sha": "c" * 40})
+        self.assertEqual(gate.run_plan(reader, cfg, "pull_request_target", LABELED_284), [])
+        self.assertEqual(gate.run_merge(reader, merger, cfg, [284]), [])
+        self.assertEqual((reader.calls, merger.calls), ([], []))
+
+
 if __name__ == "__main__":
     unittest.main()

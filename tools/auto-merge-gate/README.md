@@ -5,12 +5,12 @@ Merges a finished Chat to Code job on its own once Factory's checks and Codex's 
 | File | What it does |
 |---|---|
 | `gate.py` | The gate. `plan` evaluates pull requests and comments refusals. `merge` re-checks and squash-merges. Python standard library only. |
-| `tests/test_gate.py` | Unit tests for every refuse case and the merge case, including the P0 and P1 threshold replayed on pull request #214. All GitHub calls are mocked. |
+| `tests/test_gate.py` | Unit tests for every refuse case and the merge case, including the P0 and P1 threshold replayed on pull request #214, and the merge label wiring in the workflow replayed on pull request #284. All GitHub calls are mocked. |
 | `../../.github/workflows/auto-merge-gate.yml` | Runs the gate. |
 
 ## When it runs
 
-On `pull_request_target` (opened, synchronize, ready_for_review), `pull_request_review` (submitted), `issue_comment` (created, edited, pull requests only), `check_suite` (completed), every 15 minutes, and by hand through workflow_dispatch with an optional pull request number. A pull request event checks that pull request. The schedule, `check_suite` and a dispatch with no number check every open pull request.
+On `pull_request_target` (opened, synchronize, ready_for_review, and labeled with the merge label only), `pull_request_review` (submitted), `issue_comment` (created, edited, pull requests only), `check_suite` (completed), every 15 minutes, and by hand through workflow_dispatch with an optional pull request number. A pull request event checks that pull request. The schedule, `check_suite` and a dispatch with no number check every open pull request.
 
 GitHub does not send `check_suite` events for suites that GitHub Actions created, so most check results are picked up by the next 15 minute run. Codex editing its review summary comment starts a run straight away.
 
@@ -19,8 +19,15 @@ GitHub does not send `check_suite` events for suites that GitHub Actions created
 All of these, or the pull request is left alone with no comment:
 
 - open, not a draft, and based on main
-- opened by `factory-droid[bot]`
-- the body starts with `Closes #N`, and issue N is an issue (not a pull request) carrying the label `job`
+- either a Factory job pull request or one carrying the merge label (below)
+
+A Factory job pull request is opened by `factory-droid[bot]`, and its body starts with `Closes #N`, where issue N is an issue (not a pull request) carrying the label `job`.
+
+### The merge label
+
+Some finished work is not opened by Factory. A Codex continuation of a job, for example, is pushed as a person. Adding the label `auto-merge` enrolls such a pull request. The workflow sets `GATE_MERGE_LABEL: auto-merge` on both the plan step and the merge step. Both need the same value: the merge step evaluates every pull request again, and without the label it would leave a labelled pull request alone. The label only decides which pull requests the gate considers. A labelled pull request must pass every condition below, like any other. The author is never treated as Factory, and the gate never adds or removes the label.
+
+Adding the label starts a run straight away (`pull_request_target`, labeled). Adding any other label does not. The gate does not label a job issue `done` for a pull request it merged through the label route, because that route does not read a job issue. GitHub still closes the issue through `Closes #N`.
 
 ## When it merges
 
@@ -54,6 +61,7 @@ It posts one comment per head commit on the pull request, listing every conditio
 
 - Pull request code never runs in the gate. Every event checks out `tools/auto-merge-gate` from main, and the merge credential is minted only after `plan` finds a pull request that passes. The token carries Contents write and nothing more.
 - One gap is GitHub's, not the gate's: for `pull_request_review` and for a dispatch from another branch, GitHub runs the workflow file from that branch. A branch that edits `auto-merge-gate.yml` changes what those runs do, and any branch can already add a workflow that reads repository secrets. Restricting `SKILLS_GRAPH_APP_PRIVATE_KEY` to an environment that only main can use would close this. That is a repository setting, so it is left to Allison.
+- Only people and apps with triage or write access can add a label, so the merge label is an explicit enrollment, not an author bypass. A `labeled` event runs the workflow file from main, like every other `pull_request_target` event.
 - The gate changes no ruleset or repository setting.
 
 ## Tests
