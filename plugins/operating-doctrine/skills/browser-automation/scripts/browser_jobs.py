@@ -303,7 +303,7 @@ class Route:
         elif action in ("select", "close"):
             body += "const target=" + ("s.task" if index is None and action == "close" else "all[" + json.dumps(index) + "]") + ";if(!target||target===s.connector||!s.created.has(target)||target.isClosed())return {error:'Owned tab index not found or protected connector'};"
             if action == "close":
-                body += "await target.close();tabs=tabs.filter(p=>p!==target);if(s.task===target)s.task=tabs[0]||null;"
+                body += "await s.closePage(target);tabs=tabs.filter(p=>p!==target);if(s.task===target)s.task=tabs[0]||null;"
             else:
                 body += "s.task=target;"
         elif action != "list":
@@ -353,8 +353,8 @@ class Route:
             outcome = code(client, STATE_JS + "return await s.connector.evaluate(async({old,clientName,connectorOrigin})=>{"
                            "const incomplete=tabs=>{const descendants=new Set(old.tabIds);let changed;do{changed=false;for(const t of tabs)if(descendants.has(t.openerTabId)&&!descendants.has(t.id)){descendants.add(t.id);changed=true;}}while(changed);return tabs.some(t=>(t.windowId===old.windowId||descendants.has(t.id))&&!old.tabIds.includes(t.id));};"
                            "if(incomplete(await chrome.tabs.query({})))throw Error('uncheckpointed_page_arrival');"
-                           "const live=[];for(const id of old.tabIds){try{live.push(await chrome.tabs.get(id));}catch{}}"
-                           "if(!live.length)return {closed:true,alreadyGone:true};"
+                           "const before=await chrome.tabs.query({});"
+                           "const live=[];for(const id of old.tabIds){try{live.push(await chrome.tabs.get(id));}catch{throw Error('saved_owned_tab_missing');}}"
                            # The extension intentionally ungroups its tabs after
                            # disconnect. Anchor the ungrouped case to the saved
                            # connector's exact client identity and browser epoch.
@@ -365,7 +365,8 @@ class Route:
                            "for(const t of live){if(t.windowId!==old.windowId||(t.groupId!==old.groupId&&t.groupId!==-1)||targets.some(x=>x.tabId===t.id&&x.attached)||status.connections.some(c=>c.connectedTabIds.includes(t.id)))throw Error('ownership_changed');"
                            "if(t.groupId!==-1){const g=await chrome.tabGroups.get(t.groupId);if(g.title!==old.groupTitle)throw Error('group_identity_changed');}}"
                            "await chrome.tabs.remove(live.map(t=>t.id));"
-                           "const after=await chrome.tabs.query({});if(after.some(t=>old.tabIds.includes(t.id))||incomplete(after))throw Error('owned_cleanup_inventory_uncertain');"
+                           "const beforeIds=new Set(before.map(t=>t.id));"
+                           "const after=await chrome.tabs.query({});if(after.some(t=>old.tabIds.includes(t.id)||!beforeIds.has(t.id))||incomplete(after))throw Error('owned_cleanup_inventory_uncertain');"
                            "return {closed:true,count:live.length};}," + json.dumps({"old": old, "clientName": job["client_name"], "connectorOrigin": EXTENSION}) + ");")
             if outcome.get("closed") is not True:
                 raise Refusal("failed_cleanup_uncertain")

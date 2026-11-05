@@ -66,10 +66,10 @@ connection claims. A moved, claimed or ambiguous page is refused. Cleanup never
 chooses tabs by color, title, active focus or a guessed blank URL.
 
 Creation provenance is separate from group membership. The private MCP process
-retains an exact set of Pages it created. New Pages receive a unique nonce
-fragment on a blank page before business navigation; that exact marker binds the
-returned Page to its Chrome tab ID. Later cleanup uses the ID or retained Page,
-not the URL. An opener-owned popup is accepted only through the retained parent,
+retains an exact set of Pages it created. Chrome's tab-creation API receives the
+explicit owned window and returns the new tab's birth ID. A unique nonce fragment
+on the blank page binds the SDK Page to that ID before business navigation. Later
+cleanup uses proven IDs and retained Pages, not the URL. An opener-owned popup is accepted only through the retained parent,
 and its ID is bound using Chrome's matching opener metadata in the original
 window and group. Separate-window or ambiguous popups require reconciliation;
 this route does not claim arbitrary OAuth popup support. Unknown arrivals
@@ -81,6 +81,12 @@ Disconnected cleanup also checks for unrecorded arrivals in the isolated window
 and opener descendants across all windows, before and after closing saved IDs.
 Live cleanup checks for late descendants after closing the parent pages. If the
 inventory changed, cleanup stays incomplete and preserves unknown tabs.
+Chrome removes opener metadata when the opener disappears, so closure also checks
+all-window tab-ID deltas and refuses missing saved IDs. Close auxiliary pages with
+`browser_tabs` and finish with `browser_job_finish`; a raw Page close that bypasses
+the inventory checkpoint cannot be certified as clean. A concurrent unrelated
+tab birth during closure can conservatively leave cleanup uncertain, while that
+other tab remains untouched.
 
 Each route checks the existing profile before starting its protected launcher.
 It passes the window adapter as `--executable-path`; the launcher still owns the

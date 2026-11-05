@@ -148,7 +148,9 @@ function page(id, opener = null) {
   return p;
 }
 const context = {pages:()=>pages.filter(p=>!p.closed),newPage:async()=>page(10)};
-global.chrome = {tabs:{getCurrent:async()=>tabs.get(current.id),get:async(id)=>{
+global.chrome = {tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=args.url;return t;},
+  group:async({tabIds,groupId})=>{for(const id of tabIds)tabs.get(id).groupId=groupId;},
+  getCurrent:async()=>tabs.get(current.id),get:async(id)=>{
   if(!tabs.has(id))throw Error('missing');return tabs.get(id);},
   query:async(q)=>[...tabs.values()].filter(t=>(q.windowId===undefined||t.windowId===q.windowId)&&(q.groupId===undefined||t.groupId===q.groupId)),
   remove:async(ids)=>{for(const id of ids){tabs.delete(id);for(const p of pages)if(p.id===id)p.closed=true;}}},
@@ -188,7 +190,7 @@ const assert = require('node:assert/strict');
 const a={closed:false,isClosed:()=>false,close:async()=>{a.closed=true;},url:()=>'',title:async()=>''};
 const b={closed:false,isClosed:()=>false,close:async()=>{b.closed=true;},url:()=>'',title:async()=>''};
 const connector={context:()=>({pages:()=>[connector,...(a.closed?[]:[a]),b]})};
-process.__epBrowserJob={connector,task:a,created:new Set([connector,a,b])};
+process.__epBrowserJob={connector,task:a,created:new Set([connector,a,b]),closePage:async(p)=>await p.close()};
 '''
         script = fixture + "(async()=>{" + captured[0] + "})().then(()=>{assert.equal(a.closed,true);assert.equal(b.closed,false);}).catch(e=>{console.error(e);process.exitCode=1;});"
         checked = subprocess.run(["node", "-e", script], capture_output=True, text=True, timeout=10)
@@ -209,13 +211,15 @@ function page(id){
   pages.push(p);return p;
 }
 const context={pages:()=>pages.filter(p=>!p.closed),newPage:async()=>page(10)};
-global.chrome={tabs:{getCurrent:async()=>tabs.get(current.id),get:async(id)=>{
+global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=args.url;return t;},
+  group:async({tabIds,groupId})=>{for(const id of tabIds)tabs.get(id).groupId=groupId;},
+  getCurrent:async()=>tabs.get(current.id),get:async(id)=>{
   if(!tabs.has(id))throw Error('missing');return tabs.get(id);},
   query:async(q)=>[...tabs.values()].filter(t=>(q.windowId===undefined||t.windowId===q.windowId)&&(q.groupId===undefined||t.groupId===q.groupId)),
-  remove:async(ids)=>{for(const id of ids)tabs.delete(id);}},tabGroups:{get:async()=>({title:'fixture'})}};
+  remove:async(ids)=>{for(const id of ids){tabs.delete(id);if(id===10)tabs.set(11,{id:11,windowId:6,groupId:-1});}}},tabGroups:{get:async()=>({title:'fixture'})}};
 (async()=>{
   const s=await newOwnedState(page(1));s.task=await s.create();
-  await assert.rejects(()=>s.closeCreated(),/late_owned_popup_cleanup_uncertain/);
+  await assert.rejects(()=>s.closeCreated(),/owned_page_close_inventory_uncertain/);
   assert.equal(tabs.has(11),true); // Never silently adopt or delete the late popup.
 })().catch(e=>{console.error(e);process.exitCode=1;});
 '''
@@ -256,11 +260,15 @@ global.chrome={tabs:{getCurrent:async()=>tabs.get(current.id),get:async(id)=>{
 const assert=require('node:assert/strict');
 let unknownWindow=5;
 let parentGone=false;
+let popupLive=true;
 let removed=[];
 global.chrome={tabs:{query:async()=>[
   ...(parentGone?[]:[{id:1,windowId:5,groupId:-1},{id:10,windowId:5,groupId:-1}]),
-  {id:11,openerTabId:10,windowId:unknownWindow,groupId:-1}],
-  remove:async(ids)=>{removed.push(...ids);}}};
+  ...(popupLive?[{id:11,...(parentGone?{}:{openerTabId:10}),windowId:unknownWindow,groupId:-1}]:[])],
+  get:async(id)=>{if(parentGone)throw Error('missing');return {id,windowId:5,groupId:-1,
+    url:'chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/connect.html?client='+encodeURIComponent(JSON.stringify({name:'fixture'}))};},
+  remove:async(ids)=>{removed.push(...ids);parentGone=true;popupLive=true;}},
+  debugger:{getTargets:async()=>[]},runtime:{sendMessage:async()=>({connections:[]})}};
 process.__epBrowserJob={connector:{evaluate:async(fn,arg)=>await fn(arg)}};
 '''
             body = captured[0]
@@ -269,9 +277,14 @@ process.__epBrowserJob={connector:{evaluate:async(fn,arg)=>await fn(arg)}};
             script = fixture + "async function attempt(){" + body + "}\n" + r'''
 (async()=>{for(const w of [5,6])for(const gone of [false,true]){
   unknownWindow=w;parentGone=gone;removed=[];
-  await assert.rejects(()=>attempt(),/uncheckpointed_page_arrival/);
+  await assert.rejects(()=>attempt(),/uncheckpointed_page_arrival|saved_owned_tab_missing/);
   assert.deepEqual(removed,[]);
-}})().catch(e=>{console.error(e);process.exitCode=1;});
+}
+  unknownWindow=6;parentGone=false;popupLive=false;removed=[];
+  await assert.rejects(()=>attempt(),/owned_cleanup_inventory_uncertain/);
+  assert.deepEqual(removed,[1,10]);
+  assert.equal(popupLive,true); // Late popup is preserved and completion refused.
+})().catch(e=>{console.error(e);process.exitCode=1;});
 '''
             checked = subprocess.run(["node", "-e", script], capture_output=True, text=True, timeout=10)
             self.assertEqual(checked.returncode, 0, checked.stderr)
