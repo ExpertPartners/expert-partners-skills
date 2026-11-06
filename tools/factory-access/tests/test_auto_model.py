@@ -34,6 +34,14 @@ class AutoModelTests(unittest.TestCase):
         self.assertEqual(MODULE.auto_arguments(["exec", "--model=opus", "-mgpt", "-rhigh"]),
                          ["exec", "-m", "auto", "--model", "auto", "-m", "auto", "-r", "none"])
 
+    def test_runtime_settings_before_command_do_not_bypass_auto(self):
+        for prefix in (["--settings", "/runtime.json"], ["--settings=/runtime.json"],
+                       ["--cwd", "/path with spaces", "--use-spec"]):
+            with self.subTest(prefix=prefix):
+                self.assertEqual(
+                    MODULE.auto_arguments(prefix + ["exec", "-m", "gpt"]),
+                    prefix + ["exec", "-m", "auto", "-m", "auto"])
+
     def test_spec_and_mission_pins_are_replaced(self):
         for flag, value in MODULE.AUTO_OPTIONS.items():
             with self.subTest(flag=flag):

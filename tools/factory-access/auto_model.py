@@ -27,14 +27,27 @@ AUTO_OPTIONS = {
     "--worker-reasoning-effort": "none", "--validator-model": "auto",
     "--validator-reasoning-effort": "none",
 }
+GLOBAL_VALUE_OPTIONS = {
+    "--settings", "--cwd", "--auto", "--append-system-prompt",
+    "--append-system-prompt-file", "--worktree-dir",
+}
 
 
 def auto_arguments(arguments):
     """Replace incoming pins, preserving option values, prompts and resumes."""
-    if not arguments or arguments[0] != "exec":
+    command = 0
+    while command < len(arguments) and arguments[command] != "exec":
+        name, equals, _ = arguments[command].partition("=")
+        if name in GLOBAL_VALUE_OPTIONS:
+            command += 1 if equals else 2
+        elif name in {"--use-spec", "--disable-builtin-skills"}:
+            command += 1
+        else:
+            return arguments
+    if command >= len(arguments):
         return arguments
-    result = ["exec", "-m", "auto"]
-    index = 1
+    result = arguments[:command] + ["exec", "-m", "auto"]
+    index = command + 1
     while index < len(arguments):
         token = arguments[index]
         if token == "--":
