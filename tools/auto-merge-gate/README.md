@@ -5,12 +5,12 @@ Merges a finished Chat to Code job on its own once Factory's checks and Codex's 
 | File | What it does |
 |---|---|
 | `gate.py` | The gate. `plan` evaluates pull requests and comments refusals. `merge` re-checks and squash-merges. Python standard library only. |
-| `tests/test_gate.py` | Unit tests for every refuse case and the merge case, including the P0 and P1 threshold replayed on pull request #214. All GitHub calls are mocked. |
+| `tests/test_gate.py` | Unit tests for every refuse case and the merge case, including the P0 and P1 threshold replayed on pull request #214, the merge label wiring in the workflow replayed on pull request #284, and the enrollment actor and head rules for the label. All GitHub calls are mocked. |
 | `../../.github/workflows/auto-merge-gate.yml` | Runs the gate. |
 
 ## When it runs
 
-On `pull_request_target` (opened, synchronize, ready_for_review), `pull_request_review` (submitted), `issue_comment` (created, edited, pull requests only), `check_suite` (completed), every 15 minutes, and by hand through workflow_dispatch with an optional pull request number. A pull request event checks that pull request. The schedule, `check_suite` and a dispatch with no number check every open pull request.
+On `pull_request_target` (opened, synchronize, ready_for_review, and labeled with the merge label only), `pull_request_review` (submitted), `issue_comment` (created, edited, pull requests only), `check_suite` (completed), every 15 minutes, and by hand through workflow_dispatch with an optional pull request number. A pull request event checks that pull request. The schedule, `check_suite` and a dispatch with no number check every open pull request.
 
 GitHub does not send `check_suite` events for suites that GitHub Actions created, so most check results are picked up by the next 15 minute run. Codex editing its review summary comment starts a run straight away.
 
@@ -19,8 +19,24 @@ GitHub does not send `check_suite` events for suites that GitHub Actions created
 All of these, or the pull request is left alone with no comment:
 
 - open, not a draft, and based on main
-- opened by `factory-droid[bot]`
-- the body starts with `Closes #N`, and issue N is an issue (not a pull request) carrying the label `job`
+- either a Factory job pull request or one carrying the merge label (below)
+
+A Factory job pull request is opened by `factory-droid[bot]`, and its body starts with `Closes #N`, where issue N is an issue (not a pull request) carrying the label `job`.
+
+### The merge label
+
+Some finished work is not opened by Factory. A Codex continuation of a job, for example, is pushed as a person. An enrollment actor adding the label `auto-merge` enrolls such a pull request. The workflow sets `GATE_MERGE_LABEL: auto-merge` and `GATE_MERGE_LABEL_ACTORS: AllisonGaddy` on both the plan step and the merge step. Both need the same values: the merge step evaluates every pull request again, and without them it would leave a labelled pull request alone.
+
+Anyone with triage access, person or app, can add a label, and a label stays on through later pushes. So the label alone is not enough. The gate reads the pull request's issue events and the repository's push activity, and the label enrolls the pull request only when all of these hold:
+
+- The latest `labeled` event for the label is by a login in `GATE_MERGE_LABEL_ACTORS` (compared without case). Any other actor, an empty list, or no `labeled` event at all leaves the pull request alone with no comment.
+- The head branch is in this repository, so the gate can see its pushes. A fork head is refused.
+- The newest push to the head branch in the repository activity (`GET /repos/{repo}/activity`, GitHub's own push record) made the current head the tip, and the label was added after that push, by at least one second. A commit's dates are set by whoever made it, so the gate never uses them. If someone pushes after the label was added, the gate refuses the new head and says so: an enrollment actor removes the label and adds it again to enroll that head. If the activity does not show the head's push yet, the gate waits.
+- The author is a person or Factory. A pull request opened by any other app, such as a Dependabot update, is left alone, because a person merges those (`tools/dependency-policy/README.md`).
+
+If the events or the activity cannot be read, the run fails and nothing merges. The label only decides which pull requests the gate considers. An enrolled pull request must pass every condition below, like any other. The author is never treated as Factory, and the gate never adds or removes the label. A Factory job pull request goes through the job route and does not need the label.
+
+Adding the label starts a run straight away (`pull_request_target`, labeled). Adding any other label does not: that run gets its own concurrency group, so it never replaces a gate run waiting in the shared one, and its job is skipped. The gate does not label a job issue `done` for a pull request it merged through the label route, because that route does not read a job issue. GitHub still closes the issue through `Closes #N`.
 
 ## When it merges
 
@@ -54,6 +70,7 @@ It posts one comment per head commit on the pull request, listing every conditio
 
 - Pull request code never runs in the gate. Every event checks out `tools/auto-merge-gate` from main, and the merge credential is minted only after `plan` finds a pull request that passes. The token carries Contents write and nothing more.
 - One gap is GitHub's, not the gate's: for `pull_request_review` and for a dispatch from another branch, GitHub runs the workflow file from that branch. A branch that edits `auto-merge-gate.yml` changes what those runs do, and any branch can already add a workflow that reads repository secrets. Restricting `SKILLS_GRAPH_APP_PRIVATE_KEY` to an environment that only main can use would close this. That is a repository setting, so it is left to Allison.
+- The merge label is not an author bypass. Triage access lets a person or app add a label but not merge, so the gate trusts only a `labeled` event by a listed enrollment actor, and only for the head pushed before it. Changing the list means changing `auto-merge-gate.yml` on main, which CODEOWNERS covers. A `labeled` event runs the workflow file from main, like every other `pull_request_target` event.
 - The gate changes no ruleset or repository setting.
 
 ## Tests

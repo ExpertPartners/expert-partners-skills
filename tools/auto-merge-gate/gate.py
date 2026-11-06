@@ -7,6 +7,9 @@ A pull request is eligible when either
     Closes #N where #N is an issue labeled job), or
   - GATE_MERGE_LABEL is set and the pull request carries that label. Repos whose
     builders push as a person (Factory missions, Claude Code) mark finished work this way.
+    The label counts only when its latest labeled event is by a login listed in
+    GATE_MERGE_LABEL_ACTORS and came after the push that made the current head the
+    branch tip. Pull requests opened by an app other than Factory are never enrolled this way.
 Either way it merges only when every check on the head commit passed, the pull request
 leaves plugin versions and the top of every CHANGELOG.md to the release step
 (tools/release, fed by notes in .changeset/) and every note it adds is one that step can
@@ -40,6 +43,7 @@ import urllib.parse
 import urllib.request
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Any, Protocol
 
 FACTORY_LOGIN = "factory-droid[bot]"
@@ -192,6 +196,8 @@ class Config:
     base_branch: str = "main"
     server_url: str = "https://github.com"
     merge_label: str = ""
+    # Logins whose labeled event enrolls a pull request. Empty means none does.
+    merge_label_actors: frozenset[str] = frozenset()
 
 
 @dataclass
@@ -644,6 +650,58 @@ def release_file_change(gh: GitHubAPI, cfg: Config, f: JSONDict, head: str, merg
     ]
 
 
+def parse_time(value: str) -> datetime:
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
+def label_enrollment(gh: GitHubAPI, cfg: Config, number: int, pr: JSONDict) -> tuple[str, str] | None:
+    """None when the merge label enrolls this head, else ("skip" or "refuse", why).
+
+    Any user or app with triage access can add a label, and a label stays on through
+    later pushes. So the label counts only when its latest labeled event is by an
+    enrollment actor and came after the push that made the current head the tip."""
+    label = cfg.merge_label
+    author = (pr.get("user") or {}).get("login") or ""
+    if author.endswith("[bot]") and author != FACTORY_LOGIN:
+        # Dependency updates and other app pull requests are merged by a person
+        # (tools/dependency-policy/README.md), never through the label.
+        return "skip", f"author is the app {author}, and the {label} label enrolls only work pushed by a person or Factory"
+    events = gh.paginate(f"/repos/{cfg.repo}/issues/{number}/events")
+    last = next(
+        (e for e in reversed(events)
+         if e.get("event") in ("labeled", "unlabeled") and (e.get("label") or {}).get("name") == label),
+        None,
+    )
+    if last is None or last.get("event") != "labeled":
+        return "skip", f"no labeled event for the {label} label was found"
+    actor = (last.get("actor") or {}).get("login") or "an unknown actor"
+    if actor.casefold() not in {a.casefold() for a in cfg.merge_label_actors}:
+        return "skip", f"the {label} label was added by {actor}, who is not an enrollment actor (GATE_MERGE_LABEL_ACTORS)"
+    head = pr.get("head") or {}
+    sha, ref = head.get("sha", ""), head.get("ref", "")
+    head_repo = (head.get("repo") or {}).get("full_name")
+    if head_repo != cfg.repo:
+        return "refuse", (
+            f"The {label} label enrolls only branches in {cfg.repo}, where the gate can see each push, "
+            f"and this head is in {head_repo or 'a deleted repository'}."
+        )
+    # Repository activity is GitHub's own push record, newest first. A commit's dates
+    # are set by whoever made it, so they cannot say when it became the head.
+    activity = gh.get(
+        f"/repos/{cfg.repo}/activity", {"ref": f"refs/heads/{ref}", "direction": "desc", "per_page": 1}
+    ) or []
+    latest = activity[0] if activity else {}
+    if latest.get("after") != sha:
+        return "refuse", f"The gate cannot see the push that made {sha[:7]} the head of `{ref}` yet."
+    labelled_at, pushed_at = last.get("created_at") or "", latest.get("timestamp") or ""
+    if not labelled_at or not pushed_at or parse_time(labelled_at) <= parse_time(pushed_at):
+        return "refuse", (
+            f"{actor} added the {label} label at {labelled_at or 'an unknown time'}, before head {sha[:7]} "
+            f"was pushed at {pushed_at or 'an unknown time'}. Remove the label and add it again to enroll this head."
+        )
+    return None
+
+
 def evaluate(gh: GitHubAPI, cfg: Config, number: int) -> Decision:
     pr = gh.get(f"/repos/{cfg.repo}/pulls/{number}")
 
@@ -688,9 +746,16 @@ def evaluate(gh: GitHubAPI, cfg: Config, number: int) -> Decision:
             why += f", and it does not carry the {cfg.merge_label} label"
         return skip(why)
 
+    reasons: list[str] = []
+    if issue_number is None:
+        enrollment = label_enrollment(gh, cfg, number, pr)
+        if enrollment and enrollment[0] == "skip":
+            return skip(enrollment[1])
+        if enrollment:
+            reasons.append(enrollment[1])
     sha = (pr.get("head") or {}).get("sha", "")
     comments = gh.paginate(f"/repos/{cfg.repo}/issues/{number}/comments")
-    reasons = check_problems(gh, cfg, sha)
+    reasons += check_problems(gh, cfg, sha)
     reasons += release_file_problems(gh, cfg, number, pr)
     reasons += codex_problems(
         latest_codex_state(comments), sha,
@@ -840,6 +905,7 @@ def config_from_env() -> Config:
         base_branch=os.environ.get("GATE_BASE_BRANCH", "main"),
         server_url=os.environ.get("GITHUB_SERVER_URL", "https://github.com"),
         merge_label=os.environ.get("GATE_MERGE_LABEL", ""),
+        merge_label_actors=frozenset(re.split(r"[\s,]+", os.environ.get("GATE_MERGE_LABEL_ACTORS", ""))) - {""},
     )
 
 

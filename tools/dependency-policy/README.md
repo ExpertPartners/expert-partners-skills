@@ -191,8 +191,10 @@ Activation limits:
   this file does not read or change. If they turn version updates off, turning them on
   is a settings change for Allison and is not made here.
 - Update pull requests are never merged automatically. The auto-merge gate considers only
-  Factory job pull requests (`factory-droid[bot]`, body starting `Closes #N`), and no
-  workflow merges or approves Dependabot pull requests. A person reviews and merges each.
+  Factory job pull requests (`factory-droid[bot]`, body starting `Closes #N`) and
+  pull requests by a person carrying its merge label, never one opened by another app,
+  and no workflow merges or approves Dependabot pull requests. A person reviews and
+  merges each.
 - Dependabot adds its default labels (`dependencies` and an ecosystem label) and creates
   them in the repository if they are missing.
 - There are no `.in` files, so Dependabot edits a lock's pins and hashes in place and does

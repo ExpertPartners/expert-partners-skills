@@ -10,11 +10,21 @@
 # only after the plan step finds a pull request that passes, carries Contents write and
 # nothing else, and is used for the squash merge alone. Its push to main starts
 # skills-graph.yml and the marketplace webhook like any other merge.
+#
+# GATE_MERGE_LABEL enrolls a pull request that is not Factory's, such as a Codex
+# continuation pushed as a person, when an enrollment actor adds the auto-merge label.
+# Only a login in GATE_MERGE_LABEL_ACTORS enrolls, because anyone with triage access can
+# add a label, and only for the head pushed before the label was added, because a label
+# stays on through later pushes. It changes which pull requests the gate considers, never
+# what they must pass. Plan and merge must carry the same label and actors, or merge
+# re-evaluates a labelled pull request as not eligible and leaves it alone. The job if and
+# the concurrency group repeat the label because env is not readable there.
 name: auto-merge-gate
 
 on:
   pull_request_target:
-    types: [opened, synchronize, ready_for_review]
+    # labeled lets adding the merge label (GATE_MERGE_LABEL below) start a run at once.
+    types: [opened, synchronize, ready_for_review, labeled]
   pull_request_review:
     types: [submitted]
   issue_comment:
@@ -38,8 +48,13 @@ permissions:
 
 # One gate at a time, so two runs never race to merge or comment on the same pull request.
 # A run that is replaced while waiting loses nothing: the next run sweeps again.
+# A run for any other label is skipped by the job if below, so it gets a group of its own
+# and never replaces a run waiting in the shared one.
 concurrency:
-  group: auto-merge-gate
+  group: >-
+    ${{ github.event_name == 'pull_request_target' && github.event.action == 'labeled' &&
+    github.event.label.name != 'auto-merge' && format('auto-merge-gate-other-label-{0}', github.run_id) ||
+    'auto-merge-gate' }}
   cancel-in-progress: false
 
 jobs:
@@ -48,7 +63,8 @@ jobs:
     name: auto-merge-gate
     if: >-
       github.repository == 'ExpertPartners/expert-partners-skills' &&
-      (github.event_name != 'issue_comment' || github.event.issue.pull_request)
+      (github.event_name != 'issue_comment' || github.event.issue.pull_request) &&
+      (github.event.action != 'labeled' || github.event.label.name == 'auto-merge')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -65,6 +81,8 @@ jobs:
           GATE_TOKEN: ${{ github.token }}
           GATE_CHECK_NAME: auto-merge-gate
           GATE_BASE_BRANCH: main
+          GATE_MERGE_LABEL: auto-merge
+          GATE_MERGE_LABEL_ACTORS: AllisonGaddy
           GATE_DISPATCH_PR: ${{ inputs.pr }}
         run: |
           set -euo pipefail
@@ -91,5 +109,7 @@ jobs:
           MERGE_TOKEN: ${{ steps.app-token.outputs.token }}
           GATE_CHECK_NAME: auto-merge-gate
           GATE_BASE_BRANCH: main
+          GATE_MERGE_LABEL: auto-merge
+          GATE_MERGE_LABEL_ACTORS: AllisonGaddy
           GATE_MERGE_PRS: ${{ steps.plan.outputs.merge }}
         run: python3 tools/auto-merge-gate/gate.py merge
