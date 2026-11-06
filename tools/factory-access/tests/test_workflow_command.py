@@ -23,25 +23,37 @@ def step_command(name):
 
 
 class WorkflowCommandTests(unittest.TestCase):
-    def invoke(self, enabled):
+    def invoke(self, enabled, model="test-model"):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             executable = root / "droid"
             executable.write_text('#!/bin/bash\nprintf "%s\\n" "$@" > "$ARGUMENT_RECEIPT"\n')
             executable.chmod(0o700)
             environment = dict(os.environ, PATH=directory + os.pathsep + os.environ["PATH"],
-                               ARGUMENT_RECEIPT=str(root / "arguments"), FACTORY_MODEL="test-model",
+                               ARGUMENT_RECEIPT=str(root / "arguments"), FACTORY_MODEL=model,
                                FACTORY_LEDGER_ACCESS_ENABLED=enabled, RUNNER_TEMP=directory)
             subprocess.run(["bash", "-e", "-o", "pipefail", "-c", step_command("Run Factory Droid")], env=environment, check=True)
             return (root / "arguments").read_text().splitlines(), directory
 
     def test_disabled_caller_keeps_original_arguments_without_ledger_credentials(self):
         arguments, directory = self.invoke("false")
-        self.assertEqual(arguments, ["exec", "--auto", "high", "-m", "test-model", "-f", directory + "/factory-automation-prompt.txt"])
+        self.assertEqual(arguments, ["exec", "--auto", "high", "-m", "auto", "-f", directory + "/factory-automation-prompt.txt"])
 
     def test_enabled_caller_explicitly_adds_ledger_tools(self):
         arguments, directory = self.invoke("true")
-        self.assertEqual(arguments, ["exec", "--auto", "high", "--add-tools", "MCP:factory-ledger", "-m", "test-model", "-f", directory + "/factory-automation-prompt.txt"])
+        self.assertEqual(arguments, ["exec", "--auto", "high", "--add-tools", "MCP:factory-ledger", "-m", "auto", "-f", directory + "/factory-automation-prompt.txt"])
+
+    def test_incoming_model_cannot_override_auto(self):
+        for enabled in ("false", "true"):
+            for model in ("claude-opus-5-5", "gpt-6.1-sol", "auto", ""):
+                with self.subTest(enabled=enabled, model=model):
+                    arguments, _ = self.invoke(enabled, model)
+                    self.assertEqual(arguments[arguments.index("-m") + 1], "auto")
+
+    def test_legacy_model_input_is_accepted_but_not_consumed(self):
+        workflow = WORKFLOW.read_text()
+        self.assertIn("      model:\n", workflow)
+        self.assertNotIn("${{ inputs.model }}", workflow)
 
     def test_disabled_caller_droid_environment_does_not_receive_credential(self):
         step = WORKFLOW.read_text().split("      - name: Run Factory Droid\n", 1)[1].split("\n  release:", 1)[0]

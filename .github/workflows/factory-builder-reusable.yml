@@ -38,9 +38,9 @@ name: Factory Builder (reusable)
   workflow_call:
     inputs:
       model:
-        description: Model the Factory droid runs on
+        description: Deprecated compatibility input; Factory always starts in Auto
         type: string
-        default: claude-opus-5-5
+        default: auto
       ledger_access_enabled:
         description: Require authenticated ledger access for this provisioned caller
         type: boolean
@@ -297,10 +297,9 @@ jobs:
           if [ "$FACTORY_LEDGER_ACCESS_ENABLED" = "true" ]; then
             extra_tools=(--add-tools MCP:factory-ledger)
           fi
-          droid exec --auto high "${extra_tools[@]}" -m "$FACTORY_MODEL" -f "$RUNNER_TEMP/factory-automation-prompt.txt"
+          droid exec --auto high "${extra_tools[@]}" -m auto -f "$RUNNER_TEMP/factory-automation-prompt.txt"
         env:
           FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
-          FACTORY_MODEL: ${{ inputs.model }}
           FACTORY_LEDGER_ACCESS_ENABLED: ${{ inputs.ledger_access_enabled }}
           FACTORY_LEDGER_MCP_TOKEN: ${{ inputs.ledger_access_enabled && secrets.FACTORY_LEDGER_MCP_TOKEN || '' }}
 
