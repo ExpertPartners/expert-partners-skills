@@ -6,6 +6,8 @@ The working forms for the Shadow Board skill. They restate the steps in SKILL.md
 
 Shown to the user before the board meets, one block per member.
 
+In an unattended run, put the board card and why each member was seated at the top of the saved Doc instead.
+
 ```
 Seat <1 to 5>, <full name>
 Why they belong. <one or two sentences>
@@ -51,6 +53,7 @@ What would make it 100. <...>
 Verdict. <one or two sentences>
 Key points. <1> <2> <3>
 Watch-out. <one>
+Missing inputs. <what the user must supply, separate from weak points, or none>
 ```
 
 Bands. 90 to 100 ready. 75 to 89 solid but needs fixes. 60 to 74 uneven. Under 60 rework the core. No part weights.
@@ -67,9 +70,10 @@ Shifted. <yes or no, and how your view moved>
 
 ## The synthesis
 
-One synthesis after the peer review.
+One synthesis after the peer review, led by a neutral chair who is not one of the five members. Name the chair in the synthesis.
 
 ```
+Chair. <name of the neutral chair>
 Core tension. <...>
 Differences that remain. <kept, not smoothed over>
 Recommendation. <...>
@@ -89,6 +93,8 @@ Signs it is working. <observable signs>
 
 The Google Doc, in this order.
 
+In an unattended run, put the board card and why each member was seated above this layout.
+
 1. Before and after scores, and the biggest change. On a rerun, the earlier version's score sits beside the new one.
 2. The revised work.
 3. One tab or section per member, holding that member's card, replies and rescores.
@@ -96,4 +102,4 @@ The Google Doc, in this order.
 5. Stop conditions.
 6. Success signs.
 
-Saved to Claude Outputs [EP-BB], or Private [EP-BB] when the input came from a private file, and named [Company][Version] Title.
+Save in the brain of the company that owns the work. If the owning company is unclear, ask one question before saving. Expert Partners work goes to Claude Outputs [EP-BB], or Private [EP-BB] for private input. AG Luxury work goes to Claude outputs [AG-BB], or Private [AG-BB] for private input. Find each folder in the owning brain by its exact name, keeping the lowercase o in the AG outputs folder. Name the Doc [Company][Version] Title.
