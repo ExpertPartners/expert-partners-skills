@@ -14,11 +14,11 @@ brand-scope: null
 subtitle: "five real experts score the work, debate it and rebuild it toward 100"
 ---
 
-# Shadow Board, v1.0 (2026-11-02)
+# Shadow Board, v1.1 (2026-11-07)
 
 A board of five real experts reviews one piece of work. Each member scores it 0 to 100 from their own lens, the members debate, and the board produces one revised version aimed at 100 from every member. The finished review is saved as a company record.
 
-Source. The approved spec, [HQ][V1.0] Spec - Shadow Board, and the Decision Log entries of 2026-10-29, 2026-10-31 and 2026-11-01. Read them live before relying on them. The HQ Rulebook and the Decision Log win wherever this skill differs. Never copy a Drive link or ID into this repository, because it is public.
+Source. The approved spec, [HQ][V1.0] Spec - Shadow Board, the Decision Log entries of 2026-10-29, 2026-10-31, 2026-11-01 and 2026-11-07, and the 2026-11-02 certification notes. Read them live before relying on them. The HQ Rulebook and the Decision Log win wherever this skill differs. Never copy a Drive link or ID into this repository, because it is public.
 
 The member brief, the reply form, the peer review, the synthesis and the Doc layout are written out in references/board-procedure.md. Use them at each step.
 
@@ -33,6 +33,8 @@ Clear input goes straight to the review, with no question.
 ## 2. The board
 
 Choose five real, named experts whose perspectives differ and fit the work. For each one, say why they belong, the lens they bring and what they will challenge.
+
+Show the board card before the board meets. In an unattended run, put the board card and why each member was seated at the top of the saved Doc instead.
 
 - By default, keep the same board for the life of that project.
 - A new, unrelated task gets a newly chosen board.
@@ -81,7 +83,7 @@ Read every score against four bands. There are no part weights.
 
 One round of anonymous peer review. Each member sees all first answers, shuffled and unlabeled, and says what it agrees with, what it pushes back on, and whether its own view shifted.
 
-Then one synthesis. It names the core tension and keeps the differences that remain. It gives the recommendation, the conditions that would stop or reject it, and the observable signs it is working.
+Then one synthesis, led by a neutral chair who is not one of the five members. Name the chair in the synthesis. The synthesis names the core tension and keeps the differences that remain. It gives the recommendation, the conditions that would stop or reject it, and the observable signs it is working.
 
 ## 7. Revise and rescore
 
@@ -100,6 +102,8 @@ At most three revise-and-rescore passes. After the third, stop and say plainly w
 
 The finished review is laid out in this order.
 
+In an unattended run, place the board card and why each member was seated above this layout.
+
 1. Before and after scores, and the biggest change.
 2. The revised work.
 3. One tab or section per member.
@@ -111,7 +115,10 @@ The finished review is laid out in this order.
 
 The company record is a native Google Doc.
 
-- Save it to Claude Outputs [EP-BB]. When the input came from a private file, save it to Private [EP-BB] instead. Find each folder in Google Drive by its name.
+- Save it in the brain of the company that owns the work. If the owning company is unclear, ask one question before saving.
+- For Expert Partners work, save to Claude Outputs [EP-BB], or Private [EP-BB] for private input.
+- For AG Luxury work, save to Claude outputs [AG-BB], or Private [AG-BB] for private input. Keep the lowercase o in outputs.
+- Find each folder in the owning business brain in Google Drive by its exact name.
 - Name it by the company rule, [Company][Version] Title.
 - A rerun advances the version, keeps the earlier one, and shows the earlier score beside the new one.
 - Old versions are archived in the owning brain, never deleted.
@@ -131,6 +138,8 @@ These sources are credited in plain words, and no course text is quoted.
 - Carter Jensen, for the generated board skill, followed second. That covers the one clarifying question, a fresh board for a new task, and the choice of fixed or fresh before the skill is saved.
 - Eliot Prince, for the council's independent members launched together, the anonymous peer review and the synthesis, and the verdict, key points and watch-out in each reply, used only where Cal and Carter are silent.
 - HQ's addition is everything else. That includes the save home, the naming, the versions, the archive, the certification by HQ and Allison and the marketplace updates, which close by existing company rules (Decision Log 2026-10-31), and the one-at-a-time fallback when subagents are not available.
+- HQ's additions from the 2026-11-02 certification are the unattended board card at the top of the saved Doc, the neutral synthesis chair outside the five members, and the missing-inputs line in the member reply form.
+- HQ's save-home change sends reviews to the brain of the company that owns the work, including its private folder for private input (Decision Log 2026-11-07, Shadow Board reviews save in the brain of the company that owns the work).
 
 If the Week 0 browser hunt recovers Cal's or Carter's own board file, that file overrides these choices through a later certified rebuild, never through an edit made during a review.
 
