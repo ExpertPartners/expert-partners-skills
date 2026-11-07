@@ -1,3 +1,6 @@
+## 2.85.0 - 2026-11-07
+
+Update Shadow Board to v1.1. Save Expert Partners and AG Luxury reviews in the owning company's business brain, with private input routed to that brain's private folder. Include the board card at the top of unattended reviews, name a neutral synthesis chair outside the five members, and add missing inputs to the member reply form. Record these HQ additions and the November 7 save-home decision without changing the remaining review procedure.
 ## 2.84.11 - 2026-11-05
 
 Allocate a separate persistent Playwright connection and existing-profile Chrome window for each named browser job. Require the exact job handle on every tool, retain working-page references, preserve headless policy, and provide owned cleanup and fail-closed recovery without replay. Refuse missing, unsigned or mismatched profiles before opening a connection. Distinguish measured concurrency and source delivery from native consumer adoption and certification.
