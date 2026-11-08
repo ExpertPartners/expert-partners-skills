@@ -1,4 +1,6 @@
-# BYOK setup (Anthropic via Claude Team API credits)
+# Optional BYOK setup (Anthropic)
+
+BYOK is optional, never a prerequisite for available approved Factory Auto use. Do not change the user's explicit selection or create accounts, keys or workspaces just for preflight. The steps below apply only to a separately authorized BYOK setup. Read current provider entitlement and billing records before claiming an included-credit charge source.
 
 Facts (confirmed): Claude Team plans include monthly API credits claimed by a Team Owner into one Claude Console organization; they are spent before purchased credits, expire each billing cycle, are usable with any Messages API key, are never charged to the Claude plan, and stop hard when empty unless purchased credits or auto-reload exist. Read the current amounts at the source: https://support.claude.com/en/articles/17154008-monthly-api-credits-for-max-ultra-and-team-plans and https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers.md
 Factory BYOK keys stay local in `~/.factory/settings.json`, support `${ENV_VAR}`, and are per machine. Source: https://docs.factory.com/model-independence/byok.md
@@ -20,5 +22,5 @@ The BYOK Anthropic model IDs in use are `claude-haiku-5-5` (light), `claude-sonn
    Then run `/cost` in a session and confirm the Console Cost page shows the usage in the workspace.
 4. Repeat on the other machine. Cloud Environments will not see this model.
 
-## Fallback rule
-Switch to the BYOK model manually (`/model` or Workstream "Change models") when the decision ladder says so. There is no documented automatic Factory-to-BYOK switch; do not build one.
+## Selection rule
+Preserve the explicit user route, including Auto. BYOK may be recommended only as an available authorized alternative, not a mandatory fallback. There is no documented automatic budget-aware Factory-to-BYOK switch established here. Missing or exhausted BYOK does not block available approved Factory work. Record Factory counters separately from provider dollar charges.

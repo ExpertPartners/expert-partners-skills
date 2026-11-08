@@ -1,26 +1,41 @@
-# Settings map (verified against docs.factory.com, Nov 7 2026; re-verify on change)
+# Settings scope and evidence
 
-Precedence: hard controls resolve top-down (Org authoritative); session defaults resolve bottom-up (Runtime > Folder > Project > User > Org > Dynamic > BuiltIn). Source: https://docs.factory.com/enterprise/hierarchical-settings-and-org-control.md
+Checked against current Factory docs on 2026-11-08. Documented is not live-tested. Inspect the actual available tool schema, account policy and runtime before applying a separately authorized change.
 
-| Setting | Scope | Set in | Inherited by | Owner at Expert Partners |
-|---|---|---|---|---|
-| model, reasoningEffort, interactionMode, autonomyLevel, specMode* | Session default per machine | `~/.factory/settings.json`, project `.factory/settings.json`, App, Session Defaults, `/settings`, `--settings` overlay | New sessions on that machine, and Workstream agents whose agent model is "Default" | Operator (per machine) |
-| subagentModelSettings (light/medium/heavy), subagentAutonomyLevel | Per machine | same; `/settings`, Subagents | Task-tool subagents | Operator |
-| Mission orchestrator/worker/validator model + reasoning | Per machine | same; `droid exec --mission --worker-model …` | Missions | Operator; Extra Usage decision is founder |
-| compactionTokenLimit(PerModel), compaction model | Per machine | same | All sessions on machine | Operator |
-| customModels (BYOK) | Per machine, local only; not visible on hosted web/mobile; cloud Environment agents cannot see it | `~/.factory/settings.json` or desktop Settings, Custom Models | Sessions and Workstream agents on that machine | Operator (keys: founder via 1Password) |
-| Workstream: orchestrator model+reasoning, agent model ("Default" or specific) + reasoning | Per Workstream | Gear icon | That Workstream | Operator |
-| Workstream Defaults: remote delegation (default ON), compaction budget, default environment, additional machines | Per user | App, Settings, Workstream Defaults | Every new Workstream | Founder decides; operator sets |
-| Overage preference, Extra Usage | Per account | `/limits` or Settings, Usage | All sessions and Workstreams | Founder (spend) |
-| Org hard controls (modelPolicy, maxAutonomyLevel, usage limits) | Org | Enterprise Controls / Organization API | Everyone | Not available on current plan |
-| Skills, AGENTS.md, MCP, hooks, plugins | Repo / user / plugin | files, `/skills`, `droid plugin` | Sessions and agents on that machine | Skills repo maintainers |
+| Control | Supported surface | Scope and evidence boundary |
+|---|---|---|
+| Session model, reasoning, autonomy, interaction mode | App selector, CLI `/settings`, Sessions API `PATCH /api/v0/sessions/{sessionId}` with `sessionSettings` | Existing session only. Effective in-flight timing not tested. A response omitting settings cannot verify them |
+| Machine | Existing computer's `computerId` in session creation | Creation-time choice. No documented session machine migration PATCH |
+| Session/spec defaults | User/project settings, App Session Defaults, supported runtime overlay | Future or inheriting sessions, not proof existing sessions changed |
+| Workstream orchestrator and agent model/reasoning | Workstream gear / Change models | Workstream scope. Agent “Default” uses target machine defaults. Existing/new-agent propagation unverified |
+| Task models/reasoning | `subagentModelSettings` light/medium/heavy model and effort, custom droids, Task complexity | Spawn-time tier routing, not Workstream agent settings. Current Task schema has no machine or arbitrary model argument |
+| Task autonomy | `subagentAutonomyLevel` and org ceiling | Separate from session autonomy and Mission workers |
+| Mission models/reasoning | Orchestrator/worker/validator fields, defaults and CLI flags | Separate Mission scope and spending policy |
+| Workstream routing defaults | App Workstream Defaults, remote delegation, default environment, additional machines | Defaults for Workstreams started later. No verified callable public mutation here |
+| BYOK custom models | Per-machine custom-model settings and runtime credentials | Optional route. Matching entry/key must exist on actual target. Not a prerequisite for approved Auto work |
+| Overage, Extra Usage, rolling windows | `/limits`, Settings Usage | Account scope. Never silently enable or purchase |
+| Org model/autonomy controls | Enterprise Controls or supported org API where available | Hard policy overrides lower preferences. Do not infer absence solely from plan name |
+| Alerts | Personal monthly-cap alerts, org thresholds where entitled | Informational, not a preflight throttle or a spending limit |
+| Skills and context hooks | Existing operating-doctrine plugin and marketplace producer | Context guidance, not model changes or hard worker caps |
 
-## Remote delegation trade-off
+## Public Sessions API
 
-With remote delegation off, every Workstream agent runs on the orchestrator's machine (https://docs.factory.com/workstreams/machines.md), so one Workstream cannot place some agents on ember-mac-mini-m2 and others on ag-mac-mini-m4. The cost goal (no fresh managed cloud computers) is also met by leaving remote delegation on, clearing the default cloud Environment, and listing only the two Remote Control machines as additional machines. Which of the two applies is a founder decision; follow the newest Decision Log entry.
+[Sessions API](https://docs.factory.com/api-reference/sessions.md) documents creation and session settings updates for selected organizations. Model, reasoningEffort and autonomyLevel are supported session fields, subject to authorization and policy.
 
-## Headless model launcher
+Do not send machine/routing/count/budget fields to session PATCH. In particular `computerId`, `environmentId`, `remoteDelegation`, `defaultEnvironment`, `additionalMachines`, `agentModel`, `maxAgents`, `maxParallelism`, `tokenBudget`, `creditBudget`, `computeBudget`, `speed` and `sessionDefaultSettings` are not documented fields for that operation. Do not send guessed null resets.
 
-`~/.factory/bin/droid` is the PATH launcher from `tools/factory-access/auto_model.py`. For `droid exec` it replaces `-m`, `-r`, `--spec-model`, `--worker-model` and `--validator-model` values with `auto` (reasoning `none`). Interactive sessions and non-exec commands pass through. A headless run that must use a pinned or BYOK model calls `~/.local/bin/droid` directly. Change the launcher only through `tools/factory-access` and a reviewed pull request.
+The bounded account test on 2026-11-08 created an idle explicit-M2 session with no messages. HTTP 201 and GET confirmed its computer, and GET reported zero session credits, but omitted `sessionSettings`. Thus effective model/reasoning/autonomy were not proven. No live model/reasoning PATCH was tested. The own-test archive metadata PATCH was acknowledged but persistent archive state was not read back. Do not repeat tests merely to fill an absent field.
 
-Existing Expert Partners capabilities (do not duplicate): `session-model-advisor`, `ai-capability-routing`, `capability-currency`, `research-before-guessing`, `expert-partners-systems-map`; `tools/factory-access/` (preflight, auto_model launcher); `.github/workflows/factory-builder-reusable.yml`; `tools/overlap-check`, `tools/auto-merge-gate`, `tools/stall-sweeper`. The Factory Workstreams operating architecture initiative owns changes to Workstream Defaults and CI.
+## Current authority and target policy
+
+Read live HQ authority. Preserve Auto with available Factory allowance. M2 owns authenticated browser and visible work. Headless local selection is resource-aware, not a fixed M2/M4 order, and protects M4 memory and foreground responsiveness without touching its visible desktop. Cloud requires both local options confirmed unavailable and approval. A narrower no-cloud assignment still forbids cloud. BYOK exhaustion is not a reason to block available approved Factory use.
+
+Remote delegation off pins Workstream agents to the orchestrator's machine. Leaving it available with explicit authorized Mac targets allows cross-machine routing. Desired no-cloud defaults and descriptions are guidance until actual controls are saved and read back. A computer inventory alone proves neither saved routing defaults nor M4 execution.
+
+If native settings staging is present in the main desktop chat, use only its actual matching operations. StageSettingsChanges is not available to workers, and was unavailable in the inspected orchestrator catalog. Stage is not apply, and protected-target navigation never submits a form. If unavailable, name the exact target, desired fields, blocker, owner and expected readback in the existing work record. Do not bypass installed browser policy.
+
+## Existing launcher and distribution
+
+`tools/factory-access/auto_model.py` owns the PATH launcher. It forces Auto for `droid exec`; do not change it or add another launcher for preflight. A separately authorized pinned test can invoke the vendor binary directly without rewriting the user's selection or defaults.
+
+Existing owners include `session-model-advisor`, `capability-currency`, `tools/factory-access/`, the operating-doctrine hooks and marketplace/plugin sync. Source references are [settings](https://docs.factory.com/droid-cli/settings.md), [Workstream settings](https://docs.factory.com/workstreams/settings.md), [machines](https://docs.factory.com/workstreams/machines.md), [subagents](https://docs.factory.com/harness/subagents.md) and [enterprise controls](https://docs.factory.com/enterprise/hierarchical-settings-and-org-control.md).

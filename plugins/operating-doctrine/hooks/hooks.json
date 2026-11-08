@@ -1,6 +1,28 @@
 {
-  "description": "Headless route check. Refuses browser navigation to systems that already have headless access and names the headless route to use instead.",
+  "description": "Headless route check and lightweight Factory task preflight context.",
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/factory_preflight.py\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/factory_preflight.py\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "^mcp__.*__(browser_navigate|navigate|tabs_create_mcp|browser_tabs|browser_run_code_unsafe|browser_run_code|browser_evaluate)$",

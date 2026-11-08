@@ -1,34 +1,38 @@
-# Decision ladder
+# Task preflight decision ladder
 
-Facts relied on (confirmed at https://docs.factory.com/pricing/individuals.md and https://docs.factory.com/workstreams/settings.md): the three Standard windows are independent and all need headroom; Standard is consumed before Droid Core; Droid Core is the same currency with separate limits; at a limit the current request finishes, then requests error; `/limits` toggles Droid Core or Extra Usage; Workstreams show a banner at 90% and agents stop at the limit until reset, Extra Usage, or a BYOK model; "Change models" works mid-run; Workstreams use more tokens than single sessions; Auto Model escalates and fails over but nothing documents allowance-awareness.
+Use live HQ authority and the current catalog. Estimates guide bounded execution, they do not enforce spend or set account settings.
 
-## Window rules
+1. Reuse the existing work record, session and still-current preflight.
+2. Classify actual ambiguity, risk, dependencies and validation burden. Duration alone is not complexity.
+3. Preserve explicit selection, including Auto. State the minimum capable model category and reasoning as advice unless the user authorized a supported change.
+4. Use M2 for authenticated browser and visible work. Choose an authorized local Mac for headless work by measured suitability and headroom, protecting M4 memory and foreground responsiveness. Never take over its visible desktop. Cloud is never an automatic fallback.
+5. Estimate sequential duration and model/tool turns, context duplication, output and machine needs as a range with confidence. Without verified billing weights, tokens times a multiplier is not a credit quote. Auto's unknown mixture prevents an exact backend price estimate.
+6. Default to zero additional workers inline or one active delegated worker. Count the orchestrator separately. Consider extra workers only for independent sizeable tracks with observed headroom, enough host resources and benefit after coordination/context cost. This is not a fixed product cap.
+7. Use available native limits and monitoring. Unknown means unknown, not zero usage or unlimited budget. Continue bounded authorized work without inventing a BYOK dependency.
+8. Reflight on an actual limit error, unexpected provisioning, verified route mismatch, collision or material scope change. Do not silently enable overage, downgrade required quality or claim automatic throttling.
 
-| Condition | `high` consequence | `routine` |
-|---|---|---|
-| 5-hour < 50% | Proceed; Auto allowed | Proceed pinned |
-| 5-hour 50–89% | Proceed pinned, one Workstream at a time | Proceed pinned, max two agents |
-| 5-hour ≥ 90% | Do not start on Standard. BYOK Claude on that machine if configured; else wait for the reset time | Droid Core Flash-class (lowest live multipliers, never Kimi K3) or defer |
-| Weekly or monthly ≥ 80% | Flag founder; one agent; prefer BYOK for frontier work | Defer non-urgent |
-| Droid Core pool at 100% | Do not propose Droid Core | Same |
-| Managed compute near cap | No cloud Environments; Remote Control only | Same |
+## Worked cases
 
-## Model ladder
+### Routine repo correction, Auto selected, allowance unknown
 
-1. Category from the Rulebook chart (read live).
-2. Lowest tier for that category.
-3. Lowest live multiplier within the tier (models page, read live).
-4. Model default reasoning unless the Rulebook says higher. Lower reasoning before model.
-5. `high` never below the category floor. Browser work never on the lowest tier.
-6. Orchestrators plan and brief; they do not need the highest reasoning on every turn.
-7. Never leave a model setting on a value that can silently fall back to a costlier model. A BYOK display name in `model` with no matching `customModels` entry on that machine falls back to the Factory pool.
+A bounded edit and focused tests fit the existing M2 worker. Recommend routine/bounded-build reasoning based on actual complexity, preserve Auto, zero additional workers, sequential. Example planning estimate is 15–30 minutes and 5–15 tool/model turns, low confidence until the affected files are known. No dollar estimate or assured credit headroom. Check `/cost` or Workstream Usage after the bounded test, before expanding.
 
-## Worked examples
+### Two independent substantial modules
 
-**A. Routine research Workstream, 5-hour 42%, Droid Core 100%.** Workstream on ag-mac-mini-m4; orchestrator Sonnet-class medium; two collection agents Sonnet-class high; one synthesis agent Opus-class high at the end; no cloud Environment; pinned; overage none; no approvals; verify via Workstream Usage.
+Name disjoint files, dependencies and their validation. Recommend parallel work only if the expected elapsed-time reduction outweighs duplicated context and coordination and current headroom/host capacity supports it. State Workstream agents or Task children explicitly. Unknown headroom retains sequential default without fabricating a refusal. Do not change Task tiers to claim Workstream-wide control.
 
-**B. High-consequence bug fix + PR, 5-hour 96% resets 14:10.** Do not start on Standard. If ag-mac-mini-m4 has the BYOK Claude model, start a session on it at high reasoning. Else wait until 14:10. Never Droid Core for this. The work record note flags weekly usage.
+### Short acknowledgement versus short new task
 
-**C. 90% banner mid-run.** Change models: drop agent reasoning one step. If blocked at the limit: switch agents to BYOK Claude if it is on that machine; otherwise pause until reset. Do not enable Extra Usage. Record it on the work record.
+“Thanks”, “yes” and “quick update” reuse context and skip evaluation. “Fix tests” is a new task, not an acknowledgement. Give at least a one-line preflight and expand only when its scope warrants it. “Yes, implement the new module” is also substantive.
 
-**D. Classification batch of 400 items.** Session or two-agent Workstream on ag-mac-mini-m4; Haiku-class or Luna-class (lowest Standard multipliers), or BYOK `claude-haiku-5-5`; if Standard is tight, Droid Core Flash-class; never Kimi K3.
+### Explicit model choice conflicts with a cheaper suggestion
+
+Keep the selected model or Auto. Recommend the cheaper capable category with live evidence and note the available control, but do not override. Do not describe hidden Auto backend picks as observed.
+
+### BYOK empty, Factory route available
+
+Retain the approved Auto route and available Factory allowance. No BYOK investigation, account binding or additional API key is required. At an actual Factory limit, report the pool/reset and already-approved alternatives. No purchase or paid compute.
+
+### Revised scope, unavailable controls
+
+When a small edit becomes a broad migration, re-estimate complexity, context, time and worker count. If this worker lacks a supported setting control, record exact desired session model/reasoning/autonomy fields and the available native surface as recommendation-only. Machine changes require a new authorized launch target, not a guessed session PATCH.

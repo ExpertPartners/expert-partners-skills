@@ -1,12 +1,24 @@
 # operating-doctrine hooks
 
-Claude Code hooks that ship with the operating-doctrine plugin. `hooks.json` wires them in when the plugin is enabled, following the plugin hooks format in the Claude Code docs (`hooks/hooks.json` with a top-level `hooks` object, checked 2026-11-03).
+Hooks that ship with the operating-doctrine plugin. Factory documents the same top-level `hooks` wrapper in plugin `hooks/hooks.json`, both lifecycle events below, plain stdout context, and expansion of `${CLAUDE_PLUGIN_ROOT}` (checked 2026-11-08 at [Hooks](https://docs.factory.com/harness/hooks.md) and [Plugins](https://docs.factory.com/harness/plugins.md)). Existing Claude Code hook compatibility is retained.
 
 | File | What it does |
 |---|---|
 | `hooks.json` | Wires `headless_route_check.py` to `PreToolUse` for browser navigation, new tab and browser code tools. |
 | `headless_route_check.py` | The headless route check. Python 3.9 or later, standard library only. |
 | `tests/test_headless_route_check.py` | Unit tests. |
+| `factory_preflight.py` | Small `SessionStart` and `UserPromptSubmit` context reminder to invoke `factory-operator` before new actionable assignments. |
+| `tests/test_factory_preflight.py` | Hook protocol, trivial-message, safety and preflight contract tests. |
+
+## Factory preflight context
+
+`SessionStart` adds one short routing instruction, including after resume or compaction. `UserPromptSubmit` emits nothing for empty prompts, greetings, acknowledgements and common status requests. New actionable read, review and explain assignments qualify, with one-line preflight for small tasks. Other prompts receive a fixed reminder to await skill loading before task operations, never in parallel, and reuse an existing preflight for unchanged continuations. Images receive the reminder even without text. This intentionally conservative routing is not a full natural-language classifier.
+
+The hook itself never calls Skill, a model, a subprocess or a network service. It reads only its JSON stdin and prints fixed text, never the prompt. The agent invokes `Skill(factory-operator)` only if needed. There is no Stop hook, recursive invocation, persistent prompt cache, transcript scan or settings writer. Two short reminders can appear at session startup and first prompt, but they do not require two skill loads or evaluations. There is no per-tool reminder.
+
+This is context activation, not guaranteed compliance, automatic model selection, agent-count enforcement, throttling or a spending guard. Disabled plugins/hooks, managed-only hook policy, a missing Python runtime or a client that does not load plugin hooks can prevent activation. Use `/hooks` or debug/transcript evidence to inspect the actual runtime. `AGENTS.md` provides a repo-local routing pointer, not proof of global activation. Native deployment and active-use evidence are separate from deterministic tests.
+
+The 2026-11-08 scoped local CLI seam observed `SessionStart` on startup and resume, but no `UserPromptSubmit` receipt. First the model skipped a new read-only task under the older substantial-work wording. After correcting that wording, it actually invoked the skill, but in parallel with a task read. The current reminder explicitly forbids that ordering. Deterministic tests cover this instruction, not guaranteed model compliance. A strict sequential native acceptance check remains open; this is not a production activation receipt.
 
 ## Headless route check
 

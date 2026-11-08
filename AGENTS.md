@@ -9,6 +9,7 @@ Follow the live AI Implementation SOP in HQ Business Brain: use headless access 
 Working here
 
 - Read the skill you are changing and the canonical operating-doctrine skill first.
+- Before a new actionable Factory assignment, including read-only review, invoke `factory-operator` for a brief preflight, one line for a small task. Reuse a still-current preflight for continuations, skip trivial replies, preserve explicit model choices including Auto, and default to sequential execution without extra workers. The plugin hook supplies context only, not settings or spending enforcement.
 - Use an isolated branch or worktree, inspect git state before editing, and open a pull request for every change. Never force-push or bypass required checks.
 - Correct the canonical skill source first. Generated files, deployed copies, and the skill graph come only from their producers in tools. Never hand-edit them.
 - Never edit a plugin version in plugin.json or marketplace.json, or the top of a CHANGELOG.md. Add one note in .changeset/ instead, as .changeset/README.md explains. The release step in tools/release owns versions and CHANGELOG entries.
