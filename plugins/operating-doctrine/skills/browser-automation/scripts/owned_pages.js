@@ -1,4 +1,23 @@
 /* One private MCP process. Birth provenance is independent of group membership. */
+
+// 1Password injects these elements, with a chrome-extension iframe, into sign-in
+// pages. Chrome then detaches the Playwright extension debugger (target_closed),
+// on Google sign-in and Cloud Console. Defining the tags first makes each one
+// remove itself on insertion; Chrome's own 1Password autofill is unaffected.
+function suppressOnePasswordInlineMenu() {
+  if (typeof customElements === 'undefined') return;
+  for (const tag of ['com-1password-uso', 'com-1password-button', 'com-1password-menu', 'com-1password-notification']) {
+    if (customElements.get(tag)) continue;
+    try {
+      customElements.define(tag, class extends HTMLElement { connectedCallback() { this.remove(); } });
+    } catch {}
+  }
+}
+
+async function guardOwnedPage(p) {
+  if (typeof p.addInitScript === 'function') await p.addInitScript(suppressOnePasswordInlineMenu);
+}
+
 async function newOwnedState(connector) {
   const context = connector.context();
   const initial = await connector.evaluate(async () => {
@@ -36,6 +55,7 @@ async function newOwnedState(connector) {
     }
     if (matches.length !== 1) throw Error('owned_page_binding_failed');
     const p = matches[0];
+    await guardOwnedPage(p);
     s.created.add(p);
     s.ids.set(p, id);
     s.pendingIds.delete(id);
@@ -50,7 +70,7 @@ async function newOwnedState(connector) {
       for (const p of context.pages()) {
         if (s.created.has(p)) continue;
         const opener = await p.opener();
-        if (opener && s.created.has(opener)) { s.created.add(p); changed = true; }
+        if (opener && s.created.has(opener)) { s.created.add(p); changed = true; await guardOwnedPage(p); }
       }
     } while (changed);
     for (const p of s.created) {

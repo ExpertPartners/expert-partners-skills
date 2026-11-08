@@ -237,6 +237,47 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
         checked = subprocess.run(["node", "-e", source + fixture], capture_output=True, text=True, timeout=10)
         self.assertEqual(checked.returncode, 0, checked.stderr)
 
+    def test_owned_pages_suppress_the_1password_inline_menu(self):
+        # The 1Password inline menu iframe detaches the extension debugger on
+        # Google sign-in pages, so every owned page must get the guard first.
+        source = (SCRIPTS / "owned_pages.js").read_text()
+        fixture = r'''
+const assert=require('node:assert/strict');
+let current;
+const tabs=new Map();
+const pages=[];
+function page(id){
+  const tab={id,windowId:5,groupId:7,url:'about:blank'};tabs.set(id,tab);
+  const p={id,closed:false,inits:[],context:()=>context,isClosed:()=>p.closed,opener:async()=>null,
+    url:()=>tab.url,evaluate:async(fn,arg)=>{current=p;return await fn(arg);},
+    addInitScript:async(fn)=>{p.inits.push(fn);}};
+  pages.push(p);return p;
+}
+const context={pages:()=>pages.filter(p=>!p.closed),newPage:async()=>page(10)};
+global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=args.url;return t;},
+  group:async({tabIds,groupId})=>{for(const id of tabIds)tabs.get(id).groupId=groupId;},
+  getCurrent:async()=>tabs.get(current.id),get:async(id)=>tabs.get(id),
+  query:async()=>[]},tabGroups:{get:async()=>({title:'fixture'})}};
+(async()=>{
+  const connector=page(1);
+  const s=await newOwnedState(connector);
+  const task=await s.create();
+  assert.equal(connector.inits.length,0);
+  assert.equal(task.inits.length,1);
+  const registry=new Map();
+  global.HTMLElement=class{remove(){this.removed=true;}};
+  global.customElements={get:(t)=>registry.get(t),define:(t,c)=>registry.set(t,c)};
+  task.inits[0]();
+  task.inits[0](); // A second run on the same document must not throw.
+  for (const tag of ['com-1password-uso','com-1password-button','com-1password-menu','com-1password-notification']) {
+    const el=new (registry.get(tag))();el.connectedCallback();
+    assert.equal(el.removed,true,tag);
+  }
+})().catch(e=>{console.error(e);process.exitCode=1;});
+'''
+        checked = subprocess.run(["node", "-e", source + fixture], capture_output=True, text=True, timeout=10)
+        self.assertEqual(checked.returncode, 0, checked.stderr)
+
     def test_connector_credential_redacted_recursively(self):
         url = b.EXTENSION + "?mcpRelayUrl=ws%3A%2F%2F127.0.0.1&token=SYNTHETIC_CANARY"
         actual = json.dumps(b.redact({"content": [{"text": "Welcome [link](" + url + ")"}], "nested": url}))
