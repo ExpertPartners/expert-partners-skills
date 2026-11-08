@@ -1,3 +1,6 @@
+## 2.87.0 - 2026-11-08
+
+Browser jobs gain an opt-in sealed mode for one secret-bearing `browser_run_code_unsafe` call: console, page errors, network events, snapshots and tab headers are not captured, the code is not echoed, and the reply is only a fixed token or fixed error code, after which the job is finish-only. Job receipts now keep per-stage timestamps for recent calls, with no page content.
 ## 2.86.0 - 2026-11-08
 
 Add the factory-operator skill. Before Droid work starts, it picks the lowest-cost reliable Factory setup: surface, machine, model, reasoning, overage and BYOK posture. It checks the live usage windows first and never spends money or changes settings itself. It reuses session-model-advisor, capability-currency and the existing factory-access launcher instead of adding new tooling.
