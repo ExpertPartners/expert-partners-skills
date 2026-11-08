@@ -294,15 +294,17 @@ The HQ Rulebook holds the rest. Where this section and the Rulebook differ, the 
 
 ## Messages Between AIs
 
-Follow the current HQ Rulebook section Handoffs between AIs for passing work and delivery confirmations. It supersedes the retired mail-system instructions. The receiving AI logs the work in the Chat to Code job list; code work travels as a GitHub issue labeled job. A pasted message is not evidence the receiver claimed or completed it.
+Follow the current HQ Rulebook section Handoffs between AIs and newest Decision Log entries. Use the owning native Factory assignment or Workstream for company development. Do not require a GitHub issue, Hub record or Chat to Code job, restart retired polling/watchers, or use Allison as a routine relay. Existing issues and PRs remain evidence when relevant. A sent message is not evidence the receiver accepted or completed work.
 
 When Allison types S or s alone, it means sent, and no other single letter does. Never ask what S means. Q or q alone means ask clarifying questions before working.
 
 ## The Job Report And Archive Readiness
 
-Use job_create or job_claim for the receiving AI's work and job_status for ownership and status. Use job_finish with outcome `done`, the summary and result link only when the assignment is genuinely completed. A true founder-only decision on an affected non-code job is a separate supported outcome. Follow the current HQ Rulebook question path and live tool schema, using job_finish with outcome `needs-allison` and a `Recommend:` summary even while that assignment is unfinished. This records a decision request, never completion or archive readiness. Do not use it for an AI-owned retrieval or technical gap, or to finish an unrelated job.
+Read the current supported lifecycle and tool schema for the owning assignment. Start with a useful native Factory end-to-end outcome on Auto and the available allowance, not a custom dispatcher. Add Hub dispatch, polling or tracking only for a demonstrated gap. BYOK is not a prerequisite. Do not fabricate lifecycle tools or create a second tracker.
 
-An ordinary unfinished progress report or wrap preserves the job's open state through an authorized operation from the live tool schema. Never call job_finish merely to record progress or wrap unfinished work. If that operation or the job list is unavailable, report the blocker and keep the reporting obligation open rather than inventing a tool or claiming completion. Verify the saved result before claiming completion. Follow the current HQ Rulebook section Session lifecycle for archive consent and session-steward for unfinished work.
+Inspect current source and ownership, isolate changes, implement the complete bounded outcome, run the narrow relevant tests and changed-file checks, and obtain the applicable independent review before normal landing. Report checks that failed or could not run. Preserve existing merge, release, spending, access and production approvals. A source PR, merge, installed delivery and active runtime use are separate claims.
+
+An unfinished report preserves the existing work with one owner, return condition, expected result and follow-up trigger. A genuine founder decision carries the recommendation through the current supported route, never a false completion. Technical retrieval gaps remain AI owned. Verify the saved result before reporting success and follow live session archive consent. Native execution does not waive the repo-standards live index lookup, existing-repo preference, justified creation and verified registration gate.
 
 ---
 

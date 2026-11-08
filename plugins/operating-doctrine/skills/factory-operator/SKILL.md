@@ -42,7 +42,7 @@ If any of these cannot be read, say so and proceed with categories only, never w
 
 ## Inputs to collect
 
-- Work description and the work record (the GitHub issue for code work).
+- Work description and its existing native Factory assignment or Workstream. A GitHub issue or Hub record is optional, not an intake prerequisite.
 - Consequence class: `high` (customer-facing, money, permissions, production) or `routine`.
 - Current `/limits` output (Standard 5-hour, weekly and monthly %, Droid Core %, Extra Usage state, reset times). If missing, ask for it or open Settings, Usage in the desktop app.
 - Machines online (ember-mac-mini-m2, ag-mac-mini-m4) and whether authenticated browser, Drive or local-only data is needed.
@@ -51,12 +51,12 @@ If any of these cannot be read, say so and proceed with categories only, never w
 
 1. **Verified state.** Summarise windows, pools, machines and the catalog date. Note any model that disappeared or changed multiplier since the last `capability-currency` sweep.
 2. **Surface.** Automation for triggered repeats; Workstream for parallel multi-part work with PR output or a broad research mission; Mission only if Extra Usage is already authorised and on; otherwise Session.
-3. **Machine.** ember-mac-mini-m2 for signed-in authenticated admin, browser, Drive and local data. ag-mac-mini-m4 via Remote Control for code, tests, builds and unauthenticated research. Cloud Environment only when both Macs must be offline, and say that managed compute will be consumed. Keep Workstream Defaults, Remote delegation off and the default cloud Environment cleared, unless the founder has recorded otherwise (see `reference/settings-map.md`).
-4. **Model ladder.** Map to a Rulebook category, take its lowest tier, choose the lowest live multiplier in that tier, and use the model's default reasoning unless the Rulebook says higher. `high` consequence never drops below the category floor. Lower reasoning before lowering the model.
-5. **Window check.** See `reference/decision-ladder.md`. In short: 5-hour at or above 90% and `high` means BYOK Claude on that machine if configured, else wait for reset; 5-hour at or above 90% and `routine` means Droid Core Flash-class or defer; weekly or monthly at or above 80% means flag to the founder, one agent max.
-6. **Parallelism.** Default two agents. Three or more only when the 5-hour window is under 50% and work is `routine`.
-7. **Auto vs pinned.** Auto only when `high`, window under 50% and the task is heterogeneous; add the stop condition "report if a 4x model becomes active". Otherwise pin. Nothing documents that Auto considers remaining allowance, so never claim it does.
-8. **BYOK.** BYOK models are per machine and only visible to sessions on that machine. The BYOK Anthropic model IDs currently used are `claude-haiku-5-5`, `claude-sonnet-5-5` and `claude-opus-5-5`; confirm them against the key's model list before use. For headless BYOK runs call the vendor binary `~/.local/bin/droid` directly with `-m "custom:<display-name>"`, because the `~/.factory/bin/droid` launcher forces `-m auto`. See `reference/byok-setup.md`.
+3. **Machine.** Ember's M2 owns browser, clicking and visible desktop work. For headless APIs, Git, builds, tests and Factory execution, choose either local Mac from actual CPU, available RAM, swap pressure, disk/I/O, availability and founder responsiveness. M4 work stays invisible and never controls browser, screen, mouse or focus. Follow the newest local-first/cloud decision. Read current settings without changing them under this configuration-only skill.
+4. **Model ladder.** Auto Model and available Factory allowance are the default for this mission and its agents. Use the lowest effective reasoning and minimal agents. Pinning or BYOK requires a current task-specific reason and verified configuration, not an inherited preference.
+5. **Window check.** Read actual 5-hour, 7-day and 30-day headroom, pools, reset times and session usage through supported surfaces. Unknown usage is unknown, not a zero balance or a full reset. Respect actual provider limits and existing spend approvals. Do not impose the older fixed percentage caps as founder rules or silently change pools/models.
+6. **Parallelism.** One session for a small task. Use agents only for sizeable independent scopes when useful and current allowance supports them. Do not create agents just to satisfy a default count.
+7. **Auto vs pinned.** Auto is the default, not limited to high-consequence work or a percentage band. Verify actual model and credit reporting where available. Nothing documents that Auto considers remaining allowance, so never claim it does.
+8. **BYOK.** BYOK is optional, never a prerequisite or blocker when Auto and Factory allowance are available. Reuse only an already authorized verified per-machine configuration when the task actually needs it. Do not create keys, workspaces or billing requirements. See `reference/byok-setup.md` for optional setup mechanics, not mandatory workflow.
 9. **Posture.** Overage preference: none for `high`; Droid Core allowed for `routine` batches. Never enable Extra Usage; state the balance needed and route to the founder. Fable/Astra need founder approval (and Fable needs the retention opt-in). Fable/Mythos are forbidden for cybersecurity, bio and chem content.
 10. **Verify after.** Confirm via Workstream, Usage or `/cost` that models and credits match. A mismatch is a silent downgrade: stop and report.
 
@@ -68,7 +68,7 @@ If any of these cannot be read, say so and proceed with categories only, never w
 4. Stop conditions
 5. Approvals required (none, or founder: Extra Usage, Fable/Astra, Console workspace, auto-reload, cloud Environment)
 6. Verification test
-7. Work record note (one paragraph for the GitHub issue that tracks the work)
+7. Work record note (one paragraph in the existing native assignment, with result, actual usage evidence and limits; no new issue or queue required)
 
 ## Guardrails
 

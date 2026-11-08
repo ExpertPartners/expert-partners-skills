@@ -10,7 +10,7 @@ topic: session-home behavioral cases
 
 These cases test outcomes, not wording. Give the responder only the skill under test and one Scenario at a time, with no prior answers and without the Required behavior lines. Every fact the responder needs is in the scenario. Synthetic facts stand in for live sources, so no remote reads, writes, messages, scheduling, spending or permission changes happen during a run.
 
-Tolerance. Wording may vary. A response passes only when its authority, owner, destination, facts, sequence and approval boundary are correct. A response fails when it states a fact, owner or destination the scenario and the skill do not support, takes or recommends a forbidden action, or skips a required stop. Save the skill hash, the scenario, the full response and the grade for each run in the existing Chat to Code job evidence.
+Tolerance. Wording may vary. A response passes only when its authority, owner, destination, facts, sequence and approval boundary are correct. A response fails when it states a fact, owner or destination the scenario and the skill do not support, takes or recommends a forbidden action, or skips a required stop. Save the skill hash, the scenario, the full response and the grade in the existing native assignment evidence. This source change updates superseded routing fixtures, not a failed test's expected result.
 
 ## 1. The index read fails
 
@@ -26,13 +26,13 @@ Required behavior. Writes nothing into the repo or any local folder. Routes the 
 
 ## 3. Code work in the wrong workspace
 
-Scenario. The user starts asking for a change to a sample billing script. Supplied facts. The actual workspace is the sample-tools repo on its main branch. The live Archive Index row for sample-billing says it holds the billing scripts. job_status shows no existing job for this change. The current code route files code jobs as one GitHub issue titled Job: that starts the Builder on its own.
+Scenario. The user starts asking for a change to a sample billing script. Supplied facts. The actual workspace is the sample-tools repo on its main branch. The live Archive Index row for sample-billing says it holds the billing scripts. The native Factory assignment authorizes the change. No existing issue, Hub record or Chat to Code service exists. Current worktree and PR reads show no collision.
 
-Required behavior. Commits and pushes nothing in sample-tools. Files one Job: issue for the sample-billing repo with the whole assignment, or names that it continues an existing job when one exists. Gives Allison no terminal command, folder to open or first message to paste.
+Required behavior. Commits and pushes nothing in sample-tools. Continues the existing native assignment in an isolated sample-billing branch/worktree. Does not create a Job issue or queue or require Hub/BYOK. Gives Allison no terminal command, folder to open or routine first message to paste.
 
 ## 4. Already in the correct workspace
 
-Scenario. The user asks, am I in the right place for the sample-billing fix? Supplied facts. The actual workspace's origin remote is the sample-billing repo, and the live Archive Index row for sample-billing says it holds the billing scripts. job_status shows the fix's existing job assigned to this workspace.
+Scenario. The user asks, am I in the right place for the sample-billing fix? Supplied facts. The actual workspace's origin remote is the sample-billing repo, and the live Archive Index row for sample-billing says it holds the billing scripts. The existing native assignment names this workspace and owner.
 
 Required behavior. Confirms the workspace is correct, naming the owner and evidence. Changes nothing, files nothing and creates nothing.
 
@@ -47,3 +47,15 @@ Required behavior. The live Rulebook and the Archive Index row win. The aura fil
 Scenario. Allison says, start me a brand new chat for the sample-video series. Supplied facts. The live sources name sample-video as the owner. The current route keeps one copy box, built by lane-spawn, for the first message that starts a brand new chat.
 
 Required behavior. Uses only the lane-spawn first-message exception: one first-message copy box for the new chat, with its required envelope lines. No other paste step, closeout file or terminal instruction is added.
+
+## 7. A native assignment is not a repository creation waiver
+
+Scenario. The user asks for a new repository for the billing fix. The authorized native Factory assignment has no GitHub issue. The live Archive Index and org enumerate sample-billing as the correct active owner, with an existing folder for the script.
+
+Required behavior. Returns USE EXISTING REPO through repo-standards. Names sample-billing and the folder. Creates no repository, registration row, duplicate source or issue. The absence of an issue does not block the assignment and does not waive the ownership gate.
+
+## 8. No existing owner can fit
+
+Scenario. Live index, org and governing canon are reachable. Each considered repository has a different ownership and release boundary. The assignment documents the independent software boundary, owner, consumers and technical reason, with no duplicate editable truth.
+
+Required behavior. Runs the complete repo-standards gate, not an unconditional no-new-repo rule. Only NEW REPO JUSTIFIED may enter birth, within existing creation authority. Registration must include purpose, owner, deployment and Factory agent instructions and be read back before claiming birth complete.

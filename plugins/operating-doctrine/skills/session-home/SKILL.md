@@ -3,7 +3,7 @@ name: session-home
 description: |
   Check that a piece of work is happening in its current owning home. Resolves
   the owner live from the HQ Rulebook (Where things live, Project ownership), the
-  GitHub Archive Index row, Chat to Code jobs through job_status and the owning
+  GitHub Archive Index row, the native Factory assignment and the owning
   brain's index, then reads the actual host and workspace. Confirms an
   already-correct workspace and changes nothing. Routes business material to its
   indexed Drive brain home, never a repo or folder. Code work found in the wrong
@@ -49,7 +49,7 @@ Read these live this session, each found by its title or its current tool, never
 
 1. The HQ Rulebook sections Where things live and Project ownership.
 2. For code, the owning repo's row in the GitHub Archive Index sheet (What it holds, Pile), checked against the live org.
-3. In-flight work through job_status on the Chat to Code job list, and the owning repo's open Job issues. The Job Tracker covers older work.
+3. In-flight work through the owning Factory assignment or Workstream, current branches/worktrees and open PRs. Read an existing issue when it carries relevant work, but do not require one. Chat to Code records and the Job Tracker are historical evidence, not a queue to restart.
 4. For business material, the owning brain's `00 START HERE` index, which names its folder for that kind of content.
 
 The newest applicable Decision Log entry wins over older text. Never infer an owner from a repo name, a folder name or a deployed copy of this skill.
@@ -64,7 +64,7 @@ Read where this session actually runs instead of assuming a folder layout: the h
 
 - **Already in the right home.** Say so, name the owner and the evidence, and change nothing.
 - **Business material.** It goes to the folder the owning brain's index names, filed through the intake skill, never into a repo or a local folder, and no copy stays in the workspace. Secrets and credentials go to 1Password only and are never copied into notes, transcripts, Docs or repos.
-- **Code work in the wrong workspace.** Commit and push nothing here. If an existing Chat to Code job or Job issue already carries the work, continue it there. Otherwise file it on the current code route for the owning repo, as code-block-routing describes: one GitHub issue titled `Job:` with the whole assignment, which starts the Builder on its own. Name any edits already made in the wrong workspace in the report and carry what the job needs into its body; do not discard them without consent. Never hand Allison a terminal command, a folder to open or a first message to paste for this.
+- **Code work in the wrong workspace.** Commit and push nothing here. Continue the authorized native Factory assignment in the owning repo on an isolated branch/worktree, coordinating current owners and open PRs first. No GitHub issue, Hub record or job queue is a prerequisite. Preserve and report any edits already made in the wrong workspace; do not discard user work. Never hand Allison a terminal command, a folder to open or a routine first message to paste.
 - **Allison explicitly asks to start a brand new chat.** Only then does the one first-message copy box apply, built by lane-spawn under code-block-routing. Ordinary routing and mismatch handling never become a paste task.
 - **No owner exists yet.** Report the live checks and what came back. The work needs the repo-standards creation gate (run through new-project) before any repo or folder exists. Create nothing on the fly.
 
