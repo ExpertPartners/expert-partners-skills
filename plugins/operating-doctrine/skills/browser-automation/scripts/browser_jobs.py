@@ -30,6 +30,26 @@ EXTENSION = "chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/connect.html"
 STATE_JS = "const s=Buffer.constructor('return process')().__epBrowserJob;if(!s)throw Error('owned_state_missing');"
 OWNED_SOURCE = Path(__file__).with_name("owned_pages.js").read_text()
 SAFE_ENV = ("HOME", "USER", "LOGNAME", "PATH", "LANG", "LC_ALL", "TMPDIR")
+# Silences this private MCP process's Tab capture before the vendor builds the
+# response: console/page errors (and its console-*.log file), request events,
+# downloads, snapshots, modal text and tab headers. The process exits at finish,
+# so the job stays finish-only instead of restoring capture over revealed state.
+SEAL_JS = (STATE_JS + "if(s.task!==page)throw Error('sealed_target_not_owned_task');"
+           "const k=Object.getOwnPropertySymbols(page).find(x=>page[x]&&typeof page[x].captureSnapshot==='function');const tab=k&&page[k];"
+           "if(!tab||!tab.context||typeof tab.context.tabs!=='function')throw Error('sealed_capture_unavailable');"
+           "if(tab.context.sessionLog)throw Error('sealed_session_log_active');const T=Object.getPrototypeOf(tab);"
+           "for(const m of ['_handleConsoleMessage','_addLogEntry','_handleRequest','_handleResponse','_handleRequestFailed','_downloadStarted','captureSnapshot','headerSnapshot'])"
+           "if(typeof T[m]!=='function')throw Error('sealed_capture_unavailable');"
+           "const quiet=()=>{};T._handleConsoleMessage=quiet;T._addLogEntry=quiet;T._handleRequest=quiet;T._handleResponse=quiet;T._handleRequestFailed=quiet;"
+           "T._downloadStarted=async()=>{};T.captureSnapshot=async function(){return {ariaSnapshot:'',modalStates:[],events:[]};};"
+           "T.headerSnapshot=async function(){return {title:'',url:'',current:this.isCurrentTab(),crashed:false,console:{total:0,errors:0,warnings:0},changed:false};};"
+           "const scrub=()=>{for(const t of tab.context.tabs()){t._consoleLog?.stop();t._recentEventEntries=[];if(Array.isArray(t._requests))t._requests.length=0;}};"
+           "scrub();s.sealed=true;let ok=false;"
+           "try{const fn=Buffer.constructor('return ('+__SEALED_SOURCE__+')')();await fn(page);ok=true;}catch{}"
+           "finally{try{await page.clearConsoleMessages();await page.clearPageErrors();}catch{}scrub();}"
+           "return {sealed:ok?'ok':'error'};")
+SEALED_OUTCOMES = {"ok": None, "error": "sealed_code_failed"}
+TIMING_RECORDS = 20
 
 
 def redact(value):
@@ -156,6 +176,9 @@ class Route:
         # No URLs, credentials, provider results or arbitrary tool inputs on disk.
         row = {k: job[k] for k in ("job_id", "label", "status", "client_name", "generation", "metadata", "updated")}
         row["ownership_pending"] = job.get("ownership_pending", False)
+        row["sealed"] = job.get("sealed", False)
+        # Stage names and wall times only, so a hung call shows where it stopped.
+        row["timings"] = job.get("timings", [])
         path = self.root / (job["job_id"] + ".json")
         tmp = path.with_suffix(".tmp")
         fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
@@ -167,6 +190,12 @@ class Route:
             os.replace(tmp, path)
         finally:
             tmp.unlink(missing_ok=True)
+
+    @staticmethod
+    def mark(job, stage):
+        records = job.get("timings")
+        if records:
+            records[-1]["stages"].append([stage, round(time.time(), 3)])
 
     def checkpoint(self, job, status=None):
         if status:
@@ -252,6 +281,8 @@ class Route:
                 tool["description"] = "Finish this job; close only its owned pages, connector and transport."
             if tool["name"] == "browser_tabs":
                 tool["description"] += " Use the same indices shown by ordinary tools' Open tabs. The Welcome connector index is protected and cannot be selected or closed."
+            if tool["name"] == "browser_run_code_unsafe":
+                schema["properties"]["sealed"] = {"type": "boolean", "description": "Opt in for one secret-bearing call: pass only code. Console, events, snapshot and tab headers are not captured, the code is not echoed, and the reply is only {\"sealed\": \"ok\"} or a fixed error code. Afterwards this job only accepts browser_job_status and browser_job_finish."}
         for name, description, props in (
             ("browser_job_start", "Create a separate connection and window in the verified existing signed-in profile for this task. Never reuse another task's job_id.", {"name": {"type": "string", "minLength": 1, "maxLength": 80}}),
             ("browser_job_status", "Read only this job's lifecycle and ownership receipt.", {"job_id": {"type": "string"}}),
@@ -281,11 +312,15 @@ class Route:
             raise Refusal("job_not_ready_finish_or_recover")
         if self.preflight() != job["generation"]:
             raise Refusal("browser_generation_changed_no_replay")
+        self.mark(job, "prime_preflight")
         self.verify_connection(job)
+        self.mark(job, "prime_verify")
         own = code(job["client"], STATE_JS + "if(!s.task||s.task.isClosed())throw Error('owned_page_closed');return {index:s.connector.context().pages().indexOf(s.task)};")
+        self.mark(job, "prime_own_index")
         reply = job["client"].call("tools/call", {"name": "browser_tabs", "arguments": {"action": "select", "index": own["index"]}})
         if reply.get("isError"):
             raise Refusal("owned_page_selection_failed")
+        self.mark(job, "prime_select")
 
     def verify_connection(self, job):
         observed = self.metadata(job["client"])
@@ -402,12 +437,17 @@ class Route:
         if name == "browser_job_start":
             return self.start(arguments.get("name"))
         job = self.get(arguments.get("job_id"))
-        args = {k: v for k, v in arguments.items() if k != "job_id"}
+        sealed = name == "browser_run_code_unsafe" and "sealed" in arguments and arguments["sealed"] is not False
+        args = {k: v for k, v in arguments.items() if k != "job_id" and not (k == "sealed" and name == "browser_run_code_unsafe")}
         with job["lock"]:
             if name == "browser_job_status":
                 return result(self.summary(job))
             if name in ("browser_job_finish", "browser_close"):
                 return self.finish(job)
+            if job.get("sealed"):
+                return result({"sealed": "error", "code": "sealed_job_finish_only"}, True)
+            if sealed and (arguments["sealed"] is not True or set(args) != {"code"} or not isinstance(args["code"], str) or not args["code"].strip()):
+                return result({"sealed": "error", "code": "sealed_arguments_invalid"}, True)
             if name == "browser_job_recover":
                 if job["status"] != "failed":
                     raise Refusal("only_failed_jobs_recover")
@@ -426,6 +466,10 @@ class Route:
             denied, note = self.policy(name, args)
             if denied:
                 return denied
+            job.setdefault("timings", []).append({"tool": name, "sealed": sealed, "stages": [["received", round(time.time(), 3)]]})
+            del job["timings"][:-TIMING_RECORDS]
+            if sealed:
+                return self.sealed_call(job, args["code"])
             try:
                 if name == "browser_tabs":
                     if job["status"] != "ready":
@@ -434,22 +478,52 @@ class Route:
                         raise Refusal("browser_generation_changed_no_replay")
                     self.verify_connection(job)
                     job["ownership_pending"] = True
+                    self.mark(job, "tool_start")
                     self.checkpoint(job)
                     reply = self.tabs(job, args)
                 else:
                     self.prime(job)
                     job["ownership_pending"] = True
+                    self.mark(job, "tool_start")
                     self.checkpoint(job)
                     reply = job["client"].call("tools/call", {"name": name, "arguments": args})
+                self.mark(job, "tool_end")
                 job["metadata"] = self.verify_connection(job)
                 job["ownership_pending"] = False
+                self.mark(job, "post_metadata")
                 self.checkpoint(job)
                 if note:
                     reply.setdefault("content", []).append({"type": "text", "text": note})
                 return redact(reply)
             except Exception:
+                self.mark(job, "failed")
                 self.checkpoint(job, "failed")
                 return result({"job_id": job["job_id"], "status": "failed", "error": "Operation outcome uncertain. Inspect before retrying; no automatic replay. Use finish or recover for this job."}, True)
+
+    def sealed_call(self, job, source):
+        """Run one secret-bearing snippet. Only fixed tokens ever leave this method."""
+        try:
+            self.prime(job)
+            job["sealed"] = True
+            job["ownership_pending"] = True
+            self.mark(job, "tool_start")
+            self.checkpoint(job)
+            outcome = code(job["client"], SEAL_JS.replace("__SEALED_SOURCE__", json.dumps(source))).get("sealed")
+            self.mark(job, "tool_end")
+            if outcome not in SEALED_OUTCOMES:
+                raise Refusal("sealed_outcome_unknown")
+            job["metadata"] = self.verify_connection(job)
+            job["ownership_pending"] = False
+            self.mark(job, "post_metadata")
+            self.checkpoint(job)
+        except Exception:
+            # Provider and page text can carry the secret; keep only the fact.
+            self.mark(job, "failed")
+            self.checkpoint(job, "failed")
+            return result({"sealed": "error", "code": "sealed_outcome_uncertain"}, True)
+        if SEALED_OUTCOMES[outcome]:
+            return result({"sealed": "error", "code": SEALED_OUTCOMES[outcome]}, True)
+        return result({"sealed": "ok"})
 
     def shutdown(self):
         # EOF and normal termination dispose this facade's own jobs only.
