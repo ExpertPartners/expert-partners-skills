@@ -1,6 +1,6 @@
 ---
 name: shadow-board
-description: "Seats a board of five real, named experts on a project, decision, plan or draft. Each member scores it 0 to 100 from their own lens, the board runs one anonymous peer review and one synthesis, then produces one revised version aimed at 100 from every member and saves the finished review as a Google Doc company record. Use when someone says shadow board, board of advisors, score this 0 to 100, assemble the council, or get expert perspectives on this draft. Asks exactly one question when the input is too vague to review. Keeps the same board for the life of a project. A one-run swap keeps the seat's lens and needs the user's yes. Every score cites the exact words in the work that earned it. At most three revise and rescore passes. The true score always shows and is never raised. The skill never changes itself. Inherits operating-doctrine."
+description: "Seats a board of five real, named experts on a project, decision, plan or draft. Each member scores it 0 to 100 from their own lens, the board runs one anonymous peer review and one synthesis, then produces one revised version aimed at 100 from every member and saves the finished review as a Google Doc company record. Use when someone says shadow board, board of advisors, score this 0 to 100, assemble the council, or get expert perspectives on this draft. Asks exactly one question when the input is too vague to review. Picks a fresh board by default and keeps it for the project, or seats the board a room appointed, such as a Marketing Board of Directors, filling open seats with counterweights. A one-run swap keeps the seat's lens and needs the user's yes. Every score cites the exact words in the work that earned it. At most three revise and rescore passes. The true score always shows and is never raised. The skill never changes itself. Inherits operating-doctrine."
 allowed-tools: []
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Born dressed 2026-11-02 (Decision Log 2026-10-29, 2026-10-31 and 2026-11-01,
@@ -14,11 +14,11 @@ brand-scope: null
 subtitle: "five real experts score the work, debate it and rebuild it toward 100"
 ---
 
-# Shadow Board, v1.1 (2026-11-07)
+# Shadow Board, v1.2 (2026-11-08)
 
-A board of five real experts reviews one piece of work. Each member scores it 0 to 100 from their own lens, the members debate, and the board produces one revised version aimed at 100 from every member. The finished review is saved as a company record.
+A board of five real experts reviews one piece of work. The skill picks a fresh board, or a room seats the board it appointed. Each member scores it 0 to 100 from their own lens, the members debate, and the board produces one revised version aimed at 100 from every member. The finished review is saved as a company record.
 
-Source. The approved spec, [HQ][V1.0] Spec - Shadow Board, the Decision Log entries of 2026-10-29, 2026-10-31, 2026-11-01 and 2026-11-07, and the 2026-11-02 certification notes. Read them live before relying on them. The HQ Rulebook and the Decision Log win wherever this skill differs. Never copy a Drive link or ID into this repository, because it is public.
+Source. The approved spec, [HQ][V1.0] Spec - Shadow Board, the Decision Log entries of 2026-10-29, 2026-10-31, 2026-11-01, 2026-11-07 and 2026-11-08, and the 2026-11-02 certification notes. Read them live before relying on them. The HQ Rulebook and the Decision Log win wherever this skill differs. Never copy a Drive link or ID into this repository, because it is public.
 
 The member brief, the reply form, the peer review, the synthesis and the Doc layout are written out in references/board-procedure.md. Use them at each step.
 
@@ -32,13 +32,23 @@ Clear input goes straight to the review, with no question.
 
 ## 2. The board
 
-Choose five real, named experts whose perspectives differ and fit the work. For each one, say why they belong, the lens they bring and what they will challenge.
+The board is always five real, named experts whose perspectives differ and fit the work. For each one, say why they belong, the lens they bring and what they will challenge. There are two ways to seat it.
 
-Show the board card before the board meets. In an unattended run, put the board card and why each member was seated at the top of the saved Doc instead.
+Fresh board, the default. The skill picks all five for the work in front of it.
 
-- By default, keep the same board for the life of that project.
+- Keep the same fresh board for the life of that project, so reruns compare.
 - A new, unrelated task gets a newly chosen board.
-- Before the skill is saved for a project, the user chooses fixed board or fresh each time. That choice is saved as the project's preference.
+
+Appointed board. A room may appoint its own named board, such as Marketing Board of Directors.
+
+- The user names up to five seats. Recommend naming three. The skill fills each open seat with a counterweight, a real expert whose lens differs from the named seats, and says why.
+- If every named seat comes from one school of thought, say so once. Seat them anyway if the user keeps them.
+- Show the board card and wait for the user's yes before saving.
+- Save the board as a Google Doc in the department folder of the room's owning brain, named [Brand-Department][Version] <Name> Board of Directors. Find the folder by its exact name. If the department folder is unclear, ask one question.
+- A change to an appointed board advances its version and archives the earlier one in the owning brain.
+- When the room has an appointed board, seat it every run. If the user asks for a fresh board for one run, pick fresh for that run only.
+
+Show the board card before the board meets. Mark each seat Appointed, Counterweight or Fresh. In an unattended run, put the board card and why each member was seated at the top of the saved Doc instead.
 
 ## 3. Swapping a member for one run
 
@@ -47,7 +57,7 @@ The user may swap one member for a single run.
 - The stand-in keeps the seat's lens.
 - The stand-in is described from their real published work.
 - The stand-in is shown to the user, and the user says yes before the board meets.
-- The swap is not saved into the skill. The next run seats the saved board.
+- The swap is not saved into the skill or the appointed board. The next run seats the saved board.
 - No added seats. The board is always five.
 
 ## 4. What each member is told
@@ -135,10 +145,11 @@ The skill changes only through a deliberate rebuild that HQ and Allison certify.
 These sources are credited in plain words, and no course text is quoted.
 
 - Cal and The Uncommon Business, for the board and scoring moves, moves 13 and 14 of their published reference sheet. The build follows these first (Decision Log 2026-10-29). Cal's own tools also settle the swap, the member brief, the scoring bands, the three passes, the honest low score, the layout and the rule that the skill never changes itself (Decision Log 2026-11-01).
-- Carter Jensen, for the generated board skill, followed second. That covers the one clarifying question, a fresh board for a new task, and the choice of fixed or fresh before the skill is saved.
+- Carter Jensen, for the generated board skill, followed second. That covers the one clarifying question, a fresh board for a new task, and choosing the people you want on your board and keeping them. The appointed board is adapted from that teaching.
 - Eliot Prince, for the council's independent members launched together, the anonymous peer review and the synthesis, and the verdict, key points and watch-out in each reply, used only where Cal and Carter are silent.
 - HQ's addition is everything else. That includes the save home, the naming, the versions, the archive, the certification by HQ and Allison and the marketplace updates, which close by existing company rules (Decision Log 2026-10-31), and the one-at-a-time fallback when subagents are not available.
 - HQ's additions from the 2026-11-02 certification are the unattended board card at the top of the saved Doc, the neutral synthesis chair outside the five members, and the missing-inputs line in the member reply form.
+- HQ's additions in v1.2 are the named Boards of Directors per room, the counterweight seats that fill a partly appointed board, the one-school warning and the board saved as a Google Doc in the department brain (Decision Log 2026-11-08).
 - HQ's save-home change sends reviews to the brain of the company that owns the work, including its private folder for private input (Decision Log 2026-11-07, Shadow Board reviews save in the brain of the company that owns the work).
 
 If the Week 0 browser hunt recovers Cal's or Carter's own board file, that file overrides these choices through a later certified rebuild, never through an edit made during a review.
