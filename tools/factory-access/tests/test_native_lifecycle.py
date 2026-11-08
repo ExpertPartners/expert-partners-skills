@@ -66,6 +66,9 @@ class NativeLifecycleContracts(unittest.TestCase):
             text = ' '.join(source(SKILLS + path).split())
             for phrase in ('human verification handoff', 'own owned', 'recover',
                            'outside the job', 'verify an authorized route that can close it',
+                           'Without one, do not open it',
+                           'except a recorded pending human-handoff tab, which stays open only'
+                           ' until its return or closure condition is met',
                            'unless an explicit exception is recorded',
                            'No completed owned tab survives',
                            'record the exact tab, its owning job, the return condition and when it closes'):

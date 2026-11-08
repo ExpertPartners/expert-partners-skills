@@ -170,8 +170,8 @@ sessions. This rule follows the HQ Rulebook's Browser tabs stay clean section (D
 - Keep the job's own "Welcome" connector page while its connection is active. Create
   and retain a separate owned working Page. Do not navigate the connector page as the
   working page or reuse another job's connector.
-- Close every tab you opened before you report or end your turn. End with `browser_tabs`
-  close on each of your tabs.
+- Close every tab you opened before you report or end your turn, except a recorded pending human-handoff tab, which stays open only until its return or closure condition is met.
+  End with `browser_tabs` close on each of your other tabs.
   `browser_close` alone leaves the tab open in extension mode.
 - After a crash or reconnect, close your own leftover tabs before starting again.
 - Keep a human verification handoff, such as a sign-in or MFA step, in this job's own
