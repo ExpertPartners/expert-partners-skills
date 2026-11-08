@@ -1,3 +1,6 @@
+## 2.86.0 - 2026-11-08
+
+Add the factory-operator skill. Before Droid work starts, it picks the lowest-cost reliable Factory setup: surface, machine, model, reasoning, overage and BYOK posture. It checks the live usage windows first and never spends money or changes settings itself. It reuses session-model-advisor, capability-currency and the existing factory-access launcher instead of adding new tooling.
 ## 2.85.0 - 2026-11-07
 
 Update Shadow Board to v1.1. Save Expert Partners and AG Luxury reviews in the owning company's business brain, with private input routed to that brain's private folder. Include the board card at the top of unattended reviews, name a neutral synthesis chair outside the five members, and add missing inputs to the member reply form. Record these HQ additions and the November 7 save-home decision without changing the remaining review procedure.
