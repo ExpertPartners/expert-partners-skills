@@ -61,6 +61,13 @@ class NativeLifecycleContracts(unittest.TestCase):
         self.assertIn('Keep stored readiness scores and denominators unchanged', repo)
         self.assertIn('automatic readiness evaluation never silently repairs, renames, archives', repo)
 
+    def test_human_browser_handoff_stays_in_closable_owned_tab(self):
+        for path in ('browser-automation/SKILL.md', 'ember-browser-routing/SKILL.md'):
+            text = ' '.join(source(SKILLS + path).split())
+            self.assertIn('human verification handoff', text, path)
+            self.assertIn('verify an authorized route that can close it', text, path)
+            self.assertIn('No completed owned tab survives', text, path)
+
     def test_existing_validator_and_release_producers_remain_available(self):
         for path in ('tools/validate-job.sh', 'tools/release/release.py',
                      'tools/skill-deploy/deploy-skill.sh', '.changeset/README.md'):
