@@ -50,6 +50,7 @@ SEAL_JS = (STATE_JS + "if(s.task!==page)throw Error('sealed_target_not_owned_tas
            "return {sealed:ok?'ok':'error'};")
 SEALED_OUTCOMES = {"ok": None, "error": "sealed_code_failed"}
 TIMING_RECORDS = 20
+GENERATION_ATTEMPTS = 30
 
 
 def redact(value):
@@ -85,15 +86,28 @@ def projection(reply):
     return value
 
 
+def failure_stage(error):
+    # Refusal codes are static; any other exception keeps only its class name.
+    return "failed:" + (str(error) if type(error) is Refusal else type(error).__name__)
+
+
 def code(client, body):
     return projection(client.call("tools/call", {"name": "browser_run_code_unsafe", "arguments": {"code": "async(page)=>{" + body + "}"}}))
 
 
 def chrome_generation():
     """Read only the main Chrome process identity, never its credential-bearing argv."""
-    ids = subprocess.run(["/usr/bin/pgrep", "-x", "Google Chrome"], capture_output=True, text=True, timeout=3, check=False).stdout.split()
-    if len(ids) != 1 or not ids[0].isdigit():
-        raise Refusal("chrome_generation_ambiguous")
+    for attempt in range(GENERATION_ATTEMPTS):
+        ids = subprocess.run(["/usr/bin/pgrep", "-x", "Google Chrome"], capture_output=True, text=True, timeout=3, check=False).stdout.split()
+        if len(ids) == 1 and ids[0].isdigit():
+            break
+        # Every exec of the Chrome binary, including a peer job's window
+        # wrapper, runs a short-lived second "Google Chrome" that hands off to
+        # the running browser and exits. Wait that out; persistent ambiguity
+        # still refuses.
+        if attempt == GENERATION_ATTEMPTS - 1:
+            raise Refusal("chrome_generation_ambiguous")
+        time.sleep(.1)
     stamp = subprocess.run(["/bin/ps", "-p", ids[0], "-o", "lstart="], capture_output=True, text=True, timeout=3, check=True).stdout.strip()
     if not stamp:
         raise Refusal("chrome_generation_missing")
@@ -495,8 +509,8 @@ class Route:
                 if note:
                     reply.setdefault("content", []).append({"type": "text", "text": note})
                 return redact(reply)
-            except Exception:
-                self.mark(job, "failed")
+            except Exception as error:
+                self.mark(job, failure_stage(error))
                 self.checkpoint(job, "failed")
                 return result({"job_id": job["job_id"], "status": "failed", "error": "Operation outcome uncertain. Inspect before retrying; no automatic replay. Use finish or recover for this job."}, True)
 
@@ -516,9 +530,9 @@ class Route:
             job["ownership_pending"] = False
             self.mark(job, "post_metadata")
             self.checkpoint(job)
-        except Exception:
-            # Provider and page text can carry the secret; keep only the fact.
-            self.mark(job, "failed")
+        except Exception as error:
+            # Provider and page text can carry the secret; keep only the static code.
+            self.mark(job, failure_stage(error))
             self.checkpoint(job, "failed")
             return result({"sealed": "error", "code": "sealed_outcome_uncertain"}, True)
         if SEALED_OUTCOMES[outcome]:
