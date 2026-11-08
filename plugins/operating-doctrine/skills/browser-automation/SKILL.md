@@ -243,6 +243,15 @@ action has an uncertain outcome and is not automatically replayed. The packaged
 route supplies the separate connection and window, retains the working Page and
 checks headless policy internally as well as through native consumer hooks.
 
+For one call that reveals or moves a secret, pass `sealed: true` with only `code` to
+`browser_run_code_unsafe`. The route then captures no console, page errors, network
+events, snapshot or tab headers, does not echo the code, and answers only
+`{"sealed": "ok"}` or a fixed error code. Stage the page with ordinary read-only calls
+first. After the sealed call the job accepts only `browser_job_status` and
+`browser_job_finish`; confirm the result with a fresh job. Treat any sealed error as an
+uncertain outcome: reconcile and stop, never repeat the call. Each job receipt keeps
+stage timestamps for its recent calls, with no page content.
+
 The existing-profile window adapter is packaged with this skill. Its
 [connection procedure](references/owned-connections.md) explains its boundaries. Source
 checks do not establish installed transport allocation, headless-policy enforcement,

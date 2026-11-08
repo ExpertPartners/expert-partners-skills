@@ -300,6 +300,134 @@ process.__epBrowserJob={connector:{evaluate:async(fn,arg)=>await fn(arg)}};
             checked = subprocess.run(["node", "-e", script], capture_output=True, text=True, timeout=10)
             self.assertEqual(checked.returncode, 0, checked.stderr)
 
+    def sealed_route(self, root):
+        route = self.route(root)
+        route.inventory.append({"name": "browser_run_code_unsafe", "inputSchema": {"type": "object", "properties": {"code": {"type": "string"}}}})
+        sent = []
+        job = {"job_id": "c" * 32, "label": "fixture", "client_name": "fixture", "generation": {}, "metadata": route.metadata(None), "updated": 0,
+               "lock": threading.RLock(), "status": "ready", "client": SimpleNamespace(call=lambda *a: sent.append(a) or b.result({"vendor": "normal"}))}
+        route.jobs[job["job_id"]] = job
+        return route, job, sent
+
+    def test_sealed_reply_is_a_fixed_token_and_job_becomes_finish_only(self):
+        source = "async (page) => { console.log('SYNTHETIC_CANARY'); throw Error('SYNTHETIC_CANARY'); }"
+        for vendor, expected, status in (({"sealed": "ok"}, {"sealed": "ok"}, "ready"),
+                                         ({"sealed": "error"}, {"sealed": "error", "code": "sealed_code_failed"}, "ready"),
+                                         ({"sealed": "SYNTHETIC_CANARY"}, {"sealed": "error", "code": "sealed_outcome_uncertain"}, "failed"),
+                                         (Refusal("owned_operation_failed"), {"sealed": "error", "code": "sealed_outcome_uncertain"}, "failed")):
+            with tempfile.TemporaryDirectory() as root:
+                route, job, sent = self.sealed_route(root)
+                bodies = []
+
+                def run(_, body, vendor=vendor):
+                    bodies.append(body)
+                    if isinstance(vendor, Exception):
+                        raise vendor
+                    return vendor
+                with patch.object(b, "code", side_effect=run):
+                    reply = route.call("browser_run_code_unsafe", {"job_id": job["job_id"], "code": source, "sealed": True})
+                self.assertEqual(json.loads(reply["content"][0]["text"]), expected)
+                self.assertEqual(len(reply["content"]), 1)
+                self.assertEqual(reply["isError"], expected != {"sealed": "ok"})
+                self.assertEqual(job["status"], status)
+                self.assertEqual(sent, [])  # The user code never travels as an ordinary vendor call.
+                self.assertIn(json.dumps(source), bodies[0])
+                receipt = (Path(root) / (job["job_id"] + ".json")).read_text()
+                self.assertNotIn("SYNTHETIC_CANARY", receipt)
+                self.assertTrue(json.loads(receipt)["sealed"])
+                with patch.object(route, "prime") as prime:
+                    for name, args in (("browser_navigate", {"url": "http://127.0.0.1"}), ("browser_run_code_unsafe", {"code": source, "sealed": True})):
+                        refused = route.call(name, {"job_id": job["job_id"], **args})
+                        self.assertEqual(decode(refused), {"sealed": "error", "code": "sealed_job_finish_only"})
+                prime.assert_not_called()
+
+    def test_sealed_arguments_are_strict_and_never_reach_the_browser(self):
+        with tempfile.TemporaryDirectory() as root:
+            route, job, sent = self.sealed_route(root)
+            with patch.object(route, "prime") as prime, patch.object(b, "code") as execute:
+                for args in ({"code": "async()=>{}", "sealed": "yes"}, {"code": "async()=>{}", "filename": "x.js", "sealed": True}, {"code": " ", "sealed": True}, {"sealed": True}):
+                    reply = route.call("browser_run_code_unsafe", {"job_id": job["job_id"], **args})
+                    self.assertEqual(decode(reply), {"sealed": "error", "code": "sealed_arguments_invalid"})
+            prime.assert_not_called()
+            execute.assert_not_called()
+            self.assertFalse(job.get("sealed"))
+
+    def test_normal_run_code_is_forwarded_unchanged(self):
+        with tempfile.TemporaryDirectory() as root:
+            route, job, sent = self.sealed_route(root)
+            for extra in ({}, {"sealed": False}):
+                sent.clear()
+                reply = route.call("browser_run_code_unsafe", {"job_id": job["job_id"], "code": "async()=>1", **extra})
+                self.assertEqual(sent, [("tools/call", {"name": "browser_run_code_unsafe", "arguments": {"code": "async()=>1"}})])
+                self.assertEqual(decode(reply), {"vendor": "normal"})
+            self.assertFalse(job.get("sealed"))
+            schema = next(t for t in route.tools()["tools"] if t["name"] == "browser_run_code_unsafe")["inputSchema"]
+            self.assertEqual(schema["properties"]["sealed"]["type"], "boolean")
+            self.assertNotIn("sealed", schema["required"])
+
+    def test_receipt_retains_stage_timestamps_without_page_content(self):
+        with tempfile.TemporaryDirectory() as root:
+            route, job, _ = self.sealed_route(root)
+            route.prime = b.Route.prime.__get__(route)
+            job["generation"] = route.preflight()
+            with patch.object(b, "code", return_value={"index": 1}):
+                job["client"] = SimpleNamespace(call=lambda *a: b.result({"vendor": "SYNTHETIC_CANARY"}) if a[1]["name"] == "browser_navigate" else {"content": []})
+                for _ in range(b.TIMING_RECORDS + 2):
+                    route.call("browser_navigate", {"job_id": job["job_id"], "url": "http://127.0.0.1/SYNTHETIC_CANARY"})
+            row = json.loads((Path(root) / (job["job_id"] + ".json")).read_text())
+            self.assertEqual(len(row["timings"]), b.TIMING_RECORDS)
+            last = row["timings"][-1]
+            self.assertEqual(last["tool"], "browser_navigate")
+            self.assertEqual([s for s, _ in last["stages"]], ["received", "prime_preflight", "prime_verify", "prime_own_index", "prime_select", "tool_start", "tool_end", "post_metadata"])
+            times = [t for _, t in last["stages"]]
+            self.assertEqual(times, sorted(times))
+            self.assertNotIn("SYNTHETIC_CANARY", json.dumps(row))
+            with patch.object(b, "code", side_effect=Refusal("response_timeout")):
+                route.call("browser_navigate", {"job_id": job["job_id"], "url": "http://127.0.0.1"})
+            row = json.loads((Path(root) / (job["job_id"] + ".json")).read_text())
+            self.assertEqual([s for s, _ in row["timings"][-1]["stages"]], ["received", "prime_preflight", "prime_verify", "failed"])
+
+    def test_seal_silences_vendor_capture_before_response_build(self):
+        # Execute the shipped seal against a fake vendor Tab whose prototype owns
+        # the capture methods, as in the pinned Playwright MCP bundle.
+        with tempfile.TemporaryDirectory() as root:
+            route, job, _ = self.sealed_route(root)
+            bodies = []
+            with patch.object(b, "code", side_effect=lambda _, body: bodies.append(body) or {"sealed": "error"}):
+                route.call("browser_run_code_unsafe", {"job_id": job["job_id"], "sealed": True,
+                                                       "code": "async (page) => { page.emit('console', 'SYNTHETIC_CANARY'); throw Error('SYNTHETIC_CANARY'); }"})
+        fixture = r'''
+const assert=require('node:assert/strict');
+const written=[];let cleared=0;
+class Tab{constructor(page){this.page=page;this.context=ctx;this._consoleLog={stopped:false,stop(){this.stopped=true;}};this._recentEventEntries=[{type:'console'}];this._requests=[1];page[sym]=this;}
+  _handleConsoleMessage(m){written.push(m);} _addLogEntry(e){this._recentEventEntries.push(e);} _handleRequest(r){this._requests.push(r);}
+  _handleResponse(){} _handleRequestFailed(){} async _downloadStarted(){written.push('download');}
+  async captureSnapshot(){return {ariaSnapshot:'SYNTHETIC_CANARY',modalStates:[{description:'SYNTHETIC_CANARY'}],events:[]};}
+  async headerSnapshot(){return {title:'SYNTHETIC_CANARY',url:'http://x/SYNTHETIC_CANARY',changed:true};} isCurrentTab(){return true;}}
+const sym=Symbol('tabSymbol');const tabs=[];const ctx={tabs:()=>tabs,sessionLog:undefined};
+const page={emit(kind,m){tabs[0]._handleConsoleMessage(m);tabs[0]._addLogEntry({m});},clearConsoleMessages:async()=>{cleared++;},clearPageErrors:async()=>{cleared++;}};
+tabs.push(new Tab(page));
+process.__epBrowserJob={task:page};
+(async()=>{
+  const out=await (async(page)=>{BODY})(page);
+  assert.deepEqual(out,{sealed:'error'});
+  assert.deepEqual(written,[]);
+  assert.equal(tabs[0]._consoleLog.stopped,true);
+  assert.deepEqual(tabs[0]._recentEventEntries,[]);
+  assert.equal(tabs[0]._requests.length,0);
+  assert.equal(cleared,2);
+  const later=new Tab({});later._handleConsoleMessage('SYNTHETIC_CANARY');await later._downloadStarted();
+  assert.deepEqual(written,[]);
+  assert.equal(JSON.stringify(await later.captureSnapshot()).includes('SYNTHETIC_CANARY'),false);
+  assert.equal(JSON.stringify(await later.headerSnapshot()).includes('SYNTHETIC_CANARY'),false);
+  process.__epBrowserJob={task:{}};
+  await assert.rejects(()=>(async(page)=>{BODY})(page),/sealed_target_not_owned_task/);
+  ctx.sessionLog={};process.__epBrowserJob={task:page};
+  await assert.rejects(()=>(async(page)=>{BODY})(page),/sealed_session_log_active/);
+})().catch(e=>{console.error(e);process.exitCode=1;});
+'''
+        checked = subprocess.run(["node", "-e", fixture.replace("BODY", bodies[0])], capture_output=True, text=True, timeout=10)
+        self.assertEqual(checked.returncode, 0, checked.stderr)
     def test_owned_transport_reaps_child_and_never_signals_peer(self):
         script = "import sys,json\nfor line in sys.stdin:\n q=json.loads(line); print(json.dumps({'jsonrpc':'2.0','id':q['id'],'result':{'ok':True}}),flush=True)\n"
         clients = [StdioClient([sys.executable, "-u", "-c", script], os.environ.copy(), timeout=3) for _ in range(2)]
