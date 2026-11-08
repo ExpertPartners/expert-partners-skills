@@ -1,3 +1,6 @@
+## 2.87.1 - 2026-11-08
+
+Browser job preflight now waits out the short-lived second Chrome process that any launch of the Chrome binary creates, including a peer job opening its window, instead of failing the call as "Operation outcome uncertain". Job receipts now name the static refusal code at the failed stage.
 ## 2.87.0 - 2026-11-08
 
 Browser jobs gain an opt-in sealed mode for one secret-bearing `browser_run_code_unsafe` call: console, page errors, network events, snapshots and tab headers are not captured, the code is not echoed, and the reply is only a fixed token or fixed error code, after which the job is finish-only. Job receipts now keep per-stage timestamps for recent calls, with no page content.
