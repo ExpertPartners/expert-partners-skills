@@ -202,8 +202,10 @@ This follows the HQ Rulebook's Browser tabs stay clean section (Decision Log 202
 
 - Keep one working tab per task and reuse it by navigating in place.
 - Close a second tab right after the side-by-side step that needed it.
-- Close every tab this session opened before you report or end your turn.
+- Close every tab this session opened before you report or end your turn, except a recorded pending human-handoff tab, which stays open only until its return or closure condition is met.
 - After a crash or reconnect, close your own leftover tabs before starting again.
+- Keep a human verification handoff in the job's own owned tab, where it can be recovered and closed. Before opening a page outside the job, verify an authorized route that can close it. Without one, do not open it unless an explicit exception is recorded.
+- No completed owned tab survives the report. While a human step is still pending, record the exact tab, its owning job, the return condition and when it closes.
 - Never close another AI's tabs or Allison's, and preserve every pre-existing tab.
 - Never leave Allison's M4 browser or cursor altered.
 

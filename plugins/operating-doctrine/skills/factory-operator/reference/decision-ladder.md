@@ -2,7 +2,11 @@
 
 Facts relied on (confirmed at https://docs.factory.com/pricing/individuals.md and https://docs.factory.com/workstreams/settings.md): the three Standard windows are independent and all need headroom; Standard is consumed before Droid Core; Droid Core is the same currency with separate limits; at a limit the current request finishes, then requests error; `/limits` toggles Droid Core or Extra Usage; Workstreams show a banner at 90% and agents stop at the limit until reset, Extra Usage, or a BYOK model; "Change models" works mid-run; Workstreams use more tokens than single sessions; Auto Model escalates and fails over but nothing documents allowance-awareness.
 
-## Window rules
+## Current decision order
+
+Read the newest live Factory decisions before using numerical advice. Auto and the available Factory allowance are the default. BYOK is optional. Check actual independent usage windows and provider limits, choose minimal useful parallelism and protect founder responsiveness on local machines. Unknown usage stays unverified. No percentage in this reference grants a new spend approval or creates a universal stop.
+
+## Historical window heuristics, superseded as mandatory defaults
 
 | Condition | `high` consequence | `routine` |
 |---|---|---|
@@ -13,7 +17,7 @@ Facts relied on (confirmed at https://docs.factory.com/pricing/individuals.md an
 | Droid Core pool at 100% | Do not propose Droid Core | Same |
 | Managed compute near cap | No cloud Environments; Remote Control only | Same |
 
-## Model ladder
+## Optional pinned-model investigation
 
 1. Category from the Rulebook chart (read live).
 2. Lowest tier for that category.
@@ -23,7 +27,7 @@ Facts relied on (confirmed at https://docs.factory.com/pricing/individuals.md an
 6. Orchestrators plan and brief; they do not need the highest reasoning on every turn.
 7. Never leave a model setting on a value that can silently fall back to a costlier model. A BYOK display name in `model` with no matching `customModels` entry on that machine falls back to the Factory pool.
 
-## Worked examples
+## Historical worked examples, not current execution instructions
 
 **A. Routine research Workstream, 5-hour 42%, Droid Core 100%.** Workstream on ag-mac-mini-m4; orchestrator Sonnet-class medium; two collection agents Sonnet-class high; one synthesis agent Opus-class high at the end; no cloud Environment; pinned; overage none; no approvals; verify via Workstream Usage.
 

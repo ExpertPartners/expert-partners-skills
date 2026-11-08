@@ -56,6 +56,8 @@ Before any Fixer write, verify owner, supported defect, accepted desired-state e
 
 The standard lives in ONE place, the Repo rules section of the HQ Rulebook. Read it at the start of every run, before grading or scaffolding anything. The Project-ownership half is the Project ownership section of the same Rulebook. If it cannot be read, stop and say so, do not grade from memory.
 
+Current Factory work uses the authorized native assignment, not a universal GitHub issue, Hub record or retired Chat to Code queue. Read current Workstream, branch/worktree and PR evidence for collisions. Preserve relevant historical issues without restarting their watchers. Factory owns company development execution under the newest live decisions.
+
 This skill never restates the ten points as its own canon. The Rulebook's text wins over anything written here, and if this skill and the Rulebook ever disagree, the Rulebook is right and this skill gets corrected. Points 1 through 3 are the enforcement layer (org rulesets, bot commit routing, generated-artifact gates), points 4 through 10 are the judgment layer. Project ownership is read the same way, as authority, never restated as local canon.
 
 ## When this fires, and when it must not
@@ -83,7 +85,7 @@ When trigger 5 is ambiguous, prefer one short readiness line over a full intervi
 No Estate repo is proposed or created until this gate returns. Run it live, never from memory of what repos exist.
 
 1. **Search live existing ownership first.** Read the GitHub Archive Index sheet live before proposing any repository, then enumerate the whole org (`gh api --paginate orgs/ExpertPartners/repos`, active and archived) and reconcile the candidates against current canon. The sheet is the one topology authority. An archived or locked row whose What it holds covers the durable job is a revival candidate, not an absence; name it in the existing-owner verdict without silently unarchiving it.
-2. **Prove no existing repo can cleanly own the durable job.** Name the candidates considered and why each fails. "Nothing came to mind" is not a proof.
+2. **Prove no existing repo and folder can cleanly own the durable job.** Name the candidates considered and why each fails. "Nothing came to mind" is not a proof. Fewer repositories is a placement preference, never permission to mix unrelated owners or duplicate editable truth.
 3. **Classify the entity or capability type** using the words already in the Archive Index sheet, never a second local taxonomy.
 4. **Name the durable owner**, the domain or entity that owns the facts, not the person who asked.
 5. **Name the consumers**, who reads it and by what path (pointer, door, generated copy).
@@ -94,7 +96,7 @@ No Estate repo is proposed or created until this gate returns. Run it live, neve
 Return exactly one:
 
 - `USE EXISTING REPO` with the correct owner and why it owns the job. The creation path stops here.
-- `NEW REPO JUSTIFIED` with owner, boundaries, consumers, and the durable reason.
+- `NEW REPO JUSTIFIED` with owner, boundaries, consumers, and a documented technical or ownership reason for independent existence.
 
 Only after `NEW REPO JUSTIFIED` may stage B proceed. A gate that cannot reach live org or canon state returns neither verdict; it says which source failed and stops.
 
@@ -109,7 +111,7 @@ Work through the checklist in order and confirm each item before reporting the r
 5. **Org ruleset inheritance confirmed.** New repos inherit the estate default-branch and tag rulesets automatically. Confirm live (GET the repo's rules for its default branch) and record the check in the birth report. Never assume inheritance, prove it once.
 6. **Intake inbox, when the repo will receive session records.** Create intake/ with the ADR 0027 convention README and note the distillation cadence owner.
 7. **Project connection recorded** per Project ownership, the owning Project named and the repo connected where that surface supports connections.
-8. **Archive Index row registered.** Add the repo's row to the GitHub Archive Index sheet in the same pass: Repo name, Default branch, What it holds (the job, entity type, and owner in plain words), and Pile. Re-read the sheet to verify the landed row. A proposed row, a pending entry, or a skill's project table is not registration.
+8. **Archive Index row registered.** Add the repo's current registration row to the existing GitHub Archive Index sheet in the same pass: Repo name, Default branch, What it holds (purpose, entity type, owner, deployment and Factory agent instructions), and Pile. Preserve historical archive/worktree rows and copied-SHA receipts. Re-read the sheet to verify the landed row. A proposed row, a pending entry, or a skill's project table is not registration.
 
 Report the birth with each item named and its evidence, including the Archive Index row and its verification date. Birth cannot be reported complete without the registered row. If registration cannot land, name that exact remaining gap and keep the birth incomplete.
 
@@ -127,7 +129,7 @@ For an explicit Phase Two / Repo Design Tower pass, complete the linked sequence
 4. **Flag what is gated.** Anything destructive (deleting or rewriting existing content, force operations), anything that spends money, anything that changes who or what holds access (ruleset edits, bypass actors, token scopes), and any judgment call that needs business truth goes back to Allison as a named line item with a recommendation. The audit never executes these, even when the fix is obvious. Distinguish a verified typo or navigation correction already permitted by step 3 from a rewrite that changes governed meaning; Git reversibility alone does not authorize new business truth.
 5. **File the audit record.** A dated record lands as a Google Doc in the owning brain's home folder in Drive (HQ brain if none), titled `repo-standards-audit-<repo>`, carrying the per-point table, bounded content assessment, fixes applied with commit hashes, and open flags. Use [references/audit-record-template.md](references/audit-record-template.md). Report `READY` only when both the applicable baseline and usable front doors are evidenced; otherwise `REMEDIATION REQUIRED`. `ORGANIZE EXISTING REPO` is an action recommendation within that report, not a third readiness verdict or permission for gated changes.
 
-The walk of the existing estate runs this path one repo per pass, in the order the Archive Index and the Job Tracker set. Historically the now retired aura repo went first, per the ADR's sequencing, and the lane ledger breakup finding in its audit record is closed history now that the Job Tracker replaced the ledger.
+The walk of the existing estate runs this path one repo per pass, in the order the current authorized mission and Archive Index set. Historical aura, lane-ledger and Job Tracker sequencing is not a current execution prerequisite. Consolidation requires actual workflow, import/package, deployment and shared-infrastructure consumers, preservation of unique branches/history and unfinished work, and current owner coordination. Inactivity alone never proves no dependents. Keep stored readiness scores and denominators unchanged until the real readiness engine reruns.
 
 ## Path three, readiness check (Project attachment and material touch)
 
@@ -139,7 +141,7 @@ Run order:
 
 1. **Resolve live ownership and topology** through GitHub (repo exists, visibility, archived flag, description, default branch) and the repo's GitHub Archive Index row (What it holds, Pile). Never infer ownership from a repo name. No row means `UNREGISTERED` and `REMEDIATION REQUIRED`; the smallest safe remediation for that gap is the row itself, not a replacement repo or restructure. Use reachable owning canon to establish the proposed row's owner, or report ownership unproven rather than inventing it.
 2. **Read the Repo rules fresh**, and Project ownership for the Project half.
-3. **Resolve the relevant Project ownership and setup evidence.** Claude Project membership and repository attachment are not enumerable by any tool the estate holds; room existence is Allison's projects page. So Project relationships are established from canonical records (job_status for active assignments, each project's living plan, the current topology map) and from live session or dispatch context. A Project relationship that no accessible live source supports is reported `UNPROVEN`, never invented and never assumed from a matching name.
+3. **Resolve the relevant Project ownership and setup evidence.** Verify current capabilities rather than assuming project membership is enumerable. Establish relationships from live owning canon, the native Factory assignment or Workstream, each project's current plan and verified session context. A Project relationship that no accessible live source supports is reported `UNPROVEN`, never invented and never assumed from a matching name.
 
 Then verify, each with its evidence:
 
@@ -167,7 +169,7 @@ carrying, in this order:
 2. **Evidence** for each gap, read live this pass.
 3. **The correct owner** of the job or the fact.
 4. **The smallest safe remediation scope**, the least that closes the gap, never a repo-wide restructure when one file closes it.
-5. **A recommended scoped Claude Code dispatch** when the remediation is structural work, naming the repo, the branch, and the bounded change. Structural remediation is dispatched, never performed inline by this path.
+5. **A scoped native Factory assignment** when the remediation is structural work, naming the existing owner, repo, branch, bounded change and acceptance check. Reuse the current assignment when it already covers the work. Structural remediation is routed, never performed inline by this evaluation-only path.
 
 An automatic readiness evaluation never silently repairs, renames, archives, consolidates, or restructures anything. When a gap is destructive to close, or needs business truth, or changes who holds access, it goes to Allison as a named line item exactly as path two step 4 requires.
 

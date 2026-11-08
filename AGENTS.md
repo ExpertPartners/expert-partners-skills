@@ -13,7 +13,7 @@ Working here
 - Correct the canonical skill source first. Generated files, deployed copies, and the skill graph come only from their producers in tools. Never hand-edit them.
 - Never edit a plugin version in plugin.json or marketplace.json, or the top of a CHANGELOG.md. Add one note in .changeset/ instead, as .changeset/README.md explains. The release step in tools/release owns versions and CHANGELOG entries.
 - Run the changed-file gates in .pre-commit-config.yaml and .github/workflows/ci.yml, plus the tests under tools, before pushing. Report real results.
-- Validation command for jobs from the Chat to Code Loop: run tools/validate-job.sh from the repo root. It runs the changed-file gates from ci.yml, the skill description cap and gitleaks, and exits 0 only when all pass. A job is not done until it prints validate-job: PASS.
+- Validation command for repository changes: run tools/validate-job.sh from the repo root. The historical command name is not a queue dependency. It runs the changed-file gates from ci.yml, the skill description cap and available secret scan. Report any missing check separately from its PASS marker.
 - Secrets live in 1Password only. They never appear in code, logs, config, or chat.
 - Do not deploy, publish, upload, or delete anything permanent without the applicable founder's explicit yes.
 
@@ -23,8 +23,9 @@ Read Organization Instructions, the HQ Rulebook and the Decision Log, all in HQ 
 
 - For messages between AIs and delivery confirmations, follow the current HQ Rulebook section Handoffs between AIs. When Allison types Q or q alone, or says ask me clarifying questions, ask before working, one question at a time, most important first, using the ask-me-questions skill.
 - If a task conflicts with the Decision Log, the newest Decision Log entry wins. Follow it without asking.
-- Questions go on the board (Decision Log 2026-11-02, which wins if this line drifts from it). Never wait on a question you raise yourself inside your own app (Factory, Codex, Claude Code). This does not change the ask-me-questions flow above: when Allison asks for clarifying questions, ask her in chat and wait for each answer. If a question truly needs Allison, post a comment starting `Question for Allison` on the code job's GitHub issue, or use `job_finish` with outcome `needs-allison` for the affected non-code job and one line starting `Recommend:` in its summary, following the live tool schema. That outcome records a founder decision request, not completion. Never use `done` for unfinished work or finish an unrelated job. Retrieval and technical gaps stay AI owned unless an actual founder decision is missing. Keep working on everything that does not depend on her answer.
-- When the assignment is complete, file this job's report with job_finish, including a summary and result link, and verify it with job_status. Preserve unfinished work and its nonterminal state in its existing Chat to Code job; a partial wrap never calls job_finish. Before archive readiness, leave no uncommitted or unpushed work of its own and follow the HQ Rulebook section Session lifecycle.
+- Use the current native Factory assignment and owning Workstream for coordination. Do not require a GitHub issue or Hub record, create a Chat to Code job, restart polling, or ask Allison to relay routine messages. Existing issues and PRs remain source-control evidence, not universal intake requirements. Retrieval and technical gaps stay AI owned. A genuine founder decision names the blocker and recommendation through the current supported route, without claiming completion. User-requested clarifying questions remain separate.
+- Before creating any repository, run the live repo-standards placement gate. Prefer an existing repo and folder. Missing authority stops placement; native execution is not a shortcut around ownership or registration.
+- Finish with the actual checks, result links and limits in the owning assignment. Preserve unfinished work with its owner, return condition and expected result. A source PR, merge, installed delivery and active use are separate claims. Follow the live HQ Rulebook for archive consent and merge/release approval.
 - Never give legal, tax, or compliance advice, or suggest a professional, unless Allison asks.
 
 ## Review guidelines
@@ -33,6 +34,6 @@ These rules bind Codex and every other reviewer of pull requests here, and the b
 
 - Block only on P0 and P1 findings. A P2 or lower finding never blocks a merge.
 - Re-review only the newest commit. Do not reopen code an earlier round already reviewed unless the newest commit changed it.
-- Review rounds have no limit (Decision Log 2026-11-02, No caps stop work, which wins if this line drifts from it). The builder keeps fixing P0 and P1 findings round after round. Only a finding that comes back after it was fixed goes to Allison through the question route above, a `Question for Allison` comment on the code issue or `job_finish` with outcome `needs-allison` and a `Recommend:` summary for the affected non-code job. Never leave the question inside an app or report unfinished work as done.
+- Review rounds have no numeric cap. Fix in-scope findings through the existing PR and authorized review route. Recurring findings require root-cause evidence. Only a genuine founder decision uses the decision route above. Do not report unfinished work as done or bypass existing merge approval.
 - Fix a P2 only when the fix is small and inside the pull request's scope. Otherwise reply on the thread with the reason it is not fixed here, and resolve the thread.
 - Do not report style, rare edge cases, or refinements of an earlier fix.

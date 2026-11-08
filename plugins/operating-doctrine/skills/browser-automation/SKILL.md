@@ -170,10 +170,16 @@ sessions. This rule follows the HQ Rulebook's Browser tabs stay clean section (D
 - Keep the job's own "Welcome" connector page while its connection is active. Create
   and retain a separate owned working Page. Do not navigate the connector page as the
   working page or reuse another job's connector.
-- Close every tab you opened before you report or end your turn. End with `browser_tabs`
-  close on each of your tabs.
+- Close every tab you opened before you report or end your turn, except a recorded pending human-handoff tab, which stays open only until its return or closure condition is met.
+  End with `browser_tabs` close on each of your other tabs.
   `browser_close` alone leaves the tab open in extension mode.
 - After a crash or reconnect, close your own leftover tabs before starting again.
+- Keep a human verification handoff, such as a sign-in or MFA step, in this job's own
+  owned working tab, where the job can recover and close it. Before opening any page
+  outside the job, verify an authorized route that can close it. Without one, do not open
+  it unless an explicit exception is recorded.
+- No completed owned tab survives your report. While a human step is still pending,
+  record the exact tab, its owning job, the return condition and when it closes.
 - Never close another AI's tabs or Allison's. The extension gives each connection its own
   tab group and shows it only those tabs, so work only inside your own group.
 - Never close the window or the browser.
