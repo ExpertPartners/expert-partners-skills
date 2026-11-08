@@ -385,7 +385,7 @@ process.__epBrowserJob={connector:{evaluate:async(fn,arg)=>await fn(arg)}};
             with patch.object(b, "code", side_effect=Refusal("response_timeout")):
                 route.call("browser_navigate", {"job_id": job["job_id"], "url": "http://127.0.0.1"})
             row = json.loads((Path(root) / (job["job_id"] + ".json")).read_text())
-            self.assertEqual([s for s, _ in row["timings"][-1]["stages"]], ["received", "prime_preflight", "prime_verify", "failed"])
+            self.assertEqual([s for s, _ in row["timings"][-1]["stages"]], ["received", "prime_preflight", "prime_verify", "failed:response_timeout"])
 
     def test_seal_silences_vendor_capture_before_response_build(self):
         # Execute the shipped seal against a fake vendor Tab whose prototype owns
@@ -428,6 +428,23 @@ process.__epBrowserJob={task:page};
 '''
         checked = subprocess.run(["node", "-e", fixture.replace("BODY", bodies[0])], capture_output=True, text=True, timeout=10)
         self.assertEqual(checked.returncode, 0, checked.stderr)
+    def test_transient_second_chrome_process_is_waited_out(self):
+        # Any exec of the Chrome binary (each job's window wrapper included)
+        # briefly runs a second "Google Chrome" before handing off to the
+        # running browser. A peer's preflight must not fail during that window.
+        def runner(sequence):
+            calls = iter(sequence)
+            def run(argv, **_):
+                if argv[0] == "/usr/bin/pgrep":
+                    return SimpleNamespace(stdout=next(calls))
+                return SimpleNamespace(stdout="Thu Nov  5 16:16:24 2026\n")
+            return run
+        with patch.object(b.subprocess, "run", side_effect=runner(["92295\n25055\n", "92295\n"])), patch.object(b.time, "sleep") as pause:
+            self.assertEqual(b.chrome_generation(), {"pid": 92295, "started": "Thu Nov  5 16:16:24 2026"})
+        self.assertEqual(pause.call_count, 1)
+        with patch.object(b.subprocess, "run", side_effect=runner(["92295\n25055\n"] * b.GENERATION_ATTEMPTS)), patch.object(b.time, "sleep"):
+            with self.assertRaisesRegex(Refusal, "chrome_generation_ambiguous"):
+                b.chrome_generation()
     def test_owned_transport_reaps_child_and_never_signals_peer(self):
         script = "import sys,json\nfor line in sys.stdin:\n q=json.loads(line); print(json.dumps({'jsonrpc':'2.0','id':q['id'],'result':{'ok':True}}),flush=True)\n"
         clients = [StdioClient([sys.executable, "-u", "-c", script], os.environ.copy(), timeout=3) for _ in range(2)]
