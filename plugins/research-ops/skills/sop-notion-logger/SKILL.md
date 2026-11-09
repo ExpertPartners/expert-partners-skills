@@ -32,7 +32,7 @@ If the Notion tools cannot reach this data source, search Notion for "SOPs Datab
 1. Search the data source first for an existing entry with the same or near-same name. If it exists, update that page (status, content summary, last reviewed date). Only create a new page if no entry exists.
 2. Create or update with these properties:
    - Name: the SOP title, no date prefix.
-   - Status: Draft for anything not yet promoted; Active once promoted; In Review, Completed, Archived as appropriate.
+   - Status: Draft for anything not yet promoted by Allison; Active only when Allison has explicitly promoted it; In Review, Completed, Archived as appropriate.
    - Department: best fit from Marketing, Finance, Operations, Customer Service.
    - Tools Needed: pick from the existing multi-select options only; do not invent new options.
    - SOP Review Frequency (Months): 1 for processes tied to fast-changing external programs, 3 for internal automation-backed processes, 6 for stable ones.

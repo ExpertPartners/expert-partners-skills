@@ -69,6 +69,7 @@ As the slash command, or on its own when someone gives a business website and as
 ## What it read (B1)
 
 - Read every file in full. Name every file read in the report, and for a file read in parts, each part (B1).
+- Then run a second check for skimming, reading each source again against what was taken from it (B1).
 - Keep going. If a file cannot be opened or read after trying the other routes, name it and what failed in the report (B1).
 
 ## The run, one file at a time (R04 to R08, R14)
@@ -78,13 +79,14 @@ For each file, in order, five stages (R06). The full steps are in references/run
 1. Research. Read the brain and the web fact list for what this file needs, using every finished file before it as context (R03, R07).
 2. Draft. Fill the file's structure from references/file-structures.md. Mark every unresolved point in place as [MISSING: the exact question | Who can answer: Allison or Don] (R04, B2).
 3. Clarify. Ask Allison about the gaps, at most five questions in a batch (R05, R10).
-4. Finalize and save. Put her answers in and save the file (R06, B7).
-5. Move on to the next file (R06).
+4. Finalize and save. Put her answers in, save the file, and reopen it to confirm the save (R06, B7).
+5. Move on to the next file only after the reopen check confirms the save (R06, B7).
 
-- If a save errors, retry through another route. The closing message lists the files that saved and any that did not (R06, R07, B7, O09).
+- If a save or its reopen check fails, retry through another route and check again. If it still fails, stop the run at that file, tell Allison which file did not save and why, and never build the next file on an unsaved one. The closing message lists the files that saved and names the one that did not (R06, R07, B7, O09).
 - Keep all four files in one conversation (R08).
 - An answer still unknown after the questions stays in the file as its MISSING note. The file saves and the run moves on (B2, O04).
 - Never invent a fact, a quote, a price, a number or a name. A template field the sources cannot fill is a MISSING note (R04, R17, R19, B2).
+- Review and correct the company information with Allison before using it as workspace knowledge (R14).
 
 ## When sources disagree (B9, O03)
 
@@ -106,7 +108,7 @@ For each file, in order, five stages (R06). The full steps are in references/run
 ## The existing About Us (B6)
 
 - [EP][V1.1] About Us, the Google Doc in Company Core [EP-BB], stays untouched while Foundations builds the new Markdown About Us beside it for comparison (B6).
-- Once the new Markdown version is saved, it becomes the one master, and the old Google Doc moves to the _archived folder, never deleted (B6, R22).
+- Only Allison promotes deliverables into company knowledge (Decision Log 2026-11-08, Every department and workspace carries Cal's two boilerplate blocks before its own instructions). Saving the new Markdown version does not make it the master or archive the existing Google Doc (B6, R22).
 
 ## Saving, versions and the closing message (B6, B7, O09, R22, R24)
 
@@ -114,6 +116,7 @@ The details are in references/saving-and-closing.md (B5, B6, B7, R24).
 
 - The first Foundations version of each file is V1.0 (B5). A small change on a rerun advances the decimal and a larger change the whole number (R24).
 - The superseded version moves to the _archived folder in Company Core, keeping its history, never deleted (R22, B6).
+- Every save is confirmed by reopening the saved file before the message says it saved (B7, O09).
 - The run ends with each of the four files linked with its version, what changed since the last version, the one open-question list with each question tagged with who can answer it, and one next step (B7, B2, O09).
 
 ## What it never does (O10, B9, B1)
