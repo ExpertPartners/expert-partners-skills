@@ -76,20 +76,41 @@ const MACHINE_ALIASES: Record<string, string> = {
 	"allison m4": "ag-mac-mini-m4",
 };
 
-export async function listComputers(f: Factory): Promise<Computer[]> {
-	const d = await f.call<any>("GET", "/api/v0/computers");
+// The two Macs, the only computers sessions may start on.
+export const MAC_NAMES = ["ember-mac-mini-m2", "ag-mac-mini-m4"] as const;
+
+export function isMac(c: Computer): boolean {
+	return (MAC_NAMES as readonly string[]).includes(c.name);
+}
+
+/** List computers. Factory cloud computers (mission and droid-environment) are unlisted, so pass includeUnlisted to see them. */
+export async function listComputers(f: Factory, includeUnlisted = false): Promise<Computer[]> {
+	const d = await f.call<any>("GET", "/api/v0/computers", { query: { includeUnlisted: includeUnlisted ? "true" : undefined } });
 	return (d.computers ?? d.items ?? d) as Computer[];
 }
 
-/** Resolve "M2", "M4", a computer name or an id to a computer. */
-export async function resolveMachine(f: Factory, machine: string): Promise<Computer> {
-	const computers = await listComputers(f);
-	const want = MACHINE_ALIASES[machine.trim().toLowerCase()] ?? machine.trim();
-	const hit = computers.find((c) => c.id === want || c.name.toLowerCase() === want.toLowerCase());
+/** Match "M2", "M4", a computer name or a computer id against a computer list. */
+export function matchComputer(computers: Computer[], ref: string): Computer | undefined {
+	const want = MACHINE_ALIASES[ref.trim().toLowerCase()] ?? ref.trim();
+	return computers.find((c) => c.id === want || c.name.toLowerCase() === want.toLowerCase());
+}
+
+/** Resolve any computer the API returns, listed or unlisted, by id or name. M2 and M4 also work. Used by the computer tools. */
+export async function resolveComputer(f: Factory, ref: string): Promise<Computer> {
+	const computers = await listComputers(f, true);
+	const hit = matchComputer(computers, ref);
 	if (!hit) {
-		throw new Error(
-			`Unknown machine "${machine}". Known: ${computers.map((c) => c.name).join(", ")}, or M2 and M4.`,
-		);
+		throw new Error(`Unknown computer "${ref}". Known: ${computers.map((c) => `${c.name} (${c.id})`).join(", ")}, or M2 and M4.`);
+	}
+	return hit;
+}
+
+/** Resolve one of the two Macs. Sessions start only there, never on a Factory cloud computer. */
+export async function resolveMachine(f: Factory, machine: string): Promise<Computer> {
+	const computers = await listComputers(f, true);
+	const hit = matchComputer(computers, machine);
+	if (!hit || !isMac(hit)) {
+		throw new Error(`Unknown machine "${machine}". Sessions start only on the two Macs: M2 (ember-mac-mini-m2) or M4 (ag-mac-mini-m4).`);
 	}
 	return hit;
 }
