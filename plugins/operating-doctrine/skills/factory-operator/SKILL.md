@@ -37,6 +37,25 @@ If one can't be read, work from categories, not remembered numbers.
 - `tools/factory-access/auto_model.py`, installed as `~/.factory/bin/droid`. It rewrites every `droid exec` model and reasoning flag to `auto`. Don't install a second launcher.
 - `.github/workflows/factory-builder-reusable.yml` for CI builds.
 - `tools/skill-deploy/deploy-skill.sh` and the marketplace plugin sync for deployment.
+- `tools/factory-inbox` for the shared Drive inbox bridge. Extend this adapter rather than adding another relay.
+
+## Control Room direct line
+
+Write one plain Google Doc or UTF-8 `.txt` file into HQ Business Brain → Factory Inbox. On the M4, the same folder is available at `~/HQ-AI-Workspace-M4/Factory Inbox` and `~/.factory/Factory Inbox`. Use a unique name and this exact content, without Markdown fences inside the file.
+
+```text
+Request: control-room-20261109-001
+Session: new
+Mac: M4
+Prompt:
+The complete work request goes here.
+```
+
+Use an existing session UUID instead of `new` to send a follow-up, including into an archived session, which the bridge reopens and the close-out archives again. Read `<Request>.json` in Receipts for its session ID, link, message ID and status. `accepted` confirms submission, not completed work. Read `<Request>-completion.json` for the finished result: every session the inbox starts publishes that completion receipt and then archives itself, so a session still unarchived has unfinished bookkeeping. Never tell a session not to archive. The request moves to Done after receipt publication. New instructions and revisions use new Request IDs. Local receipt mirrors are under `~/.factory/session-inbox/receipts`. No key goes in a request. The M4 LaunchAgent resolves it from 1Password only at runtime. See [Factory Inbox](https://github.com/ExpertPartners/expert-partners-skills/blob/main/tools/factory-inbox/README.md) for installation, failure handling and tests.
+
+## North quick how-to
+
+North, use your writable Drive action to create a single plain Google Doc or UTF-8 text file with content in HQ Business Brain → Factory Inbox. Use the exact format above with a fresh Request ID, `Session: new` or the existing session UUID, `Mac: M4` or `Mac: M2`, then `Prompt:` on its own line followed by the whole instruction. Do not add Markdown fences or credentials. Read the matching JSON receipt in Receipts and report its session link and status, then the completion receipt for the result. A read-only Drive connection cannot submit files, so use the existing writable action. Allison does not paste anything or start the Factory session.
 
 ## Workflow
 1. **State.** Read actual windows (5-hour, 7-day, 30-day), pools, reset times and machines. Unknown usage is unknown.

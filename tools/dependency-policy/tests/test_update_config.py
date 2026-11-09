@@ -36,6 +36,7 @@ PYTHON_DIRS = {
     "/",
     "/plugins/research-ops/skills/source-hunter",
     "/plugins/research-ops/skills/video-discovery",
+    "/tools/factory-inbox",
 }
 NPM_DIRS = {"/tools/capability-feed", "/tools/skill-map"}
 MANIFEST = {"pip": "requirements*.txt", "npm": "package.json"}
@@ -195,12 +196,26 @@ def parse_yaml_subset(text: str):
 # ---------------------------------------------------------------------------
 
 TOP_LEVEL_KEYS = {"version", "updates"}
-ENTRY_KEYS = {"package-ecosystem", "directories", "schedule", "groups", "labels",
-              "commit-message", "ignore", "allow"}
+ENTRY_KEYS = {
+    "package-ecosystem",
+    "directories",
+    "schedule",
+    "groups",
+    "labels",
+    "commit-message",
+    "ignore",
+    "allow",
+}
 SCHEDULE_KEYS = {"interval", "day", "time", "timezone", "cronjob"}
 INTERVALS = {"daily", "weekly", "monthly", "quarterly", "semiannually", "yearly", "cron"}
-GROUP_KEYS = {"group-by", "patterns", "exclude-patterns", "applies-to", "update-types",
-              "dependency-type"}
+GROUP_KEYS = {
+    "group-by",
+    "patterns",
+    "exclude-patterns",
+    "applies-to",
+    "update-types",
+    "dependency-type",
+}
 REFUSED = {
     "open-pull-requests-limit": "holds update pull requests at a fixed count",
     "cooldown": "is a dependency-age rule, which this repository has not decided",
@@ -208,10 +223,13 @@ REFUSED = {
     "insecure-external-code-execution": "lets an update run code from a manifest",
     "directory": "is the single-path form; use directories so coverage is one list",
 }
-SENSITIVE_KEY_RE = re.compile(r"token|password|secret|credential|auth|username|permission|merge", re.I)
+SENSITIVE_KEY_RE = re.compile(
+    r"token|password|secret|credential|auth|username|permission|merge", re.I
+)
 SENSITIVE_VALUE_RE = re.compile(r"\$\{\{|secrets\.|auto-?merge", re.I)
 MERGE_STEP_RE = re.compile(
-    r"gh\s+pr\s+(merge|review)|--auto\b|enablePullRequestAutoMerge|/merge\b|approve", re.I)
+    r"gh\s+pr\s+(merge|review)|--auto\b|enablePullRequestAutoMerge|/merge\b|approve", re.I
+)
 
 
 def _walk(value, where: str):
@@ -231,7 +249,9 @@ def policy_problems(config) -> list[str]:
     problems = []
     for path, key, child in _walk(config, "config"):
         if key is not None and SENSITIVE_KEY_RE.search(str(key)):
-            problems.append(f"{path}: key {key!r} could carry a credential, permission or merge rule")
+            problems.append(
+                f"{path}: key {key!r} could carry a credential, permission or merge rule"
+            )
         if isinstance(child, str) and SENSITIVE_VALUE_RE.search(child):
             problems.append(f"{path}: value {child!r} references a secret or merge rule")
     for key in sorted(set(config) - TOP_LEVEL_KEYS):
@@ -257,9 +277,13 @@ def policy_problems(config) -> list[str]:
             directories = []
         for directory in directories:
             if not isinstance(directory, str) or not directory.startswith("/"):
-                problems.append(f"{where}.directories: {directory!r} is not a path from the repository root")
+                problems.append(
+                    f"{where}.directories: {directory!r} is not a path from the repository root"
+                )
             elif "*" in directory:
-                problems.append(f"{where}.directories: {directory!r} is a wildcard the coverage check cannot verify")
+                problems.append(
+                    f"{where}.directories: {directory!r} is a wildcard the coverage check cannot verify"
+                )
         if len(set(map(str, directories))) != len(directories):
             problems.append(f"{where}.directories: lists a directory twice")
         schedule = entry.get("schedule")
@@ -269,7 +293,9 @@ def policy_problems(config) -> list[str]:
             for key in sorted(set(schedule) - SCHEDULE_KEYS):
                 problems.append(f"{where}.schedule.{key}: is not a schedule option")
             if schedule.get("interval") not in INTERVALS:
-                problems.append(f"{where}.schedule.interval: {schedule.get('interval')!r} is not a Dependabot interval")
+                problems.append(
+                    f"{where}.schedule.interval: {schedule.get('interval')!r} is not a Dependabot interval"
+                )
         groups = entry.get("groups") or {}
         if not isinstance(groups, dict):
             problems.append(f"{where}.groups: is not a mapping")
@@ -280,12 +306,21 @@ def policy_problems(config) -> list[str]:
                 continue
             for key in sorted(set(group) - GROUP_KEYS):
                 problems.append(f"{where}.groups.{name}.{key}: is not a group option")
-        shared = [g for g in groups.values() if isinstance(g, dict) and g.get("group-by") == "dependency-name"
-                  and "*" in (g.get("patterns") or ["*"]) and not g.get("exclude-patterns")
-                  and not g.get("update-types") and not g.get("dependency-type")]
+        shared = [
+            g
+            for g in groups.values()
+            if isinstance(g, dict)
+            and g.get("group-by") == "dependency-name"
+            and "*" in (g.get("patterns") or ["*"])
+            and not g.get("exclude-patterns")
+            and not g.get("update-types")
+            and not g.get("dependency-type")
+        ]
         if len(directories) > 1 and not shared:
-            problems.append(f"{where}.groups: no group with group-by: dependency-name covers every dependency, "
-                            "so a dependency two directories share could move in one of them only")
+            problems.append(
+                f"{where}.groups: no group with group-by: dependency-name covers every dependency, "
+                "so a dependency two directories share could move in one of them only"
+            )
     return problems
 
 
@@ -315,7 +350,9 @@ def coverage_problems(config, root: Path) -> list[str]:
     problems = []
     for ecosystem, directories in expected.items():
         if directories and ecosystem not in present:
-            problems.append(f"no {ecosystem} entry; {MANIFEST[ecosystem]} lives in {', '.join(sorted(directories))}")
+            problems.append(
+                f"no {ecosystem} entry; {MANIFEST[ecosystem]} lives in {', '.join(sorted(directories))}"
+            )
         for directory in sorted(directories - configured[ecosystem]):
             problems.append(f"{ecosystem} does not cover {directory}")
         for directory in sorted(configured[ecosystem] - directories):
@@ -329,8 +366,10 @@ def workflow_problems(root: Path) -> list[str]:
     for path in sorted(base.glob("*.y*ml")) if base.is_dir() else []:
         text = path.read_text(encoding="utf-8")
         if re.search(r"dependabot", text, re.I) and MERGE_STEP_RE.search(text):
-            problems.append(f"{check_versions.rel(root, path)}: acts on Dependabot pull requests "
-                            "with a merge or approval step")
+            problems.append(
+                f"{check_versions.rel(root, path)}: acts on Dependabot pull requests "
+                "with a merge or approval step"
+            )
     return problems
 
 
@@ -393,8 +432,12 @@ class FixtureRepo:
         self.root = root
         self.write("requirements-tooling.txt", LOCK)
         self.write("plugins/research-ops/skills/video-discovery/requirements.txt", LOCK)
-        self.write("plugins/research-ops/skills/video-discovery/requirements-dev.txt", "-r requirements.txt\n")
+        self.write(
+            "plugins/research-ops/skills/video-discovery/requirements-dev.txt",
+            "-r requirements.txt\n",
+        )
         self.write("plugins/research-ops/skills/source-hunter/requirements.txt", LOCK)
+        self.write("tools/factory-inbox/requirements.txt", LOCK)
         self.write("tools/capability-feed/package.json", "{}\n")
         self.write("tools/skill-map/package.json", "{}\n")
         self.write(".github/workflows/ci.yml", "name: ci\njobs: {}\n")
@@ -429,36 +472,49 @@ class RemovedCoverageTest(FixtureTestCase):
 
     def test_removed_pip_ecosystem_is_detected(self) -> None:
         self.config["updates"].remove(self.entry("pip"))
-        self.assertDetected("no pip entry", "pip does not cover /plugins/research-ops/skills/source-hunter")
+        self.assertDetected(
+            "no pip entry", "pip does not cover /plugins/research-ops/skills/source-hunter"
+        )
 
     def test_removed_npm_ecosystem_is_detected(self) -> None:
         self.config["updates"].remove(self.entry("npm"))
-        self.assertDetected("no npm entry", "npm does not cover /tools/capability-feed",
-                            "npm does not cover /tools/skill-map")
+        self.assertDetected(
+            "no npm entry",
+            "npm does not cover /tools/capability-feed",
+            "npm does not cover /tools/skill-map",
+        )
 
     def test_each_removed_npm_directory_is_detected(self) -> None:
         for directory in sorted(NPM_DIRS):
             with self.subTest(directory=directory):
                 config = copy.deepcopy(self.config)
-                next(e for e in config["updates"] if e["package-ecosystem"] == "npm")["directories"].remove(directory)
+                next(e for e in config["updates"] if e["package-ecosystem"] == "npm")[
+                    "directories"
+                ].remove(directory)
                 self.assertDetected(f"npm does not cover {directory}", config=config)
 
     def test_each_removed_python_directory_is_detected(self) -> None:
         for directory in sorted(PYTHON_DIRS):
             with self.subTest(directory=directory):
                 config = copy.deepcopy(self.config)
-                next(e for e in config["updates"] if e["package-ecosystem"] == "pip")["directories"].remove(directory)
+                next(e for e in config["updates"] if e["package-ecosystem"] == "pip")[
+                    "directories"
+                ].remove(directory)
                 self.assertDetected(f"pip does not cover {directory}", config=config)
 
     def test_directory_removed_from_the_file_text_is_detected(self) -> None:
         line = '      - "/tools/skill-map"\n'
         self.assertIn(line, CONFIG_TEXT)
-        self.assertDetected("npm does not cover /tools/skill-map",
-                            config=parse_yaml_subset(CONFIG_TEXT.replace(line, "")))
+        self.assertDetected(
+            "npm does not cover /tools/skill-map",
+            config=parse_yaml_subset(CONFIG_TEXT.replace(line, "")),
+        )
 
     def test_ecosystem_swapped_to_wrong_directory_is_detected(self) -> None:
         self.entry("npm")["package-ecosystem"] = "pip"
-        self.assertDetected("no npm entry", "pip lists /tools/skill-map, which has no requirements*.txt")
+        self.assertDetected(
+            "no npm entry", "pip lists /tools/skill-map, which has no requirements*.txt"
+        )
 
     def test_new_lock_directory_without_coverage_is_detected(self) -> None:
         self.repo.write("plugins/new-plugin/skills/new-skill/requirements.txt", LOCK)
@@ -470,7 +526,9 @@ class RemovedCoverageTest(FixtureTestCase):
 
     def test_stale_directory_is_detected(self) -> None:
         (self.repo.root / "plugins/research-ops/skills/source-hunter/requirements.txt").unlink()
-        self.assertDetected("pip lists /plugins/research-ops/skills/source-hunter, which has no requirements*.txt")
+        self.assertDetected(
+            "pip lists /plugins/research-ops/skills/source-hunter, which has no requirements*.txt"
+        )
 
     def test_vendored_lock_is_not_coverage(self) -> None:
         self.repo.write("tools/skill-map/node_modules/pkg/requirements.txt", LOCK)
@@ -483,18 +541,28 @@ class PolicyTest(FixtureTestCase):
             with self.subTest(limit=limit):
                 config = copy.deepcopy(self.config)
                 config["updates"][0]["open-pull-requests-limit"] = limit
-                self.assertDetected("open-pull-requests-limit: holds update pull requests at a fixed count",
-                                    config=config)
+                self.assertDetected(
+                    "open-pull-requests-limit: holds update pull requests at a fixed count",
+                    config=config,
+                )
 
     def test_dependency_age_rule_is_refused(self) -> None:
         self.entry("npm")["cooldown"] = {"default-days": 7}
         self.assertDetected("cooldown: is a dependency-age rule")
 
     def test_registry_credentials_are_refused(self) -> None:
-        self.config["registries"] = {"npm-private": {"type": "npm-registry", "url": "https://example.invalid",
-                                                     "token": "${{secrets.NPM_TOKEN}}"}}
-        self.assertDetected("config.registries: configures registry credentials",
-                            "key 'token' could carry a credential", "references a secret")
+        self.config["registries"] = {
+            "npm-private": {
+                "type": "npm-registry",
+                "url": "https://example.invalid",
+                "token": "${{secrets.NPM_TOKEN}}",
+            }
+        }
+        self.assertDetected(
+            "config.registries: configures registry credentials",
+            "key 'token' could carry a credential",
+            "references a secret",
+        )
 
     def test_secret_reference_in_any_value_is_refused(self) -> None:
         self.entry("pip")["commit-message"] = {"prefix": "${{ secrets.PREFIX }}"}
@@ -505,7 +573,9 @@ class PolicyTest(FixtureTestCase):
         self.assertDetected("value 'automerge' references a secret or merge rule")
         config = copy.deepcopy(self.config)
         config["updates"][0]["auto-merge"] = True
-        self.assertDetected("key 'auto-merge' could carry a credential, permission or merge rule", config=config)
+        self.assertDetected(
+            "key 'auto-merge' could carry a credential, permission or merge rule", config=config
+        )
 
     def test_permission_grant_is_refused(self) -> None:
         self.config["permissions"] = {"contents": "write"}
@@ -529,7 +599,9 @@ class PolicyTest(FixtureTestCase):
     def test_single_directory_form_and_wildcards_are_refused(self) -> None:
         npm = self.entry("npm")
         npm["directory"] = npm.pop("directories")[0]
-        self.assertDetected("directory: is the single-path form", "directories: is not a non-empty list")
+        self.assertDetected(
+            "directory: is the single-path form", "directories: is not a non-empty list"
+        )
         config = parse_yaml_subset(CONFIG_TEXT)
         config["updates"][1]["directories"] = ["/tools/*"]
         self.assertDetected("is a wildcard the coverage check cannot verify", config=config)
@@ -540,23 +612,37 @@ class PolicyTest(FixtureTestCase):
         self.assertDetected("config.version: is 1, not 2", "'hourly' is not a Dependabot interval")
 
     def test_workflow_that_merges_dependabot_pull_requests_is_refused(self) -> None:
-        self.repo.write(".github/workflows/dependabot-merge.yml",
-                        "on: pull_request\njobs:\n  merge:\n    if: github.actor == 'dependabot[bot]'\n"
-                        "    steps:\n      - uses: dependabot/fetch-metadata@v2\n"
-                        "      - run: gh pr merge --auto --squash \"$PR_URL\"\n")
-        self.assertDetected(".github/workflows/dependabot-merge.yml: acts on Dependabot pull requests")
+        self.repo.write(
+            ".github/workflows/dependabot-merge.yml",
+            "on: pull_request\njobs:\n  merge:\n    if: github.actor == 'dependabot[bot]'\n"
+            "    steps:\n      - uses: dependabot/fetch-metadata@v2\n"
+            "      - run: gh pr merge --auto --squash \"$PR_URL\"\n",
+        )
+        self.assertDetected(
+            ".github/workflows/dependabot-merge.yml: acts on Dependabot pull requests"
+        )
 
 
 class SubsetParserTest(unittest.TestCase):
     def test_parses_nested_mappings_and_sequences(self) -> None:
-        text = ('version: 2  # comment\nupdates:\n  - package-ecosystem: "npm"\n    directories:\n'
-                '      - "/a#b"\n      - /c\n    schedule:\n      interval: weekly\nlist:\n- 1\n- \'x\'\n')
-        self.assertEqual(parse_yaml_subset(text), {
-            "version": 2,
-            "updates": [{"package-ecosystem": "npm", "directories": ["/a#b", "/c"],
-                         "schedule": {"interval": "weekly"}}],
-            "list": [1, "x"],
-        })
+        text = (
+            'version: 2  # comment\nupdates:\n  - package-ecosystem: "npm"\n    directories:\n'
+            '      - "/a#b"\n      - /c\n    schedule:\n      interval: weekly\nlist:\n- 1\n- \'x\'\n'
+        )
+        self.assertEqual(
+            parse_yaml_subset(text),
+            {
+                "version": 2,
+                "updates": [
+                    {
+                        "package-ecosystem": "npm",
+                        "directories": ["/a#b", "/c"],
+                        "schedule": {"interval": "weekly"},
+                    }
+                ],
+                "list": [1, "x"],
+            },
+        )
 
     def test_refuses_what_it_cannot_read_exactly(self) -> None:
         cases = {
