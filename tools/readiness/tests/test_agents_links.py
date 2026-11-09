@@ -77,6 +77,16 @@ class AgentsLinkTests(unittest.TestCase):
             ["AGENTS.md:2: local link 'docs/guide.md#missing' has no matching heading"],
         )
 
+    def test_escaped_labels_and_long_unclosed_labels(self) -> None:
+        self.agents.write_text(
+            r"[escaped \] label](missing.md)" + "\n[" + "\\" * 10000 + "\n",
+            encoding="utf-8",
+        )
+        self.assertEqual(
+            validate_links(self.agents),
+            ["AGENTS.md:1: local link 'missing.md' does not exist"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
