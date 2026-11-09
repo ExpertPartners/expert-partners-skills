@@ -10,6 +10,7 @@ import {
 	machineLabel,
 	messageText,
 	READINESS_BASE,
+	resolveComputer,
 	resolveMachine,
 	sleep,
 } from "./factory";
@@ -35,6 +36,10 @@ const tag = z.object({ name: z.string().min(1), metadata: z.record(z.string(), z
 const machine = z
 	.string()
 	.describe('Which Mac. "M2" (Ember M2, browser and visible work) or "M4" (Allison M4, invisible background only), a computer name, or a computer id.');
+
+const computer = z
+	.string()
+	.describe('Any computer the Factory API returns, listed or unlisted: its id or name. "M2" and "M4" also work.');
 
 const settingsShape = {
 	model: z.string().optional().describe('Model id. Default "auto" (Auto Model / Factory Router).'),
@@ -218,8 +223,8 @@ export const TOOLS: ToolDef[] = [
 			machine: machine.optional(),
 		}),
 		run: async (a, f) => {
-			const computers = await listComputers(f);
-			const c = a.machine ? await resolveMachine(f, a.machine) : undefined;
+			const computers = await listComputers(f, true);
+			const c = a.machine ? await resolveComputer(f, a.machine) : undefined;
 			const d = await sessionsPage(f, a.limit ?? 50, a.cursor, c?.id);
 			return {
 				sessions: (d.sessions ?? []).map((s: any) => ({
@@ -489,10 +494,10 @@ export const TOOLS: ToolDef[] = [
 	},
 	{
 		name: "get_computer",
-		description: "Get one computer by id, name, M2 or M4.",
+		description: "Get one computer by id or name, including unlisted Factory cloud computers. M2 and M4 also work.",
 		readOnly: true,
-		schema: z.object({ machine }),
-		run: async (a, f) => f.call("GET", `/api/v0/computers/${(await resolveMachine(f, a.machine)).id}`),
+		schema: z.object({ machine: computer }),
+		run: async (a, f) => f.call("GET", `/api/v0/computers/${(await resolveComputer(f, a.machine)).id}`),
 	},
 	{
 		name: "computer_providers",
@@ -505,8 +510,8 @@ export const TOOLS: ToolDef[] = [
 		name: "computer_metrics",
 		description: "CPU, memory and disk metrics for a Factory-managed computer. Not supported for Macs connected through Remote Control.",
 		readOnly: true,
-		schema: z.object({ machine, start: z.string().optional() }),
-		run: async (a, f) => f.call("GET", `/api/v0/computers/${(await resolveMachine(f, a.machine)).id}/metrics`, { query: { start: a.start } }),
+		schema: z.object({ machine: computer, start: z.string().optional() }),
+		run: async (a, f) => f.call("GET", `/api/v0/computers/${(await resolveComputer(f, a.machine)).id}/metrics`, { query: { start: a.start } }),
 	},
 	{
 		name: "create_computer",
@@ -522,35 +527,35 @@ export const TOOLS: ToolDef[] = [
 	{
 		name: "update_computer",
 		description: "Rename a computer or change its remote user.",
-		schema: z.object({ machine, name: z.string().optional(), remoteUser: z.string().optional() }),
+		schema: z.object({ machine: computer, name: z.string().optional(), remoteUser: z.string().optional() }),
 		run: async (a, f) => {
-			const c = await resolveMachine(f, a.machine);
+			const c = await resolveComputer(f, a.machine);
 			return f.call("PATCH", `/api/v0/computers/${c.id}`, { body: pickSettings(a, ["name", "remoteUser"]) });
 		},
 	},
 	{
 		name: "delete_computer",
 		description: "Delete a computer registration.",
-		schema: z.object({ machine }),
-		run: async (a, f) => f.call("DELETE", `/api/v0/computers/${(await resolveMachine(f, a.machine)).id}`),
+		schema: z.object({ machine: computer }),
+		run: async (a, f) => f.call("DELETE", `/api/v0/computers/${(await resolveComputer(f, a.machine)).id}`),
 	},
 	{
 		name: "refresh_computer",
 		description: "Refresh a managed computer.",
-		schema: z.object({ machine }),
-		run: async (a, f) => f.call("POST", `/api/v0/computers/${(await resolveMachine(f, a.machine)).id}/refresh`),
+		schema: z.object({ machine: computer }),
+		run: async (a, f) => f.call("POST", `/api/v0/computers/${(await resolveComputer(f, a.machine)).id}/refresh`),
 	},
 	{
 		name: "restart_computer",
 		description: "Restart a managed computer.",
-		schema: z.object({ machine }),
-		run: async (a, f) => f.call("POST", `/api/v0/computers/${(await resolveMachine(f, a.machine)).id}/restart`, { body: {} }),
+		schema: z.object({ machine: computer }),
+		run: async (a, f) => f.call("POST", `/api/v0/computers/${(await resolveComputer(f, a.machine)).id}/restart`, { body: {} }),
 	},
 	{
 		name: "retry_install_deps",
 		description: "Retry the install-dependencies step on a managed computer.",
-		schema: z.object({ machine }),
-		run: async (a, f) => f.call("POST", `/api/v0/computers/${(await resolveMachine(f, a.machine)).id}/install-deps`),
+		schema: z.object({ machine: computer }),
+		run: async (a, f) => f.call("POST", `/api/v0/computers/${(await resolveComputer(f, a.machine)).id}/install-deps`),
 	},
 
 	// ---------- CI Automations API ----------
