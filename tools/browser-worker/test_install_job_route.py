@@ -1,17 +1,22 @@
 """The entry-point producer never launches a browser or changes credentials."""
+
 import hashlib
 import importlib.util
 import json
-import os
 from pathlib import Path
 import socket
 import sys
 import tempfile
 import unittest
 
-SCRIPTS = Path(__file__).resolve().parents[2] / "plugins/operating-doctrine/skills/browser-automation/scripts"
+SCRIPTS = (
+    Path(__file__).resolve().parents[2]
+    / "plugins/operating-doctrine/skills/browser-automation/scripts"
+)
 sys.path.insert(0, str(SCRIPTS))
-spec = importlib.util.spec_from_file_location("browser_route_install_source", SCRIPTS / "install_job_route.py")
+spec = importlib.util.spec_from_file_location(
+    "browser_route_install_source", SCRIPTS / "install_job_route.py"
+)
 producer = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(producer)
 
@@ -23,7 +28,15 @@ class InstallerTests(unittest.TestCase):
         scripts = runtime / "scripts"
         scripts.mkdir(parents=True)
         manifest = []
-        for name in ("browser_jobs.py", "chrome_job_window.py", "job_transport.py", "owned_pages.js"):
+        for name in (
+            "browser_jobs.py",
+            "chrome_job_window.py",
+            "job_transport.py",
+            "owned_pages.js",
+            "browser_lifecycle.py",
+            "browser_window_cleanup.py",
+            "install_browser_lifecycle.py",
+        ):
             content = ("fixture " + name).encode()
             (scripts / name).write_bytes(content)
             manifest.append(hashlib.sha256(content).hexdigest() + "  ./scripts/" + name)
@@ -32,14 +45,23 @@ class InstallerTests(unittest.TestCase):
         entry = root / "existing launcher.sh"
         entry.write_bytes(original)
         entry.chmod(0o755)
-        settings = {"host": socket.gethostname(), "profile": "Default", "expected_account": "worker@example.test",
-                    "launcher": str(entry), "launcher_sha256": hashlib.sha256(original).hexdigest(),
-                    "bootstrap_lock": str(root / "private" / "bootstrap.lock"), "state_dir": str(root / "private" / "receipts"),
-                    "headless_hook": str(root / "hook.py"), "mcp_version": "fixture"}
+        settings = {
+            "host": socket.gethostname(),
+            "profile": "Default",
+            "expected_account": "worker@example.test",
+            "launcher": str(entry),
+            "launcher_sha256": hashlib.sha256(original).hexdigest(),
+            "bootstrap_lock": str(root / "private" / "bootstrap.lock"),
+            "state_dir": str(root / "private" / "receipts"),
+            "headless_hook": str(root / "hook.py"),
+            "mcp_version": "fixture",
+        }
         return settings, runtime, root / "private" / "route.json", original
 
     def apply(self, settings, runtime, dest, check=lambda *_: None):
-        return producer.install(settings, runtime, dest, sys.executable, identity_check=check, running=lambda: True)
+        return producer.install(
+            settings, runtime, dest, sys.executable, identity_check=check, running=lambda: True
+        )
 
     def test_activation_backs_up_exact_bootstrap_and_is_idempotent(self):
         with tempfile.TemporaryDirectory() as root:
@@ -59,6 +81,19 @@ class InstallerTests(unittest.TestCase):
             self.assertNotIn("protected credential", wrapper)
             self.assertFalse(self.apply(settings, runtime, dest)["changed"])
             self.assertEqual(checked, [("Default", "worker@example.test")])
+
+    def test_upgrade_preserves_bootstrap_and_rollback(self):
+        with tempfile.TemporaryDirectory() as root:
+            settings, runtime, dest, original = self.fixture(root)
+            self.apply(settings, runtime, dest)
+            upgraded = Path(root) / "next"
+            import shutil
+
+            shutil.copytree(runtime, upgraded)
+            self.assertTrue(producer.upgrade(dest, upgraded, sys.executable)["changed"])
+            self.assertFalse(producer.upgrade(dest, upgraded, sys.executable)["changed"])
+            producer.rollback(dest)
+            self.assertEqual(Path(settings["launcher"]).read_bytes(), original)
 
     def test_source_or_artifact_drift_does_not_change_entry(self):
         with tempfile.TemporaryDirectory() as root:

@@ -1,7 +1,17 @@
 {
-  "description": "Headless route check for browser navigation, and the standing yes that every session starts with.",
+  "description": "Headless policy, owned browser window lifecycle, and the standing yes.",
   "hooks": {
     "PreToolUse": [
+      {
+        "matcher": "browser_",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/browser_window_cleanup.py\"",
+            "timeout": 160
+          }
+        ]
+      },
       {
         "matcher": "^mcp__.*__(browser_navigate|navigate|tabs_create_mcp|browser_tabs|browser_run_code_unsafe|browser_run_code|browser_evaluate)$",
         "hooks": [
@@ -9,6 +19,40 @@
             "type": "command",
             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/headless_route_check.py\"",
             "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "browser_job_start$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/browser_window_cleanup.py\"",
+            "timeout": 160
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/browser_window_cleanup.py\"",
+            "timeout": 160
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/browser_window_cleanup.py\"",
+            "timeout": 160
           }
         ]
       }

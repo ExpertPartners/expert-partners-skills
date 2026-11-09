@@ -1,6 +1,20 @@
 /* One private MCP process. Birth provenance is independent of group membership. */
 async function newOwnedState(connector) {
   const context = connector.context();
+  // Chrome can hand a --new-window launch to the most recently created window
+  // when connections start close together, so two jobs once shared a window.
+  // Move this connector into its own window before recording ownership.
+  await connector.evaluate(async () => {
+    const t = await chrome.tabs.getCurrent();
+    const others = (await chrome.tabs.query({windowId: t.windowId})).filter(x => x.id !== t.id);
+    if (!others.length) return;
+    const g = await chrome.tabGroups.get(t.groupId);
+    const w = await chrome.windows.create({tabId: t.id, focused: false});
+    const groupId = await chrome.tabs.group({tabIds: [t.id], createProperties: {windowId: w.id}});
+    await chrome.tabGroups.update(groupId, {title: g.title, color: g.color});
+    const placed = await chrome.tabs.query({windowId: w.id});
+    if (placed.length !== 1 || placed[0].id !== t.id) throw Error('owned_window_isolation_failed');
+  });
   const initial = await connector.evaluate(async () => {
     const t = await chrome.tabs.getCurrent();
     const g = await chrome.tabGroups.get(t.groupId);
@@ -131,6 +145,27 @@ async function newOwnedState(connector) {
     await s.discoverPopups();
     if ([...s.created].some(p => !s.ids.has(p))) throw Error('unbound_owned_page_cleanup_uncertain');
     await s.closeIds([...s.tabIds].filter(id => id !== initial.connectorId && !s.closedIds.has(id)));
+  };
+  s.closeWindow = async () => {
+    // All owned work pages have already closed. A window that also holds an
+    // unknown tab (Allison's or a peer's) is kept; only this connector closes.
+    return await connector.evaluate(async (initial) => {
+      const self = await chrome.tabs.getCurrent();
+      const tabs = await chrome.tabs.query({windowId: initial.windowId});
+      if (self.id !== initial.connectorId || self.windowId !== initial.windowId) throw Error('connection_ownership_changed');
+      if (tabs.length !== 1 || tabs[0].id !== self.id) {
+        setTimeout(() => chrome.tabs.remove(self.id), 250);
+        return {scheduled: true, shared: true, windowId: initial.windowId};
+      }
+      setTimeout(async () => {
+        const remaining = await chrome.tabs.query({windowId: initial.windowId});
+        if (remaining.length === 1 && remaining[0].id === self.id)
+          await chrome.windows.remove(initial.windowId);
+        else
+          await chrome.tabs.remove(self.id);
+      }, 250);
+      return {scheduled: true, shared: false, windowId: initial.windowId};
+    }, initial);
   };
   return s;
 }

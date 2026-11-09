@@ -5,6 +5,7 @@ The existing protected bootstrap is retained byte-for-byte in an owner-only
 backup. Future invocations use the facade; existing MCP processes keep running.
 The skill's normal producer must build and verify the runtime before this step.
 """
+
 import argparse
 import fcntl
 import hashlib
@@ -34,10 +35,22 @@ def verified_runtime(root):
     for line in (root / "checksums.sha256").read_text().splitlines():
         sha, name = line.split(None, 1)
         manifest[name.removeprefix("./")] = sha
-    for name in ("browser_jobs.py", "chrome_job_window.py", "job_transport.py", "owned_pages.js"):
+    for name in (
+        "browser_jobs.py",
+        "chrome_job_window.py",
+        "job_transport.py",
+        "owned_pages.js",
+        "browser_lifecycle.py",
+        "browser_window_cleanup.py",
+        "install_browser_lifecycle.py",
+    ):
         relative = "scripts/" + name
         path = root / relative
-        if path.is_symlink() or not path.is_file() or digest(path.read_bytes()) != manifest.get(relative):
+        if (
+            path.is_symlink()
+            or not path.is_file()
+            or digest(path.read_bytes()) != manifest.get(relative)
+        ):
             raise InstallRefusal("runtime_artifact_mismatch")
     return root
 
@@ -56,8 +69,14 @@ def atomic(path, data, mode):
             os.unlink(temp)
 
 
-def install(settings, runtime, destination, interpreter, identity_check=existing_signed_in_profile,
-            running=chrome_is_running):
+def install(
+    settings,
+    runtime,
+    destination,
+    interpreter,
+    identity_check=existing_signed_in_profile,
+    running=chrome_is_running,
+):
     runtime = verified_runtime(runtime)
     destination = Path(destination).absolute()
     interpreter = Path(interpreter)
@@ -67,7 +86,11 @@ def install(settings, runtime, destination, interpreter, identity_check=existing
     identity_check(settings["profile"], settings["expected_account"])
     if not running():
         raise InstallRefusal("existing_browser_required")
-    if not interpreter.is_absolute() or not interpreter.is_file() or not os.access(interpreter, os.X_OK):
+    if (
+        not interpreter.is_absolute()
+        or not interpreter.is_file()
+        or not os.access(interpreter, os.X_OK)
+    ):
         raise InstallRefusal("python_interpreter_required")
     if entry.is_symlink() or destination.is_symlink() or entry.stat().st_uid != os.geteuid():
         raise InstallRefusal("owned_regular_entry_required")
@@ -84,11 +107,24 @@ def install(settings, runtime, destination, interpreter, identity_check=existing
         backup = destination.parent / ("protected-bootstrap-" + expected[:16] + ".sh")
         config = {**settings, "launcher": str(backup)}
         config_bytes = (json.dumps(config, sort_keys=True, indent=2) + "\n").encode()
-        command = [str(interpreter), str(runtime / "scripts/browser_jobs.py"), "--config", str(destination)]
-        wrapper = ("#!/bin/sh\n[ \"$#\" -eq 0 ] || exit 2\nexec " + " ".join(shlex.quote(x) for x in command) + "\n").encode()
+        command = [
+            str(interpreter),
+            str(runtime / "scripts/browser_jobs.py"),
+            "--config",
+            str(destination),
+        ]
+        wrapper = (
+            "#!/bin/sh\n[ \"$#\" -eq 0 ] || exit 2\nexec "
+            + " ".join(shlex.quote(x) for x in command)
+            + "\n"
+        ).encode()
         old = entry.read_bytes()
         if old == wrapper:
-            if backup.is_symlink() or destination.read_bytes() != config_bytes or digest(backup.read_bytes()) != expected:
+            if (
+                backup.is_symlink()
+                or destination.read_bytes() != config_bytes
+                or digest(backup.read_bytes()) != expected
+            ):
                 raise InstallRefusal("installed_route_drift")
             return {"changed": False, "entry": str(entry), "backup": str(backup)}
         if digest(old) != expected:
@@ -101,10 +137,19 @@ def install(settings, runtime, destination, interpreter, identity_check=existing
         else:
             atomic(backup, old, 0o700)
         original_mode = stat.S_IMODE(entry.stat().st_mode)
-        rollback = {"entry": str(entry), "backup": str(backup), "original_sha256": expected,
-                    "original_mode": original_mode, "installed_sha256": digest(wrapper)}
+        rollback = {
+            "entry": str(entry),
+            "backup": str(backup),
+            "original_sha256": expected,
+            "original_mode": original_mode,
+            "installed_sha256": digest(wrapper),
+        }
         atomic(destination, config_bytes, 0o600)
-        atomic(destination.with_suffix(".rollback.json"), (json.dumps(rollback, sort_keys=True) + "\n").encode(), 0o600)
+        atomic(
+            destination.with_suffix(".rollback.json"),
+            (json.dumps(rollback, sort_keys=True) + "\n").encode(),
+            0o600,
+        )
         # This is the sole activation write, after the private bootstrap/config
         # are ready. It changes future starts, never any running transport.
         atomic(entry, wrapper, 0o700)
@@ -124,12 +169,65 @@ def rollback(destination):
         entry, backup = Path(record["entry"]), Path(record["backup"])
         if entry.is_symlink() or backup.is_symlink() or entry.stat().st_uid != os.geteuid():
             raise InstallRefusal("owned_regular_entry_required")
-        if digest(entry.read_bytes()) != record["installed_sha256"] or digest(backup.read_bytes()) != record["original_sha256"]:
+        if (
+            digest(entry.read_bytes()) != record["installed_sha256"]
+            or digest(backup.read_bytes()) != record["original_sha256"]
+        ):
             raise InstallRefusal("rollback_drift")
         atomic(entry, backup.read_bytes(), record["original_mode"])
         return {"restored": True, "entry": str(entry)}
     finally:
         fcntl.flock(fd, fcntl.LOCK_UN)
+        os.close(fd)
+
+
+def upgrade(destination, runtime, interpreter):
+    """Update future facades only, preserving the original bootstrap/rollback."""
+    runtime = verified_runtime(runtime)
+    destination = Path(destination)
+    config = json.loads(destination.read_text())
+    interpreter = Path(interpreter)
+    if (
+        not interpreter.is_absolute()
+        or not interpreter.is_file()
+        or not os.access(interpreter, os.X_OK)
+    ):
+        raise InstallRefusal("python_interpreter_required")
+    if config["host"] != socket.gethostname():
+        raise InstallRefusal("assigned_host_required")
+    fd = os.open(config["bootstrap_lock"], os.O_RDWR | os.O_NOFOLLOW)
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX)
+        rollback_path = destination.with_suffix(".rollback.json")
+        record = json.loads(rollback_path.read_text())
+        entry, backup = Path(record["entry"]), Path(record["backup"])
+        if (
+            entry.is_symlink()
+            or backup.is_symlink()
+            or entry.stat().st_uid != os.geteuid()
+            or digest(entry.read_bytes()) != record["installed_sha256"]
+            or digest(backup.read_bytes()) != record["original_sha256"]
+        ):
+            raise InstallRefusal("upgrade_drift")
+        wrapper = (
+            "#!/bin/sh\n[ \"$#\" -eq 0 ] || exit 2\nexec "
+            + shlex.join(
+                [
+                    str(interpreter),
+                    str(runtime / "scripts/browser_jobs.py"),
+                    "--config",
+                    str(destination.absolute()),
+                ]
+            )
+            + "\n"
+        ).encode()
+        changed = entry.read_bytes() != wrapper
+        if changed:
+            atomic(entry, wrapper, 0o700)
+            record["installed_sha256"] = digest(wrapper)
+            atomic(rollback_path, (json.dumps(record, sort_keys=True) + "\n").encode(), 0o600)
+        return {"changed": changed, "entry": str(entry), "existing_transports_untouched": True}
+    finally:
         os.close(fd)
 
 
@@ -140,19 +238,27 @@ def main():
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--python", type=Path)
     parser.add_argument("--rollback", action="store_true")
+    parser.add_argument("--upgrade", action="store_true")
     args = parser.parse_args()
     try:
         if args.rollback:
             report = rollback(args.config)
+        elif args.upgrade:
+            report = upgrade(args.config, args.runtime, args.python)
         else:
             if not all((args.settings, args.runtime, args.python)):
                 raise InstallRefusal("installation_arguments_required")
-            report = install(json.loads(args.settings.read_text()), args.runtime, args.config, args.python)
+            report = install(
+                json.loads(args.settings.read_text()), args.runtime, args.config, args.python
+            )
         print(json.dumps(report))
         return 0
     except Exception:
         # Never echo protected source, configuration contents or exception text.
-        print("Browser route installation refused; verify the assigned host, signed-in profile, pinned source, producer artifact and private backup", file=sys.stderr)
+        print(
+            "Browser route installation refused; verify the assigned host, signed-in profile, pinned source, producer artifact and private backup",
+            file=sys.stderr,
+        )
         return 2
 
 

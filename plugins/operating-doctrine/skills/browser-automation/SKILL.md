@@ -171,7 +171,12 @@ sessions. This rule follows the HQ Rulebook's Browser tabs stay clean section (D
   record the exact tab, its owning job, the return condition and when it closes.
 - Never close another AI's tabs or Allison's. The extension gives each connection its own
   tab group and shows it only those tabs, so work only inside your own group.
-- Never close the window or the browser.
+- Each job owns one whole Chrome window. When the job is done, the whole window closes.
+  `browser_job_finish` closes it, and the lifecycle hook closes it at Stop and SessionEnd
+  for every job the session started. A nightly sweep on the M2 closes windows of jobs
+  whose session has ended. A window that also holds a tab the job did not open, Allison's
+  or another job's, stays open and only the job's own tabs close. Never close any other
+  window or the browser.
 
 ## The setup on Ember's M2
 
