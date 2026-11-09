@@ -1,3 +1,6 @@
+## 0.6.9 - 2026-11-09
+
+Act by default (Decision Log 2026-11-08, Act by default, caution removed). Removed approval gates, confirm-before-send, publish, schedule or delete steps, owner handoffs, readbacks and certification passes from the skills. Each skill keeps its mechanics, brand voice rules and spelling locks, and now acts and reports with links.
 ## 0.6.8 - 2026-11-04
 
 Consolidates useful standalone AI Capability Routing behavior into the designed marketplace skill and Repo Curator behavior into existing repo-standards. Moves intake, new-project and session-home into operating-doctrine, folds verify-docs into research-before-guessing, and removes their unbundled sources while preserving Git history.

@@ -1,3 +1,6 @@
+## 0.6.3 - 2026-11-09
+
+Act by default (Decision Log 2026-11-08, Act by default, caution removed). Removed approval gates, confirm-before-send, publish, schedule or delete steps, owner handoffs, readbacks and certification passes from the skills. Each skill keeps its mechanics, brand voice rules and spelling locks, and now acts and reports with links.
 ## 0.6.2 - 2026-11-04
 
 Use the supported needs-allison job outcome for genuine founder decisions while preserving unfinished work and AI-owned recovery. Treat the retired Aura governance scan as historical evidence and verify the current topology-check owner before claiming coverage.
