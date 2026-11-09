@@ -12,8 +12,8 @@ class StandingYes(unittest.TestCase):
         out = subprocess.run([sys.executable, str(HOOK)], capture_output=True, text=True, check=True).stdout
         specific = json.loads(out)["hookSpecificOutput"]
         self.assertEqual(specific["hookEventName"], "SessionStart")
-        self.assertIn("Her brief is the go", specific["additionalContext"])
-        self.assertIn("Friction Floor", specific["additionalContext"])
+        self.assertIn("brief is the go", specific["additionalContext"])
+        self.assertIn("no approval gates", specific["additionalContext"])
 
     def test_hooks_json_registers_it(self):
         hooks = json.loads((HOOK.parent / "hooks.json").read_text())
