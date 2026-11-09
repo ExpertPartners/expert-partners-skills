@@ -269,7 +269,7 @@ export const TOOLS: ToolDef[] = [
 	{
 		name: "update_session",
 		description:
-			"Change a session's settings, including tags and archivedAt. archive=true sets archivedAt to now, archive=false clears it. Note: tested 2026-11-09, archivedAt set by API is stored by Factory but does not move the session to Archived in the Factory app.",
+			"Change a session's settings, including tags and archivedAt. Allison archives sessions herself, so do not archive one unless she asks. archive=true sets archivedAt to now, archive=false clears it. Tested 2026-11-09, archivedAt set by API is stored by Factory but does not move the session to Archived in the Factory app.",
 		schema: z.object({ sessionId: id, archive: z.boolean().optional(), archivedAt: z.string().optional(), ...settingsShape }),
 		run: (a, f) => {
 			const sessionSettings: any = pickSettings(a, [...Object.keys(settingsShape), "archivedAt"]);
@@ -357,7 +357,7 @@ export const TOOLS: ToolDef[] = [
 	{
 		name: "start_and_watch",
 		description:
-			"Create a session on a Mac, send the work, and wait until it finishes (up to waitSeconds, default 45, max 290). Returns the final reply, or the sessionId to keep watching with watch_session. Defaults Auto Model and High autonomy.",
+			"Create a session on a Mac, send the work, and wait until it finishes. Name it on the first line as Section - Mission with an exact sidebar section, and ask it to end with Ready to archive (up to waitSeconds, default 45, max 290). Returns the final reply, or the sessionId to keep watching with watch_session. Defaults Auto Model and High autonomy.",
 		schema: z.object({
 			machine,
 			message: z.string().describe("The full brief. First line is the session name, 'Section - Mission'."),
