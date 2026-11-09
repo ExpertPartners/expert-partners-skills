@@ -48,4 +48,4 @@ Numbered grid, one representative frame per shot with exact timecodes and durati
 One page of prose: why the source works (structural devices, persuasion engine, visual grammar, restraint) and what must carry into the client's version vs. what must be natively theirs.
 
 ## 00 README index
-Table of all deliverables + the 3–5 findings that matter most + exactly what is needed from the client to proceed. This is the entry document; write it last.
+Table of all deliverables + the 3 to 5 findings that matter most + exactly what is needed from the client to proceed. This is the entry document; write it last.

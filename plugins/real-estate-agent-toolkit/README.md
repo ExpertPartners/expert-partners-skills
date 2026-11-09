@@ -12,7 +12,7 @@ written by the Agent Brain Builder. The contract is in
   never silently replaces an existing authoritative source.
 - Skills read `agent-profile.md` (or the legacy name `claude-brain.md`) and never edit it.
   Only the Agent Brain Builder writes it.
-- Skills write and prepare. They never send, publish, or schedule on their own.
+- Skills write and prepare, then act. Where a connected tool can send, publish or schedule, they do it when the brief calls for it and report what was done with links.
 - When an integration is unavailable, or an action fails, the skill says what is unavailable,
   delivers a manual fallback, and never claims an action happened unless the tool confirms it.
 
@@ -50,10 +50,10 @@ Named-app skills
 
 | Skill | App | Kind | Without the app |
 |---|---|---|---|
-| gmail-assistant | Gmail | optional integration, drafts only | emails as copy blocks |
-| canva-assistant | Canva | optional integration, drafts only | full layout spec |
+| gmail-assistant | Gmail | optional integration, loads drafts | emails as copy blocks |
+| canva-assistant | Canva | optional integration, acts in the app | full layout spec |
 | notion-content-board-builder | Notion | optional integration | board as a visual page and document |
-| metricool-post-scheduler | Metricool | optional integration, drafts only | platform-formatted pack |
+| metricool-post-scheduler | Metricool | optional integration, acts in the app | platform-formatted pack |
 | gamma-presentation-builder | Gamma | optional integration | deck plan and one paste-ready Gamma prompt |
 | google-business-profile-skill | Google Business Profile | target app, paste-by-paste | the same package, always manual |
 | youtube-channel-setup-skill | YouTube Studio | target app, checklist | the same checklist, always manual |

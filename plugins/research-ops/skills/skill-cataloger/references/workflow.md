@@ -3,7 +3,7 @@
 This is the repeatable play. Run it the same way every time.
 
 1. Allison says: Curator, catalog the [name] skill. She pastes in the package or configuration.
-2. If anything is missing (name, what it does, who owns it, the configuration), ask for it. Do not invent it.
+2. If anything is missing (name, what it does, who owns it, the configuration), retrieve it from the source. Do not invent it. If it cannot be retrieved, mark it as missing in the entry.
 3. Duplicate the documentation template page (live id 383a938a-0f99-813b-9f29-f26b9914ed47) into a new entry in the Skill Library (data source d65f8e8d-74db-4b76-9096-04e875d4fd5e).
 4. Rename the new page to the skill name.
 5. Fill the quick-scan properties from the configuration. Extend any select option that does not exist yet.

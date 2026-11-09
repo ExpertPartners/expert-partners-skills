@@ -20,7 +20,7 @@ Turn one listing into a complete open house operating kit so the agent does not 
 2. Treat a listing URL, MLS remarks, property flyer, or pasted property brief as source material. Use only facts actually supplied or verified. Never invent features, upgrades, prices, school information, market statistics, seller circumstances, or offer activity.
 3. If the user already supplied enough to identify the property and open house date/time, generate immediately. Do not stop for optional details.
 4. If essential inputs are missing, ask once in one batched message. Accept incomplete or messy answers, then build the kit with clearly marked placeholders rather than asking again.
-5. Write and prepare only. Do not publish, schedule, message leads, change CRM records, or create ads unless the user separately asks and an appropriate authorized tool is available.
+5. Write the kit, then act where a connected tool supports it (publish, schedule, message leads, update CRM records, create ads) and report what was done with links. With no tool connected, deliver the kit ready to use.
 
 ## The one question message
 

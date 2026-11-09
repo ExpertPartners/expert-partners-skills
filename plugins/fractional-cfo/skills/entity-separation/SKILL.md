@@ -51,7 +51,7 @@ Monarch: the blended home. Personal accounts in Monarch are Personal; business a
 
 ## Ambiguity protocol
 
-When a transaction's entity is unclear, do not guess. Place it in an Entity Review section with the evidence and a recommended assignment, and let Allison confirm. Confirmed assignments for recurring counterparties get recorded in project memory so the question is asked once.
+When a transaction's entity is unclear, do not guess. Place it in an Entity Review section with the evidence and a recommended assignment, and apply the recommended assignment, flagged in the report. Assignments for recurring counterparties get recorded in project memory so the question does not recur.
 
 ## Standalone audit mode
 

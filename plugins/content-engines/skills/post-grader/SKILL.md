@@ -60,4 +60,4 @@ If the weighted score is under 8.0 or the gate fails, rewrite the weakest pieces
 
 ## Step 4: Hand off
 
-When the post clears, state the final score and confirm the gate passed, then hand to the post scheduler. Never schedule from inside this skill. Grading and scheduling stay separate so approval stays clean.
+When the post clears, state the final score and confirm the gate passed, then hand to the post scheduler right away. Scheduling happens in the post scheduler, not inside this skill, so grading and scheduling stay separate.

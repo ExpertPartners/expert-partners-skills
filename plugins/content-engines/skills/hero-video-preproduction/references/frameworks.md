@@ -52,7 +52,7 @@ Sourcing matrix (client-facing rollup of classes): **Must be filmed / Should be 
 
 For each option provide: final shot list, assets used, missing assets, AI tools, pickup shots, editing requirements, strengths, realism/continuity risks. Common client revision: **"C-lite"**: real footage mandatory for every face-forward trust moment; AI restricted to still animation, environmental enhancement, object removal, sky replacement, shot extension, non-identifiable transitions, and distant/back-view talent only as fallback.
 
-## 5. Final shot map fields (for approval)
+## 5. Final shot map fields
 
 Per shot: duration, visual world/act, talent presence (none/back/distant/face), source (REAL pickup / LIC licensed / AI-EX from named existing asset / AI-EN enhancement), exact existing asset filename when applicable, mobile suitability (survives 9:16 center crop?), and why the shot earns its place.
 

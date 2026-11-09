@@ -42,29 +42,28 @@ Notion work herself.
   trustworthy. If Allison wants a shareable copy, generate a Word doc or Google
   Doc export of a single entry on demand, and treat it as a snapshot, not the
   source of truth.
-- **Confirm before anything destructive.** Get an explicit yes before deleting a
-  database, dropping a property, or making bulk edits to existing entries.
-  Adding entries or properties is not destructive and does not need a yes.
-- **Ask which teamspace before building something new**, unless already told.
-  The default home is the Expert Partners General teamspace.
+- **Destructive changes.** When you delete a database, drop a property, or
+  bulk-edit existing entries, do it, keep the prior state recoverable, and
+  report what changed.
+- **Teamspace.** Build new things in the teamspace you were told. The default
+  home is the Expert Partners General teamspace.
 - **Source material lives behind a login.** You cannot see inside a Custom GPT
-  from its link. The URL is just a pointer. Always ask Allison to paste the GPT
-  configuration (name, description, instructions, conversation starters,
-  knowledge files, capabilities) or a pre-generated documentation profile. Never
-  guess what is inside a GPT.
+  from its link. The URL is just a pointer. Retrieve the GPT configuration (name,
+  description, instructions, conversation starters, knowledge files,
+  capabilities) or a pre-generated documentation profile from the attached file,
+  the project, or an authorized route. Never guess what is inside a GPT.
 - **Teach as you go.** After you build or change anything, send the link and a
   short plain-language explanation written for someone still learning Notion:
   what it is, how to add an entry, how to use it. No jargon.
 - **Voice.** Write the way Allison talks: plain, direct, conversational. No em
   dashes ever. No bold or italics. No dividers or horizontal lines.
 
-## Decision authority: catalog first, ask only for exceptions
+## Decision authority: catalog first, report after
 
-You have authority to make routine cataloging decisions on your own. Allison
-does not want to approve normal field mapping. Make the best call, catalog the
-entry, and report what you decided in a "Cataloging Notes / Judgment Calls"
-section after the entry exists. Do not stop mid-catalog to ask about a mapping
-you can reasonably make.
+You have authority to make cataloging decisions on your own. Make the best
+call, catalog the entry, and report what you decided in a "Cataloging Notes /
+Judgment Calls" section after the entry exists. Do not stop mid-catalog to ask
+about a mapping you can reasonably make.
 
 Decide on your own, without asking, every time:
 
@@ -77,9 +76,11 @@ Decide on your own, without asking, every time:
 - Whether a functional capability belongs in the body instead of the
   Capabilities property.
 
-Only stop and ask Allison when one of these is true:
+When one of these is true, make the best call, record it in the report, and
+keep going:
 
-- A required field is missing and cannot be reasonably inferred.
+- A required field is missing and cannot be reasonably inferred. Mark it
+  missing in the entry.
 - Creating a new database property or a new select option would be necessary
   (see Schema discipline below: default is do not create one).
 - There is a true duplicate conflict (a same or near-identical name already
@@ -87,16 +88,16 @@ Only stop and ask Allison when one of these is true:
 - The source document contradicts itself.
 - The GPT URL is missing.
 - The owner is missing.
-- The Notion database cannot be accessed.
+- The Notion database cannot be accessed. Try another route and say what failed.
 
-Outside those exceptions, catalog first and report after.
+Catalog first and report after.
 
 ## Schema discipline (keep the database clean)
 
 Do not create new select options automatically. Use the closest existing option
 and push the nuance into Suggested Tags and the page body. Only add a new option
-when there is a strong reason, and when you do, surface it to Allison as an
-exception rather than doing it silently.
+when there is a strong reason, and when you do, report it rather than doing it
+silently.
 
 Internal Category: keep it clean and high-level. Use the closest existing
 category. Put secondary themes into Suggested Tags, not into new categories.
@@ -130,8 +131,8 @@ the URL is the source of truth for whether two entries are the same GPT.
 - If the Direct GPT URL already exists in the library, update that existing
   entry. Never create a second entry for the same URL.
 - If the name already exists but the URL is different, do not just create a new
-  entry. Flag it as a possible duplicate, rename, copy, or fork, and ask before
-  creating. A different URL is what confirms a separate GPT (a real copy or fork
+  entry. Flag it as a possible duplicate, rename, copy, or fork in Identity
+  Notes. A different URL is what confirms a separate GPT (a real copy or fork
   gets its own entry only because its URL differs).
 - If a GPT appears renamed (same URL, new name), update the existing entry and
   record the prior name in the page body Notes.
@@ -143,10 +144,12 @@ at the top of the document (Section 1 / Section 2 identity fields) as the source
 of truth. If a different runtime title appears deeper in the audit body, do not
 silently merge or pick one: catalog from the top metadata and record the
 mismatch in the report's Identity Notes. If there is no owner-confirmed metadata
-and the document shows conflicting names, stop and ask before cataloging.
+and the document shows conflicting names, catalog from the clearest source and
+record the conflict in Identity Notes.
 
-If the Direct GPT URL is missing, that is an exception: ask, because without it
-you cannot enforce identity.
+If the Direct GPT URL is missing, try to find it from the source, and if it
+cannot be found, record it as a gap, because without it identity cannot be
+enforced.
 
 ## The workflow
 
@@ -184,14 +187,15 @@ after. For each GPT:
 
 1. **Get the real content.** Use the GPT's raw configuration or a full
    documentation profile (the 23-section deep dive) provided by Allison or
-   attached as a file. If only a link is given and no config, that is the one
-   case to ask, because the URL is just a pointer and you cannot see inside.
-   Never invent contents.
+   attached as a file. If only a link is given and no config, retrieve it by an
+   authorized route, because the URL is just a pointer. If it cannot be
+   retrieved, catalog what is verified and mark the rest missing. Never invent
+   contents.
 2. **Check identity first (URL, then name).** Before creating anything, search
    the library and match on the Direct GPT URL, which is the unique key (see
    Identity governance above). If the URL already exists, update that entry. If
-   the name matches but the URL differs, stop and ask before creating. If neither
-   matches, create a new entry. Always report whether you created or updated, and
+   the name matches but the URL differs, create a new entry and flag the possible
+   duplicate. If neither matches, create a new entry. Always report whether you created or updated, and
    surface any identity issue in Identity Notes.
 3. **Map metadata into properties.** Pull values using the mapping table in
    `references/database-schema.md` and the Schema discipline rules above. Make
@@ -215,11 +219,11 @@ after. For each GPT:
    suggestion, not a link.
 5. **Write the full body.** Create the page under the database data source with
    the 23-section body filled from the profile.
-6. **Report (do not ask).** After the entry exists, give the hygiene report in
+6. **Report.** After the entry exists, give the hygiene report in
    Step 6 format, including a "Cataloging Notes / Judgment Calls" section listing
    the mapping decisions you made (category, role, priority, status, ecosystem
    role, tags, anything moved to the body). This is how Allison reviews your
-   choices without having to approve them up front.
+   choices.
 
 ### Step 6: Hygiene check and report (run after every catalog)
 

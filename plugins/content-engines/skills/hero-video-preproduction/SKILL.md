@@ -1,22 +1,22 @@
 ---
 name: hero-video-preproduction
-description: End-to-end pre-production workflow for website hero videos and brand films, especially luxury real estate. Use when a client provides a reference video to emulate and asks for shot-by-shot analysis, storyboard/contact sheets, an audit of their existing footage and photos, market/brand adaptation, tiered production plans (existing-only vs AI-hybrid vs premium pickup shoot), pickup-shoot call sheets, or web hero delivery specs. Covers reference deconstruction, asset classification, and approval-gated planning, everything BEFORE any video generation.
+description: End-to-end pre-production workflow for website hero videos and brand films, especially luxury real estate. Use when a client provides a reference video to emulate and asks for shot-by-shot analysis, storyboard/contact sheets, an audit of their existing footage and photos, market/brand adaptation, tiered production plans (existing-only vs AI-hybrid vs premium pickup shoot), pickup-shoot call sheets, or web hero delivery specs. Covers reference deconstruction, asset classification, and tiered planning, everything up to video generation.
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: content
 status: live
 inherits: operating-doctrine
 brand-scope: null
-subtitle: "hero video pre-production up to the approval gate"
+subtitle: "hero video pre-production through the shot map"
 ---
 
 # Hero Video Pre-Production
 
-Turn a reference hero video plus a client's existing asset library into an approval-ready production package: timestamped shot list, storyboard contact sheet, asset audit, adapted shot map, production options, pickup-shoot plan, and delivery specs.
+Turn a reference hero video plus a client's existing asset library into a production-ready package: timestamped shot list, storyboard contact sheet, asset audit, adapted shot map, production options, pickup-shoot plan, and delivery specs.
 
 ## Non-negotiable rules
 
-1. **Never generate video before explicit client approval of a shot map.** The workflow ends at an approval gate; say so in every deliverable.
+1. **Generate video only from a finished shot map.** Build the shot map first, then write the production prompts in the same run.
 2. **Never invent or assume footage the client did not provide.** Audit what exists, state where you looked, and list every gap explicitly.
 3. **Adapt, don't copy.** The new film must serve the same strategic purposes as the reference without reproducing its footage, branding, or exact creative execution.
 4. If the client restricts AI usage (common: "no AI faces in trust moments"), re-plan around a real-footage spine; see "C-lite" in `references/frameworks.md`.
@@ -54,7 +54,7 @@ Present three tiers, A (existing footage only), B (AI-enhanced hybrid), and C (p
 
 ### Phase 5: Shot map, pickup plan, delivery specs
 
-Produce the approval package: final shot map with all per-shot fields (§5 of frameworks), a pickup-shoot plan scheduled backward from sunset with verbatim talent direction (§1 of `references/pickup-and-delivery.md`), the four-category sourcing matrix, and web delivery specs: durations, encode ladder, poster strategy, reduced-motion and slow-connection fallbacks (§2). **Stop and await approval.** After approval, write numbered production-ready prompts for each AI shot tied to exact source files.
+Produce the production package: final shot map with all per-shot fields (§5 of frameworks), a pickup-shoot plan scheduled backward from sunset with verbatim talent direction (§1 of `references/pickup-and-delivery.md`), the four-category sourcing matrix, and web delivery specs: durations, encode ladder, poster strategy, reduced-motion and slow-connection fallbacks (§2). Then write numbered production-ready prompts for each AI shot tied to exact source files.
 
 ## Deliverable standards
 

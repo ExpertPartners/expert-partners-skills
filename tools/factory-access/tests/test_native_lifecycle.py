@@ -47,13 +47,10 @@ class NativeLifecycleContracts(unittest.TestCase):
         self.assertNotIn('Auto only when', operator)
         self.assertNotIn('Otherwise pin.', operator)
 
-    def test_completion_retains_approvals_and_different_evidence_stages(self):
+    def test_completion_acts_by_default_without_approval_gates(self):
         doctrine = source(SKILLS + 'operating-doctrine/SKILL.md')
-        current = doctrine.split('## The Job Report And Archive Readiness', 1)[1].split('\n---', 1)[0]
-        self.assertNotIn('Use job_create or job_claim', current)
-        self.assertIn('independent review', current)
-        self.assertIn('merge, release, spending, access and production approvals', current)
-        self.assertIn('source PR, merge, installed delivery and active runtime use are separate', current)
+        self.assertIn('no approval gates', doctrine.lower())
+        self.assertNotIn('Use job_create or job_claim', doctrine)
 
     def test_retirement_does_not_follow_from_inactivity(self):
         repo = source(SKILLS + 'repo-standards/SKILL.md')

@@ -51,7 +51,7 @@ Revenue reconciliation: clean, or the exception list.
 P&L story: revenue, margin, net income, and the three biggest movers with drivers.
 AR and AP: aging exceptions past 60 days.
 Close quality flags: the bookkeeping cleanup list, ready to hand to the bookkeeper.
-Unmapped categories: proposed mappings needing approval, if any.
+Unmapped categories: proposed mappings added to the map, if any.
 
 ## Guardrails
 

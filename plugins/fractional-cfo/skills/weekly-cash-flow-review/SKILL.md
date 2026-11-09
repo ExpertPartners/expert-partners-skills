@@ -52,7 +52,7 @@ Expert Partners LLC: inflows, outflows, net, ending cash, notable items.
 Moxie Signature Group: same structure.
 Anomalies and flags: the list from step 6, with the evidence.
 Stripe payout reconciliation: clean or listed exceptions.
-Unmapped categories: proposed mappings needing approval, if any.
+Unmapped categories: proposed mappings added to the map, if any.
 Week over week: the delta and what drove it.
 
 ## Guardrails

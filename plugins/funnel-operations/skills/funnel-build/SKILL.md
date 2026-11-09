@@ -12,7 +12,7 @@ description: >-
   it even if they do not say "build," as long as the intent is a new funnel
   that does not exist yet. This skill is permanent. It ends by calling the
   Funnel Documentation skill, so every new funnel lands fully documented from
-  day one. Built for a non-technical teammate; hand-hold one step at a time.
+  day one. Built for a non-technical teammate; it does the work.
   It inherits the operating-doctrine and never overrides it.
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
@@ -31,7 +31,7 @@ This walks the build of a new funnel in the funnel's brand location and then run
 
 ## Who you are talking to
 
-Assume the person running you may not be technical. Hand-hold. One instruction at a time, wait, confirm, then the next. Never dump the whole list at once. The GHL builder work happens in their browser, so be exact about what to do and what to look for.
+Assume the person running you may not be technical. Do everything you can reach yourself. Report what you did in plain words, with links.
 
 ## How you talk
 
@@ -61,23 +61,23 @@ A funnel is never just its pages. Plan and build against the full model from the
 
 ## The work split
 
-You orchestrate in Cowork through the Notion connector. The GHL work belongs to Claude Code, which holds the Marketplace app token. GHL is not read-only. The data and CRM layer is writable through that token (contacts, tags, custom fields and values, opportunities and stage moves, calendars, email templates, products and order-form pricing, trigger links, media), and the behavioral test-audit runs there. Only the builder layer (funnel pages, forms, surveys, the workflow canvas, pipeline renames, publish, domain) has no write API and stays a UI action, done by the person or by supervised computer-use, whichever is faster. Any time Code or a builder-UI step is needed, you stop and hand a bridge block or an exact click-path. You do not attempt builder-UI work yourself.
+You orchestrate in Cowork through the Notion connector. The GHL work belongs to Claude Code, which holds the Marketplace app token. GHL is not read-only. The data and CRM layer is writable through that token (contacts, tags, custom fields and values, opportunities and stage moves, calendars, email templates, products and order-form pricing, trigger links, media), and the behavioral test-audit runs there. Only the builder layer (funnel pages, forms, surveys, the workflow canvas, pipeline renames, publish, domain) has no write API and stays a UI action, done through Ember's M2 browser route (browser-automation skill). Any time Code is needed, dispatch the bridge block to Claude Code as a job (or run it yourself where you have Code tools) and read the result. For builder-UI steps no API can reach, run them through that browser route yourself.
 
 ## Guardrail: never create a duplicate
 
-Before building, check that this funnel does not already exist. Query the Notion Funnels database for the proposed name and slug. This system exists because of duplicate pipelines, so check every time. If something close already exists, stop and confirm with the person whether this is genuinely new or a variant of an existing funnel. Any deletion or destructive action requires explicit confirmation from the person, logged before you proceed.
+Before building, check that this funnel does not already exist. Query the Notion Funnels database for the proposed name and slug. This system exists because of duplicate pipelines, so check every time. If something close already exists, treat this as a variant, update the existing funnel's record and note the call. Log any deletion or destructive action when you do it.
 
 ## The walk
 
-One step at a time, confirming as you go.
+Run the steps in order, checking each result as you go.
 
-### Step 1: Confirm the funnel and location
+### Step 1: Name the funnel and location
 
-Ask what the funnel is for, what it should accomplish, and which brand location it belongs in (per section 7.1 of the Identity Canon). Confirm back before doing anything.
+Take what the funnel is for, what it should accomplish, and which brand location it belongs in (per section 7.1 of the Identity Canon) from the brief. State what you understood and proceed.
 
 ### Step 2: Check for duplicates
 
-Query the Notion Funnels database for the proposed name and slug. Tell the person what you found and confirm this is genuinely a new funnel before building.
+Query the Notion Funnels database for the proposed name and slug. Report what you found, decide whether this is a new funnel or a variant, and proceed.
 
 ### Step 3: Plan against the object model
 
@@ -85,31 +85,31 @@ Walk the object model and decide which elements this funnel needs. How many page
 
 ### Step 4: Build the funnel in GHL
 
-Walk the person through building each element in their browser, one at a time, in the planned order. Pages and steps with the chosen slug, forms and surveys, workflows and triggers, tags, pipeline and stage, trigger links, custom fields and values, calendars and order forms if needed. Confirm each element exists before the next.
+Build each element through Ember's M2 browser route (browser-automation skill), one at a time, in the planned order. Pages and steps with the chosen slug, forms and surveys, workflows and triggers, tags, pipeline and stage, trigger links, custom fields and values, calendars and order forms if needed. Check each element exists before the next.
 
 ### Step 5: Build the messages
 
-Walk the email, SMS, and snippet sequence, each with its trigger and sequence order. Capture the content as you go, because it becomes rows in Funnel Messages during documentation.
+Build the email, SMS, and snippet sequence, each with its trigger and sequence order. Capture the content as you go, because it becomes rows in Funnel Messages during documentation.
 
 ### Step 6: The post-load layer
 
-Do this deliberately and out loud. Confirm domain mapped and resolving, phone assigned, Stripe connected if it takes payment, and every integration connected. Nothing here happens automatically. A new funnel that skips this layer looks live but does not actually work.
+Do this deliberately. Check domain mapped and resolving, phone assigned, Stripe connected if it takes payment, and every integration connected. Nothing here happens automatically. A new funnel that skips this layer looks live but does not actually work.
 
 ### Step 7: Prove it works (Code)
 
-Hand the person the behavioral test-audit bridge block pointed at the live funnel. When it returns, you have proof the form fires, tags apply, the workflow enrolls, and the opportunity lands in the right pipeline and stage. A new funnel is not finished until this passes end to end. If it fails, fix the named element and retest.
+Dispatch the behavioral test-audit bridge block pointed at the live funnel. When it returns, you have proof the form fires, tags apply, the workflow enrolls, and the opportunity lands in the right pipeline and stage. A new funnel is not finished until this passes end to end. If it fails, fix the named element and retest.
 
 ### Step 8: Document it (call Funnel Documentation)
 
-Run the Funnel Documentation skill for this funnel. Load and follow funnel-documentation/SKILL.md. Documentation will write the full funnel record into the Funnels database, write every message into Funnel Messages, run its completeness gate, record the test-audit evidence you just produced, and certify. The build is not done until the documentation record is certified in Notion.
+Run the Funnel Documentation skill for this funnel. Load and follow funnel-documentation/SKILL.md. Documentation will write the full funnel record into the Funnels database, write every message into Funnel Messages, run its completeness check, and record the test-audit evidence you just produced. The build is done when the documentation record is in Notion.
 
-## The Code handoff
+## Running Code
 
-Any time Code is needed, stop. Do not attempt it yourself. Print a bridge block the person copies into a new Claude Code session, in this exact shape:
+Any time Code is needed, write a bridge block in plain language and dispatch it to Claude Code as a job, then read the file or result it returns and continue. Use this shape for the block:
 
-Stop here. Open Claude Code, start a new session, and paste the block below. It will [plain description of what it does]. When Code says DONE, come back here and type done so we can keep going.
+[plain description of what it does]. Print DONE with the file path or result when finished.
 
-Then the exact block to paste. Then the instruction to come back. Make it impossible to get lost.
+Then continue the walk with what came back.
 
 ### Bridge block: prove the new funnel works
 

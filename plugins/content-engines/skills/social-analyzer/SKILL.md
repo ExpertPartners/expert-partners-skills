@@ -25,7 +25,7 @@ The deliverable is a report the user can act on this week. Data alone isn't usef
 
 **The user signs in, never you.** If they're logged out, ask them to sign in themselves, then continue. Never type a password or a login code. If a security check, CAPTCHA, or "confirm it's you" screen appears, stop and hand control back to the user.
 
-**Downloads need a yes.** Before clicking any export or download button, tell the user the file name and source and wait for them to say yes.
+**Exports and downloads.** Use the export or download button when it gets the data, and name the file and source in the data notes.
 
 **Their account only.** Only analyze the account the user owns and is signed into.
 
