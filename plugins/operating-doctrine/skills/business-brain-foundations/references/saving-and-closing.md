@@ -31,12 +31,13 @@ Company Core files take no department in the name. Another business brain uses i
 ## The existing About Us Google Doc (B6)
 
 - [EP][V1.1] About Us stays untouched in Company Core [EP-BB] while the Markdown About Us is built beside it for comparison (B6).
-- Once the new Markdown About Us is saved, it becomes the one master, and the old Google Doc moves to the _archived folder, never deleted (B6, R22).
+- Only Allison promotes deliverables into company knowledge (Decision Log 2026-11-08, Every department and workspace carries Cal's two boilerplate blocks before its own instructions). Saving the new Markdown About Us does not make it the master or archive the existing Google Doc (B6, R22).
 - Notion HQ links to the Markdown file and keeps no copy. Foundations writes no Notion copy (B6).
 
-## Reporting each save (B7, O09)
+## Confirming each save (B7, O09)
 
-- Report each file with its link. A file that errored on save is reported as not saved, with the reason (B7).
+- After saving a file, reopen it from where it was saved and check that its name, version, place and contents are what was written (B7).
+- Only a file that reopened correctly is reported as saved. A file that did not save or did not reopen is reported as not saved, with the reason (B7).
 
 ## The closing message (B7, B2, B9, O09)
 

@@ -26,7 +26,7 @@ Read Organization Instructions, the HQ Rulebook and the Decision Log, all in HQ 
 - If a task conflicts with the Decision Log, the newest Decision Log entry wins. Follow it without asking.
 - When Allison types Q or q alone, or says ask me clarifying questions, ask before working, one question at a time, most important first, using the ask-me-questions skill.
 - Use the current native Factory assignment and owning Workstream for coordination. Do not require a GitHub issue or Hub record, create a job, or ask Allison to relay messages.
-- Before creating a repository, check for an existing repo and folder that fits and prefer it. Pick the best home and go.
+- Before creating a repository, consult the existing authoritative GitHub Archive Index and the live organization, identify the owning business and software boundary, and prefer an existing repo and folder. A new repo requires a documented technical or ownership reason and registration of purpose, owner, deployment and Factory agent instructions (HQ Rulebook, Where repos are listed).
 - Finish with the actual checks and result links. Merge when checks pass.
 - Never give legal, tax, or compliance advice, or suggest a professional, unless Allison asks.
 
