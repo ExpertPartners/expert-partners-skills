@@ -309,6 +309,11 @@ DESTRUCTIVE = [
     re.compile(r"osascript.*\bdelete\b", re.IGNORECASE | re.DOTALL),
     re.compile(r"\bgit\b.*\bclean\b", re.DOTALL),
 ]
+# A dynamic move may resolve to the Trash without spelling a Trash component
+# at all ("mv /tmp/x $D"), or join it to an expanded prefix ("${P}.Trash").
+# Never try to approve destinations the shell, rather than this guard, chooses.
+MOVE_WORD = re.compile(r"(?:^|[\s;|&(`=/{,])mv(?=$|[\s;|&)`},])")
+DYNAMIC_SHELL = re.compile(r"[$`;|&(){}<>*?\[\]]")
 BIN = r"(?:(?:/usr/bin|/usr/local/bin|/opt/homebrew/bin|/bin)/)?"
 SSH_WORD = re.compile(r"(?:^|[\s;|&(`$])" + BIN + r"=?(?:ssh|mosh)(?=\s|$)")
 FED_INTO_SSH = re.compile(r"\|\s*" + BIN + r"=?(?:ssh|mosh)(?=\s|$)|(?:^|[\s;|&(`$])" + BIN + r"=?(?:ssh|mosh)\s[^|;&]*<")
@@ -320,9 +325,91 @@ def plain(text):
     return re.sub(r"[\"'\\]", "", text)
 
 
+def dynamic_tilde(word):
+    # Only the plain home anchor is predictable. ~+/~- (including stack
+    # indices) and zsh named directories can resolve to an attacker-set Trash.
+    return (not word.first_quoted and word.text.startswith("~")
+            and word.text != "~" and not word.text.startswith("~/"))
+
+
+def known_non_deleting_move_piece(text):
+    """Recognize a literal non-Trash destination, not a whole shell script.
+
+    Inspect words without expanding them. An expanded source needs -- or a
+    quoted scalar with a stable literal prefix. Never exempt
+    substitutions, redirections or grouping.
+    Pure assignments are data; any later hidden command is checked separately
+    against the full command's move context.
+    """
+    if "$(" in text or "`" in text or unquoted_has(text, ";|&<>()"):
+        return False
+    try:
+        words = split_words(text)
+        if not words or [w.text for w in words] != shlex.split(text):
+            return False
+    except ValueError:
+        return False
+    # A comment can hide the actual final argument. Keep escaped/quoted
+    # literal hashes, but never use comment words as destination evidence.
+    if any(w.text.startswith("#") and not w.first_quoted for w in words):
+        return False
+    assignment = re.compile(r"[A-Za-z_][A-Za-z_0-9]*=.*", re.DOTALL)
+    if all(assignment.fullmatch(w.text) for w in words):
+        return not any(p.search(plain(text)) for p in DESTRUCTIVE)
+    # Only transparent wrappers with no options can be inspected this way.
+    while words and not words[0].quoted and not words[0].glob \
+            and words[0].text in {"env", "command", "exec", "sudo", "doas", "nohup"}:
+        wrapper = words.pop(0).text
+        if wrapper == "env":
+            while words and assignment.fullmatch(words[0].text):
+                words.pop(0)
+    if len(words) < 3 or words[0].quoted or words[0].glob \
+            or os.path.basename(words[0].text) != "mv":
+        return False
+    destination = words[-1]
+    if destination.glob or dynamic_tilde(destination) or any(c in destination.text for c in "$`{}") \
+            or destination.text.startswith("-"):
+        return False
+    options, saw_source = True, False
+    for word in words[1:-1]:
+        if options and word.text == "--" and not word.quoted:
+            options = False
+        elif options and word.text.startswith("-"):
+            if saw_source or not re.fullmatch(r"-[fvin]+", word.text):
+                return False
+        else:
+            # Quoting alone does not stop --target-directory=... from being
+            # an option. A leading variable/glob/brace needs an earlier --.
+            if options and word.text and word.text[0] in "$`{*?[~":
+                return False
+            # An unquoted scalar can split off a later --target-directory
+            # field despite a stable prefix. Quoted arrays/$@ can do so too.
+            scalar_only = re.sub(r"\$(?:[A-Za-z_][A-Za-z_0-9]*|\{[A-Za-z_][A-Za-z_0-9]*\})", "", word.text)
+            if options and (word.unquoted_expansion or "$" in scalar_only):
+                return False
+            saw_source = True
+    path = norm_path(destination.text) or destination.text
+    return saw_source and not is_trash(path) and not has_trash_component(path)
+
+
+def looks_dynamic_move(text):
+    t = plain(text)
+    expansion = DYNAMIC_SHELL.search(t) or re.search(r"(?:^|\s)~[^/\s]", t)
+    return bool(MOVE_WORD.search(t) and expansion
+                and not known_non_deleting_move_piece(text))
+
+
 def looks_destructive(text):
     t = plain(text)
-    return any(p.search(t) for p in DESTRUCTIVE)
+    if any(p.search(t) for p in DESTRUCTIVE) or looks_dynamic_move(text):
+        return True
+    for _seps, piece in split_unquoted(text):
+        first = first_word(piece)
+        if re.search(r"[$`{}*?\[\]]", first):
+            return True
+        if first in INTERPRETERS | WRAPPERS and DYNAMIC_SHELL.search(plain(piece)):
+            return True
+    return False
 
 
 def out(*lines):
@@ -375,6 +462,7 @@ def unsafe(command):
 class Word:
     def __init__(self):
         self.chars, self.glob, self.quoted, self.first_quoted = [], False, False, None
+        self.unquoted_expansion = False
 
     @property
     def text(self):
@@ -388,6 +476,8 @@ def split_words(text):
 
     def add(ch, q):
         cur.chars.append(ch)
+        if not q and ch in "$`":
+            cur.unquoted_expansion = True
         if cur.first_quoted is None:
             cur.first_quoted = q
 
@@ -637,14 +727,21 @@ def remote_verdict(host, remote, risky, opts=()):
     rwords = parse(remote.strip())
     if rwords is None:
         # Chained or piped remote text. Read-only pieces (ls ~/.Trash | wc -l)
-        # pass. A piece that looks like a delete, or any remote command
-        # substitution around one, blocks. None of it is approvable.
-        if ("`" in remote or "$(" in remote) and looks_destructive(remote):
-            block("a remote delete inside command substitution, which no note can approve.")
+        # pass. Command substitutions can run hidden command words which
+        # spell no literal delete verb. None of them is approvable.
+        if "`" in remote or "$(" in remote:
+            block("a remote command substitution this guard cannot read, which no note can approve.")
+        # Keep the full command's context when splitting it. In A=mv; "$A"
+        # neither isolated piece still spells both the move and expansion.
+        dynamic_move = looks_dynamic_move(remote)
         for _seps, piece in split_unquoted(remote):
             if first_word(re.sub(r"\d*[<>]+&?\S*", " ", piece)) in READ_ONLY:
                 continue
-            if looks_destructive(piece):
+            if known_non_deleting_move_piece(piece):
+                continue
+            # Unknown non-read-only shell pieces cannot be proved harmless
+            # by the absence of a literal mv: "$A"v can construct it instead.
+            if looks_destructive(piece) or dynamic_move or re.search(r"[$`{}*?\[\]]", plain(piece)):
                 block("a remote delete with chained, piped, expanded or unbalanced text. Send one plain delete per ssh command.")
         none()
     first = rwords[0]
@@ -681,15 +778,20 @@ def remote_verdict(host, remote, risky, opts=()):
                 continue
             if options and tok.startswith("-"):
                 block("a remote move with an option this guard cannot read.")
+            if options and w.glob and tok and tok[0] in "*?[":
+                block("a remote move whose leading wildcard could become a destination-changing option. Put -- before source arguments.")
             args.append(w)
         if len(args) < 2:
             block("a remote move this guard cannot read.")
+        if args[-1].glob:
+            block("a remote move whose destination the shell would expand. Give one literal destination so the guard can check whether it is the Trash.")
+        if dynamic_tilde(args[-1]):
+            block("a remote move whose special tilde destination the shell would choose. Give one literal destination.")
         dest = norm_path(args[-1].text) or args[-1].text
-        trash_pattern = args[-1].glob and looks_destructive(args[-1].text)
-        if not (is_trash(dest) or has_trash_component(args[-1].text) or trash_pattern):
+        if not (is_trash(dest) or has_trash_component(args[-1].text)):
             # A plain move that does not land in the Trash is not a delete.
             none()
-        if args[-1].glob or not is_trash(dest):
+        if not is_trash(dest):
             block("a remote move into the Trash this guard cannot read.")
         paths = args[:-1]
     elif verb in READ_ONLY:
