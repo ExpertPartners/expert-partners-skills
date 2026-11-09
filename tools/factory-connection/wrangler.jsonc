@@ -1,0 +1,30 @@
+// Factory connection Worker. Secrets live in 1Password and are set with wrangler secret put, never here.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "factory-connection",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-03-10",
+  "compatibility_flags": ["nodejs_compat"],
+  "account_id": "c4a6597a8d775d575401befb7d52846b",
+  "workers_dev": true,
+  "preview_urls": false,
+  "vars": {
+    "MCP_RESOURCE": "https://factory-connection.expert-partners.workers.dev/mcp",
+    "ALLOWED_EMAILS": "allison@expertpartners.com"
+  },
+  "kv_namespaces": [{ "binding": "OAUTH_KV", "id": "8c3ef39f44e64ac8909b158d99339e48" }],
+  "observability": { "enabled": true },
+  "dev": { "port": 8788 },
+  "secrets": {
+    "required": [
+      "FACTORY_API_KEY",
+      "HUB_API_TOKEN",
+      "ACCESS_CLIENT_ID",
+      "ACCESS_CLIENT_SECRET",
+      "ACCESS_TOKEN_URL",
+      "ACCESS_AUTHORIZATION_URL",
+      "ACCESS_JWKS_URL",
+      "COOKIE_ENCRYPTION_KEY"
+    ]
+  }
+}
