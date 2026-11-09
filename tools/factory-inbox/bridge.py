@@ -130,6 +130,22 @@ def archive_session(session_id, cwd=None):
     return settings["archivedAt"]
 
 
+def reopen_session(session_id):
+    """Clear the archive flag so the owning machine serves the session again and report
+    the stamp it carried, or None when this machine holds no archived copy of it."""
+    path = settings_path(session_id)
+    if not path.exists():
+        return None
+    try:
+        settings = json.loads(path.read_text())
+    except ValueError:
+        return None
+    stamp = settings.pop("archivedAt", None)
+    if stamp:
+        save(path, settings)
+    return stamp
+
+
 class Http:
     def __init__(self, config):
         import requests
@@ -290,6 +306,10 @@ class Worker:
                     state["session_id"] = result["sessionId"]
                 else:
                     sid = request["Session"]
+                    # An archived session is not served by its machine: the session read and
+                    # the message POST both answer 404 until the archive flag is cleared. The
+                    # close-out archives it again once the follow-up work is done.
+                    state["reopened_from"] = reopen_session(sid)
                     result = self.api.factory(
                         "GET", f"/sessions/{sid}?computerId={quote(machine['computer_id'])}"
                     )
@@ -339,6 +359,7 @@ class Worker:
             ),
             "message_id": state.get("message_id"),
             "agent_status": state.get("agent_status"),
+            "reopened_from_archive": state.get("reopened_from"),
             "meaning": (
                 "Factory accepted the prompt, not proof the requested work is complete. The"
                 " session publishes its completion receipt and archives itself once the work is"

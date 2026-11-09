@@ -271,14 +271,24 @@ class BridgeTests(unittest.TestCase):
             self.worker.finish("test", "99999999-2222-3333-4444-555555555555", "note")
         self.assertFalse(self.settings().exists())
 
-    def test_follow_up_into_an_archived_session_sends_without_unarchiving(self):
+    def test_follow_up_reopens_an_archived_session_and_records_the_stamp(self):
         bridge.save(self.settings(), {"archivedAt": "2026-11-09T00:00:00.000Z", "model": "auto"})
         receipt = self.worker.process(self.file, self.request("follow", SID))
         self.assertEqual(receipt["status"], "accepted")
+        self.assertEqual(receipt["reopened_from_archive"], "2026-11-09T00:00:00.000Z")
         self.assertTrue(self.api.calls[1][1].endswith("/messages"))
         kept = json.loads(self.settings().read_text())
-        self.assertEqual(kept["archivedAt"], "2026-11-09T00:00:00.000Z")
+        self.assertNotIn("archivedAt", kept)
         self.assertEqual(kept["model"], "auto")
+        self.worker.finish("follow", SID, "done")
+        self.assertTrue(json.loads(self.settings().read_text())["archivedAt"])
+
+    def test_follow_up_to_a_live_session_touches_no_archive_state(self):
+        bridge.save(self.settings(), {"model": "auto"})
+        receipt = self.worker.process(self.file, self.request("follow", SID))
+        self.assertIsNone(receipt["reopened_from_archive"])
+        self.assertEqual(json.loads(self.settings().read_text()), {"model": "auto"})
+        self.assertIsNone(bridge.reopen_session("77777777-8888-9999-aaaa-bbbbbbbbbbbb"))
 
     def test_archive_preserves_other_settings_and_creates_a_missing_file(self):
         bridge.save(self.settings(), {"model": "auto"})
