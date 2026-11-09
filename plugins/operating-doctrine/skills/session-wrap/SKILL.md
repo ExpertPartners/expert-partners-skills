@@ -9,6 +9,8 @@ description: "Closes out and hands off work on every surface. Writes the session
 tier: plugin
 zone: routing
 status: live
+calls:
+  - share-the-love
 subtitle: "the one canonical session close-out"
 ---
 
@@ -23,6 +25,7 @@ Allison typing wrap and archive, or only W or w, in a Claude Code or Codex sessi
 ## What to do
 
 1. Finish any remaining authorized work. Don't leave advice where an action would do.
+   Load `share-the-love` to catch any missed agent-facing lessons and give the day's short list from the existing Share List. It owns deduplication, appending and the saved receipt. Never create a second list or reappend the recap.
 2. Write the session record from artifacts and repo state, not chat scrollback. Use `reference/record-template.md`.
 3. Write the continuity note as its own document so the next session can pick up cold. Use `reference/continuity-template.md`.
 4. Save both in their owning home (the owning Drive brain for business material, the owning repo for code) and link them in your final report. Drive writes, the Decision Log format and connector fallbacks are in `reference/mcp-and-dashboard.md`.

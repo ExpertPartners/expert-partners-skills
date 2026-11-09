@@ -1,13 +1,14 @@
 ---
 name: teach-me
 description: "Teach Me opens every step of Cal's course the same way on every surface, then turns each finished step into teaching for anyone who joins Expert Partners. Two moments. Before a step, open with the line Next step, Teach Me, then a CEO brief under 200 words for someone who has never watched Cal's videos. When a step is done, draft the HQ guide entry in four fixed parts, the SOP story if an SOP was written, and a 60 to 90 second explainer scene list that ends on Stuck, ask Allison. Fires on Teach Me, teach me this step, teaching mode, next step, starting any step of Cal's course, and a step is done. It drafts the guide entry, SOP story and scene list and saves them where the HQ guide lives. HQ's own skill, not one of Cal's. Inherits operating-doctrine."
-allowed-tools: []
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Born dressed 2026-10-25 (Teach Me Skill Build, Decision Log 2026-10-25, Every step starts in teach-me mode).
 tier: plugin
 zone: content
 status: live
 inherits: operating-doctrine
+calls:
+  - share-the-love
 brand-scope: null
 subtitle: "every step opens and closes as teaching"
 ---
@@ -52,6 +53,8 @@ Mark anything Cal does not support as HQ's addition. When Cal is silent or her m
 ## Moment 2, when a step is done
 
 Do not use the Next step, Teach Me line here, it belongs to the moment before a step. Write the guide entry, the SOP story when one was written, and the scene list.
+
+Then load `share-the-love` with this finished step's real output, Allison's lesson and the source. It flags an agent-facing teaching moment and appends the entry or a dated source note to the existing Share List, without duplicating an earlier capture. Keep the guide drafts in their own home and preserve confidential-course restrictions. Share the Love owns the capture and saved receipt, not a second list in Teach Me.
 
 ### The HQ guide entry
 
