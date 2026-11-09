@@ -43,7 +43,15 @@ Use actual excerpt, source title and revision, reason, suggested change and disp
 
 ## Return useful work
 
+Score every reviewed draft against the Anti AI Writing Guide from 0 to 100. Report `Anti AI score`, `Anti AI result` and `Problems` together. The editorial result is `PASS` at 90 or above and `FAIL` below 90. Explain the score using the actual guide observations and draft excerpts, not an invented weighted rubric or a claim of measured accuracy.
+
+Keep every identified problem alongside the score, even at 90 or 100. Use an explicit empty problems list only when none was found. Keep factual, privacy, brand and voice findings and their dispositions separate from the editorial result. An Anti AI PASS does not clear those findings, prove authorship or authorize delivery. Current company canon and accepted calibration still take precedence over generic guide preferences; explain any applicable exception rather than penalizing approved voice.
+
+If the draft or guide cannot be read, report the missing input and leave the score and editorial result unassessed. Never invent a passing score. A score must be a finite number within 0 to 100, not a string or Boolean. An optional local check is `python3 scripts/check_score.py /absolute/path/score-record.json` from this skill directory. It accepts a JSON object with `score` and a `problems` array of nonempty strings, computes the editorial result and preserves all other findings. The helper checks the threshold and record, not editorial quality. It is not required for a normal prose audit.
+
 For an audit, return the findings and a bounded verdict with unresolved facts. Do not rewrite the whole draft unless asked. For a requested revision, return clean copy separately from an internal edit log, preserving meaning and verified facts. Explain edits in terms of audience and context, not rigid new rules.
+
+For requested revisions, revise writing below 90 and rescore the actual revision before delivering it as finished copy. Keep the original score and problems in the internal edit log. An audit-only request returns the score and problems without silently rewriting. If a revision still fails, report that result rather than presenting it as passing work.
 
 For material longer than 200 words, the recovered three-weaknesses and one-tweak review belongs in that internal log, never pasted onto customer-facing copy. Do not invent defects to fill a quota.
 
