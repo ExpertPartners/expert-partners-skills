@@ -1,8 +1,8 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-11-09T02:06:01Z",
-  "verifiedAt": "2026-11-09T02:06:01Z",
+  "generatedAt": "2026-11-09T02:08:14Z",
+  "verifiedAt": "2026-11-09T02:08:14Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
@@ -115,7 +115,7 @@
     },
     {
       "id": "brand-voice-plugin",
-      "humanName": "Brand Voice Plugin",
+      "humanName": "Brand voice workflows",
       "kind": "plugin",
       "summary": "Canonical brand context for the Estate brand registry (Expert Partners, EPIC, AG Personal Brand, AG Luxury, FAM, Don Hobbs).",
       "status": "Unknown",
@@ -127,28 +127,31 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the brand-voice plugin, version 0.6.8, in the expert-partners plugin marketplace.",
-        "Contains 7 skills. Each one activates when a request matches its purpose."
+        "Packaged as the brand-voice plugin, version 0.7.0, in the expert-partners plugin marketplace.",
+        "Contains 10 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.6.8.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.7.0.",
       "containsSkillIds": [
         "ag-luxury-brand",
         "ag-personal-brand",
+        "brand-guardian",
         "brand-voice",
+        "custom-instruction-builder",
         "don-hobbs-brand",
         "ep-brand",
         "fam-epic-brand",
-        "the-strong-ones-brand"
+        "the-strong-ones-brand",
+        "voice-guide-extractor"
       ],
       "relatedIds": [],
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/brand-voice",
-        "packageVersion": "0.6.8",
+        "packageVersion": "0.7.0",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
-        "skillCount": "7"
+        "skillCount": "10"
       },
       "keywords": [
         "brand",
@@ -163,10 +166,10 @@
         "luxury",
         "partners",
         "personal",
-        "plugin",
         "registry",
         "voice",
-        "voices"
+        "voices",
+        "workflows"
       ],
       "bestFor": [],
       "useCases": [],
@@ -683,7 +686,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.8.",
+        "Packaged in the Brand Voice plugin, version 0.7.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -698,7 +701,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.8 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.7.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "ag-luxury"
       },
@@ -758,7 +761,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.8.",
+        "Packaged in the Brand Voice plugin, version 0.7.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -773,7 +776,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.8 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.7.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "ag-personal-brand"
       },
@@ -1366,6 +1369,62 @@
       "example": false
     },
     {
+      "id": "brand-guardian",
+      "humanName": "Brand Guardian",
+      "kind": "skill",
+      "summary": "Audit or revise writing against the selected company's current brand canon and authentic voice.",
+      "status": "Unknown",
+      "maintainer": "ExpertPartners",
+      "collectionIds": [],
+      "categories": [
+        "The voices"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Brand Voice plugin, version 0.7.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "brand-voice-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/brand-voice/skills/brand-guardian/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "brands",
+        "packaging": "brand-voice plugin v0.7.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine"
+      },
+      "keywords": [
+        "against",
+        "applied",
+        "audit",
+        "authentic",
+        "brand",
+        "canon",
+        "company",
+        "current",
+        "guardian",
+        "real",
+        "revise",
+        "selected",
+        "voice",
+        "voices",
+        "writing"
+      ],
+      "bestFor": [
+        "current canon and voice applied to real writing"
+      ],
+      "useCases": [],
+      "askExamples": [],
+      "example": false
+    },
+    {
       "id": "brand-voice",
       "humanName": "Brand Voice",
       "kind": "skill",
@@ -1379,7 +1438,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.8.",
+        "Packaged in the Brand Voice plugin, version 0.7.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1400,7 +1459,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.8 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.7.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "ep-brand, fam-epic-brand, ag-personal-brand, ag-luxury-brand, don-hobbs-brand, the-strong-ones-brand"
       },
@@ -2683,6 +2742,64 @@
       "example": false
     },
     {
+      "id": "custom-instruction-builder",
+      "humanName": "Custom Instruction Builder",
+      "kind": "skill",
+      "summary": "Build or audit marketing workspace custom instructions from current company knowledge and authentic voice evidence.",
+      "status": "Unknown",
+      "maintainer": "ExpertPartners",
+      "collectionIds": [],
+      "categories": [
+        "The voices"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Brand Voice plugin, version 0.7.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "brand-voice-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/brand-voice/skills/custom-instruction-builder/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "brands",
+        "packaging": "brand-voice plugin v0.7.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine"
+      },
+      "keywords": [
+        "audit",
+        "authentic",
+        "brand",
+        "build",
+        "builder",
+        "company",
+        "current",
+        "custom",
+        "evidence",
+        "grounded",
+        "instruction",
+        "instructions",
+        "knowledge",
+        "marketing",
+        "voice",
+        "voices",
+        "workspace"
+      ],
+      "bestFor": [
+        "evidence-grounded marketing workspace instructions"
+      ],
+      "useCases": [],
+      "askExamples": [],
+      "example": false
+    },
+    {
       "id": "daily-planner",
       "humanName": "Daily Planner",
       "kind": "skill",
@@ -2943,7 +3060,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.8.",
+        "Packaged in the Brand Voice plugin, version 0.7.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2958,7 +3075,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.8 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.7.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "don-hobbs"
       },
@@ -3120,7 +3237,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.8.",
+        "Packaged in the Brand Voice plugin, version 0.7.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3135,7 +3252,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.8 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.7.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "expert-partners"
       },
@@ -3388,7 +3505,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.8.",
+        "Packaged in the Brand Voice plugin, version 0.7.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3403,7 +3520,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.8 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.7.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "fam, epic"
       },
@@ -7686,7 +7803,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.6.8.",
+        "Packaged in the Brand Voice plugin, version 0.7.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7701,7 +7818,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.6.8 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.7.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "the-strong-ones"
       },
@@ -8151,6 +8268,63 @@
       ],
       "bestFor": [
         "video to transcript relay"
+      ],
+      "useCases": [],
+      "askExamples": [],
+      "example": false
+    },
+    {
+      "id": "voice-guide-extractor",
+      "humanName": "Voice Guide Extractor",
+      "kind": "skill",
+      "summary": "Extract or audit a personal or company voice guide from authentic writing or speaker-isolated transcripts.",
+      "status": "Unknown",
+      "maintainer": "ExpertPartners",
+      "collectionIds": [],
+      "categories": [
+        "The voices"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Brand Voice plugin, version 0.7.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "brand-voice-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/brand-voice/skills/voice-guide-extractor/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "brands",
+        "packaging": "brand-voice plugin v0.7.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine"
+      },
+      "keywords": [
+        "audit",
+        "authentic",
+        "brand",
+        "company",
+        "extract",
+        "extractor",
+        "guide",
+        "isolated",
+        "personal",
+        "reusable",
+        "samples",
+        "speaker",
+        "transcripts",
+        "voice",
+        "voices",
+        "writing"
+      ],
+      "bestFor": [
+        "authentic samples to a reusable voice guide"
       ],
       "useCases": [],
       "askExamples": [],
