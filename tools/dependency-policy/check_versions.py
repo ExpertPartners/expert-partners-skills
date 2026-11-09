@@ -40,8 +40,6 @@ WORKFLOWS_DIR = ".github/workflows"
 # that text prints as a warning; any other finding in the workflow fails. The entry fails
 # once the waived finding is gone, so the exception cannot outlive the gap it records.
 PENDING_WORKFLOWS: dict[str, tuple[str, str]] = {
-    "builder-allowlist.yml": ("installs 'pyyaml' by name",
-                              "installs PyYAML by name; move it to -r requirements-tooling.txt"),
     "skills-graph.yml": ("installs 'pyyaml' by name",
                          "installs PyYAML by name; move it to -r requirements-tooling.txt"),
 }
