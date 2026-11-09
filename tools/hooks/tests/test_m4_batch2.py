@@ -171,13 +171,6 @@ class CoreTest(unittest.TestCase):
     def note_path(self, action=ACTION):
         return self.directory / self.store.note_name(action)
 
-    def mutate_note(self, change, action=ACTION):
-        path = self.note_path(action)
-        data = json.loads(path.read_text())
-        change(data)
-        path.write_text(json.dumps(data))
-        path.chmod(0o600)
-
     def assert_no_dispatch(self):
         self.assertEqual(self.runtime.calls, [])
 
