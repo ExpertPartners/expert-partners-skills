@@ -4,7 +4,7 @@ classification: public
 
 # Factory connection
 
-One service, three users. The Factory connection is a Cloudflare Worker that wraps the Factory Public API. Claude and ChatGPT reach it as a remote MCP connector at `https://factory-connection.expert-partners.workers.dev/mcp`, signing in through Cloudflare Access with Allison's Expert Partners account only. The Expert Partners Hub reaches the same tools at `https://factory-connection.expert-partners.workers.dev/api` with a bearer token. Code lives in `tools/factory-connection`.
+One service, three users. The Factory connection is a Cloudflare Worker that wraps the Factory Public API. Claude and ChatGPT reach it as a remote MCP connector at `https://factory-connection.expert-partners.workers.dev/mcp`, signing in through Cloudflare Access with Allison's Expert Partners account only. The Expert Partners Hub reaches the same tools at `https://factory-connection.expert-partners.workers.dev/api` with a bearer token. Code lives in `connectors/factory-connection`.
 
 ## Routing every request
 

@@ -41,6 +41,8 @@ If one can't be read, work from categories, not remembered numbers.
 
 ## Factory connection
 
+Factory is the first assumption for company builds, with Claude Code, Codex and Replit's agent used when they are the faster capable route. Reuse existing owners and Workstreams, keep the newest approved decisions and the full approved scope, then execute and report.
+
 Claude, ChatGPT and the Hub drive Factory through one connection, the Factory connection connector (remote MCP) or its Hub endpoint. Before starting anything, call `find_owner` and decide whether the message is a new assignment, a status question, a correction or a duplicate. Send work for an existing Workstream to its orchestrator with `post_message`. A new continuing program gets a Workstream brief for Allison (outcome, constraints, how Factory tests it, decisions reserved for her). A bounded job starts with `start_and_watch`, first line `Section - Mission`. Use `interactionMode: "spec"` when architecture is unclear. Defaults are Auto Model and High autonomy. Deliverables land in Drive (docs) or GitHub (code), never only in a Factory shared folder. See `reference/factory-connection.md` for the routing table, test results and tool list.
 
 ## Control Room direct line

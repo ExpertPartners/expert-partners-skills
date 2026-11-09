@@ -34,7 +34,7 @@ Load or rotate them by piping from `op` into `wrangler secret bulk`, never on a 
 ## Develop and deploy
 
 ```bash
-cd tools/factory-connection
+cd connectors/factory-connection
 npm ci
 npm run type-check
 npm test
