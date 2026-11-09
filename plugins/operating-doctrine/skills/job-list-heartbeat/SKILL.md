@@ -1,6 +1,8 @@
 ---
 name: job-list-heartbeat
 description: "Retired. Sessions no longer check a job list on a timer. The AI acts on the brief and reports with links. Inherits operating-doctrine."
+disable-model-invocation: true
+user-invocable: false
 allowed-tools: []
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Born dressed 2026-11-03 (Decision Log 2026-11-02, CEO directive, every Claude
@@ -8,7 +10,7 @@ allowed-tools: []
 # so it ships with no proving line.
 tier: plugin
 zone: routing
-status: live
+status: retired
 inherits: operating-doctrine
 brand-scope: null
 subtitle: "check the job list every 15 minutes"

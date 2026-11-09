@@ -1,10 +1,12 @@
 ---
 name: session-steward
 description: "Retired. Continuity and lifecycle stewarding of code sessions is no longer a function. Each AI acts on its own work and archives itself when done."
+disable-model-invocation: true
+user-invocable: false
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
-status: live
+status: retired
 inherits: operating-doctrine
 defers-to:
   - code-block-routing

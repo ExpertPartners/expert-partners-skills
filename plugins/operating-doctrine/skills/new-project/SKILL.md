@@ -29,7 +29,7 @@ The legacy local bootstrap script and any older deployed copy that describes it 
 
 ## Steps
 
-1. **Parse the input.** Extract the proposed project name and the durable job it would hold. Look for an existing GitHub issue or Factory assignment already carrying this request and continue it.
+1. **Parse the input.** Extract the proposed project name and the durable job it would hold. Look for an existing Factory session or Workstream already carrying this request (call find_owner) and continue it.
 
 2. **Run repo-standards creation Stage A live.** Read the GitHub Archive Index sheet and complete the ownership gate. On `USE EXISTING REPO`, do the work in that owner's repo (an archived owner is a revival candidate, so revive it rather than duplicating) and report the owner and Archive Index row. On `NEW REPO JUSTIFIED`, continue. If a live read fails, fix the access and rerun.
 
