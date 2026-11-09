@@ -44,9 +44,9 @@ Required behavior. The live Rulebook and the Archive Index row win. The aura fil
 
 ## 6. Allison explicitly asks for a brand new chat
 
-Scenario. Allison says, start me a brand new chat for the sample-video series. Supplied facts. The live sources name sample-video as the owner. The current route keeps one copy box, built by lane-spawn, for the first message that starts a brand new chat.
+Scenario. Allison says, start me a brand new chat for the sample-video series. Supplied facts. The live sources name sample-video as the owner. 
 
-Required behavior. Uses only the lane-spawn first-message exception: one first-message copy box for the new chat, with its required envelope lines. No other paste step, closeout file or terminal instruction is added.
+Required behavior. Starts the new chat itself where it can, and names the owner. Adds no paste step, closeout file or terminal instruction for Allison.
 
 ## 7. A native assignment is not a repository creation waiver
 

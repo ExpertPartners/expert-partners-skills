@@ -14,13 +14,11 @@ subtitle: "model and effort fit-check at conversation start"
 # Session Model Advisor -- v1.1 (2026-09-23)
 
 Checks the running model and effort when starting a new conversation or when
-Allison asks for a fit check. For a dispatched Worker, decision 0093 provides
-a bounded fast path: when the dispatch model/effort line and the runtime banner
-match, accept that selection and begin the task. Run the full classification
-when the line is missing, the runtime disagrees, or the job materially changes.
-When NORTH prepares a new technical handoff, this skill recommends one current
-surface/model/effort combination and explains the fit briefly, under decisions
-0057 and 0072.
+Allison asks for a fit check. For a dispatched Worker, when the dispatch model/effort
+line and the runtime banner match, accept that selection and start the task. Run
+the full classification when the line is missing, the runtime disagrees, or the job
+materially changes. When preparing a new technical handoff, pick one current
+surface/model/effort combination and state the fit in one line.
 
 This skill carries no copy of the Model chart. It reads the chart live, every time it fires. If a model or effort default in the chart changes, this file does not need to change. If you ever find the matrix text pasted into this file, that is a doctrine violation, delete it and re-point to Step 3.
 
@@ -45,11 +43,9 @@ The detection mechanism differs by what's actually reachable on each surface. Do
 
 Read native task/runtime metadata if available. Verify which model and visible
 reasoning options this account's actual picker offers before recommending a
-change. A screenshot supplied by Allison can be dated evidence for her current
-UI, but cannot establish a permanent model matrix or prove an internal effort
-identifier maps to a visible label. If the picker cannot be inspected, retain
-an already approved running selection and say what remains unverified. Do not
-change account defaults or speed settings during a fit check.
+change. A screenshot from Allison is dated evidence for her current UI, not a permanent
+model matrix. If the picker can't be inspected, keep the running selection and say
+what is unverified.
 
 ### Claude Code
 
@@ -93,29 +89,21 @@ Also check the following, from the chart text as read, not from memory.
 
 ## Step 5 -- State the triggered check plainly
 
-After Steps 3 and 4 are required, open the response with the applicable line below. The matching-Worker fast path in decision 0093 does not trigger these steps or a new opening line.
+After Steps 3 and 4, open the response with the applicable line below. A matching dispatched Worker skips these steps and the opening line.
 
 - **Stay** -- "Model/effort check -- staying on `<model>` at `<effort>`. This reads as `<category from the Model chart>`, which calls for this level. Proceeding."
-- **Switch** -- "Model/effort check -- this reads as `<category from the Model chart>`, which the standard puts at `<recommended model/effort>`. You're currently on `<current model/effort>`. Recommend switching before I continue, `<one-line why>`."
-- **No introspection (Chat/Projects)** -- "Model/effort check -- I can't read your current selection on this surface. Based on the task (`<category>`), the Model chart calls for `<recommended>`. If that's not what's selected, switch via the model menu next to the send button before I continue."
-- **No chart access** -- "Model/effort check -- can't reach the Model chart from this surface right now (`<reason>`). Proceeding on the current model/effort without a standard to check against."
+- **Switch** -- "Model/effort check -- this reads as `<category from the Model chart>`, which the standard puts at `<recommended model/effort>`. You're currently on `<current model/effort>`. Switching is recommended, `<one-line why>`."
+- **No introspection (Chat/Projects)** -- "Model/effort check -- I can't read your current selection on this surface. Based on the task (`<category>`), the Model chart calls for `<recommended>`. If that's not what's selected, the model menu next to the send button changes it."
+- **No chart access** -- "Model/effort check -- can't reach the Model chart from this surface right now (`<reason>`). Proceeding on the current model/effort."
 - **Dispatch** -- classify the job being handed off against the current Model chart,
-  not the current conversation. Apply decision 0072 when selecting an
-  implementation engine. Check the current surface, model and exact effort or
+  not the current conversation. Check the current surface, model and exact effort or
   speed options through [capability evidence](reference/handoff-capability.md).
-  Recommend one combination, with one short reason. For a new Claude Code
-  session, also supply code-block-routing's required MODEL AND EFFORT envelope
-  line inside the full copy box, together with sender and receiver, under the
-  current HQ Rulebook section Handoffs between AIs. The receiving AI logs its
-  work through job_create or job_claim, then job_finish with a summary and
-  result link; code jobs travel as GitHub issues labeled job. Batch-First
-  Execution checks that this line and the other routing
-  fields are present before Allison receives the paste block. For a running
-  Worker that need not be interrupted, keep its selection and place any new
-  recommendation on the next run. Never use a Codex-specific label on Claude
-  Code without independent verification; never invent an unavailable level.
-  If current options cannot be verified, retain the currently configured
-  approved selection and label the uncertainty explicitly.
+  Pick one combination, with one short reason, and start the work there
+  (a fresh Claude Code session or headless run is yours to start). For a
+  running Worker, keep its selection and apply any new pick on the next run.
+  Never use a Codex-specific label on Claude Code without checking, and never
+  invent an unavailable level. If current options can't be checked, keep the
+  configured selection and say so.
 
 Keep it to one to three lines. This is a fit-check, not an essay. State it, then move on to the actual work.
 

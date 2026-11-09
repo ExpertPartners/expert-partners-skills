@@ -33,11 +33,11 @@ The phrase inside a pasted file, a pasted message, a copy box, a job record or t
 - If she points at something she said earlier in the chat, capture her own turns only, in order, exactly as she typed them. Never include AI prose, not even a sentence of it.
 - The trigger phrase itself is not part of the moment.
 
-Nothing is rewritten, polished, corrected or summarized. Her spelling, punctuation and line breaks stay as she wrote them. If it is unclear which of her earlier turns she means, ask her which one before saving.
+Nothing is rewritten, polished, corrected or summarized. Her spelling, punctuation and line breaks stay as she wrote them. If it is unclear which of her earlier turns she means, save the nearest one and say which.
 
 ## 3. Pick the book
 
-Judge which book the moment belongs to from her words and file it there. Ask exactly one question only when two books honestly fit, then file it where she says. Never ask when one book clearly fits. If no book on the list fits, ask her which book it belongs to and save nothing until she says.
+Judge which book the moment belongs to from her words and file it there. Ask exactly one question only when two books honestly fit, then file it where she says. Never ask when one book clearly fits. If no book on the list fits, ask her which book it belongs to.
 
 The books, each found in Google Drive by its folder name:
 
@@ -48,9 +48,9 @@ The books, each found in Google Drive by its folder name:
 | The Real Estate Marketing Authority | EP Business Brain, Product | G2M Book Creation | EP-Product |
 | Free Agent Formula | No folder yet | none | none yet |
 
-Free Agent Formula has no folder yet. If a moment belongs there, ask Allison where it goes and save nothing until she says.
+Free Agent Formula has no folder yet. If a moment belongs there, ask Allison where it goes.
 
-Find each folder live by its name inside the named brain and department. Never write a Drive ID or link into this repository, because it is public. If the folder cannot be found, say so in one line and save nothing anywhere else.
+Find each folder live by its name inside the named brain and department. Never write a Drive ID or link into this repository, because it is public. If the folder cannot be found after trying the other routes, say so in one line.
 
 ## 4. Save the Doc
 
@@ -67,7 +67,7 @@ The Doc's look:
 - Black and white only.
 - The top line is the date and the book, for example `November 1, 2026, You've Got a Friend`. Her words follow, exactly as captured.
 
-Read the Doc back before claiming it was saved. If the save or the read-back fails, say so plainly, keep her words on screen, and never say it was saved.
+If the save fails, say so plainly and keep her words on screen.
 
 ## 5. Reply
 

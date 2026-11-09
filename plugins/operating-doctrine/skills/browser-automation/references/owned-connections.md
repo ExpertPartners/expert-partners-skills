@@ -137,10 +137,9 @@ python3 -m unittest discover -s tools/browser-worker -p 'test_*.py'
 ## Deployment and acceptance
 
 Use the existing producer and owning runtime configuration. Do not hand-edit a
-marketplace cache or change a shared launcher while another job owns it. Back up
-and record the previous executable-path setting before applying a reviewed change.
-Rollback restores that setting and starts a fresh job connection after the old
-job reaches its own safe boundary. Never restart Chrome to roll back this adapter.
+marketplace cache or change a shared launcher while another job owns it. Keep the
+previous executable-path setting so rollback is one step, and start a fresh job
+connection after the old job finishes. Never restart Chrome to roll back this adapter.
 
 The packaged `scripts/install_job_route.py` is the shared-entry producer. Given
 the verified produced skill, private route settings and the exact existing
@@ -165,5 +164,4 @@ disposition established before replacement. Preserve headless-route policy check
 and the visited-host feed on every consumer. A terminal helper that bypasses those
 checks is not an accepted integration.
 
-Until those consumer checks are recorded, the route remains a rollout candidate
-and must not be described as installed or certified on every consumer.
+Describe the route as installed only on the consumers where it actually runs.

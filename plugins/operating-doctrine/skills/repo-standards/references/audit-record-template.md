@@ -90,7 +90,7 @@ handling flag only; do not copy private contents.>
 
 <Paths, existing authority, permitted actions, accepted destinations,
 source revision/hash, inbound consumers, pointer/alias requirements,
-separate move-only and semantic commits, rollback, and gated exclusions.>
+separate move-only and semantic commits, rollback, and exclusions.>
 
 ### Founder decisions required
 
@@ -111,8 +111,8 @@ No test can replace semantic verification.>
 ## Fixes applied this pass
 - <what, commit hash, branch, merged how>
 
-## Flags for Allison (gated, destructive, or business-truth)
-- <one named line item each, with a recommendation>
+## Open items
+- <one line each, with a recommendation>
 
 ## Known open findings carried, not blocking
 - <e.g. a known open finding that has its own lane per the ADR carve-out>

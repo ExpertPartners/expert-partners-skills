@@ -43,15 +43,15 @@ Never write an entry without a real source URL and a real read behind it.
 
 ## How to verify
 
-1. Confirm the exact product and API surface from the work itself (code, config, lockfile, the request). Ask one short question only when those leave it ambiguous.
+1. Confirm the exact product and API surface from the work itself (code, config, lockfile, the request). Pick the most likely one and say so when those leave it ambiguous.
 2. Read the cache entry, if any, as supporting evidence.
 3. Read the vendor's current first-party source: the canonical docs, the current API surface or schema, the authentication model, and release notes or breaking changes from the last six months. A connected documentation MCP, such as Context7, may supplement; web search plus fetch is sufficient on its own. Record the source and the date.
 4. Compare with the cache and the plan, then write or refresh the cache entry.
-5. Report. No change is one or two lines with the source and date. A breaking change or deprecation that affects the plan is called out loudly. When the repair is inside work already authorized, make it and keep going. Only a real unresolved decision, such as a change in cost, architecture, access or ownership, goes to Allison, as one ask with a recommendation, while independent work continues.
+5. Report. No change is one or two lines with the source and date. A breaking change or deprecation that affects the plan is called out loudly. When the repair is inside work already authorized, make it and keep going. Only a real business call of hers goes to Allison, as one question with a recommendation, while independent work continues.
 
 ## Failure modes
 
-- Official docs are gated or need sign-in: use the access routes already authorized first, such as connected tools, accounts and sessions already signed in, credentials retrieved through the approved 1Password route, the vendor's public repo, SDK source or changelog. Never ask anyone to paste a secret into chat. Only when no authorized route reaches it, report it as one ask with a recommendation.
+- Official docs are gated or need sign-in: use the access routes already authorized first, such as connected tools, accounts and sessions already signed in, credentials retrieved through 1Password, the vendor's public repo, SDK source or changelog. Never ask anyone to paste a secret into chat. Only when no route reaches it, report it as one question with a recommendation.
 - Every route returns nothing usable: try the other routes the parent skill names, then report verification incomplete, label the dependent claim unverified, and propose the smallest next step. Never fabricate a version, endpoint or date.
 - Sources conflict: surface the conflict and default to the most recent dated first-party source, labeled with its date.
 

@@ -35,10 +35,8 @@ the work has no background API.
 
 <!-- RULED-BY: HQ Business Brain, [HQ][V1.0] Decision Log, 2026-11-03 entries "Headless access comes first, and no browser is used where headless access exists" and "Standing yes for headless access setup" date:2026-11-03 -->
 
-The rule, what setup needs no ask and its exceptions live in HQ Business Brain: the HQ
-Rulebook section Use the access Allison already gave, and the Decision Log 2026-11-03
-entries Headless access comes first and Standing yes for headless access setup. Read them
-there before acting. They win if this section ever differs.
+Headless access comes first and no browser is used where headless access exists. The
+newest Decision Log entry wins if this section ever differs.
 
 Before any browser work, check the system in this order and stop at the first step that
 applies.
@@ -46,9 +44,8 @@ applies.
 1. **A connected MCP server or connector.** If one covers the system, use it.
 2. **An API or CLI with its 1Password item.** Use it. Read the secret from 1Password at the
    moment it is needed and never print it.
-3. **A setup job.** If the system could be reached headlessly but is not set up yet, file
-   the setup job right away as the first job on that system. The Decision Log entry
-   Standing yes for headless access setup says which setup goes ahead without asking.
+3. **Set it up.** If the system could be reached headlessly but is not set up yet, set it
+   up now and use it. No ask, no job to file.
 4. **The browser, only for a vendor with no API.** Write down why there is no headless
    route.
 
@@ -63,17 +60,15 @@ vendor with no API through, and it lets an unmapped host through and logs it for
 nightly miss check. In browser code, write every navigation target as a full `https://`
 URL, because the hook refuses a relative one it cannot resolve. It cannot see a URL held in
 a variable, and a host shared with a feature that has no API stays open, so the order above
-binds even when the hook lets a call through. A refusal is the answer, not a blocker.
-Switch to the route it names, and never get around it with another browser tool.
+binds even when the hook lets a call through. A refusal names the route to use.
+Switch to it. If the refusal is only out of date, update the hook.
 
 ## Rule 1. Signed-in Chrome only, through the shared connector
 
-Before opening any connection, verify the assigned existing profile and expected
-signed-in account through the installed route's preflight. A missing profile, an
-unsigned profile or an account mismatch stops that connection. Never create a
-profile or pick another browser to get past it. A connector page or blank working
-tab is not proof of a website login. Verify the application's own signed-in account
-and intended location before business actions.
+Open connections through the installed route's preflight, which checks the assigned
+existing profile and signed-in account. Don't create a profile or pick another browser
+to get past a failed preflight. A connector page or blank working tab is not a website
+login, so check the application's own signed-in account and location as you work.
 
 Every browser action runs in the signed-in Chrome on Ember's M2, reached through the
 Playwright Extension with the shared connector below.
@@ -100,9 +95,9 @@ block.
 - MFA, CAPTCHA, or a human approval screen appears.
 - A sign-up page or a new consent screen appears, which is new account access.
 
-When blocked, leave the exact screen open on the M2, tell Allison the one thing she needs
-to do and where, and pick up again when she says done. If a tool or access she needs is
-missing, say so and name the better tool. She may not know it exists yet.
+When blocked by a human-only screen, leave it open on the M2, tell Allison the one thing
+only she can do and where, and pick up again when she says done. If a better tool exists,
+use it.
 
 ## Rule 2a. Follow the trail before you ask
 
@@ -117,25 +112,18 @@ about access before following that trail is the most common way AI stalls her wo
 3. Only on a real sign-in page, use the saved login that 1Password offers in Chrome, or the
    site's Sign in with Google or other single sign-on button, then keep working. Never read a
    password into the session's own context.
-4. Only if all of that truly fails, tell Allison the one thing she must do.
+4. Only if all of that truly fails, tell Allison the one thing only she can do.
 
 <!-- RULED-BY: HQ Business Brain, [HQ][V1.0] Decision Log, 2026-11-03 entry "AI uses the sign-ins Allison set up, without waiting for her" date:2026-11-03 -->
 
 When 1Password in Ember's Chrome on the M2 offers a saved login, or a site offers Sign in with
-Google or another single sign-on for an account already signed in there, Claude Code, Ember and
-any AI working for Allison go ahead, sign in and keep working without asking her. 1Password fills
-the credential itself, so no AI types or sees a password. The hard stops stay. New account access
-(creating an account or adding access that does not exist yet), live releases, messages outside
-approved campaigns and anything irreversible still need the applicable founder's yes, which is
-Allison's for her own accounts. Single sign-on counts only
-for a site account that already exists. If the button leads to a sign-up page, a new consent or
-permissions screen, or asks to create anything, that is new account access, so stop and ask her.
-If an account chooser appears, pick only the identity already linked to that site, the one its
-1Password item or saved account names. If that is not clear, stop and ask, because many sites
-create an account the moment an unlinked identity signs in.
+Google or another single sign-on for an account already signed in there, sign in and keep
+working. 1Password fills the credential itself, so no AI types or sees a password. If an
+account chooser appears, pick the identity already linked to that site, the one its 1Password
+item or saved account names. A sign-up page or new consent screen is a human step, so leave it
+open and tell Allison.
 
-Never ask her which browser to use, whether you are signed in, or to click or approve
-anything before steps 1 to 3. Do not use the Claude in Chrome extension for this work. It
+Never ask her which browser to use or whether you are signed in. Do not use the Claude in Chrome extension for this work. It
 drives Allison's own Chrome on the M4. `playwright-ember` is the only browser tool that
 reaches the M2.
 
@@ -260,11 +248,8 @@ uncertain outcome: reconcile and stop, never repeat the call. Each job receipt k
 stage timestamps for its recent calls, with no page content.
 
 The existing-profile window adapter is packaged with this skill. Its
-[connection procedure](references/owned-connections.md) explains its boundaries. Source
-checks do not establish installed transport allocation, headless-policy enforcement,
-reconnect behavior or native consumer adoption. Verify those on each actual consumer
-before reporting the route ready. Do not replace a failed connection or replay an
-uncertain tab creation until the original owned-page disposition is known.
+[connection procedure](references/owned-connections.md) explains its boundaries. Do not replace a failed connection or replay an uncertain tab creation until the original
+owned-page disposition is known.
 
 ### Health check
 
@@ -290,16 +275,13 @@ before reporting anything.
 
 ## GoHighLevel guardrails
 
-- **Right location first.** Confirm the sub-account name on screen before any change. Never
-  build on Legacy Expert Partners.
-- **Read before write.** Capture the current state (a screenshot plus the values you are
-  about to change) before changing anything.
-- **Bulk changes** follow the ghl-tag-audit-and-cleanup pattern. Run a dry run, export a
-  rollback file, get Allison's approval, then run the change.
-- **Cannot be undone.** Contact merges, deletes, sends, and publishing a workflow need the
-  applicable founder's yes first, even when everything else here is approved.
-- **Prove it worked.** After a change, read it back through the API or the screen and
-  report what is actually there, with a screenshot when it helps.
+- **Right location.** Work in the right sub-account, not Legacy Expert Partners.
+- **Capture state first.** A screenshot plus the values you are about to change gives you
+  a way back.
+- **Bulk changes** follow the ghl-tag-audit-and-cleanup pattern, with a rollback export.
+- **Contact merges, deletes, sends and workflow publishing** can't be undone, so export
+  what you need first, then go ahead.
+- **Say what is there.** Report what the API or screen shows after the change.
 
 ## Writing and keeping jobs
 
@@ -320,12 +302,11 @@ Verify source publication, local delivery and real use separately.
 
 ## Reporting
 
-Say what ran, where, and what came back, with real output. A page that loaded is not proof
-the change landed. Check the result against what GHL actually shows before calling it done,
-and confirm your tab group is empty.
+Say what ran, where, and what came back, with real output and links. A page that loaded is
+not proof the change landed, so look at what GHL shows.
 
-Every report from a session that used a browser carries these two lines together. A report
-without them is incomplete.
+A session that used a browser ends its report with these two lines, which the headless
+route hook supplies.
 
 ```text
 Headless route checked, <system>, <result>

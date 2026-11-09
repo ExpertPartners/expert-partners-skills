@@ -24,9 +24,9 @@ v4.1 follows Decision Log 2026-10-24, Every document made in work with Allison u
 
 The Document formatting section of the HQ Rulebook sets every number for company documents. That covers fonts, sizes, colors, line spacing, and paragraph spacing. The Decision Log records each change.
 
-Read that section live before you make or restyle a document. Never use a remembered value. Line spacing alone moved from 1.5 to 1.15 and back to 1.5 during October 2026.
+Read that section live before you make or restyle a document. Do not rely on a remembered value. Line spacing alone moved from 1.5 to 1.15 and back to 1.5 during October 2026.
 
-If this skill and the Rulebook ever differ, the Rulebook wins. Report the difference to [HQ 🧠] - Chief HR Officer under the current HQ Rulebook section Handoffs between AIs, with the result linked in the existing job.
+If this skill and the Rulebook ever differ, the Rulebook wins. Fix this skill to match and say so in your report.
 
 ## What the Rulebook asks for, in short
 
@@ -58,8 +58,8 @@ These notes translate the Rulebook's values. They never replace them.
 - Use the native named styles (TITLE, HEADING_1, HEADING_2, NORMAL_TEXT) so the outline works. A visually enlarged paragraph is not a heading.
 - Never insert empty paragraphs to make space. Use spaceBelow on body paragraphs instead.
 - In docx-js, line spacing is the Rulebook value times 240 and font sizes are in half points.
-- Before you report done, read the saved document back. Check the font, the line spacing, the heading styles, and that no empty paragraphs sit between paragraphs.
+- Apply the font, line spacing and heading styles as you build, with no empty paragraphs between paragraphs.
 
 ## Where this standard lives
 
-This file in expert-partners-skills, plugins/operating-doctrine/skills/document-formatting-standard/, is the canonical copy. Claude Code, Claude surfaces, and Codex receive it through the expert-partners plugin marketplace.
+This file in expert-partners-skills, plugins/operating-doctrine/skills/document-formatting-standard/, is the canonical copy. Surfaces receive it through the plugin marketplace.

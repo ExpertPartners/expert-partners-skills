@@ -34,17 +34,17 @@ CEO brief is Teach Me's own step opener, so it never fires this skill. Q and ask
 
 ## What to do when it fires
 
-1. Verify first. Read the live state of what this session worked on, such as git status, the job through job_status, logs, test output, or the file itself. Never report from memory what a check can answer. If something cannot be checked, say it is not checked.
+1. Read the live state of what this session worked on, such as git status, logs, test output, or the file itself, so you report what is true. If something is not checked, say so.
 2. Write the heading, Quick update, super simple.
 3. Write the three lists below, in this order, each with its short heading on its own line.
 4. Write the closing status line for the surface (see below).
-5. Stop. No extra recap, no menu, no question unless a real decision is waiting on Allison.
+5. Stop. No extra recap, no menu, no question unless a real decision only she can make is waiting.
 
 ## The three lists
 
 What's important. Two to four bullets, the things she must know. Lead with what changed and what works, then what is protected. One fact per bullet. Say what you tested when you tested it.
 
-What's still outstanding. Two to four bullets. Each one names the thing, who does it, and when it happens, with the date and time first when there is one. Say who owns it, you, a scheduled job, or her. End with Nothing is needed from you right now when that is true, and when it is not true, name the one thing she must do and where.
+What's still outstanding. Two to four bullets. Each one names the thing, who does it, and when it happens, with the date and time first when there is one. Say who owns it, you or a scheduled job. End with Nothing is needed from you right now when that is true. If only she can do something, name it.
 
 What I recommend. Two or three bullets. Give a recommendation, not a menu. Say what to keep, what to say yes to and why, and what to leave alone. If she must decide something, make that the first bullet and state the decision in one sentence.
 
@@ -56,10 +56,8 @@ Do not soften or hide a problem to keep it simple. If something failed or is unv
 
 ## Closing line
 
-Claude Code and Codex. End with exactly one verified SESSION STATUS line, chosen by the standing tests in the Code close rule, Waiting on you, Still working, SAFE TO ARCHIVE, or NOT safe to archive. Verify it live in the same turn. If waits exist, name the work, the owner and what they must return. Keep its tracking number in the internal record.
-
-Cowork. Follow the Cowork close rule. Give an advance cue only when a next step exists. When nothing remains, say exactly We're done here. You can archive this session.
+End with one plain status line, such as Still working on X or All done. Keep tracking numbers in the internal record.
 
 ## What it never changes
 
-The work and the rules. The doctrine, the verification duty, the approval gates, and the formatting locks stay at full strength. No em dashes. Colons and semicolons sparingly. No bold or italics. Links are clickable file names, never raw URLs. Only the length and the register change, the thinking does not shrink.
+The work and the rules. The doctrine and the formatting locks stay as they are. No em dashes. Colons and semicolons sparingly. No bold or italics. Links are clickable file names, never raw URLs. Only the length and the register change, the thinking does not shrink.
