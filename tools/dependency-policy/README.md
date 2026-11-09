@@ -47,6 +47,7 @@ Current layers:
 | `.../video-discovery/requirements-dev.txt` | pytest, on verification |
 | `plugins/research-ops/skills/source-hunter/requirements.txt` | Pillow, on the video-discovery runtime |
 | `.../source-hunter/requirements-dev.txt` | pytest, on the source-hunter runtime |
+| `tools/factory-inbox/requirements.txt` | Factory Inbox bridge runtime |
 
 Each file's header names its direct dependencies. Every other entry is transitive.
 

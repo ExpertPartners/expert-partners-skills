@@ -60,6 +60,7 @@ jobs:
           python3 -m pip install --dry-run --ignore-installed --quiet --require-hashes -r requirements-tooling.txt
           python3 -m pip install --dry-run --ignore-installed --quiet --require-hashes -r plugins/research-ops/skills/video-discovery/requirements-dev.txt
           python3 -m pip install --dry-run --ignore-installed --quiet --require-hashes -r plugins/research-ops/skills/source-hunter/requirements-dev.txt
+          python3 -m pip install --dry-run --ignore-installed --quiet --require-hashes -r tools/factory-inbox/requirements.txt
       - name: npm lockfiles install with verified integrity
         run: |
           set -euo pipefail

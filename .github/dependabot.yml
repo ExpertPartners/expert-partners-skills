@@ -15,6 +15,7 @@ updates:
       - "/"
       - "/plugins/research-ops/skills/source-hunter"
       - "/plugins/research-ops/skills/video-discovery"
+      - "/tools/factory-inbox"
     schedule:
       interval: "weekly"
     groups:

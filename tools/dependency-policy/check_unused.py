@@ -57,13 +57,20 @@ LANGUAGES = ("python", "javascript")
 # exports, unresolved imports) are the dead-code gate's, not this one's. knip has no
 # unused-optionalDependencies report: an optional dependency is a declared integration
 # point, and this check never asks to remove one.
-KNIP_INCLUDE = ("dependencies", "devDependencies", "optionalPeerDependencies", "unlisted", "binaries")
+KNIP_INCLUDE = (
+    "dependencies",
+    "devDependencies",
+    "optionalPeerDependencies",
+    "unlisted",
+    "binaries",
+)
 
 # Python distribution names whose importable top-level module is not the normalized
 # name with dashes turned to underscores. types-* stubs install no module; the stub
 # rule handles them.
 IMPORT_NAMES: dict[str, tuple[str, ...]] = {
     "beautifulsoup4": ("bs4",),
+    "google-auth": ("google",),
     "pillow": ("PIL",),
     "pyyaml": ("yaml",),
     "yt-dlp": ("yt_dlp",),
@@ -77,26 +84,21 @@ INCLUDE_RE = re.compile(r"^(?:-r|--requirement)(?:\s+|=)(\S+)$")
 # cannot see. An entry fails once its import is gone, so a waiver cannot outlive the
 # integration it records. There is no blanket ignore: a new undeclared import fails.
 EXCEPTIONS: dict[str, str] = {
-    "plugins/research-ops/skills/video-discovery/scripts/video_discovery.py:import:playwright":
-        "lazy optional integration: the browser probe imports Playwright only when it runs, "
-        "on a workstation that has it; no lock carries it and pyproject.toml [tool.mypy] "
-        "lists playwright under ignore_missing_imports",
-    "tools/capability-currency/drive_docs.py:import:google":
-        "lazy optional integration: runs on the founder Mac with the Google client installed "
-        "outside the repo locks; pyproject.toml [tool.mypy] lists google.oauth2 under "
-        "ignore_missing_imports",
-    "tools/capability-currency/drive_docs.py:import:googleapiclient":
-        "lazy optional integration: runs on the founder Mac with the Google client installed "
-        "outside the repo locks; pyproject.toml [tool.mypy] lists googleapiclient under "
-        "ignore_missing_imports",
-    "tools/plugin-sync/drift-check.py:import:google":
-        "lazy optional integration: runs on the founder Mac with the Google client installed "
-        "outside the repo locks; pyproject.toml [tool.mypy] lists google.oauth2 under "
-        "ignore_missing_imports",
-    "tools/plugin-sync/drift-check.py:import:googleapiclient":
-        "lazy optional integration: runs on the founder Mac with the Google client installed "
-        "outside the repo locks; pyproject.toml [tool.mypy] lists googleapiclient under "
-        "ignore_missing_imports",
+    "plugins/research-ops/skills/video-discovery/scripts/video_discovery.py:import:playwright": "lazy optional integration: the browser probe imports Playwright only when it runs, "
+    "on a workstation that has it; no lock carries it and pyproject.toml [tool.mypy] "
+    "lists playwright under ignore_missing_imports",
+    "tools/capability-currency/drive_docs.py:import:google": "lazy optional integration: runs on the founder Mac with the Google client installed "
+    "outside the repo locks; pyproject.toml [tool.mypy] lists google.oauth2 under "
+    "ignore_missing_imports",
+    "tools/capability-currency/drive_docs.py:import:googleapiclient": "lazy optional integration: runs on the founder Mac with the Google client installed "
+    "outside the repo locks; pyproject.toml [tool.mypy] lists googleapiclient under "
+    "ignore_missing_imports",
+    "tools/plugin-sync/drift-check.py:import:google": "lazy optional integration: runs on the founder Mac with the Google client installed "
+    "outside the repo locks; pyproject.toml [tool.mypy] lists google.oauth2 under "
+    "ignore_missing_imports",
+    "tools/plugin-sync/drift-check.py:import:googleapiclient": "lazy optional integration: runs on the founder Mac with the Google client installed "
+    "outside the repo locks; pyproject.toml [tool.mypy] lists googleapiclient under "
+    "ignore_missing_imports",
 }
 
 
@@ -211,8 +213,9 @@ def parse_lock(root: Path, path: Path) -> Lock:
             header_line = number
             break
     if not direct:
-        raise ConfigError(f"{where} does not name its direct dependencies in a "
-                          "'# Direct: ...' header line")
+        raise ConfigError(
+            f"{where} does not name its direct dependencies in a '# Direct: ...' header line"
+        )
     pins: set[str] = set()
     includes: list[str] = []
     for _, line in logical_lines(text):
@@ -224,8 +227,14 @@ def parse_lock(root: Path, path: Path) -> Lock:
         if pin:
             pins.add(normalize(pin.group(1)))
     directory = PurePosixPath(where).parent.as_posix()
-    return Lock(where, "" if directory == "." else directory, frozenset(pins), direct,
-                tuple(includes), header_line)
+    return Lock(
+        where,
+        "" if directory == "." else directory,
+        frozenset(pins),
+        direct,
+        tuple(includes),
+        header_line,
+    )
 
 
 def python_locks(root: Path) -> dict[str, Lock]:
@@ -237,7 +246,9 @@ def python_locks(root: Path) -> dict[str, Lock]:
     return locks
 
 
-def closure_pins(locks: dict[str, Lock], lock: Lock, seen: frozenset[str] = frozenset()) -> set[str]:
+def closure_pins(
+    locks: dict[str, Lock], lock: Lock, seen: frozenset[str] = frozenset()
+) -> set[str]:
     if lock.path in seen:
         return set()
     pins = set(lock.pins)
@@ -248,8 +259,9 @@ def closure_pins(locks: dict[str, Lock], lock: Lock, seen: frozenset[str] = froz
     return pins
 
 
-def closure_direct_names(locks: dict[str, Lock], lock: Lock,
-                         seen: frozenset[str] = frozenset()) -> set[str]:
+def closure_direct_names(
+    locks: dict[str, Lock], lock: Lock, seen: frozenset[str] = frozenset()
+) -> set[str]:
     """Direct declarations in this layer and the locks it includes."""
     if lock.path in seen:
         return set()
@@ -267,9 +279,15 @@ def python_scope(root: Path) -> list[str]:
         raise ConfigError(f"{PYPROJECT} is missing")
     with open(path, "rb") as fh:
         table = tomllib.load(fh).get("tool", {}).get("vulture")
-    if not isinstance(table, dict) or not isinstance(table.get("paths"), list) or not table["paths"]:
-        raise ConfigError(f"{PYPROJECT} has no [tool.vulture] paths; the canonical Python "
-                          "tooling scope lives there")
+    if (
+        not isinstance(table, dict)
+        or not isinstance(table.get("paths"), list)
+        or not table["paths"]
+    ):
+        raise ConfigError(
+            f"{PYPROJECT} has no [tool.vulture] paths; the canonical Python "
+            "tooling scope lives there"
+        )
     return [str(p) for p in table["paths"]]
 
 
@@ -313,7 +331,8 @@ def optional_import_nodes(tree: ast.Module) -> set[int]:
         if not isinstance(node, ast.Try):
             continue
         catches = any(handler.type is None for handler in node.handlers) or any(
-            "ImportError" in ast.dump(handler.type) for handler in node.handlers if handler.type)
+            "ImportError" in ast.dump(handler.type) for handler in node.handlers if handler.type
+        )
         if catches:
             for sub in ast.walk(node):
                 if isinstance(sub, (ast.Import, ast.ImportFrom)):
@@ -341,8 +360,9 @@ def imports_of(path: str, tree: ast.Module) -> list[ImportUse]:
         else:
             continue
         for module in modules:
-            uses.append(ImportUse(path, node.lineno, module, is_test_module(path),
-                                  id(node) in optional))
+            uses.append(
+                ImportUse(path, node.lineno, module, is_test_module(path), id(node) in optional)
+            )
     return uses
 
 
@@ -367,7 +387,9 @@ def invocation_sources(root: Path) -> list[tuple[str, list[tuple[int, str]]]]:
 def cli_evidence(root: Path, name: str) -> str | None:
     """Where a workflow or script runs the dependency's command, if one does."""
     variants = {name, name.replace("-", "_")}
-    patterns = [re.compile(r"\bpython\d*(?:\.\d+)?\s+-m\s+" + re.escape(v) + r"\b") for v in variants]
+    patterns = [
+        re.compile(r"\bpython\d*(?:\.\d+)?\s+-m\s+" + re.escape(v) + r"\b") for v in variants
+    ]
     patterns += [re.compile(r"node_modules/\.bin/" + re.escape(v) + r"\b") for v in variants]
     for where, lines in invocation_sources(root):
         for number, line in lines:
@@ -391,9 +413,12 @@ def check_python(root: Path, report: Report) -> list[Finding]:
     for lock in locks.values():
         by_dir.setdefault(lock.directory, []).append(lock)
     declared_by_dir = {
-        directory: {name for lock in group
-                    for pin in closure_direct_names(locks, lock) & closure_pins(locks, lock)
-                    for name in import_names(pin)}
+        directory: {
+            name
+            for lock in group
+            for pin in closure_direct_names(locks, lock) & closure_pins(locks, lock)
+            for name in import_names(pin)
+        }
         for directory, group in by_dir.items()
     }
 
@@ -403,11 +428,21 @@ def check_python(root: Path, report: Report) -> list[Finding]:
             continue
         if use.module in declared_by_dir.get(governing_dir(use.path, lock_dirs), set()):
             continue
-        findings.append(Finding(use.path, use.line, "import", use.module,
-                                "imported but not directly declared and pinned in the governing "
-                                "lock's closure"
-                                + (" (optional import behind try/except; it still needs a "
-                                   "declaration)" if use.optional else "")))
+        findings.append(
+            Finding(
+                use.path,
+                use.line,
+                "import",
+                use.module,
+                "imported but not directly declared and pinned in the governing "
+                "lock's closure"
+                + (
+                    " (optional import behind try/except; it still needs a declaration)"
+                    if use.optional
+                    else ""
+                ),
+            )
+        )
 
     all_pins = {pin for lock in locks.values() for pin in lock.pins}
     imported_modules = {use.module for use in imports}
@@ -415,18 +450,26 @@ def check_python(root: Path, report: Report) -> list[Finding]:
         scope_imports = [u for u in imports if governing_dir(u.path, lock_dirs) == lock.directory]
         for dep in lock.direct:
             if dep.startswith("types-"):
-                base = dep[len("types-"):]
+                base = dep[len("types-") :]
                 base_names = IMPORT_NAMES.get(base, (base.replace("-", "_"),))
                 if base in all_pins:
-                    report.uses.append(Use(lock.path, dep, "stub",
-                                           f"stubs {base}, which a repository lock pins"))
+                    report.uses.append(
+                        Use(lock.path, dep, "stub", f"stubs {base}, which a repository lock pins")
+                    )
                 elif any(name in imported_modules for name in base_names):
-                    report.uses.append(Use(lock.path, dep, "stub",
-                                           f"stubs {base}, which scoped sources import"))
+                    report.uses.append(
+                        Use(lock.path, dep, "stub", f"stubs {base}, which scoped sources import")
+                    )
                 else:
-                    findings.append(Finding(lock.path, lock.header_line, "dependency", dep,
-                                            f"stub for {base}, which no lock pins and no scoped "
-                                            "source imports"))
+                    findings.append(
+                        Finding(
+                            lock.path,
+                            lock.header_line,
+                            "dependency",
+                            dep,
+                            f"stub for {base}, which no lock pins and no scoped source imports",
+                        )
+                    )
                 continue
             names = set(import_names(dep))
             uses = [u for u in scope_imports if u.module in names]
@@ -435,17 +478,25 @@ def check_python(root: Path, report: Report) -> list[Finding]:
                 if all(u.optional for u in uses):
                     kind += ", optional"
                 first = uses[0]
-                report.uses.append(Use(lock.path, dep, kind,
-                                       f"imported at {first.path}:{first.line}"))
+                report.uses.append(
+                    Use(lock.path, dep, kind, f"imported at {first.path}:{first.line}")
+                )
                 continue
             evidence = cli_evidence(root, dep)
             if evidence:
                 report.uses.append(Use(lock.path, dep, "cli", evidence))
                 continue
             scope_desc = f"the {lock.directory or 'repository tooling'} scope"
-            findings.append(Finding(lock.path, lock.header_line, "dependency", dep,
-                                    f"declared direct but nothing in {scope_desc} imports it and "
-                                    "no workflow or script runs it"))
+            findings.append(
+                Finding(
+                    lock.path,
+                    lock.header_line,
+                    "dependency",
+                    dep,
+                    f"declared direct but nothing in {scope_desc} imports it and "
+                    "no workflow or script runs it",
+                )
+            )
     return findings
 
 
@@ -457,8 +508,10 @@ def check_python(root: Path, report: Report) -> list[Finding]:
 def knip_config(root: Path) -> tuple[dict[str, object], dict[str, dict[str, object]]]:
     path = root / KNIP_CONFIG
     if not path.is_file():
-        raise ConfigError(f"{KNIP_CONFIG} is missing; the dead-code job owns the one shared "
-                          "knip configuration and this check reuses it")
+        raise ConfigError(
+            f"{KNIP_CONFIG} is missing; the dead-code job owns the one shared "
+            "knip configuration and this check reuses it"
+        )
     data = json.loads(path.read_text(encoding="utf-8"))
     workspaces = data.get("workspaces") if isinstance(data, dict) else None
     if not isinstance(workspaces, dict) or not workspaces:
@@ -475,12 +528,20 @@ def knip_binary(root: Path, producer: str) -> Path | None:
 
 def knip_issue_findings(producer: str, issues: list[dict[str, object]]) -> list[Finding]:
     findings = []
-    sections = (("dependencies", "dependency", "declared in dependencies but nothing imports it"),
-                ("devDependencies", "devDependency",
-                 "declared in devDependencies but no source, test or script uses it"),
-                ("optionalPeerDependencies", "optional peer dependency",
-                 "declared as an optional peer dependency but nothing imports it"),
-                ("binaries", "binary", "dependency binary nothing runs"))
+    sections = (
+        ("dependencies", "dependency", "declared in dependencies but nothing imports it"),
+        (
+            "devDependencies",
+            "devDependency",
+            "declared in devDependencies but no source, test or script uses it",
+        ),
+        (
+            "optionalPeerDependencies",
+            "optional peer dependency",
+            "declared as an optional peer dependency but nothing imports it",
+        ),
+        ("binaries", "binary", "dependency binary nothing runs"),
+    )
     for issue in issues:
         file = str(issue.get("file", ""))
         where = f"{producer}/{file}"
@@ -495,13 +556,26 @@ def knip_issue_findings(producer: str, issues: list[dict[str, object]]) -> list[
         if isinstance(unlisted, list):
             for item in unlisted:
                 name = str(item.get("name", "")) if isinstance(item, dict) else str(item)
-                line = item.get("line") if isinstance(item, dict) and isinstance(item.get("line"), int) else 1
-                findings.append(Finding(where, int(str(line)), "import", name,
-                                        "imported but not declared in package.json (knip)"))
+                line = (
+                    item.get("line")
+                    if isinstance(item, dict) and isinstance(item.get("line"), int)
+                    else 1
+                )
+                findings.append(
+                    Finding(
+                        where,
+                        int(str(line)),
+                        "import",
+                        name,
+                        "imported but not declared in package.json (knip)",
+                    )
+                )
     return findings
 
 
-def run_knip(root: Path, producer: str, options: dict[str, object], report: Report) -> list[Finding]:
+def run_knip(
+    root: Path, producer: str, options: dict[str, object], report: Report
+) -> list[Finding]:
     binary = knip_binary(root, producer)
     if binary is None:
         report.errors.append(f"knip is not installed; run npm ci in {producer}")
@@ -510,15 +584,31 @@ def run_knip(root: Path, producer: str, options: dict[str, object], report: Repo
         config = Path(tmp) / "knip.json"
         config.write_text(json.dumps(options), encoding="utf-8")
         result = subprocess.run(
-            [str(binary), "--directory", str(root / producer), "--config", str(config),
-             "--reporter", "json", "--no-progress", "--no-config-hints", "--no-exit-code",
-             "--include", ",".join(KNIP_INCLUDE)],
-            capture_output=True, text=True, timeout=600)
+            [
+                str(binary),
+                "--directory",
+                str(root / producer),
+                "--config",
+                str(config),
+                "--reporter",
+                "json",
+                "--no-progress",
+                "--no-config-hints",
+                "--no-exit-code",
+                "--include",
+                ",".join(KNIP_INCLUDE),
+            ],
+            capture_output=True,
+            text=True,
+            timeout=600,
+        )
     try:
         issues = json.loads(result.stdout)["issues"]
     except (ValueError, KeyError, TypeError):
-        report.errors.append(f"knip failed in {producer} (exit {result.returncode}): "
-                             f"{(result.stderr or result.stdout).strip()[:500]}")
+        report.errors.append(
+            f"knip failed in {producer} (exit {result.returncode}): "
+            f"{(result.stderr or result.stdout).strip()[:500]}"
+        )
         return []
     return knip_issue_findings(producer, issues)
 
@@ -540,8 +630,9 @@ def check_javascript(root: Path, report: Report) -> list[Finding]:
 # ---------------------------------------------------------------------------
 
 
-def check(root: Path, exceptions: dict[str, str] | None = None,
-          languages: tuple[str, ...] = LANGUAGES) -> Report:
+def check(
+    root: Path, exceptions: dict[str, str] | None = None, languages: tuple[str, ...] = LANGUAGES
+) -> Report:
     exceptions = EXCEPTIONS if exceptions is None else exceptions
     report = Report()
     raw: list[Finding] = []
@@ -564,7 +655,9 @@ def check(root: Path, exceptions: dict[str, str] | None = None,
             report.findings.append(finding)
     for key in sorted(exceptions):
         if key not in matched and key.split(":", 1)[0].endswith(".py") and "python" in languages:
-            report.errors.append(f"EXCEPTIONS lists {key} but no check reports it; remove the entry")
+            report.errors.append(
+                f"EXCEPTIONS lists {key} but no check reports it; remove the entry"
+            )
     return report
 
 
@@ -577,8 +670,10 @@ def print_report(report: Report) -> None:
         print(f"FAIL {finding}")
     for error in report.errors:
         print(f"FAIL {error}")
-    summary = (f"{report.locks} Python locks, {report.imports} imports read, "
-               f"{report.producers} JavaScript producers, {len(report.excepted)} exceptions")
+    summary = (
+        f"{report.locks} Python locks, {report.imports} imports read, "
+        f"{report.producers} JavaScript producers, {len(report.excepted)} exceptions"
+    )
     problems = len(report.findings) + len(report.errors)
     if problems:
         print(f"unused-dependencies: FAIL ({problems} problem(s); {summary})")
