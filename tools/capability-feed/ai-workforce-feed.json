@@ -1,8 +1,8 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-11-09T22:30:33Z",
-  "verifiedAt": "2026-11-09T22:30:33Z",
+  "generatedAt": "2026-11-09T23:46:41Z",
+  "verifiedAt": "2026-11-09T23:46:41Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
@@ -107,6 +107,73 @@
         "toolkit",
         "video",
         "youtube"
+      ],
+      "bestFor": [],
+      "useCases": [],
+      "askExamples": [],
+      "example": false
+    },
+    {
+      "id": "authority-engine-plugin",
+      "humanName": "Authority Engine Plugin",
+      "kind": "plugin",
+      "summary": "Don Hobbs's Authority Engine suite (interview, market ownership, market domination architecture, brand story, execution, quarterly recalibration). Reads Don's method from Drive; inherits operating-doctrine.",
+      "status": "Unknown",
+      "maintainer": "Don Hobbs",
+      "collectionIds": [],
+      "categories": [
+        "The marketing engines"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged as the authority-engine plugin, version 0.1.0, in the expert-partners plugin marketplace.",
+        "Contains 6 skills. Each one activates when a request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Package version 0.1.0.",
+      "containsSkillIds": [
+        "brand-blueprint-interviewer",
+        "brand-story-architect",
+        "execution-deployment-engine",
+        "market-domination-architecture",
+        "market-ownership-engine",
+        "quarterly-recalibration-engine"
+      ],
+      "relatedIds": [],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/authority-engine",
+        "packageVersion": "0.1.0",
+        "marketplace": "expert-partners",
+        "presentedAs": "plugin",
+        "skillCount": "6"
+      },
+      "keywords": [
+        "architecture",
+        "authority",
+        "brand",
+        "doctrine",
+        "domination",
+        "don",
+        "drive",
+        "engine",
+        "engines",
+        "execution",
+        "hobbs",
+        "inherits",
+        "interview",
+        "market",
+        "marketing",
+        "method",
+        "operating",
+        "ownership",
+        "plugin",
+        "quarterly",
+        "reads",
+        "recalibration",
+        "story",
+        "suite"
       ],
       "bestFor": [],
       "useCases": [],
@@ -1205,6 +1272,77 @@
       "example": false
     },
     {
+      "id": "brand-blueprint-interviewer",
+      "humanName": "Brand Blueprint Interviewer",
+      "kind": "skill",
+      "summary": "Run Don Hobbs's Brand Blueprint Interviewer, the guided discovery interview that uncovers a real estate agent's identity, story, values, differentiators, ideal client, market and goals as raw material for their brand.",
+      "status": "Unknown",
+      "maintainer": "Don Hobbs",
+      "collectionIds": [],
+      "categories": [
+        "The marketing engines"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Authority Engine plugin, version 0.1.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "authority-engine-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/authority-engine/skills/brand-blueprint-interviewer/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "content",
+        "packaging": "authority-engine plugin v0.1.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine"
+      },
+      "keywords": [
+        "agent",
+        "authority",
+        "blueprint",
+        "brand",
+        "client",
+        "differentiators",
+        "discovery",
+        "don",
+        "engine",
+        "engines",
+        "estate",
+        "goals",
+        "guided",
+        "hobbs",
+        "ideal",
+        "identity",
+        "interview",
+        "interviewer",
+        "market",
+        "marketing",
+        "material",
+        "raw",
+        "real",
+        "run",
+        "story",
+        "their",
+        "uncovers",
+        "values"
+      ],
+      "bestFor": [
+        "Authority Engine, Brand Blueprint Interviewer"
+      ],
+      "useCases": [
+        "Use when an agent, team leader or broker wants to start the interview, resume it, or be interviewed about their brand, positioning, ideal client or authority story, including 'Start the interview' and 'Let's begin again.' Part of the Authority Engine suite; reads its live method from Drive."
+      ],
+      "askExamples": [],
+      "example": false
+    },
+    {
       "id": "brand-direction-builder",
       "humanName": "Brand Direction Builder",
       "kind": "skill",
@@ -1423,6 +1561,75 @@
         "current canon and voice applied to real writing"
       ],
       "useCases": [],
+      "askExamples": [],
+      "example": false
+    },
+    {
+      "id": "brand-story-architect",
+      "humanName": "Brand Story Architect",
+      "kind": "skill",
+      "summary": "Run Don Hobbs's Brand Story Architect, which turns an agent's real experiences, values and positioning into personal brand stories, About page copy, positioning statements and brochure, postcard and flyer copy.",
+      "status": "Unknown",
+      "maintainer": "Don Hobbs",
+      "collectionIds": [],
+      "categories": [
+        "The marketing engines"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Authority Engine plugin, version 0.1.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "authority-engine-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/authority-engine/skills/brand-story-architect/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "content",
+        "packaging": "authority-engine plugin v0.1.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine"
+      },
+      "keywords": [
+        "about",
+        "agent",
+        "architect",
+        "authority",
+        "brand",
+        "brochure",
+        "copy",
+        "don",
+        "engine",
+        "engines",
+        "experiences",
+        "flyer",
+        "hobbs",
+        "marketing",
+        "page",
+        "personal",
+        "positioning",
+        "postcard",
+        "real",
+        "run",
+        "statements",
+        "stories",
+        "story",
+        "turns",
+        "values",
+        "which"
+      ],
+      "bestFor": [
+        "Authority Engine, Brand Story Architect"
+      ],
+      "useCases": [
+        "Use when an agent asks for their personal brand story, a StoryBrand-style About page, a luxury brand narrative, a positioning statement or brochure story panels."
+      ],
       "askExamples": [],
       "example": false
     },
@@ -3431,6 +3638,80 @@
       "example": false
     },
     {
+      "id": "execution-deployment-engine",
+      "humanName": "Execution Deployment Engine",
+      "kind": "skill",
+      "summary": "Run Don Hobbs's Execution and Deployment Engine, which turns an approved Market Domination Architecture into production-ready assets, sprint plans, weekly production schedules, channel placement, CRM triggers and automation sequences without changing the strategy.",
+      "status": "Unknown",
+      "maintainer": "Don Hobbs",
+      "collectionIds": [],
+      "categories": [
+        "The marketing engines"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Authority Engine plugin, version 0.1.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "authority-engine-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/authority-engine/skills/execution-deployment-engine/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "content",
+        "packaging": "authority-engine plugin v0.1.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine"
+      },
+      "keywords": [
+        "approved",
+        "architecture",
+        "assets",
+        "authority",
+        "automation",
+        "changing",
+        "channel",
+        "crm",
+        "deployment",
+        "domination",
+        "don",
+        "engine",
+        "engines",
+        "execution",
+        "hobbs",
+        "market",
+        "marketing",
+        "placement",
+        "plans",
+        "production",
+        "ready",
+        "run",
+        "schedules",
+        "sequences",
+        "sprint",
+        "strategy",
+        "triggers",
+        "turns",
+        "weekly",
+        "which",
+        "without"
+      ],
+      "bestFor": [
+        "Authority Engine, Execution Deployment Engine"
+      ],
+      "useCases": [
+        "Use when someone asks for a sprint plan, a production schedule, CRM triggers for a funnel, or to turn an approved strategy into assets."
+      ],
+      "askExamples": [],
+      "example": false
+    },
+    {
       "id": "expert-partners-systems-map",
       "humanName": "Expert Partners Systems Map and Access Map",
       "kind": "skill",
@@ -5372,6 +5653,146 @@
       "example": false
     },
     {
+      "id": "market-domination-architecture",
+      "humanName": "Market Domination Architecture",
+      "kind": "skill",
+      "summary": "Run Don Hobbs's Market Domination Architecture Generator, which turns a completed Marketing Architecture Intelligence Brief into a full 8x8x8 strategic marketing architecture with positioning, channel and pillar weighting, CRM and AI visibility strategy.",
+      "status": "Unknown",
+      "maintainer": "Don Hobbs",
+      "collectionIds": [],
+      "categories": [
+        "The marketing engines"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Authority Engine plugin, version 0.1.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "authority-engine-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/authority-engine/skills/market-domination-architecture/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "content",
+        "packaging": "authority-engine plugin v0.1.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine"
+      },
+      "keywords": [
+        "8x8x8",
+        "architecture",
+        "authority",
+        "brief",
+        "channel",
+        "completed",
+        "crm",
+        "domination",
+        "don",
+        "engine",
+        "engines",
+        "full",
+        "generator",
+        "hobbs",
+        "intelligence",
+        "market",
+        "marketing",
+        "pillar",
+        "positioning",
+        "run",
+        "strategic",
+        "strategy",
+        "turns",
+        "visibility",
+        "weighting",
+        "which"
+      ],
+      "bestFor": [
+        "Authority Engine, Market Domination Architecture"
+      ],
+      "useCases": [
+        "Use when someone asks to build a Market Domination Architecture from a brief, engineer AEO or LLM authority positioning, or weight channels with AI amplification."
+      ],
+      "askExamples": [],
+      "example": false
+    },
+    {
+      "id": "market-ownership-engine",
+      "humanName": "Market Ownership Engine",
+      "kind": "skill",
+      "summary": "Run Don Hobbs's Market Ownership Engine, which helps a real estate agent choose a specific market to own, maps that market's ecosystem and builds an executable plan to become known for it, using MLS and market data the agent supplies.",
+      "status": "Unknown",
+      "maintainer": "Don Hobbs",
+      "collectionIds": [],
+      "categories": [
+        "The marketing engines"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Authority Engine plugin, version 0.1.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "authority-engine-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/authority-engine/skills/market-ownership-engine/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "content",
+        "packaging": "authority-engine plugin v0.1.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine"
+      },
+      "keywords": [
+        "agent",
+        "authority",
+        "become",
+        "builds",
+        "choose",
+        "data",
+        "don",
+        "ecosystem",
+        "engine",
+        "engines",
+        "estate",
+        "executable",
+        "helps",
+        "hobbs",
+        "known",
+        "maps",
+        "market",
+        "marketing",
+        "mls",
+        "own",
+        "ownership",
+        "plan",
+        "real",
+        "run",
+        "specific",
+        "supplies",
+        "using",
+        "which"
+      ],
+      "bestFor": [
+        "Authority Engine, Market Ownership Engine"
+      ],
+      "useCases": [
+        "Use when an agent asks which market, niche or neighborhood to own, wants a market ownership plan, or wants to stop chasing transactions and dominate one market."
+      ],
+      "askExamples": [],
+      "example": false
+    },
+    {
       "id": "market-research-skill",
       "humanName": "Market Research Skill",
       "kind": "skill",
@@ -6483,6 +6904,75 @@
       ],
       "useCases": [
         "Use when the agent says pre-listing package, I have a listing appointment, what do I send first, send something before my listing appointment, pre-appointment email, or a listing appointment just got booked and they ask what to send the seller."
+      ],
+      "askExamples": [],
+      "example": false
+    },
+    {
+      "id": "quarterly-recalibration-engine",
+      "humanName": "Quarterly Recalibration Engine",
+      "kind": "skill",
+      "summary": "Run Don Hobbs's Quarterly Recalibration Engine, which compares an approved strategic architecture's baseline with current performance data and recalibrates weighting and priorities for the next quarter without rebuilding the system.",
+      "status": "Unknown",
+      "maintainer": "Don Hobbs",
+      "collectionIds": [],
+      "categories": [
+        "The marketing engines"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Authority Engine plugin, version 0.1.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "authority-engine-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/authority-engine/skills/quarterly-recalibration-engine/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "content",
+        "packaging": "authority-engine plugin v0.1.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine"
+      },
+      "keywords": [
+        "approved",
+        "architecture",
+        "authority",
+        "baseline",
+        "compares",
+        "current",
+        "data",
+        "don",
+        "engine",
+        "engines",
+        "hobbs",
+        "marketing",
+        "next",
+        "performance",
+        "priorities",
+        "quarter",
+        "quarterly",
+        "rebuilding",
+        "recalibrates",
+        "recalibration",
+        "run",
+        "strategic",
+        "system",
+        "weighting",
+        "which",
+        "without"
+      ],
+      "bestFor": [
+        "Authority Engine, Quarterly Recalibration Engine"
+      ],
+      "useCases": [
+        "Use when someone asks to recalibrate with new performance data, compare baseline against current results, find bottlenecks in an architecture or update next quarter's deployment priorities."
       ],
       "askExamples": [],
       "example": false
