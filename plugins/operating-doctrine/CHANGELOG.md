@@ -1,3 +1,6 @@
+## 3.3.0 - 2026-11-09
+
+Add the shared Drive Factory Inbox bridge and a short Factory Operator guide so connected chats can create or message Factory sessions without a paste relay. Sessions the inbox starts publish their own completion receipt and then archive themselves.
 ## 3.2.0 - 2026-11-09
 
 Add Share the Love for proactive, source-backed agent teaching captures in the existing Share List. Connect Teach Me's finished-step moment and session wrap to its deduplicated append and daily recap path, with live playbook and voice lookup and no new list or background watcher.
