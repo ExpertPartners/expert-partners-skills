@@ -11,9 +11,10 @@ Working here
 - Read the skill you are changing and the canonical operating-doctrine skill first.
 - Use an isolated branch or worktree, inspect git state before editing, and open a pull request for every change. Do not bypass required checks.
 - Correct the canonical skill source first. Generated files, deployed copies, and the skill graph come only from their producers in tools. Never hand-edit them.
-- Never edit a plugin version in plugin.json or marketplace.json, or the top of a CHANGELOG.md. Add one note in .changeset/ instead, as .changeset/README.md explains. The release step in tools/release owns versions and CHANGELOG entries.
-- Run the changed-file gates in .pre-commit-config.yaml and .github/workflows/ci.yml, plus the tests under tools, before pushing. Report real results.
-- Validation command for repository changes: run tools/validate-job.sh from the repo root. The historical command name is not a queue dependency. It runs the changed-file gates from ci.yml, the skill description cap and available secret scan. Report any missing check separately from its PASS marker.
+- Never edit a plugin version in plugin.json or marketplace.json, or the top of a CHANGELOG.md. Add one note in `.changeset/` instead, as [`.changeset/README.md`](.changeset/README.md) explains. The release step in [`tools/release/README.md`](tools/release/README.md) owns versions and CHANGELOG entries.
+- Run the changed-file gates in [`.pre-commit-config.yaml`](.pre-commit-config.yaml) and [`.github/workflows/ci.yml`](.github/workflows/ci.yml), plus the tests under [`tools/`](tools/), before pushing. Report real results.
+- Validation command for repository changes: run [`tools/validate-job.sh`](tools/validate-job.sh) from the repo root. The historical command name is not a queue dependency. It runs the changed-file gates from ci.yml, the skill description cap, AGENTS.md link validation and available secret scan. Report any missing check separately from its PASS marker.
+- Use the [repository operations runbook](runbooks/repository-operations.md) to diagnose CI and generated-output failures.
 - Secrets live in 1Password only. They never appear in code, logs, config, or chat.
 - Act by default. Allison's brief is the go and there are no approval gates. Deploy, publish, merge and clean up as the work needs, then report with links.
 

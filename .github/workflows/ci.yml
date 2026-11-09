@@ -46,8 +46,11 @@ jobs:
             BASE_SHA=$(git rev-parse --verify --quiet "${HEAD_SHA}^" || git hash-object -t tree /dev/null)
           fi
           git diff --name-only --diff-filter=ACMR "$BASE_SHA" "$HEAD_SHA" -- "${GLOBS[@]}" > changed_files.txt
+          git diff --name-only --diff-filter=ACMR "$BASE_SHA" "$HEAD_SHA" -- '*.py' > changed_python_files.txt
           echo "count=$(grep -c . changed_files.txt || true)" >> "$GITHUB_OUTPUT"
+          echo "python_count=$(grep -c . changed_python_files.txt || true)" >> "$GITHUB_OUTPUT"
           echo "Changed text files:"; cat changed_files.txt
+          echo "Changed Python files:"; cat changed_python_files.txt
 
       - name: Brand-naming lint (F2+F4)
         if: steps.changed.outputs.count != '0'
@@ -76,6 +79,19 @@ jobs:
           set -euo pipefail
           python3 -m pip install --quiet --require-hashes -r requirements-tooling.txt
           python3 .ep/skill-description-lint.py --selftest
+
+      - name: Python formatting (changed files)
+        if: steps.changed.outputs.python_count != '0'
+        run: |
+          set -euo pipefail
+          mapfile -t FILES < <(grep . changed_python_files.txt)
+          python3 -m ruff format --check "${FILES[@]}"
+
+      - name: Validate AGENTS.md links
+        run: python3 tools/readiness/check_agents_links.py
+
+      - name: AGENTS.md link validator tests
+        run: python3 -m unittest discover -s tools/readiness/tests -p 'test_agents_links.py' -v
 
   gitleaks:
     name: gitleaks secret scan (full history)

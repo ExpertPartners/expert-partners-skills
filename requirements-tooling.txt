@@ -1,7 +1,7 @@
-# Hash-locked Python dependencies: repository tooling, CI lint gates, the type checker, the unused-code detector and the coverage gate.
+# Hash-locked Python dependencies: repository tooling, CI lint gates, type checking, formatting, unused-code detection and coverage.
 # Every package, direct and transitive, is pinned with == and carries its sha256
 # hashes, so pip installs in --require-hashes mode and refuses anything unlisted.
-# Direct: pyyaml, mypy, types-defusedxml, types-pyyaml, types-requests, vulture, coverage. Any other entry is a transitive dependency.
+# Direct: pyyaml, mypy, types-defusedxml, types-pyyaml, types-requests, vulture, coverage, ruff. Any other entry is a transitive dependency.
 # Change or regenerate: tools/dependency-policy/README.md
 ast-serialize==0.13.1 \
     --hash=sha256:02686b281ec9b8e9614f6f0db27e12e4cac515f336c5d05b678bc9eb73ff2af5 \
@@ -452,6 +452,26 @@ pyyaml==6.0.3 \
     --hash=sha256:f7057c9a337546edc7973c0d3ba84ddcdf0daa14533c2065749c9075001090e6 \
     --hash=sha256:fa160448684b4e94d80416c0fa4aac48967a969efe22931448d853ada8baf926 \
     --hash=sha256:fc09d0aa354569bc501d4e787133afc08552722d3ab34836a80547331bb5d4a0
+ruff==0.14.4 \
+    --hash=sha256:e6604613ffbcf2297cd5dcba0e0ac9bd0c11dc026442dfbb614504e87c349518 \
+    --hash=sha256:d99c0b52b6f0598acede45ee78288e5e9b4409d1ce7f661f0fa36d4cbeadf9a4 \
+    --hash=sha256:9358d490ec030f1b51d048a7fd6ead418ed0826daf6149e95e30aa67c168af33 \
+    --hash=sha256:81b40d27924f1f02dfa827b9c0712a13c0e4b108421665322218fc38caf615c2 \
+    --hash=sha256:f5e649052a294fe00818650712083cddc6cc02744afaf37202c65df9ea52efa5 \
+    --hash=sha256:aa082a8f878deeba955531f975881828fd6afd90dfa757c2b0808aadb437136e \
+    --hash=sha256:a9f3a936ac27fb7c2a93e4f4b943a662775879ac579a433291a6f69428722649 \
+    --hash=sha256:1043c6811c2419e39011890f14d0a30470f19d47d197c4858b2787dfa698f6c8 \
+    --hash=sha256:95643ffd209ce78bc113266b88fba3d39e0461f0cbc8b55fb92505030fb4a850 \
+    --hash=sha256:456daa2fa1021bc86ca857f43fe29d5d8b3f0e55e9f90c58c317c1dcc2afc7b5 \
+    --hash=sha256:f911bba769e4a9f51af6e70037bb72b70b45a16db5ce73e1f72aefe6f6d62132 \
+    --hash=sha256:76158a7369b3979fa878612c623a7e5430c18b2fd1c73b214945c2d06337db67 \
+    --hash=sha256:f3b8f3b442d2b14c246e7aeca2e75915159e06a3540e2f4bed9f50d062d24469 \
+    --hash=sha256:c62da9a06779deecf4d17ed04939ae8b31b517643b26370c3be1d26f3ef7dbde \
+    --hash=sha256:5a443a83a1506c684e98acb8cb55abaf3ef725078be40237463dae4463366349 \
+    --hash=sha256:643b69cb63cd996f1fc7229da726d07ac307eae442dd8974dbc7cf22c1e18fff \
+    --hash=sha256:26673da283b96fe35fa0c939bf8411abec47111644aa9f7cfbd3c573fb125d2c \
+    --hash=sha256:dd09c292479596b0e6fec8cd95c65c3a6dc68e9ad17b8f2382130f87ff6a75bb \
+    --hash=sha256:f459a49fe1085a749f15414ca76f61595f1a2cc8778ed7c279b6ca2e1fd19df3
 types-defusedxml==0.7.0.20260504 \
     --hash=sha256:2ab2828a3f97111ba1c16cee273ad4124a831fc9198c41bf8368ff6ea48ad300 \
     --hash=sha256:a959e3a0a43b93e464bd625d91ec9193a2703ddc10443bdd627792485fae0b10
