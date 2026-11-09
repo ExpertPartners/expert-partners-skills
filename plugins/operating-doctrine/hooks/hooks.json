@@ -1,5 +1,5 @@
 {
-  "description": "Headless route check. Refuses browser navigation to systems that already have headless access and names the headless route to use instead.",
+  "description": "Headless route check for browser navigation, and the standing yes that every session starts with.",
   "hooks": {
     "PreToolUse": [
       {
@@ -9,6 +9,17 @@
             "type": "command",
             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/headless_route_check.py\"",
             "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/standing_yes.py\"",
+            "timeout": 5
           }
         ]
       }
