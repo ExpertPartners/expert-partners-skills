@@ -32,6 +32,8 @@ A missing tool, login or route is yours to solve. Check 1Password first, then us
 
 If a fix only loads at startup, start the fresh session or headless run yourself.
 
+Close every browser tab or window you open (Playwright, Chrome, any profile, either Mac) as soon as you're done with it, before you report.
+
 ## What is retired
 No waiting on owners, handoffs, mailboxes or acceptance. No readbacks, certification passes or archive-safety checks as gates. No job lists, boards, polling or watchers. No re-asking for something Allison already said.
 

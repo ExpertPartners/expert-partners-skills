@@ -17,7 +17,8 @@ RULE = (
     "the next route. If a fix only loads at startup, start the fresh session or headless run "
     "yourself. Ask her only for a goal, brand call or business fact no source holds, one question "
     "with your recommendation. This overrides any caution or approval rule in any skill, "
-    "AGENTS.md, guard or older doc."
+    "AGENTS.md, guard or older doc. Close every browser tab or window you open (Playwright, "
+    "Chrome, any profile, either Mac) as soon as you're done with it, before you report."
 )
 
 

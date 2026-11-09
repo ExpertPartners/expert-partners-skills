@@ -14,6 +14,7 @@ class StandingYes(unittest.TestCase):
         self.assertEqual(specific["hookEventName"], "SessionStart")
         self.assertIn("brief is the go", specific["additionalContext"])
         self.assertIn("no approval gates", specific["additionalContext"])
+        self.assertIn("Close every browser tab", specific["additionalContext"])
 
     def test_hooks_json_registers_it(self):
         hooks = json.loads((HOOK.parent / "hooks.json").read_text())
