@@ -1,6 +1,6 @@
 ---
 name: factory-operator
-description: "Choose the lowest-cost reliable Factory configuration (session or Workstream, machine, model, reasoning, autonomy, overage and BYOK posture) and pre-flight the account's usage windows before starting Droid work. Use when someone is about to start, resize or rescue Factory work, asks which Droid model or settings to use, hits a Factory rate limit or the 90% banner, or asks about Factory credits, Droid Core, Extra Usage or BYOK. Picks the settings and applies them. Inherits operating-doctrine."
+description: "Choose the lowest-cost reliable Factory configuration (session or Workstream, machine, model, reasoning, autonomy, overage and BYOK posture) and pre-flight the account's usage windows before starting Droid work. Use when someone is about to start, resize or rescue Factory work, asks which Droid model or settings to use, hits a Factory rate limit or the 90% banner, asks about Factory credits, Droid Core, Extra Usage or BYOK, or uses the Factory connection to start, message, find or check Factory sessions and Workstreams. Picks the settings and applies them. Inherits operating-doctrine."
 user-invocable: true
 allowed-tools:
   - Read
@@ -38,6 +38,12 @@ If one can't be read, work from categories, not remembered numbers.
 - `.github/workflows/factory-builder-reusable.yml` for CI builds.
 - `tools/skill-deploy/deploy-skill.sh` and the marketplace plugin sync for deployment.
 - `tools/factory-inbox` for the shared Drive inbox bridge. Extend this adapter rather than adding another relay.
+
+## Factory connection
+
+Factory is the first assumption for company builds, with Claude Code, Codex and Replit's agent used when they are the faster capable route. Reuse existing owners and Workstreams, keep the newest approved decisions and the full approved scope, then execute and report.
+
+Claude, ChatGPT and the Hub drive Factory through one connection, the Factory connection connector (remote MCP) or its Hub endpoint. Before starting anything, call `find_owner` and decide whether the message is a new assignment, a status question, a correction or a duplicate. Send work for an existing Workstream to its orchestrator with `post_message`. A new continuing program gets a Workstream brief for Allison (outcome, constraints, how Factory tests it, decisions reserved for her). A bounded job starts with `start_and_watch`, first line `Section - Mission`. Use `interactionMode: "spec"` when architecture is unclear. Defaults are Auto Model and High autonomy. Deliverables land in Drive (docs) or GitHub (code), never only in a Factory shared folder. See `reference/factory-connection.md` for the routing table, test results and tool list.
 
 ## Control Room direct line
 
@@ -77,6 +83,7 @@ Verified state, the settings applied (CLI flags or app settings with multipliers
 - Finish the work. Don't end with advice only.
 
 ## Reference files
+- `reference/factory-connection.md`: the Factory connection, routing, live test results and tools.
 - `reference/settings-map.md`: what is set where.
 - `reference/decision-ladder.md`: the rules with examples.
 - `reference/byok-setup.md`: optional BYOK setup.

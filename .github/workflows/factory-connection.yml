@@ -1,0 +1,35 @@
+name: factory-connection
+
+# Type check and unit tests for the Factory connection Worker (connectors/factory-connection).
+# It deploys to Cloudflare on its own toolchain, so it is checked here rather than by the
+# marketplace producer gates under tools/.
+
+on:
+  pull_request:
+    paths:
+      - 'connectors/factory-connection/**'
+      - '.github/workflows/factory-connection.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'connectors/factory-connection/**'
+      - '.github/workflows/factory-connection.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: connectors/factory-connection
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci --ignore-scripts
+      - run: npx wrangler types
+      - run: npm run type-check
+      - run: npm test
