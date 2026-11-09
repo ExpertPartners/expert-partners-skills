@@ -15,7 +15,7 @@ The hook backs the check order in browser-automation Rule 0, which points to whe
 | Access map status for the host | What the hook does |
 |---|---|
 | live | Refuses the call and names the headless route and the 1Password item to use |
-| setting up | Refuses the call and says the setup job comes first |
+| setting up | Lets the call through, because the M2 browser is the next route until the headless route is live |
 | no API | Lets the call through |
 | host not on the map | Lets the call through and adds the host to `unknown-hosts.log` |
 | no cached map at all | Lets the call through and logs it in `hook.log` |

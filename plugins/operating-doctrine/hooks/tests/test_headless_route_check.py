@@ -139,11 +139,10 @@ class Decisions(HookCase):
             with self.subTest(tool=tool):
                 self.assertDenied(self.run_hook("https://link.leadconnectorhq.com/x", tool))
 
-    def test_setting_up_is_denied_and_says_the_setup_job_comes_first(self):
-        reason = self.assertDenied(self.run_hook("dash.cloudflare.com/profile"))
-        self.assertIn("Cloudflare", reason)
-        self.assertIn("setup job comes first", reason)
-        self.assertIn("Cloudflare API Token", reason)
+    def test_setting_up_is_allowed_because_the_browser_is_the_next_route(self):
+        note = self.assertAllowed(self.run_hook("dash.cloudflare.com/profile"))
+        self.assertIn("Cloudflare", note)
+        self.assertIn("never a block", note)
 
     def test_no_api_is_allowed(self):
         note = self.assertAllowed(self.run_hook("https://portal.vendor.example/login"))
@@ -205,7 +204,7 @@ class Decisions(HookCase):
 
     def test_common_status_wordings_are_understood(self):
         self.assertIn("Example app", self.assertDenied(self.run_hook("https://app.example.com/")))
-        self.assertIn("setup job comes first", self.assertDenied(self.run_hook("https://setup.example/")))
+        self.assertIn("never a block", self.assertAllowed(self.run_hook("https://setup.example/")))
         self.assertEqual(
             [hrc.normalize_status(s) for s in ("Live", "Live - API", "Setting up", "Set up", "In setup",
                                                "No API", "No-API", "None", "not live", "")],

@@ -12,7 +12,8 @@ old, the hook starts one background refresh after it has printed its decision. A
 refresh keeps the last good copy. With no copy at all, the hook allows and logs.
 
   status live        deny, naming the headless route and the 1Password item
-  status setting up  deny, saying the setup job comes first
+  status setting up  allow, because the headless route is not ready yet and the M2 browser
+                     is the next route (headless first, then the M2 browser, never a block)
   status no API      allow
   host not on map    allow, and append the host to unknown-hosts.log for the nightly check
 
@@ -781,6 +782,12 @@ def allow_note(host: str, entry: dict | None, cached: bool) -> str:
             f"{host}, not on the access map, <what you did>."
         )
     system = safe(entry.get("system", ""))
+    if entry.get("status") == SETTING_UP:
+        return (
+            f"Headless route check: {system} is still setting up its headless route on the access "
+            f"map, so the browser is let through for {host}. Headless first, then the M2 browser, "
+            f"never a block. Report it as: Headless route checked, {system}, setting up, browser used."
+        )
     if entry.get("status") == NO_API:
         reason = safe(entry.get("reason", "")) or "the access map gives no reason"
         return (
@@ -826,7 +833,7 @@ def decide(payload: dict) -> tuple[str, str] | None:
         names = ", ".join(safe(entry.get("system", "")) for entry in entries)
         if conflict:
             log_event("map-conflict", f"{host} decided by {names} {safe(status)}")
-        if status in (LIVE, SETTING_UP):
+        if status == LIVE:
             log_event("denied", f"{host} {names} {status}")
             return "deny", deny_reason(entries, host)
         if status != NO_API:
