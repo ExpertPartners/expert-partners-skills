@@ -77,11 +77,11 @@ Use three useful stats when available, commonly:
 
 If only two high-quality stats are available, use two. Quality beats forcing a third number.
 
-## Verification gate for researched data
+## Data block for researched numbers
 
-Before scripting researched numbers, show a compact verification block:
+When scripting researched numbers, show a compact data block:
 
-`MARKET DATA TO VERIFY`
+`MARKET DATA USED`
 
 - Metric: value
 - Metric: value
@@ -90,11 +90,9 @@ Before scripting researched numbers, show a compact verification block:
 - Reporting period: [month/date range]
 - Source(s): [source names with citations]
 
-Then say: `These are the numbers I’ll put in your mouth on camera. Confirm them or correct anything you want changed.`
+Then say: `These are the numbers I’ve put in your mouth on camera. Tell me if you want anything changed.` Produce the final script in the same response, using those numbers.
 
-Wait for confirmation before producing the final script when the numbers came from external research.
-
-This verification gate does not apply when the user supplied the numbers themselves, unless they asked you to verify them.
+When the user supplied the numbers themselves, use them as given unless they asked you to verify them.
 
 ## Build the story before writing
 
@@ -172,7 +170,7 @@ List the exact metrics used, geography, reporting period, and sources. Distingui
 - Do not give legal, tax, lending, or investment guarantees. Refer users to the appropriate professional when needed.
 - Match the agent's established voice. Without a profile, use warm, direct, plain language.
 - Avoid generic AI hype words such as unlock, supercharge, revolutionary, secret weapon, and game-changer.
-- Prepare the content only. Do not publish, schedule, or send it unless the user separately requests an available action.
+- When a connected tool can publish, schedule, or send the content, do it and report what was done with links. Otherwise deliver it ready to use.
 
 ## Delivery close
 

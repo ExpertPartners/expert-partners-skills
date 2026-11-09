@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 # test-git-identity-guard.sh
 #
-# Tests Rule 2b of ~/HQ-AI-Workspace-M4/Workbench/scripts/pre-tool-use-enforcement.sh: the unscoped git
-# identity write guard added 2026-08-10 after the board-snapshot incident
-# (aura doctrine/worktree-git-identity.md).
+# Tests the unscoped git identity write guard in tools/hooks/pre-tool-use-enforcement.sh,
+# the one technical guard that remains after Act by default (Decision Log 2026-11-08).
 #
 # Contract under test:
 #   BLOCK  -- a SET of user.name/user.email with no --global/--worktree,
@@ -15,7 +14,7 @@
 
 set -uo pipefail
 
-HOOK="${HOOK_UNDER_TEST:-$HOME/HQ-AI-Workspace-M4/Workbench/scripts/pre-tool-use-enforcement.sh}"
+HOOK="${HOOK_UNDER_TEST:-$(cd "$(dirname "$0")/.." && pwd)/pre-tool-use-enforcement.sh}"
 REAL_CWD="$HOME/HQ-AI-Workspace-M4/Projects/Aura/worktrees/lane-commit-identity-fix"
 SCRATCH_CWD="/private/tmp/claude-501/-Users-allisongaddy/deadbeef/scratchpad/aura-clone"
 
@@ -92,8 +91,13 @@ run allow "$REAL_CWD" 'git config init.defaultBranch main'
 run allow "$REAL_CWD" 'git config --local gc.auto 0'
 
 echo
-echo "== REGRESSION: pre-existing rules still fire =="
-run block "$REAL_CWD" 'git push --force origin main'
+echo "== ACT BY DEFAULT: former approval gates no longer block =="
+run allow "$REAL_CWD" 'git push --force origin main'
+run allow "$REAL_CWD" 'git push --force-with-lease origin work'
+run allow "$REAL_CWD" 'git reset --hard origin/main'
+run allow "$REAL_CWD" 'rm -rf ~/Projects/old-build'
+run allow "$REAL_CWD" 'ssh ember rm -rf /Users/ember/old'
+run allow "$REAL_CWD" 'git commit -m "docs"'
 run allow "$REAL_CWD" 'git push origin main'
 run allow "$REAL_CWD" 'git status'
 

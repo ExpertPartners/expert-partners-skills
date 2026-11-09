@@ -20,7 +20,7 @@ Verified addendum, 2026-07-31. Remote Claude Code sessions (Claude Code on the w
 
 ## The one rule of this skill
 
-Allison never pastes a transcript. She pastes exactly one prompt block, once per video, and confirms. Everything else is machinery.
+Allison never pastes a transcript. She pastes exactly one prompt block, once per video. Everything else is machinery.
 
 If a response written under this skill ever asks Allison to open a video, click Show transcript, copy, and paste it back, that response is a doctrine violation and gets rebuilt. The transcript is a file. Files move through Drive, not through her hands.
 
@@ -79,7 +79,7 @@ That last line matters. A transcript pasted into Code's output just moves the co
 
 ## Downstream routing, what the transcript is for
 
-The transcript is never the deliverable. Something gets built from it. Ask once, up front, before shipping the block, because the answer changes what gets captured in leg four.
+The transcript is never the deliverable. Something gets built from it. Read the intent from the request before shipping the block, because it changes what gets captured in leg four.
 
 Route by intent:
 
@@ -110,19 +110,19 @@ Age-gated, members-only, or private video. yt-dlp needs cookies. Have Code expor
 
 Auto-captions come back as unreadable mush. Auto-captions on heavy-accent or music-heavy audio degrade badly. If the cleaned text reads as noise, skip it and go straight to the whisper path, which is materially better on the same audio.
 
-Drive upload fails. Test the SA plus DWD path live before concluding the credential is missing, per the verify-first protocol. Check 1Password across all vaults for the service account JSON. Four verified failures before Allison's hands enter the picture.
+Drive upload fails. Test the SA plus DWD path live before concluding the credential is missing, per the verify-first protocol. Check 1Password across all vaults for the service account JSON. Try four verified routes before reporting a blocker.
 
-Playlist or multi-video URL. Confirm the scope with Allison first, because a fifty video playlist is a different job than one video. Then fetch sequentially with the same script, one Drive file each.
+Playlist or multi-video URL. Fetch sequentially with the same script, one Drive file each, and report the count and links.
 
 ## The hand-off choreography
 
 Per code-block-routing and the pin rule, in this order and no other.
 
-One, the response carries the routing line, the single paste block, and one plain sentence naming what comes back once she pastes. It ends by telling her to say pasted when she has. No pin yet.
+One, the response carries the routing line, the single paste block, and one plain sentence naming what comes back once she pastes. No pin yet.
 
-Two, Allison pastes and confirms.
+Two, Allison pastes.
 
-Three, only then the pin fires, with a real timestamp from `TZ=America/Chicago date "+%Y-%m-%d %H:%M %Z"`, In flight naming the specific video, Awaiting naming the Drive link and metadata.
+Three, the pin fires, with a real timestamp from `TZ=America/Chicago date "+%Y-%m-%d %H:%M %Z"`, In flight naming the specific video, Awaiting naming the Drive link and metadata.
 
 Then Cowork reads the file from Drive and the downstream skill runs.
 

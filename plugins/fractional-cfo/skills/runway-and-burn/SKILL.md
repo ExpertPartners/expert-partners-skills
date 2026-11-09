@@ -30,7 +30,7 @@ Available cash: Mercury operating balances. Treasury balances get shown separate
 
 ## Steps
 
-1. Pull Mercury balances per account per entity, tagged as operating, treasury, or tax reserve based on account names and the systems map. If an account's role is ambiguous, ask once and record the answer in project memory.
+1. Pull Mercury balances per account per entity, tagged as operating, treasury, or tax reserve based on account names and the systems map. If an account's role is ambiguous, tag it by best judgment, say so in the report and record the tag in project memory.
 
 2. Compute trailing burn from Mercury transactions: 3-month and 6-month trailing averages of inflows and outflows through canonical categories, transfers excluded. Show both windows; if they diverge more than 20 percent, name what changed.
 

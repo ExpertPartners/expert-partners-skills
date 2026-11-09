@@ -72,7 +72,7 @@ This phase is mandatory whenever the user pastes a finished training video (link
    - Before creating, search the database for an existing record with the same video title or link. Never create duplicates. If a record exists, update it instead.
    - Properties to fill: Name (video title), Brand (Expert Partners, EPIC, Free Agent Movement, Moxie Signature Group, or AG Personal Brand), CoWork Project (which project produced it), Format (Explainer Video, Short Video, Cinematic Video, Audio Overview, Slide Deck, or Other), Tool (Gemini Notebook or Other), Video Link (URL if available), Audience, Training Topic, Status (Draft, Final, Needs Review, or Archived), Date Produced, Source Notebook (the Gemini Notebook it was generated from).
    - Page body: full context, including the training objective, audience detail, the exact prompt used to generate it, QA review notes, and any follow-up actions.
-   - If any property value is unknown, fill what is known, set Status to Needs Review, and ask the user one question at most to complete the record.
+   - If any property value is unknown, fill what is known, set Status to Needs Review, and ask the user one question at most only if no source holds the answer.
    - After writing, give the user the direct Notion link to the new record.
 If the Notion connector is unavailable in the current session, say so, log destinations 1 and 2, and give the user the exact record content to add so nothing is lost.
 
@@ -196,7 +196,7 @@ Before delivery, verify each output against:
 - Accessibility: plain language, high-contrast visuals, captions or transcripts where possible.
 - Visual quality (slides, infographic, video) and narration quality (audio, video).
 - Assessment quality: questions map to learning outcomes; answers are defensible from sources.
-Tell the user which items only a human can sign off (compliance, confidentiality, factual verification).
+Report which items need subject-matter verification (compliance, confidentiality, factual claims).
 
 ---
 

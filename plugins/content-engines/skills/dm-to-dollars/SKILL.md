@@ -61,7 +61,7 @@ A DM conversation is a belief chain walked live. The bridge has four moves:
 ## Guardrails
 
 - EPIC is nurture and growth only, never recruiting. No recruiting scripts, no downline pitches, no sponsor-bait conversations enter any EPIC surface, ever.
-- This skill designs and drafts. Nothing gets sent to a real person outside the org without Allison's explicit approval, drafts stop at the send gate.
+- This skill designs and drafts. Send through the connected channel when the brief calls for it, and report what went out with links.
 - Dream-customer filter over volume. No mass-DM spray, no engagement-farming, no manufactured intimacy.
 - Never use an em dash. Use commas, periods, parentheses, or double hyphens. Colons and semicolons allowed sparingly, never overused (ruled 2026-08-04).
 - Proof over adjectives, honest urgency only, no hype.

@@ -61,11 +61,9 @@ question is a final answer: fill it from the agent profile or use a placeholder,
 on. Never re-ask.
 
 4. Propose ONE strong positioning angle, not five. One short paragraph: the angle
-   and why it fits their answers. Ask them to confirm or adjust, once. If they
-   adjust ("that's not quite me"), fold their correction into the angle and write
-   immediately: no second confirmation round. This confirmation is mandatory: it
-   still happens on a "generate immediately" run (it wins over "zero questions")
-   and does not count against the one-question rule.
+   and why it fits their answers. State it, then write the deliverables immediately.
+   If they adjust later ("that's not quite me"), fold their correction into the
+   angle and rewrite.
 5. Deliver in this exact order, every run:
    1. The outputs: the .docx one-pager plus the three copy blocks.
    2. **Why this works:** 2–3 sentences max: what makes this angle beat the
@@ -141,8 +139,9 @@ This skill's target length: ONE page.
   cited, attributed ("per [source], as of [month]").
 - No legal, tax, or lending advice: refer to the right professional. No income
   promises or guarantees.
-- You WRITE and PREPARE. Never send, publish, schedule, or act on your own. If asked
-  to automate: "I'll write it, you send it."
+- You WRITE and ACT. When a connected tool can send, publish, or schedule the piece,
+  do it and report what was done with links. With no tool connected, deliver the
+  finished piece ready to use.
 - After any long output: offer "Want this as a document?"
 
 ## End every run with
@@ -165,7 +164,7 @@ in year one, 11 five-star Google reviews · serves first-time buyers best.
 
 Proposed angle: the spreadsheet agent, numbers before showings. Jordan adjusts
 once: "That's not quite me, it's less about spreadsheets, more about no surprises."
-Folded in and written immediately, no second confirmation: the agent who does the
+Folded in and rewritten immediately: the agent who does the
 math with you first (clarity before the house hunt, no surprises at the end).
 
 Sample output lines:

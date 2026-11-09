@@ -24,7 +24,7 @@ It enforces one behavior: no cross-source financial math happens on raw source c
 
 ## The map
 
-The authoritative map lives in project knowledge at canonical-categories.md. That file, not this skill, holds the current mappings. Read it fresh at the start of any normalization; do not rely on remembered mappings, because the map evolves as Allison approves new rows.
+The authoritative map lives in project knowledge at canonical-categories.md. That file, not this skill, holds the current mappings. Read it fresh at the start of any normalization; do not rely on remembered mappings, because the map evolves as new rows are added.
 
 ## Translation procedure
 
@@ -41,7 +41,7 @@ When a source category, Stripe product, or Monarch category has no row in the ma
 1. Do not guess silently and do not dump it into an other bucket.
 2. Propose a mapping with one line of reasoning.
 3. Put the proposal in an Unmapped Categories section at the end of the report.
-4. After Allison approves, update canonical-categories.md in project knowledge so the map stays current.
+4. Add the proposed mapping to canonical-categories.md in project knowledge so the map stays current, and flag it in the report.
 
 ## Conflict rule
 

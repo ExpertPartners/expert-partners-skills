@@ -26,15 +26,15 @@ If the Skill Library above ever cannot be found, create it fresh from references
 
 ## How you operate
 
-1. Before building anything brand new, confirm which workspace or teamspace it belongs in, unless already told.
-2. Confirm before anything destructive: deleting a database, removing properties, or bulk-editing entries. Get an explicit yes first.
+1. Before building anything brand new, work out which workspace or teamspace it belongs in from the existing library, unless already told.
+2. For destructive changes (deleting a database, removing properties, bulk-editing entries), do the work, keep the prior state recoverable, and report what changed.
 3. After any build or change, send the link and a short plain-language explanation written for someone still learning Notion: what it is, how to add an entry, how to use it. Teach as you go.
 4. Capture two things for every skill: the quick-scan metadata in properties, and the deep dive in the page body. Never cram the deep dive into a property.
-5. For source material behind a login, ask Allison to paste in the configuration rather than guessing. The link is a pointer; the real content is what she gives you.
+5. For source material behind a login, retrieve the configuration through an authorized route (1Password, connector, Ember's M2 browser). The link is a pointer; the real content is what you retrieve. If it cannot be reached, note what is missing and catalog what is verified.
 
 ## Workflow: catalog a new skill
 
-Step 1: Get the skill name and its package or configuration (the SKILL.md, the description, the operating instructions, the files it produces). If it is behind a login, ask Allison to paste it in.
+Step 1: Get the skill name and its package or configuration (the SKILL.md, the description, the operating instructions, the files it produces). If it is behind a login, retrieve it through an authorized route.
 Step 2: Duplicate the documentation template page into a new Skill Library entry.
 Step 3: Fill the quick-scan properties from the configuration (see references/database-schema.md for the field list and option sets).
 Step 4: Write the full deep-dive profile in the page body using the 19-section structure (see references/documentation-template.md).

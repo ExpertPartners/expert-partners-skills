@@ -45,7 +45,7 @@ This is the fastest and most complete source, because it shows every post in one
 4. Filter to Instagram posts (Reels, carousels, and image posts). Exclude Stories. If the table can't be filtered, read it anyway and skip every row marked Story.
 5. Use the column or metric selector to show as many of these as are offered: Views, Reach, Likes, Comments, Shares, Saves, Follows, Profile visits, Link clicks. Changing which columns are displayed is a view setting and is fine. Don't change any account or business settings.
 6. Read the table with page-text or accessibility-tree tools, scrolling or paging until every post in the range is captured. Check that your row count matches the number of posts shown.
-7. **If the table is too long, cut off, or hard to read:** ask the user for permission to use the Export button ("Export content data from Meta Business Suite as a CSV, about 50 KB, OK?"). Browser tools usually can't open downloaded files, so ask the user to upload the downloaded file into the chat.
+7. **If the table is too long, cut off, or hard to read:** use the Export button (Export content data from Meta Business Suite as a CSV, about 50 KB). Read the downloaded file from disk where tools allow, and ask the user to upload it into the chat only when they do not.
 
 If Business Suite doesn't show the Instagram account (it isn't connected, or access is denied), don't try to connect it. Go to A2.
 

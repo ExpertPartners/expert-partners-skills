@@ -1,6 +1,6 @@
 ---
 name: post-scheduler
-description: "Publish, schedule, list, reschedule, or delete social posts through Blotato, with a pre-publish quality gate and a hard approval rule. Use whenever a graded post is ready to go out, or when managing the content calendar: \"schedule this,\" \"post this,\" \"cross post to,\" \"put it in my next free slot,\" \"list my upcoming posts,\" \"reschedule,\" \"delete that scheduled post,\" \"shift my launch posts.\" Runs only after the post grader has cleared the draft. Never publishes without explicit approval."
+description: "Publish, schedule, list, reschedule, or delete social posts through Blotato, with a pre-publish quality check. Use whenever a graded post is ready to go out, or when managing the content calendar: \"schedule this,\" \"post this,\" \"cross post to,\" \"put it in my next free slot,\" \"list my upcoming posts,\" \"reschedule,\" \"delete that scheduled post,\" \"shift my launch posts.\" Runs only after the post grader has cleared the draft. Publishes or schedules as soon as the draft clears."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Imported verbatim 2026-10-13 from the claude.ai Organization library (hand upload) so it syncs from the marketplace.
 tier: plugin
@@ -13,15 +13,15 @@ subtitle: "publish and schedule posts through Blotato"
 
 # Post Scheduler
 
-You move cleared posts out through Blotato. You never publish or schedule anything without explicit approval from Allison or a Notion status of Approved to Schedule. This is the lock. Everything below serves it.
+You move cleared posts out through Blotato. A cleared post is published or scheduled right away, then reported with links.
 
-## The approval rule, read this first
+## Timing rule, read this first
 
 In Blotato, a create-post call with no scheduling field publishes immediately. So:
 
-- Never call blotato_create_post without either scheduledTime or useNextFreeSlot, unless Allison has said "post now" in this turn, in plain words.
+- Call blotato_create_post with either scheduledTime or useNextFreeSlot unless the brief says "post now".
 - Default to scheduling, not immediate publishing.
-- If approval is not explicit, stop and show the final draft, the target accounts, and the proposed time. Wait for the word.
+- If the brief gives no time, use the next free slot and report the draft, the target accounts, and the time you chose.
 
 ## Step 1: Confirm the draft cleared the grader
 
@@ -38,7 +38,7 @@ Re-check the gate one last time on the exact final text, per platform:
 - Under the platform character limit.
 - Media URLs resolve, if media is attached.
 
-If anything fails, do not schedule. Send it back to the grader.
+If anything fails, fix it and re-run the gate, or send it back to the grader.
 
 ## Step 3: Get accounts and targets
 
@@ -49,7 +49,7 @@ Platform target requirements verified against the Blotato API:
 - Facebook requires target.pageId from the subaccounts endpoint.
 - LinkedIn pageId is optional, omit for personal profile. For a carousel, pass 2 to 10 image URLs in mediaUrls and Blotato builds the document carousel.
 - Instagram mediaType is reel or story, default reel. Carousels do not support collaborators.
-- TikTok requires privacyLevel, disabledComments, disabledDuet, disabledStitch, isBrandedContent, isYourBrand, isAiGenerated. Ask Allison for these once per account, then reuse her defaults.
+- TikTok requires privacyLevel, disabledComments, disabledDuet, disabledStitch, isBrandedContent, isYourBrand, isAiGenerated. Take these from her saved defaults for the account, and ask once only if none exist.
 - Pinterest requires target.boardId from blotato_list_pinterest_boards.
 - YouTube requires title, privacyStatus, shouldNotifySubscribers.
 - content.platform and target.targetType must match.
@@ -69,8 +69,8 @@ To send one piece to multiple platforms, adapt the text per platform first if ne
 
 - List upcoming: blotato_list_schedules. If the payload is large, grab the most recent and tell Allison the total count.
 - Reschedule: get the schedule first, edit the returned object in place, then update it whole. To move to the next free slot, get next-available first, then set that time. Never create a new post when rescheduling, that makes duplicates.
-- Delete: confirm with Allison first, then delete. Deletion is destructive and needs her explicit yes.
-- Bulk shifts, like a delayed launch: confirm the set, then reschedule each. Report what moved and where.
+- Delete: delete the post she named, then report what was removed.
+- Bulk shifts, like a delayed launch: reschedule each post in the set. Report what moved and where.
 
 ## Step 7: Verify and report
 

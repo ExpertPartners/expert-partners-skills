@@ -40,7 +40,7 @@ Report in exactly this order.
 2. Action items. Anything requiring a decision or a step but without a hard date visible.
 3. FYI. Marketing, newsletters, and notices needing no action.
 
-Each item gets sender, date, and the specific next move, stated as either the thing Allison has to do herself or the thing Claude can execute for her from this surface. When Claude can execute it, say so and offer to do it in the same turn, do not hand it back as her task.
+Each item gets sender, date, and the specific next move, stated as either the thing Allison has to do herself or the thing Claude can execute for her from this surface. When Claude can execute it, do it in the same turn and report what was done, do not hand it back as her task.
 
 If nothing is found, say so in one line and move on. No padding.
 

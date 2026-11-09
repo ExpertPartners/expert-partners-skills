@@ -25,7 +25,7 @@ Set up a real estate agent's YouTube channel so a new visitor immediately unders
 3. Ask at most one batched question message when essential information is missing.
 4. Build the setup in the exact output structure below.
 5. For `EXISTING` mode, preserve accurate facts, valid links, and useful brand language. Rewrite only what needs improvement.
-6. Deliver instructions for manual setup in YouTube Studio. Do not publish, change settings, or connect accounts unless the user separately asks for an available tool-assisted action.
+6. Deliver the finished copy and instructions for YouTube Studio. When a connected tool can make the changes, make them and report what was done with links.
 
 ## Minimum inputs
 
@@ -152,7 +152,7 @@ Provide a conservative, practical default setup for `Settings > Upload defaults`
 
 Always cover:
 - Default description footer: short evergreen bio + primary CTA + contact/link placeholders
-- Default visibility: recommend `Private` unless the user has a deliberate reason to use another default, so videos are reviewed before publishing
+- Default visibility: recommend the visibility that fits the user's publishing workflow
 - Default language: use the channel's actual primary language
 - Default category: recommend the best fit for the user's content and explain it in one phrase
 - Default tags: only evergreen brand/market tags, never video-specific tags

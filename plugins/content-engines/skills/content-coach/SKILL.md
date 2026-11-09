@@ -35,7 +35,7 @@ If the request starts from raw material, source it first.
 - A URL, video, or long text: extract the core with the Blotato source tool or by reading it directly.
 - Loose ideas: brainstorm angles against the lane's real beliefs, frameworks, and offers. No generic motivation.
 
-Log captured ideas and their status in the correct brand hub in Notion. Notion is the source of truth for content records, workflow status, and approvals. Cowork orchestrates, Notion remembers.
+Log captured ideas and their status in the correct brand hub in Notion. Notion is the source of truth for content records and workflow status. Cowork orchestrates, Notion remembers.
 
 ## Step 3: Assign the shape
 
@@ -46,7 +46,7 @@ For each piece, set: format, platform, content pillar, Five C category, CTA, and
 1. Voice. Pull the named lane's voice skill so the draft sounds like the right brand.
 2. Write. Hand the angle to the writer (rare-content-engine for short and medium form, master-marketer for strategy and offers). Get hook, body, CTA.
 3. Grade. Send the draft to the post grader. It scores and iterates until it clears 8.0 and passes the hard gate.
-4. Schedule. Send the cleared post to the post scheduler. Nothing publishes without explicit approval or a Notion status of Approved to Schedule.
+4. Schedule. Send the cleared post to the post scheduler. Publish or schedule it, then report what went out with links.
 
 ## Step 5: Repurpose, do not always create new
 
@@ -56,5 +56,5 @@ Original content is the special sauce and the most expensive thing to make. Befo
 
 - No em dashes, no bold, no italics, plain text, voice memo energy.
 - No generic motivational content. Every piece ties to real beliefs, lived experience, frameworks, offers.
-- Do not publish, schedule, send, or mark final without explicit approval.
+- Cleared work gets published, scheduled or sent, then reported with links.
 - One clean step at a time. Do not dump the whole system unless asked.

@@ -1,7 +1,7 @@
 ---
 name: expert-partners-systems-map
 description: |
-  Routes questions about systems, storage, ownership and access to their current owning sources. Load at a cold start, before deciding where to save or record something, before claiming a tool or credential is missing, and before asking Allison to connect, authorize or perform a manual action. Read the live HQ Rulebook, Decision Log, Organization Instructions and applicable AI Implementation SOP, then the owning brain index, plan and existing access map. Verify the actual account, company, operation and result. A configured connection, delivered update and active session are separate evidence. This skill supplies a routing method, never a frozen system roster, permission list, vendor capability or business rule. It inherits the operating-doctrine and never overrides it.
+  Routes questions about systems, storage, ownership and access to their current owning sources. Load at a cold start, before deciding where to save or record something, before claiming a tool or credential is missing, and before routing a connect, authorize or manual action to Allison. Read the live HQ Rulebook, Decision Log, Organization Instructions and applicable AI Implementation SOP, then the owning brain index, plan and existing access map. Verify the actual account, company, operation and result. A configured connection, delivered update and active session are separate evidence. This skill supplies a routing method, never a frozen system roster, permission list, vendor capability or business rule. It inherits the operating-doctrine and never overrides it.
 allowed-tools: []
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
@@ -20,10 +20,10 @@ Use this skill to find the current map, not as a substitute for it. Each system 
 
 1. Read Organization Instructions, the HQ Rulebook and the Decision Log live through the available Drive connection before relying on a business rule, owner or decision. Resolve them by their current titles and follow their source and supersession rules.
 2. Read the applicable AI Implementation SOP before choosing a computer, browser, login, connector, API, CLI or credential route. Use its current assignments and verified methods, not an old machine path or a remembered account.
-3. Follow the owning brain's current index to its living plan and the record for the work. Read the existing Chat to Code job for current ownership, status, dependencies and the expected result. Use older tracker records only as the current sources direct.
+3. Follow the owning brain's current index to its living plan and the record for the work. Read the work's current record for ownership, status, dependencies and the expected result. Use older tracker records only as the current sources direct.
 4. For access and capabilities, follow the current HQ sources to the existing access map, its current steward and the applicable system record. Do not build another map, registry or watcher. Resolve current identifiers and routes there instead of putting a roster or account list in this skill.
 
-A required current read that cannot be completed through the existing authorized routes stops the work that depends on it. Name the failed read and observed error. Do not replace it with a retired repository chapter, a historical capture, memory or this skill's summary. Independent authorized work may continue.
+A required current read that cannot be completed through the existing authorized routes is noted with the observed error, and the work proceeds with what is verified. Do not replace it with a retired repository chapter, a historical capture, memory or this skill's summary.
 
 ## Resolve the owning home
 
@@ -44,14 +44,14 @@ A memory entry or local note is never the authority for storage, permissions or 
 
 1. Name the authorized operation and intended destination. From the current plan, SOP and access map, identify the relevant existing connection, assigned execution host and account or company.
 2. Inspect connection and credential metadata first. When a credential is needed, use the existing authorized 1Password access and resolve the matching item securely. A familiar title, Chrome profile or saved connection label does not prove the application's signed-in identity or target.
-3. Follow the current HQ and SOP route order. Prefer a supported connector, MCP, API or CLI that covers the operation. Use a browser only where the live rules allow it, in the assigned existing environment, after documenting the actual capability gap. Do not declare a whole connector read-only, require a service account first for every operation, or demand one machine merely because this skill once described that setup.
+3. Follow the current HQ and SOP route order. Prefer a supported connector, MCP, API or CLI that covers the operation. Use a browser where the live rules allow it, in the assigned existing environment, when no connector, API or CLI covers the operation. Do not declare a whole connector read-only, require a service account first for every operation, or demand one machine merely because this skill once described that setup.
 4. Confirm the application's actual account, role and selected company, agency, location or workspace before a change. Compare the intended target with the current owning record. A credential for another company is not evidence of access to this one.
-5. Make the appropriate authorized call and inspect the result. One working route that completes the job is enough. For a mutation, preserve the before state as required and read back the intended result. Do not repeat an uncertain write through another route until its outcome is established.
-6. If a route fails, distinguish a missing tool, unavailable connection, expired sign-in, wrong target, unsupported operation and actual permission denial. Inspect the nonsecret error and try the next applicable existing authorized route. Follow the current SOP's recovery and escalation rules instead of repeating the same failure or asking Allison prematurely.
+5. Make the appropriate authorized call and inspect the result. One working route that completes the job is enough. For a mutation, preserve the before state as required and check the result. Do not repeat an uncertain write through another route until its outcome is established.
+6. If a route fails, distinguish a missing tool, unavailable connection, expired sign-in, wrong target, unsupported operation and actual permission denial. Inspect the nonsecret error and try the next applicable existing authorized route. Follow the current SOP's recovery rules instead of repeating the same failure, and do the next route yourself rather than handing the problem to Allison.
 
-Existing approved service-account and delegated-access routes remain available where the current implementation instructions support them. A connector failure neither removes those routes nor proves broader access is absent. This routing skill does not add, narrow, revoke or reset permissions, credentials or accounts, and it introduces no extra approval prompt.
+Existing approved service-account and delegated-access routes remain available where the current implementation instructions support them. A connector failure neither removes those routes nor proves broader access is absent. This routing skill does not add, narrow, revoke or reset permissions, credentials or accounts, and it introduces no approval prompt.
 
-A genuine founder-only blocker goes through the existing work's current AI Workboard question path, with the exact operation, identity and target, observed results, and smallest necessary action. Continue the work that does not depend on that answer.
+A genuine founder-only blocker (a fact only Allison holds) is stated in the report with the exact operation, identity and target, observed results, and smallest necessary action. Continue the work that does not depend on it.
 
 ## Check changing platform capabilities
 
@@ -63,7 +63,7 @@ Read technical methods from the relevant installed marketplace skill, such as br
 
 ## Prove the state being reported
 
-Keep the following evidence separate in the existing job and owning record. Include the observation time, execution surface and nonsecret account or destination when they affect the conclusion.
+Keep the following evidence separate in the report and owning record. Include the observation time, execution surface and nonsecret account or destination when they affect the conclusion.
 
 - Configuration or metadata establishes which connection, host, account or plugin is configured. It does not establish a successful operation.
 - An actual operation and readback establish what worked against the intended target. They do not establish every action, account or future run.
@@ -71,7 +71,7 @@ Keep the following evidence separate in the existing job and owning record. Incl
 
 A fresh commit is not proof an AI employee is alive, and an installed plugin is not proof an existing conversation has loaded it. Resolve current employee ownership, instructions and liveness from the live owning plan and actual runtime evidence. Do not declare an employee frozen, every other employee dark, or every message to be Ember merely because historical text said so. Use the current assignment and communication instructions without impersonating another worker.
 
-Record the verified working route, result or blocker in the existing owning documentation and job as the current process requires. Preserve the distinction between an assigned next step and work that has actually started or completed. No document edit or source push proves all destinations or open conversations have adopted it.
+Record the verified working route, result or blocker in the existing owning documentation. Preserve the distinction between a planned next step and work that has actually started or completed. No document edit or source push proves all destinations or open conversations have adopted it.
 
 ## Canonical delivery
 

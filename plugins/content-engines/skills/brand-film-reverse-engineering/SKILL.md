@@ -1,6 +1,6 @@
 ---
 name: brand-film-reverse-engineering
-description: Reverse-engineer a reference personal-brand or luxury real-estate film (About Me video, website hero video) and produce a complete adaptation package for a client, covering shot-by-shot analysis, storyboard contact sheet, transcript/cadence/narrative analyses, story substitution framework, Google Drive asset audit, gap inventories, and three production pathways, stopping at an approval gate before any script or video generation. Use when a user provides a competitor's or reference video and asks to analyze it, replicate its structure with their own story/market/footage, plan an About Me or hero film, or audit their assets against a reference.
+description: Reverse-engineer a reference personal-brand or luxury real-estate film (About Me video, website hero video) and produce a complete adaptation package for a client, covering shot-by-shot analysis, storyboard contact sheet, transcript/cadence/narrative analyses, story substitution framework, Google Drive asset audit, gap inventories, and three production pathways, ending at the creative summary and README, with script and video generation following once the client's story and assets are in. Use when a user provides a competitor's or reference video and asks to analyze it, replicate its structure with their own story/market/footage, plan an About Me or hero film, or audit their assets against a reference.
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: content
@@ -12,7 +12,7 @@ subtitle: "reverse-engineer a reference brand film"
 
 # Brand Film Reverse-Engineering
 
-Turn a reference film into a client-specific production plan. The output is a numbered deliverables package (up to 15 documents + README index), not a video: this skill ends at an **approval gate**: never write the client's script, invent their biography, or generate video/AI footage before explicit approval.
+Turn a reference film into a client-specific production plan. The output is a numbered deliverables package (up to 15 documents + README index), not a video: this skill ends at the creative summary and README. Never invent the client's biography. Write the script and generate video/AI footage once the client's story answers and assets are in.
 
 ## Workflow
 
@@ -41,7 +41,7 @@ Search connected Google Drive (`scripts/drive_media_audit.py search`, then `walk
 Missing-story questionnaire (chapter-grouped, vivid-answer questions + permissions section; recommend voice-memo answers). Missing-asset inventory (FILM / LICENSE / AI-FROM-OWNED / PICKUP / OPTIONAL + 3-item priority list). Three production pathways: A existing-assets-only, B minimal-shoot hybrid (usually the recommendation floor; the seated interview is non-negotiable if the reference is interview-led), C premium production. No vendor pricing without evidence.
 
 ### 7. Package and stop (Deliverables 00, 15)
-Write the one-page creative summary and the README index (deliverables table + 3–5 headline findings + exactly what the client must provide next). Deliver everything, state clearly that no script/video was generated, and **wait for approval**.
+Write the one-page creative summary and the README index (deliverables table + 3 to 5 headline findings + exactly what the client must provide next). Deliver everything, state clearly that no script/video was generated yet, and list what the client's answers unlock.
 
 ## Non-negotiable rules
 

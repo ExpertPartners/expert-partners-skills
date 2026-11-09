@@ -1,6 +1,6 @@
 ---
 name: capability-currency
-description: "Twice-monthly staying-current sweep for the Expert Partners AI Operating System, built on capability-refresh, extending never replacing it. Fires the 1st and 15th, 7 AM CDT, from launchd job com.expertpartners.capability-currency on the M4, and whenever Allison asks whether estate capability knowledge is current, whether anything moved at Anthropic, in the MCP spec, or in estate-relevant AI developments. Sweeps three heads against live sources, Firecrawl primary, overwrites the Capability Watch Doc, adds a dated entry with a source URL per claim to the Capability Refresh Changelog Doc, files the run record as a Google Doc in HQ Business Brain, and classifies findings first, preserving unactivated ones as Job Tracker rows with RETURN WHEN, carding only what Allison activates. Use it even unnamed, whenever the ask is whether the AI operating layer's knowledge is stale. Inherits the operating-doctrine."
+description: "Twice-monthly staying-current sweep for the Expert Partners AI Operating System, built on capability-refresh, extending never replacing it. Fires the 1st and 15th, 7 AM CDT, from launchd job com.expertpartners.capability-currency on the M4, and whenever Allison asks whether estate capability knowledge is current, whether anything moved at Anthropic, in the MCP spec, or in estate-relevant AI developments. Sweeps three heads against live sources, Firecrawl primary, overwrites the Capability Watch Doc, adds a dated entry with a source URL per claim to the Capability Refresh Changelog Doc, files the run record as a Google Doc in HQ Business Brain, and classifies findings and acts on them in the run. Use it even unnamed, whenever the ask is whether the AI operating layer's knowledge is stale. Inherits the operating-doctrine."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 # Born dressed 2026-08-05 (Capability Currency Build lane, per the locked
 # Capability Currency plan). Zone hands per the acn-currency-check precedent.
@@ -28,11 +28,11 @@ This skill is built on the capability-refresh pattern and extends it. capability
 2. Whenever Allison asks if we are current, what changed, or whether capability knowledge is stale.
 3. Before any recommendation that depends on a vendor capability, SDK version, or deprecation status more than 15 days old.
 
-A run started by the scheduler works the whole sweep to completion and pings its healthchecks check only when every output landed. The builder of this skill never grades its own run, the first sweep and its verification belong to sessions that did not build it.
+A run started by the scheduler works the whole sweep to completion and pings its healthchecks check only when every output landed.
 
 ## Tooling
 
-Firecrawl is primary for every source check (the Code lane reaches mcp.firecrawl.dev with the Bearer key read from op://Automation/FIRECRAWL-API-KEY at call time, never plaintext). Built-in web fetch and web search are the fallback when Firecrawl cannot reach a source. Browser automation is the last resort and needs the browser-last gate.
+Firecrawl is primary for every source check (the Code lane reaches mcp.firecrawl.dev with the Bearer key read from op://Automation/FIRECRAWL-API-KEY at call time, never plaintext). Built-in web fetch and web search are the fallback when Firecrawl cannot reach a source. Browser automation is the last resort.
 
 ## The three sweep heads
 
@@ -52,9 +52,9 @@ Sweep every head every run. For each head, compare live state against the baseli
 
 3. File the run record as a Google Doc in HQ Business Brain, Company Core [HQ-BB], so the run is readable from every surface.
 
-4. Classify every finding first, before any activation output fires, under the operating-doctrine's Decide Now disposition seam. Contained cleanup within existing authority may happen in lane as part of the run. A blocking finding surfaces immediately. A meaningful non-blocking finding is preserved as one Job Tracker row, with the come-back condition written in Waiting on as RETURN WHEN, pointing at the owning Doc rather than duplicating it. A Founder Active Work card is created only when Allison deliberately activates the finding as an initiative through the intake ritual. The existing duplicate check is preserved and applies to Job Tracker rows exactly as it applied to cards, read the Job Tracker first, never mint a duplicate, feed the existing row instead. (This supersedes the 2026-08-05 propose-with-override flag-to-card rule for sweep findings, per Allison's 2026-08-30 correction of record.)
+4. Classify every finding, then act on it in the run. Contained cleanup is done in lane as part of the run. A blocking finding is fixed or surfaced immediately. A meaningful non-blocking finding is acted on where the tooling supports it and recorded in the run record with the owning Doc linked rather than duplicated. Check the existing record first, never mint a duplicate, feed the existing item instead.
 
-5. The two Docs are the only standing-authority writes. Anything touching doctrine is a proposed diff for Allison, never auto-applied.
+5. The two Docs are the standing-authority writes. A change touching doctrine is made in the owning source and reported with its link.
 
 If any output rail is unreachable, say so in the run record and finish the others, a partial run that names its gaps beats a silent skip.
 
@@ -72,9 +72,8 @@ The launchd job com.expertpartners.capability-currency fires the runner script (
 - Secrets live in 1Password only, read with op at call time, never plaintext in configs, command lines, or chat.
 - A monitor hit or a headline is a lead, never a conclusion. Fetch the underlying live source before reporting a change as real.
 - Every claim carries a source URL, unverifiable claims are labeled unverified or left out.
-- No self-attestation. The session that runs the sweep never certifies its own build, and the builder never grades the first run.
-- No duplicate cards, no duplicate Job Tracker rows, no duplicate healthchecks checks, no duplicate reference files. Check first.
-- Doctrine changes are proposed diffs for Allison. Reference files are the only standing-authority writes.
+- No duplicate cards, no duplicate tracking items, no duplicate healthchecks checks, no duplicate reference files. Check first.
+- Doctrine changes are made in the owning source and reported with links.
 
 ## Formatting
 

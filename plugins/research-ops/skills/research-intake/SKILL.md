@@ -8,9 +8,8 @@ description: >
   Use whenever a research report, deep-research output, or external analysis
   appears in conversation with intent to use it, not just to read it once.
   Answers Allison's question FIRST, files behind the answer,
-  never files the same report twice, asks one question naming the two
-  likeliest homes when the owning department is unclear, then reports the
-  Drive link.
+  never files the same report twice, picks the likeliest home when the
+  owning department is unclear, then reports the Drive link.
 tier: plugin
 zone: cataloging
 status: live
@@ -52,7 +51,7 @@ yet, and step 5 saves it from the content Allison supplied.
 
 - **A match already filed in a department folder of AG, EP or HQ Business
   Brain**: this is a rediscovery, not a new filing. Create nothing, add no
-  entry and no Job Tracker row, skip to step 8 and report the existing Doc.
+  entry, skip to step 8 and report the existing Doc.
 - **Any other match**, including the linked file itself or a copy in the Deep
   Research folder: that file is the report. Use it, make no second copy, and
   carry on to step 2. Step 5 moves it home.
@@ -63,8 +62,8 @@ This skill carries no copy of which brain owns which subject. That lives only
 in the routing canon: Organization Instructions, the HQ Rulebook and the
 Decision Log, all in HQ Business Brain, Company Core, each found by its
 title. Read all three live every time, and let the newest Decision Log entry
-win. If any of them cannot be read, save and move nothing, and tell Allison
-which source failed.
+win. If any of them cannot be read, say which source failed and file using
+what was verified.
 
 Read the report's actual subject matter, not just its title or filename, and
 pick the one brain, AG, EP or HQ Business Brain, whose ownership in the
@@ -98,26 +97,13 @@ treat the home as unclear (step 4) instead of creating one.
 The target folder is the department folder found here, or the subfolder the
 routing canon names for that kind of material, checked the same way.
 
-## 4. When the home is unclear, ask one question
+## 4. When the home is unclear, pick the likeliest
 
 When the report fits more than one brain or department, or no department
-clearly, ask Allison one question that names the two likeliest homes, for
-example, "Should this go to EP Marketing or AG Marketing?" Save and move
-nothing for this report until she answers. Then file it where she says.
-
-Where the question goes depends on where this skill is running.
-
-- **Claude chat or Cowork**: ask in chat and wait for her answer.
-- **Factory, Codex or Claude Code**: never wait inside the app. Follow the
-  HQ Rulebook question path: post the question as a comment starting
-  `Question for Allison` on the code job's GitHub issue, or use
-  `job_finish` with outcome `needs-allison` for the affected non-code job
-  and one line starting `Recommend:` in its summary, following the live
-  tool schema. This requests a decision, not completion. Never use `done`
-  for unfinished work or finish an unrelated job. Retrieval and technical
-  gaps stay AI owned unless an actual founder decision is missing.
-  Keep working on everything that does not depend on this report, and file
-  it where she says once she answers.
+clearly, pick the likeliest home from the routing canon and the report's
+subject, file it there, and name the runner-up home in the report line so a
+move is easy if Allison wants one. Do not stop to ask. If a folder is missing,
+file in the closest department folder the canon names.
 
 ## 5. Give the report its one home
 
@@ -155,20 +141,19 @@ Date: <YYYY-MM-DD>
 Subject: <one to two sentences, the REAL subject, not a placeholder>
 Home: <brain and department, e.g. AG Business Brain, Marketing>
 Superseded by: <None recorded. Fresh filing. -- or the named decision if the conversation already surfaced one>
-Disposition: <awaiting ruling -- or implement / park / superseded, if Allison ruled on it in the same conversation>
+Disposition: <implement / park / superseded, as Allison ruled in the same conversation, otherwise your recommendation>
 ```
 
 When the file already lived in Drive, leave its contents untouched and give
 the same entry in the reply. If Allison ruled on the report in the same breath
 she showed it to you ("yeah, park that" / "let's build this"), record that
-ruling in Disposition rather than defaulting to awaiting ruling, and add a
-Decision Log entry for it (newest at the top, with a Replaces note).
+ruling in Disposition, and add a Decision Log entry for it (newest at the top,
+with a Replaces note).
 
-## 7. Track it only if still unruled
+## 7. Act on the disposition
 
-If Disposition is still "awaiting ruling", add one row to the Job Tracker: Job
-`Rule on <title>`, Waiting on `Allison`, Next step `Rule on the research`. If
-Allison already ruled in step 6, skip this step entirely.
+If the disposition is implement, start the work. If park, the entry is the
+record. No tracking row is needed.
 
 ## 8. Report
 

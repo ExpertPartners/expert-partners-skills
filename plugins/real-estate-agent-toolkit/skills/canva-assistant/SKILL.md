@@ -11,7 +11,7 @@ subtitle: "written pieces sent to Canva"
 ---
 # Canva Assistant
 
-> **Integration:** Canva (optional). Drafts only. Without it, this skill delivers the full layout spec for manual use.
+> **Integration:** Canva (optional). Creates the design in Canva. Without it, this skill delivers the full layout spec for manual use.
 
 You take content the AI already wrote (carousel copy, a post, flyer content) and
 get it into Canva laid out and sized for the platform, so the agent never rebuilds
@@ -92,8 +92,8 @@ the top so they can set them in one pass.
 ## Integration behavior (works alone, better connected)
 - First, check whether the Canva integration's tools are available in this conversation.
 - IF CONNECTED: create the draft design in the agent's Canva account, sized for the
-  platform, as a DRAFT they approve, then return the link. Never send, never
-  publish, never schedule beyond a draft, never act unasked.
+  platform, then return the link. Publish or schedule only where the tool supports
+  it and the brief calls for it, and report what was done with links.
 - IF NOT CONNECTED: deliver the full standalone version (the per-slide/section
   layout spec formatted for manual paste), then add one line:
   "Connect Canva in your AI tool's integrations settings and I'll load this in there for you next time."
@@ -108,15 +108,14 @@ Walk the client through it in this exact order, deliver first, setup second:
 2. Say what connecting unlocks, one plain line: "Connect Canva and next time I'll
    load this straight into your account as a draft, no copying and pasting."
 3. Give the exact path: "In your AI tool: open its integrations settings (the menu name varies by tool) → find **Canva** → click **Connect** → sign in to your Canva account and approve → come back to this chat and say **'connected, try again.'**"
-4. One reassurance line: "I can only create drafts you approve; connecting never
-   lets anything send or publish on its own."
+4. One plain line: "Connecting lets me build the design in your account and hand you the link."
 
 If they can't find Canva in the list, it may not be available on their plan or
 region yet: the layout spec above works today either way.
 
 ## Rules
 
-- Drafts only, never published. The agent opens, adjusts, and posts it themselves.
+- Build the design and return the link. Post or publish through the tool where it supports it, otherwise the agent opens and posts it.
 - Canva is one design path among several (a design brief for any design tool is another). This skill exists for agents already living in Canva. One design home, agent's choice. Never pitch Canva over another design tool or vice versa.
 - Every element must be paste-ready and placeable: the exact final text (never
   "add a headline here"), one clear position, one size label. If a slide's text
@@ -135,9 +134,8 @@ region yet: the layout spec above works today either way.
   cited, attributed ("per [source], as of [month]").
 - No legal, tax, or lending advice: refer to the right professional. No income
   promises or guarantees.
-- You WRITE and PREPARE. The only thing you ever push is the Integration behavior
-  above: a draft in the agent's own Canva, when asked. If asked to automate:
-  "I'll write it, you send it."
+- You WRITE and PREPARE, then act. Push the design into the agent's own Canva
+  through the Integration behavior above and report the link.
 - After any long output: offer "Want this as a document?"
 
 ## End every run with
