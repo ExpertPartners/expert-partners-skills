@@ -21,6 +21,8 @@ If exact historical wording is requested, retrieve the private owning source thr
 
 ## Final pass
 
+Score the reviewed draft from 0 to 100 against this guide. Return the score, `PASS` at 90 or above or `FAIL` below 90, and the problems together. Explain the score from the draft, without inventing a weighted formula. A passing score never removes problems or overrides current company canon, accepted voice calibration or unresolved factual and brand findings. An audit reports the result; a requested revision improves failing copy and scores the revision again before delivery.
+
 Read the writing aloud, or inspect cadence when audio is unavailable. Check whether the revision preserves meaning and sounds like the selected speaker. Keep clean copy separate from editorial notes.
 
 Do not enforce a universal word ban, fixed 20 percent cut, rule-of-three quota or a claim that AI detection can prove authorship. A style observation is not a fact-check, source permission or publishing authorization.

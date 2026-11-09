@@ -30,3 +30,5 @@ python3 -m unittest discover -s tools/brand-workflows/tests -v
 The validator checks heading order, inclusive 80 to 120 word voice length, maximum 1,000 word total, filename and basic inventory leaks. It does not prove factual accuracy, detect every document title or judge authentic voice. Brand Guardian compares those against the actual sources.
 
 Fresh personal extraction needs an isolated context and authentic samples, not a generated guide. Review-only requests do not rewrite or publish. File generation, saved output, installed delivery and active use must be reported separately. Company output follows the current document standard and stays in its owning brain, not this repository.
+
+Brand Guardian reports an Anti AI score from 0 to 100, PASS at 90 or above, and all problems alongside it. The editorial result is separate from brand and factual findings. Current canon and accepted calibration remain authoritative. The optional `brand-guardian/scripts/check_score.py` helper checks a score record without judging the writing or requiring JSON for ordinary audits.
