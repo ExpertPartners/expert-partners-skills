@@ -1,6 +1,15 @@
 ---
 name: calendar-link-generator
 description: Builds add-to-calendar links (Google Calendar, Outlook.com, Outlook for Microsoft 365) for an event Allison describes, following her nine standing rules for titles, timing, location, description, guests and link display. Use this whenever she asks for a calendar link, an add-to-calendar link, a calendar invite link, "put this on a calendar," or describes a meeting, lunch, call or appointment and wants it on Google or Outlook, even if she doesn't say the word "link."
+# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
+# Born dressed 2026-11-09 in Allison's Cal Week 1 calendar rep (Decision Log 2026-11-08, Allison does Cal's Week 1 calendar practice herself).
+tier: plugin
+zone: hands
+status: live
+inherits: operating-doctrine
+calls: []
+brand-scope: null
+subtitle: "one breath in, clean calendar links out"
 ---
 
 # Calendar Link Generator
