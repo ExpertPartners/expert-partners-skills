@@ -1,0 +1,53 @@
+{
+  "name": "Development",
+  "description": "Code-only developer tools, hooks, agent scaffolds and CI for Expert Partners. Repository navigation does not assert that historical runtime components are deployed or maintained.",
+  "owner": "Expert Partners, HQ technical repository",
+  "github": "ExpertPartners/Development",
+  "entry_points": {
+    "purpose": {
+      "path": "README.md",
+      "description": "Repository purpose and boundary between code and business brains."
+    },
+    "agent_instructions": {
+      "path": "AGENTS.md",
+      "description": "Current repository work boundaries and live authority pointers."
+    },
+    "claude_instructions": {
+      "path": "CLAUDE.md",
+      "description": "Generated Claude entry point importing AGENTS.md."
+    },
+    "surface_generator": {
+      "path": "generate/render.py",
+      "description": "Render technical navigation and instruction templates; --check detects output drift."
+    },
+    "surface_targets": {
+      "path": "generate/targets.yaml",
+      "description": "Declared source-template and generated-output mapping."
+    },
+    "ci_checks": {
+      "path": ".github/workflows/ci.yml",
+      "description": "Existing text lint, generated surface, deployed-copy and secret-scan checks."
+    },
+    "deletion_guard": {
+      "path": "hooks/pre-tool-use-enforcement.sh",
+      "description": "Source for the deletion guard; installation and live execution remain separately governed."
+    },
+    "guard_tests": {
+      "path": "hooks/tests/",
+      "description": "Offline regression tests for hook behavior."
+    },
+    "merge_gate": {
+      "path": "tools/auto-merge-gate/",
+      "description": "Repository review gate implementation and tests."
+    },
+    "credential_audit_tools": {
+      "path": "agents/ember/scripts/README-cred-audit.md",
+      "description": "Historical probe tooling runbook and preserved audit-report pointer; no claim of present credential currency."
+    }
+  },
+  "generated": {
+    "by": "generate/render.py",
+    "template": "generate/templates/_index.json.source",
+    "note": "Generated repository navigation. Edit the declared source template, then run python3 generate/render.py. CI checks output byte identity."
+  }
+}

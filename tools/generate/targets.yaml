@@ -1,0 +1,10 @@
+# Technical surface targets for generate/render.py.
+# The producer copies source templates verbatim and CI checks byte identity.
+# Paths are relative to the repository root. Never hand-edit generated outputs.
+targets:
+  - name: claude-md
+    template: generate/templates/CLAUDE.md.source
+    output: CLAUDE.md
+  - name: repository-index
+    template: generate/templates/_index.json.source
+    output: _index.json
