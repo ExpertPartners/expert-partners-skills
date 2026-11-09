@@ -4,7 +4,7 @@ classification: public
 
 # Factory connection
 
-One service, three users. The Factory connection is a Cloudflare Worker that wraps the Factory Public API. Claude and ChatGPT reach it as a remote MCP connector at `https://factory-connection.expert-partners.workers.dev/mcp`, signing in through Cloudflare Access with Allison's Expert Partners account only. The Expert Partners Hub reaches the same tools at `https://factory-connection.expert-partners.workers.dev/api` with a bearer token. Code lives in `connectors/factory-connection`.
+One service, three users. The Factory connection is a Cloudflare Worker that wraps the Factory Public API. Claude and ChatGPT (North) reach it as a remote MCP connector at `https://factory-connection.expert-partners.workers.dev/mcp`, signing in through Cloudflare Access with Allison's Expert Partners account only. The Expert Partners Hub reaches the same tools at `https://factory-connection.expert-partners.workers.dev/api` with a bearer token. Code lives in `connectors/factory-connection`.
 
 ## Routing every request
 
@@ -21,6 +21,16 @@ Decide what the message is before calling anything.
 | A job whose architecture is unclear | Start it with `interactionMode: "spec"` first. |
 
 Always call `find_owner` before starting anything. A match with kind `workstream-or-mission` is a Workstream orchestrator or mission that owns continuing work. Its `recentAssignments` show the latest instructions it received, newest first, so you can tell new work from repeated work.
+
+## Without the connection
+
+An AI that does not have the Factory connection uses the Factory Inbox in HQ Business Brain, described in the Control Room direct line section of `SKILL.md`.
+
+## Names and close-out
+
+Every session and Workstream is named `Section - Mission`, using an exact sidebar section name from the HQ Rulebook (Control Room, Cal Library, Weeks 0 and 1, Week 2 Marketing, AG Marketing and Teaching, or the section opened for the current Cal week). Control Room holds Factory and Hub plumbing. Helper work uses subagents or headless `droid exec`, never a new sidebar session. Every session wraps its own work and ends with the exact line `Ready to archive`. No session archives itself or another session. Allison clicks archive. Workstreams are organized around missions, not calendar weeks.
+
+The Cal implementation app lives inside the Hub with separate Expert Partners and AG Luxury workspaces, defined by Allison and North. Never build a competing weekly system in Factory.
 
 ## Workstream brief for Allison
 
@@ -54,7 +64,7 @@ Name either one as `M2` or `M4` in any tool.
 - A Workstream orchestrator can be found through the API, messaged, and its history read for duplicate checks. The Week 2-10 Document Creation orchestrator answered a status question through the API with its open assignment.
 - Session Contents Sync is on for the organization, so messages stay readable when a Mac is offline. Reads of a session whose computer no longer exists succeeded.
 - Posting to a session whose Mac is offline or asleep returns 503 "Failed to connect to session daemon" and nothing is queued. `start_and_watch` refuses an offline Mac up front.
-- `archivedAt` set through the API is stored by Factory but the session stays in the app's active sidebar. Archive from the app until Factory changes this.
+- `archivedAt` set through the API is stored by Factory but the session stays in the app's active sidebar. Allison archives sessions in the app. No AI archives a session.
 - The API has no title field. Factory names a session from its first message and may retitle it, so put `Section - Mission` on the first line.
 - Mission mode started through the API ran a one-step task directly, with no plan approval pause and no agents.
 - A brand new session can answer 404 to its first message for a second or two. The tools retry.

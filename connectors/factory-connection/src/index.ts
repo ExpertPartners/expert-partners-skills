@@ -9,7 +9,7 @@ import { isAllowedEmail } from "./allow";
 import { runTool, TOOLS } from "./tools";
 import type { Props } from "./workers-oauth-utils";
 
-const INSTRUCTIONS = `Factory connection for Expert Partners. Before starting new work, call find_owner to see whether a Workstream or session already owns it, and send new work for a Workstream to its orchestrator with post_message. Bounded jobs start with start_and_watch or create_session, named "Section - Mission" on the first line. Defaults are Auto Model and High autonomy. Use interactionMode "spec" when architecture is unclear. Ember M2 takes all browser and visible work. Allison M4 takes invisible background work only. Deliverables land in Drive (docs) or GitHub (code), never only in a Factory shared folder.`;
+const INSTRUCTIONS = `Factory connection for Expert Partners. Before starting new work, call find_owner to see whether a Workstream or session already owns it, and send new work for a Workstream to its orchestrator with post_message. Bounded jobs start with start_and_watch or create_session, named "Section - Mission" on the first line using an exact sidebar section (Control Room, Cal Library, Weeks 0 and 1, Week 2 Marketing, AG Marketing and Teaching, or the current Cal week). Every session ends with the line Ready to archive and never archives itself; Allison archives. Defaults are Auto Model and High autonomy. Use interactionMode "spec" when architecture is unclear. Ember M2 takes all browser and visible work. Allison M4 takes invisible background work only. Deliverables land in Drive (docs) or GitHub (code), never only in a Factory shared folder.`;
 
 function createServer() {
 	const server = new McpServer({ name: "Factory connection", version: "1.0.0" }, { instructions: INSTRUCTIONS });
