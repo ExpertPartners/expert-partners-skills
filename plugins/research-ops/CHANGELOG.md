@@ -1,3 +1,6 @@
+## 0.6.4 - 2026-11-09
+
+Restore Foundations source checking, save-before-next-file dependencies, testimonial inventory confirmation and company-information review, plus the same-task test comparison and new-tool baseline. Preserve Allison's knowledge-promotion role in Foundations and SOP logging. Restore the approved repository-placement lookup, reason and registration requirements. Keep the act-by-default execution rule and removed approval, certification, relay and archive-safety gates.
 ## 0.6.3 - 2026-11-09
 
 Act by default (Decision Log 2026-11-08, Act by default, caution removed). Removed approval gates, confirm-before-send, publish, schedule or delete steps, owner handoffs, readbacks and certification passes from the skills. Each skill keeps its mechanics, brand voice rules and spelling locks, and now acts and reports with links.

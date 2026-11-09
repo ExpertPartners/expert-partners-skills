@@ -1,3 +1,6 @@
+## 3.1.2 - 2026-11-09
+
+Restore Foundations source checking, save-before-next-file dependencies, testimonial inventory confirmation and company-information review, plus the same-task test comparison and new-tool baseline. Preserve Allison's knowledge-promotion role in Foundations and SOP logging. Restore the approved repository-placement lookup, reason and registration requirements. Keep the act-by-default execution rule and removed approval, certification, relay and archive-safety gates.
 ## 3.1.1 - 2026-11-09
 
 Every session now starts with Cal first. Before advising on setup or method, check Cal's evidence for what Cal would do, never make up what she says, and improve only how it's done, never her method.
