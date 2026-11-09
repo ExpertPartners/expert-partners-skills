@@ -14,6 +14,8 @@ MERGE_BASE="$(git merge-base "$BASE" HEAD 2>/dev/null || echo "$BASE")"
 
 changed="$(git diff --name-only --diff-filter=ACMR "$MERGE_BASE" -- '*.md' '*.markdown' '*.mdx' '*.txt' '*.rst'; git ls-files --others --exclude-standard -- '*.md' '*.markdown' '*.mdx' '*.txt' '*.rst')"
 changed="$(printf '%s\n' "$changed" | sort -u | grep . || true)"
+changed_python="$(git diff --name-only --diff-filter=ACMR "$MERGE_BASE" -- '*.py'; git ls-files --others --exclude-standard -- '*.py')"
+changed_python="$(printf '%s\n' "$changed_python" | sort -u | grep . || true)"
 
 echo "validate-job: base $MERGE_BASE"
 if [ -n "$changed" ]; then
@@ -27,8 +29,17 @@ else
   echo "validate-job: no changed text files"
 fi
 
+if [ -n "$changed_python" ]; then
+  echo "validate-job: changed Python files"; printf '%s\n' "$changed_python"
+  printf '%s\n' "$changed_python" | tr '\n' '\0' | xargs -0 python3 -m ruff format --check
+else
+  echo "validate-job: no changed Python files"
+fi
+
 python3 .ep/skill-description-lint.py --selftest
 python3 tools/plugin-sync/chatgpt-import-check.py
+python3 tools/readiness/check_agents_links.py
+python3 -m unittest discover -s tools/readiness/tests -p 'test_agents_links.py' -v
 
 if command -v gitleaks >/dev/null 2>&1; then
   gitleaks git . --redact --config .gitleaks.toml

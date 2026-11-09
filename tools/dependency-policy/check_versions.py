@@ -35,14 +35,9 @@ SKIP_DIRS = {".git", "node_modules", ".venv", "venv", "__pycache__"}
 JS_PRODUCERS_DIR = "tools"
 WORKFLOWS_DIR = ".github/workflows"
 
-# Workflows outside the change that brought them under this policy, mapped to the one
-# finding still waived there and the follow-up that removes it. Only a finding containing
-# that text prints as a warning; any other finding in the workflow fails. The entry fails
-# once the waived finding is gone, so the exception cannot outlive the gap it records.
-PENDING_WORKFLOWS: dict[str, tuple[str, str]] = {
-    "skills-graph.yml": ("installs 'pyyaml' by name",
-                         "installs PyYAML by name; move it to -r requirements-tooling.txt"),
-}
+# No repository workflow currently has a waived package-install finding. Keep the
+# parameterized waiver behavior below for isolated policy tests, not as a live exception.
+PENDING_WORKFLOWS: dict[str, tuple[str, str]] = {}
 
 DEP_SECTIONS = ("dependencies", "devDependencies", "optionalDependencies", "peerDependencies")
 HASH_RE = re.compile(r"--hash=sha256:[0-9a-f]{64}")
@@ -151,12 +146,21 @@ def parse_lock(root: Path, path: Path, report: Report) -> tuple[list[Pin], list[
                 includes.append(target)
             continue
         if line.startswith("-"):
-            report.error(at, f"option {line.split()[0]} is not allowed in a lock; only -r includes are")
+            report.error(
+                at, f"option {line.split()[0]} is not allowed in a lock; only -r includes are"
+            )
             continue
         match = PIN_RE.match(line)
         if match:
-            pins.append(Pin(normalize(match.group("name")), match.group("version"),
-                            (match.group("marker") or "").strip(), where, number))
+            pins.append(
+                Pin(
+                    normalize(match.group("name")),
+                    match.group("version"),
+                    (match.group("marker") or "").strip(),
+                    where,
+                    number,
+                )
+            )
             continue
         requirement = line.split(" --hash", 1)[0].strip()
         if "://" in requirement or requirement.startswith((".", "/")):
@@ -195,16 +199,22 @@ def check_python(root: Path, report: Report) -> list[str]:
             key = (pin.name, pin.marker)
             first = by_name.setdefault(key, pin)
             if first is not pin and (first.path, first.line) != (pin.path, pin.line):
-                report.error(rel(root, path), f"{pin.name} is pinned twice in one install "
-                             f"({first.path}:{first.line} and {pin.path}:{pin.line})")
+                report.error(
+                    rel(root, path),
+                    f"{pin.name} is pinned twice in one install "
+                    f"({first.path}:{first.line} and {pin.path}:{pin.line})",
+                )
 
     versions: dict[str, Pin] = {}
     for pins, _ in parsed.values():
         for pin in pins:
             first = versions.setdefault(pin.name, pin)
             if first.version != pin.version:
-                report.error(f"{pin.path}:{pin.line}", f"{pin.name}=={pin.version} drifts from "
-                             f"{pin.name}=={first.version} in {first.path}:{first.line}")
+                report.error(
+                    f"{pin.path}:{pin.line}",
+                    f"{pin.name}=={pin.version} drifts from "
+                    f"{pin.name}=={first.version} in {first.path}:{first.line}",
+                )
     return [rel(root, p) for p in files]
 
 
@@ -234,12 +244,16 @@ def check_javascript(root: Path, report: Report) -> list[str]:
         lock = json.loads(lock_path.read_text(encoding="utf-8"))
         lock_where = rel(root, lock_path)
         if lock.get("lockfileVersion") not in (2, 3):
-            report.error(lock_where, f"lockfileVersion {lock.get('lockfileVersion')!r}; expected 2 or 3")
+            report.error(
+                lock_where, f"lockfileVersion {lock.get('lockfileVersion')!r}; expected 2 or 3"
+            )
             continue
         lock_root = (lock.get("packages") or {}).get("") or {}
         for section in DEP_SECTIONS:
             if (manifest.get(section) or {}) != (lock_root.get(section) or {}):
-                report.error(lock_where, f"{section} differ from package.json; the lock is out of sync")
+                report.error(
+                    lock_where, f"{section} differ from package.json; the lock is out of sync"
+                )
         for key, entry in sorted((lock.get("packages") or {}).items()):
             if not key or entry.get("link"):
                 continue
@@ -253,21 +267,29 @@ def check_javascript(root: Path, report: Report) -> list[str]:
 
     names = sorted(producers)
     for i, left in enumerate(names):
-        for right in names[i + 1:]:
+        for right in names[i + 1 :]:
             left_deps, right_deps = declared(producers[left][0]), declared(producers[right][0])
             for dep in sorted(set(left_deps) & set(right_deps)):
                 if left_deps[dep] != right_deps[dep]:
-                    report.error(f"{right}/package.json", f"declares {dep} {right_deps[dep]!r} but "
-                                 f"{left}/package.json declares {left_deps[dep]!r}")
+                    report.error(
+                        f"{right}/package.json",
+                        f"declares {dep} {right_deps[dep]!r} but "
+                        f"{left}/package.json declares {left_deps[dep]!r}",
+                    )
             left_lock, right_lock = producers[left][1], producers[right][1]
             for key in sorted(set(left_lock) & set(right_lock) - {""}):
                 a, b = left_lock[key], right_lock[key]
                 if a.get("version") != b.get("version"):
-                    report.error(f"{right}/package-lock.json", f"{key} resolves to {b.get('version')} but "
-                                 f"{left}/package-lock.json resolves it to {a.get('version')}")
+                    report.error(
+                        f"{right}/package-lock.json",
+                        f"{key} resolves to {b.get('version')} but "
+                        f"{left}/package-lock.json resolves it to {a.get('version')}",
+                    )
                 elif a.get("integrity") != b.get("integrity"):
-                    report.error(f"{right}/package-lock.json", f"{key}@{b.get('version')} integrity "
-                                 f"differs from {left}/package-lock.json")
+                    report.error(
+                        f"{right}/package-lock.json",
+                        f"{key}@{b.get('version')} integrity differs from {left}/package-lock.json",
+                    )
     return names
 
 
@@ -300,8 +322,8 @@ def shell_commands(line: str) -> list[list[str]]:
 def pip_install_args(tokens: list[str]) -> list[str] | None:
     """Arguments after `install` when tokens run pip install, global options allowed between."""
     for i, token in enumerate(tokens):
-        if PIP_RE.fullmatch(token) and "install" in tokens[i + 1:]:
-            return tokens[tokens.index("install", i + 1) + 1:]
+        if PIP_RE.fullmatch(token) and "install" in tokens[i + 1 :]:
+            return tokens[tokens.index("install", i + 1) + 1 :]
     return None
 
 
@@ -344,7 +366,9 @@ def check_pip_args(root: Path, args: list[str]) -> list[str]:
 
 def check_workflows(root: Path, report: Report, pending: dict[str, tuple[str, str]]) -> list[str]:
     base = root / WORKFLOWS_DIR
-    paths = sorted(p for p in base.glob("*") if p.suffix in (".yml", ".yaml")) if base.is_dir() else []
+    paths = (
+        sorted(p for p in base.glob("*") if p.suffix in (".yml", ".yaml")) if base.is_dir() else []
+    )
     for path in paths:
         where = rel(root, path)
         findings: list[Finding] = []
@@ -352,14 +376,21 @@ def check_workflows(root: Path, report: Report, pending: dict[str, tuple[str, st
             if PIP_INSTALL_RE.search(line):
                 findings += [Finding(f"{where}:{number}", p) for p in check_pip_command(root, line)]
             if NPM_INSTALL_RE.search(line):
-                findings.append(Finding(f"{where}:{number}", "runs npm install; use npm ci so the lock is honored"))
+                findings.append(
+                    Finding(
+                        f"{where}:{number}", "runs npm install; use npm ci so the lock is honored"
+                    )
+                )
         waived_text = pending[path.name][0] if path.name in pending else None
         waived = [f for f in findings if waived_text and waived_text in f.message]
         report.warnings += waived
         report.errors += [f for f in findings if f not in waived]
         if waived_text and not waived:
-            report.error(where, "is listed in PENDING_WORKFLOWS but no longer has its waived finding; "
-                         "remove the entry")
+            report.error(
+                where,
+                "is listed in PENDING_WORKFLOWS but no longer has its waived finding; "
+                "remove the entry",
+            )
     return [rel(root, p) for p in paths]
 
 

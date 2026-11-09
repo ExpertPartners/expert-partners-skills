@@ -1,9 +1,19 @@
-# Type-check and unused-code configuration only; nothing here is a package build.
+# Type-check, unused-code and formatting configuration only; nothing here is a package build.
 # Strict check:   python -m mypy   (install: pip install --require-hashes -r requirements-tooling.txt
 #                 -r plugins/research-ops/skills/video-discovery/requirements-verification.txt)
+# Format:         python -m ruff format [paths]
 # JavaScript:     tools/skill-map/node_modules/.bin/tsc -p jsconfig.json   (after npm ci in both producers)
 # .github/workflows/tooling-typecheck.yml runs both; tools/readiness/tests/test_typecheck_config.py
 # proves the scope and that a planted error fails.
+
+[tool.ruff]
+required-version = "==0.14.4"
+target-version = "py312"
+line-length = 100
+force-exclude = true
+
+[tool.ruff.format]
+quote-style = "preserve"
 
 [tool.mypy]
 python_version = "3.12"

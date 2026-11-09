@@ -103,7 +103,7 @@ jobs:
         working-directory: eps
         run: |
           set -euo pipefail
-          python3 -m pip install --quiet pyyaml
+          python3 -m pip install --quiet --require-hashes -r requirements-tooling.txt
           (cd tools/skill-map && npm test)
           bash tools/skill-deploy/test/test-deploy-skill.sh
           python3 -m unittest discover -s tools/skills-graph-ci/tests -p 'test_*.py' -v

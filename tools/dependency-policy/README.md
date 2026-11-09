@@ -41,7 +41,7 @@ Current layers:
 
 | Lock | Adds |
 |---|---|
-| `requirements-tooling.txt` | CI lint and repository tooling (PyYAML) |
+| `requirements-tooling.txt` | CI lint, the Ruff formatter, type checking, unused-code detection and coverage tooling; also pins PyYAML for the skills-graph workflow |
 | `plugins/research-ops/skills/video-discovery/requirements.txt` | video-discovery runtime |
 | `.../video-discovery/requirements-verification.txt` | av and Pillow, on the runtime |
 | `.../video-discovery/requirements-dev.txt` | pytest, on verification |
