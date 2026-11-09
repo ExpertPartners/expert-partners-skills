@@ -1,8 +1,8 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-11-09T02:10:03Z",
-  "verifiedAt": "2026-11-09T02:10:03Z",
+  "generatedAt": "2026-11-09T02:12:02Z",
+  "verifiedAt": "2026-11-09T02:12:02Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
@@ -26,7 +26,7 @@
         "Choose a skill in this collection, then use it in any AI assistant that can load skills or read a text file."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.1.0.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.1.1.",
       "containsSkillIds": [
         "agent-brain-builder",
         "brand-direction-builder",
@@ -73,7 +73,7 @@
       "accessNote": "Designed, not yet deployed. Availability depends on what your AI assistant can load.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/real-estate-agent-toolkit",
-        "packageVersion": "0.1.0",
+        "packageVersion": "0.1.1",
         "marketplace": "expert-partners",
         "presentedAs": "collection",
         "skillCount": "40"
@@ -127,11 +127,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the brand-voice plugin, version 0.7.0, in the expert-partners plugin marketplace.",
+        "Packaged as the brand-voice plugin, version 0.7.1, in the expert-partners plugin marketplace.",
         "Contains 10 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.7.0.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.7.1.",
       "containsSkillIds": [
         "ag-luxury-brand",
         "ag-personal-brand",
@@ -148,7 +148,7 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/brand-voice",
-        "packageVersion": "0.7.0",
+        "packageVersion": "0.7.1",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
         "skillCount": "10"
@@ -190,11 +190,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the content-engines plugin, version 0.9.2, in the expert-partners plugin marketplace.",
+        "Packaged as the content-engines plugin, version 0.9.3, in the expert-partners plugin marketplace.",
         "Contains 16 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.9.2.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.9.3.",
       "containsSkillIds": [
         "brand-film-reverse-engineering",
         "content-coach",
@@ -217,7 +217,7 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/content-engines",
-        "packageVersion": "0.9.2",
+        "packageVersion": "0.9.3",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
         "skillCount": "16"
@@ -283,11 +283,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the fractional-cfo plugin, version 0.1.0, in the expert-partners plugin marketplace.",
+        "Packaged as the fractional-cfo plugin, version 0.1.1, in the expert-partners plugin marketplace.",
         "Contains 5 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.1.0.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.1.1.",
       "containsSkillIds": [
         "canonical-categories",
         "entity-separation",
@@ -299,7 +299,7 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/fractional-cfo",
-        "packageVersion": "0.1.0",
+        "packageVersion": "0.1.1",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
         "skillCount": "5"
@@ -350,11 +350,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the funnel-operations plugin, version 0.3.0, in the expert-partners plugin marketplace.",
+        "Packaged as the funnel-operations plugin, version 0.3.1, in the expert-partners plugin marketplace.",
         "Contains 6 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.3.0.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.3.1.",
       "containsSkillIds": [
         "funnel-build",
         "funnel-documentation",
@@ -367,7 +367,7 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/funnel-operations",
-        "packageVersion": "0.3.0",
+        "packageVersion": "0.3.1",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
         "skillCount": "6"
@@ -506,11 +506,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the research-ops plugin, version 0.6.2, in the expert-partners plugin marketplace.",
+        "Packaged as the research-ops plugin, version 0.6.3, in the expert-partners plugin marketplace.",
         "Contains 11 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.6.2.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.6.3.",
       "containsSkillIds": [
         "capability-currency",
         "capability-refresh",
@@ -528,7 +528,7 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/research-ops",
-        "packageVersion": "0.6.2",
+        "packageVersion": "0.6.3",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
         "skillCount": "11"
@@ -578,11 +578,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the systems-map plugin, version 0.6.8, in the expert-partners plugin marketplace.",
+        "Packaged as the systems-map plugin, version 0.6.9, in the expert-partners plugin marketplace.",
         "Contains 1 skill. It activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.6.8.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.6.9.",
       "containsSkillIds": [
         "expert-partners-systems-map"
       ],
@@ -590,7 +590,7 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/systems-map",
-        "packageVersion": "0.6.8",
+        "packageVersion": "0.6.9",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
         "skillCount": "1"
@@ -686,7 +686,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.7.0.",
+        "Packaged in the Brand Voice plugin, version 0.7.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -701,7 +701,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.7.0 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.7.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "ag-luxury"
       },
@@ -761,7 +761,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.7.0.",
+        "Packaged in the Brand Voice plugin, version 0.7.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -776,7 +776,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.7.0 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.7.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "ag-personal-brand"
       },
@@ -852,7 +852,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -926,7 +926,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "brain",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -1235,7 +1235,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "about",
@@ -1289,7 +1289,7 @@
       "id": "brand-film-reverse-engineering",
       "humanName": "Brand Film Reverse-Engineering",
       "kind": "skill",
-      "summary": "Reverse-engineer a reference personal-brand or luxury real-estate film (About Me video, website hero video) and produce a complete adaptation package for a client, covering shot-by-shot analysis, storyboard contact sheet, transcript/cadence/narrative analyses, story substitution framework, Google Drive asset audit, gap inventories, and three production pathways, stopping at an approval gate before any script or video generation.",
+      "summary": "Reverse-engineer a reference personal-brand or luxury real-estate film (About Me video, website hero video) and produce a complete adaptation package for a client, covering shot-by-shot analysis, storyboard contact sheet, transcript/cadence/narrative analyses, story substitution framework, Google Drive asset audit, gap inventories, and three production pathways, ending at the creative summary and README, with script and video generation following once the client's story and assets are in.",
       "status": "Unknown",
       "maintainer": "ExpertPartners",
       "collectionIds": [],
@@ -1299,7 +1299,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.2.",
+        "Packaged in the Content Engines plugin, version 0.9.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1314,7 +1314,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.2 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -1382,7 +1382,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.7.0.",
+        "Packaged in the Brand Voice plugin, version 0.7.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1397,7 +1397,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.7.0 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.7.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -1438,7 +1438,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.7.0.",
+        "Packaged in the Brand Voice plugin, version 0.7.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1459,7 +1459,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.7.0 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.7.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "ep-brand, fam-epic-brand, ag-personal-brand, ag-luxury-brand, don-hobbs-brand, the-strong-ones-brand"
       },
@@ -1700,7 +1700,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "activities",
@@ -1822,7 +1822,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Fractional Cfo plugin, version 0.1.0.",
+        "Packaged in the Fractional Cfo plugin, version 0.1.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1838,7 +1838,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "finance",
-        "packaging": "fractional-cfo plugin v0.1.0 (expert-partners marketplace)",
+        "packaging": "fractional-cfo plugin v0.1.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "entity-separation"
       },
@@ -1903,7 +1903,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -1954,7 +1954,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.2.",
+        "Packaged in the Research Ops plugin, version 0.6.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1969,7 +1969,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.6.2 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -2015,7 +2015,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.2.",
+        "Packaged in the Research Ops plugin, version 0.6.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2030,7 +2030,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.6.2 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -2101,7 +2101,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -2171,7 +2171,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -2245,7 +2245,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "active",
@@ -2321,7 +2321,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -2449,7 +2449,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "brain",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -2576,7 +2576,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.2.",
+        "Packaged in the Content Engines plugin, version 0.9.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2591,7 +2591,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.2 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -2643,7 +2643,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -2755,7 +2755,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.7.0.",
+        "Packaged in the Brand Voice plugin, version 0.7.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2770,7 +2770,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.7.0 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.7.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -2832,7 +2832,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -2944,7 +2944,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.2.",
+        "Packaged in the Content Engines plugin, version 0.9.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2959,7 +2959,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.2 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -3060,7 +3060,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.7.0.",
+        "Packaged in the Brand Voice plugin, version 0.7.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3075,7 +3075,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.7.0 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.7.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "don-hobbs"
       },
@@ -3180,7 +3180,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Fractional Cfo plugin, version 0.1.0.",
+        "Packaged in the Fractional Cfo plugin, version 0.1.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3195,7 +3195,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "finance",
-        "packaging": "fractional-cfo plugin v0.1.0 (expert-partners marketplace)",
+        "packaging": "fractional-cfo plugin v0.1.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -3237,7 +3237,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.7.0.",
+        "Packaged in the Brand Voice plugin, version 0.7.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3252,7 +3252,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.7.0 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.7.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "expert-partners"
       },
@@ -3368,7 +3368,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Systems Map plugin, version 0.6.8.",
+        "Packaged in the Systems Map plugin, version 0.6.9.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3383,7 +3383,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brain",
-        "packaging": "systems-map plugin v0.6.8 (expert-partners marketplace)",
+        "packaging": "systems-map plugin v0.6.9 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -3505,7 +3505,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.7.0.",
+        "Packaged in the Brand Voice plugin, version 0.7.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3520,7 +3520,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.7.0 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.7.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "fam, epic"
       },
@@ -3643,7 +3643,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Funnel Operations plugin, version 0.3.0.",
+        "Packaged in the Funnel Operations plugin, version 0.3.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3659,7 +3659,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "funnel-operations plugin v0.3.0 (expert-partners marketplace)",
+        "packaging": "funnel-operations plugin v0.3.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "funnel-documentation"
       },
@@ -3717,7 +3717,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Funnel Operations plugin, version 0.3.0.",
+        "Packaged in the Funnel Operations plugin, version 0.3.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3732,7 +3732,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "funnel-operations plugin v0.3.0 (expert-partners marketplace)",
+        "packaging": "funnel-operations plugin v0.3.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -3758,7 +3758,7 @@
         "one complete Notion record per funnel"
       ],
       "useCases": [
-        "Use it whenever someone wants to document a funnel, log a funnel, write a funnel record, capture a funnel in Notion, certify a funnel, reconcile a funnel against the object model, or record a funnel's emails, SMS, and snippets."
+        "Use it whenever someone wants to document a funnel, log a funnel, write a funnel record, capture a funnel in Notion, verify a funnel, reconcile a funnel against the object model, or record a funnel's emails, SMS, and snippets."
       ],
       "askExamples": [],
       "example": false
@@ -3767,7 +3767,7 @@
       "id": "funnel-migration",
       "humanName": "Funnel Migration",
       "kind": "skill",
-      "summary": "Move a funnel out of the old PartnerSync location and into EPIC or Expert Partners, verify every object-model element transferred, certify the cutover with a live behavioral test, then document it.",
+      "summary": "Move a funnel out of the old PartnerSync location and into EPIC or Expert Partners, verify every object-model element transferred, verify the cutover with a live behavioral test, then document it.",
       "status": "Unknown",
       "maintainer": "Allison Gaddy",
       "collectionIds": [],
@@ -3777,7 +3777,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Funnel Operations plugin, version 0.3.0.",
+        "Packaged in the Funnel Operations plugin, version 0.3.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3793,13 +3793,12 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "funnel-operations plugin v0.3.0 (expert-partners marketplace)",
+        "packaging": "funnel-operations plugin v0.3.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "funnel-documentation"
       },
       "keywords": [
         "behavioral",
-        "certify",
         "clean",
         "cutover",
         "document",
@@ -3867,7 +3866,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -3918,7 +3917,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.2.",
+        "Packaged in the Content Engines plugin, version 0.9.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3936,7 +3935,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.2 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "ep-brand, fam-epic-brand, ag-personal-brand"
       },
@@ -3978,7 +3977,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Funnel Operations plugin, version 0.3.0.",
+        "Packaged in the Funnel Operations plugin, version 0.3.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3993,7 +3992,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "funnel-operations plugin v0.3.0 (expert-partners marketplace)",
+        "packaging": "funnel-operations plugin v0.3.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -4038,7 +4037,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Funnel Operations plugin, version 0.3.0.",
+        "Packaged in the Funnel Operations plugin, version 0.3.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4054,7 +4053,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "funnel-operations plugin v0.3.0 (expert-partners marketplace)",
+        "packaging": "funnel-operations plugin v0.3.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "ghl-asset-inventory"
       },
@@ -4091,7 +4090,7 @@
       "id": "ghl-tag-audit-and-cleanup",
       "humanName": "GHL Tag Audit and Safe Cleanup",
       "kind": "skill",
-      "summary": "Audit Allison's GoHighLevel tags and, only after she approves, run a safe tag cleanup using the dry-run-approve-rollback-execute pattern.",
+      "summary": "Audit Allison's GoHighLevel tags and run a safe tag cleanup using the dry-run, rollback-file, batched-execute pattern.",
       "status": "Unknown",
       "maintainer": "Allison Gaddy",
       "collectionIds": [],
@@ -4101,7 +4100,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Funnel Operations plugin, version 0.3.0.",
+        "Packaged in the Funnel Operations plugin, version 0.3.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4116,30 +4115,27 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "funnel-operations plugin v0.3.0 (expert-partners marketplace)",
+        "packaging": "funnel-operations plugin v0.3.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
-        "after",
         "allison",
-        "approve",
-        "approves",
         "audit",
+        "batched",
         "cleanup",
         "dry",
         "execute",
+        "file",
         "first",
         "funnel",
         "ghl",
         "gohighlevel",
         "hands",
-        "only",
         "operations",
         "pattern",
         "rollback",
         "run",
         "safe",
-        "she",
         "tag",
         "tags",
         "then",
@@ -4187,7 +4183,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "addressed",
@@ -4257,7 +4253,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -4313,7 +4309,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.2.",
+        "Packaged in the Research Ops plugin, version 0.6.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4328,7 +4324,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "cataloging",
-        "packaging": "research-ops plugin v0.6.2 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -4375,7 +4371,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.2.",
+        "Packaged in the Content Engines plugin, version 0.9.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4390,11 +4386,10 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.2 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
-        "approval",
         "brand",
         "content",
         "end",
@@ -4402,21 +4397,23 @@
         "especially",
         "estate",
         "films",
-        "gate",
         "hero",
         "luxury",
+        "map",
         "marketing",
         "pre",
         "preproduction",
         "production",
         "real",
+        "shot",
+        "through",
         "video",
         "videos",
         "website",
         "workflow"
       ],
       "bestFor": [
-        "hero video pre-production up to the approval gate"
+        "hero video pre-production through the shot map"
       ],
       "useCases": [
         "Use when a client provides a reference video to emulate and asks for shot-by-shot analysis, storyboard/contact sheets, an audit of their existing footage and photos, market/brand adaptation, tiered production plans (existing-only vs AI-hybrid vs premium pickup shoot), pickup-shoot call sheets, or web hero delivery specs."
@@ -4438,7 +4435,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.2.",
+        "Packaged in the Content Engines plugin, version 0.9.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4453,7 +4450,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.2 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -4522,7 +4519,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -4590,7 +4587,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -4895,7 +4892,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -4966,7 +4963,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -5041,7 +5038,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -5114,7 +5111,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "ads",
@@ -5190,7 +5187,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -5257,7 +5254,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -5331,7 +5328,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "brain",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -5403,7 +5400,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -5449,7 +5446,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.2.",
+        "Packaged in the Content Engines plugin, version 0.9.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -5465,7 +5462,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.2 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "xavier-offer-builder"
       },
@@ -5514,7 +5511,7 @@
       "id": "metricool-post-scheduler",
       "humanName": "Metricool Post Scheduler",
       "kind": "skill",
-      "summary": "Takes one finished piece of content, formats it per platform, and schedules it as a draft in the agent's Metricool queue.",
+      "summary": "Takes one finished piece of content, formats it per platform, and schedules it in the agent's Metricool queue.",
       "status": "Designed",
       "maintainer": "ExpertPartners",
       "collectionIds": [
@@ -5543,14 +5540,12 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
         "app",
         "content",
-        "draft",
-        "drafts",
         "estate",
         "finished",
         "formats",
@@ -5570,7 +5565,7 @@
         "toolkit"
       ],
       "bestFor": [
-        "posts queued as Metricool drafts"
+        "posts queued in Metricool"
       ],
       "useCases": [
         "Use when the agent says schedule this post, send this to Metricool, queue this up, or schedule this for tomorrow."
@@ -5592,7 +5587,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Fractional Cfo plugin, version 0.1.0.",
+        "Packaged in the Fractional Cfo plugin, version 0.1.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -5609,7 +5604,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "finance",
-        "packaging": "fractional-cfo plugin v0.1.0 (expert-partners marketplace)",
+        "packaging": "fractional-cfo plugin v0.1.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "canonical-categories, entity-separation"
       },
@@ -5737,7 +5732,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "actually",
@@ -5805,7 +5800,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -5879,7 +5874,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "across",
@@ -5954,7 +5949,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "actually",
@@ -6030,7 +6025,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -6179,7 +6174,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.2.",
+        "Packaged in the Content Engines plugin, version 0.9.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6194,7 +6189,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.2 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6232,7 +6227,7 @@
       "id": "post-scheduler",
       "humanName": "Post Scheduler",
       "kind": "skill",
-      "summary": "Publish, schedule, list, reschedule, or delete social posts through Blotato, with a pre-publish quality gate and a hard approval rule.",
+      "summary": "Publish, schedule, list, reschedule, or delete social posts through Blotato, with a pre-publish quality check.",
       "status": "Unknown",
       "maintainer": "ExpertPartners",
       "collectionIds": [],
@@ -6242,7 +6237,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.2.",
+        "Packaged in the Content Engines plugin, version 0.9.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6257,17 +6252,15 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.2 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
-        "approval",
         "blotato",
+        "check",
         "content",
         "delete",
         "engines",
-        "gate",
-        "hard",
         "list",
         "marketing",
         "post",
@@ -6276,7 +6269,6 @@
         "publish",
         "quality",
         "reschedule",
-        "rule",
         "schedule",
         "scheduler",
         "social",
@@ -6305,7 +6297,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.2.",
+        "Packaged in the Content Engines plugin, version 0.9.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6320,7 +6312,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.2 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6380,7 +6372,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -6487,7 +6479,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.2.",
+        "Packaged in the Content Engines plugin, version 0.9.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6502,7 +6494,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.2 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6568,7 +6560,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -6649,7 +6641,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -6875,7 +6867,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.2.",
+        "Packaged in the Research Ops plugin, version 0.6.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6890,7 +6882,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "cataloging",
-        "packaging": "research-ops plugin v0.6.2 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6963,7 +6955,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -7018,7 +7010,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Fractional Cfo plugin, version 0.1.0.",
+        "Packaged in the Fractional Cfo plugin, version 0.1.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7035,7 +7027,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "finance",
-        "packaging": "fractional-cfo plugin v0.1.0 (expert-partners marketplace)",
+        "packaging": "fractional-cfo plugin v0.1.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "canonical-categories, entity-separation"
       },
@@ -7355,7 +7347,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.2.",
+        "Packaged in the Research Ops plugin, version 0.6.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7370,7 +7362,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "cataloging",
-        "packaging": "research-ops plugin v0.6.2 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7408,7 +7400,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.2.",
+        "Packaged in the Content Engines plugin, version 0.9.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7423,7 +7415,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.2 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7474,7 +7466,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.2.",
+        "Packaged in the Research Ops plugin, version 0.6.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7489,7 +7481,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "cataloging",
-        "packaging": "research-ops plugin v0.6.2 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7531,7 +7523,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.2.",
+        "Packaged in the Research Ops plugin, version 0.6.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7547,7 +7539,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.6.2 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "video-discovery"
       },
@@ -7593,7 +7585,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.2.",
+        "Packaged in the Content Engines plugin, version 0.9.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7609,7 +7601,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.2 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "brand-voice"
       },
@@ -7676,7 +7668,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.2.",
+        "Packaged in the Content Engines plugin, version 0.9.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7691,7 +7683,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.2 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7803,7 +7795,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.7.0.",
+        "Packaged in the Brand Voice plugin, version 0.7.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7818,7 +7810,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.7.0 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.7.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "the-strong-ones"
       },
@@ -7884,7 +7876,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "actually",
@@ -7940,7 +7932,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.2.",
+        "Packaged in the Research Ops plugin, version 0.6.3.",
         "Do not use for new work."
       ],
       "sourceLinks": [],
@@ -7955,7 +7947,7 @@
         "lifecycle": "retired",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.6.2 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7992,7 +7984,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.2.",
+        "Packaged in the Research Ops plugin, version 0.6.3.",
         "Do not use for new work."
       ],
       "sourceLinks": [],
@@ -8007,7 +7999,7 @@
         "lifecycle": "retired",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.6.2 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -8043,7 +8035,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.2.",
+        "Packaged in the Research Ops plugin, version 0.6.3.",
         "Do not use for new work."
       ],
       "sourceLinks": [],
@@ -8058,7 +8050,7 @@
         "lifecycle": "retired",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.6.2 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -8096,7 +8088,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Research Ops plugin, version 0.6.2.",
+        "Packaged in the Research Ops plugin, version 0.6.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -8111,7 +8103,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "research-ops plugin v0.6.2 (expert-partners marketplace)",
+        "packaging": "research-ops plugin v0.6.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -8177,7 +8169,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -8225,7 +8217,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.2.",
+        "Packaged in the Content Engines plugin, version 0.9.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -8240,7 +8232,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.2 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -8287,7 +8279,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Brand Voice plugin, version 0.7.0.",
+        "Packaged in the Brand Voice plugin, version 0.7.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -8302,7 +8294,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "brand-voice plugin v0.7.0 (expert-partners marketplace)",
+        "packaging": "brand-voice plugin v0.7.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -8344,7 +8336,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Fractional Cfo plugin, version 0.1.0.",
+        "Packaged in the Fractional Cfo plugin, version 0.1.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -8361,7 +8353,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "finance",
-        "packaging": "fractional-cfo plugin v0.1.0 (expert-partners marketplace)",
+        "packaging": "fractional-cfo plugin v0.1.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "canonical-categories, entity-separation"
       },
@@ -8473,7 +8465,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Content Engines plugin, version 0.9.2.",
+        "Packaged in the Content Engines plugin, version 0.9.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -8488,7 +8480,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "content-engines plugin v0.9.2 (expert-partners marketplace)",
+        "packaging": "content-engines plugin v0.9.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -8548,7 +8540,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -8614,7 +8606,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -8685,7 +8677,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.0 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.1.1 (expert-partners marketplace)"
       },
       "keywords": [
         "actually",

@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "5476d9253e5d8ccf7e99ddccd6818421dba30628"
+    "eps": "9eb99f28a782c992e33d11a900d64fc0f0bf5e37"
   },
   "zones": [
     "surfaces",
@@ -1701,18 +1701,18 @@
       "calls": [],
       "defersTo": [],
       "brandScope": [],
-      "subtitle": "hero video pre-production up to the approval gate",
+      "subtitle": "hero video pre-production through the shot map",
       "renderNote": null,
       "layout": {
-        "x": 309,
+        "x": 313,
         "y": 4010.7,
-        "width": 230,
+        "width": 222,
         "height": 77,
         "rectHeight": 62,
         "annotationHeight": 15,
         "subtitleLines": [
-          "hero video pre-production up to",
-          "the approval gate"
+          "hero video pre-production",
+          "through the shot map"
         ]
       }
     },
@@ -2152,17 +2152,17 @@
       "calls": [],
       "defersTo": [],
       "brandScope": [],
-      "subtitle": "posts queued as Metricool drafts",
+      "subtitle": "posts queued in Metricool",
       "renderNote": null,
       "layout": {
-        "x": 1024,
+        "x": 1031,
         "y": 811,
-        "width": 236,
+        "width": 222,
         "height": 63,
         "rectHeight": 48,
         "annotationHeight": 15,
         "subtitleLines": [
-          "posts queued as Metricool drafts"
+          "posts queued in Metricool"
         ]
       }
     },
