@@ -1,3 +1,6 @@
+## 3.2.0 - 2026-11-09
+
+Add Share the Love for proactive, source-backed agent teaching captures in the existing Share List. Connect Teach Me's finished-step moment and session wrap to its deduplicated append and daily recap path, with live playbook and voice lookup and no new list or background watcher.
 ## 3.1.2 - 2026-11-09
 
 Restore Foundations source checking, save-before-next-file dependencies, testimonial inventory confirmation and company-information review, plus the same-task test comparison and new-tool baseline. Preserve Allison's knowledge-promotion role in Foundations and SOP logging. Restore the approved repository-placement lookup, reason and registration requirements. Keep the act-by-default execution rule and removed approval, certification, relay and archive-safety gates.
