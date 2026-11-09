@@ -1,6 +1,6 @@
 # AGENTS.md -- expert-partners-skills
 
-This repository holds the skills marketplace and its tooling. skills holds standalone skills. plugins holds plugin manifests and the skills they carry. tools holds the skill graph producer and the deploy producer. operating-doctrine holds the pointer to the canonical doctrine skill.
+This repository holds the skills marketplace and its tooling. skills holds standalone skills. plugins holds plugin manifests and the skills they carry. tools holds the skill graph producer, the deploy producer, the merge gate, the guard hooks (tools/hooks) and the generated-surface renderer (tools/generate). operating-doctrine holds the pointer to the canonical doctrine skill.
 
 Business knowledge, rules, and decisions do not live here. They live in the business brains in Google Drive, starting with the HQ Rulebook and the Decision Log in HQ Business Brain, Company Core. Read those before acting on anything that could depend on a prior decision, an owner, a brand, or an operating rule. If a brain cannot be reached, say so and separate verified fact from unverified reasoning. Do not add knowledge files here.
 

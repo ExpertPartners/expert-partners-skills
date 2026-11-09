@@ -1,0 +1,510 @@
+{
+  "active_keys": [
+    "6583fba12287d067",
+    "9833c18b2d85bc59"
+  ],
+  "approval_sha256": "f030041209c7246208824eb7b254e28790304687497856b6f5e6688775b9f736",
+  "archive_root": "/Users/allisongaddy/Desktop/FounderCommandCenter Recovery - 2026-09-22",
+  "archives": [
+    {
+      "bytes": 62314288,
+      "inode": 84412812,
+      "mtime_ns": 1790125221154855864,
+      "name": "_supabase-pre-damage-171238.dump.enc"
+    },
+    {
+      "bytes": 3747040,
+      "inode": 84387069,
+      "mtime_ns": 1790122612389373084,
+      "name": "_supabase-readable.dump.enc"
+    },
+    {
+      "bytes": 5776,
+      "inode": 84387210,
+      "mtime_ns": 1790122617202737539,
+      "name": "globals-no-passwords.sql.enc"
+    },
+    {
+      "bytes": 81211872,
+      "inode": 84473658,
+      "mtime_ns": 1790128922548716545,
+      "name": "post-repair-_supabase.dump.enc"
+    },
+    {
+      "bytes": 5776,
+      "inode": 84473742,
+      "mtime_ns": 1790128928238458395,
+      "name": "post-repair-globals.sql.enc"
+    },
+    {
+      "bytes": 437040,
+      "inode": 84473517,
+      "mtime_ns": 1790128912498047828,
+      "name": "post-repair-postgres.dump.enc"
+    },
+    {
+      "bytes": 3040,
+      "inode": 84473596,
+      "mtime_ns": 1790128915649224281,
+      "name": "post-repair-storage_vectors.dump.enc"
+    },
+    {
+      "bytes": 1632,
+      "inode": 84473723,
+      "mtime_ns": 1790128925845169305,
+      "name": "post-repair-template1.dump.enc"
+    },
+    {
+      "bytes": 437040,
+      "inode": 84386992,
+      "mtime_ns": 1790122607308188557,
+      "name": "postgres.dump.enc"
+    },
+    {
+      "bytes": 4603200,
+      "inode": 84449955,
+      "mtime_ns": 1790127265178031235,
+      "name": "pre-repair-_supabase.dump.enc"
+    },
+    {
+      "bytes": 5776,
+      "inode": 84450026,
+      "mtime_ns": 1790127270129713430,
+      "name": "pre-repair-globals.sql.enc"
+    },
+    {
+      "bytes": 437040,
+      "inode": 84449920,
+      "mtime_ns": 1790127260000897001,
+      "name": "pre-repair-postgres.dump.enc"
+    },
+    {
+      "bytes": 75167696,
+      "inode": 84450053,
+      "mtime_ns": 1790127274035218637,
+      "name": "pre-repair-realtime.log.enc"
+    },
+    {
+      "bytes": 3040,
+      "inode": 84449935,
+      "mtime_ns": 1790127262286222462,
+      "name": "pre-repair-storage_vectors.dump.enc"
+    },
+    {
+      "bytes": 1632,
+      "inode": 84449991,
+      "mtime_ns": 1790127267812675039,
+      "name": "pre-repair-template1.dump.enc"
+    },
+    {
+      "bytes": 75076192,
+      "inode": 84393137,
+      "mtime_ns": 1790123212148069809,
+      "name": "realtime-container-retained.log.enc"
+    },
+    {
+      "bytes": 3040,
+      "inode": 84387045,
+      "mtime_ns": 1790122609741399759,
+      "name": "storage_vectors.dump.enc"
+    },
+    {
+      "bytes": 1632,
+      "inode": 84387105,
+      "mtime_ns": 1790122614747428334,
+      "name": "template1.dump.enc"
+    }
+  ],
+  "boot_volume_uuid": "FC506CF1-BA04-4DAE-B582-497BA6B1D809",
+  "data_uuid": "5D0F9DC9-9E64-422F-A343-998431D72871",
+  "mission": "M4 Batch 2, exact approval 2026-09-23",
+  "npm_tree_sha256": "f880dde94086c344ea3cc96559fd04043f72a9b163b8036221d10e7a20e3bc53",
+  "npx_keys": [
+    "3fac9f70aa5c9ccf",
+    "03676be6c5876144",
+    "67eb4586ca667318",
+    "705bc6b22212b352",
+    "9eac9498388ae25e",
+    "96a8727b140d6939",
+    "bce731a0395adf49",
+    "cc2145a2fe1558fa",
+    "7f312557c12f11a3",
+    "3f410cde517faec3",
+    "a3586cc356aa4ace",
+    "1ce9283feb7d83f2",
+    "8003d8991b0d346b",
+    "33664ddc0e10cefa",
+    "dcf0514efa8ecddd",
+    "1bf7c3c15bf47d04",
+    "bd03aaf280724e38",
+    "f19f78a55038d137",
+    "69f9afb961c37556",
+    "705d23756ff7dacc",
+    "ffe2131771d88588",
+    "1ddbeaccabfe00a4",
+    "32026684e21afda6",
+    "1a3c4333f3a90708",
+    "67a0730928194b24",
+    "e41f203b7505f1fb",
+    "ac0ed6aa23b37c1e",
+    "9dc43daea2065b57"
+  ],
+  "old_snapshot": {
+    "name": "com.apple.TimeMachine.2026-09-23-131322.local",
+    "uuid": "FCA82852-B4F7-477B-B344-49DD9FB4660B"
+  },
+  "proposal_sha256": "6cb4d3af827edca546a163f1accb5fafae7e6f4a9e0033d3962bb71848d65af9",
+  "protected_snapshots": [
+    [
+      "5D0F9DC9-9E64-422F-A343-998431D72871",
+      "com.apple.TimeMachine.2026-09-23-141244.local",
+      "B1DA81BE-0498-4B72-873C-643D8857774B"
+    ],
+    [
+      "5D0F9DC9-9E64-422F-A343-998431D72871",
+      "com.apple.TimeMachine.2026-09-23-151231.local",
+      "EFD81A53-6709-4F48-9FF0-462F1691C0A5"
+    ],
+    [
+      "FC506CF1-BA04-4DAE-B582-497BA6B1D809",
+      "com.apple.os.update-5203530F8BB20B9DABC5CE76A0FFE87CCC885EE69B8A5488C24B458A7555E3AB",
+      "A74C9840-16B8-4780-8571-BA0B94481072"
+    ]
+  ],
+  "protected_trees": [
+    {
+      "fingerprint": {
+        "exists": true,
+        "inode": 8927421,
+        "metadata_sha256": "f0811d6e938c96bbbb386b8e53634d59c3fa250e5879d8d3f44692d60a618235"
+      },
+      "path": "/Users/allisongaddy/.npm/_npx/6583fba12287d067"
+    },
+    {
+      "fingerprint": {
+        "exists": true,
+        "inode": 12374945,
+        "metadata_sha256": "35f1e4dd480c64f227dd7cb70da34e6ed2a0c7dad5049e139ecd5433cb1d60a1"
+      },
+      "path": "/Users/allisongaddy/.npm/_npx/9833c18b2d85bc59"
+    },
+    {
+      "fingerprint": {
+        "exists": true,
+        "inode": 12892663,
+        "metadata_sha256": "06c68719ec47932f11c20fb8ea389b5913dddfc39882e2d4fdb499f4f6989cdc"
+      },
+      "path": "/Users/allisongaddy/Library/Caches/ms-playwright/mcp-chrome-1f77ca2"
+    },
+    {
+      "fingerprint": {
+        "exists": true,
+        "inode": 16662534,
+        "metadata_sha256": "9983878aa9966217ce1540eb830ff581f1d097b9afbcda1c90d60a6fab205aa9"
+      },
+      "path": "/Users/allisongaddy/Library/Caches/ms-playwright/mcp-chrome-076290f"
+    },
+    {
+      "fingerprint": {
+        "exists": true,
+        "inode": 16671344,
+        "metadata_sha256": "5299f6edd5cd852d090f18f98f41d30042ab3efffe7bf3a127b3552abf961be2"
+      },
+      "path": "/Users/allisongaddy/Library/Caches/ms-playwright/mcp-chrome-243a7c8"
+    },
+    {
+      "fingerprint": {
+        "exists": true,
+        "inode": 12899581,
+        "metadata_sha256": "b863836e6b7f3c41690ec155e9110dbfd229b2e3f12b64b9c51c07512ac089a2"
+      },
+      "path": "/Users/allisongaddy/Library/Caches/ms-playwright/mcp-chrome-1b59213"
+    },
+    {
+      "fingerprint": {
+        "exists": true,
+        "inode": 12894881,
+        "metadata_sha256": "d4042e7127e188f3ecc7cd96c998529ef253f161c42ca999a35a5a58045bbc01"
+      },
+      "path": "/Users/allisongaddy/Library/Caches/ms-playwright/b"
+    },
+    {
+      "fingerprint": {
+        "exists": true,
+        "inode": 81057594,
+        "metadata_sha256": "38c10016d8dc515603e2e73fe5c4479eedad82e37918638954af8f133f846ea8"
+      },
+      "path": "/Users/allisongaddy/Library/Application Support/Frame.io Drive/MountedStorageCache"
+    },
+    {
+      "fingerprint": {
+        "exists": true,
+        "inode": 30040908,
+        "metadata_sha256": "c9c64f9b99563d92621b8b947c3cd36610bf0a2bf00a392eeee92673904dc753"
+      },
+      "path": "/Users/allisongaddy/Movies/CapCut/User Data/Cache"
+    },
+    {
+      "fingerprint": {
+        "exists": true,
+        "inode": 30040898,
+        "metadata_sha256": "8677703cd5cfcbf90670ad54bbf55139598486607f4c623fbf8f94cb07929b78"
+      },
+      "path": "/Users/allisongaddy/Movies/CapCut/User Data/Projects"
+    }
+  ],
+  "runtime_sha256": "fc21d00abf306467c9022dc066ff033731ba84be19aaf9a21ffe032c0ca265f2",
+  "schema_version": 1,
+  "session": "M4 Fix",
+  "snapshot_representatives": [
+    "/Users/allisongaddy/.npm/_npx/6583fba12287d067/package.json",
+    "/Users/allisongaddy/.npm/_npx/9833c18b2d85bc59/package.json",
+    "/Users/allisongaddy/Library/Caches/ms-playwright/mcp-chrome-1f77ca2",
+    "/Users/allisongaddy/Library/Caches/ms-playwright/mcp-chrome-076290f",
+    "/Users/allisongaddy/Library/Caches/ms-playwright/mcp-chrome-243a7c8",
+    "/Users/allisongaddy/Library/Caches/ms-playwright/mcp-chrome-1b59213",
+    "/Users/allisongaddy/Library/Caches/ms-playwright/b",
+    "/Users/allisongaddy/Library/Application Support/Frame.io Drive/MountedStorageCache",
+    "/Users/allisongaddy/Movies/CapCut/User Data/Cache",
+    "/Users/allisongaddy/Movies/CapCut/User Data/Projects",
+    "/Users/allisongaddy/Desktop/FounderCommandCenter Recovery - 2026-09-22/_supabase-pre-damage-171238.dump.enc",
+    "/Users/allisongaddy/Claude/projects/Aura/AGENTS.md",
+    "/Users/allisongaddy/Claude/projects/FounderCommandCenter/package.json"
+  ],
+  "state_directory": "/Users/allisongaddy/.claude/deletion-approvals/m4-batch2-20260923",
+  "targets": {
+    "03676be6c5876144": {
+      "inode": 76896852,
+      "lock_sha256": "281113468081bc00178860999fd123d8285dbc1ac976f73970e88842e19a3fba",
+      "metadata_sha256": "dc8842131e8c8aaa4bc12d142d3d41c590cfe2c27ce0d308f2c5af78815bd31c",
+      "package_sha256": "f31a95a9dfde64ebda8905c5b35e5e05edb85f80021a7b0105c098cb06d07e9d",
+      "path": "/Users/allisongaddy/.npm/_npx/03676be6c5876144"
+    },
+    "1a3c4333f3a90708": {
+      "inode": 12349172,
+      "lock_sha256": "f8c8641f24d6285f93f2b32a6d85748e42e9324e5b382a5b71f5c29f65f6d2ea",
+      "metadata_sha256": "3ab5c6ad7c89f2fc979bc3a4616f38e0409859602b74800b8ae75a3a17f2d388",
+      "package_sha256": "68b5361f1bbc0222b4a3419dde17cc226a815c4a4b964b01cf8c4486923ba55b",
+      "path": "/Users/allisongaddy/.npm/_npx/1a3c4333f3a90708"
+    },
+    "1bf7c3c15bf47d04": {
+      "inode": 22513368,
+      "lock_sha256": "2c3f80f9c0f91a3e5d576c1a079f925c423ca0c1c1e13ede0ca1987a6b489a02",
+      "metadata_sha256": "e948f964d37c96afcf0feab5a064595005532144dd9ff312df9874b715cd7141",
+      "package_sha256": "71986acdfad14518aae3ae3155abccf400581835f683936943c72267768f2129",
+      "path": "/Users/allisongaddy/.npm/_npx/1bf7c3c15bf47d04"
+    },
+    "1ce9283feb7d83f2": {
+      "inode": 43101380,
+      "lock_sha256": "bc222ee140170021afd5a5842e4760c388a15f4a1b5abfad441048d9b714c0a6",
+      "metadata_sha256": "f1c4c64719a1f327f616741f9cc951dcead11eb70ac47f5208462492fef3329b",
+      "package_sha256": "33f8275e191d3450751d4c0765b9a0365088376dbbee61f2c34edebe63b2e568",
+      "path": "/Users/allisongaddy/.npm/_npx/1ce9283feb7d83f2"
+    },
+    "1ddbeaccabfe00a4": {
+      "inode": 23700018,
+      "lock_sha256": "9f1d4bb5b295eadfca1d93b204421ebb13ce613f6ad67e59ea3d26b8d80b277c",
+      "metadata_sha256": "092c476793c3cac1c7395a142607ddd3d48c2739d742631a4f30c23abc72d9b8",
+      "package_sha256": "4898b955b45182da134f843382e9f729ad6f42639f820b7b8f66bb51f5b65970",
+      "path": "/Users/allisongaddy/.npm/_npx/1ddbeaccabfe00a4"
+    },
+    "32026684e21afda6": {
+      "inode": 22559312,
+      "lock_sha256": "67ede3bd763aa987c514e9661826fe6644534043d93a0deca288cf5445710810",
+      "metadata_sha256": "a0f1d37a00bc9a7170ad147267521c561be15551c2989435cf6cf6414e65eff1",
+      "package_sha256": "24ee0334c1394007648d307511c200cf969a9941da239190d306c3a385ee7ad2",
+      "path": "/Users/allisongaddy/.npm/_npx/32026684e21afda6"
+    },
+    "33664ddc0e10cefa": {
+      "inode": 23763438,
+      "lock_sha256": "5be8530fa3cae39286cc4d329adcf062828946bd9e29a4ce40ca7a548df528f4",
+      "metadata_sha256": "9f8d23314440884bab1c05f46df3358c41ac6c12c3cbc73ca3384ea41309921a",
+      "package_sha256": "a8c90840051e2722bf90455ad2f77528ee7660a6d5ef6f620a97915bcdc1457b",
+      "path": "/Users/allisongaddy/.npm/_npx/33664ddc0e10cefa"
+    },
+    "3f410cde517faec3": {
+      "inode": 61994794,
+      "lock_sha256": "51ac05f02b873a709b7950e046e787324454b1a976dfddc91b453efce0c35003",
+      "metadata_sha256": "b56286c1e79969e5015d98e77c85829724536b5dc0361bd03c83075ea43e0956",
+      "package_sha256": "67a3bcf5af485533cb1a2f3f1361f9b947d2c1c72d2b859bdb6ee4cb12d32c7d",
+      "path": "/Users/allisongaddy/.npm/_npx/3f410cde517faec3"
+    },
+    "3fac9f70aa5c9ccf": {
+      "inode": 60138012,
+      "lock_sha256": "8750cd2fae6b88c4551f06f6f802a353ea1ecc1199efb0de24920bad195b9159",
+      "metadata_sha256": "584eef490dd49b8d619f4bf5329b52dd2b47287351aa9361f60cda9633521207",
+      "package_sha256": "405bd54fdae4e32d76e3eeedc67c17c00322aa49e10bf4f7496e1e6390af0f06",
+      "path": "/Users/allisongaddy/.npm/_npx/3fac9f70aa5c9ccf"
+    },
+    "67a0730928194b24": {
+      "inode": 58650418,
+      "lock_sha256": "7a3fca2cbe024b4dea8795c58be47b2ae7323a718b62149eb3f0ae7849d301d3",
+      "metadata_sha256": "a3d7ee8ceb59780eea8baf23f49272fb1020402d28fa6e74e2bbbc256068ce6a",
+      "package_sha256": "fd804aff47654e3379acb74aadfe947fb2795155ecfc3ab24a0283b7364569cb",
+      "path": "/Users/allisongaddy/.npm/_npx/67a0730928194b24"
+    },
+    "67eb4586ca667318": {
+      "inode": 43010210,
+      "lock_sha256": "e4ffc976c1840bcbd7a8b7ab3692c400a963614a787e613fba9dcae1836850b7",
+      "metadata_sha256": "2a01aa02bee935ef0ddf9208f1255710ea7d0d2fa5c349d30be22b95b778f721",
+      "package_sha256": "cd712054508d947f56543d2e0b13f39ee93f645723562ef660f77a63195b1d24",
+      "path": "/Users/allisongaddy/.npm/_npx/67eb4586ca667318"
+    },
+    "69f9afb961c37556": {
+      "inode": 29224564,
+      "lock_sha256": "778e2f7e03bf7271c04de8d5c083f09ed2faf20e4415f659ad94ede47c1d8cb3",
+      "metadata_sha256": "d7512da627d2abc6f2e9835337fb6fdf02d487c1b082db0b6fab32ae380be9f6",
+      "package_sha256": "5d766aa2a5569c2136c43b084f686b97053919d6f0b2d824cf9b4a12989fa436",
+      "path": "/Users/allisongaddy/.npm/_npx/69f9afb961c37556"
+    },
+    "705bc6b22212b352": {
+      "inode": 52282197,
+      "lock_sha256": "dce0cd7f002e0a33c46d4fa7467179c1aaba855535edb19ea5757c3819b7e52b",
+      "metadata_sha256": "c9a10042f75516d789a2283e17d661b215acbae7e08f4e804f5da7ce3266275c",
+      "package_sha256": "99b3de4aac8e848bb38e73463369a45c09ae67f1974568597676b56424a6feba",
+      "path": "/Users/allisongaddy/.npm/_npx/705bc6b22212b352"
+    },
+    "705d23756ff7dacc": {
+      "inode": 60115295,
+      "lock_sha256": "871222d37392b881f3e0657daa69e1c02bb7a37afa9dd422762443b65c03fc8e",
+      "metadata_sha256": "f2cbb94cf31da7c38687cddbc8832397453547ca56574c8f93d514f44eee84b3",
+      "package_sha256": "5caac45dc4d90eb722922204315dbcbc016169a179ef5a9a635717ba9a7e2872",
+      "path": "/Users/allisongaddy/.npm/_npx/705d23756ff7dacc"
+    },
+    "7f312557c12f11a3": {
+      "inode": 59424680,
+      "lock_sha256": "4945e0db6ce83dae050f06ae706f5e56875cc6a54baf5d7b8637c30ce68da202",
+      "metadata_sha256": "c6598e06707991fd80fd60ae3113b95f261665cc26b17f596fd0cfc36a0255b1",
+      "package_sha256": "48a161acaf5e5f4f48423ccd0dffecf4d92f3db9e1f6152d19b0ae648853e226",
+      "path": "/Users/allisongaddy/.npm/_npx/7f312557c12f11a3"
+    },
+    "8003d8991b0d346b": {
+      "inode": 44004163,
+      "lock_sha256": "4886a35bfdfeb52badead24cdfec3426e01d5c23527de812e628739370140482",
+      "metadata_sha256": "a73c1087bf031244be97a909b2f75157d4824e1d4f9d959f61d3787c71915c65",
+      "package_sha256": "ee9c397da044e62dae4201ea3a81acf917bf05b160009c94c31241e5e08bc98f",
+      "path": "/Users/allisongaddy/.npm/_npx/8003d8991b0d346b"
+    },
+    "96a8727b140d6939": {
+      "inode": 51847725,
+      "lock_sha256": "ba330d98164172da722c73c84c5e1b9a55daad4d0519cc490d45d1999289c6ac",
+      "metadata_sha256": "92d1731f98132499fb1fc85d16d67caa3096bce07dce1381783d47fce7853f8e",
+      "package_sha256": "0971c932b5755a78b9f7bc6c00836bdac075583806b5ab642fcaf134ef43df52",
+      "path": "/Users/allisongaddy/.npm/_npx/96a8727b140d6939"
+    },
+    "9dc43daea2065b57": {
+      "inode": 66594177,
+      "lock_sha256": "f8ad8ede3f36fd09a493ffeedaade0cb2750cf7dbe93681dfa15bb7c00de6f4c",
+      "metadata_sha256": "308773a3b92a28c1c6071e4be8260a87f4e25e3b1bcd5d24b77af3a7f31907e5",
+      "package_sha256": "2ebdb30fd8a42756139ce812b663339211e98cc1077f69aea1023540f1c449ea",
+      "path": "/Users/allisongaddy/.npm/_npx/9dc43daea2065b57"
+    },
+    "9eac9498388ae25e": {
+      "inode": 59409697,
+      "lock_sha256": "784e50175bb84dbc7025e5b89b619a6eda5a7951d2335316c1a03269620e63d2",
+      "metadata_sha256": "3e6e5347f6edd536cd58517dfef4af1d649fd98e3670b55215bcd69eb17a9cac",
+      "package_sha256": "7d8f7c120a0d1aba36bea9f724b4198495ff3d9106cdd7d94eb4ca44c0ed58fd",
+      "path": "/Users/allisongaddy/.npm/_npx/9eac9498388ae25e"
+    },
+    "a3586cc356aa4ace": {
+      "inode": 58586529,
+      "lock_sha256": "604229de3b32ba83054dde483f59a2452d3f905ac7d377df700905618ec950fe",
+      "metadata_sha256": "32695ca147c9ec88d11de58c3dc31778c3bb6f00bd2eec2ba3b647beaab0ff8d",
+      "package_sha256": "cd7215e13a54391c64d33f7ece7edb499005401d354a78b0b170404baf58a2f6",
+      "path": "/Users/allisongaddy/.npm/_npx/a3586cc356aa4ace"
+    },
+    "ac0ed6aa23b37c1e": {
+      "inode": 11310193,
+      "lock_sha256": "229b52ccdb57ef38d9d0525b97fd7cf95262d7e6c2c8f7b953448ea38deb0b3f",
+      "metadata_sha256": "7b2a8c51f8edfca5de209efd62de349bfef3f01b1546392341d2d47b79cd4aa7",
+      "package_sha256": "8c513cbf5f27b612ef451c214de2b3671a9ed7e7f91fc32decbd13206d28b695",
+      "path": "/Users/allisongaddy/.npm/_npx/ac0ed6aa23b37c1e"
+    },
+    "bce731a0395adf49": {
+      "inode": 12263960,
+      "lock_sha256": "de34ce969a166f71ea186afcfe8f3caf50b571c4ce94104071df3e8e6ac03827",
+      "metadata_sha256": "dbd72d4042a0e963192bfe6ee392a837dcf8ded4127710acad99a102af5e59a9",
+      "package_sha256": "ebb5ff28e124f2666615588e519b51fe0e1f8fd81b26f66eca313ce2a735908b",
+      "path": "/Users/allisongaddy/.npm/_npx/bce731a0395adf49"
+    },
+    "bd03aaf280724e38": {
+      "inode": 60229450,
+      "lock_sha256": "9bfda8779823abcfe35e9d4ef89e0a733154b331c99f9e7c175a1f52db38631d",
+      "metadata_sha256": "e2d97eac46cc5321776ad2333baa47a07897aca63ab3a4d121c3f644d40e44fc",
+      "package_sha256": "d58d07f74f3d62c5628620f3e5849250b2e4e7d45504f8afd7d1a2b65a7ef7f9",
+      "path": "/Users/allisongaddy/.npm/_npx/bd03aaf280724e38"
+    },
+    "cc2145a2fe1558fa": {
+      "inode": 29255553,
+      "lock_sha256": "b798a0e167762e79ea7290b122a3b9f421e0965904182c2f43dd46889dd2aeb1",
+      "metadata_sha256": "f37865f85fdb6ffb724692bfbceb6fa1086e1d2180428295e7b56653766a1a2e",
+      "package_sha256": "6e3ade9ede4b6ea52a7b7b35cf8cf4ac0f0e42e10c8621dea9b4d25ec06f1e60",
+      "path": "/Users/allisongaddy/.npm/_npx/cc2145a2fe1558fa"
+    },
+    "dcf0514efa8ecddd": {
+      "inode": 76895963,
+      "lock_sha256": "65f57048947adffb846f276fb5f872d7c5fe17fbb424b35fa0f0f0d2cf9f4e60",
+      "metadata_sha256": "b16fd79e371ed17298e931bc5c5604cfd8fce75705bf34bbda9bcb83c816f18b",
+      "package_sha256": "b1a8825b62aab1cc721e87ae4db31f5f0ef0b06f67543bd45d8a11c55e01c070",
+      "path": "/Users/allisongaddy/.npm/_npx/dcf0514efa8ecddd"
+    },
+    "e41f203b7505f1fb": {
+      "inode": 8920812,
+      "lock_sha256": "4e959769663758e836b160c5d970afa7308c238d34f75e82f90624d06432fc0b",
+      "metadata_sha256": "3cafd3cc91532b79be8579ddc8ecf19272361ca1eb45722997ddf7025f689b8b",
+      "package_sha256": "ce5323ba1a708d5fdca87cdaa58220e064d28fc689ce47adacf6864a06787f38",
+      "path": "/Users/allisongaddy/.npm/_npx/e41f203b7505f1fb"
+    },
+    "f19f78a55038d137": {
+      "inode": 55098153,
+      "lock_sha256": "3b7f19d41ea6c69642e12f7833c06360a9bc9f44d9b36d0399a13bce9116eb0e",
+      "metadata_sha256": "52581d959e03943f364e9c3c827c8bc479c5fded897c9001e761862ef5a3fbe9",
+      "package_sha256": "505e7a5087e86815e0d1082d7a6ea0bfb94501ddc33e01786526be6f72b9f58c",
+      "path": "/Users/allisongaddy/.npm/_npx/f19f78a55038d137"
+    },
+    "ffe2131771d88588": {
+      "inode": 43058203,
+      "lock_sha256": "0f3fbb0e646ca691b23ae0cd2d4a4f87498011fc558b16f220192fea47d5b83a",
+      "metadata_sha256": "9bd1e9c012461cc289c210f1b71078fb923596c83f7e53a11381584f8cd8c7d0",
+      "package_sha256": "0cbf97df89834d097a7e71ecdceb99118d9fb03998896f30542e01c63d61ec05",
+      "path": "/Users/allisongaddy/.npm/_npx/ffe2131771d88588"
+    }
+  },
+  "task_id": "01a0cf8d-3e69-7d52-ad46-81c3dc7751eb",
+  "tools": {
+    "/bin/ps": "a06fe087161557f1f8c030672eaedcd90bc6a8e92b8f2d44e07cffedc3349205",
+    "/opt/homebrew/Cellar/node/25.9.0_2/bin/node": "32e234a5b6bec67d72a016f2baadf7fadf3afd328470b395b73af473fdee0d85",
+    "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/bin/python3.14": "2477b47fa3ae65b9574eb18a15edb364e96948eaa1875ad3f1c80d780efc9c12",
+    "/opt/homebrew/lib/node_modules/npm/bin/npm-cli.js": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7",
+    "/opt/homebrew/lib/node_modules/npm/lib/commands/cache.js": "3eebc9e9a74db052c5c381f6bc178506e1fd0491ea560a25b0c4e26d2549efd5",
+    "/opt/homebrew/lib/node_modules/npm/package.json": "48a06e6aeede3499e391710db82fe948afa7e74ecbf3e819b66121f3cd54666b",
+    "/opt/homebrew/opt/ada-url/lib/libada.3.dylib": "a55588fab581b41c9b918f4a5bab044e946091eb72cbed3bc82a8df00db189a2",
+    "/opt/homebrew/opt/brotli/lib/libbrotlidec.1.dylib": "d7ac1e69b6c443341fb4302de0169d187489d58d8a641c8eadd6db9ca2cd0cbf",
+    "/opt/homebrew/opt/brotli/lib/libbrotlienc.1.dylib": "32e38a8ab06c8770ea4bfaf11ea324d7bcb6fe5f07eaff9d6260f93984ee6729",
+    "/opt/homebrew/opt/c-ares/lib/libcares.2.dylib": "e5595a0c640a2341e2df5a0fedaa63e7e9afe99b01c9880338064e0746414518",
+    "/opt/homebrew/opt/hdrhistogram_c/lib/libhdr_histogram.6.dylib": "d1f4ba22087781611f0187787217ffef1ef97b96cd76ff2af3fb600a4434bbb6",
+    "/opt/homebrew/opt/icu4c@78/lib/libicui18n.78.dylib": "f319e50c965a1a0065d2cc5595d8553ff60b0e78a2e76bc3173774fd112de9ed",
+    "/opt/homebrew/opt/icu4c@78/lib/libicuuc.78.dylib": "177dab8ae0bf0b1357d7ec6404a1e145bcc3d927aa15c3064171d23b2a1fd263",
+    "/opt/homebrew/opt/libnghttp2/lib/libnghttp2.14.dylib": "b56cd6b95765b0c608a6cb50ab44ffb4ab29303d627f0c2d96a028aa11688cc2",
+    "/opt/homebrew/opt/libnghttp3/lib/libnghttp3.9.dylib": "f16407d21bebb61f141026116f304bd02ac9c2c44f7e2aee051293290c8bcd2f",
+    "/opt/homebrew/opt/libngtcp2/lib/libngtcp2.16.dylib": "e82462c1d2c68aa714e20e8665a3c35de8ae50e9631f640ceabfd3e41f25feca",
+    "/opt/homebrew/opt/libuv/lib/libuv.1.dylib": "34d4e2cd30b56dca5bda539f4448667360f0994c6b337ffebc5d37d818bc15d5",
+    "/opt/homebrew/opt/llhttp/lib/libllhttp.9.3.dylib": "84d500746c0e7017b2f2a8cfb001c8788cbb83ca065db126368d1da868ac18c5",
+    "/opt/homebrew/opt/merve/lib/libmerve.1.dylib": "59516d6964b86b1a0e05434f0676e1820c78ae1603474eb7fc5d74ccfd36488a",
+    "/opt/homebrew/opt/nbytes/lib/libnbytes.dylib": "2ebb8415d537b47420fc46efb6d6271b93befd22b30ad2afba75ab5e2be55fcc",
+    "/opt/homebrew/opt/openssl@3/lib/libcrypto.3.dylib": "a12805a18cd5e4f733fa8727b91afa08b587f9da5a760517cd79cb508a3a3f71",
+    "/opt/homebrew/opt/openssl@3/lib/libssl.3.dylib": "ffd8ac6981000def0928367924b6cb1e7a98712efbc06e2a2f3f750138bd89ca",
+    "/opt/homebrew/opt/simdjson/lib/libsimdjson.33.dylib": "9ac6d74a81c248a5a946fae44bc88ad0705f3a32a495aa1a906fb6a35fe3d258",
+    "/opt/homebrew/opt/sqlite/lib/libsqlite3.dylib": "e25fd720937eaeba7bc831164fb1a6d0b03430bec9524b153906189afcc09e1e",
+    "/opt/homebrew/opt/uvwasi/lib/libuvwasi.dylib": "c922288c5179279316b32b2c83d5c50d7b87216b442473ada8c99ef4a58ba312",
+    "/opt/homebrew/opt/zstd/lib/libzstd.1.dylib": "e2847c4613b386683c234913ae3b7b04299254096caf7616e3b3cd9bb97a39ab",
+    "/sbin/mount": "e246c89940a5482ffa1b6f9d3d8e000ba7c107ef3a82e21c19252adb1320b0f5",
+    "/sbin/mount_apfs": "92cde65e1e1961ffa325842ad5ad44de143ceacea0a57ac3aa8e34160031d5ff",
+    "/sbin/umount": "f5a291e460e6d3ed2ea17662e86419c04bf27ff410dc3778179a4f4a48256625",
+    "/usr/bin/tmutil": "ef322874187a510cf3a0a5070c55ac0346b900e5fad30dce481468db5aa36eff",
+    "/usr/local/bin/docker": "70d5a06adf388bd09b652f47ddc9ca31663a3e5353d24188bdb0054b3014ab3e",
+    "/usr/sbin/diskutil": "81c90e225c6c28f812d2f2563be7fefa630266b592ca2fe02fe590fd67fca5ac",
+    "/usr/sbin/lsof": "deff85c7b4750a948a69fcd48eae3b394a37575e5048e5eb4a35b7a0482c3dc8"
+  },
+  "ttl_seconds": 900
+}
