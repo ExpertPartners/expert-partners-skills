@@ -1,3 +1,8 @@
+## 3.1.1 - 2026-11-09
+
+Every session now starts with Cal first. Before advising on setup or method, check Cal's evidence for what Cal would do, never make up what she says, and improve only how it's done, never her method.
+
+Every session now starts with the rule to close every browser tab or window it opens, Playwright or Chrome, on either Mac, as soon as it's done and before it reports.
 ## 3.1.0 - 2026-11-09
 
 Act by default across every operating-doctrine skill (Decision Log 2026-11-08, Act by default, caution removed). Approval gates, owner handoffs, copy-box and mailbox relays, job-list polling, readbacks, certification and archive-safety gating are removed from all skills. Skills whose whole purpose was a retired gate (pin, session-steward, job-list-heartbeat, lane-spawn, intake, code-block-routing) are now short retirement notes that keep existing references resolving. Technical mechanics, trigger descriptions and Allison's personal controls are kept.
