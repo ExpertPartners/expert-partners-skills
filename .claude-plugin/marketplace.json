@@ -58,6 +58,12 @@
       "source": "./plugins/fractional-cfo",
       "version": "0.1.1",
       "description": "Read-only Fractional CFO reviews (weekly cash flow, runway and burn, monthly close) over canonical categories and entity separation, for Expert Partners LLC and Moxie Signature Group."
+    },
+    {
+      "name": "authority-engine",
+      "source": "./plugins/authority-engine",
+      "version": "0.1.0",
+      "description": "Don Hobbs's Authority Engine suite (interview, market ownership, market domination architecture, brand story, execution, quarterly recalibration). Reads Don's method from Drive; inherits operating-doctrine."
     }
   ]
 }
