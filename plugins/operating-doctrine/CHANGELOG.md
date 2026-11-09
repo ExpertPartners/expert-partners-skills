@@ -1,3 +1,6 @@
+## 2.89.0 - 2026-11-09
+
+The headless route check now lets the browser through when a system's headless route is still setting up on the access map, instead of refusing it. Headless first, then the M2 browser, never a block. Only a system whose headless route is live is still refused, with the route to use. This stops a half-finished setup row from blocking real work, like Claude Project settings on claude.ai, which have no API.
 ## 2.88.1 - 2026-11-08
 
 Align native Factory execution and placement consumers with current authority. Remove universal issue and retired queue prerequisites, default to Auto without requiring BYOK, retain live existing-repository lookup and justified creation, and distinguish source checks from installed delivery and active use. Keep human verification handoffs in an owned, closable browser tab, and leave no completed owned tab open after a report.
