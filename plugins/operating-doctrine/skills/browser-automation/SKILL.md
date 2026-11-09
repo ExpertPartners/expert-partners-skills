@@ -57,7 +57,8 @@ headless route, its 1Password item and its status. The plugin's headless route c
 (`hooks/headless_route_check.py`) checks browser navigation and `browser_tabs` new tabs
 against it, and the URLs that `browser_run_code_unsafe` and `browser_evaluate` code
 navigates to. It refuses a host whose system is live and names the route and item to use.
-It refuses a host whose system is setting up, because the setup job comes first. It lets a
+It lets a host whose system is setting up through, because the M2 browser is the next route
+until the headless route is live (headless first, then the M2 browser, never a block). It lets a
 vendor with no API through, and it lets an unmapped host through and logs it for Star's
 nightly miss check. In browser code, write every navigation target as a full `https://`
 URL, because the hook refuses a relative one it cannot resolve. It cannot see a URL held in
