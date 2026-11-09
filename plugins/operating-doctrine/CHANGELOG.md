@@ -1,3 +1,6 @@
+## 3.6.0 - 2026-11-09
+
+Adds calendar-link-generator, Allison's Cal Week 1 practice skill. It turns an event description into labeled add-to-calendar links for Google Calendar, Outlook.com and Outlook for Microsoft 365, following her nine standing rules for titles, one-hour default length, Central time, relative dates, location, a short useful description, guests and no raw links. Built in her own Week 1 calendar rep and published through the marketplace so it reaches her and Don in Claude and ChatGPT.
 ## 3.5.0 - 2026-11-09
 
 Instruction sweep to match the HQ Rulebook of November 9, 2026. HQ now names Codex beside Claude, Claude Code and Factory. batch-first-execution no longer routes work through the retired Chat to Code Loop, and new-project looks for an existing Factory session or Workstream with find_owner instead of a GitHub issue. pin, session-steward, job-list-heartbeat and lane-spawn, whose only job was a retired route, are retired through the marketplace retire path (status retired, model and user invocation disabled). Their notes stay so existing references resolve.
