@@ -1,10 +1,12 @@
 ---
 name: lane-spawn
 description: "Retired. Side work is just done, in its own isolated worktree or session when that is cleaner. No hand-off block, no envelope, no copy box. Inherits operating-doctrine."
+disable-model-invocation: true
+user-invocable: false
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
-status: live
+status: retired
 inherits: operating-doctrine
 defers-to:
   - code-block-routing

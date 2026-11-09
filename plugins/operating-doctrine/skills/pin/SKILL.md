@@ -1,10 +1,12 @@
 ---
 name: pin
 description: "Retired. Carry-back envelopes and pins are no longer a function. The AI just acts and reports what it did with links."
+disable-model-invocation: true
+user-invocable: false
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
-status: live
+status: retired
 inherits: operating-doctrine
 defers-to:
   - code-block-routing
