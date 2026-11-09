@@ -4,12 +4,12 @@ description: |
   Check that a piece of work is happening in its current owning home. Resolves
   the owner live from the HQ Rulebook (Where things live, Project ownership), the
   GitHub Archive Index row, the native Factory assignment and the owning
-  brain's index, then reads the actual host and workspace. Confirms an
-  already-correct workspace and changes nothing. Routes business material to its
+  brain's index, then reads the actual host and workspace. Says so when the
+  workspace is already correct and changes nothing. Routes business material to its
   indexed Drive brain home, never a repo or folder. Code work found in the wrong
   workspace is not committed there; it goes on the current code route for the
   owning repo, never as a terminal-and-paste step for Allison. A failed live read
-  stops placement. Trigger when the user asks where work should happen, which
+  is worked around through another route. Trigger when the user asks where work should happen, which
   repo or folder for X, am I in the right place, or starts work that does not
   match the current workspace.
 argument-hint: "[topic or description of the work]"
@@ -18,8 +18,7 @@ allowed-tools: Bash, Read
 # Adopted into canonical 2026-08-05 (Skill Map Rulings lane, flags item 9) as a
 # user-tier source; migrated into the marketplace 2026-11-04 (Chat to Code job,
 # Audit and migrate useful standalone skill behavior into the canonical
-# marketplace). Designed until HQ and Allison certify it under build-standard.
-# The machine copies at ~/.claude/skills and ~/.agents/skills are deployed
+# marketplace). # The machine copies at ~/.claude/skills and ~/.agents/skills are deployed
 # copies the owning audit retires after native verification.
 tier: plugin
 zone: routing
@@ -37,7 +36,7 @@ Provenance. This skill carries forward useful method from the user-tier session-
 
 ## Step 1. Name the work
 
-Use the work described in the request. If none is described, ask one short question about what the work is. Then sort it:
+Use the work described in the request. If none is described, infer it from the session. Then sort it:
 
 - **Code**: changes to a repository's files, tooling, skills or automation.
 - **Business material**: rules, decisions, brand notes, plans, meeting notes, transcripts, research and other knowledge.
@@ -54,7 +53,7 @@ Read these live this session, each found by its title or its current tool, never
 
 The newest applicable Decision Log entry wins over older text. Never infer an owner from a repo name, a folder name or a deployed copy of this skill.
 
-If a read that placement depends on fails through every authorized route, stop placement. Name the failed source, say what is verified and what is not, and place nothing. No table, aura file, memory, older deployed copy or folder name stands in for the failed read. Continue only work that does not depend on placement.
+If a read fails, try another route (connector, API, CLI) before reporting. Only if every route fails, name the failed source and what is unverified, and keep working on whatever doesn't depend on placement. No table, aura file, memory or folder name stands in for the failed read.
 
 ## Step 3. Read the actual workspace
 
@@ -62,17 +61,17 @@ Read where this session actually runs instead of assuming a folder layout: the h
 
 ## Step 4. Act on the result
 
-- **Already in the right home.** Say so, name the owner and the evidence, and change nothing.
+- **Already in the right home.** Name the owner and carry on.
 - **Business material.** It goes to the folder the owning brain's index names, filed through the intake skill, never into a repo or a local folder, and no copy stays in the workspace. Secrets and credentials go to 1Password only and are never copied into notes, transcripts, Docs or repos.
-- **Code work in the wrong workspace.** Commit and push nothing here. Continue the authorized native Factory assignment in the owning repo on an isolated branch/worktree, coordinating current owners and open PRs first. No GitHub issue, Hub record or job queue is a prerequisite. Preserve and report any edits already made in the wrong workspace; do not discard user work. Never hand Allison a terminal command, a folder to open or a routine first message to paste.
-- **Allison explicitly asks to start a brand new chat.** Only then does the one first-message copy box apply, built by lane-spawn under code-block-routing. Ordinary routing and mismatch handling never become a paste task.
-- **No owner exists yet.** Report the live checks and what came back. The work needs the repo-standards creation gate (run through new-project) before any repo or folder exists. Create nothing on the fly.
+- **Code work in the wrong workspace.** Commit and push nothing here. Continue the authorized native Factory assignment in the owning repo on an isolated branch/worktree, checking open PRs on the way. No GitHub issue, Hub record or job queue is a prerequisite. Preserve any edits already made in the wrong workspace; do not discard user work. Never hand Allison a terminal command or a message to paste.
+- **Allison asks for a brand new chat.** Start it yourself where you can. Ordinary routing never becomes a paste task.
+- **No owner exists yet.** Run the repo-standards placement check (through new-project), then create the home it names.
 
 ## Edge cases
 
 - **Aura as a home.** Aura is retired and locked read-only. It is never a home, a source or a fallback.
 - **Work spanning owners.** Split it by owner. Cross-brand rules and decisions live in the HQ Business Brain in Drive.
-- **Genuinely unclear ownership.** Bring Allison one question with a recommendation, routed the way the HQ Rulebook and Decision Log route questions, and keep working on everything that does not depend on the answer.
+- **Genuinely unclear ownership.** Pick the best fit, say why in one line, and keep working. Ask Allison only if the choice is a business call no source answers.
 
 ## Why it matters
 

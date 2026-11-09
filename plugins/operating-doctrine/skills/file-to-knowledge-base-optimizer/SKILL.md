@@ -26,14 +26,14 @@ As the slash command, or on its own when someone asks to prepare, clean, format 
 
 1. Read the live HQ Rulebook, How we build, for the file rules, and the Decision Log entries above (R31, G21).
 2. Find where the source lives. Its own name may carry the company or department identity, and a source that sits in a brain's Private folder keeps its output in that Private folder (G13, R32, Decision Log 2026-10-28, The EP Business Brain gets a Claude Outputs folder).
-3. Confirm a Python 3 runtime can run scripts/optimize.py in this session. The script has no required dependencies. pdfplumber gives better tables and page layout for PDFs when it is installed (R09, G18, G22).
-4. Find the Drive route this session already holds, a connector or the service account the machine is set up with. Never ask for a credential before checking 1Password and the routes already set up (R13, R32).
+3. Use a Python 3 runtime to run scripts/optimize.py in this session. The script has no required dependencies. pdfplumber gives better tables and page layout for PDFs when it is installed (R09, G18, G22).
+4. Find the Drive route this session already holds, a connector or the service account the machine is set up with. Check 1Password and the routes already set up for credentials (R13, R32).
 
 ## Step 1, take in the source (R05, R06, G22)
 
 Accept pasted text, a PDF, a Word or Google Doc, a captions file (VTT or SRT), a Notion or web export, a web page by its address, or an audio or video recording. Save pasted text to a file first. For a Google Doc, fetch the document through the Docs API with every tab included and save that JSON, or export it as a Word file, so no tab is left behind. For a web page, fetch it and save the HTML. Several files are processed one at a time, each with its own run, unless the request asks to combine them (see Combining related files).
 
-Pick the extraction route by source kind. The script does this when the kind is clear from the file. A recording goes through Whisper transcription when it is available in the session. If a file cannot be read at all, stop on that file, say exactly what failed, invent nothing, and continue with the remaining files (G22).
+Pick the extraction route by source kind. The script does this when the kind is clear from the file. A recording goes through Whisper transcription when it is available in the session. If a file cannot be read at all after trying the other routes, say exactly what failed in the report, invent nothing, and continue with the remaining files (G22).
 
 ## Step 2, intake, one or two questions (R07, R08)
 
@@ -94,9 +94,9 @@ Rules for what you write.
 - An action or decision is something the source states as a commitment, a decision or a request still to be done. Something the source already treats as settled is not an action (R18, G19).
 - The intake's title, date and people may appear in the summary and takeaways. Nothing else from outside the source may (R07, G19).
 - Keep interpretation in the summary and takeaways. The Content section is the source itself (G17).
-- Check your own work before handing it in. Read every summary sentence and every takeaway again next to the passage it comes from. Count anything you counted, and state the count the text gives. Keep the source's own groupings, so two statements the source makes separately stay separate. Use words like first, last, closes with or opens with only when the text's order bears them out. Fix or remove anything the text does not say exactly (G17, G19, R16).
-- Then check it with fresh eyes. Where the session can start a fresh context, such as Claude Code or Codex, hand the part text and the draft file to a fresh reader whose only job is to find every statement the text does not support, every attribution the labeled words do not carry, every hedge dropped and every word the source does not use, and fix what it finds. Elsewhere, read the part again from the top and run the same hunt yourself. Nothing is handed in until that read finds nothing (G17, G19).
-- Check each file's shape, quotes and words before moving on, with python3 scripts/optimize.py validate --derived <file> --part <the part file> (add --combined and one --part per source for combined.json). Besides the shape and the quotes, it checks that every name, number and term in the summary, takeaways, headings and actions appears in the part text, or in the run folder's intake.json, spelled the same way. It prints OK or says what to fix (R16, R17, G17, G19).
+- Read every summary sentence and every takeaway again next to the passage it comes from. Count anything you counted, and state the count the text gives. Keep the source's own groupings, so two statements the source makes separately stay separate. Use words like first, last, closes with or opens with only when the text's order bears them out. Fix or remove anything the text does not say exactly (G17, G19, R16).
+- Then read it with fresh eyes. Where the session can start a fresh context, such as Claude Code or Codex, hand the part text and the draft file to a fresh reader whose only job is to find every statement the text does not support, every attribution the labeled words do not carry, every hedge dropped and every word the source does not use, and fix what it finds. Elsewhere, read the part again from the top and run the same hunt yourself. Fix what it finds (G17, G19).
+- Run python3 scripts/optimize.py validate --derived <file> --part <the part file> (add --combined and one --part per source for combined.json). Besides the shape and the quotes, it checks that every name, number and term in the summary, takeaways, headings and actions appears in the part text, or in the run folder's intake.json, spelled the same way. It prints OK or says what to fix, and you fix it (R16, R17, G17, G19).
 
 ## Step 5, size and split (R12, G16)
 
@@ -115,7 +115,7 @@ What happens, from references/file-rules.md.
 - Names follow the company file rule, [Company][Version] Title.md or [Company-Department][Version] Title.md, with the version near the front and a friendly title. Parts add , Part n of N and the navigation page adds , Navigation (G13, R31).
 - The files land in the working folder, then in the Claude outputs folder of the brain the file belongs to, found by its name, for example Claude Outputs [EP-BB]. A source that sits in a Private folder keeps its output there. The tool never creates a folder (R13, R32, G23).
 - A source optimized for the first time is V1.0. A source already optimized is compared with the saved version. Unchanged, nothing new is saved. A small change advances the decimal and a larger change the whole number. The superseded files move to the brain's Archives folder, keeping their IDs, and nothing is deleted (R31, G14).
-- Then the message, printed and saved as completion-report.md. The file name or names, where they were saved, how many parts, the version and what it replaced, which uploaded copies now need refreshing, and anything that could not be read (G12). Give that message to the person who asked, with each saved file as a clickable name.
+- Then the message, printed and saved as completion-report.md. The file name or names, where they were saved, how many parts, the version and what it replaced, which uploaded copies now need refreshing, and anything that could not be read (G12). Report to the person who asked, with each saved file as a clickable name.
 
 Read references/output-contract.md for the exact shape of every file.
 
@@ -131,7 +131,6 @@ Combine only when the request asks for it, and only files on the same topic. Run
 - Guesses at a table, a scan or an unreadable region (G18).
 - Picks a winner between sources that disagree (G15).
 - Creates a folder, deletes a file, or changes an original (G23, R31).
-- Certifies its own output. Claude in HQ and Allison certify under the build standard (G21).
 
 ## Files in this skill
 

@@ -16,7 +16,7 @@ subtitle: "ask before working"
 
 One job. Before doing the work, ask Allison the few questions that would most change the result, the way Cal teaches.
 
-Source: the HQ Rulebook, Clarifying questions, and the Decision Log entry of 2026-10-25, Q means ask me clarifying questions. The Rulebook wins wherever this differs.
+Source: the Decision Log entry of 2026-10-25, Q means ask me clarifying questions. Allison asked for this mode, so asking is the job here and it is not a gate.
 
 ## Trigger
 
@@ -30,14 +30,14 @@ The skill fires on these and nothing else.
 
 A Q or the word question inside a normal sentence. What were our Q3 numbers does not fire it. Q4 planning does not fire it. Quick question, is the listing live does not fire it. Answer those the normal way.
 
-Q is never a sent signal and S is never a clarifying signal. For delivery confirmations, follow the current HQ Rulebook section Handoffs between AIs.
+Q is never a sent signal and S is never a clarifying signal.
 
 ## What to do when it fires
 
-1. Read first. Read the conversation, any attached files, and the owning brain before asking anything.
+1. Read first. Read the conversation, any attached files, and the owning brain before asking anything, and look up whatever a tool can answer.
 2. Ask one question and wait. Make it the most important one first. Ask no more than five in total, one at a time, and stop early when nothing material is left. Each question must unlock something you could not work out on your own.
 3. Never ask what you already know. Never invent a missing fact. When Allison does not know an answer, mark it as missing and move on.
-4. Say it back. After the last answer, write two or three plain lines on what you learned, then do the work. This step is HQ's addition to Cal's method.
+4. Sum up. After the last answer, write two or three plain lines on what you learned, then do the work all the way to done. This step is HQ's addition to Cal's method.
 5. Nothing to ask. If nothing material is unclear, say so in one line and do the work. This exit is also HQ's addition.
 6. No task yet. If there is no task on the table at all, ask the one question, what do you want to work on, and wait. Then start at step 1.
 

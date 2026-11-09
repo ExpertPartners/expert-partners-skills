@@ -6,7 +6,7 @@ Every implementation conversation runs on some model (Haiku, Sonnet, Opus, Fable
 
 ## What it does, in one sentence
 
-At conversation start or on a fit question, it checks the current selection against the Model chart in the HQ Rulebook (which replaced ADR 0057). When NORTH prepares a new technical handoff, it also recommends one verified surface, model and effort under ADR 0072. A correctly dispatched Worker whose selection matches its banner follows ADR 0093 and proceeds without repeating the whole fit check.
+At conversation start or on a fit question, it checks the current selection against the Model chart in the HQ Rulebook (which replaced ADR 0057). For a new technical handoff, it also picks one verified surface, model and effort. A dispatched Worker whose selection matches its banner proceeds without repeating the whole fit check.
 
 ## Why it fetches the ADR live instead of just knowing the rules
 
@@ -29,4 +29,4 @@ This estate's skill standard (the four-artifact rule) calls for SKILL.md, a trai
 
 ## How to know it's working
 
-For a new handoff, check that NORTH names one current surface/model/effort combination with a short reason and supporting capability evidence. Batch-First Execution must then include every required routing field before Allison receives the prompt. For a dispatched Worker with a matching runtime banner, proceeding without another full classification is expected under ADR 0093. A live surface smoke test is still needed before claiming installation.
+For a new handoff, one current surface/model/effort combination with a short reason is named. A dispatched Worker with a matching runtime banner proceeds without another full classification.

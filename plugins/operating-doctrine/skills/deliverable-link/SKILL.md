@@ -18,7 +18,7 @@ Ruled by Allison Gaddy, August 4, 2026, after a Session Close and Continuity Pro
 
 When Claude builds, updates, or delivers anything that lives at a URL, the confirmation in chat carries a markdown hyperlink and the link text is the document's exact name. Like this, [2026-08-04 Session Close and Continuity Prompt v2](the Doc's URL). Never a raw URL. Never a location description standing in for a link ("it's in your Drive", "check the repo", "I pushed it to intake"). The link is the delivery. The name on the link matches the name on the file, including the YYYY-MM-DD prefix when the file carries one.
 
-Rider, 2026-08-05 (Allison's robot delivery standards ruling, history in GitHub Archive): this standard extends to every automated sender (robots) on every rail, including the CI watchman's iMessages via Sendblue and Ember at wake; a robot's link text is always the exact document title, never a bare URL and never a GitHub link. Amended 2026-08-06 per the Ember Voice and Your Move Queue ruling (history in GitHub Archive, ee86601). R2, every robot message to Allison speaks as Ember in first person. R3, robot texts link hq.allisongaddy.com only, and the your-move instruction itself lives on the board rendered at hq.allisongaddy.com rather than a per-task doc (rail spec, history in GitHub Archive).
+This standard extends to every automated sender on every rail. A robot's link text is always the exact document title, never a bare URL.
 
 ## What fires it
 
@@ -34,8 +34,8 @@ One markdown hyperlink per deliverable. Multiple deliverables in one response ea
 
 ## Failure condition
 
-Any confirmation that a deliverable exists without its hyperlink in the same message. Any bare raw URL. Any sentence shaped like "I made it, it's in X". If a slip is noticed mid session, fix it immediately by re-delivering the link, do not wait to be asked.
+Any confirmation that a deliverable exists without its hyperlink in the same message. Any bare raw URL. Any sentence shaped like "I made it, it's in X". If a slip is noticed mid session, re-deliver the link at once.
 
 ## Where this standard lives
 
-This file, in expert-partners-skills (plugins/operating-doctrine/skills/deliverable-link/), is the canonical copy. Cowork loads its saved operative copy of the same skill; Claude Code applies it via the user CLAUDE.md pointer and the expert-partners plugin marketplace mirror. If the standard changes, Allison rules it, and every copy updates together. The org-provisioned copy in Cowork does not auto-sync; after any change here, Allison re-uploads it per the skills sync ADR.
+This file, in expert-partners-skills (plugins/operating-doctrine/skills/deliverable-link/), is the canonical copy. Surfaces receive it through the plugin marketplace.
