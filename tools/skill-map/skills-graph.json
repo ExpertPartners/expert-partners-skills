@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "e153e6580c02a5cacbe3b3b2746307bab7c40000"
+    "eps": "293b2aaf669a91a9d70331ee570eceeef31ad331"
   },
   "zones": [
     "surfaces",
@@ -1830,7 +1830,7 @@
       "repo": "eps",
       "tier": "plugin",
       "zone": "routing",
-      "status": "live",
+      "status": "retired",
       "inherits": [
         "operating-doctrine"
       ],
@@ -1885,7 +1885,7 @@
       "repo": "eps",
       "tier": "plugin",
       "zone": "routing",
-      "status": "live",
+      "status": "retired",
       "inherits": [
         "operating-doctrine"
       ],
@@ -2386,7 +2386,7 @@
       "repo": "eps",
       "tier": "plugin",
       "zone": "routing",
-      "status": "live",
+      "status": "retired",
       "inherits": [
         "operating-doctrine"
       ],
@@ -2853,7 +2853,7 @@
       "repo": "eps",
       "tier": "plugin",
       "zone": "routing",
-      "status": "live",
+      "status": "retired",
       "inherits": [
         "operating-doctrine"
       ],
