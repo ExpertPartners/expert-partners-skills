@@ -47,9 +47,11 @@ class NativeLifecycleContracts(unittest.TestCase):
         self.assertNotIn('Auto only when', operator)
         self.assertNotIn('Otherwise pin.', operator)
 
-    def test_completion_acts_by_default_without_approval_gates(self):
+    def test_doctrine_acts_by_default_without_approval_gates(self):
         doctrine = source(SKILLS + 'operating-doctrine/SKILL.md')
-        self.assertIn('no approval gates', doctrine.lower())
+        self.assertIn('There are no approval gates', doctrine)
+        self.assertIn('Allison\'s brief is the go', doctrine)
+        self.assertNotIn('## The Job Report And Archive Readiness', doctrine)
         self.assertNotIn('Use job_create or job_claim', doctrine)
 
     def test_retirement_does_not_follow_from_inactivity(self):

@@ -1,40 +1,13 @@
-# Wrap mechanics: Drive writes, job reports, historical dashboard mark
-
-Volatile mechanics live here, dated, verified at use time. Nothing in SKILL.md depends on them.
+# Wrap mechanics
 
 ## Drive records
 
-The session report lives in the job_finish summary. Substantive deliverables and the continuity note: a Google Doc in the owning brain's home folder, found through that brain's 00 START HERE index (Company Core [HQ-BB] when no one company owns it). Plain title, no date prefix. Create it with the Google Docs or Drive connector; if the connector refuses the write, use the service-account path (SA+DWD, impersonating allison@) for the same folder. The returned link is a write receipt, not proof: open the Doc from Drive to verify.
+Save substantive deliverables and the continuity note as a Google Doc in the owning brain's home folder, found through that brain's 00 START HERE index (Company Core when no one company owns it). Plain title, no date prefix. Use the Google Docs or Drive connector. If the connector refuses the write, use the service-account path for the same folder.
 
 ## Decision Log
 
-The Decision Log Doc, in Company Core [HQ-BB], found by its title. Add each decision at the top under today's date heading (create the heading if today's is missing): what was decided, why in one or two sentences, a `Replaces:` note naming the older decision it supersedes (or none), and a link to the full record. Re-read the Doc after the write to confirm the entry landed and nothing else changed.
+The Decision Log Doc is in Company Core, found by its title. Add each decision at the top under today's date heading: what was decided, why in a sentence or two, a `Replaces:` note (or none), and a link to the full record.
 
-## Chat to Code job report
+## Dashboard wrap mark
 
-Use job_create or job_claim for the receiving AI's assignment. Use job_finish with the summary and result link for the single final completion report only when the assignment is genuinely completed. The exception is a genuine non-code founder decision request where current HQ requires job_finish with outcome needs-allison and a Recommend: summary; verify that request through job_status. It is not completion, does not count as the single final completion report and does not clear archive readiness or consent. Ordinary unfinished progress uses only a schema-supported nonterminal write in the same job; if none is available, report the blocker without claiming completion. Retrieval and technical gaps remain AI owned and never justify a done outcome. Verify both the saved report and correct state through job_status. Code work travels as a GitHub issue labeled job. Inspect the current tool schemas rather than inventing arguments. Follow the current HQ Rulebook section Handoffs between AIs for the complete return message. An unavailable write leaves the reporting obligation open; never claim completion from a copy box alone.
-
-## Dashboard wrap mark (hq.allisongaddy.com)
-
-RETIRED 2026-08-06. Ruled by Allison in the Memory Drawer Cleanup lane, ruling of record: history in GitHub Archive, forced by the Board Walk clearing of 2026-08-07 (commit d183965, twelve marks removed, bodies preserved; history in GitHub Archive). The wrap mark is out of the session-wrap protocol entirely as of SKILL.md v1.4; a wrap no longer marks the board. Everything below is kept as the mechanical record of how the mark worked, per append-and-update-never-silently-delete. Do not execute it as part of a wrap. Disposition of door tool nine `wrap_mark` is settled as of 2026-08-07, the tool has been removed from the door. Live `tools/list` returns eight tools, confirmed in the session-wrap MCP-failure eval (Finding B) and inked at history in GitHub Archive.
-
-The dashboard is a stateless read-only render of the Founder Active Work board (github.com/orgs/ExpertPartners/projects/1). The wrap leaves its mark ON THE BOARD, never via a second dashboard render path (one source of truth). Ruled mechanism, one dated draft item per wrap.
-
-The mark was once written by a dedicated tool that enumerated before writing, deduped by title, and verified by query-back. That tool is gone. Use the REST fallback below if a mark is ever needed again.
-
-CORRECTION, 2026-08-07: ProjectsV2 is NOT GraphQL-only. That claim was true when this file was written and is now stale; it survived into the wrap-mark flag's premise and briefly argued for a classic PAT that the estate did not need. Verified live 2026-08-07 against api.github.com from this repo's session: `GET /orgs/ExpertPartners/projectsV2` returns the org's projects, and `POST /orgs/{org}/projectsV2/{number}/drafts` is a real endpoint on BOTH API versions 2022-11-28 and 2026-03-10 (probed with the body omitted, so both returned HTTP 422 "Invalid input: data cannot be null" citing docs.github.com/rest/projects/drafts#create-draft-item-for-organization-owned-project, and nothing was created). Independently corroborated 2026-08-06 by the Door Tools Build lane. The retired mark writer used REST, not GraphQL.
-
-REST path. REST, two calls:
-
-1. Read the board to dedupe: `GET /orgs/ExpertPartners/projectsV2/1/items`
-2. Create the mark: `POST /orgs/ExpertPartners/projectsV2/1/drafts` with a JSON body carrying the title and body.
-
-Title: `Wrap: [lane] [YYYY-MM-DD]`. Body: one line pointing at the two intake paths and the ledger commit. Pointers only, no pasted state.
-
-From Claude Code: `gh api` with the authenticated gh session. The GraphQL pair (`organization.projectV2(number:)` for the node id, then `addProjectV2DraftIssue`) still works and stays a valid fallback; it is no longer the only path. Auth needs project scope. Tokens live in 1Password only. Proven live 2026-08-05 by the Canon Doc Sync and Wrap Marks Backfill lanes (AllisonGaddy keyring identity with project scope, query-back verification per item).
-
-Known constraint (reported 2026, community-sourced, verify before relying): `updateProjectV2ItemFieldValue` single-select changes can update the data store without updating the board-view grouping index, so a card may not visibly move columns. That is why the wrap mark is a NEW dated draft item, never a status move.
-
-If the current surface has no authenticated REST or GraphQL path: say plainly the mark did not land and why, and ship the mark's dispatch block to a capable session in the same wrap turn (closeout completeness rule, SKILL.md v1.3). Never silently skip. The durable fix ordered by the shared-canonical-file-writes directive (Rule 3) shipped 2026-08-07 with two tools, a lane-ledger writer and a wrap-mark writer. Both were caught out by their own first live run, the ledger writer on timezone and the mark writer on board-index lag, neither reachable by unit test; proving-live is the standard for write tools.
-
-RETIRED IN HALF, 2026-08-06 (same ruling as the section head). The ORDERED durable fix above paired two tools, and only one half survived the ruling. The lane-ledger half stood because it served an active wrap step. The wrap-mark half is MOOT, the protocol step it was built for no longer exists, so nothing in a wrap calls it, and its tool has been removed entirely. See the ruling at history in GitHub Archive.
+Retired. A wrap no longer marks the board.

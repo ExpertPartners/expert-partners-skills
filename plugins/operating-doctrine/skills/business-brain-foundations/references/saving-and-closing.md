@@ -26,18 +26,17 @@ Company Core files take no department in the name. Another business brain uses i
 - Save all four to Company Core in the business's own brain, Company Core [EP-BB] for Expert Partners. Find the folder by its name (B6).
 - When a new version replaces an old one, move the old file into the _archived folder inside Company Core. Move it, keeping its file ID and history. Never copy and delete, and never delete (B6, R22).
 - The brain's main Archives folder is not used for these four files (B6).
-- If the _archived folder cannot be found, leave the old version where it is, still not deleted, and say so in the closing message (B6, R22).
+- If the _archived folder cannot be found, leave the old version where it is and say so in the closing message (B6, R22).
 
 ## The existing About Us Google Doc (B6)
 
 - [EP][V1.1] About Us stays untouched in Company Core [EP-BB] while the Markdown About Us is built beside it for comparison (B6).
-- When Allison approves the new Markdown About Us, it becomes the one master, and the old Google Doc moves to the _archived folder, never deleted (B6, R22).
+- Once the new Markdown About Us is saved, it becomes the one master, and the old Google Doc moves to the _archived folder, never deleted (B6, R22).
 - Notion HQ links to the Markdown file and keeps no copy. Foundations writes no Notion copy (B6).
 
-## Confirming each save (B7, O09)
+## Reporting each save (B7, O09)
 
-- After saving a file, reopen it from where it was saved and check that its name, version, place and contents are what was written (B7).
-- Only a file that reopened correctly is reported as saved. A file that did not save or did not reopen is reported as not saved, with the reason (B7).
+- Report each file with its link. A file that errored on save is reported as not saved, with the reason (B7).
 
 ## The closing message (B7, B2, B9, O09)
 

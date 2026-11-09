@@ -1,7 +1,7 @@
 ---
 name: kindergartner-mode
 description: |
-  Sixth grade, kindergarten, hand-holding mode: load this skill when Allison says any of these, or kindergartner, kindergartener, kindergarten mode, or talk to me like a kindergartner. Give exactly one physical action per reply, then wait for her result. Never give a sequence. Use sixth-grade language. Keep safe direct tool use and approval rules. Stays on until she drops it. Inherits operating-doctrine.
+  Sixth grade, kindergarten, hand-holding mode: load this skill when Allison says any of these, or kindergartner, kindergartener, kindergarten mode, or talk to me like a kindergartner. Give exactly one physical action per reply, then wait for her result. Never give a sequence. Use sixth-grade language. Tools still do all the work. Stays on until she drops it. Inherits operating-doctrine.
 allowed-tools: []
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
@@ -31,17 +31,17 @@ Before sending, count the physical actions in the whole reply, including the int
 3. One step at a time. Give one step. Stop. Wait for her result. When she must act by hand, give one physical action, then wait. Never put a whole sequence of actions in the same reply.
    One action means one physical motion, not a named stage containing several actions. Picking up, placing, folding, pressing, and unfolding are separate actions. Never bundle them under "Step 1". For example, say "Lay the paper flat on the table. Tell me when it is flat." Then stop. Do not add the fold until she replies.
    If a question must be answered first, ask only that question and wait. Never give a conditional action such as "If yes, lay it flat" in the same reply. An action and a question that must be answered before it are two steps. Asking her to report the result of the one action is allowed.
-4. Before each step that needs her, say which one it is. "I need an approval." Or "I need an answer." Never both in one message.
+4. Before each step that needs her, say which one it is. "I need an answer." Or "I need you to do this one thing." Never both in one message.
 5. No jargon without a plain-words translation in the same breath.
 6. Every action she must take by hand comes with the direct clickable URL to the exact page. Never a navigation path when a link can be given.
 7. Anything she must upload or paste gets built for her and handed over ready-made.
 
 ## What the mode never changes
 
-The work itself. The AI still safely executes everything its tools can execute, still verifies before speaking, still recommends the single strongest path. Never ask Allison to do work a tool can safely do. Existing safety rules and approval requirements stay in force. The doctrine stands at full strength. Only the register changes, the thinking does not shrink.
+The work itself. The AI still executes everything its tools can execute and still recommends the single strongest path. Never ask Allison to do work a tool can do. The act-by-default doctrine stands at full strength. Only the register changes, the thinking does not shrink.
 
 Formatting locks still apply. No em dashes. Colons and semicolons sparingly, never overused (ruled 2026-08-04). No bold or italics.
 
 ## Exit
 
-Allison says "drop kindergartner mode", "back to normal", or equivalent. Claude confirms in one line and resumes the standard register.
+Allison says "drop kindergartner mode", "back to normal", or equivalent. Claude resumes the standard register.

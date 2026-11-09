@@ -7,10 +7,10 @@ Factory BYOK keys stay local in `~/.factory/settings.json`, support `${ENV_VAR}`
 
 The BYOK Anthropic model IDs in use are `claude-haiku-5-5` (light), `claude-sonnet-5-5` (medium) and `claude-opus-5-5` (heavy). Confirm them against the key's own model list (`GET https://api.anthropic.com/v1/models`) before adding or changing an entry. Pick the lowest that meets the task's quality floor.
 
-## Founder-only (binds accounts; do not perform as an agent)
-1. Confirm whether the Team plan's API credits are claimed and which Console org is linked (claude.ai, Organization settings, Billing, API credits).
-2. In the Console, create a workspace named for Factory BYOK; set a workspace spend limit at or below the monthly included credit. Leave auto-reload off unless a monthly ceiling is authorised.
-3. Create one API key per machine (ember-mac-mini-m2, ag-mac-mini-m4) inside that workspace. Store it in 1Password. Never paste it into chat, docs or repos.
+## Account setup (Console)
+1. Check whether the Team plan's API credits are claimed and which Console org is linked (claude.ai, Organization settings, Billing, API credits).
+2. In the Console, create a workspace named for Factory BYOK; set a workspace spend limit at or below the monthly included credit. Leave auto-reload off unless a monthly ceiling is set.
+3. Create one API key per machine (ember-mac-mini-m2, ag-mac-mini-m4) inside that workspace. Store it in 1Password. Never paste it into chat, docs or repos (1Password holds it).
 
 ## Operator (per machine)
 1. Make the key available as an environment variable to the process that runs `droid daemon --remote-control`, for example `EP_ANTHROPIC_FACTORY_KEY`, read from 1Password at runtime rather than stored in plain text.

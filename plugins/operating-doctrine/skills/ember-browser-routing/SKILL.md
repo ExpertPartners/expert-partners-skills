@@ -26,27 +26,22 @@ Never attach to, click, type in, navigate, foreground, or move the cursor on All
 
 <!-- RULED-BY: HQ Business Brain, [HQ][V1.0] Decision Log, 2026-11-03 entries "Headless access comes first, and no browser is used where headless access exists" and "Standing yes for headless access setup" date:2026-11-03 -->
 
-The rule, what setup needs no ask and its exceptions live in HQ Business Brain: the HQ
-Rulebook section Use the access Allison already gave, and the Decision Log 2026-11-03
-entries Headless access comes first and Standing yes for headless access setup. Read them
-there before acting. They win if this section ever differs.
+Headless access comes first and no browser is used where headless access exists. The
+newest Decision Log entry wins if this section ever differs.
 
 Before any browser work, check the system in this order and stop at the first step that
 applies.
 
 1. A connected MCP server or connector that covers the system.
 2. An API or CLI with its 1Password item.
-3. If neither exists yet but could, a setup job filed right away as the first job on that
-   system. The Decision Log entry Standing yes for headless access setup says which setup
-   goes ahead without asking.
+3. If neither exists yet but could, set it up now and use it.
 4. Only then a browser, and only for a vendor with no API, with that reason written down.
 
 The access map, a Google Sheet owned by Keys and Sign-Ins, records each system's hosts,
 headless route, 1Password item and status. The operating-doctrine plugin's headless route
 check hook refuses any browser navigation to a system marked live, naming the route and item
-to use, and to a system marked setting up, because the setup job comes first. A refusal is
-the answer, not a blocker. Switch to the route it names and never get around it with
-another browser tool. [browser-automation](../browser-automation/SKILL.md) Rule 0 carries
+to use, and to a system marked setting up, because setup comes first. Switch to the
+route it names. If a refusal is only out of date, update the hook. [browser-automation](../browser-automation/SKILL.md) Rule 0 carries
 the full rule.
 
 ## Browser workflow
@@ -58,7 +53,7 @@ the full rule.
    live website session. Verify the target application's own account before acting.
 2. When browser/UI work is required, connect to Ember's M2 through the `playwright-ember` tool, the one browser route (AI Implementation SOP, section 5).
 3. Enumerate the M2 browser targets and select the exact tab/window needed for the current assignment.
-4. Continue without asking Allison whether the M2 is available merely because other tabs, windows, tasks, or sessions are visible.
+4. The M2 is available. Other visible tabs, windows, tasks or sessions don't change that.
 5. Keep one working tab per task and reuse it by navigating in place. Open a second tab only when two pages must sit side by side, and close it right after. Preserve pre-existing tabs and anything owned by another session or by Allison.
 
 ## Existing authenticated Chrome attachment
@@ -151,7 +146,7 @@ window alone does not prove that separation.
 - Control only the tab/window belonging to the current assignment.
 - Do not close, repurpose, or navigate another session's tabs or Allison's.
 - Use exact tab selection when the integration supports it.
-- If exact targeting genuinely cannot be established without risking another session, stop on that specific conflict rather than asking whether the whole M2 is available.
+- If exact targeting can't be established without risking another session, resolve that specific conflict. The M2 itself stays available.
 
 The narrow existing-profile window adapter and consumer acceptance checklist are
 [packaged with browser-automation](../browser-automation/references/owned-connections.md). The SOP owns
@@ -174,17 +169,11 @@ Never use a click on Allison's M4 as a workaround to rebind browser control.
 <!-- RULED-BY: HQ Business Brain, [HQ][V1.0] Decision Log, 2026-11-03 entry "AI uses the sign-ins Allison set up, without waiting for her" date:2026-11-03 -->
 
 When 1Password in Ember's Chrome on the M2 offers a saved login, or a site offers Sign in with
-Google or another single sign-on for an account already signed in there, Claude Code, Ember and
-any AI working for Allison go ahead, sign in and keep working without asking her. 1Password fills
-the credential itself, so no AI types or sees a password. The hard stops stay. New account access
-(creating an account or adding access that does not exist yet), live releases, messages outside
-approved campaigns and anything irreversible still need the applicable founder's yes, which is
-Allison's for her own accounts. Single sign-on counts only
-for a site account that already exists. If the button leads to a sign-up page, a new consent or
-permissions screen, or asks to create anything, that is new account access, so stop and ask her.
-If an account chooser appears, pick only the identity already linked to that site, the one its
-1Password item or saved account names. If that is not clear, stop and ask, because many sites
-create an account the moment an unlinked identity signs in.
+Google or another single sign-on for an account already signed in there, sign in and keep
+working. 1Password fills the credential itself, so no AI types or sees a password. If an
+account chooser appears, pick the identity already linked to that site, the one its
+1Password item or saved account names. A sign-up page or new consent screen is a human
+step, handled below.
 
 A sign-in page by itself is not human-only. Use the 1Password fill or the single sign-on button
 first, and never read a password into the session's own context.
@@ -211,8 +200,7 @@ This follows the HQ Rulebook's Browser tabs stay clean section (Decision Log 202
 
 ## Reporting
 
-Every report from a session that used a browser carries these two lines together. A report
-without them is incomplete.
+A session that used a browser ends its report with these two lines.
 
 ```text
 Headless route checked, <system>, <result>
@@ -226,6 +214,6 @@ when it lets one through.
 
 ## Dispatch wording
 
-When a handoff needs an explicit browser line, use:
+When a brief needs an explicit browser line, use:
 
-`BROWSER RULE: Check the headless route first, and use no browser for a system with headless access. Browser/UI work runs on Ember's M2 only. Allison's M4 may be used for code/terminal/files but never for browser control. Assume the M2 is available; do not ask because other M2 tabs/sessions are visible. Stop only on an explicit M2 browser-control failure, a sign-in that neither the 1Password fill nor single sign-on covers, MFA, CAPTCHA, a sign-up or consent screen, a human approval, or a genuine tab-selection conflict, and never fall back to the M4.`
+`BROWSER RULE: Check the headless route first, and use no browser for a system with headless access. Browser/UI work runs on Ember's M2 only. Allison's M4 may be used for code/terminal/files but never for browser control. The M2 is available. Never fall back to the M4. Only a human-only screen (a sign-in the 1Password fill and single sign-on don't cover, MFA, CAPTCHA, a sign-up or consent screen) needs Allison.`

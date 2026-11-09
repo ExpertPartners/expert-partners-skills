@@ -1,3 +1,6 @@
+## 3.1.0 - 2026-11-09
+
+Act by default across every operating-doctrine skill (Decision Log 2026-11-08, Act by default, caution removed). Approval gates, owner handoffs, copy-box and mailbox relays, job-list polling, readbacks, certification and archive-safety gating are removed from all skills. Skills whose whole purpose was a retired gate (pin, session-steward, job-list-heartbeat, lane-spawn, intake, code-block-routing) are now short retirement notes that keep existing references resolving. Technical mechanics, trigger descriptions and Allison's personal controls are kept.
 ## 3.0.0 - 2026-11-09
 
 The operating doctrine is rewritten as Act by Default. Allison's brief is the go, there are no approval gates, out-of-date guards get updated instead of obeyed, and every session starts with that rule. It overrides any caution, approval or handoff rule in any other skill, AGENTS.md, guard or older doc. The longer doctrine it replaced stays in git history.

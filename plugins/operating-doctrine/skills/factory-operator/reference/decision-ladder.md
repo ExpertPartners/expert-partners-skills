@@ -4,7 +4,7 @@ Facts relied on (confirmed at https://docs.factory.com/pricing/individuals.md an
 
 ## Current decision order
 
-Read the newest live Factory decisions before using numerical advice. Auto and the available Factory allowance are the default. BYOK is optional. Check actual independent usage windows and provider limits, choose minimal useful parallelism and protect founder responsiveness on local machines. Unknown usage stays unverified. No percentage in this reference grants a new spend approval or creates a universal stop.
+Read the newest live Factory decisions before using numerical advice. Auto and the available Factory allowance are the default. BYOK is optional. Check actual independent usage windows and provider limits, choose minimal useful parallelism and protect founder responsiveness on local machines. Unknown usage stays unverified. No percentage in this reference is a stop.
 
 ## Historical window heuristics, superseded as mandatory defaults
 
@@ -13,7 +13,7 @@ Read the newest live Factory decisions before using numerical advice. Auto and t
 | 5-hour < 50% | Proceed; Auto allowed | Proceed pinned |
 | 5-hour 50–89% | Proceed pinned, one Workstream at a time | Proceed pinned, max two agents |
 | 5-hour ≥ 90% | Do not start on Standard. BYOK Claude on that machine if configured; else wait for the reset time | Droid Core Flash-class (lowest live multipliers, never Kimi K3) or defer |
-| Weekly or monthly ≥ 80% | Flag founder; one agent; prefer BYOK for frontier work | Defer non-urgent |
+| Weekly or monthly ≥ 80% | One agent; prefer BYOK for frontier work | Defer non-urgent |
 | Droid Core pool at 100% | Do not propose Droid Core | Same |
 | Managed compute near cap | No cloud Environments; Remote Control only | Same |
 
@@ -29,9 +29,9 @@ Read the newest live Factory decisions before using numerical advice. Auto and t
 
 ## Historical worked examples, not current execution instructions
 
-**A. Routine research Workstream, 5-hour 42%, Droid Core 100%.** Workstream on ag-mac-mini-m4; orchestrator Sonnet-class medium; two collection agents Sonnet-class high; one synthesis agent Opus-class high at the end; no cloud Environment; pinned; overage none; no approvals; verify via Workstream Usage.
+**A. Routine research Workstream, 5-hour 42%, Droid Core 100%.** Workstream on ag-mac-mini-m4; orchestrator Sonnet-class medium; two collection agents Sonnet-class high; one synthesis agent Opus-class high at the end; no cloud Environment; pinned; overage none; verify via Workstream Usage.
 
-**B. High-consequence bug fix + PR, 5-hour 96% resets 14:10.** Do not start on Standard. If ag-mac-mini-m4 has the BYOK Claude model, start a session on it at high reasoning. Else wait until 14:10. Never Droid Core for this. The work record note flags weekly usage.
+**B. High-consequence bug fix + PR, 5-hour 96% resets 14:10.** Do not start on Standard. If ag-mac-mini-m4 has the BYOK Claude model, start a session on it at high reasoning. Else wait until 14:10. Never Droid Core for this. The work record note notes weekly usage.
 
 **C. 90% banner mid-run.** Change models: drop agent reasoning one step. If blocked at the limit: switch agents to BYOK Claude if it is on that machine; otherwise pause until reset. Do not enable Extra Usage. Record it on the work record.
 

@@ -17,7 +17,7 @@ Compare only the homes a real owner check left standing, and only on the dimensi
 | Dimension | What to establish |
 | --- | --- |
 | Required access | Can it reach the sources, connectors and accounts the job needs, through the access order the AI Implementation SOP sets? |
-| Unattended operation | Only when asked for. Can it run on its own, and has it passed the proving runs the Decision Log requires? |
+| Unattended operation | Only when asked for. Can it run on its own? |
 | Persistence | Where its state and working context live between runs, and whether that state stays out of a second truth store. |
 | Collaboration | Who can use it, share it and see its results. |
 | Deployment and updates | How a change reaches it, how fast the current vendor docs say that happens, and what a running session keeps. |
@@ -33,7 +33,7 @@ When one outcome needs more than one system, each gets exactly one job. For a sk
 
 1. Discover. Name the outcome, run the owner checks and gather current capability evidence. Build nothing while the owner is unclear.
 2. Place. Choose the home and say why. Name the canonical source, operating owner, execution surface, human view and delivery surface.
-3. Launch. Coordinate the smallest build that establishes the capability in its home, through the existing Chat to Code route and the build-standard skill. Write the acceptance criteria and approval boundaries first.
+3. Launch. Coordinate the smallest build that establishes the capability in its home, through Claude Code or Factory and the build-standard skill. Write the acceptance criteria first.
 4. Prove. Verify in the destination itself. Keep the five kinds of evidence apart.
 5. Reconcile. Bring the existing records up to date and make sure the human view points to the source. A destination's settings screen never becomes a second truth.
 6. Transition. Hand day-to-day work to the owner. The room keeps only what still belongs to it, such as open cross-system issues. If nothing remains, recommend closing it.
@@ -52,7 +52,7 @@ When a platform does not expose the exact release it loaded, keep that uncertain
 
 ## Acceptance for a persistent specialist
 
-Before building an AI employee, bot or agent, write down its owned outcome, what is in and out of scope, its sources of truth, its tool and connector access, its approval boundaries, its state model, its output standard, its tests and failure tests, its first supervised assignment, and the proving runs that would let it run unattended. The build-standard skill and its test plan carry these forward.
+When building an AI employee, bot or agent, write down its owned outcome, what is in and out of scope, its sources of truth, its tool and connector access, its state model, its output standard, its tests and failure tests, and its first assignment. The build-standard skill and its test plan carry these forward.
 
 ## The failure to prevent
 

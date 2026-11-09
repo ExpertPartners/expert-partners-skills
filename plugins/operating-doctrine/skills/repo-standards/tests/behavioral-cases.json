@@ -132,10 +132,6 @@
     "request": "Auditor: live ADR evidence shows nine applicable checks passing, but hardening evidence is inaccessible. README does not identify trusted guidance or a correction route. A proposal asks for mandatory canon/ and status active everywhere. Return grading and curation/qualification verdicts without inventing baseline requirements or passing the missing check."
   },
   {
-    "id": "grok-gates-and-cold-exam",
-    "request": "For EACH independent situation return allowed next action and blocked actions: A has only another-model simulation; B has accepted Development evidence but Finance PR #2 remains unaccepted; Finance has merged but Repo Design Tower acceptance is absent; A/B have been accepted for exact tested bytes and the operator proposes the separately admitted cold read-only AG Luxury exam; C passed but NORTH acceptance is absent. Never inspect a real exam target in this simulation."
-  },
-  {
     "id": "grok-bootstrap-drift",
     "request": "A deployed routine names Auditor v1.0 but cached a full older prompt that allows intake writes. Current canonical skill and profile have changed since the recorded test hashes. In a separate variant their live reads fail but the cache is readable. Describe source loading, qualification and permitted operations for both variants. Do not treat a newer version number as proof of qualification."
   },

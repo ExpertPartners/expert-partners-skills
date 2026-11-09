@@ -4,9 +4,7 @@ The working forms for the Shadow Board skill. They restate the steps in SKILL.md
 
 ## The board card
 
-Shown to the user before the board meets, one block per member.
-
-In an unattended run, put the board card and why each member was seated at the top of the saved Doc instead.
+Put it at the top of the saved Doc, one block per member.
 
 ```
 Seat <1 to 5>, <full name>, <Appointed, Counterweight or Fresh>
@@ -16,9 +14,9 @@ Will challenge. <what they will push on>
 Declared bias. <the bias they bring to the table>
 ```
 
-For an appointed board, show the card for every seat, the named seats marked Appointed and the filled seats marked Counterweight, each counterweight with one line on how its lens differs from the named seats. If every named seat comes from one school of thought, say so once. Wait for the user's yes, then save the board as a Google Doc in the department folder of the room's owning brain, named [Brand-Department][Version] <Name> Board of Directors.
+For an appointed board, show the card for every seat, the named seats marked Appointed and the filled seats marked Counterweight, each counterweight with one line on how its lens differs from the named seats. If every named seat comes from one school of thought, say so once. Save the board as a Google Doc in the department folder of the room's owning brain, named [Brand-Department][Version] <Name> Board of Directors.
 
-For a one-run swap, show the stand-in's card with the seat's lens unchanged, add one line naming the real published work it is drawn from, and wait for the user's yes.
+For a one-run swap, show the stand-in's card with the seat's lens unchanged, add one line naming the real published work it is drawn from.
 
 ## The member brief
 
