@@ -8,14 +8,14 @@
     {
       "name": "operating-doctrine",
       "source": "./plugins/operating-doctrine",
-      "version": "3.3.0",
+      "version": "3.4.0",
       "description": "The non-negotiable operating standard. Loads at every session."
     },
     {
       "name": "brand-voice",
       "source": "./plugins/brand-voice",
       "description": "Canonical brand context for the Estate brand registry (Expert Partners, EPIC, AG Personal Brand, AG Luxury, FAM, Don Hobbs)",
-      "version": "0.7.1"
+      "version": "0.7.2"
     },
     {
       "name": "content-engines",

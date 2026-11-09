@@ -1,3 +1,6 @@
+## 3.4.0 - 2026-11-09
+
+Factory Operator now teaches every Claude and ChatGPT chat to use the Factory connection, one remote MCP connector and Hub endpoint over the Factory Public API. It finds the existing owner first, tells a new assignment from a status question, a correction or a duplicate, sends Workstream work to its orchestrator, writes a Workstream brief for new continuing programs, starts bounded jobs as Section - Mission sessions, uses Spec Mode when architecture is unclear, and lands deliverables in Drive or GitHub. A new reference file records the live API test results from November 9, 2026.
 ## 3.3.0 - 2026-11-09
 
 Add the shared Drive Factory Inbox bridge and a short Factory Operator guide so connected chats can create or message Factory sessions without a paste relay. Sessions the inbox starts publish their own completion receipt and then archive themselves.

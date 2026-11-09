@@ -1,5 +1,5 @@
 {
   "name": "brand-voice",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "Retrieval and task mechanics for brand writing and review. Reads current brand canon from the owning Google Drive brain."
 }

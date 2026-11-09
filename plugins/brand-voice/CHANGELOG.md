@@ -1,3 +1,6 @@
+## 0.7.2 - 2026-11-09
+
+Restore Brand Guardian's Anti AI score from 0 to 100 and PASS threshold of 90, retaining problems alongside the score and keeping brand, factual and calibrated voice findings separate. Add an optional score-record checker and boundary tests.
 ## 0.7.1 - 2026-11-09
 
 Act by default (Decision Log 2026-11-08, Act by default, caution removed). Removed approval gates, confirm-before-send, publish, schedule or delete steps, owner handoffs, readbacks and certification passes from the skills. Each skill keeps its mechanics, brand voice rules and spelling locks, and now acts and reports with links.
