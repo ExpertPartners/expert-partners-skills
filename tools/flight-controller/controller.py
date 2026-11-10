@@ -23,7 +23,7 @@ import uuid
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 MARKER = "flight-controller"
 USER_AGENT = "ep-flight-controller/" + VERSION
 SEND_URL = "https://api.sendblue.co/api/send-message"
@@ -47,6 +47,13 @@ EXHAUSTED = re.compile(
     r"|insufficient credits|no (?:remaining )?usage remaining)",
     re.I,
 )
+REFUSAL = re.compile(
+    r"(request failed|api error|error[: ]|refused|rejected|denied|blocked by"
+    r"|cannot (?:continue|proceed|complete)|unable to (?:continue|proceed|complete)"
+    r"|try again|retry|resets? (?:at|in)|too many requests|\b429\b|\b529\b"
+    r"|overloaded|please wait|paused until)",
+    re.I,
+)
 RESET_AT = re.compile(r"resets?\s+(?:at|on)\s+([0-9][0-9T:\-+.Z ]{7,31})", re.I)
 RESET_IN = re.compile(r"(?:try again|retry|resets?)\s+in\s+(\d{1,4})\s*(second|minute|hour)", re.I)
 UNITS = {"second": 1, "minute": 60, "hour": 3600}
@@ -64,6 +71,12 @@ class ApiError(ControllerError):
         self.kind = kind
         self.status = status
         self.sent_unknown = sent_unknown
+
+
+def iso(stamp):
+    if not stamp:
+        return "an unknown time"
+    return datetime.fromtimestamp(int(stamp) / 1000, timezone.utc).strftime("%Y-%m-%dT%H:%MZ")
 
 
 def atomic_write(path, text, mode=0o600):
@@ -254,18 +267,23 @@ def classify(session, children, messages, now_ms, config):
             reason="founder_text",
             evidence=FOUNDER.search(text).group(0),
         )
-    if EXHAUSTED.search(latest_words):
-        # Only the session's newest own words count, so an exhaustion message that later
-        # work has moved past is not read as current exhaustion.
+    hit = EXHAUSTED.search(latest_words)
+    if hit:
+        # The words alone are not a refusal: a session discussing a usage limit reads exactly
+        # like one that was refused by the provider. A real refusal carries a refusal cue
+        # beside the phrase or a reset time, so without either this stays ordinary prose.
         said_at = int(latest.get("createdAt") or now_ms)
-        return dict(
-            verdict,
-            state="usage_exhausted",
-            reason="usage_text",
-            evidence=EXHAUSTED.search(latest_words).group(0),
-            evidence_at=said_at,
-            reset_at=parse_reset(latest_words, said_at),
-        )
+        reset_at = parse_reset(latest_words, said_at)
+        nearby = latest_words[max(0, hit.start() - 160) : hit.end() + 160]
+        if reset_at or REFUSAL.search(nearby):
+            return dict(
+                verdict,
+                state="usage_exhausted",
+                reason="usage_text",
+                evidence=hit.group(0),
+                evidence_at=said_at,
+                reset_at=reset_at,
+            )
     if blocked_children:
         return dict(verdict, state="child_blocked", reason="child_attention")
     if live_children:
@@ -338,8 +356,10 @@ class Api:
         return answer.get("messages") or []
 
     def post_message(self, session_id, text):
+        # The documented request body requires "text". Sending "content" is refused with
+        # HTTP 400, which silently disabled every recovery message until 2026-11-10.
         return self._call(
-            "POST", "/sessions/" + session_id + "/messages", {"content": text}, retry=False
+            "POST", "/sessions/" + session_id + "/messages", {"text": text}, retry=False
         )
 
 
@@ -538,6 +558,7 @@ class Controller:
         entry.pop("pending_nonce", None)
         entry["accepted_at"] = self.clock()
         entry["message_id"] = answer.get("messageId")
+        entry["recipient_status"] = answer.get("recipientDroidStatus")
         entry["count"] = entry.get("count", 0) + 1
         entry["nonce"] = nonce
         entry.pop("progress_verified_at", None)
@@ -653,12 +674,16 @@ class Controller:
             report["actions"].extend(self.verify_progress(session_id, messages))
             title = verdict.get("title") or session_id
             link = "https://app.factory.ai/sessions/" + session_id
+            outcome = None
             if verdict["state"] == "stalled":
                 if self.unverified_nudge(session_id):
                     # A nudge that produced no reply is not repeated; a person looks instead.
-                    report["actions"].append(
-                        {"action": "nudge", "session": session_id, "result": "held_unverified"}
-                    )
+                    outcome = {
+                        "action": "nudge",
+                        "session": session_id,
+                        "result": "held_unverified",
+                    }
+                    report["actions"].append(outcome)
                     report["alerts"].append(
                         self.alert(
                             "nudge_unverified:" + session_id,
@@ -668,9 +693,10 @@ class Controller:
                     )
                 else:
                     stall = "stale_since:" + str(session.get("updatedAt"))
-                    report["actions"].append(
-                        self.send_to_session(session_id, "nudge", stall, verdict, session, dry_run)
+                    outcome = self.send_to_session(
+                        session_id, "nudge", stall, verdict, session, dry_run
                     )
+                    report["actions"].append(outcome)
             elif verdict["state"] == "usage_exhausted":
                 outcome = self.handle_exhausted(session_id, verdict, session, dry_run)
                 report["actions"].append(outcome)
@@ -682,6 +708,29 @@ class Controller:
                             "after the one bounded resume. Nothing else will be sent. " + link,
                         )
                     )
+                elif outcome.get("result") == "waiting_for_reset" and not verdict["children_live"]:
+                    # Waiting silently for a reset is indistinguishable from a dead stall, so
+                    # the wait itself is reported once per exhaustion message.
+                    report["alerts"].append(
+                        self.alert(
+                            f"usage_parked:{session_id}:{outcome.get('ready_at')}",
+                            f"Factory flight controller: {title} reported a usage limit and has "
+                            f"no running children. Waiting until {iso(outcome.get('ready_at'))} "
+                            f"({outcome.get('basis')}) before one bounded resume, so nothing is "
+                            "watching it resume until then. " + link,
+                        )
+                    )
+            if outcome and outcome.get("result") == "failed":
+                # The recovery action itself is broken. Silence here once hid six refused
+                # sends, so a person is told rather than the failure only reaching the log.
+                report["alerts"].append(
+                    self.alert(
+                        "action_failed:" + session_id,
+                        f"Factory flight controller: the {outcome.get('action')} it tried to send "
+                        f"to {title} was refused by the API, so no recovery message reached it. "
+                        "Check the controller, not the session. " + link,
+                    )
+                )
             if verdict["state"] in ("blocked_attention", "founder_decision", "child_blocked"):
                 report["alerts"].append(
                     self.alert(
