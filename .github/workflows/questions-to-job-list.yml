@@ -1,16 +1,7 @@
-# One question inbox (Decision Log 2026-11-02, Fix the holes now, and the HQ Rulebook
-# section Handoffs between AIs). A builder that is stuck writes a line starting
-# Question for Allison or Blocked, or opens a draft with a What is unclear section.
-# This copies those words into one comment on the linked Job issue, starting
-# Question for Allison, so the watcher puts it on the AI Work Board.
-#
-# Nothing from the pull request is checked out or run. The body and comments are read
-# from the event file by the script below, never pasted into a shell command. Pull
-# requests from forks are skipped, so outside text never reaches the board.
-#
-# The pull_request path runs the workflow as it is on the pull request branch. The
-# comment and review paths run only the copy on main, so they start working once this
-# file is merged.
+# Retired question-to-job-list workflow. Automatic PR, issue and review triggers were
+# disabled on 2026-11-09. Retain the implementation for history; questions go to Allison
+# in live chat and work is dispatched through the Factory connection, not GitHub issues
+# or job boards. Manual runs are not a dispatch route.
 name: questions-to-job-list
 
 # Triggers disabled 2026-11-09. The job list and Job issue question route are retired;
