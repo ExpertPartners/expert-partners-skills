@@ -38,12 +38,9 @@ on:
       - "tools/capability-feed/**"
       - "tools/skills-graph-ci/**"
       - ".github/workflows/skills-graph.yml"
-  # The durable retry. Scheduled runs use the latest commit on main (docs.github.com,
-  # events that trigger workflows, verified 2026-11-04). A run that ran out of publish
-  # attempts, or a main move that changed no watched path, is repaired within the hour.
-  # An in-sync run commits nothing. Off the top of the hour, when schedules are delayed.
-  schedule:
-    - cron: "41 * * * *"
+  # No timer. The hourly retry was retired in HQ Cleanup (Nov 9, 2026), since
+  # scheduled polls are retired. A missed publish is repaired by the next
+  # watched push or a manual workflow_dispatch run.
   workflow_dispatch:
 
 # The automatic GITHUB_TOKEN stays read-only on every ref: any action can read it through
