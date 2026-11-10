@@ -1,3 +1,6 @@
+## 3.7.1 - 2026-11-10
+
+Browser jobs now finish cleanly after a call fails during its post-action ownership check. Each proven inventory saves the newest Chrome tab ID, and failed-job cleanup reconciles an interrupted call through the same two exact-ID phases only when no surviving tab is newer than that watermark, so an orphaned popup is refused and preserved. Receipts now record a fixed Playwright or extension failure class instead of a bare owned_operation_failed, and finish records each cleanup step, including a live cleanup failure that used to be swallowed. No vendor or page text is kept.
 ## 3.7.0 - 2026-11-10
 
 Failed browser jobs no longer leave windows behind with only part of their tabs. The route now stops a job's own browser process outright instead of letting it close pages one at a time, so a failure can't remove the connector and strand the working page. Reconciliation accepts a missing connector when every saved working page survives, records the removal before it happens so a retry finishes cleanly, and polls briefly until Chrome stops listing the closed window. A stale facade no longer overwrites a finished receipt, and a failed step now records which of the route's own checks refused.
