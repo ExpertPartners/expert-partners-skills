@@ -1,3 +1,6 @@
+## 3.6.2 - 2026-11-10
+
+Share the Love puts a new source for a lesson already on the Share List directly under that lesson, the way Allison asked, instead of at the end of the document. A new lesson is numbered one higher than the highest number already on the list, so two captures never share a number again.
 ## 3.6.1 - 2026-11-10
 
 Second instruction sweep pass, November 9, 2026. Funnel skills send Code bridge blocks to Factory through the Factory connection, or to Claude Code or Codex when they fit, instead of dispatching a Chat to Code job. factory-operator drops a pointer to a workflow file that no longer exists, repo-standards names Claude Code and Codex beside Factory, and the retired pin and job-list-heartbeat skills get retired subtitles.
