@@ -52,6 +52,13 @@ A missing or unknown handle is refused. There is no shared-current-tab fallback.
   selected or closed. Different jobs may execute concurrently; calls within one
   job serialize.
 - `browser_job_status` returns only that job's lifecycle and ownership receipt.
+- Ordinary vendor error replies keep their original result and add an uncertain-outcome
+  warning. Receipt timings record only an allowlisted error class, never vendor text.
+  Post-call ownership verification also checks the retained working Page. If Chrome
+  detached that Page while its tab survived, the job fails with `working_page_lost`.
+  Finish or recover that job before further work. The route never rebinds the Page or
+  replays the action. A vendor error with a live working Page leaves the job ready
+  for inspection, not automatic retry.
 - `browser_job_finish` and `browser_close` close only the job's own pages,
   connector and subprocess group. A peer keeps its connection and pages.
 - `browser_job_recover` first reconciles a failed job's saved pages, then creates
