@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "af2b91001d4aabc8bf79357d84cf3fb9dfae791e"
+    "eps": "8ce2804fc79499f86ae75628ca11093842d3cc23"
   },
   "zones": [
     "surfaces",
@@ -681,7 +681,7 @@
       "renderNote": null,
       "layout": {
         "x": 89.5,
-        "y": 1873.6,
+        "y": 1887.6,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1055,7 +1055,7 @@
       "renderNote": null,
       "layout": {
         "x": 88,
-        "y": 2061.6,
+        "y": 2075.6,
         "width": 215,
         "height": 77,
         "rectHeight": 62,
@@ -1949,18 +1949,17 @@
       "calls": [],
       "defersTo": [],
       "brandScope": [],
-      "subtitle": "check the job list every 15 minutes",
+      "subtitle": "retired job list check",
       "renderNote": null,
       "layout": {
-        "x": 92.5,
-        "y": 2263.6,
-        "width": 206,
-        "height": 77,
-        "rectHeight": 62,
+        "x": 106.5,
+        "y": 2277.6,
+        "width": 178,
+        "height": 63,
+        "rectHeight": 48,
         "annotationHeight": 15,
         "subtitleLines": [
-          "check the job list every 15",
-          "minutes"
+          "retired job list check"
         ]
       }
     },
@@ -1981,7 +1980,7 @@
       "renderNote": null,
       "layout": {
         "x": 92.5,
-        "y": 1974.6,
+        "y": 1988.6,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -2563,18 +2562,17 @@
         "code-block-routing"
       ],
       "brandScope": [],
-      "subtitle": "carry-back envelope and place-keeping baton",
+      "subtitle": "retired carry-back envelope",
       "renderNote": null,
       "layout": {
-        "x": 368,
-        "y": 2188.3,
-        "width": 182,
-        "height": 77,
-        "rectHeight": 62,
+        "x": 360,
+        "y": 2206.9,
+        "width": 206,
+        "height": 63,
+        "rectHeight": 48,
         "annotationHeight": 15,
         "subtitleLines": [
-          "carry-back envelope and",
-          "place-keeping baton"
+          "retired carry-back envelope"
         ]
       }
     },
@@ -3063,7 +3061,7 @@
       "renderNote": null,
       "layout": {
         "x": 100,
-        "y": 2162.6,
+        "y": 2176.6,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -4642,11 +4640,11 @@
         },
         {
           "x": 346,
-          "y": 2239.6
+          "y": 2248.9
         },
         {
-          "x": 368,
-          "y": 2239.6
+          "x": 360,
+          "y": 2248.9
         }
       ]
     },
@@ -4776,12 +4774,12 @@
       "type": "defers-to",
       "points": [
         {
-          "x": 550,
-          "y": 2226.8
+          "x": 566,
+          "y": 2238.4
         },
         {
           "x": 584,
-          "y": 2226.8
+          "y": 2238.4
         },
         {
           "x": 584,
@@ -4930,19 +4928,19 @@
       "points": [
         {
           "x": 336,
-          "y": 2188.3
+          "y": 2202.3
         },
         {
           "x": 346,
-          "y": 2188.3
+          "y": 2202.3
         },
         {
           "x": 346,
-          "y": 2177.3
+          "y": 2195.9
         },
         {
           "x": 594,
-          "y": 2177.3
+          "y": 2195.9
         },
         {
           "x": 594,
@@ -4961,11 +4959,11 @@
       "points": [
         {
           "x": 336,
-          "y": 2213.9
+          "y": 2227.9
         },
         {
-          "x": 368,
-          "y": 2213.9
+          "x": 360,
+          "y": 2227.9
         }
       ]
     },
