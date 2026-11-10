@@ -467,11 +467,13 @@ class WorkflowContract(unittest.TestCase):
         self.assertEqual(env["SKILLS_GRAPH_PUSH_TOKEN"], "${{ steps.app-token.outputs.token }}")
         self.assertEqual(env["SKILLS_GRAPH_CI_CHECKOUT"], "${{ github.workspace }}/eps")
 
-    def test_permissions_concurrency_and_durable_retry(self):
+    def test_permissions_concurrency_and_no_timer(self):
         self.assertEqual(self.doc["permissions"], {"contents": "read"})
         self.assertEqual(self.doc["concurrency"], {"group": "skills-graph-${{ github.ref }}", "cancel-in-progress": True})
         triggers = self.doc[True] if True in self.doc else self.doc["on"]
-        self.assertTrue(triggers["schedule"])
+        # Scheduled polls are retired (HQ Cleanup, Nov 9, 2026). Push and manual dispatch only.
+        self.assertNotIn("schedule", triggers)
+        self.assertIn("workflow_dispatch", triggers)
         self.assertIn("**", triggers["push"]["branches"])
         self.assertIn("tools/skills-graph-ci/**", triggers["push"]["paths"])
 
