@@ -8,7 +8,7 @@
     {
       "name": "operating-doctrine",
       "source": "./plugins/operating-doctrine",
-      "version": "3.6.0",
+      "version": "3.6.1",
       "description": "The non-negotiable operating standard. Loads at every session."
     },
     {
@@ -26,7 +26,7 @@
     {
       "name": "funnel-operations",
       "source": "./plugins/funnel-operations",
-      "version": "0.3.1",
+      "version": "0.3.2",
       "description": "Build, migrate, and document funnels for Expert Partners and EPIC, with Notion as the single source of truth, plus GoHighLevel inventory, automation design, and safe tag cleanup."
     },
     {
