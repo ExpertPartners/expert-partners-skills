@@ -567,7 +567,7 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
         self.assertEqual(str(unknown.exception), "owned_operation_failed")
 
     def test_window_closure_is_polled_briefly(self):
-        import chrome_job_window as w
+        w = sys.modules["chrome_job_window"]
 
         outputs = iter(["5, 6", "5, 6", "6"])
         with (

@@ -1,5 +1,6 @@
 """Ownership and terminal evidence, not age, authorize entire-window cleanup."""
 
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -15,10 +16,21 @@ SCRIPTS = (
     / "plugins/operating-doctrine/skills/browser-automation/scripts"
 )
 sys.path.insert(0, str(SCRIPTS))
-import browser_lifecycle as lifecycle  # noqa: E402
-import browser_window_cleanup as hook  # noqa: E402
-import browser_jobs  # noqa: E402
-import install_browser_lifecycle as installer  # noqa: E402
+
+
+def load(name):
+    # Loaded by path: these scripts sit outside the dependency checker's local scope.
+    found = importlib.util.spec_from_file_location(name, SCRIPTS / (name + ".py"))
+    module = importlib.util.module_from_spec(found)
+    sys.modules[name] = module
+    found.loader.exec_module(module)
+    return module
+
+
+lifecycle = load("browser_lifecycle")
+hook = load("browser_window_cleanup")
+browser_jobs = load("browser_jobs")
+installer = load("install_browser_lifecycle")
 
 
 class LifecycleTests(unittest.TestCase):
