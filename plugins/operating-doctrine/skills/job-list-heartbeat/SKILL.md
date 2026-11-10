@@ -13,7 +13,7 @@ zone: routing
 status: retired
 inherits: operating-doctrine
 brand-scope: null
-subtitle: "check the job list every 15 minutes"
+subtitle: "retired job list check"
 ---
 
 # Job List Heartbeat

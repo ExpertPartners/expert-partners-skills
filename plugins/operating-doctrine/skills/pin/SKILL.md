@@ -11,7 +11,7 @@ inherits: operating-doctrine
 defers-to:
   - code-block-routing
 brand-scope: null
-subtitle: "carry-back envelope and place-keeping baton"
+subtitle: "retired carry-back envelope"
 ---
 
 # Pin (retired)

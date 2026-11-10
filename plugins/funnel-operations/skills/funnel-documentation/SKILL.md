@@ -64,7 +64,7 @@ Before you write anything, query the Funnels database for the funnel name and fo
 
 ## The work split
 
-You orchestrate in Cowork through the Notion connector: reading and writing the two databases, reading Drive audit docs, reading the Airtable tracker. The GHL work belongs to Claude Code, which holds the Marketplace app token. GHL is not read-only. The data and CRM layer is writable through that token, so Code writes contacts, tags, custom field definitions, custom values, opportunities and stage moves, calendars, email templates, products and order-form pricing, trigger links, and media directly, and runs the behavioral test-audit. Only the builder layer (funnel pages, forms, surveys, the workflow canvas, pipeline renames, publish, and domain) has no write API and stays a UI action, done through Ember's M2 browser route (browser-automation skill). Any time Code is needed, dispatch the bridge block to Claude Code as a job (or run it yourself where you have Code tools) and read the result. For builder-UI steps no API can reach, run them through that browser route yourself.
+You orchestrate in Cowork through the Notion connector: reading and writing the two databases, reading Drive audit docs, reading the Airtable tracker. The GHL work belongs to Claude Code, which holds the Marketplace app token. GHL is not read-only. The data and CRM layer is writable through that token, so Code writes contacts, tags, custom field definitions, custom values, opportunities and stage moves, calendars, email templates, products and order-form pricing, trigger links, and media directly, and runs the behavioral test-audit. Only the builder layer (funnel pages, forms, surveys, the workflow canvas, pipeline renames, publish, and domain) has no write API and stays a UI action, done through Ember's M2 browser route (browser-automation skill). Any time Code is needed, send the bridge block to Factory through the Factory connection, or to Claude Code or Codex when they fit (or run it yourself where you have Code tools), and read the result. For builder-UI steps no API can reach, run them through that browser route yourself.
 
 ## The completeness rule
 
@@ -116,7 +116,7 @@ Report plainly: the funnel is documented, here is its Notion link, here is what 
 
 ## Running Code
 
-Any time Code is needed, write a bridge block in plain language and dispatch it to Claude Code as a job, then read the file or result it returns and continue. Use this shape for the block:
+Any time Code is needed, write a bridge block in plain language and send it to Factory through the Factory connection, or to Claude Code or Codex when they fit, then read the file or result it returns and continue. Use this shape for the block:
 
 [plain description of what it does]. Print DONE with the file path or result when finished.
 

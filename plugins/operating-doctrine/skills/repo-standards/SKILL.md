@@ -27,7 +27,7 @@ For Grok repository work, load the [Repo Auditor](references/grok-auditor.md) or
 
 The standard lives in ONE place, the Repo rules section of the HQ Rulebook. Read it at the start of every run. The Project-ownership half is the Project ownership section of the same Rulebook. If it cannot be read, fix access and retry rather than grading from memory.
 
-Factory work uses the native assignment, not a GitHub issue, Hub record or Chat to Code queue. Check current Workstream, branch/worktree and PR evidence for collisions. Factory owns company development execution.
+Factory work uses the native assignment, not a GitHub issue, Hub record or Chat to Code queue. Check current Workstream, branch/worktree and PR evidence for collisions. Factory is first for builds, and Claude Code or Codex are chosen when they fit.
 
 This skill never restates the ten points as its own canon. The Rulebook's text wins, and this skill gets corrected if they differ. Points 1 through 3 are the enforcement layer (org rulesets, bot commit routing, generated-artifact gates), points 4 through 10 are the judgment layer.
 

@@ -61,7 +61,7 @@ A funnel is never just its pages. Plan and build against the full model from the
 
 ## The work split
 
-You orchestrate in Cowork through the Notion connector. The GHL work belongs to Claude Code, which holds the Marketplace app token. GHL is not read-only. The data and CRM layer is writable through that token (contacts, tags, custom fields and values, opportunities and stage moves, calendars, email templates, products and order-form pricing, trigger links, media), and the behavioral test-audit runs there. Only the builder layer (funnel pages, forms, surveys, the workflow canvas, pipeline renames, publish, domain) has no write API and stays a UI action, done through Ember's M2 browser route (browser-automation skill). Any time Code is needed, dispatch the bridge block to Claude Code as a job (or run it yourself where you have Code tools) and read the result. For builder-UI steps no API can reach, run them through that browser route yourself.
+You orchestrate in Cowork through the Notion connector. The GHL work belongs to Claude Code, which holds the Marketplace app token. GHL is not read-only. The data and CRM layer is writable through that token (contacts, tags, custom fields and values, opportunities and stage moves, calendars, email templates, products and order-form pricing, trigger links, media), and the behavioral test-audit runs there. Only the builder layer (funnel pages, forms, surveys, the workflow canvas, pipeline renames, publish, domain) has no write API and stays a UI action, done through Ember's M2 browser route (browser-automation skill). Any time Code is needed, send the bridge block to Factory through the Factory connection, or to Claude Code or Codex when they fit (or run it yourself where you have Code tools), and read the result. For builder-UI steps no API can reach, run them through that browser route yourself.
 
 ## Guardrail: never create a duplicate
 
@@ -105,7 +105,7 @@ Run the Funnel Documentation skill for this funnel. Load and follow funnel-docum
 
 ## Running Code
 
-Any time Code is needed, write a bridge block in plain language and dispatch it to Claude Code as a job, then read the file or result it returns and continue. Use this shape for the block:
+Any time Code is needed, write a bridge block in plain language and send it to Factory through the Factory connection, or to Claude Code or Codex when they fit, then read the file or result it returns and continue. Use this shape for the block:
 
 [plain description of what it does]. Print DONE with the file path or result when finished.
 

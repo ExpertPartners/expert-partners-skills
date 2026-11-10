@@ -1,12 +1,12 @@
 ---
-name: Code job
-about: A job for the Chat to Code Loop. The issue body is the assignment.
-title: "Job: "
-labels: job
+name: Work context
+about: Optional context only. Work is dispatched through the Factory connection, not GitHub issues.
+title: ""
+labels: ""
 ---
 
 Mission
-One line naming the mission and its Chat to Code job number.
+One line naming the mission.
 
 Goal
 One of: Finish Week 0 of Cal's course, Launch Ember, AI work runs without me, or a new plain-words goal.
