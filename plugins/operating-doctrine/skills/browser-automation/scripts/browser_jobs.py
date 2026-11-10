@@ -53,6 +53,10 @@ SEAL_JS = (
     "return {sealed:ok?'ok':'error'};"
 )
 SEALED_OUTCOMES = {"ok": None, "error": "sealed_code_failed"}
+# Static codes this route's own browser code throws; nothing else is projected.
+OWNED_ERROR_CODES = frozenset(
+    re.findall(r"Error\('([a-z_]+)'\)", OWNED_SOURCE + Path(__file__).read_text())
+)
 TIMING_RECORDS = 20
 GENERATION_ATTEMPTS = 30
 
@@ -77,7 +81,11 @@ def result(value, error=False):
 
 def projection(reply):
     if reply.get("isError"):
-        raise Refusal("owned_operation_failed")
+        # Vendor error text can carry page content. Keep only a static code
+        # this route itself throws, so receipts show why an owned step failed.
+        text = "\n".join(b.get("text", "") for b in reply.get("content", []) if isinstance(b, dict))
+        found = sorted(c for c in OWNED_ERROR_CODES if re.search(r"\b" + c + r"\b", text))
+        raise Refusal("owned_operation_failed" + (":" + found[0] if found else ""))
     blocks = reply.get("content", [])
     if len(blocks) != 1 or blocks[0].get("type") != "text":
         raise Refusal("owned_projection_shape")
@@ -91,6 +99,47 @@ def projection(reply):
     if not isinstance(value, dict):
         raise Refusal("owned_projection_type")
     return value
+
+
+def failed_cleanup_js(args, remove):
+    """Reconcile a failed job's saved IDs from a fresh maintenance connector.
+
+    Phase one (remove=False) only proves ownership; phase two repeats every
+    check and closes the exact saved window.
+    """
+    return (
+        STATE_JS
+        + "return await s.connector.evaluate(async({old,clientName,connectorOrigin,removalIssued,remove})=>{"
+        "const incomplete=tabs=>{const descendants=new Set(old.tabIds);let changed;do{changed=false;for(const t of tabs)if(descendants.has(t.openerTabId)&&!descendants.has(t.id)){descendants.add(t.id);changed=true;}}while(changed);return tabs.some(t=>(t.windowId===old.windowId||descendants.has(t.id))&&!old.tabIds.includes(t.id));};"
+        "const before=await chrome.tabs.query({});"
+        "if(incomplete(before))throw Error('uncheckpointed_page_arrival');"
+        "const live=before.filter(t=>old.tabIds.includes(t.id));"
+        # Every saved tab gone is explained only by a removal this route
+        # already issued. Otherwise a popup may have escaped and lost its
+        # opener link when its parent closed.
+        "if(!live.length){if(removalIssued&&!before.some(t=>t.windowId===old.windowId))return {closed:true,count:0,alreadyClosed:true};throw Error('saved_owned_tab_missing');}"
+        # The connector is an extension page that never opens popups, so its
+        # absence alone cannot hide an unrecorded descendant. A missing
+        # working page can, so that still refuses.
+        "if(old.tabIds.some(id=>id!==old.connectorId&&!live.some(t=>t.id===id)))throw Error('saved_owned_tab_missing');"
+        # The extension intentionally ungroups its tabs after disconnect.
+        # When the connector survives, anchor to its exact client identity.
+        "const connector=live.find(t=>t.id===old.connectorId);"
+        "if(connector){const u=new URL(connector.url);if(u.protocol+'//'+u.host+u.pathname!==connectorOrigin||JSON.parse(u.searchParams.get('client')).name!==clientName)throw Error('connector_identity_changed');}"
+        "const status=await chrome.runtime.sendMessage({type:'getConnectionStatus'});if(!status||!Array.isArray(status.connections))throw Error('connection_status_unavailable');"
+        "const targets=await chrome.debugger.getTargets();"
+        "for(const t of live){if(t.windowId!==old.windowId||(t.groupId!==old.groupId&&t.groupId!==-1)||targets.some(x=>x.tabId===t.id&&x.attached)||status.connections.some(c=>(c.connectedTabIds||[]).includes(t.id)))throw Error('ownership_changed');"
+        "if(t.groupId!==-1){const g=await chrome.tabGroups.get(t.groupId);if(g.title!==old.groupTitle)throw Error('group_identity_changed');}}"
+        "if(!remove)return {ready:true,count:live.length,connectorMissing:!connector};"
+        "await chrome.windows.remove(old.windowId);"
+        "const beforeIds=new Set(before.map(t=>t.id));"
+        # Chrome can still list a removed window's tabs for a moment.
+        "let after;for(let i=0;i<20;i++){after=await chrome.tabs.query({});if(!after.some(t=>old.tabIds.includes(t.id)||t.windowId===old.windowId))break;await new Promise(r=>setTimeout(r,100));}"
+        "if(after.some(t=>old.tabIds.includes(t.id)||t.windowId===old.windowId||!beforeIds.has(t.id))||incomplete(after))throw Error('owned_cleanup_inventory_uncertain');"
+        "return {closed:true,count:live.length,connectorMissing:!connector};},"
+        + json.dumps({**args, "remove": remove})
+        + ");"
+    )
 
 
 def failure_stage(error):
@@ -295,7 +344,14 @@ class Route:
         row["control_socket"] = getattr(self, "control_socket", None)
         if job.get("window_disposition"):
             row["window_disposition"] = job["window_disposition"]
+        if job.get("window_removal_issued"):
+            row["window_removal_issued"] = True
         path = self.root / (job["job_id"] + ".json")
+        if self.settled_elsewhere(job):
+            # Another route (sweep or reconciliation) already settled this job.
+            # A stale facade never reopens a finished receipt.
+            job["status"] = "finished"
+            return
         tmp = path.with_suffix(".tmp")
         fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
         try:
@@ -307,6 +363,15 @@ class Route:
         finally:
             tmp.unlink(missing_ok=True)
 
+    def settled_elsewhere(self, job):
+        if job.get("receipt_owned") or job.get("status") == "finished":
+            return False
+        try:
+            disk = json.loads((self.root / (job["job_id"] + ".json")).read_text())
+        except (OSError, ValueError, KeyError):
+            return False
+        return disk.get("status") == "finished"
+
     @staticmethod
     def mark(job, stage):
         records = job.get("timings")
@@ -316,6 +381,8 @@ class Route:
     def checkpoint(self, job, status=None):
         if status:
             job["status"] = status
+        if status == "finished":
+            job["receipt_owned"] = True
         job["updated"] = time.time()
         self.save(job)
 
@@ -625,34 +692,23 @@ class Route:
                 + json.dumps(EXTENSION + "?")
                 + "))throw Error('not_own_connector');p.__epBrowserJob={connector:page,task:null};return {ready:true};",
             )
-            outcome = code(
-                client,
-                STATE_JS
-                + "return await s.connector.evaluate(async({old,clientName,connectorOrigin})=>{"
-                "const incomplete=tabs=>{const descendants=new Set(old.tabIds);let changed;do{changed=false;for(const t of tabs)if(descendants.has(t.openerTabId)&&!descendants.has(t.id)){descendants.add(t.id);changed=true;}}while(changed);return tabs.some(t=>(t.windowId===old.windowId||descendants.has(t.id))&&!old.tabIds.includes(t.id));};"
-                "if(incomplete(await chrome.tabs.query({})))throw Error('uncheckpointed_page_arrival');"
-                "const before=await chrome.tabs.query({});"
-                "const live=[];for(const id of old.tabIds){try{live.push(await chrome.tabs.get(id));}catch{throw Error('saved_owned_tab_missing');}}"
-                # The extension intentionally ungroups its tabs after
-                # disconnect. Anchor the ungrouped case to the saved
-                # connector's exact client identity and browser epoch.
-                "const connector=live.find(t=>t.id===old.connectorId);if(!connector)throw Error('connector_identity_missing');"
-                "const u=new URL(connector.url);if(u.protocol+'//'+u.host+u.pathname!==connectorOrigin||JSON.parse(u.searchParams.get('client')).name!==clientName)throw Error('connector_identity_changed');"
-                "const status=await chrome.runtime.sendMessage({type:'getConnectionStatus'});if(!Array.isArray(status.connections))throw Error('connection_status_unavailable');"
-                "const targets=await chrome.debugger.getTargets();"
-                "for(const t of live){if(t.windowId!==old.windowId||(t.groupId!==old.groupId&&t.groupId!==-1)||targets.some(x=>x.tabId===t.id&&x.attached)||status.connections.some(c=>c.connectedTabIds.includes(t.id)))throw Error('ownership_changed');"
-                "if(t.groupId!==-1){const g=await chrome.tabGroups.get(t.groupId);if(g.title!==old.groupTitle)throw Error('group_identity_changed');}}"
-                "await chrome.windows.remove(old.windowId);"
-                "const beforeIds=new Set(before.map(t=>t.id));"
-                "const after=await chrome.tabs.query({});if(after.some(t=>old.tabIds.includes(t.id)||!beforeIds.has(t.id))||incomplete(after))throw Error('owned_cleanup_inventory_uncertain');"
-                "return {closed:true,count:live.length};},"
-                + json.dumps(
-                    {"old": old, "clientName": job["client_name"], "connectorOrigin": EXTENSION}
-                )
-                + ");",
-            )
+            args = {
+                "old": old,
+                "clientName": job["client_name"],
+                "connectorOrigin": EXTENSION,
+                "removalIssued": bool(job.get("window_removal_issued")),
+            }
+            outcome = code(client, failed_cleanup_js(args, remove=False))
+            if outcome.get("ready") is True:
+                # Recorded before removal so a retry after an interrupted close
+                # can prove the vanished window was this route's own removal.
+                job["window_removal_issued"] = True
+                self.checkpoint(job)
+                outcome = code(client, failed_cleanup_js(args, remove=True))
             if outcome.get("closed") is not True:
                 raise Refusal("failed_cleanup_uncertain")
+            verify_window_closed(old["windowId"])
+            job["window_disposition"] = "closed"
         finally:
             try:
                 closed = code(
@@ -668,6 +724,14 @@ class Route:
 
     def finish(self, job):
         if job["status"] == "finished":
+            return result(self.summary(job))
+        if self.settled_elsewhere(job):
+            # Adopt the settled receipt. This stale client's pages are already
+            # gone, so only its own subprocess group is closed.
+            if job.get("client") and not job["client"].closed:
+                job["client"].close()
+            job["status"] = "finished"
+            job["receipt_owned"] = True
             return result(self.summary(job))
         with self.bootstrap():
             if job["status"] == "ready" and job["client"] and not job["client"].closed:

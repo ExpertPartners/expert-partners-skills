@@ -12,6 +12,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import time
 from urllib.parse import urlsplit
 
 
@@ -64,20 +65,31 @@ def chrome_is_running():
         return False
 
 
-def verify_window_closed(window_id):
-    """Chrome's scripting window ID equals its extension window ID on macOS."""
+def verify_window_closed(window_id, attempts=10, pause=0.2):
+    """Chrome's scripting window ID equals its extension window ID on macOS.
+
+    Closure lands asynchronously, so a just-removed window is polled briefly.
+    """
     if type(window_id) is not int or window_id < 0:
         raise InvalidLaunch("Invalid owned window identity")
-    observed = subprocess.run(
-        ["/usr/bin/osascript", "-e", 'tell application "Google Chrome" to get id of every window'],
-        capture_output=True,
-        text=True,
-        timeout=5,
-        check=True,
-    )
-    ids = {int(x.strip()) for x in observed.stdout.strip().split(",") if x.strip()}
-    if window_id in ids:
-        raise InvalidLaunch("Owned window closure was not observed")
+    for attempt in range(attempts):
+        observed = subprocess.run(
+            [
+                "/usr/bin/osascript",
+                "-e",
+                'tell application "Google Chrome" to get id of every window',
+            ],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=True,
+        )
+        ids = {int(x.strip()) for x in observed.stdout.strip().split(",") if x.strip()}
+        if window_id not in ids:
+            return
+        if attempt < attempts - 1:
+            time.sleep(pause)
+    raise InvalidLaunch("Owned window closure was not observed")
 
 
 def browser_arguments(arguments):

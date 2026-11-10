@@ -5,6 +5,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import signal
 import subprocess
 import sys
 import tempfile
@@ -319,29 +320,15 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
                 "groupTitle": "fixture",
                 "tabIds": [1, 10],
             }
-            job = {
-                "client": None,
-                "metadata": own,
-                "generation": route.preflight(),
-                "client_name": "fixture",
-                "ownership_pending": False,
-            }
-            captured = []
-
-            def capture(_, body):
-                if "async({old,clientName,connectorOrigin})" in body:
-                    captured.append(body)
-                return {"closed": True}
-
-            with (
-                patch.object(
-                    route, "client", create=True, return_value=SimpleNamespace(close=lambda: None)
-                ),
-                patch.object(b, "code", side_effect=capture),
-                patch.object(b.time, "sleep"),
-            ):
-                route.dispose_failed(job)
-            self.assertEqual(len(captured), 1)
+            body = b.failed_cleanup_js(
+                {
+                    "old": own,
+                    "clientName": "fixture",
+                    "connectorOrigin": b.EXTENSION,
+                    "removalIssued": False,
+                },
+                True,
+            )
             fixture = r'''
 const assert=require('node:assert/strict');
 let unknownWindow=5;
@@ -349,7 +336,8 @@ let parentGone=false;
 let popupLive=true;
 let removed=[];
 global.chrome={tabs:{query:async()=>[
-  ...(parentGone?[]:[{id:1,windowId:5,groupId:-1},{id:10,windowId:5,groupId:-1}]),
+  ...(parentGone?[]:[{id:1,windowId:5,groupId:-1,
+    url:'chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/connect.html?client='+encodeURIComponent(JSON.stringify({name:'fixture'}))},{id:10,windowId:5,groupId:-1}]),
   ...(popupLive?[{id:11,...(parentGone?{}:{openerTabId:10}),windowId:unknownWindow,groupId:-1}]:[])],
   get:async(id)=>{if(parentGone)throw Error('missing');return {id,windowId:5,groupId:-1,
     url:'chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/connect.html?client='+encodeURIComponent(JSON.stringify({name:'fixture'}))};},
@@ -358,7 +346,6 @@ global.chrome={tabs:{query:async()=>[
   debugger:{getTargets:async()=>[]},runtime:{sendMessage:async()=>({connections:[]})}};
 process.__epBrowserJob={connector:{evaluate:async(fn,arg)=>await fn(arg)}};
 '''
-            body = captured[0]
             # Check both same-window and separate-window late popups, even after
             # all saved parent tabs have already disappeared.
             script = (
@@ -383,6 +370,222 @@ process.__epBrowserJob={connector:{evaluate:async(fn,arg)=>await fn(arg)}};
                 ["node", "-e", script], capture_output=True, text=True, timeout=10
             )
             self.assertEqual(checked.returncode, 0, checked.stderr)
+
+    OLD = {
+        "connectorId": 1,
+        "windowId": 5,
+        "groupId": 7,
+        "groupTitle": "fixture",
+        "tabIds": [1, 10],
+    }
+    CONNECTOR_URL = (
+        "chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/connect.html?client="
+        + "%7B%22name%22%3A%22fixture%22%7D"
+    )
+    CLEANUP_FIXTURE = r"""
+const state=__STATE__;let removed=[];
+global.chrome={tabs:{query:async()=>{if(state.lag>0){state.lag--;return state.tabs.concat(state.ghost||[]);}return state.tabs;}},
+  windows:{remove:async(id)=>{removed.push(id);state.ghost=state.tabs.filter(t=>t.windowId===id);state.tabs=state.tabs.filter(t=>t.windowId!==id);state.lag=state.lagAfter||0;}},
+  tabGroups:{get:async()=>({title:'fixture'})},
+  debugger:{getTargets:async()=>(state.attached||[]).map(tabId=>({tabId,attached:true}))},
+  runtime:{sendMessage:async()=>({connections:state.connections||[]})}};
+process.__epBrowserJob={connector:{evaluate:async(fn,arg)=>await fn(arg)}};
+async function attempt(){__BODY__}
+attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({...o,removed})));
+"""
+
+    def failed_cleanup(self, tabs, remove=True, removal_issued=False, **state):
+        body = b.failed_cleanup_js(
+            {
+                "old": self.OLD,
+                "clientName": "fixture",
+                "connectorOrigin": b.EXTENSION,
+                "removalIssued": removal_issued,
+            },
+            remove,
+        )
+        script = self.CLEANUP_FIXTURE.replace(
+            "__STATE__", json.dumps({"tabs": tabs, **state})
+        ).replace("__BODY__", body)
+        run = subprocess.run(["node", "-e", script], capture_output=True, text=True, timeout=10)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        return json.loads(run.stdout)
+
+    def test_missing_connector_with_only_owned_survivor_closes_exact_window(self):
+        survivor = [
+            {"id": 10, "windowId": 5, "groupId": -1},
+            {"id": 50, "windowId": 9, "groupId": -1},
+        ]
+        out = self.failed_cleanup(survivor)
+        self.assertEqual(out["v"], {"closed": True, "count": 1, "connectorMissing": True})
+        self.assertEqual(out["removed"], [5])
+        # Chrome may list a removed window's tab briefly; the bounded poll waits it out.
+        out = self.failed_cleanup(survivor, lagAfter=3)
+        self.assertTrue(out["v"]["closed"])
+        connector = {"id": 1, "windowId": 5, "groupId": 7, "url": self.CONNECTOR_URL}
+        out = self.failed_cleanup([connector, survivor[0]])
+        self.assertEqual(out["v"], {"closed": True, "count": 2, "connectorMissing": False})
+
+    def test_hard_killed_relay_leaves_whole_ungrouped_window_closed_by_exact_id(self):
+        # After a SIGKILL the extension only ungroups; every saved tab survives.
+        # Peer windows, including a peer's ungrouped connector, stay untouched.
+        peer_connector = {"id": 70, "windowId": 8, "groupId": -1, "url": self.CONNECTOR_URL}
+        tabs = [
+            {"id": 1, "windowId": 5, "groupId": -1, "url": self.CONNECTOR_URL},
+            {"id": 10, "windowId": 5, "groupId": -1},
+            peer_connector,
+            {"id": 71, "windowId": 8, "groupId": -1},
+            {"id": 80, "windowId": 9, "groupId": 3},
+        ]
+        out = self.failed_cleanup(tabs, connections=[{"connectedTabIds": [80]}], attached=[80])
+        self.assertEqual(out["v"], {"closed": True, "count": 2, "connectorMissing": False})
+        self.assertEqual(out["removed"], [5])
+
+    def test_phase_one_proves_ownership_without_closing(self):
+        out = self.failed_cleanup([{"id": 10, "windowId": 5, "groupId": -1}], remove=False)
+        self.assertTrue(out["v"]["ready"])
+        self.assertEqual(out["removed"], [])
+
+    def test_extra_claimed_or_missing_work_page_is_preserved(self):
+        survivor = {"id": 10, "windowId": 5, "groupId": -1}
+        cases = [
+            (
+                [survivor, {"id": 99, "windowId": 5, "groupId": -1}],
+                {},
+                "uncheckpointed_page_arrival",
+            ),
+            (
+                [survivor, {"id": 98, "windowId": 9, "groupId": -1, "openerTabId": 10}],
+                {},
+                "uncheckpointed_page_arrival",
+            ),
+            ([survivor], {"attached": [10]}, "ownership_changed"),
+            ([survivor], {"connections": [{"connectedTabIds": [10]}]}, "ownership_changed"),
+            ([{**survivor, "windowId": 6}], {}, "ownership_changed"),
+            (
+                [{"id": 1, "windowId": 5, "groupId": 7, "url": self.CONNECTOR_URL}],
+                {},
+                "saved_owned_tab_missing",
+            ),
+            ([], {}, "saved_owned_tab_missing"),
+        ]
+        for tabs, state, expected in cases:
+            with self.subTest(expected=expected, tabs=tabs, state=state):
+                out = self.failed_cleanup(tabs, **state)
+                self.assertEqual(out.get("e"), expected)
+                self.assertEqual(out["removed"], [])
+
+    def test_window_already_closed_by_issued_removal_is_idempotent(self):
+        out = self.failed_cleanup([{"id": 50, "windowId": 9, "groupId": -1}], removal_issued=True)
+        self.assertEqual(out["v"], {"closed": True, "count": 0, "alreadyClosed": True})
+        self.assertEqual(out["removed"], [])
+        stray = [{"id": 99, "windowId": 5, "groupId": -1}]
+        self.assertEqual(
+            self.failed_cleanup(stray, removal_issued=True)["e"], "uncheckpointed_page_arrival"
+        )
+
+    def full_job(self, route, status="failed"):
+        job = {
+            "job_id": "d" * 32,
+            "label": "fixture",
+            "status": status,
+            "client_name": "fixture",
+            "generation": route.preflight(),
+            "metadata": {**self.OLD, "unboundOwnedPages": 0},
+            "updated": 0,
+            "ownership_pending": False,
+            "client": None,
+            "lock": threading.RLock(),
+        }
+        return job
+
+    def test_failed_cleanup_records_removal_before_closing_and_settles_closed(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            job = self.full_job(route)
+            route.save(job)
+            receipt = Path(root) / (job["job_id"] + ".json")
+            seen = []
+
+            def fake(_, body):
+                if "async({old,clientName,connectorOrigin,removalIssued,remove})" in body:
+                    removing = '"remove": true' in body
+                    seen.append(
+                        (removing, json.loads(receipt.read_text()).get("window_removal_issued"))
+                    )
+                    return {"closed": True, "count": 1} if removing else {"ready": True, "count": 1}
+                if "maintenance_window_not_exclusive" in body:
+                    return {"scheduled": True, "windowId": 77}
+                return {"ready": True}
+
+            with (
+                patch.object(
+                    route, "client", create=True, return_value=SimpleNamespace(close=lambda: None)
+                ),
+                patch.object(b, "code", side_effect=fake),
+                patch.object(b, "verify_window_closed") as verified,
+                patch.object(b.time, "sleep"),
+            ):
+                route.finish(job)
+            self.assertEqual(seen, [(False, None), (True, True)])
+            self.assertEqual([c.args[0] for c in verified.call_args_list], [5, 77])
+            row = json.loads(receipt.read_text())
+            self.assertEqual((row["status"], row["window_disposition"]), ("finished", "closed"))
+
+    def test_stale_facade_never_reopens_a_settled_receipt(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            settled = self.full_job(route, "finished")
+            route.save(settled)
+            receipt = Path(root) / (settled["job_id"] + ".json")
+            before = receipt.read_text()
+            stale = self.full_job(route)
+            route.checkpoint(stale, "failed")
+            self.assertEqual(receipt.read_text(), before)
+            self.assertEqual(stale["status"], "finished")
+            stale = self.full_job(route)
+            closed = []
+            stale["client"] = SimpleNamespace(closed=False, close=lambda: closed.append(True))
+            with patch.object(route, "dispose_failed") as dispose:
+                reply = route.finish(stale)
+            dispose.assert_not_called()
+            self.assertEqual(closed, [True])
+            self.assertEqual(decode(reply)["status"], "finished")
+            # Once adopted, the same handle may recover and write again.
+            route.checkpoint(stale, "starting")
+            self.assertEqual(json.loads(receipt.read_text())["status"], "starting")
+
+    def test_downstream_error_keeps_only_a_static_owned_code(self):
+        def failing(text):
+            return {"isError": True, "content": [{"type": "text", "text": text}]}
+
+        with self.assertRaises(Refusal) as known:
+            b.projection(failing("### Error\nError: saved_owned_tab_missing\n at SYNTHETIC_CANARY"))
+        self.assertEqual(str(known.exception), "owned_operation_failed:saved_owned_tab_missing")
+        with self.assertRaises(Refusal) as unknown:
+            b.projection(failing("page said SYNTHETIC_CANARY"))
+        self.assertEqual(str(unknown.exception), "owned_operation_failed")
+
+    def test_window_closure_is_polled_briefly(self):
+        import chrome_job_window as w
+
+        outputs = iter(["5, 6", "5, 6", "6"])
+        with (
+            patch.object(
+                w.subprocess,
+                "run",
+                side_effect=lambda *a, **k: SimpleNamespace(stdout=next(outputs)),
+            ) as run,
+            patch.object(w.time, "sleep"),
+        ):
+            w.verify_window_closed(5)
+        self.assertEqual(run.call_count, 3)
+        with (
+            patch.object(w.subprocess, "run", return_value=SimpleNamespace(stdout="5")),
+            patch.object(w.time, "sleep"),
+        ):
+            with self.assertRaises(w.InvalidLaunch):
+                w.verify_window_closed(5)
 
     def sealed_route(self, root):
         route = self.route(root)
@@ -640,6 +843,70 @@ process.__epBrowserJob={task:page};
         ):
             with self.assertRaisesRegex(Refusal, "chrome_generation_ambiguous"):
                 b.chrome_generation()
+
+    CHILD = (
+        "import sys,json,os,signal,subprocess\n"
+        "d=sys.argv[1]\n"
+        "g=subprocess.Popen([sys.executable,'-c','import time\\nwhile True: time.sleep(1)'])\n"
+        "open(os.path.join(d,'grandchild'),'w').write(str(g.pid))\n"
+        "def graceful(*_):\n"
+        "    open(os.path.join(d,'graceful'),'w').write('1'); sys.exit(0)\n"
+        "signal.signal(signal.SIGTERM,graceful)\n"
+        "for line in sys.stdin:\n"
+        "    q=json.loads(line); print(json.dumps({'jsonrpc':'2.0','id':q['id'],'result':{'ok':True}}),flush=True)\n"
+        "graceful()\n"
+    )
+
+    @staticmethod
+    def gone(pid, seconds=3):
+        deadline = time.monotonic() + seconds
+        while time.monotonic() < deadline:
+            try:
+                os.kill(pid, 0)
+            except ProcessLookupError:
+                return True
+            time.sleep(0.05)
+        return False
+
+    def test_transport_close_is_abrupt_and_reaps_the_whole_owned_group(self):
+        # A graceful exit (stdin EOF or SIGTERM) lets Playwright MCP close pages
+        # one by one; the close must never give it that chance.
+        with tempfile.TemporaryDirectory() as d:
+            client = StdioClient(
+                [sys.executable, "-u", "-c", self.CHILD, d], os.environ.copy(), timeout=3
+            )
+            try:
+                self.assertEqual(client.call("ping"), {"ok": True})
+                grandchild = int(Path(d, "grandchild").read_text())
+                client.close()
+                self.assertFalse(Path(d, "graceful").exists())
+                self.assertTrue(client.cleanup_verified)
+                self.assertEqual(client.proc.returncode, -signal.SIGKILL)
+                self.assertTrue(self.gone(grandchild))
+                self.assertTrue(
+                    client.proc.stdout.closed
+                    and client.proc.stderr.closed
+                    and client.proc.stdin.closed
+                )
+                with self.assertRaisesRegex(Refusal, "client_closed"):
+                    client.call("ping")
+                client.close()  # Idempotent, and never signals again.
+            finally:
+                client.close()
+
+    def test_transport_close_after_child_already_exited_never_signals_others(self):
+        peer = subprocess.Popen(
+            [sys.executable, "-c", "import time\nwhile True: time.sleep(1)"], start_new_session=True
+        )
+        try:
+            client = StdioClient([sys.executable, "-c", "pass"], os.environ.copy(), timeout=3)
+            client.proc.wait(timeout=5)
+            client.close()
+            self.assertTrue(client.cleanup_verified)
+            self.assertIsNone(peer.poll())
+        finally:
+            peer.kill()
+            peer.wait()
 
     def test_owned_transport_reaps_child_and_never_signals_peer(self):
         script = "import sys,json\nfor line in sys.stdin:\n q=json.loads(line); print(json.dumps({'jsonrpc':'2.0','id':q['id'],'result':{'ok':True}}),flush=True)\n"

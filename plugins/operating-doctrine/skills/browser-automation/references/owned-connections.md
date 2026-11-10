@@ -109,8 +109,8 @@ SSH route where needed. Configuration and receipts are private host files. They
 must not contain tokens. The owning SOP records actual installed paths and pins.
 
 Receipts contain only lifecycle and ownership metadata, never connector queries,
-page contents or tool arguments. EOF and normal termination attempt owned-job
-cleanup. After an abrupt facade kill, preserve its receipts and reconcile the
+page contents or tool arguments. EOF and normal termination of the facade attempt
+owned-job cleanup. After an abrupt facade kill, preserve its receipts and reconcile the
 exact orphan pages under the owning repair procedure. A restarted facade does
 not silently adopt old handles or replay work. If Chrome restarted, saved tab IDs
 are insufficient to authorize cleanup and the route refuses.
@@ -155,6 +155,19 @@ Completion is proven, never guessed from age or idle time.
   tabs close and the receipt records `window_disposition: preserved_shared`. A facade
   that has exited is reconciled through exact saved IDs, and any uncertainty preserves
   the receipt as `preserved_uncertain`.
+- Failed-job reconciliation. A fresh maintenance connector first proves ownership
+  without closing anything, records `window_removal_issued`, then removes the exact
+  saved window and polls briefly until Chrome stops listing it. A missing connector is
+  accepted only when every saved working page survives in the saved window, and no
+  extra, claimed, attached or descendant tab is present. A retry after an interrupted
+  removal finishes idempotently. Once a receipt is finished, a stale facade adopts it
+  and never writes it back. A failed owned step records a static code from this
+  route's own browser code (`owned_operation_failed:<code>`), never vendor text.
+- Transport close. The route kills the job's own MCP process group with SIGKILL before
+  closing its stdin. A graceful Playwright MCP exit closes pages one at a time and was
+  cut off part way, which left windows without their connector. A hard kill only drops
+  the relay. The extension ungroups the tabs intact, and reconciliation closes them by
+  exact ID.
 - Isolation at birth. Chrome can place a new connector in the newest existing window when
   two jobs start close together. Each connector that finds another tab in its window
   moves itself to a new window before ownership is recorded.
