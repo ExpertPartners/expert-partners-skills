@@ -82,6 +82,55 @@ WORKING_PAGE_LOST_NOTE = (
 )
 TIMING_RECORDS = 20
 GENERATION_ATTEMPTS = 30
+# Fixed reasons the Playwright extension (0.5.0) passes when it closes a relay.
+# A reload or crash closes it without any reason, which stays unknown.
+CLOSE_REASONS = {
+    "All controlled tabs detached": "all_controlled_tabs_detached",
+    "User disconnected": "user_disconnect",
+}
+CLOSE_REASON_LABELS = frozenset(CLOSE_REASONS.values()) | {"connector_closed", "unknown"}
+DIAGNOSTIC_VALUES = ("yes", "no", "unknown")
+DIAGNOSTIC_UNAVAILABLE = (
+    "diagnostics_unavailable:connection_status",
+    "diagnostics_unavailable:debugger_targets",
+)
+DIAGNOSTIC_SKIPS = frozenset(
+    ("metadata_missing", "generation_changed", "reconciliation_refused", "sealed_job")
+)
+
+
+def reported_close_reason(reply):
+    """Project only an explicit extension close reason, never arbitrary text."""
+    text = "\n".join(b.get("text", "") for b in reply.get("content", []) if isinstance(b, dict))
+    # Only the MCP relay's own wording carries a reason; page text cannot pose as one.
+    found = re.search(
+        r"Extension disconnected(?: before initialization)?: (" + "|".join(CLOSE_REASONS) + ")",
+        text,
+    )
+    return CLOSE_REASONS[found.group(1)] if found else "unknown"
+
+
+def connection_diagnostics_js(scope, client_name, reason="unknown"):
+    """Read extension state without selecting, attaching or changing any tab."""
+    return (
+        STATE_JS + "return await s.connector.evaluate(async({scope,clientName,reason})=>{"
+        "const tabs=await chrome.tabs.query({});"
+        "const out={connector_present:tabs.some(t=>t.id===scope.connectorId)?'yes':'no',connection_lists_owned_tabs:'unknown',debugger_attached:Object.fromEntries(scope.tabIds.map(id=>[id,'unknown'])),close_reason:reason};"
+        # Only the job's own connector tab closing is derivable from state.
+        "if(reason==='unknown'&&out.connector_present==='no')out.close_reason='connector_closed';"
+        "out.unavailable=[];"
+        # Only this job's exact client and saved tab IDs are read back.
+        "try{const status=await chrome.runtime.sendMessage({type:'getConnectionStatus'});"
+        "if(!status||!Array.isArray(status.connections))throw 0;"
+        "out.connection_lists_owned_tabs=status.connections.some(c=>c.clientName===clientName&&Array.isArray(c.connectedTabIds)&&c.connectedTabIds.some(id=>scope.tabIds.includes(id)))?'yes':'no';"
+        "}catch{out.unavailable.push('diagnostics_unavailable:connection_status');}"
+        "try{const targets=await chrome.debugger.getTargets();"
+        "for(const id of scope.tabIds)out.debugger_attached[id]=targets.some(t=>t.tabId===id&&t.attached)?'yes':'no';"
+        "}catch{out.unavailable.push('diagnostics_unavailable:debugger_targets');}"
+        "return out;},"
+        + json.dumps({"scope": scope, "clientName": client_name, "reason": reason})
+        + ");"
+    )
 
 
 def redact(value):
@@ -117,7 +166,9 @@ def projection(reply):
         text = "\n".join(b.get("text", "") for b in reply.get("content", []) if isinstance(b, dict))
         found = sorted(c for c in OWNED_ERROR_CODES if re.search(r"\b" + c + r"\b", text))
         label = found[0] if found else vendor_error_class(reply)
-        raise Refusal("owned_operation_failed" + (":" + label if label else ""))
+        error = Refusal("owned_operation_failed" + (":" + label if label else ""))
+        error.close_reason = reported_close_reason(reply)
+        raise error
     blocks = reply.get("content", [])
     if len(blocks) != 1 or blocks[0].get("type") != "text":
         raise Refusal("owned_projection_shape")
@@ -381,6 +432,8 @@ class Route:
         # Stage names and wall times only, so a hung call shows where it stopped.
         row["timings"] = job.get("timings", [])
         row["control_socket"] = getattr(self, "control_socket", None)
+        if job.get("connection_diagnostics"):
+            row["connection_diagnostics"] = job["connection_diagnostics"]
         if job.get("window_disposition"):
             row["window_disposition"] = job["window_disposition"]
         if job.get("window_removal_issued"):
@@ -427,6 +480,96 @@ class Route:
 
     def metadata(self, client, strict=True):
         return code(client, STATE_JS + "return await s.snapshot(" + json.dumps(strict) + ");")
+
+    @contextmanager
+    def maintenance_connector(self):
+        client = self.client("EP cleanup " + uuid.uuid4().hex)
+        try:
+            code(
+                client,
+                "const p=Buffer.constructor('return process')();if(page.context().pages().length!==1||!page.url().startsWith("
+                + json.dumps(EXTENSION + "?")
+                + "))throw Error('not_own_connector');p.__epBrowserJob={connector:page,task:null};return {ready:true};",
+            )
+            yield client
+        finally:
+            try:
+                closed = code(
+                    client,
+                    STATE_JS
+                    + "return await s.connector.evaluate(async()=>{const t=await chrome.tabs.getCurrent();const tabs=await chrome.tabs.query({windowId:t.windowId});if(tabs.length!==1||tabs[0].id!==t.id)throw Error('maintenance_window_not_exclusive');setTimeout(()=>chrome.windows.remove(t.windowId),250);return {scheduled:true,windowId:t.windowId};});",
+                )
+                time.sleep(0.4)
+                if "windowId" in closed:
+                    verify_window_closed(closed["windowId"])
+            finally:
+                client.close()
+
+    def capture_connection_diagnostics(self, job, stage, client=None, reason="unknown", skip=None):
+        """Record fixed-label connection state once per phase without changing the outcome.
+
+        The first route-side failure and failed-job reconciliation each keep one
+        snapshot. Collection is read-only and never selects, attaches or closes a tab.
+        """
+        key = "dispose_failed" if stage in ("dispose_failed", "reconcile") else "first_failure"
+        captures = job.setdefault("connection_diagnostics", {})
+        if key in captures:
+            return
+        if reason not in CLOSE_REASON_LABELS:
+            reason = "unknown"
+        if reason == "unknown":
+            reason = captures.get("first_failure", {}).get("close_reason", "unknown")
+        old = job.get("metadata") or {}
+        tab_ids = [i for i in old.get("tabIds") or [] if type(i) is int]
+        snapshot = {
+            "stage": stage,
+            "at": round(time.time(), 3),
+            "connector_present": "unknown",
+            "connection_lists_owned_tabs": "unknown",
+            "debugger_attached": {str(i): "unknown" for i in tab_ids},
+            "close_reason": reason,
+            "unavailable": [],
+        }
+        captures[key] = snapshot
+        try:
+            if skip:
+                raise Refusal(skip)
+            if not tab_ids or type(old.get("connectorId")) is not int:
+                raise Refusal("metadata_missing")
+            scope = {"connectorId": old["connectorId"], "tabIds": tab_ids}
+
+            def collect(connector):
+                value = code(
+                    connector, connection_diagnostics_js(scope, job["client_name"], reason)
+                )
+                for field in ("connector_present", "connection_lists_owned_tabs"):
+                    if value.get(field) in DIAGNOSTIC_VALUES:
+                        snapshot[field] = value[field]
+                seen = value.get("debugger_attached")
+                for tab_id in snapshot["debugger_attached"]:
+                    if isinstance(seen, dict) and seen.get(tab_id) in DIAGNOSTIC_VALUES:
+                        snapshot["debugger_attached"][tab_id] = seen[tab_id]
+                if value.get("close_reason") in CLOSE_REASON_LABELS:
+                    snapshot["close_reason"] = value["close_reason"]
+                missing = value.get("unavailable")
+                snapshot["unavailable"] = [
+                    c for c in DIAGNOSTIC_UNAVAILABLE if isinstance(missing, list) and c in missing
+                ]
+
+            if client is not None:
+                collect(client)
+            else:
+                if self.preflight() != job["generation"]:
+                    raise Refusal("generation_changed")
+                with self.bootstrap(), self.maintenance_connector() as connector:
+                    collect(connector)
+        except Exception as error:
+            failed = (
+                str(error)
+                if type(error) is Refusal and str(error) in DIAGNOSTIC_SKIPS
+                else "collection_failed"
+            )
+            snapshot["unavailable"] = ["diagnostics_unavailable:" + failed]
 
     def connect(self, job, working=True):
         client = self.client(job["client_name"])
@@ -491,7 +634,11 @@ class Route:
                         bind(self.root, job_id, owner_session_id)
                     self.connect(job)
                 return result(self.summary(job))
-            except BaseException:
+            except BaseException as error:
+                if isinstance(error, Exception):
+                    self.capture_connection_diagnostics(
+                        job, "allocation", reason=getattr(error, "close_reason", "unknown")
+                    )
                 self.checkpoint(job, "failed")
                 # Caller gets the handle even if allocation failed. Never hide
                 # an uncertain creation behind an automatic second attempt.
@@ -704,7 +851,7 @@ class Route:
         client.close()
         job["ownership_pending"] = False
 
-    def dispose_failed(self, job):
+    def dispose_failed(self, job, reason="unknown"):
         """Use a fresh own connector to reconcile exact unclaimed old IDs only."""
         if job["client"] and not job["client"].closed:
             # Capture any page created just before an interrupted response while
@@ -714,33 +861,30 @@ class Route:
                 return
             except Exception as error:
                 self.mark(job, "live_" + failure_stage(error))
+                reason = getattr(error, "close_reason", reason)
             job["client"].close()
         old = job["metadata"]
-        if not old:
-            raise Refusal("creation_outcome_unknown_requires_reconciliation")
-        pending_since = old.get("newestTabId") if job.get("ownership_pending") else None
-        if job.get("ownership_pending") and type(pending_since) is not int:
-            # No proven pre-call watermark, so an orphaned popup could escape.
-            raise Refusal("uncheckpointed_page_creation_requires_reconciliation")
-        if old.get("unboundOwnedPages"):
-            raise Refusal("unbound_owned_pages_require_reconciliation")
-        if self.preflight() != job["generation"]:
-            raise Refusal("browser_generation_changed_requires_reconciliation")
-        maintenance = {
-            **job,
-            "client_name": "EP cleanup " + uuid.uuid4().hex,
-            "metadata": None,
-            "client": None,
-        }
-        # Never save the temporary connection over the original receipt.
-        client = self.client(maintenance["client_name"])
         try:
-            code(
-                client,
-                "const p=Buffer.constructor('return process')();if(page.context().pages().length!==1||!page.url().startsWith("
-                + json.dumps(EXTENSION + "?")
-                + "))throw Error('not_own_connector');p.__epBrowserJob={connector:page,task:null};return {ready:true};",
+            if not old:
+                raise Refusal("creation_outcome_unknown_requires_reconciliation")
+            pending_since = old.get("newestTabId") if job.get("ownership_pending") else None
+            if job.get("ownership_pending") and type(pending_since) is not int:
+                # No proven pre-call watermark, so an orphaned popup could escape.
+                raise Refusal("uncheckpointed_page_creation_requires_reconciliation")
+            if old.get("unboundOwnedPages"):
+                raise Refusal("unbound_owned_pages_require_reconciliation")
+            if self.preflight() != job["generation"]:
+                raise Refusal("browser_generation_changed_requires_reconciliation")
+        except Exception:
+            # Reconciliation opens no connector here, so neither do diagnostics.
+            self.capture_connection_diagnostics(
+                job, "dispose_failed", reason=reason, skip="reconciliation_refused"
             )
+            raise
+        # Never save the temporary connection over the original receipt.
+        with self.maintenance_connector() as client:
+            self.capture_connection_diagnostics(job, "reconcile", client=client, reason=reason)
+            self.checkpoint(job)
             args = {
                 "old": old,
                 "clientName": job["client_name"],
@@ -761,18 +905,6 @@ class Route:
             verify_window_closed(old["windowId"])
             job["window_disposition"] = "closed"
             job["ownership_pending"] = False
-        finally:
-            try:
-                closed = code(
-                    client,
-                    STATE_JS
-                    + "return await s.connector.evaluate(async()=>{const t=await chrome.tabs.getCurrent();const tabs=await chrome.tabs.query({windowId:t.windowId});if(tabs.length!==1||tabs[0].id!==t.id)throw Error('maintenance_window_not_exclusive');setTimeout(()=>chrome.windows.remove(t.windowId),250);return {scheduled:true,windowId:t.windowId};});",
-                )
-                time.sleep(0.4)
-                if "windowId" in closed:
-                    verify_window_closed(closed["windowId"])
-            finally:
-                client.close()
 
     def finish(self, job):
         if job["status"] == "finished":
@@ -797,7 +929,7 @@ class Route:
                     except Exception as error:
                         self.mark(job, "live_" + failure_stage(error))
                         self.checkpoint(job, "failed")
-                        self.dispose_failed(job)
+                        self.dispose_failed(job, getattr(error, "close_reason", "unknown"))
                 else:
                     self.dispose_failed(job)
         except Exception as error:
@@ -842,6 +974,11 @@ class Route:
                     raise Refusal("only_failed_jobs_recover")
                 try:
                     self.finish(job)
+                    # The new connection gets fresh snapshots; the old ones stay one level back.
+                    earlier = job.pop("connection_diagnostics", None)
+                    if earlier:
+                        earlier.pop("previous", None)
+                        job["connection_diagnostics"] = {"previous": earlier}
                     with self.bootstrap():
                         job.update(
                             client_name="EP " + job["label"] + " [" + uuid.uuid4().hex[:8] + "]",
@@ -879,6 +1016,7 @@ class Route:
             del job["timings"][:-TIMING_RECORDS]
             if sealed:
                 return self.sealed_call(job, args["code"])
+            capture_stage, reported = "prime", "unknown"
             try:
                 if name == "browser_tabs":
                     if job["status"] != "ready":
@@ -895,12 +1033,15 @@ class Route:
                     job["ownership_pending"] = True
                     self.mark(job, "tool_start")
                     self.checkpoint(job)
+                    capture_stage = "tool"
                     reply = job["client"].call("tools/call", {"name": name, "arguments": args})
                 self.mark(job, "tool_end")
                 notes = [note] if note else []
                 if reply.get("isError") and name != "browser_tabs":
                     self.mark(job, "vendor_error:" + (vendor_error_class(reply) or "unclassified"))
                     notes.append(VENDOR_ERROR_NOTE)
+                    reported = reported_close_reason(reply)
+                capture_stage = "post_call"
                 job["metadata"] = self.verify_connection(job)
                 job["ownership_pending"] = False
                 self.mark(job, "post_metadata")
@@ -909,6 +1050,7 @@ class Route:
                     # later call can prove it is the same document. Never
                     # re-bind or replay; finish or recover closes it by exact ID.
                     self.mark(job, "failed:working_page_lost")
+                    self.capture_connection_diagnostics(job, "post_call", reason=reported)
                     self.checkpoint(job, "failed")
                     notes.append(WORKING_PAGE_LOST_NOTE)
                 else:
@@ -918,6 +1060,9 @@ class Route:
                 return redact(reply)
             except Exception as error:
                 self.mark(job, failure_stage(error))
+                self.capture_connection_diagnostics(
+                    job, capture_stage, reason=getattr(error, "close_reason", reported)
+                )
                 self.checkpoint(job, "failed")
                 return result(
                     {
@@ -949,6 +1094,9 @@ class Route:
         except Exception as error:
             # Provider and page text can carry the secret; keep only the static code.
             self.mark(job, failure_stage(error))
+            self.capture_connection_diagnostics(
+                job, "sealed_call", reason=getattr(error, "close_reason", "unknown")
+            )
             self.checkpoint(job, "failed")
             return result({"sealed": "error", "code": "sealed_outcome_uncertain"}, True)
         if SEALED_OUTCOMES[outcome]:

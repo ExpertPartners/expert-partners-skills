@@ -702,6 +702,366 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
             route.checkpoint(stale, "starting")
             self.assertEqual(json.loads(receipt.read_text())["status"], "starting")
 
+    DIAGNOSTICS_FIXTURE = r"""
+const state=__STATE__;const calls=[];
+const fail=name=>{calls.push(name);throw Error('SYNTHETIC_CANARY '+name);};
+global.chrome={tabs:{query:async()=>{calls.push('tabs.query');return state.tabs;}},
+  runtime:{sendMessage:async(m)=>{if(state.statusFails)fail('runtime.sendMessage');calls.push('runtime.sendMessage:'+m.type);return {connections:state.connections||[]};}},
+  debugger:{getTargets:async()=>{if(state.targetsFail)fail('debugger.getTargets');calls.push('debugger.getTargets');return (state.attached||[]).map(tabId=>({tabId,attached:true}));}}};
+process.__epBrowserJob={connector:{evaluate:async(fn,arg)=>await fn(arg)}};
+async function attempt(){__BODY__}
+attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({...o,calls})));
+"""
+
+    def diagnostics(self, reason="unknown", **state):
+        body = b.connection_diagnostics_js({"connectorId": 1, "tabIds": [1, 10]}, "fixture", reason)
+        script = self.DIAGNOSTICS_FIXTURE.replace("__STATE__", json.dumps(state)).replace(
+            "__BODY__", body
+        )
+        run = subprocess.run(["node", "-e", script], capture_output=True, text=True, timeout=10)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        return json.loads(run.stdout)
+
+    def test_connection_diagnostics_read_only_the_owned_scope(self):
+        owned = [{"id": 1, "windowId": 5, "url": self.CONNECTOR_URL}, {"id": 10, "windowId": 5}]
+        peer = [{"id": 70, "windowId": 8, "url": self.CONNECTOR_URL}, {"id": 71, "windowId": 8}]
+        peer_connection = {
+            "id": "p",
+            "clientName": "EP peer [00000000]",
+            "connectedTabIds": [70, 71],
+        }
+        cases = [
+            (
+                "healthy connection",
+                {
+                    "tabs": owned + peer,
+                    "connections": [
+                        {"id": "o", "clientName": "fixture", "connectedTabIds": [1, 10]},
+                        peer_connection,
+                    ],
+                    "attached": [1, 10, 70, 71],
+                },
+                "unknown",
+                ("yes", "yes", {"1": "yes", "10": "yes"}, "unknown", []),
+            ),
+            (
+                # A peer that claims an owned ID never counts as this job's connection.
+                "peer claims and attaches owned ids",
+                {
+                    "tabs": owned + peer,
+                    "connections": [{**peer_connection, "connectedTabIds": [1, 10, 70]}],
+                    "attached": [70],
+                },
+                "all_controlled_tabs_detached",
+                ("yes", "no", {"1": "no", "10": "no"}, "all_controlled_tabs_detached", []),
+            ),
+            (
+                "connector tab gone",
+                {"tabs": owned[1:] + peer, "connections": [peer_connection], "attached": [70]},
+                "unknown",
+                ("no", "no", {"1": "no", "10": "no"}, "connector_closed", []),
+            ),
+            (
+                "reported reason wins over derivation",
+                {"tabs": owned[1:], "connections": []},
+                "user_disconnect",
+                ("no", "no", {"1": "no", "10": "no"}, "user_disconnect", []),
+            ),
+            (
+                "extension reads fail",
+                {"tabs": owned, "statusFails": True, "targetsFail": True},
+                "unknown",
+                (
+                    "yes",
+                    "unknown",
+                    {"1": "unknown", "10": "unknown"},
+                    "unknown",
+                    [
+                        "diagnostics_unavailable:connection_status",
+                        "diagnostics_unavailable:debugger_targets",
+                    ],
+                ),
+            ),
+        ]
+        for name, state, reason, expected in cases:
+            with self.subTest(name):
+                out = self.diagnostics(reason, **state)
+                v = out["v"]
+                self.assertEqual(
+                    (
+                        v["connector_present"],
+                        v["connection_lists_owned_tabs"],
+                        v["debugger_attached"],
+                        v["close_reason"],
+                        v["unavailable"],
+                    ),
+                    expected,
+                )
+                self.assertEqual(
+                    set(v),
+                    {
+                        "connector_present",
+                        "connection_lists_owned_tabs",
+                        "debugger_attached",
+                        "close_reason",
+                        "unavailable",
+                    },
+                )
+                # Only reads; any select, attach, update or close call would throw.
+                self.assertTrue(
+                    set(out["calls"])
+                    <= {
+                        "tabs.query",
+                        "runtime.sendMessage:getConnectionStatus",
+                        "runtime.sendMessage",
+                        "debugger.getTargets",
+                    }
+                )
+                self.assertNotIn("SYNTHETIC_CANARY", json.dumps(v))
+                self.assertNotIn("connect.html", json.dumps(v))
+
+    def test_close_reason_comes_only_from_the_relay_wording(self):
+        def failing(text):
+            return {"isError": True, "content": [{"type": "text", "text": text}]}
+
+        closed = "Target page, context or browser has been closed\n"
+        for text, expected in (
+            (
+                closed + "Extension disconnected: All controlled tabs detached",
+                "all_controlled_tabs_detached",
+            ),
+            ("Extension disconnected before initialization: User disconnected", "user_disconnect"),
+            (closed + "page said User disconnected SYNTHETIC_CANARY", "unknown"),
+            ("Extension disconnected: SYNTHETIC_CANARY", "unknown"),
+            (closed, "unknown"),
+        ):
+            with self.subTest(expected=expected, text=text):
+                with self.assertRaises(Refusal) as raised:
+                    b.projection(failing(text))
+                self.assertEqual(raised.exception.close_reason, expected)
+
+    def diagnosed_route(self, root, collected=None, fails=None):
+        route = self.route(root)
+        job = self.ready_job(route, b.result({"clicked": True}))
+        job["metadata"]["tabIds"] = [1, 10]
+        lost = {
+            "isError": True,
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Target page, context or browser has been closed\nExtension disconnected: All controlled tabs detached SYNTHETIC_CANARY",
+                }
+            ],
+        }
+
+        def verify(*_, **__):
+            b.projection(lost)
+
+        route.metadata = verify
+        opened = []
+
+        @contextlib.contextmanager
+        def maintenance():
+            opened.append(True)
+            if fails:
+                raise fails
+            yield "maintenance"
+
+        route.maintenance_connector = maintenance
+        sent = []
+
+        def fake(client, body):
+            sent.append((client, body))
+            return copy.deepcopy(collected)
+
+        return route, job, opened, sent, fake
+
+    def test_first_failure_records_fixed_connection_diagnostics(self):
+        collected = {
+            "connector_present": "yes",
+            "connection_lists_owned_tabs": "no",
+            "debugger_attached": {"1": "no", "10": "no", "70": "yes"},
+            "close_reason": "all_controlled_tabs_detached",
+            "unavailable": ["SYNTHETIC_CANARY"],
+            "title": "SYNTHETIC_CANARY",
+        }
+        with tempfile.TemporaryDirectory() as root:
+            route, job, opened, sent, fake = self.diagnosed_route(root, collected)
+            with (
+                patch.object(b, "code", side_effect=fake),
+                patch.object(b.time, "time", return_value=1234.5),
+            ):
+                reply = route.call(
+                    "browser_navigate", {"job_id": job["job_id"], "url": "https://example.com/"}
+                )
+            self.assertEqual(decode(reply)["status"], "failed")
+            receipt = (Path(root) / (job["job_id"] + ".json")).read_text()
+            row = json.loads(receipt)
+            self.assertEqual(
+                row["connection_diagnostics"],
+                {
+                    "first_failure": {
+                        "stage": "post_call",
+                        "at": 1234.5,
+                        "connector_present": "yes",
+                        "connection_lists_owned_tabs": "no",
+                        "debugger_attached": {"1": "no", "10": "no"},
+                        "close_reason": "all_controlled_tabs_detached",
+                        "unavailable": [],
+                    }
+                },
+            )
+            # Diagnostics add no timing stage and do not change the outcome.
+            self.assertEqual(
+                [s for s, _ in row["timings"][-1]["stages"]],
+                [
+                    "received",
+                    "tool_start",
+                    "tool_end",
+                    "failed:owned_operation_failed:vendor_target_closed",
+                ],
+            )
+            self.assertEqual(row["status"], "failed")
+            self.assertEqual(opened, [True])
+            self.assertEqual([c for c, _ in sent], ["maintenance"])
+            body = sent[0][1]
+            self.assertIn('"clientName": "fixture"', body)
+            self.assertIn('"tabIds": [1, 10]', body)
+            self.assertNotIn("SYNTHETIC_CANARY", receipt)
+            # A later failure on the same connection keeps the first snapshot.
+            job["status"] = "ready"
+            with patch.object(b, "code", side_effect=fake):
+                route.call(
+                    "browser_navigate", {"job_id": job["job_id"], "url": "https://example.com/"}
+                )
+            self.assertEqual(opened, [True])
+            self.assertEqual(job["connection_diagnostics"]["first_failure"]["at"], 1234.5)
+
+    def test_diagnostics_collection_failure_records_a_static_code(self):
+        for fails, code in (
+            (RuntimeError("SYNTHETIC_CANARY"), "collection_failed"),
+            (None, "generation_changed"),
+        ):
+            with self.subTest(code=code), tempfile.TemporaryDirectory() as root:
+                route, job, opened, _, fake = self.diagnosed_route(root, {}, fails)
+                if code == "generation_changed":
+                    route.preflight = lambda: {"pid": 9, "started": "other"}
+                with patch.object(b, "code", side_effect=fake):
+                    reply = route.call(
+                        "browser_navigate", {"job_id": job["job_id"], "url": "https://example.com/"}
+                    )
+                self.assertEqual(decode(reply)["status"], "failed")
+                receipt = (Path(root) / (job["job_id"] + ".json")).read_text()
+                snap = json.loads(receipt)["connection_diagnostics"]["first_failure"]
+                self.assertEqual(snap["unavailable"], ["diagnostics_unavailable:" + code])
+                self.assertEqual(
+                    (
+                        snap["connector_present"],
+                        snap["connection_lists_owned_tabs"],
+                        snap["debugger_attached"],
+                    ),
+                    ("unknown", "unknown", {"1": "unknown", "10": "unknown"}),
+                )
+                self.assertNotIn("SYNTHETIC_CANARY", receipt)
+                self.assertEqual(opened, [True] if fails else [])
+
+    def test_failed_disposal_keeps_the_detach_reason_in_reconciliation(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            job = self.full_job(route)
+            job["client"] = SimpleNamespace(
+                closed=False, close=lambda: setattr(job["client"], "closed", True)
+            )
+            route.jobs[job["job_id"]] = job
+            lost = Refusal("owned_operation_failed:vendor_target_closed")
+            lost.close_reason = "user_disconnect"
+            route.dispose_live = lambda _: (_ for _ in ()).throw(lost)
+            sent = []
+
+            def fake(_, body):
+                if "connection_lists_owned_tabs" in body:
+                    sent.append(body)
+                    return {
+                        "connector_present": "no",
+                        "connection_lists_owned_tabs": "no",
+                        "debugger_attached": {"1": "no", "10": "unknown"},
+                        "close_reason": "user_disconnect",
+                        "unavailable": ["diagnostics_unavailable:debugger_targets"],
+                    }
+                if "async({old,clientName," in body:
+                    return (
+                        {"closed": True, "count": 1}
+                        if '"remove": true' in body
+                        else {"ready": True}
+                    )
+                if "maintenance_window_not_exclusive" in body:
+                    return {"scheduled": True, "windowId": 77}
+                return {"ready": True}
+
+            with (
+                patch.object(
+                    route, "client", create=True, return_value=SimpleNamespace(close=lambda: None)
+                ),
+                patch.object(b, "code", side_effect=fake),
+                patch.object(b, "verify_window_closed"),
+                patch.object(b.time, "sleep"),
+            ):
+                route.call("browser_job_finish", {"job_id": job["job_id"]})
+            self.assertEqual(len(sent), 1)
+            self.assertIn('"reason": "user_disconnect"', sent[0])
+            row = json.loads((Path(root) / (job["job_id"] + ".json")).read_text())
+            snap = row["connection_diagnostics"]["dispose_failed"]
+            self.assertEqual(
+                (
+                    snap["stage"],
+                    snap["close_reason"],
+                    snap["connector_present"],
+                    snap["debugger_attached"],
+                    snap["unavailable"],
+                ),
+                (
+                    "reconcile",
+                    "user_disconnect",
+                    "no",
+                    {"1": "no", "10": "unknown"},
+                    ["diagnostics_unavailable:debugger_targets"],
+                ),
+            )
+            self.assertEqual(row["status"], "finished")
+            self.assertEqual(
+                [s for s, _ in row["timings"][-1]["stages"]],
+                [
+                    "received",
+                    "live_failed:owned_operation_failed:vendor_target_closed",
+                    "reconcile_proven",
+                    "finished",
+                ],
+            )
+
+    def test_refused_reconciliation_still_records_diagnostics_without_a_connector(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            job = self.full_job(route)
+            job["ownership_pending"] = True
+            job["connection_diagnostics"] = {
+                "first_failure": {"stage": "tool", "close_reason": "all_controlled_tabs_detached"}
+            }
+            route.jobs[job["job_id"]] = job
+            with patch.object(route, "client", create=True) as connect:
+                with self.assertRaises(Refusal):
+                    route.call("browser_job_finish", {"job_id": job["job_id"]})
+            connect.assert_not_called()
+            row = json.loads((Path(root) / (job["job_id"] + ".json")).read_text())
+            snap = row["connection_diagnostics"]["dispose_failed"]
+            self.assertEqual(
+                (snap["stage"], snap["close_reason"], snap["unavailable"]),
+                (
+                    "dispose_failed",
+                    "all_controlled_tabs_detached",
+                    ["diagnostics_unavailable:reconciliation_refused"],
+                ),
+            )
+
     def test_downstream_error_keeps_only_a_static_owned_code(self):
         def failing(text):
             return {"isError": True, "content": [{"type": "text", "text": text}]}
