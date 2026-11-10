@@ -1,12 +1,68 @@
 """Public prompt-contract checks; private business cases run outside this repo."""
 
 import unittest
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3] / "plugins/content-engines/skills"
 
 
 class ContentSourceContractTest(unittest.TestCase):
+    def test_standalone_claims_cannot_be_rescued_by_labels(self):
+        for name in ("hook-engine", "post-value-filter"):
+            with self.subTest(name=name):
+                text = (ROOT / name / "SKILL.md").read_text()
+                for clause in (
+                    "Standalone literal check",
+                    "A suggestion label is not evidence",
+                    "An external disclaimer cannot rescue an unsupported sentence",
+                    "A question must not smuggle in an unsupported premise",
+                    "implied causes, diagnoses, comparisons, frequency and promised outcomes",
+                    "supports their exact scope",
+                    "without a guaranteed result",
+                    "Keep truthful specific persuasive language",
+                    "Hypothetical framing permits an invented situation",
+                ):
+                    self.assertIn(clause, text)
+        for path in (
+            "hook-engine/references/architectures.md",
+            "post-value-filter/references/idea-check.md",
+            "post-value-filter/references/rewrite-playbook.md",
+        ):
+            with self.subTest(path=path):
+                text = (ROOT / path).read_text()
+                self.assertIn("external disclaimer", text)
+                self.assertIn(
+                    "line"
+                    if "architectures" in path
+                    else "sentence"
+                    if "idea-check" in path
+                    else "line itself",
+                    text,
+                )
+
+    def test_reader_prose_is_neutral_except_fixed_compatibility_labels(self):
+        labels = (
+            "Most valuable thing she saw today",
+            "She'd send it to a friend",
+            "Valuable even if she never buys",
+            "Her Exact Words",
+            "Her moment",
+            "Her bad day",
+            "Her words",
+            "What she wants",
+        )
+        for name in ("hook-engine", "post-value-filter"):
+            for path in (ROOT / name).rglob("*.md"):
+                with self.subTest(path=path):
+                    text = path.read_text()
+                    for label in labels:
+                        text = re.sub(re.escape(label), "", text, flags=re.I)
+                    self.assertNotRegex(text, r"(?i)\b(?:she|her|hers|herself)\b")
+            text = (ROOT / name / "SKILL.md").read_text()
+            for clause in ("critiques", "score explanations", "ancillary advice"):
+                self.assertIn(clause, text)
+
     def test_both_entrypoints_bound_suggestions_and_gender(self):
         for name in ("hook-engine", "post-value-filter"):
             with self.subTest(name=name):

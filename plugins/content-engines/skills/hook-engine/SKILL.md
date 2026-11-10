@@ -29,7 +29,11 @@ This skill writes hooks from what the user has: their audience, their customers'
 
 Apply the truth check to every mode and to ancillary advice, including pattern-unlock suggestions. Keep supplied canon separate from proposed content: a list of factors does not establish their order, and co-occurring problems do not establish a universal cause. Label a new angle, inferred mechanism or hypothetical scenario as a suggestion, not the user's approved method or a verified result. Never invent proof, prices, dates, urgency or a sales CTA to sharpen an opener.
 
+**Standalone literal check, before showing any hook or advice:** read each written hook, spoken opener, headline, subheadline and proposed takeaway on its own, without its pattern name, proof note or surrounding disclaimer. Identify its factual assertions, including implied causes, diagnoses, comparisons, frequency and promised outcomes, and check that the supplied material supports their exact scope. A suggestion label is not evidence. An external disclaimer cannot rescue an unsupported sentence. A question must not smuggle in an unsupported premise. Expertise or a pattern's availability is not permission to diagnose every reader or say one factor always causes another. If support is missing, rewrite the line itself as a bounded observation, a genuinely open question or an explicitly proposed action without a guaranteed result, or use a flagged placeholder. Keep truthful specific persuasive language; do not flatten supported claims into vague caution. Hypothetical framing permits an invented situation, not an unsupported real-world causal rule.
+
 Use the audience's stated pronouns; otherwise use they/their or the reader. Legacy labels such as `Her words` and pattern names are compatibility labels, not evidence of the audience's gender. Preserve an approved original and its supplied source locator when critiquing it; rewrites are suggestions, not replacements for canon.
+
+Apply the pronoun rule to critiques, score explanations, why-it-works notes and ancillary advice too, not just publishable copy. Preserve exact supplied quotations and fixed legacy labels without carrying their pronouns into new reader prose.
 
 If asked for versions, distinguish the plugin release from the skill's frontmatter metadata. Slash injection may omit frontmatter: read the loaded `SKILL.md` if available, or say the skill version was not observed. Omitted metadata is not proof that no version exists.
 
@@ -89,9 +93,9 @@ The 12 patterns, their formulas, what each one requires, and examples across ind
 
 Write **10 hooks** by default (5 if they ask for a quick batch, more if they ask). Every hook must deliver three things within the first three seconds of reading or watching:
 
-1. **Who it's for.** The reader recognizes herself, whether it's stated or implied.
-2. **What she'll get.** A list, a story, a breakdown, a rating, a result. She knows what shape the value arrives in.
-3. **Why now.** A specific number, a real moment, a surprising claim, or a stake. Something that makes her stop instead of saving it for later.
+1. **Who it's for.** The reader recognizes themselves, whether it's stated or implied.
+2. **What they'll get.** A list, a story, a breakdown, a rating, a result. They know what shape the value arrives in.
+3. **Why now.** A specific number, a real moment, a surprising claim, or a stake. Something that makes them stop instead of saving it for later.
 
 Rules for every hook:
 
@@ -119,11 +123,11 @@ Score each hook on five tests, 1 point each:
 
 | Test | Passes when |
 |---|---|
-| **Relevance** | Her exact reader would stop because it feels written for her, not for everyone. |
+| **Relevance** | The intended reader would stop because it feels written for them, not for everyone. |
 | **Specificity** | There's a real number, a named audience, a concrete moment, or a specific outcome. |
-| **Tension** | There's a contrast, surprise, conflict, or open loop she needs to close. |
+| **Tension** | There's a contrast, surprise, conflict, or open loop they need to close. |
 | **Speed** | The charged word lands in the first three words. No warm-up. |
-| **Pull** | She needs to see what comes next. |
+| **Pull** | They need to see what comes next. |
 
 Only show hooks scoring **4 or 5**. Rewrite anything at 3 or below until it passes, or cut it and write a new one. Be strict. A hook you wouldn't personally stop for doesn't pass.
 

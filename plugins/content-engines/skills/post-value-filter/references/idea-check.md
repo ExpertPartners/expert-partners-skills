@@ -15,7 +15,7 @@ Is this a take the reader hasn't already seen twenty times this month? Pull from
 - 8/10: "Your email list isn't dead. Your subject lines are. The 4-word test I run before every send."
 
 **Her moment (0-10)**
-Is the idea tied to a real moment in her life she'll recognize instantly?
+Is the idea tied to a real moment in their life they'll recognize instantly?
 - 3/10: "Improving team communication"
 - 8/10: "The Slack message you send at 9pm that makes your team dread Monday"
 
@@ -35,12 +35,14 @@ Always give three, even when the verdict is WRITE IT. Each angle gets:
 ```
 Angle 1: [short name]
 Hook: "[a first line written for this reader]"
-The takeaway: [the one thing she'll know or be able to do after]
+The takeaway: [the one thing they'll know or be able to do after]
 Best format: [carousel / reel / text post / thread / story sequence] · [why, in a few words]
 ```
 
-Make the three angles different from each other. A good spread: one teaches a mechanism, one names a mistake, one tells a story that mirrors her. Never invent stats or client results inside an angle. Use placeholders if needed.
+Make the three angles different from each other. A good spread: one teaches a mechanism, one names a mistake, one tells a story that mirrors the reader. Never invent stats or client results inside an angle. Use placeholders if needed.
 
 Check each hook and takeaway against the supplied source boundaries, not just its score. Preserve the distinction between a stated fact and a proposed angle: do not infer an order from an unordered list or a universal cause from an audience problem. Mark new frames as suggestions and hypothetical situations as hypothetical, not approved company teaching or real customer stories. Use the audience's stated pronouns or neutral reader references, regardless of the fixed `Her moment` rubric label. Do not invent proof, permission, price, timing, urgency or a sales CTA.
+
+Read every hook and takeaway alone, without its angle title, suggestion label or external disclaimer. Its literal assertions must still be supported at their stated scope. A proposed exercise can invite the reader to inspect a problem; it cannot declare an unverified cause or guarantee the exercise fixes it. An open question cannot presume an unverified diagnosis. Revise the sentence itself when it overclaims. Keep specific supported language and the three-angle format. Apply neutral reader prose to the critique and scoring reasons too.
 
 End with: "Draft whichever one pulls you and paste it back. I'll score it."

@@ -15,11 +15,11 @@ subtitle: "seven-filter quality gate for posts"
 
 # Post Value Filter
 
-Most social content fails for one reason: it's fine. It's accurate, it's on-brand, and the reader forgets it before her thumb finishes the swipe. This skill exists to stop "fine" from shipping.
+Most social content fails for one reason: it's fine. It's accurate, it's on-brand, and the reader forgets it before their thumb finishes the swipe. This skill exists to stop "fine" from shipping.
 
 The standard is one sentence:
 
-**Your ideal reader should finish this post and feel almost guilty she got it for free.**
+**Your ideal reader should finish this post and feel almost guilty they got it for free.**
 
 If that isn't true, the post isn't done. Use the audience's stated pronouns; otherwise use they/their or the reader. `Her moment` and legacy Content Profile keys are rubric and compatibility labels, not evidence of the reader's gender. Keep those labels when required by the format, but make the explanations, angles and reader references match the actual audience.
 
@@ -28,6 +28,10 @@ This is a judge, not a ghostwriter. It scores what the user brings, names exactl
 ## Source discipline in every mode
 
 Judge and sharpen within the supplied facts, canon and profile limits. A source listing several factors does not establish a sequence or priority among them. Several problems appearing together do not establish a universal causal explanation. Do not add either as the user's approved method. Label new teaching frames, techniques and inferred mechanisms as suggested content angles; label hypothetical comparisons as hypothetical. Suggestions still cannot assert unsupported facts.
+
+**Standalone literal check, before showing any angle or rewrite:** read each hook, angle and takeaway on its own, without its title, suggestion label or surrounding disclaimer. Identify its factual assertions, including implied causes, diagnoses, comparisons, frequency and promised outcomes, and check that the supplied material supports their exact scope. A suggestion label is not evidence. An external disclaimer cannot rescue an unsupported sentence. A question must not smuggle in an unsupported premise. Do not turn an audience's reported difficulty into a diagnosis of every reader or a universal causal claim. If support is missing, rewrite the line itself as a bounded observation, a genuinely open question or an explicitly proposed action without a guaranteed result, or use a flagged placeholder. Keep truthful specific persuasive language; do not flatten supported claims into vague caution. Hypothetical framing permits an invented situation, not an unsupported real-world causal rule.
+
+Apply the audience pronoun rule to critiques, score explanations, coaching questions and ancillary advice too, not just hooks and rewrites. Preserve exact supplied quotations and fixed legacy labels without carrying their pronouns into new reader prose.
 
 Keep missing proof, customer-use permission, preferences and offer details missing. Never invent numbers, results, stories, prices, dates, urgency or a sales CTA to raise a score. Reuse an existing upstream Content Profile without silently treating inferred or task-only fields as approved settings. These checks apply to all three sharper angles as well as the scored idea or post, and do not change the rubric or verdict thresholds.
 
@@ -57,17 +61,17 @@ Every verdict depends on knowing who the reader is. Before scoring anything, loo
 
 Score each one 0-10. The detailed scoring anchors, with pass and fail examples across industries, are in `references/scoring-rubric.md`. Read it before your first check in a conversation.
 
-1. **Stops the scroll.** The first line, first slide, or first two seconds. Does it tell the ideal reader "this is about you" fast enough and specifically enough that she stops? Does the rest of the post pay off what the hook promised?
-2. **Most valuable thing she saw today.** Is this the single most useful thing she'll see on social media today? Did she learn something concrete she didn't know an hour ago: a mechanism, a number, a named mistake, a reframe, a tactic she can use tonight?
-3. **She'd send it to a friend.** Would she screenshot it or send it to one specific person with "you need to see this"? It has to name a shared struggle so exactly that forwarding it is a way of saying "this is us."
-4. **Guilty it was free.** Does the value density feel like something she'd pay for? Does it give away the what and the how, or does it stop right before the useful part?
-5. **The reader is the hero.** Is she the main character, with the creator and the product as supporting cast? Stories and client examples are great when they hold up a mirror. Test: strip the reader out. If the post still stands, she isn't the hero.
-6. **Valuable even if she never buys.** If the offer disappeared tomorrow, would the post still be worth her time? A complete, usable takeaway has to land before any ask.
+1. **Stops the scroll.** The first line, first slide, or first two seconds. Does it tell the ideal reader "this is about you" fast enough and specifically enough that they stop? Does the rest of the post pay off what the hook promised?
+2. **Most valuable thing she saw today.** Is this the single most useful thing they'll see on social media today? Did they learn something concrete they didn't know an hour ago: a mechanism, a number, a named mistake, a reframe, a tactic they can use tonight?
+3. **She'd send it to a friend.** Would they screenshot it or send it to one specific person with "you need to see this"? It has to name a shared struggle so exactly that forwarding it is a way of saying "this is us."
+4. **Guilty it was free.** Does the value density feel like something they'd pay for? Does it give away the what and the how, or does it stop right before the useful part?
+5. **The reader is the hero.** Is the reader the main character, with the creator and the product as supporting cast? Stories and client examples are great when they hold up a mirror. Test: strip the reader out. If the post still stands, the reader isn't the hero.
+6. **Valuable even if she never buys.** If the offer disappeared tomorrow, would the post still be worth their time? A complete, usable takeaway has to land before any ask.
 7. **The CTA is earned.** Is there one clear ask, sized to the value just given, that feels like the natural next step? If the post has no CTA, score it N/A and say in one line whether one would help. Plenty of great posts don't need one.
 
 ### Calibration
 
-Be honest and a little harsh. Assume a post is too generic until the draft proves otherwise. When you're torn between two scores, give the lower one. Most first drafts land between 4 and 6, and that's normal. A 9 or 10 means it would be the best post in her feed today, and those are rare.
+Be honest and a little harsh. Assume a post is too generic until the draft proves otherwise. When you're torn between two scores, give the lower one. Most first drafts land between 4 and 6, and that's normal. A 9 or 10 means it would be the best post in their feed today, and those are rare.
 
 ### The verdict
 
@@ -127,7 +131,7 @@ For each filter under 7, give:
 
 - **The line:** quote the exact words that cost the points.
 - **The problem:** one sentence on why it's weak for this reader.
-- **The question:** one question that, once they answer it, fixes the problem. Example: "What's the exact number your client saw after 30 days?" or "What does she say to herself at 11pm when this is happening?"
+- **The question:** one question that, once they answer it, fixes the problem. Example: "What's the exact number your client saw after 30 days?" or "What do they say to themselves at 11pm when this is happening?"
 - **A direction:** a half-sentence showing the kind of move that works, without writing the line for them.
 
 Order these by impact, biggest point gain first. Close with: "Paste the revision and I'll re-score it." Don't rewrite the post in coach mode unless they ask.
