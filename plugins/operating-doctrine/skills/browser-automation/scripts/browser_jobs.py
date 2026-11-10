@@ -57,6 +57,20 @@ SEALED_OUTCOMES = {"ok": None, "error": "sealed_code_failed"}
 OWNED_ERROR_CODES = frozenset(
     re.findall(r"Error\('([a-z_]+)'\)", OWNED_SOURCE + Path(__file__).read_text())
 )
+# Fixed Playwright and extension failure phrases (MCP 0.0.83), checked in order.
+# Only the static label is kept, so page text that happens to match leaks nothing.
+VENDOR_ERROR_CLASSES = (
+    (
+        "vendor_target_closed",
+        r"Target page, context or browser has been closed|Page has been closed|Target closed",
+    ),
+    ("vendor_context_destroyed", r"Execution context was destroyed"),
+    ("vendor_frame_detached", r"Frame was detached"),
+    ("vendor_extension_disconnected", r"Extension disconnected"),
+    ("vendor_transport_closed", r"Pipe has been closed"),
+    ("vendor_no_open_tabs", r"No open tabs"),
+    ("vendor_timeout", r"Timeout \d+ms exceeded"),
+)
 TIMING_RECORDS = 20
 GENERATION_ATTEMPTS = 30
 
@@ -85,6 +99,8 @@ def projection(reply):
         # this route itself throws, so receipts show why an owned step failed.
         text = "\n".join(b.get("text", "") for b in reply.get("content", []) if isinstance(b, dict))
         found = sorted(c for c in OWNED_ERROR_CODES if re.search(r"\b" + c + r"\b", text))
+        if not found:
+            found = [label for label, pattern in VENDOR_ERROR_CLASSES if re.search(pattern, text)]
         raise Refusal("owned_operation_failed" + (":" + found[0] if found else ""))
     blocks = reply.get("content", [])
     if len(blocks) != 1 or blocks[0].get("type") != "text":
@@ -109,10 +125,17 @@ def failed_cleanup_js(args, remove):
     """
     return (
         STATE_JS
-        + "return await s.connector.evaluate(async({old,clientName,connectorOrigin,removalIssued,remove})=>{"
+        + "return await s.connector.evaluate(async({old,clientName,connectorOrigin,removalIssued,pendingSince,remove})=>{"
         "const incomplete=tabs=>{const descendants=new Set(old.tabIds);let changed;do{changed=false;for(const t of tabs)if(descendants.has(t.openerTabId)&&!descendants.has(t.id)){descendants.add(t.id);changed=true;}}while(changed);return tabs.some(t=>(t.windowId===old.windowId||descendants.has(t.id))&&!old.tabIds.includes(t.id));};"
+        "const self=pendingSince===null?null:(await chrome.tabs.getCurrent()).id;"
+        # An interrupted call may have created a page and then closed it,
+        # orphaning a popup it opened elsewhere. Chrome tab IDs only grow
+        # within one browser generation, so any surviving tab born after the
+        # last proven inventory, other than this maintenance connector, may be
+        # that orphan. A peer's new tab is refused too, never adopted.
+        "const unproven=tabs=>self!==null&&tabs.some(t=>t.id>pendingSince&&t.id!==self&&!old.tabIds.includes(t.id));"
         "const before=await chrome.tabs.query({});"
-        "if(incomplete(before))throw Error('uncheckpointed_page_arrival');"
+        "if(incomplete(before)||unproven(before))throw Error('uncheckpointed_page_arrival');"
         "const live=before.filter(t=>old.tabIds.includes(t.id));"
         # Every saved tab gone is explained only by a removal this route
         # already issued. Otherwise a popup may have escaped and lost its
@@ -137,7 +160,7 @@ def failed_cleanup_js(args, remove):
         "let after;for(let i=0;i<20;i++){after=await chrome.tabs.query({});if(!after.some(t=>old.tabIds.includes(t.id)||t.windowId===old.windowId))break;await new Promise(r=>setTimeout(r,100));}"
         "if(after.some(t=>old.tabIds.includes(t.id)||t.windowId===old.windowId||!beforeIds.has(t.id))||incomplete(after))throw Error('owned_cleanup_inventory_uncertain');"
         "return {closed:true,count:live.length,connectorMissing:!connector};},"
-        + json.dumps({**args, "remove": remove})
+        + json.dumps({"pendingSince": None, **args, "remove": remove})
         + ");"
     )
 
@@ -648,8 +671,11 @@ class Route:
             for k in ("connectorId", "windowId", "groupId", "groupTitle")
         ):
             raise Refusal("connection_ownership_changed")
+        self.mark(job, "live_metadata")
         code(client, STATE_JS + "await s.closeCreated();return {closed:true};")
+        self.mark(job, "live_pages_closed")
         closing = code(client, STATE_JS + "return await s.closeWindow();")
+        self.mark(job, "live_window_scheduled")
         time.sleep(0.4)
         if not closing.get("shared"):
             verify_window_closed(job["metadata"]["windowId"])
@@ -665,13 +691,15 @@ class Route:
             try:
                 self.dispose_live(job)
                 return
-            except Exception:
-                pass
+            except Exception as error:
+                self.mark(job, "live_" + failure_stage(error))
             job["client"].close()
         old = job["metadata"]
         if not old:
             raise Refusal("creation_outcome_unknown_requires_reconciliation")
-        if job.get("ownership_pending"):
+        pending_since = old.get("newestTabId") if job.get("ownership_pending") else None
+        if job.get("ownership_pending") and type(pending_since) is not int:
+            # No proven pre-call watermark, so an orphaned popup could escape.
             raise Refusal("uncheckpointed_page_creation_requires_reconciliation")
         if old.get("unboundOwnedPages"):
             raise Refusal("unbound_owned_pages_require_reconciliation")
@@ -697,8 +725,10 @@ class Route:
                 "clientName": job["client_name"],
                 "connectorOrigin": EXTENSION,
                 "removalIssued": bool(job.get("window_removal_issued")),
+                "pendingSince": pending_since,
             }
             outcome = code(client, failed_cleanup_js(args, remove=False))
+            self.mark(job, "reconcile_proven")
             if outcome.get("ready") is True:
                 # Recorded before removal so a retry after an interrupted close
                 # can prove the vanished window was this route's own removal.
@@ -709,6 +739,7 @@ class Route:
                 raise Refusal("failed_cleanup_uncertain")
             verify_window_closed(old["windowId"])
             job["window_disposition"] = "closed"
+            job["ownership_pending"] = False
         finally:
             try:
                 closed = code(
@@ -733,15 +764,27 @@ class Route:
             job["status"] = "finished"
             job["receipt_owned"] = True
             return result(self.summary(job))
-        with self.bootstrap():
-            if job["status"] == "ready" and job["client"] and not job["client"].closed:
-                try:
-                    self.dispose_live(job)
-                except Exception:
-                    self.checkpoint(job, "failed")
+        job.setdefault("timings", []).append(
+            {"tool": "finish", "sealed": False, "stages": [["received", round(time.time(), 3)]]}
+        )
+        del job["timings"][:-TIMING_RECORDS]
+        try:
+            with self.bootstrap():
+                if job["status"] == "ready" and job["client"] and not job["client"].closed:
+                    try:
+                        self.dispose_live(job)
+                    except Exception as error:
+                        self.mark(job, "live_" + failure_stage(error))
+                        self.checkpoint(job, "failed")
+                        self.dispose_failed(job)
+                else:
                     self.dispose_failed(job)
-            else:
-                self.dispose_failed(job)
+        except Exception as error:
+            # The caller sees one generic refusal; the receipt keeps the static step.
+            self.mark(job, failure_stage(error))
+            self.checkpoint(job)
+            raise
+        self.mark(job, "finished")
         self.checkpoint(job, "finished")
         return result(self.summary(job))
 

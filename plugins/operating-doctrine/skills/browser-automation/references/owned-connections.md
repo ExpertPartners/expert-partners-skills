@@ -162,7 +162,17 @@ Completion is proven, never guessed from age or idle time.
   extra, claimed, attached or descendant tab is present. A retry after an interrupted
   removal finishes idempotently. Once a receipt is finished, a stale facade adopts it
   and never writes it back. A failed owned step records a static code from this
-  route's own browser code (`owned_operation_failed:<code>`), never vendor text.
+  route's own browser code (`owned_operation_failed:<code>`), or else a fixed
+  Playwright or extension failure class such as `vendor_target_closed`, never vendor
+  text.
+- Interrupted calls. Every proven inventory also saves the newest Chrome tab ID as a
+  watermark. When a call fails after it may have opened a page, cleanup reconciles
+  through the same two phases only if no surviving tab anywhere is newer than that
+  watermark, apart from the maintenance connector itself, so an orphaned popup cannot
+  escape. Any newer tab, even a peer's, refuses and is preserved. A receipt with no
+  watermark still requires manual reconciliation. Finish records each cleanup step
+  and the static failure code in the receipt timings, including a swallowed live
+  cleanup failure.
 - Transport close. The route kills the job's own MCP process group with SIGKILL before
   closing its stdin. A graceful Playwright MCP exit closes pages one at a time and was
   cut off part way, which left windows without their connector. A hard kill only drops
