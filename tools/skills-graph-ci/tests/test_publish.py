@@ -9,6 +9,7 @@ real run loses the push race.
 
 Run: python3 -m unittest discover -s tools/skills-graph-ci/tests -p 'test_*.py' -v
 """
+
 import hashlib
 import json
 import os
@@ -80,7 +81,12 @@ LAND = textwrap.dedent(
 def expected_outputs(sources, head="seed"):
     """What the fixture producer writes; like the real extractor it stamps the commit."""
     graph = {"generatedFrom": {"eps": head}, "nodes": sorted(sources)}
-    feed = {"records": [{"id": k, "sha": hashlib.sha256(v.encode()).hexdigest()} for k, v in sorted(sources.items())]}
+    feed = {
+        "records": [
+            {"id": k, "sha": hashlib.sha256(v.encode()).hexdigest()}
+            for k, v in sorted(sources.items())
+        ]
+    }
     return json.dumps(graph, indent=2) + "\n", json.dumps(feed, indent=2) + "\n"
 
 
@@ -110,7 +116,9 @@ class Fixture:
         (self.state / "land.py").write_text(LAND)
         self.producer = tmp / "producer.sh"
         (tmp / "producer.py").write_text(PRODUCER)
-        self.producer.write_text(f'#!/usr/bin/env bash\nexec "{sys.executable}" "{tmp / "producer.py"}"\n')
+        self.producer.write_text(
+            f'#!/usr/bin/env bash\nexec "{sys.executable}" "{tmp / "producer.py"}"\n'
+        )
         self.producer.chmod(0o755)
 
         run("git", "init", "--quiet", "--bare", "--initial-branch=main", str(self.origin))
@@ -150,7 +158,9 @@ class Fixture:
         (self.state / f"race-{call}.json").write_text(json.dumps(spec))
 
     def env(self, **overrides):
-        env = {k: v for k, v in os.environ.items() if not k.startswith(("SKILLS_GRAPH_", "GITHUB_"))}
+        env = {
+            k: v for k, v in os.environ.items() if not k.startswith(("SKILLS_GRAPH_", "GITHUB_"))
+        }
         env.update(
             SKILLS_GRAPH_PUBLISH_REF="refs/heads/main",
             SKILLS_GRAPH_PUSH_TOKEN="fixture-token",
@@ -166,10 +176,15 @@ class Fixture:
 
     def publish(self, *extra, script=None, checkout=None, regenerate=None, **env):
         return run(
-            "bash", str(script or self.tool / "publish.sh"),
-            "--checkout", str(checkout or self.ci),
-            "--regenerate", str(regenerate or self.producer),
-            *extra, env=self.env(**env), check=False,
+            "bash",
+            str(script or self.tool / "publish.sh"),
+            "--checkout",
+            str(checkout or self.ci),
+            "--regenerate",
+            str(regenerate or self.producer),
+            *extra,
+            env=self.env(**env),
+            check=False,
         )
 
     def producer_calls(self):
@@ -222,7 +237,10 @@ class MainMovement(Base):
         git(fx.ci, "add", "-A")
         git(fx.ci, "commit", "--quiet", "-m", "triggering source change")
         git(fx.ci, "push", "--quiet", "origin", "HEAD:main")
-        graph, feed = expected_outputs({"src/a.txt": "alpha\n", "src/c.txt": "from the triggering push\n"}, git(fx.ci, "rev-parse", "HEAD").stdout.strip())
+        graph, feed = expected_outputs(
+            {"src/a.txt": "alpha\n", "src/c.txt": "from the triggering push\n"},
+            git(fx.ci, "rev-parse", "HEAD").stdout.strip(),
+        )
         fx.write(fx.ci, {GRAPH: graph, FEED: feed})
         git(fx.dev, "pull", "--quiet", "--ff-only", "origin", "main")
 
@@ -241,7 +259,9 @@ class MainMovement(Base):
         git(fx.ci, "add", GRAPH, FEED)
         git(fx.ci, "commit", "--quiet", "-m", "generated")
         self.land_competitor_with_generated_files()
-        self.assertNotEqual(git(fx.ci, "push", "--quiet", "origin", "HEAD:main", check=False).returncode, 0)
+        self.assertNotEqual(
+            git(fx.ci, "push", "--quiet", "origin", "HEAD:main", check=False).returncode, 0
+        )
         rebase = git(fx.ci, "pull", "--rebase", "origin", "main", check=False)
         self.assertNotEqual(rebase.returncode, 0)
         self.assertIn("CONFLICT", rebase.stdout + rebase.stderr)
@@ -264,7 +284,9 @@ class MainMovement(Base):
         self.land_competitor_with_generated_files()
         sources_now = fx.main_sources()
         graph, feed = expected_outputs({**sources_now, "src/d.txt": "first race\n"})
-        fx.race(1, {"src/d.txt": "first race\n", GRAPH: graph, FEED: feed}, "lands during attempt 1")
+        fx.race(
+            1, {"src/d.txt": "first race\n", GRAPH: graph, FEED: feed}, "lands during attempt 1"
+        )
         fx.race(2, {"src/e.txt": "second race\n"}, "lands during attempt 2")
         result = fx.publish()
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -272,7 +294,11 @@ class MainMovement(Base):
         self.assertEqual(result.stdout.count("rebuilding the graph and feed"), 3)
         second_race = git(fx.dev, "rev-parse", "HEAD").stdout.strip()
         self.assert_fresh_generated_commit(second_race)
-        for name, text in {"src/b.txt": "competitor\n", "src/d.txt": "first race\n", "src/e.txt": "second race\n"}.items():
+        for name, text in {
+            "src/b.txt": "competitor\n",
+            "src/d.txt": "first race\n",
+            "src/e.txt": "second race\n",
+        }.items():
             self.assertEqual(fx.main_file(name), text)
         self.assertEqual(git(fx.origin, "rev-list", "--count", "main").stdout.strip(), "6")
 
@@ -285,7 +311,9 @@ class MainMovement(Base):
         self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
         self.assertEqual(fx.producer_calls(), 3)
         self.assertIn("hourly scheduled run", result.stderr)
-        self.assertEqual(git(fx.origin, "log", "-1", "--format=%s", "main").stdout.strip(), "race 3")
+        self.assertEqual(
+            git(fx.origin, "log", "-1", "--format=%s", "main").stdout.strip(), "race 3"
+        )
 
     def test_push_run_keeps_committing_the_fresh_stamp(self):
         fx = self.fx
@@ -293,7 +321,9 @@ class MainMovement(Base):
         result = fx.publish()
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assert_fresh_generated_commit(before)
-        self.assertEqual(git(fx.origin, "diff", "--name-only", "main~1", "main").stdout.split(), [GRAPH])
+        self.assertEqual(
+            git(fx.origin, "diff", "--name-only", "main~1", "main").stdout.split(), [GRAPH]
+        )
 
     def test_scheduled_reconcile_of_an_in_sync_main_commits_nothing(self):
         fx = self.fx
@@ -316,7 +346,11 @@ class MainMovement(Base):
 
     def test_move_while_already_current_is_rebuilt(self):
         fx = self.fx
-        fx.race(1, {"src/late.txt": "lands while the first attempt finds nothing to do\n"}, "late source change")
+        fx.race(
+            1,
+            {"src/late.txt": "lands while the first attempt finds nothing to do\n"},
+            "late source change",
+        )
         result = fx.publish()
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual(fx.producer_calls(), 2)
@@ -385,7 +419,9 @@ class WriterGate(Base):
         self.assertEqual(git(self.fx.ci, "rev-parse", "HEAD").stdout.strip(), self.ci_head)
 
     def test_branch_with_a_token_is_still_refused(self):
-        self.assert_refused(self.fx.publish(SKILLS_GRAPH_PUBLISH_REF="refs/heads/job/1-x"), self.before)
+        self.assert_refused(
+            self.fx.publish(SKILLS_GRAPH_PUBLISH_REF="refs/heads/job/1-x"), self.before
+        )
 
     def test_main_without_token_is_refused(self):
         self.assert_refused(self.fx.publish(SKILLS_GRAPH_PUSH_TOKEN=""), self.before)
@@ -417,7 +453,9 @@ class WriterGate(Base):
     def test_token_never_reaches_the_producers(self):
         fx = self.fx
         probe = fx.tmp / "probe.sh"
-        probe.write_text(f'#!/usr/bin/env bash\nprintf %s "${{SKILLS_GRAPH_PUSH_TOKEN-unset}}" > "{fx.tmp}/seen"\nexec "{fx.producer}"\n')
+        probe.write_text(
+            f'#!/usr/bin/env bash\nprintf %s "${{SKILLS_GRAPH_PUSH_TOKEN-unset}}" > "{fx.tmp}/seen"\nexec "{fx.producer}"\n'
+        )
         probe.chmod(0o755)
         result = fx.publish(regenerate=probe)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -441,14 +479,27 @@ class WorkflowContract(unittest.TestCase):
         return next(s for s in self.steps if s.get("name") == name)
 
     def test_privileged_steps_run_only_on_main(self):
-        privileged = [s for s in self.steps if any(k in json.dumps(s) for k in ("secrets.", "steps.app-token", "create-github-app-token"))]
+        privileged = [
+            s
+            for s in self.steps
+            if any(
+                k in json.dumps(s)
+                for k in ("secrets.", "steps.app-token", "create-github-app-token")
+            )
+        ]
         self.assertEqual(
             sorted(s["name"] for s in privileged),
-            ["Commit regenerated graph and AI Workforce feed (main only)", "Mint skills-graph app token"],
+            [
+                "Commit regenerated graph and AI Workforce feed (main only)",
+                "Mint skills-graph app token",
+            ],
         )
         for s in privileged:
             self.assertEqual(s.get("if"), MAIN_IF, s["name"])
-        self.assertIn("publish.sh", self.step("Commit regenerated graph and AI Workforce feed (main only)")["run"])
+        self.assertIn(
+            "publish.sh",
+            self.step("Commit regenerated graph and AI Workforce feed (main only)")["run"],
+        )
 
     def test_branch_path_has_no_secret_and_a_read_only_checkout(self):
         branch_steps = [s for s in self.steps if s.get("if") != MAIN_IF]
@@ -469,7 +520,10 @@ class WorkflowContract(unittest.TestCase):
 
     def test_permissions_concurrency_and_no_timer(self):
         self.assertEqual(self.doc["permissions"], {"contents": "read"})
-        self.assertEqual(self.doc["concurrency"], {"group": "skills-graph-${{ github.ref }}", "cancel-in-progress": True})
+        self.assertEqual(
+            self.doc["concurrency"],
+            {"group": "skills-graph-${{ github.ref }}", "cancel-in-progress": True},
+        )
         triggers = self.doc[True] if True in self.doc else self.doc["on"]
         # Scheduled polls are retired (HQ Cleanup, Nov 9, 2026). Push and manual dispatch only.
         self.assertNotIn("schedule", triggers)
@@ -497,7 +551,10 @@ class WorkflowContract(unittest.TestCase):
     def test_committed_feed_is_still_verified_after_publishing(self):
         names = [s.get("name") for s in self.steps]
         verify = "Verify the committed AI Workforce feed matches its sources (main only)"
-        self.assertLess(names.index("Commit regenerated graph and AI Workforce feed (main only)"), names.index(verify))
+        self.assertLess(
+            names.index("Commit regenerated graph and AI Workforce feed (main only)"),
+            names.index(verify),
+        )
         self.assertIn("--check", self.step(verify)["run"])
 
 
