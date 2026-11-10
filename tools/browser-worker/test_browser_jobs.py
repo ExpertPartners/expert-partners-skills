@@ -4,6 +4,7 @@ import contextlib
 import importlib.util
 import json
 import os
+import re
 from pathlib import Path
 import signal
 import subprocess
@@ -384,7 +385,8 @@ process.__epBrowserJob={connector:{evaluate:async(fn,arg)=>await fn(arg)}};
     )
     CLEANUP_FIXTURE = r"""
 const state=__STATE__;let removed=[];
-global.chrome={tabs:{query:async()=>{if(state.lag>0){state.lag--;return state.tabs.concat(state.ghost||[]);}return state.tabs;}},
+global.chrome={tabs:{query:async()=>{if(state.lag>0){state.lag--;return state.tabs.concat(state.ghost||[]);}return state.tabs;},
+  getCurrent:async()=>({id:state.current||0})},
   windows:{remove:async(id)=>{removed.push(id);state.ghost=state.tabs.filter(t=>t.windowId===id);state.tabs=state.tabs.filter(t=>t.windowId!==id);state.lag=state.lagAfter||0;}},
   tabGroups:{get:async()=>({title:'fixture'})},
   debugger:{getTargets:async()=>(state.attached||[]).map(tabId=>({tabId,attached:true}))},
@@ -394,13 +396,14 @@ async function attempt(){__BODY__}
 attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({...o,removed})));
 """
 
-    def failed_cleanup(self, tabs, remove=True, removal_issued=False, **state):
+    def failed_cleanup(self, tabs, remove=True, removal_issued=False, pending_since=None, **state):
         body = b.failed_cleanup_js(
             {
                 "old": self.OLD,
                 "clientName": "fixture",
                 "connectorOrigin": b.EXTENSION,
                 "removalIssued": removal_issued,
+                "pendingSince": pending_since,
             },
             remove,
         )
@@ -484,6 +487,56 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
             self.failed_cleanup(stray, removal_issued=True)["e"], "uncheckpointed_page_arrival"
         )
 
+    def test_pending_inventory_reconciles_only_below_its_watermark(self):
+        # Job 185ec5ed: post-click verification failed, the connector was gone
+        # and only the saved working page survived in the saved window.
+        maintenance = {"id": 200, "windowId": 20, "groupId": -1}
+        peer = {"id": 50, "windowId": 9, "groupId": -1}
+        survivor = {"id": 10, "windowId": 5, "groupId": -1}
+        out = self.failed_cleanup([survivor, peer, maintenance], pending_since=60, current=200)
+        self.assertEqual(out["v"], {"closed": True, "count": 1, "connectorMissing": True})
+        self.assertEqual(out["removed"], [5])
+        cases = [
+            # Extra tab in the owned window.
+            [survivor, {"id": 61, "windowId": 5, "groupId": -1}],
+            # Popup descendant in another window.
+            [survivor, {"id": 62, "windowId": 9, "groupId": -1, "openerTabId": 10}],
+            # Orphan born after the watermark whose opener is already gone.
+            [survivor, {"id": 63, "windowId": 9, "groupId": -1}],
+        ]
+        for tabs in cases:
+            with self.subTest(tabs=tabs):
+                out = self.failed_cleanup(tabs + [maintenance], pending_since=60, current=200)
+                self.assertEqual(out.get("e"), "uncheckpointed_page_arrival")
+                self.assertEqual(out["removed"], [])
+        # Without a pending call the same orphan is outside this job's proof.
+        out = self.failed_cleanup(cases[2] + [maintenance], current=200)
+        self.assertTrue(out["v"]["closed"])
+
+    def test_snapshot_records_the_newest_tab_watermark(self):
+        source = (SCRIPTS / "owned_pages.js").read_text()
+        fixture = r'''
+const assert=require('node:assert/strict');
+let current;const tabs=new Map();const pages=[];
+function page(id){const tab={id,windowId:5,groupId:7,url:'about:blank'};tabs.set(id,tab);
+  const p={id,closed:false,context:()=>context,isClosed:()=>p.closed,opener:async()=>null,url:()=>tab.url,
+    evaluate:async(fn,arg)=>{current=p;return await fn(arg);}};pages.push(p);return p;}
+const context={pages:()=>pages.filter(p=>!p.closed)};
+global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=args.url;return t;},
+  group:async({tabIds,groupId})=>{for(const id of tabIds)tabs.get(id).groupId=groupId;},
+  getCurrent:async()=>tabs.get(current.id),get:async(id)=>tabs.get(id),
+  query:async(q)=>[...tabs.values()].filter(t=>(q.windowId===undefined||t.windowId===q.windowId)&&(q.groupId===undefined||t.groupId===q.groupId))},
+  tabGroups:{get:async()=>({title:'fixture'})}};
+(async()=>{const s=await newOwnedState(page(1));s.task=await s.create();
+  tabs.set(77,{id:77,windowId:9,groupId:-1}); // A peer's tab in another window.
+  const m=await s.snapshot();assert.deepEqual(m.tabIds,[1,10]);assert.equal(m.newestTabId,77);
+})().catch(e=>{console.error(e);process.exitCode=1;});
+'''
+        checked = subprocess.run(
+            ["node", "-e", source + fixture], capture_output=True, text=True, timeout=10
+        )
+        self.assertEqual(checked.returncode, 0, checked.stderr)
+
     def full_job(self, route, status="failed"):
         job = {
             "job_id": "d" * 32,
@@ -508,7 +561,7 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
             seen = []
 
             def fake(_, body):
-                if "async({old,clientName,connectorOrigin,removalIssued,remove})" in body:
+                if "async({old,clientName," in body:
                     removing = '"remove": true' in body
                     seen.append(
                         (removing, json.loads(receipt.read_text()).get("window_removal_issued"))
@@ -531,6 +584,99 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
             self.assertEqual([c.args[0] for c in verified.call_args_list], [5, 77])
             row = json.loads(receipt.read_text())
             self.assertEqual((row["status"], row["window_disposition"]), ("finished", "closed"))
+
+    def test_post_action_verify_failure_finishes_through_watermarked_reconciliation(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            route.prime = lambda _: None
+            job = self.full_job(route, "ready")
+            job["metadata"]["newestTabId"] = 60
+            job["client"] = SimpleNamespace(
+                closed=False,
+                close=lambda: setattr(job["client"], "closed", True),
+                call=lambda *a: b.result({"clicked": True}),
+            )
+            route.jobs[job["job_id"]] = job
+            route.inventory.append({"name": "browser_click", "inputSchema": {"type": "object"}})
+            closed_vendor = {
+                "isError": True,
+                "content": [
+                    {
+                        "type": "text",
+                        "text": "Target page, context or browser has been closed SYNTHETIC_CANARY",
+                    }
+                ],
+            }
+
+            def lost_connector(*_, **__):
+                b.projection(closed_vendor)
+
+            route.metadata = lost_connector
+            reply = route.call("browser_click", {"job_id": job["job_id"], "ref": "e1"})
+            self.assertTrue(reply["isError"])
+            receipt = Path(root) / (job["job_id"] + ".json")
+            row = json.loads(receipt.read_text())
+            self.assertEqual((row["status"], row["ownership_pending"]), ("failed", True))
+            self.assertEqual(
+                row["timings"][-1]["stages"][-1][0],
+                "failed:owned_operation_failed:vendor_target_closed",
+            )
+            sent = []
+
+            def fake(_, body):
+                if "async({old,clientName," in body:
+                    sent.append(int(re.search(r'"pendingSince": (\d+)', body).group(1)))
+                    return (
+                        {"closed": True, "count": 1}
+                        if '"remove": true' in body
+                        else {"ready": True}
+                    )
+                if "maintenance_window_not_exclusive" in body:
+                    return {"scheduled": True, "windowId": 77}
+                return {"ready": True}
+
+            with (
+                patch.object(
+                    route, "client", create=True, return_value=SimpleNamespace(close=lambda: None)
+                ),
+                patch.object(b, "code", side_effect=fake),
+                patch.object(b, "verify_window_closed"),
+                patch.object(b.time, "sleep"),
+            ):
+                route.call("browser_job_finish", {"job_id": job["job_id"]})
+            self.assertEqual(sent, [60, 60])
+            row = json.loads(receipt.read_text())
+            self.assertEqual(
+                (row["status"], row["window_disposition"], row["ownership_pending"]),
+                ("finished", "closed", False),
+            )
+            self.assertEqual(
+                [s for s, _ in row["timings"][-1]["stages"]],
+                [
+                    "received",
+                    "live_failed:owned_operation_failed:vendor_target_closed",
+                    "reconcile_proven",
+                    "finished",
+                ],
+            )
+            self.assertNotIn("SYNTHETIC_CANARY", receipt.read_text())
+
+    def test_pending_without_watermark_refuses_and_records_the_step(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            job = self.full_job(route)
+            job["ownership_pending"] = True
+            route.jobs[job["job_id"]] = job
+            with patch.object(route, "client", create=True) as connect:
+                with self.assertRaises(Refusal):
+                    route.call("browser_job_finish", {"job_id": job["job_id"]})
+            connect.assert_not_called()
+            row = json.loads((Path(root) / (job["job_id"] + ".json")).read_text())
+            self.assertEqual(row["status"], "failed")
+            self.assertEqual(
+                [s for s, _ in row["timings"][-1]["stages"]],
+                ["received", "failed:uncheckpointed_page_creation_requires_reconciliation"],
+            )
 
     def test_stale_facade_never_reopens_a_settled_receipt(self):
         with tempfile.TemporaryDirectory() as root:
@@ -565,6 +711,32 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
         with self.assertRaises(Refusal) as unknown:
             b.projection(failing("page said SYNTHETIC_CANARY"))
         self.assertEqual(str(unknown.exception), "owned_operation_failed")
+
+    def test_vendor_failure_class_is_a_fixed_label_without_page_text(self):
+        def failing(text):
+            return {"isError": True, "content": [{"type": "text", "text": text}]}
+
+        for text, label in (
+            (
+                "Error: page.evaluate: Target page, context or browser has been closed",
+                "vendor_target_closed",
+            ),
+            (
+                "Execution context was destroyed, most likely because of a navigation",
+                "vendor_context_destroyed",
+            ),
+            ("Frame was detached", "vendor_frame_detached"),
+            ("Extension disconnected", "vendor_extension_disconnected"),
+            ("TimeoutError: Timeout 5000ms exceeded.", "vendor_timeout"),
+        ):
+            with self.subTest(label=label):
+                with self.assertRaises(Refusal) as caught:
+                    b.projection(failing(text + " SYNTHETIC_CANARY"))
+                self.assertEqual(str(caught.exception), "owned_operation_failed:" + label)
+        # The route's own code still wins over a vendor phrase in the same text.
+        with self.assertRaises(Refusal) as caught:
+            b.projection(failing("Page has been closed\nError: saved_owned_tab_missing"))
+        self.assertEqual(str(caught.exception), "owned_operation_failed:saved_owned_tab_missing")
 
     def test_window_closure_is_polled_briefly(self):
         w = sys.modules["chrome_job_window"]

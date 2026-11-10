@@ -100,12 +100,14 @@ async function newOwnedState(connector) {
         }
       }
       const group = await chrome.tabs.query({groupId: initial.groupId, windowId: initial.windowId});
-      return {unknownIds: group.filter(t => !knownIds.includes(t.id)).map(t => t.id)};
+      // Watermark for failed cleanup: tab IDs only grow within one Chrome run.
+      const newestTabId = Math.max(0, ...(await chrome.tabs.query({})).map(t => t.id));
+      return {unknownIds: group.filter(t => !knownIds.includes(t.id)).map(t => t.id), newestTabId};
     }, {initial, knownIds, pendingIds: [...s.pendingIds]});
     const unknownPages = context.pages().filter(p => !s.created.has(p));
     const unbound = [...s.created].filter(p => !s.ids.has(p)).length + s.pendingIds.size;
     if (strict && (unknownPages.length || observed.unknownIds.length || unbound)) throw Error('unproven_page_arrival');
-    return {...initial, tabIds: knownIds, unboundOwnedPages: unbound};
+    return {...initial, tabIds: knownIds, unboundOwnedPages: unbound, newestTabId: observed.newestTabId};
   };
 
   s.closeIds = async (ids) => {
