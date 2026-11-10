@@ -13,15 +13,10 @@
 # file is merged.
 name: questions-to-job-list
 
+# Triggers disabled 2026-11-09. The job list and Job issue question route are retired;
+# questions go to Allison in the live chat. History is kept; manual runs only.
 on:
-  pull_request:
-    types: [opened, ready_for_review]
-  issue_comment:
-    types: [created]
-  pull_request_review:
-    types: [submitted]
-  pull_request_review_comment:
-    types: [created]
+  workflow_dispatch:
 
 permissions:
   contents: read

@@ -1,13 +1,12 @@
-Closes #N
-<!-- Keep the line above as the first line, with N replaced by the job issue number. The auto-merge gate reads only that line. Delete it only when this pull request has no job issue. -->
+<!-- Work is dispatched through the Factory connection. Link an issue only as optional context. -->
 
 ## Description
 
 <!-- What this pull request changes and why, in plain words. -->
 
-## Linked job and context
+## Linked assignment and context
 
-- Job issue: #N
+- Factory assignment or Workstream:
 - Mission and goal:
 - Decisions relied on (Decision Log date and title):
 
@@ -15,7 +14,7 @@ Closes #N
 
 ## Files and scope
 
-<!-- List every file this pull request changes, marked (new) when it creates the file. The list must match the files in scope on the job issue. Paste the real output of the command below. -->
+<!-- List every file this pull request changes, marked (new) when it creates the file. The list must match the files in scope for the assignment. Paste the real output of the command below. -->
 
 ```text
 $ git diff --name-only origin/main...HEAD
@@ -25,7 +24,7 @@ $ git diff --name-only origin/main...HEAD
 
 ## Testing done
 
-<!-- One entry per acceptance check on the job issue, in the same order. Paste the exact command you ran and its real output. Mark PASS only when the pasted output shows it. Mark FAIL when a check failed or was not run, and say why. -->
+<!-- One entry per acceptance check in the assignment, in the same order. Paste the exact command you ran and its real output. Mark PASS only when the pasted output shows it. Mark FAIL when a check failed or was not run, and say why. -->
 
 1. Acceptance check:
    - Result: PASS or FAIL
@@ -46,8 +45,8 @@ $ git diff --name-only origin/main...HEAD
 ## Dependencies and overlap
 
 - Depends on (pull requests, issues or setup that must land first):
-- Overlaps with (open pull requests or jobs that touch the same files):
-- Overlap check result on the job issue:
+- Overlaps with (open pull requests or Factory sessions that touch the same files):
+- Overlap check result:
 
 ## Risks and rollback
 

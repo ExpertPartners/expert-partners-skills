@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # One command that exits 0 on good work and non-zero otherwise.
-# Used by Chat to Code Loop builders (AGENTS.md names it) and safe for people to run.
+# Used by builders (AGENTS.md names it) and safe for people to run.
 # Runs the same gates as .github/workflows/ci.yml on the files this branch changed.
 set -euo pipefail
 

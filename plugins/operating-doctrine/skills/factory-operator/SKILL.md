@@ -35,7 +35,6 @@ If one can't be read, work from categories, not remembered numbers.
 - `session-model-advisor` for model and effort at conversation start.
 - `capability-currency` (research-ops) for catalog drift.
 - `tools/factory-access/auto_model.py`, installed as `~/.factory/bin/droid`. It rewrites every `droid exec` model and reasoning flag to `auto`. Don't install a second launcher.
-- `.github/workflows/factory-builder-reusable.yml` for CI builds.
 - `tools/skill-deploy/deploy-skill.sh` and the marketplace plugin sync for deployment.
 - `tools/factory-inbox` for the shared Drive inbox bridge. Extend this adapter rather than adding another relay.
 
