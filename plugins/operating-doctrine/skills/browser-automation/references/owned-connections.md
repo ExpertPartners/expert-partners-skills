@@ -180,7 +180,21 @@ Completion is proven, never guessed from age or idle time.
   watermark still requires manual reconciliation. Finish records each cleanup step
   and the static failure code in the receipt timings, including a swallowed live
   cleanup failure.
-- Transport close. The route kills the job's own MCP process group with SIGKILL before
+- Connection diagnostics. At a job's first route-side failure (allocation, prime,
+  the tool call, post-call verification or a sealed call) and again when failed-job
+  reconciliation runs, the receipt gains one `connection_diagnostics` snapshot,
+  `first_failure` and `dispose_failed`. Each holds `stage`, `at`, `connector_present`,
+  `connection_lists_owned_tabs`, `debugger_attached` keyed by saved tab ID,
+  `close_reason` and `unavailable`. Values are `yes`, `no` or `unknown`. A first-failure
+  snapshot is read from a fresh maintenance connector, and reconciliation reuses its
+  own. Both only read `chrome.tabs.query`, `getConnectionStatus` and
+  `chrome.debugger.getTargets`, count only this job's exact client name and saved tab
+  IDs, and never select, attach or close a tab. `close_reason` is
+  `all_controlled_tabs_detached` or `user_disconnect` only when the relay's own
+  disconnect wording reports it, `connector_closed` when the job's connector tab is
+  gone, and otherwise `unknown`. The extension gives no reason for a reload or crash.
+  A failed read records `diagnostics_unavailable:<code>` and never changes the job's
+  outcome. A recovered job keeps the earlier snapshots under `previous`.- Transport close. The route kills the job's own MCP process group with SIGKILL before
   closing its stdin. A graceful Playwright MCP exit closes pages one at a time and was
   cut off part way, which left windows without their connector. A hard kill only drops
   the relay. The extension ungroups the tabs intact, and reconciliation closes them by
