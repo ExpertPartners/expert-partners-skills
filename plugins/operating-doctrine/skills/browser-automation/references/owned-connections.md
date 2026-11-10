@@ -109,8 +109,8 @@ SSH route where needed. Configuration and receipts are private host files. They
 must not contain tokens. The owning SOP records actual installed paths and pins.
 
 Receipts contain only lifecycle and ownership metadata, never connector queries,
-page contents or tool arguments. EOF and normal termination attempt owned-job
-cleanup. After an abrupt facade kill, preserve its receipts and reconcile the
+page contents or tool arguments. EOF and normal termination of the facade attempt
+owned-job cleanup. After an abrupt facade kill, preserve its receipts and reconcile the
 exact orphan pages under the owning repair procedure. A restarted facade does
 not silently adopt old handles or replay work. If Chrome restarted, saved tab IDs
 are insufficient to authorize cleanup and the route refuses.
@@ -134,6 +134,52 @@ native consumer adoption.
 python3 -m unittest discover -s tools/browser-worker -p 'test_*.py'
 ```
 
+## Window lifecycle
+
+Each job owns one whole Chrome window, and the window closes when the job is done.
+Completion is proven, never guessed from age or idle time.
+
+- Binding. The lifecycle hook (`scripts/browser_window_cleanup.py`, entered through
+  `hooks/browser_window_cleanup.py` and the stable user hook
+  `~/.local/bin/ep-browser-window-cleanup`) adds the native `owner_session_id` to every
+  `browser_job_start`. The route records the job's owner in a private ledger under the
+  receipt directory (`owners/<job_id>.json`). One job has one owner session and a peer
+  session cannot rebind it.
+- Terminal evidence. Stop and SessionEnd mark only that session's jobs terminal. Sessions
+  that never started a job never reach the M2. Codex allows SessionEnd only three
+  seconds, so SessionEnd saves the terminal mark and finishes in a detached helper.
+- Closure. A live facade finishes through its private same-user socket
+  (`control-<id>.sock`), which accepts only a terminal job whose owner matches. After the
+  owned pages close, the connector closes the whole window and the route confirms the
+  window is gone. If the window also holds a tab the job did not open, only the job's own
+  tabs close and the receipt records `window_disposition: preserved_shared`. A facade
+  that has exited is reconciled through exact saved IDs, and any uncertainty preserves
+  the receipt as `preserved_uncertain`.
+- Failed-job reconciliation. A fresh maintenance connector first proves ownership
+  without closing anything, records `window_removal_issued`, then removes the exact
+  saved window and polls briefly until Chrome stops listing it. A missing connector is
+  accepted only when every saved working page survives in the saved window, and no
+  extra, claimed, attached or descendant tab is present. A retry after an interrupted
+  removal finishes idempotently. Once a receipt is finished, a stale facade adopts it
+  and never writes it back. A failed owned step records a static code from this
+  route's own browser code (`owned_operation_failed:<code>`), never vendor text.
+- Transport close. The route kills the job's own MCP process group with SIGKILL before
+  closing its stdin. A graceful Playwright MCP exit closes pages one at a time and was
+  cut off part way, which left windows without their connector. A hard kill only drops
+  the relay. The extension ungroups the tabs intact, and reconciliation closes them by
+  exact ID.
+- Isolation at birth. Chrome can place a new connector in the newest existing window when
+  two jobs start close together. Each connector that finds another tab in its window
+  moves itself to a new window before ownership is recorded.
+- Nightly sweep. The M2 LaunchAgent `com.expertpartners.browser-window-sweep` runs
+  `browser_lifecycle.py --sweep` at 02:35. It finishes only terminal owned jobs. Active
+  jobs, receipts with no owner record and uncertain receipts are left as they are. An
+  owner row whose job finished more than thirty days ago is dropped; its receipt stays.
+- Install. `scripts/install_browser_lifecycle.py` writes the stable user hooks for
+  Factory, Claude Code and Codex on either Mac, so a pinned plugin version still runs
+  them. On the M4 it forwards every request to the M2 over SSH. On the M2 it also
+  installs the sweep. `install_job_route.py --upgrade` points future facades at a new
+  produced runtime and leaves running transports alone.
 ## Deployment and acceptance
 
 Use the existing producer and owning runtime configuration. Do not hand-edit a
