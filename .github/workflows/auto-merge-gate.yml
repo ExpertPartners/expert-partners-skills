@@ -1,5 +1,5 @@
-# Auto-merge gate for finished Chat to Code jobs (Decision Log 2026-11-01, Finished code
-# merges itself, except in Ember's repo). tools/auto-merge-gate/README.md explains the rules.
+# Automated PR checks, review-state validation and merge. See README for the current
+# auto-merge-label route and compatibility with older job-linked pull requests.
 #
 # Pull request code is never checked out or run here. pull_request_target, schedule,
 # issue_comment and check_suite run this file as it is on main, and every event checks out

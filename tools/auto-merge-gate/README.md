@@ -2,7 +2,7 @@
 
 > Current use, November 9, 2026. Chat to Code job issues are retired, so the live route is a pull request labeled `auto-merge` that merges once its checks pass. The job issue route below is kept only so older pull requests still resolve.
 
-Merges a finished Chat to Code job on its own once Factory's checks and Codex's automatic review both pass. No merge yes from Allison is needed. Authority: Decision Log 2026-11-01, Finished code merges itself, except in Ember's repo. Pull requests stay required, and Ember's repository is never touched: the workflow runs only in this repository, and `gate.py` refuses any repository named ember.
+Legacy compatibility for older job-linked pull requests: the gate checks required CI and review status before merging. Pull requests remain required, and Ember's repository is never touched: the workflow runs only in this repository, and `gate.py` refuses any repository named ember.
 
 | File | What it does |
 |---|---|
