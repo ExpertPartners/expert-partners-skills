@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
+import urllib.error
 
 SPEC = importlib.util.spec_from_file_location(
     "controller", Path(__file__).parents[1] / "controller.py"
@@ -37,6 +38,20 @@ def child(status="running", attention=None):
 
 def says(text, role="assistant"):
     return [{"id": "m1", "role": role, "content": text, "createdAt": str(NOW)}]
+
+
+class FakeResponse:
+    def __init__(self, payload):
+        self.payload = payload
+
+    def read(self):
+        return json.dumps(self.payload).encode()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
 
 
 class FakeApi:
@@ -447,6 +462,133 @@ class UsageOnce(Base):
         )
         self.assertEqual(len(api.posts), 1)
         self.assertTrue(any("still reports a usage limit" in text for text in alerts.sent))
+
+
+class Contract(unittest.TestCase):
+    """The documented Sessions API contract, driven through the real Api class.
+
+    The decision fixtures stub post_message, so they cannot see the request body. A wrong
+    field name here refused every recovery message for a day while every fixture passed.
+    """
+
+    def api(self, opener, **kw):
+        return controller.Api(
+            "https://api.example/v0", "k", sleep=lambda _: None, opener=opener, **kw
+        )
+
+    def test_a_posted_message_uses_the_documented_text_field(self):
+        seen = {}
+
+        def opener(request, timeout=None):
+            seen["method"] = request.get_method()
+            seen["url"] = request.full_url
+            seen["body"] = json.loads(request.data.decode())
+            return FakeResponse({"messageId": "m1", "status": "pending"})
+
+        answer = self.api(opener).post_message(SID, "hello")
+        self.assertEqual(seen["method"], "POST")
+        self.assertTrue(seen["url"].endswith(f"/sessions/{SID}/messages"))
+        self.assertEqual(seen["body"], {"text": "hello"})
+        self.assertNotIn("content", seen["body"])
+        self.assertEqual(answer["messageId"], "m1")
+
+    def test_a_refused_body_is_a_failure_not_a_silent_success(self):
+        def opener(request, timeout=None):
+            raise urllib.error.HTTPError(request.full_url, 400, "Bad Request", {}, None)
+
+        with self.assertRaises(controller.ApiError) as caught:
+            self.api(opener).post_message(SID, "hello")
+        self.assertEqual((caught.exception.kind, caught.exception.status), ("http", 400))
+        self.assertFalse(caught.exception.sent_unknown)
+
+    def test_a_post_is_never_retried_but_a_read_is(self):
+        calls = []
+
+        def opener(request, timeout=None):
+            calls.append(request.get_method())
+            raise urllib.error.HTTPError(request.full_url, 503, "busy", {}, None)
+
+        with self.assertRaises(controller.ApiError):
+            self.api(opener).post_message(SID, "hello")
+        self.assertEqual(calls, ["POST"])
+        calls.clear()
+        with self.assertRaises(controller.ApiError):
+            self.api(opener).session(SID)
+        self.assertEqual(calls, ["GET", "GET", "GET"])
+
+
+class Escalation(Base):
+    def test_a_refused_recovery_message_tells_a_person(self):
+        error = controller.ApiError("http", 400)
+        api = FakeApi(parent=session(updated=NOW - 90 * MINUTE), post=error)
+        alerts = FakeAlerts()
+        report = self.make(api, alerts).tick()
+        self.assertIn("failed", [item.get("result") for item in report["actions"]])
+        self.assertTrue(any("was refused by the API" in text for text in alerts.sent))
+
+    def test_waiting_for_a_reset_with_no_live_children_is_announced_once(self):
+        api = FakeApi(
+            parent=session(updated=NOW - 90 * MINUTE),
+            messages=says("Request failed: usage limit reached. Resets at 2023-11-14T22:40:00Z"),
+        )
+        alerts = FakeAlerts()
+        hand = self.make(api, alerts)
+        first = hand.tick()
+        self.assertEqual(
+            [i["result"] for i in first["actions"] if i.get("action") == "resume"],
+            ["waiting_for_reset"],
+        )
+        parked = [text for text in alerts.sent if "no running children" in text]
+        self.assertEqual(len(parked), 1)
+        self.assertIn("before one bounded resume", parked[0])
+        self.assertEqual(api.posts, [])
+        self.now += 15 * MINUTE
+        hand.tick()
+        self.assertEqual(len([t for t in alerts.sent if "no running children" in t]), 1)
+
+    def test_an_idle_orchestrator_waiting_on_children_is_not_announced(self):
+        api = FakeApi(
+            parent=session(updated=NOW - 90 * MINUTE),
+            kids=[child("running")],
+            messages=says("Request failed: usage limit reached. Resets at 2023-11-14T22:40:00Z"),
+        )
+        alerts = FakeAlerts()
+        self.make(api, alerts).tick()
+        self.assertEqual([t for t in alerts.sent if "no running children" in t], [])
+
+
+class ExhaustionEvidence(Base):
+    def test_prose_mentioning_a_usage_limit_is_not_a_refusal(self):
+        # The live misclassification of 2026-11-10: the session discussed a usage limit
+        # while actually blocked by a browser failure, and was parked for four hours.
+        api = FakeApi(
+            parent=session(updated=NOW - 90 * MINUTE),
+            messages=says(
+                "The browser call closed the target. No usage limit is involved here, so I am "
+                "routing it to the existing recovery owners."
+            ),
+        )
+        report = self.make(api).tick()
+        self.assertEqual(report["sessions"][SID]["state"], "stalled")
+        self.assertEqual(
+            [i["result"] for i in report["actions"] if i.get("action") == "resume"], []
+        )
+
+    def test_a_provider_refusal_beside_the_phrase_still_counts(self):
+        api = FakeApi(
+            parent=session(updated=NOW - 90 * MINUTE),
+            messages=says("Error: usage limit reached for this window."),
+        )
+        verdict = self.make(api).tick()["sessions"][SID]
+        self.assertEqual(verdict["state"], "usage_exhausted")
+        self.assertEqual(verdict["evidence"], "usage limit")
+
+    def test_a_reported_reset_alone_still_counts(self):
+        api = FakeApi(
+            parent=session(updated=NOW - 90 * MINUTE),
+            messages=says("Quota exceeded. Resets at 2023-11-14T22:40:00Z"),
+        )
+        self.assertEqual(self.make(api).tick()["sessions"][SID]["state"], "usage_exhausted")
 
 
 if __name__ == "__main__":
