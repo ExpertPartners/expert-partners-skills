@@ -41,7 +41,7 @@ When Allison says `teaching moment` or `Share the Love`, capture what was just d
 
 Keep her actual lesson wording when it exists. Quote only her exact words. If the lesson was demonstrated but she never phrased it, label the lesson a paraphrase from the work, not a quote or something she said. Never invent a first-person experience, result, statistic or source.
 
-For a new lesson, continue the existing numbering and include these parts in the list's plain-label style.
+For a new lesson, number it one higher than the highest entry number already in the list, never the last number seen and never a number already used. Include these parts in the list's plain-label style.
 
 1. The lesson in one line, in Allison's own words when available.
 2. Theme, using the list's existing themes.
@@ -56,11 +56,11 @@ Keep it bite-sized for agents who still treat AI as search or a chatbot. Lead wi
 
 Read the current list immediately before writing. Compare meaning as well as wording against existing entries.
 
-- A genuinely new lesson gets one numbered entry at the end.
-- A new source or useful refinement of an existing lesson gets a dated source note appended at the end, referencing that entry. Do not create another numbered version of the same lesson or overwrite its old wording or status.
+- A genuinely new lesson gets one numbered entry at the end of the list, numbered as above.
+- A new source or useful refinement of an existing lesson gets a dated source note inserted directly under that entry, after its last line and after any source notes already under it, labeled Dated source note for entry N. Do not create another numbered version of the same lesson, append the note at the end of the document, or overwrite the entry's old wording or status.
 - The same lesson from the same source, including a retry after a timeout, is a no-op. Read first to reconcile an uncertain write before retrying.
 
-Append with an insert-at-end operation, never whole-document replacement. Preserve all previous text, formatting and entries. Use revision control when the API offers it. If another writer changes the document, reread, deduplicate and recompute the next number before appending. Never copy business content or private source URLs into the public skill repository.
+Write with a targeted insert, at the end for a new entry or right under the existing entry for a source note, never whole-document replacement. Preserve all previous text, formatting and entries. Use revision control when the API offers it. If another writer changes the document, reread, deduplicate and recompute the next number before appending. Never copy business content or private source URLs into the public skill repository.
 
 Read the saved portion from the existing document. Say saved only when the appended entry or source note is there. Link the document using its exact title. A failed write stays not saved, with the proposed text and outstanding save obligation in this conversation. Capture never publishes a post, creates a kit, changes a status to sold or starts an automation.
 
