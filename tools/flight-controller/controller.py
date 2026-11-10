@@ -23,7 +23,7 @@ import uuid
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 MARKER = "flight-controller"
 USER_AGENT = "ep-flight-controller/" + VERSION
 SEND_URL = "https://api.sendblue.co/api/send-message"
@@ -52,6 +52,13 @@ REFUSAL = re.compile(
     r"|cannot (?:continue|proceed|complete)|unable to (?:continue|proceed|complete)"
     r"|try again|retry|resets? (?:at|in)|too many requests|\b429\b|\b529\b"
     r"|overloaded|please wait|paused until)",
+    re.I,
+)
+PLATFORM = re.compile(
+    r"(workstreams? (?:are|is) not available(?: for this organization)?"
+    r"|not available for this organization"
+    r"|access could not be verified|not (?:enabled|available) for (?:this|your) "
+    r"(?:organization|org|account|plan)|feature is disabled for)",
     re.I,
 )
 RESET_AT = re.compile(r"resets?\s+(?:at|on)\s+([0-9][0-9T:\-+.Z ]{7,31})", re.I)
@@ -210,7 +217,17 @@ def classify(session, children, messages, now_ms, config):
     """Evidence, not a status label, decides whether work is recoverably stalled."""
     status = session.get("status")
     stale_minutes = max(0.0, (now_ms - int(session.get("updatedAt") or 0)) / 60000.0)
-    live_children = [child for child in children if child.get("status") in LIVE]
+    # A child's status is a label the platform sets, and a session that closed abnormally
+    # keeps reporting "running" forever. Only a child that has also been touched recently
+    # is evidence of work, otherwise one dead child silences the watcher permanently.
+    child_window = config["child_progress_minutes"] * 60000
+    labelled_live = [child for child in children if child.get("status") in LIVE]
+    live_children = [
+        child
+        for child in labelled_live
+        if now_ms - int(child.get("updatedAt") or 0) <= child_window
+    ]
+    stale_running = [child for child in labelled_live if child not in live_children]
     attention = session.get("attention") or None
     blocked_children = [
         child
@@ -222,6 +239,7 @@ def classify(session, children, messages, now_ms, config):
         "status": status,
         "stale_minutes": round(stale_minutes, 1),
         "children_live": len(live_children),
+        "children_stale_running": len(stale_running),
         "children_total": len(children),
         "blocked_children": [child["sessionId"] for child in blocked_children],
         "reset_at": None,
@@ -267,6 +285,18 @@ def classify(session, children, messages, now_ms, config):
             reason="founder_text",
             evidence=FOUNDER.search(text).group(0),
         )
+    platform = PLATFORM.search(latest_words)
+    if platform:
+        # A platform refusal is machine truth rather than prose, and no message can clear
+        # it: sending one only queues work behind a denial. This is the one case where a
+        # system message counts as evidence.
+        return dict(
+            verdict,
+            state="platform_blocked",
+            reason="platform_refusal",
+            evidence=platform.group(0),
+            evidence_at=int(latest.get("createdAt") or now_ms),
+        )
     hit = EXHAUSTED.search(latest_words)
     if hit:
         # The words alone are not a refusal: a session discussing a usage limit reads exactly
@@ -287,10 +317,19 @@ def classify(session, children, messages, now_ms, config):
     if blocked_children:
         return dict(verdict, state="child_blocked", reason="child_attention")
     if live_children:
-        # An orchestrator waiting for working children is healthy, however long it waits.
+        # An orchestrator waiting for children that are working is healthy, however long.
         return dict(verdict, state="waiting_on_children", reason="children_live")
     if stale_minutes < config["stale_minutes"]:
         return dict(verdict, state="idle_recent", reason="within_stale_window")
+    if stale_running:
+        # Children labelled running but untouched for longer than the window: the parent is
+        # stalled and the labels are stale, which is not something a message to it can fix.
+        return dict(
+            verdict,
+            state="stalled",
+            reason="idle_children_stale_running",
+            evidence=f"{len(stale_running)} children labelled running but idle",
+        )
     return dict(verdict, state="stalled", reason="idle_no_live_children_stale")
 
 
@@ -731,6 +770,16 @@ class Controller:
                         "Check the controller, not the session. " + link,
                     )
                 )
+            if verdict["state"] == "platform_blocked":
+                report["alerts"].append(
+                    self.alert(
+                        "platform_blocked:" + session_id,
+                        f"Factory flight controller: {title} was refused by the platform "
+                        f"({verdict.get('evidence')}). No message can clear that, so nothing was "
+                        "sent. This needs the platform or the account checked, not a nudge. "
+                        + link,
+                    )
+                )
             if verdict["state"] in ("blocked_attention", "founder_decision", "child_blocked"):
                 report["alerts"].append(
                     self.alert(
@@ -841,6 +890,7 @@ DEFAULTS = {
     "reset_margin_minutes": 10,
     "unknown_reset_wait_minutes": 360,
     "progress_grace_minutes": 20,
+    "child_progress_minutes": 30,
     "failure_alert_after": 3,
     "alert_cooldown_minutes": 180,
     "evidence_messages": 40,
