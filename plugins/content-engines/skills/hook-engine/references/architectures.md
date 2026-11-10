@@ -4,7 +4,7 @@ These patterns show up again and again in high-performing short-form content acr
 
 **About the examples:** every example below is illustrative and was written for this guide. The numbers and stories are placeholders showing the shape of the pattern. Never reuse them as if they were the user's proof.
 
-**Needs proof:** patterns 1-4 need real material from the user's "My real proof." Patterns 5-12 need none.
+**Availability:** evaluate each pattern's `Requires`, not a blanket proof/no-proof split. Patterns 1-4 need their stated achieved outcome, story, result or verifiable credential/number. Wrong Answer needs a supplied contrarian take or mechanism; Her Exact Words needs authentic customer language permitted for the intended use; Hot Seat needs a permitted real situation or an explicitly hypothetical one. Expertise and opinion patterns still cannot invent facts, admissions or causal claims. Check these conditions again when suggesting what would unlock a pattern.
 
 ---
 
@@ -149,7 +149,7 @@ These patterns show up again and again in high-performing short-form content acr
 - "'I know what to do, I just don't do it.' If that's you, the problem isn't discipline."
 - "'I feel like I'm always behind on my books.' You're not behind. Your system is built for someone with more hours than you."
 
-**Note:** strip names and identifying details. Confirm the quote is real, and never invent one.
+**Note:** strip names and identifying details. Confirm the quote is real and permitted for the intended use, and never invent one. A historical quote or private source alone does not grant public testimonial permission. Do not turn one phrase into a claim about how often customers say it.
 
 ---
 
