@@ -107,7 +107,8 @@ async function newOwnedState(connector) {
     const unknownPages = context.pages().filter(p => !s.created.has(p));
     const unbound = [...s.created].filter(p => !s.ids.has(p)).length + s.pendingIds.size;
     if (strict && (unknownPages.length || observed.unknownIds.length || unbound)) throw Error('unproven_page_arrival');
-    return {...initial, tabIds: knownIds, unboundOwnedPages: unbound, newestTabId: observed.newestTabId};
+    const workingPage = s.task ? (s.task.isClosed() ? 'closed' : 'live') : 'none';
+    return {...initial, tabIds: knownIds, unboundOwnedPages: unbound, newestTabId: observed.newestTabId, workingPage};
   };
 
   s.closeIds = async (ids) => {

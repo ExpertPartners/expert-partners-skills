@@ -1,6 +1,7 @@
 """Contract tests for job routing, concurrent calls and fail-closed recovery."""
 
 import contextlib
+import copy
 import importlib.util
 import json
 import os
@@ -711,6 +712,140 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
         with self.assertRaises(Refusal) as unknown:
             b.projection(failing("page said SYNTHETIC_CANARY"))
         self.assertEqual(str(unknown.exception), "owned_operation_failed")
+
+    def ready_job(self, route, reply):
+        job = {
+            "job_id": "e" * 32,
+            "label": "fixture",
+            "client_name": "fixture",
+            "generation": route.preflight(),
+            "metadata": route.metadata(None),
+            "updated": 0,
+            "lock": threading.RLock(),
+            "status": "ready",
+            "client": SimpleNamespace(call=lambda *a: copy.deepcopy(reply)),
+        }
+        route.jobs[job["job_id"]] = job
+        return job
+
+    def working_page_after(self, route, state):
+        base = route.metadata(None)
+        route.metadata = lambda _, strict=True: {**base, "workingPage": state}
+
+    def test_vendor_error_that_loses_the_working_page_fails_the_job(self):
+        # Job cd3aebeb: the Instagram navigate returned a vendor TargetClosedError
+        # while the connector, window, group and tab IDs all survived.
+        vendor = {
+            "isError": True,
+            "content": [
+                {
+                    "type": "text",
+                    "text": "### Error\nError: browserBackend.callTool: Target page, context or browser has been closed SYNTHETIC_CANARY",
+                }
+            ],
+        }
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            job = self.ready_job(route, vendor)
+            self.working_page_after(route, "closed")
+            reply = route.call(
+                "browser_navigate", {"job_id": job["job_id"], "url": "https://www.instagram.com/"}
+            )
+            self.assertTrue(reply["isError"])
+            texts = [b["text"] for b in reply["content"]]
+            self.assertIn("SYNTHETIC_CANARY", texts[0])  # The caller still sees the vendor reply.
+            self.assertEqual(texts[1:], [b.VENDOR_ERROR_NOTE, b.WORKING_PAGE_LOST_NOTE])
+            receipt = (Path(root) / (job["job_id"] + ".json")).read_text()
+            row = json.loads(receipt)
+            self.assertEqual((row["status"], row["ownership_pending"]), ("failed", False))
+            self.assertEqual(
+                [s for s, _ in row["timings"][-1]["stages"]][-4:],
+                [
+                    "tool_end",
+                    "vendor_error:vendor_target_closed",
+                    "post_metadata",
+                    "failed:working_page_lost",
+                ],
+            )
+            self.assertNotIn("workingPage", row["metadata"])
+            self.assertNotIn("SYNTHETIC_CANARY", receipt)
+            # The failed job refuses further work, so nothing is replayed.
+            route.prime = b.Route.prime.__get__(route)
+            job["client"] = SimpleNamespace(call=lambda *a: self.fail("replayed"))
+            again = route.call(
+                "browser_navigate", {"job_id": job["job_id"], "url": "https://www.instagram.com/"}
+            )
+            self.assertEqual(decode(again)["status"], "failed")
+            row = json.loads((Path(root) / (job["job_id"] + ".json")).read_text())
+            self.assertEqual(
+                row["timings"][-1]["stages"][-1][0], "failed:job_not_ready_finish_or_recover"
+            )
+
+    def test_page_lost_after_a_successful_reply_still_fails_the_job(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            job = self.ready_job(route, b.result({"navigated": True}))
+            self.working_page_after(route, "closed")
+            reply = route.call(
+                "browser_navigate", {"job_id": job["job_id"], "url": "https://www.instagram.com/"}
+            )
+            self.assertFalse(reply.get("isError"))
+            self.assertEqual(reply["content"][-1]["text"], b.WORKING_PAGE_LOST_NOTE)
+            row = json.loads((Path(root) / (job["job_id"] + ".json")).read_text())
+            self.assertEqual(row["status"], "failed")
+            self.assertEqual(
+                [s for s, _ in row["timings"][-1]["stages"]][-3:],
+                ["tool_end", "post_metadata", "failed:working_page_lost"],
+            )
+
+    def test_ordinary_vendor_error_is_labelled_and_the_job_stays_ready(self):
+        vendor = {
+            "isError": True,
+            "content": [{"type": "text", "text": "### Error\nRef e9 not found SYNTHETIC_CANARY"}],
+        }
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            job = self.ready_job(route, vendor)
+            self.working_page_after(route, "live")
+            reply = route.call(
+                "browser_navigate", {"job_id": job["job_id"], "url": "https://example.com/"}
+            )
+            self.assertTrue(reply["isError"])
+            self.assertEqual(reply["content"][-1]["text"], b.VENDOR_ERROR_NOTE)
+            receipt = (Path(root) / (job["job_id"] + ".json")).read_text()
+            row = json.loads(receipt)
+            self.assertEqual(row["status"], "ready")
+            self.assertEqual(
+                [s for s, _ in row["timings"][-1]["stages"]][-3:],
+                ["tool_end", "vendor_error:unclassified", "post_metadata"],
+            )
+            self.assertNotIn("SYNTHETIC_CANARY", receipt)
+
+    def test_snapshot_reports_a_closed_working_page_whose_tab_survives(self):
+        source = (SCRIPTS / "owned_pages.js").read_text()
+        fixture = r'''
+const assert=require('node:assert/strict');
+let current;const tabs=new Map();const pages=[];
+function page(id){const tab={id,windowId:5,groupId:7,url:'about:blank'};tabs.set(id,tab);
+  const p={id,closed:false,context:()=>context,isClosed:()=>p.closed,opener:async()=>null,url:()=>tab.url,
+    evaluate:async(fn,arg)=>{current=p;return await fn(arg);}};pages.push(p);return p;}
+const context={pages:()=>pages.filter(p=>!p.closed)};
+global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=args.url;return t;},
+  group:async({tabIds,groupId})=>{for(const id of tabIds)tabs.get(id).groupId=groupId;},
+  getCurrent:async()=>tabs.get(current.id),get:async(id)=>tabs.get(id),
+  query:async(q)=>[...tabs.values()].filter(t=>(q.windowId===undefined||t.windowId===q.windowId)&&(q.groupId===undefined||t.groupId===q.groupId))},
+  tabGroups:{get:async()=>({title:'fixture'})}};
+(async()=>{const s=await newOwnedState(page(1));s.task=await s.create();
+  assert.equal((await s.snapshot()).workingPage,'live');
+  s.task.closed=true; // Debugger detached; Chrome keeps tab 10 open.
+  const m=await s.snapshot();assert.equal(m.workingPage,'closed');assert.deepEqual(m.tabIds,[1,10]);
+  s.task=null;assert.equal((await s.snapshot()).workingPage,'none');
+})().catch(e=>{console.error(e);process.exitCode=1;});
+'''
+        checked = subprocess.run(
+            ["node", "-e", source + fixture], capture_output=True, text=True, timeout=10
+        )
+        self.assertEqual(checked.returncode, 0, checked.stderr)
 
     def test_vendor_failure_class_is_a_fixed_label_without_page_text(self):
         def failing(text):

@@ -71,6 +71,15 @@ VENDOR_ERROR_CLASSES = (
     ("vendor_no_open_tabs", r"No open tabs"),
     ("vendor_timeout", r"Timeout \d+ms exceeded"),
 )
+VENDOR_ERROR_NOTE = (
+    "Browser job route: the browser tool reported an error, so this action's outcome is "
+    "uncertain. Inspect the page before any retry; nothing was replayed."
+)
+WORKING_PAGE_LOST_NOTE = (
+    "Browser job route: the working page lost its browser connection during this call, so the "
+    "job is now failed. Do not replay the action. Use browser_job_finish, or browser_job_recover "
+    "for a fresh working page."
+)
 TIMING_RECORDS = 20
 GENERATION_ATTEMPTS = 30
 
@@ -93,15 +102,22 @@ def result(value, error=False):
     }
 
 
+def vendor_error_class(reply):
+    """Fixed label for a vendor error reply, or None. Never returns reply text."""
+    text = "\n".join(b.get("text", "") for b in reply.get("content", []) if isinstance(b, dict))
+    return next(
+        (label for label, pattern in VENDOR_ERROR_CLASSES if re.search(pattern, text)), None
+    )
+
+
 def projection(reply):
     if reply.get("isError"):
         # Vendor error text can carry page content. Keep only a static code
         # this route itself throws, so receipts show why an owned step failed.
         text = "\n".join(b.get("text", "") for b in reply.get("content", []) if isinstance(b, dict))
         found = sorted(c for c in OWNED_ERROR_CODES if re.search(r"\b" + c + r"\b", text))
-        if not found:
-            found = [label for label, pattern in VENDOR_ERROR_CLASSES if re.search(pattern, text)]
-        raise Refusal("owned_operation_failed" + (":" + found[0] if found else ""))
+        label = found[0] if found else vendor_error_class(reply)
+        raise Refusal("owned_operation_failed" + (":" + label if label else ""))
     blocks = reply.get("content", [])
     if len(blocks) != 1 or blocks[0].get("type") != "text":
         raise Refusal("owned_projection_shape")
@@ -435,6 +451,7 @@ class Route:
             self.checkpoint(job)
             code(client, STATE_JS + "s.task=await s.create();return {created:!s.task.isClosed()};")
             job["metadata"] = self.metadata(client)
+            job["metadata"].pop("workingPage", None)
             if len(job["metadata"]["tabIds"]) != 2:
                 raise Refusal("owned_page_count_mismatch")
             job["ownership_pending"] = False
@@ -624,6 +641,10 @@ class Route:
             observed[k] != old[k] for k in ("connectorId", "windowId", "groupId", "groupTitle")
         ):
             raise Refusal("connection_ownership_changed")
+        # Liveness of the retained Playwright Page, kept out of the saved
+        # ownership metadata. Chrome can detach the debugger from a tab that
+        # stays open, which closes the Page without changing any tab ID.
+        job["working_page"] = observed.pop("workingPage", None)
         return observed
 
     def tabs(self, job, args):
@@ -876,12 +897,24 @@ class Route:
                     self.checkpoint(job)
                     reply = job["client"].call("tools/call", {"name": name, "arguments": args})
                 self.mark(job, "tool_end")
+                notes = [note] if note else []
+                if reply.get("isError") and name != "browser_tabs":
+                    self.mark(job, "vendor_error:" + (vendor_error_class(reply) or "unclassified"))
+                    notes.append(VENDOR_ERROR_NOTE)
                 job["metadata"] = self.verify_connection(job)
                 job["ownership_pending"] = False
                 self.mark(job, "post_metadata")
-                self.checkpoint(job)
-                if note:
-                    reply.setdefault("content", []).append({"type": "text", "text": note})
+                if job.get("working_page") == "closed":
+                    # The tab may still be open and showing the page, but no
+                    # later call can prove it is the same document. Never
+                    # re-bind or replay; finish or recover closes it by exact ID.
+                    self.mark(job, "failed:working_page_lost")
+                    self.checkpoint(job, "failed")
+                    notes.append(WORKING_PAGE_LOST_NOTE)
+                else:
+                    self.checkpoint(job)
+                for text in notes:
+                    reply.setdefault("content", []).append({"type": "text", "text": text})
                 return redact(reply)
             except Exception as error:
                 self.mark(job, failure_stage(error))
