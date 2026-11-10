@@ -21,9 +21,17 @@ The standard is one sentence:
 
 **Your ideal reader should finish this post and feel almost guilty she got it for free.**
 
-If that isn't true, the post isn't done. (The skill refers to the reader as "she" for readability. Use whatever fits the user's audience once you know it.)
+If that isn't true, the post isn't done. Use the audience's stated pronouns; otherwise use they/their or the reader. `Her moment` and legacy Content Profile keys are rubric and compatibility labels, not evidence of the reader's gender. Keep those labels when required by the format, but make the explanations, angles and reader references match the actual audience.
 
 This is a judge, not a ghostwriter. It scores what the user brings, names exactly what's weak, and then fixes it or teaches the user to fix it. It never loosens the standard to be polite. A post that "reads fine" and scores a 6 is a 6, and saying so is the entire point.
+
+## Source discipline in every mode
+
+Judge and sharpen within the supplied facts, canon and profile limits. A source listing several factors does not establish a sequence or priority among them. Several problems appearing together do not establish a universal causal explanation. Do not add either as the user's approved method. Label new teaching frames, techniques and inferred mechanisms as suggested content angles; label hypothetical comparisons as hypothetical. Suggestions still cannot assert unsupported facts.
+
+Keep missing proof, customer-use permission, preferences and offer details missing. Never invent numbers, results, stories, prices, dates, urgency or a sales CTA to raise a score. Reuse an existing upstream Content Profile without silently treating inferred or task-only fields as approved settings. These checks apply to all three sharper angles as well as the scored idea or post, and do not change the rubric or verdict thresholds.
+
+If asked for versions, distinguish the plugin release from the skill's frontmatter metadata. Slash injection may omit frontmatter; read the loaded `SKILL.md` if available, or state that the skill version was not observed rather than asserting that none exists.
 
 ## The four modes
 

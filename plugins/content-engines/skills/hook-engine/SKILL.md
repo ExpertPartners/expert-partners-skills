@@ -25,7 +25,13 @@ This skill writes hooks from what the user has: their audience, their customers'
 
 - Use only proof that's in the Content Profile or that the user gave you in this conversation.
 - When a pattern needs a detail you don't have, write a bracketed placeholder, like `[your real client result]`, and flag it under the hook.
-- If the user has no proof yet, that's fine. Eight of the 12 patterns need none, so lean on those.
+- A pattern without a result-proof requirement may still need a supplied mechanism, customer language, expertise or a clearly hypothetical situation. Check each pattern's `Requires` in `references/architectures.md`; no numeric proof does not mean no inputs are required.
+
+Apply the truth check to every mode and to ancillary advice, including pattern-unlock suggestions. Keep supplied canon separate from proposed content: a list of factors does not establish their order, and co-occurring problems do not establish a universal cause. Label a new angle, inferred mechanism or hypothetical scenario as a suggestion, not the user's approved method or a verified result. Never invent proof, prices, dates, urgency or a sales CTA to sharpen an opener.
+
+Use the audience's stated pronouns; otherwise use they/their or the reader. Legacy labels such as `Her words` and pattern names are compatibility labels, not evidence of the audience's gender. Preserve an approved original and its supplied source locator when critiquing it; rewrites are suggestions, not replacements for canon.
+
+If asked for versions, distinguish the plugin release from the skill's frontmatter metadata. Slash injection may omit frontmatter: read the loaded `SKILL.md` if available, or say the skill version was not observed. Omitted metadata is not proof that no version exists.
 
 ## Modes
 
@@ -63,15 +69,15 @@ Before writing, sort the material you have into the categories below. This decid
 | Credential | "My real proof" (years, clients served, qualifications) |
 | Client story | "My real proof," with permission |
 | Contrarian take or mechanism | "What I know that others miss" |
-| Customer language | "Her words," or pasted messages |
+| Customer language | "Her words," or pasted messages, respecting their use permissions |
 | Opinions and expertise | Everyone has this |
 
 ### 2. Choose the patterns
 
-The 12 patterns, their formulas, what each one requires, and examples across industries are in `references/architectures.md`. Read it before your first batch in a conversation.
+The 12 patterns, their formulas, what each one requires, and examples across industries are in `references/architectures.md`. Read it before your first batch or Hook Doctor check in a conversation, and consult it for unlock advice in any mode.
 
 - Use only patterns whose "Requires" is met by the inventory.
-- Use **at least 5 different patterns** in a batch. If fewer than 5 are available because proof is thin, use every available pattern, and tell the user which material would unlock more ("Share one client result and I can add Before/After and Credential Bridge hooks").
+- Use **at least 5 different patterns** in a batch. If fewer than 5 are available, use every available pattern and map each unlock suggestion to that pattern's actual `Requires`. A real client result with permission can unlock Before/After; Credential Bridge separately needs a verifiable credential or number. Do not claim one item automatically satisfies both.
 - Prioritize by goal:
   - **Reach and shares:** Start-Over Plan, Wrong Answer, Signs You're, Bold Declaration
   - **Connection and trust:** Low Point, Honest Admission, Her Exact Words
@@ -93,7 +99,7 @@ Rules for every hook:
 - **No throat-clearing.** Cut "Today I want to talk about," "Let me share," "So, I've been thinking," "Here's the thing." Start with the hook.
 - **Provoke before you explain.** Tension, proof, or surprise first, context after.
 - **Specific beats vague.** A number beats "a lot," a timeframe beats "quickly," and "restaurant owners at month-end" beats "business owners."
-- **Use her words.** When the profile has customer language, at least two hooks in the batch should be built on it.
+- **Use the reader's words.** When the profile has customer language permitted for the intended use, at least two hooks in the batch should be built on it. Historical or privately supplied language is not public testimonial permission; withhold that pattern when the intended use is not permitted rather than manufacturing more phrases or prevalence.
 - **Fit the visible window.** Written hooks must land their punch before the platform's "more" cutoff. Limits are in `references/platforms.md`.
 - **Sound like a person.** No em dashes (unless the user's own voice uses them), and none of: unlock, elevate, game-changer, journey, navigate, delve, "let that sink in," "read that again," "nobody is talking about this." Match the voice in the profile.
 - **Respect the "never say" list** and any compliance limits, every time.
