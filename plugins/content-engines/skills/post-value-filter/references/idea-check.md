@@ -16,6 +16,7 @@ Is this a take the reader hasn't already seen twenty times this month? Pull from
 
 **Her moment (0-10)**
 Is the idea tied to a real moment in their life they'll recognize instantly?
+Score this criterion only on whether the idea names or clearly points to a real, recognizable moment for this audience. Evidence that readers will recognize a moment is separate from permission to publish a quote, testimonial or result. Missing prevalence data, publication permission or profile fields, or doubt about whether one moment can carry a whole post, does not lower this score. Judge format fit under Fits the format, and apply permission limits to the wording of hooks and angles.
 - 3/10: "Improving team communication"
 - 8/10: "The Slack message you send at 9pm that makes your team dread Monday"
 
@@ -39,7 +40,7 @@ The takeaway: [the one thing they'll know or be able to do after]
 Best format: [carousel / reel / text post / thread / story sequence] · [why, in a few words]
 ```
 
-Make the three angles different from each other. A good spread: one teaches a mechanism, one names a mistake, one tells a story that mirrors the reader. Never invent stats or client results inside an angle. Use placeholders if needed.
+Make the three angles different from each other. A good spread: one teaches a mechanism, one names a mistake, one tells a story that mirrors the reader. When no real story is supplied or permitted, the mirror angle may be a clearly labeled hypothetical scenario. It must not present itself as a real customer event, quote unpermitted customer language, or add invented proof, numbers or causal rules. Never invent stats or client results inside an angle. Use placeholders if needed.
 
 Check each hook and takeaway against the supplied source boundaries, not just its score. Preserve the distinction between a stated fact and a proposed angle: do not infer an order from an unordered list or a universal cause from an audience problem. Mark new frames as suggestions and hypothetical situations as hypothetical, not approved company teaching or real customer stories. Use the audience's stated pronouns or neutral reader references, regardless of the fixed `Her moment` rubric label. Do not invent proof, permission, price, timing, urgency or a sales CTA.
 

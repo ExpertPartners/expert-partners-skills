@@ -63,6 +63,26 @@ class ContentSourceContractTest(unittest.TestCase):
             for clause in ("critiques", "score explanations", "ancillary advice"):
                 self.assertIn(clause, text)
 
+    def test_her_moment_scores_recognition_not_permission(self):
+        text = (ROOT / "post-value-filter/references/idea-check.md").read_text()
+        for clause in (
+            "Score this criterion only on whether",
+            "separate from permission to publish",
+            "Missing prevalence data, publication permission or profile fields",
+            "can carry a whole post, does not lower this score",
+        ):
+            self.assertIn(clause, text)
+
+    def test_idea_check_allows_labeled_hypothetical_mirror(self):
+        text = (ROOT / "post-value-filter/references/idea-check.md").read_text()
+        for clause in (
+            "may be a clearly labeled hypothetical scenario",
+            "must not present itself as a real customer event",
+            "quote unpermitted customer language",
+            "invented proof, numbers or causal rules",
+        ):
+            self.assertIn(clause, text)
+
     def test_both_entrypoints_bound_suggestions_and_gender(self):
         for name in ("hook-engine", "post-value-filter"):
             with self.subTest(name=name):
