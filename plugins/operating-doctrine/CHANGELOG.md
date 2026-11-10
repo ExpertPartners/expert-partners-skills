@@ -1,3 +1,8 @@
+## 3.7.0 - 2026-11-10
+
+Failed browser jobs no longer leave windows behind with only part of their tabs. The route now stops a job's own browser process outright instead of letting it close pages one at a time, so a failure can't remove the connector and strand the working page. Reconciliation accepts a missing connector when every saved working page survives, records the removal before it happens so a retry finishes cleanly, and polls briefly until Chrome stops listing the closed window. A stale facade no longer overwrites a finished receipt, and a failed step now records which of the route's own checks refused.
+
+Every browser job now owns one whole Chrome window that closes when the job is done. A lifecycle hook binds each job to its native session and closes that session's windows at Stop and SessionEnd on Factory, Claude Code and Codex, and a nightly sweep on the M2 closes windows of ended sessions. Active jobs, jobs with no proven owner and windows holding another tab are preserved. A connector born in an occupied window now moves to its own window first.
 ## 3.6.2 - 2026-11-10
 
 Share the Love puts a new source for a lesson already on the Share List directly under that lesson, the way Allison asked, instead of at the end of the document. A new lesson is numbered one higher than the highest number already on the list, so two captures never share a number again.
