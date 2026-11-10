@@ -32,8 +32,14 @@ def session(status="idle", updated=NOW, count=100, attention=None, title="Cal We
     }
 
 
-def child(status="running", attention=None):
-    return {"sessionId": CHILD, "title": "worker", "status": status, "attention": attention}
+def child(status="running", attention=None, updated=NOW, child_id=CHILD):
+    return {
+        "sessionId": child_id,
+        "title": "worker",
+        "status": status,
+        "attention": attention,
+        "updatedAt": updated,
+    }
 
 
 def says(text, role="assistant"):
@@ -589,6 +595,102 @@ class ExhaustionEvidence(Base):
             messages=says("Quota exceeded. Resets at 2023-11-14T22:40:00Z"),
         )
         self.assertEqual(self.make(api).tick()["sessions"][SID]["state"], "usage_exhausted")
+
+
+class StaleRunningChildren(Base):
+    """The live failure of 2026-11-10: two children kept the label "running" for almost two
+    hours after their sessions closed, and the watcher read them as work in progress."""
+
+    def test_a_child_labelled_running_but_untouched_is_not_work_in_progress(self):
+        api = FakeApi(
+            parent=session(updated=NOW - 110 * MINUTE),
+            kids=[child("running", updated=NOW - 110 * MINUTE)],
+        )
+        verdict = self.make(api).tick()["sessions"][SID]
+        self.assertEqual(verdict["state"], "stalled")
+        self.assertEqual(verdict["reason"], "idle_children_stale_running")
+        self.assertEqual(verdict["children_live"], 0)
+        self.assertEqual(verdict["children_stale_running"], 1)
+
+    def test_a_child_that_is_actually_working_still_keeps_the_parent_healthy(self):
+        api = FakeApi(
+            parent=session(updated=NOW - 110 * MINUTE),
+            kids=[child("running", updated=NOW - 2 * MINUTE)],
+        )
+        verdict = self.make(api).tick()["sessions"][SID]
+        self.assertEqual(verdict["state"], "waiting_on_children")
+        self.assertEqual((verdict["children_live"], verdict["children_stale_running"]), (1, 0))
+
+    def test_one_working_child_among_stale_ones_still_counts_as_progress(self):
+        api = FakeApi(
+            parent=session(updated=NOW - 110 * MINUTE),
+            kids=[
+                child("running", updated=NOW - 110 * MINUTE),
+                child("running", updated=NOW - MINUTE),
+            ],
+        )
+        verdict = self.make(api).tick()["sessions"][SID]
+        self.assertEqual(verdict["state"], "waiting_on_children")
+        self.assertEqual((verdict["children_live"], verdict["children_stale_running"]), (1, 1))
+
+    def test_a_stale_running_child_does_not_suppress_the_stall_forever(self):
+        api = FakeApi(
+            parent=session(updated=NOW - 110 * MINUTE),
+            kids=[child("running", updated=NOW - 110 * MINUTE)],
+        )
+        alerts = FakeAlerts()
+        hand = self.make(api, alerts)
+        for _ in range(3):
+            hand.tick()
+            self.now += 15 * MINUTE
+        self.assertEqual(len(api.posts), 1, "one bounded nudge, not one per tick")
+
+
+class PlatformRefusal(Base):
+    """A platform denial is not something a message to the session can clear."""
+
+    def test_the_workstreams_denial_is_classified_and_alerted_not_nudged(self):
+        api = FakeApi(
+            parent=session(updated=NOW - 110 * MINUTE),
+            messages=says("Workstreams are not available for this organization", role="system"),
+        )
+        alerts = FakeAlerts()
+        verdict = self.make(api, alerts).tick()["sessions"][SID]
+        self.assertEqual(verdict["state"], "platform_blocked")
+        self.assertEqual(verdict["evidence"], "Workstreams are not available for this organization")
+        self.assertEqual(api.posts, [], "a denied platform cannot be nudged")
+        self.assertTrue(any("refused by the platform" in text for text in alerts.sent))
+
+    def test_a_platform_denial_beats_a_stale_running_child(self):
+        # Both faults were present at once on 2026-11-10, and the denial is the actionable one.
+        api = FakeApi(
+            parent=session(updated=NOW - 110 * MINUTE),
+            kids=[child("running", updated=NOW - 110 * MINUTE)],
+            messages=says("Workstreams are not available for this organization", role="system"),
+        )
+        self.assertEqual(
+            self.make(api).tick()["sessions"][SID]["state"],
+            "platform_blocked",
+        )
+
+    def test_the_denial_alerts_once_not_every_tick(self):
+        api = FakeApi(
+            parent=session(updated=NOW - 110 * MINUTE),
+            messages=says("Workstreams are not available for this organization", role="system"),
+        )
+        alerts = FakeAlerts()
+        hand = self.make(api, alerts)
+        for _ in range(3):
+            hand.tick()
+            self.now += 15 * MINUTE
+        self.assertEqual(len([t for t in alerts.sent if "refused by the platform" in t]), 1)
+
+    def test_ordinary_prose_about_availability_is_not_a_platform_denial(self):
+        api = FakeApi(
+            parent=session(updated=NOW - 110 * MINUTE),
+            messages=says("I checked whether workstreams are available and they are."),
+        )
+        self.assertEqual(self.make(api).tick()["sessions"][SID]["state"], "stalled")
 
 
 if __name__ == "__main__":
