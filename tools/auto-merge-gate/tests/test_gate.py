@@ -408,6 +408,8 @@ class Targets(unittest.TestCase):
 
     def test_dispatch_with_number(self):
         self.assertEqual(gate.target_prs(FakeGitHub({}), CFG, "workflow_dispatch", {}, " 12 "), [12])
+        self.assertEqual(gate.target_prs(FakeGitHub({}), CFG, "workflow_run",
+                                         {"workflow_run": {"pull_requests": [{"number": 21}]}}), [21])
 
     def test_schedule_and_check_suite_sweep_open_factory_pull_requests(self):
         gh = FakeGitHub({f"/repos/{REPO}/pulls": [

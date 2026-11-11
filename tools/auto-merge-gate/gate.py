@@ -764,7 +764,14 @@ def target_prs(gh: GitHubAPI, cfg: Config, event_name: str, event: JSONDict, dis
         return [int(issue["number"])] if "pull_request" in issue else []
     if event_name == "workflow_dispatch" and dispatch_pr.strip():
         return [int(dispatch_pr.strip())]
-    # schedule, check_suite and a dispatch without a number sweep every open pull request.
+    if event_name == "workflow_run":
+        # ci-gates finished on a pull request. GitHub lists the same-repository pull
+        # requests for that head; a fork or push run lists none and falls through to a sweep.
+        numbers = [int(p["number"]) for p in (event.get("workflow_run") or {}).get("pull_requests") or []]
+        if numbers:
+            return numbers
+    # schedule, check_suite, a workflow_run with no listed pull request and a dispatch
+    # without a number sweep every open pull request.
     open_prs = gh.paginate(f"/repos/{cfg.repo}/pulls", params={"state": "open"})
     def wanted(p: JSONDict) -> bool:
         if (p.get("user") or {}).get("login") == FACTORY_LOGIN:

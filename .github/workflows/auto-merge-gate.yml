@@ -1,9 +1,13 @@
 # Automated PR checks, review-state validation and merge. See README for the current
 # auto-merge-label route and compatibility with older job-linked pull requests.
 #
-# Pull request code is never checked out or run here. pull_request_target, schedule,
+# Pull request code is never checked out or run here. workflow_run, schedule,
 # issue_comment and check_suite run this file as it is on main, and every event checks out
 # the gate script from main, so a pull request cannot loosen the gate that judges it.
+#
+# A pull request push reaches the gate through workflow_run when ci-gates finishes, not
+# through pull_request_target, which GitHub blocks by default in public repositories from
+# December 2, 2026 (github.blog/changelog/2026-11-02-pull_request_target-blocked-by-default-december-2).
 #
 # Two tokens, never mixed. The workflow token reads, comments and labels. The EP Skills
 # Graph Bot app token (the one actor allowed past the pull request rule on main) is minted
@@ -13,8 +17,9 @@
 name: auto-merge-gate
 
 on:
-  pull_request_target:
-    types: [opened, synchronize, ready_for_review]
+  workflow_run:
+    workflows: [ci-gates]
+    types: [completed]
   pull_request_review:
     types: [submitted]
   issue_comment:
@@ -48,7 +53,8 @@ jobs:
     name: auto-merge-gate
     if: >-
       github.repository == 'ExpertPartners/expert-partners-skills' &&
-      (github.event_name != 'issue_comment' || github.event.issue.pull_request)
+      (github.event_name != 'issue_comment' || github.event.issue.pull_request) &&
+      (github.event_name != 'workflow_run' || github.event.workflow_run.event == 'pull_request')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

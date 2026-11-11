@@ -12,7 +12,7 @@ Legacy compatibility for older job-linked pull requests: the gate checks require
 
 ## When it runs
 
-On `pull_request_target` (opened, synchronize, ready_for_review), `pull_request_review` (submitted), `issue_comment` (created, edited, pull requests only), `check_suite` (completed), every 15 minutes, and by hand through workflow_dispatch with an optional pull request number. A pull request event checks that pull request. The schedule, `check_suite` and a dispatch with no number check every open pull request.
+On `workflow_run` when `ci-gates` completes for a pull request (which replaces `pull_request_target`, blocked by default in public repositories from December 2, 2026), `pull_request_review` (submitted), `issue_comment` (created, edited, pull requests only), `check_suite` (completed), every 15 minutes, and by hand through workflow_dispatch with an optional pull request number. A pull request event, or a `workflow_run` that lists its pull request, checks that pull request. The schedule, `check_suite` and a dispatch with no number check every open pull request.
 
 GitHub does not send `check_suite` events for suites that GitHub Actions created, so most check results are picked up by the next 15 minute run. Codex editing its review summary comment starts a run straight away.
 
