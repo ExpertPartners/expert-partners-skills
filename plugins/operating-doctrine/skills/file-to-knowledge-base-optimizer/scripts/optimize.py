@@ -2093,11 +2093,16 @@ def assemble_combined(
         for c in conflicts:
             body.append("- About " + clean_inline(c.get("about", "")) + ".")
             for cl in c.get("claims", []):
+                claim_date = (
+                    src_dates[labels.index(cl.get("source"))]
+                    if cl.get("source") in labels
+                    else "unknown"
+                )
                 body.append(
                     "  - Source "
                     + str(cl.get("source", ""))
                     + " ("
-                    + str(cl.get("date", "unknown"))
+                    + claim_date
                     + "): "
                     + clean_inline(cl.get("text", ""))
                 )

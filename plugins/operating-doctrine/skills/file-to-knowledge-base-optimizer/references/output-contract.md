@@ -11,7 +11,7 @@ A YAML block before the document title. Keys in this order. A key is always carr
 title: Weekly Team Call
 type: transcript
 source: 2026-05-05__zoom_sample__weekly_team_call.vtt
-date: 2026-05-05
+date: unknown
 duration: 42 minutes 10 seconds
 people: [First Speaker, "Second Speaker (Guest)"]
 optimized_for: Claude Project

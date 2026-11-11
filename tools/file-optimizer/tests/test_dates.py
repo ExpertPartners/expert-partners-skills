@@ -61,7 +61,7 @@ class DateProvenanceTests(unittest.TestCase):
         )
         return work
 
-    def finish(self, works, intake=None, combine=False):
+    def finish(self, works, intake=None, combine=False, conflicts=None):
         intake = {"company_file": "EP", "title": "Garden", **(intake or {})}
         intake_path = self.root / "intake.json"
         intake_path.write_text(json.dumps(intake))
@@ -71,6 +71,7 @@ class DateProvenanceTests(unittest.TestCase):
             "summary": [QUOTES[0]],
             "takeaways": [{"point": q, "support": [q]} for q in QUOTES],
             "sections": [],
+            "conflicts": conflicts or [],
         }
         if combine:
             data["sections"] = [
@@ -178,6 +179,46 @@ class DateProvenanceTests(unittest.TestCase):
             "other.vtt, captions (VTT), dated 2026-08-04 (source date supplied at extraction)",
             output,
         )
+
+    def conflict(self, first_source="A", first_date="2026-10-02"):
+        return [
+            {
+                "about": "garden",
+                "claims": [
+                    {"source": first_source, "date": first_date, "text": QUOTES[0]},
+                    {"source": "B", "date": "2026-09-01", "text": QUOTES[1]},
+                ],
+            }
+        ]
+
+    def test_conflict_dates_do_not_promote_filename_or_metadata(self):
+        first = self.extract()
+        second = self.extract("other.vtt")
+        path = second / "source.meta.json"
+        meta = json.loads(path.read_text())
+        meta["date_from_file"] = "2026-09-01"
+        path.write_text(json.dumps(meta))
+        output = self.finish([first, second], combine=True, conflicts=self.conflict())
+        self.assertIn(f"Source A (unknown): {QUOTES[0]}", output)
+        self.assertIn(f"Source B (unknown): {QUOTES[1]}", output)
+
+    def test_conflict_dates_use_resolved_source_dates(self):
+        output = self.finish(
+            [self.extract(), self.extract("other.vtt", "2026-08-04")],
+            {"source_dates": {"2026-10-02__sample.vtt": "2026-08-03"}},
+            combine=True,
+            conflicts=self.conflict(),
+        )
+        self.assertIn(f"Source A (2026-08-03): {QUOTES[0]}", output)
+        self.assertIn(f"Source B (2026-08-04): {QUOTES[1]}", output)
+
+    def test_ambiguous_conflict_source_date_stays_unknown(self):
+        output = self.finish(
+            [self.extract(source_date="2026-08-03"), self.extract("other.vtt")],
+            combine=True,
+            conflicts=self.conflict("2026-10-02__sample.vtt", "2026-08-03"),
+        )
+        self.assertIn(f"Source 2026-10-02__sample.vtt (unknown): {QUOTES[0]}", output)
 
 
 if __name__ == "__main__":
