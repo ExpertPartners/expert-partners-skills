@@ -71,7 +71,9 @@ PR_EVENTS = {"pull_request", "pull_request_target", "pull_request_review"}
 MARKETPLACE_PATH = ".claude-plugin/marketplace.json"
 PLUGIN_MANIFEST_RE = re.compile(r"^plugins/([^/]+)/\.claude-plugin/plugin\.json$")
 CHANGELOG_RE = re.compile(r"(^|/)CHANGELOG\.md$")
-RELEASE_HINT = "The release step owns versions and CHANGELOG entries; add a note in `.changeset/` instead."
+RELEASE_HINT = (
+    "The release step owns versions and CHANGELOG entries; add a note in `.changeset/` instead."
+)
 CHANGESET_NOTE_RE = re.compile(r"^\.changeset/[^/]+\.md$")
 NOTE_BUMPS = ("patch", "minor", "major")
 NOTE_KEY_RE = re.compile(r"""^\s*(?:"([^"]+)"|'([^']+)'|([A-Za-z0-9._-]+))\s*:\s*(\S+?)\s*$""")
@@ -123,7 +125,9 @@ class GitHub:
             path += "?" + urllib.parse.urlencode(params)
         return self._request("GET", path)[0]
 
-    def paginate(self, path: str, key: str | None = None, params: JSONDict | None = None) -> list[JSONDict]:
+    def paginate(
+        self, path: str, key: str | None = None, params: JSONDict | None = None
+    ) -> list[JSONDict]:
         query = dict(params or {})
         query.setdefault("per_page", 100)
         url: str | None = f"{path}?{urllib.parse.urlencode(query)}"
@@ -131,7 +135,9 @@ class GitHub:
         while url:
             data, link = self._request("GET", url)
             items.extend(data[key] if key else data)
-            url = next((p.split(";")[0].strip()[1:-1] for p in link.split(",") if 'rel="next"' in p), None)
+            url = next(
+                (p.split(";")[0].strip()[1:-1] for p in link.split(",") if 'rel="next"' in p), None
+            )
         return items
 
     def review_threads(self, repo: str, number: int) -> dict[int, bool]:
@@ -147,11 +153,14 @@ class GitHub:
         after: str | None = None
         while True:
             data, _ = self._request(
-                "POST", self.api_url + "/graphql",
+                "POST",
+                self.api_url + "/graphql",
                 {"query": query, "variables": {"o": owner, "n": name, "p": number, "a": after}},
             )
             if not data or data.get("errors"):
-                raise GitHubError(502, f"review threads could not be read: {(data or {}).get('errors')}")
+                raise GitHubError(
+                    502, f"review threads could not be read: {(data or {}).get('errors')}"
+                )
             threads = data["data"]["repository"]["pullRequest"]["reviewThreads"]
             for t in threads["nodes"]:
                 first = ((t.get("comments") or {}).get("nodes") or [{}])[0] or {}
@@ -176,7 +185,9 @@ class GitHubAPI(Protocol):
 
     def get(self, path: str, params: JSONDict | None = None) -> Any: ...
 
-    def paginate(self, path: str, key: str | None = None, params: JSONDict | None = None) -> list[JSONDict]: ...
+    def paginate(
+        self, path: str, key: str | None = None, params: JSONDict | None = None
+    ) -> list[JSONDict]: ...
 
     def post(self, path: str, body: JSONDict) -> Any: ...
 
@@ -281,6 +292,7 @@ def check_problems(gh: GitHubAPI, cfg: Config, sha: str) -> list[str]:
 @dataclass
 class Finding:
     """One inline finding Codex left on the pull request."""
+
     comment_id: int | None
     kind: str  # "code" or "security"
     severity: str | None  # "P0", "P1", "P2", ... or None when the badge cannot be read
@@ -290,7 +302,11 @@ class Finding:
     resolved: bool | None = None  # None when the thread state is unknown
 
     def describe(self) -> str:
-        what = f"Codex {self.severity} {self.kind} finding" if self.severity else f"Codex {self.kind} finding with no readable severity"
+        what = (
+            f"Codex {self.severity} {self.kind} finding"
+            if self.severity
+            else f"Codex {self.kind} finding with no readable severity"
+        )
         link = f" ({self.url})" if self.url else ""
         return f"{what} \"{self.title}\"{link}"
 
@@ -308,7 +324,14 @@ def finding_title(body: str) -> str:
         title = " ".join(BADGE_MARKUP_RE.sub("", text).split())
         if title:
             return title[:120]
-    first = next((line.strip() for line in body.splitlines() if line.strip() and not line.strip().startswith("<!--")), "")
+    first = next(
+        (
+            line.strip()
+            for line in body.splitlines()
+            if line.strip() and not line.strip().startswith("<!--")
+        ),
+        "",
+    )
     return first[:120] or "(no text)"
 
 
@@ -324,12 +347,15 @@ def parse_finding(comment: JSONDict) -> Finding:
     )
 
 
-def codex_findings(gh: GitHubAPI, cfg: Config, number: int, sha: str) -> tuple[list[Finding], str | None]:
+def codex_findings(
+    gh: GitHubAPI, cfg: Config, number: int, sha: str
+) -> tuple[list[Finding], str | None]:
     """Every inline finding Codex left, with whether its thread is resolved, and a note
     saying why thread states are unknown (None when they were all read)."""
     comments = gh.paginate(f"/repos/{cfg.repo}/pulls/{number}/comments")
     found = [
-        parse_finding(c) for c in comments
+        parse_finding(c)
+        for c in comments
         if (c.get("user") or {}).get("login") == CODEX_LOGIN and not c.get("in_reply_to_id")
     ]
     if all(f.commit == sha for f in found):
@@ -347,7 +373,9 @@ def codex_findings(gh: GitHubAPI, cfg: Config, number: int, sha: str) -> tuple[l
     return found, "its review thread was not found"
 
 
-def blocking_findings(findings: list[Finding], sha: str, note: str | None, kind: str | None = None) -> tuple[list[str], int]:
+def blocking_findings(
+    findings: list[Finding], sha: str, note: str | None, kind: str | None = None
+) -> tuple[list[str], int]:
     """(why each P0, P1 or unreadable finding blocks, how many findings are open).
 
     A finding is open when Codex raised it on this head (resolving its thread does
@@ -366,11 +394,17 @@ def blocking_findings(findings: list[Finding], sha: str, note: str | None, kind:
             open_count += 1
         if f.severity is not None and f.severity not in BLOCKING_SEVERITIES:
             continue
-        gap = "" if f.severity else " The gate cannot read its severity, so this is a gap in the review evidence, not a pass."
+        gap = (
+            ""
+            if f.severity
+            else " The gate cannot read its severity, so this is a gap in the review evidence, not a pass."
+        )
         if on_head:
             problems.append(f"{f.describe()} blocks: Codex raised it on head {short}.{gap}")
         elif f.resolved is False:
-            problems.append(f"{f.describe()} blocks: its thread from {f.commit[:7] or 'an earlier commit'} is unresolved.{gap}")
+            problems.append(
+                f"{f.describe()} blocks: its thread from {f.commit[:7] or 'an earlier commit'} is unresolved.{gap}"
+            )
         else:
             problems.append(
                 f"{f.describe()} from {f.commit[:7] or 'an earlier commit'} may still be open: "
@@ -398,7 +432,9 @@ def security_problems(
     short = sha[:7]
     found, note = load()
     if found is None:
-        return [f"Codex security review on {short} reports unresolved findings, but {note}, so the gate cannot read their severity."]
+        return [
+            f"Codex security review on {short} reports unresolved findings, but {note}, so the gate cannot read their severity."
+        ]
     problems, open_count = blocking_findings(found, sha, note, "security")
     if not problems and open_count == 0:
         problems.append(unexplained("security", sha, found, note))
@@ -441,18 +477,29 @@ def codex_problems(
         # and the summary it replaces may be stale, so every finding is read.
         found, note = load()
         if found is None:
-            return [f"Codex posted a clean code review receipt for {short}, but {note}."] + security_problems(state, sha, load)
+            return [
+                f"Codex posted a clean code review receipt for {short}, but {note}."
+            ] + security_problems(state, sha, load)
         problems += blocking_findings(found, sha, note)[0]
-        state = dict(state or {}, code_review={
-            "commit_sha": sha, "status": "completed", "has_unresolved_findings": False,
-        })
+        state = dict(
+            state or {},
+            code_review={
+                "commit_sha": sha,
+                "status": "completed",
+                "has_unresolved_findings": False,
+            },
+        )
     if state is None:
-        return [f"Codex has not reviewed head {short} yet (no Codex review summary on this pull request)."]
+        return [
+            f"Codex has not reviewed head {short} yet (no Codex review summary on this pull request)."
+        ]
     code = state.get("code_review") or {}
     reviewed = code.get("commit_sha") or ""
     if reviewed != sha:
         covered = reviewed[:7] if reviewed else "no commit"
-        return [f"Codex has not reviewed head {short} yet (its last code review covered {covered})."]
+        return [
+            f"Codex has not reviewed head {short} yet (its last code review covered {covered})."
+        ]
     unresolved = code.get("has_unresolved_findings")
     if code.get("status") != "completed":
         problems.append(f"Codex code review on {short} is {code.get('status')}, not completed.")
@@ -462,17 +509,27 @@ def codex_problems(
         found, note = load()
         if found is None:
             if unresolved is True:
-                problems.append(f"Codex code review on {short} reports unresolved findings, but {note}, so the gate cannot read their severity.")
+                problems.append(
+                    f"Codex code review on {short} reports unresolved findings, but {note}, so the gate cannot read their severity."
+                )
             else:
-                problems.append(f"Codex code review on {short} did not report has_unresolved_findings: false, and {note}.")
+                problems.append(
+                    f"Codex code review on {short} did not report has_unresolved_findings: false, and {note}."
+                )
         else:
             blockers, _ = blocking_findings(found, sha, note)
             problems += blockers
             # True claims a finding is open now, so one must be found to read its severity.
-            if unresolved is True and not blockers and blocking_findings(found, sha, note, "code")[1] == 0:
+            if (
+                unresolved is True
+                and not blockers
+                and blocking_findings(found, sha, note, "code")[1] == 0
+            ):
                 problems.append(unexplained("code", sha, found, note))
     elif unresolved is not False:
-        problems.append(f"Codex code review on {short} did not report has_unresolved_findings: false.")
+        problems.append(
+            f"Codex code review on {short} did not report has_unresolved_findings: false."
+        )
     problems += security_problems(state, sha, load)
     return list(dict.fromkeys(problems))
 
@@ -482,7 +539,9 @@ def mergeable_problems(pr: JSONDict) -> list[str]:
     if mergeable is None:
         return ["GitHub is still computing whether the pull request can merge."]
     if mergeable is not True:
-        return [f"GitHub reports the pull request is not mergeable (mergeable_state: {pr.get('mergeable_state')})."]
+        return [
+            f"GitHub reports the pull request is not mergeable (mergeable_state: {pr.get('mergeable_state')})."
+        ]
     return []
 
 
@@ -495,11 +554,15 @@ def file_text(gh: GitHubAPI, cfg: Config, path: str, ref: str) -> str:
     data = gh.get(f"/repos/{cfg.repo}/contents/{urllib.parse.quote(path)}?ref={ref}")
     # Directories, symlinks, submodules and files over 1 MB come back without base64 content.
     if not isinstance(data, dict) or data.get("encoding") != "base64":
-        raise FileContentError(f"`{path}` at {ref[:7]} is not a text file the gate can read, so it cannot be checked.")
+        raise FileContentError(
+            f"`{path}` at {ref[:7]} is not a text file the gate can read, so it cannot be checked."
+        )
     try:
         return base64.b64decode(data.get("content") or "").decode("utf-8")
     except ValueError:
-        raise FileContentError(f"`{path}` at {ref[:7]} is not UTF-8 text, so it cannot be checked.") from None
+        raise FileContentError(
+            f"`{path}` at {ref[:7]} is not UTF-8 text, so it cannot be checked."
+        ) from None
 
 
 def listed_versions(path: str, text: str) -> dict[str, object]:
@@ -507,16 +570,26 @@ def listed_versions(path: str, text: str) -> dict[str, object]:
     try:
         data = json.loads(text)
     except ValueError:
-        raise FileContentError(f"`{path}` is not valid JSON, so the gate cannot read the plugins in it.") from None
+        raise FileContentError(
+            f"`{path}` is not valid JSON, so the gate cannot read the plugins in it."
+        ) from None
     plugins = data.get("plugins", []) if isinstance(data, dict) else None
     if not isinstance(data, dict) or (path == MARKETPLACE_PATH and not isinstance(plugins, list)):
-        raise FileContentError(f"`{path}` is not the JSON object it should be, so the gate cannot read the plugins in it.")
+        raise FileContentError(
+            f"`{path}` is not the JSON object it should be, so the gate cannot read the plugins in it."
+        )
     # plugins is always a list here for the marketplace, the check above made sure.
     if path == MARKETPLACE_PATH and isinstance(plugins, list):
-        return {p["name"]: p.get("version") for p in plugins if isinstance(p, dict) and isinstance(p.get("name"), str)}
+        return {
+            p["name"]: p.get("version")
+            for p in plugins
+            if isinstance(p, dict) and isinstance(p.get("name"), str)
+        }
     manifest = PLUGIN_MANIFEST_RE.match(path)
     if manifest is None:
-        raise FileContentError(f"`{path}` is neither the marketplace file nor a plugin manifest, so the gate cannot read the plugins in it.")
+        raise FileContentError(
+            f"`{path}` is neither the marketplace file nor a plugin manifest, so the gate cannot read the plugins in it."
+        )
     return {manifest.group(1): data.get("version")}
 
 
@@ -537,7 +610,10 @@ def note_problem(text: str) -> tuple[str | None, list[str]]:
             continue
         m = NOTE_KEY_RE.match(raw)
         if not m:
-            return f"has a line it cannot read, {raw.strip()!r}; write it as <plugin>: patch|minor|major", []
+            return (
+                f"has a line it cannot read, {raw.strip()!r}; write it as <plugin>: patch|minor|major",
+                [],
+            )
         name = m.group(1) or m.group(2) or m.group(3)
         bump = m.group(4).strip("\"'").lower()
         if bump not in NOTE_BUMPS:
@@ -547,11 +623,14 @@ def note_problem(text: str) -> tuple[str | None, list[str]]:
         names.append(name)
     if not names:
         return "names no plugin", []
-    body = "\n".join(lines[end + 1:]).strip()
+    body = "\n".join(lines[end + 1 :]).strip()
     if not body:
         return "says nothing about the change; write it below the closing ---", []
     if any(line.startswith("## ") for line in body.split("\n")):
-        return "has a `## ` heading in its text, which would start a second CHANGELOG entry; use `###` or lower", []
+        return (
+            "has a `## ` heading in its text, which would start a second CHANGELOG entry; use `###` or lower",
+            [],
+        )
     return None, names
 
 
@@ -578,7 +657,9 @@ def note_problems(gh: GitHubAPI, cfg: Config, notes: list[JSONDict], head: str) 
         return problems + [str(exc)]
     for path, name in named:
         if name not in known:
-            problems.append(f"`{path}` names {name}, which is not a plugin in `{MARKETPLACE_PATH}`. {NOTE_HINT}")
+            problems.append(
+                f"`{path}` names {name}, which is not a plugin in `{MARKETPLACE_PATH}`. {NOTE_HINT}"
+            )
     return problems
 
 
@@ -592,17 +673,24 @@ def changelog_shape(text: str) -> tuple[list[str], int]:
 def release_file_problems(gh: GitHubAPI, cfg: Config, number: int, pr: JSONDict) -> list[str]:
     """A pull request may not edit a plugin version or the top of a CHANGELOG.md.
     Brand new plugins and edits to older CHANGELOG entries are allowed."""
-    files = [f for f in gh.paginate(f"/repos/{cfg.repo}/pulls/{number}/files") if f.get("status") != "removed"]
+    files = [
+        f
+        for f in gh.paginate(f"/repos/{cfg.repo}/pulls/{number}/files")
+        if f.get("status") != "removed"
+    ]
     watched = [
-        f for f in files
+        f
+        for f in files
         if f.get("filename") == MARKETPLACE_PATH
         or PLUGIN_MANIFEST_RE.match(f.get("filename", ""))
         or CHANGELOG_RE.search(f.get("filename", ""))
     ]
     # The release step reads every top-level .changeset/*.md except the README.
     notes = [
-        f for f in files
-        if CHANGESET_NOTE_RE.match(f.get("filename", "")) and f["filename"].rsplit("/", 1)[-1].lower() != "readme.md"
+        f
+        for f in files
+        if CHANGESET_NOTE_RE.match(f.get("filename", ""))
+        and f["filename"].rsplit("/", 1)[-1].lower() != "readme.md"
     ]
     if not watched and not notes:
         return []
@@ -611,7 +699,9 @@ def release_file_problems(gh: GitHubAPI, cfg: Config, number: int, pr: JSONDict)
     if watched:
         # Compare against the merge base, not the base tip, so a release that landed on
         # main after the branch was cut is not mistaken for an edit by this branch.
-        compare = gh.get(f"/repos/{cfg.repo}/compare/{(pr.get('base') or {}).get('sha', '')}...{head}")
+        compare = gh.get(
+            f"/repos/{cfg.repo}/compare/{(pr.get('base') or {}).get('sha', '')}...{head}"
+        )
         merge_base = compare["merge_base_commit"]["sha"]
         for f in watched:
             try:
@@ -621,7 +711,9 @@ def release_file_problems(gh: GitHubAPI, cfg: Config, number: int, pr: JSONDict)
     return problems + note_problems(gh, cfg, notes, head)
 
 
-def release_file_change(gh: GitHubAPI, cfg: Config, f: JSONDict, head: str, merge_base: str) -> list[str]:
+def release_file_change(
+    gh: GitHubAPI, cfg: Config, f: JSONDict, head: str, merge_base: str
+) -> list[str]:
     path = f["filename"]
     added = f.get("status") == "added"
     before_path = f.get("previous_filename") or path
@@ -693,7 +785,8 @@ def evaluate(gh: GitHubAPI, cfg: Config, number: int) -> Decision:
     reasons = check_problems(gh, cfg, sha)
     reasons += release_file_problems(gh, cfg, number, pr)
     reasons += codex_problems(
-        latest_codex_state(comments), sha,
+        latest_codex_state(comments),
+        sha,
         lambda: codex_findings(gh, cfg, number, sha),
         has_clean_codex_receipt(comments, sha),
     )
@@ -756,7 +849,9 @@ def merge(gh: GitHubAPI, merger: GitHubAPI, cfg: Config, d: Decision) -> str | N
     return sha
 
 
-def target_prs(gh: GitHubAPI, cfg: Config, event_name: str, event: JSONDict, dispatch_pr: str = "") -> list[int]:
+def target_prs(
+    gh: GitHubAPI, cfg: Config, event_name: str, event: JSONDict, dispatch_pr: str = ""
+) -> list[int]:
     if event_name in PR_EVENTS:
         return [int(event["pull_request"]["number"])]
     if event_name == "issue_comment":
@@ -767,12 +862,15 @@ def target_prs(gh: GitHubAPI, cfg: Config, event_name: str, event: JSONDict, dis
     if event_name == "workflow_run":
         # ci-gates finished on a pull request. GitHub lists the same-repository pull
         # requests for that head; a fork or push run lists none and falls through to a sweep.
-        numbers = [int(p["number"]) for p in (event.get("workflow_run") or {}).get("pull_requests") or []]
+        numbers = [
+            int(p["number"]) for p in (event.get("workflow_run") or {}).get("pull_requests") or []
+        ]
         if numbers:
             return numbers
     # schedule, check_suite, a workflow_run with no listed pull request and a dispatch
     # without a number sweep every open pull request.
     open_prs = gh.paginate(f"/repos/{cfg.repo}/pulls", params={"state": "open"})
+
     def wanted(p: JSONDict) -> bool:
         if (p.get("user") or {}).get("login") == FACTORY_LOGIN:
             return True
@@ -789,7 +887,12 @@ def is_excluded_repo(repo: str) -> bool:
 
 
 def run_plan(
-    gh: GitHubAPI, cfg: Config, event_name: str, event: JSONDict, dispatch_pr: str = "", errors: list[str] | None = None
+    gh: GitHubAPI,
+    cfg: Config,
+    event_name: str,
+    event: JSONDict,
+    dispatch_pr: str = "",
+    errors: list[str] | None = None,
 ) -> list[int]:
     if is_excluded_repo(cfg.repo):
         print(f"auto-merge-gate: {cfg.repo} is excluded; nothing to do.")
@@ -803,7 +906,9 @@ def run_plan(
             errors.append(f"#{number}: {exc}")
             print(f"::error::auto-merge-gate: #{number} could not be evaluated: {exc}")
             continue
-        print(f"auto-merge-gate: #{number} {d.action}: {'; '.join(d.reasons) or 'all conditions met'}")
+        print(
+            f"auto-merge-gate: #{number} {d.action}: {'; '.join(d.reasons) or 'all conditions met'}"
+        )
         if d.action == "refuse":
             post_refusal(gh, cfg, d)
         elif d.action == "merge":
@@ -811,7 +916,13 @@ def run_plan(
     return ready
 
 
-def run_merge(gh: GitHubAPI, merger: GitHubAPI, cfg: Config, numbers: list[int], errors: list[str] | None = None) -> list[str]:
+def run_merge(
+    gh: GitHubAPI,
+    merger: GitHubAPI,
+    cfg: Config,
+    numbers: list[int],
+    errors: list[str] | None = None,
+) -> list[str]:
     if is_excluded_repo(cfg.repo):
         print(f"auto-merge-gate: {cfg.repo} is excluded; nothing to do.")
         return []
@@ -863,7 +974,12 @@ def main(argv: list[str]) -> int:
             event = json.load(fh)
         errors: list[str] = []
         ready = run_plan(
-            gh, cfg, os.environ["GITHUB_EVENT_NAME"], event, os.environ.get("GATE_DISPATCH_PR", ""), errors
+            gh,
+            cfg,
+            os.environ["GITHUB_EVENT_NAME"],
+            event,
+            os.environ.get("GATE_DISPATCH_PR", ""),
+            errors,
         )
         out = os.environ.get("GITHUB_OUTPUT")
         if out:
@@ -873,7 +989,10 @@ def main(argv: list[str]) -> int:
 
     merge_token = os.environ.get("MERGE_TOKEN", "")
     if not merge_token:
-        print("auto-merge-gate: MERGE_TOKEN is empty; refusing to merge with any other token.", file=sys.stderr)
+        print(
+            "auto-merge-gate: MERGE_TOKEN is empty; refusing to merge with any other token.",
+            file=sys.stderr,
+        )
         return 1
     numbers = [int(n) for n in os.environ.get("GATE_MERGE_PRS", "").split()]
     errors = []

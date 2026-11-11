@@ -18,7 +18,8 @@ from pathlib import Path
 from unittest import mock
 
 spec = importlib.util.spec_from_file_location(
-    "gate", os.path.join(os.path.dirname(__file__), "..", "gate.py"))
+    "gate", os.path.join(os.path.dirname(__file__), "..", "gate.py")
+)
 gate = importlib.util.module_from_spec(spec)
 # dataclasses resolves annotations through sys.modules, so register before executing.
 sys.modules["gate"] = gate
@@ -31,39 +32,82 @@ CFG = gate.Config(repo=REPO)
 GOOD_NOTE = "---\noperating-doctrine: minor\n---\n\nAdds the release step.\n"
 
 
-def codex_comment(sha=HEAD, status="completed", unresolved=False, security_unresolved=None, updated="2026-11-01T10:00:00Z"):
+def codex_comment(
+    sha=HEAD,
+    status="completed",
+    unresolved=False,
+    security_unresolved=None,
+    updated="2026-11-01T10:00:00Z",
+):
     state = {
-        "code_review": {"commit_sha": sha, "has_any_findings": unresolved, "has_unresolved_findings": unresolved, "status": status},
-        "security_review": {"commit_sha": sha, "has_any_findings": security_unresolved, "has_unresolved_findings": security_unresolved, "status": "completed"},
+        "code_review": {
+            "commit_sha": sha,
+            "has_any_findings": unresolved,
+            "has_unresolved_findings": unresolved,
+            "status": status,
+        },
+        "security_review": {
+            "commit_sha": sha,
+            "has_any_findings": security_unresolved,
+            "has_unresolved_findings": security_unresolved,
+            "status": "completed",
+        },
     }
     body = (
         "<!-- codex-pull-request-review-summary -->\n"
         f"<!-- codex-review-state:v1 {json.dumps(state, separators=(',', ':'))} -->\n"
         "## Codex Review Summary\n"
     )
-    return {"id": 900, "user": {"login": "chatgpt-codex-connector[bot]"}, "body": body, "created_at": updated, "updated_at": updated}
+    return {
+        "id": 900,
+        "user": {"login": "chatgpt-codex-connector[bot]"},
+        "body": body,
+        "created_at": updated,
+        "updated_at": updated,
+    }
 
 
 def passing_routes(number=7, issue=126):
     return {
         f"/repos/{REPO}/pulls/{number}": {
-            "number": number, "state": "open", "draft": False,
+            "number": number,
+            "state": "open",
+            "draft": False,
             "user": {"login": "factory-droid[bot]"},
-            "base": {"ref": "main"}, "head": {"sha": HEAD},
+            "base": {"ref": "main"},
+            "head": {"sha": HEAD},
             "body": f"Closes #{issue}\n\nAcceptance checks ...",
-            "mergeable": True, "mergeable_state": "blocked",
+            "mergeable": True,
+            "mergeable_state": "blocked",
         },
-        f"/repos/{REPO}/issues/{issue}": {"number": issue, "labels": [{"name": "job"}, {"name": "in-progress"}]},
+        f"/repos/{REPO}/issues/{issue}": {
+            "number": issue,
+            "labels": [{"name": "job"}, {"name": "in-progress"}],
+        },
         f"/repos/{REPO}/issues/{number}/comments": [codex_comment()],
         f"/repos/{REPO}/commits/{HEAD}/check-runs": [
-            {"name": "brand + classification lint (changed files)", "status": "completed", "conclusion": "success"},
-            {"name": "gitleaks secret scan (full history)", "status": "completed", "conclusion": "success"},
-            {"name": "validate + regenerate skills-graph.json", "status": "completed", "conclusion": "skipped"},
+            {
+                "name": "brand + classification lint (changed files)",
+                "status": "completed",
+                "conclusion": "success",
+            },
+            {
+                "name": "gitleaks secret scan (full history)",
+                "status": "completed",
+                "conclusion": "success",
+            },
+            {
+                "name": "validate + regenerate skills-graph.json",
+                "status": "completed",
+                "conclusion": "skipped",
+            },
             {"name": "move-contract", "status": "completed", "conclusion": "neutral"},
             {"name": "auto-merge-gate", "status": "in_progress", "conclusion": None},
         ],
         f"/repos/{REPO}/commits/{HEAD}/status": {"state": "pending", "statuses": []},
-        f"/repos/{REPO}/pulls/{number}/files": [{"filename": ".changeset/126-change.md", "status": "added"}],
+        f"/repos/{REPO}/pulls/{number}/files": [
+            {"filename": ".changeset/126-change.md", "status": "added"}
+        ],
         f"/repos/{REPO}/contents/.changeset/126-change.md?ref={HEAD}": content(GOOD_NOTE),
         f"/repos/{REPO}/contents/.claude-plugin/marketplace.json?ref={HEAD}": content(market()),
         f"/repos/{REPO}/pulls": [],
@@ -71,10 +115,22 @@ def passing_routes(number=7, issue=126):
     }
 
 
-def finding_comment(cid, severity="P2", sha=HEAD, security=False, login="chatgpt-codex-connector[bot]",
-                    title="Parse global pip options before install", reply_to=None, badge=True):
+def finding_comment(
+    cid,
+    severity="P2",
+    sha=HEAD,
+    security=False,
+    login="chatgpt-codex-connector[bot]",
+    title="Parse global pip options before install",
+    reply_to=None,
+    badge=True,
+):
     """An inline finding in the shape Codex posts, copied from pull requests #214 and #108."""
-    mark = f"**<sub><sub>![{severity} Badge](https://img.shields.io/badge/{severity}-yellow?style=flat)</sub></sub>  " if badge else "**"
+    mark = (
+        f"**<sub><sub>![{severity} Badge](https://img.shields.io/badge/{severity}-yellow?style=flat)</sub></sub>  "
+        if badge
+        else "**"
+    )
     if security:
         body = (
             "<!-- codex-security-review-finding:v1 -->\n\n"
@@ -84,8 +140,13 @@ def finding_comment(cid, severity="P2", sha=HEAD, security=False, login="chatgpt
     else:
         body = f"{mark}{title}**\n\nDetails.\n\nUseful? React with \U0001f44d / \U0001f44e.\n\n<!-- codex-code-review-finding:v1 -->"
     return {
-        "id": cid, "user": {"login": login}, "body": body, "commit_id": HEAD, "original_commit_id": sha,
-        "in_reply_to_id": reply_to, "path": "tools/x.py",
+        "id": cid,
+        "user": {"login": login},
+        "body": body,
+        "commit_id": HEAD,
+        "original_commit_id": sha,
+        "in_reply_to_id": reply_to,
+        "path": "tools/x.py",
         "html_url": f"https://github.com/{REPO}/pull/7#discussion_r{cid}",
     }
 
@@ -138,12 +199,16 @@ class Base(unittest.TestCase):
     def assert_left_alone(self, routes, fragment):
         gh = self.fake(routes)
         merger = FakeGitHub({})
-        self.assertEqual(gate.run_plan(gh, CFG, "pull_request_target", {"pull_request": {"number": 7}}), [])
+        self.assertEqual(
+            gate.run_plan(gh, CFG, "pull_request_target", {"pull_request": {"number": 7}}), []
+        )
         self.assertEqual(gate.run_merge(gh, merger, CFG, [7]), [])
         d = gate.evaluate(gh, CFG, 7)
         self.assertEqual(d.action, "skip")
         self.assertIn(fragment, d.reasons[0])
-        self.assertEqual(gh.writes(), [], "a pull request the gate does not consider gets no comment")
+        self.assertEqual(
+            gh.writes(), [], "a pull request the gate does not consider gets no comment"
+        )
         self.assertEqual(merger.calls, [])
 
     def assert_refused(self, routes, fragment):
@@ -202,12 +267,19 @@ class Refused(Base):
     def test_failing_check(self):
         routes = passing_routes()
         routes[f"/repos/{REPO}/commits/{HEAD}/check-runs"][1]["conclusion"] = "failure"
-        self.assert_refused(routes, "Check `gitleaks secret scan (full history)` finished as failure.")
+        self.assert_refused(
+            routes, "Check `gitleaks secret scan (full history)` finished as failure."
+        )
 
     def test_pending_check(self):
         routes = passing_routes()
-        routes[f"/repos/{REPO}/commits/{HEAD}/check-runs"][0].update(status="in_progress", conclusion=None)
-        self.assert_refused(routes, "Check `brand + classification lint (changed files)` is in_progress, not completed.")
+        routes[f"/repos/{REPO}/commits/{HEAD}/check-runs"][0].update(
+            status="in_progress", conclusion=None
+        )
+        self.assert_refused(
+            routes,
+            "Check `brand + classification lint (changed files)` is in_progress, not completed.",
+        )
 
     def test_cancelled_check(self):
         routes = passing_routes()
@@ -216,23 +288,32 @@ class Refused(Base):
 
     def test_failing_commit_status(self):
         routes = passing_routes()
-        routes[f"/repos/{REPO}/commits/{HEAD}/status"]["statuses"] = [{"context": "deploy/preview", "state": "failure"}]
+        routes[f"/repos/{REPO}/commits/{HEAD}/status"]["statuses"] = [
+            {"context": "deploy/preview", "state": "failure"}
+        ]
         self.assert_refused(routes, "Commit status `deploy/preview` is failure.")
 
     def test_pending_commit_status(self):
         routes = passing_routes()
-        routes[f"/repos/{REPO}/commits/{HEAD}/status"]["statuses"] = [{"context": "deploy/preview", "state": "pending"}]
+        routes[f"/repos/{REPO}/commits/{HEAD}/status"]["statuses"] = [
+            {"context": "deploy/preview", "state": "pending"}
+        ]
         self.assert_refused(routes, "Commit status `deploy/preview` is pending.")
 
     def test_no_checks_reported_yet(self):
         routes = passing_routes()
-        routes[f"/repos/{REPO}/commits/{HEAD}/check-runs"] = [{"name": "auto-merge-gate", "status": "in_progress", "conclusion": None}]
+        routes[f"/repos/{REPO}/commits/{HEAD}/check-runs"] = [
+            {"name": "auto-merge-gate", "status": "in_progress", "conclusion": None}
+        ]
         self.assert_refused(routes, "No checks have reported on the head commit yet.")
 
     def test_codex_not_yet_on_head(self):
         routes = passing_routes()
         routes[f"/repos/{REPO}/issues/7/comments"] = [codex_comment(sha=OLD)]
-        self.assert_refused(routes, f"Codex has not reviewed head {HEAD[:7]} yet (its last code review covered {OLD[:7]}).")
+        self.assert_refused(
+            routes,
+            f"Codex has not reviewed head {HEAD[:7]} yet (its last code review covered {OLD[:7]}).",
+        )
 
     def test_codex_never_commented(self):
         routes = passing_routes()
@@ -247,14 +328,20 @@ class Refused(Base):
     def test_codex_open_findings_it_cannot_find(self):
         routes = passing_routes()
         routes[f"/repos/{REPO}/issues/7/comments"] = [codex_comment(unresolved=True)]
-        self.assert_refused(routes, f"Codex code review on {HEAD[:7]} reports unresolved findings, but the gate found no open Codex code finding comment")
+        self.assert_refused(
+            routes,
+            f"Codex code review on {HEAD[:7]} reports unresolved findings, but the gate found no open Codex code finding comment",
+        )
 
     def test_codex_open_p1_finding(self):
         routes = passing_routes()
         routes[f"/repos/{REPO}/issues/7/comments"] = [codex_comment(unresolved=True)]
         routes[f"/repos/{REPO}/pulls/7/comments"] = [finding_comment(31, "P1")]
-        self.assert_refused(routes, f"Codex P1 code finding \"Parse global pip options before install\" "
-                                    f"(https://github.com/{REPO}/pull/7#discussion_r31) blocks: Codex raised it on head {HEAD[:7]}.")
+        self.assert_refused(
+            routes,
+            f"Codex P1 code finding \"Parse global pip options before install\" "
+            f"(https://github.com/{REPO}/pull/7#discussion_r31) blocks: Codex raised it on head {HEAD[:7]}.",
+        )
 
     def test_codex_findings_unknown(self):
         routes = passing_routes()
@@ -311,7 +398,8 @@ class RefusalCommentOncePerHead(Base):
         routes = self.failing_routes()
         d = self.evaluate(routes)
         routes[f"/repos/{REPO}/issues/7/comments"].append(
-            {"id": 55, "user": {"login": "github-actions[bot]"}, "body": gate.refusal_body(d)})
+            {"id": 55, "user": {"login": "github-actions[bot]"}, "body": gate.refusal_body(d)}
+        )
         gh = FakeGitHub(routes)
         gate.run_plan(gh, CFG, "pull_request_target", {"pull_request": {"number": 7}})
         self.assertEqual(gh.writes(), [])
@@ -319,8 +407,12 @@ class RefusalCommentOncePerHead(Base):
     def test_changed_reasons_edit_the_one_comment(self):
         routes = self.failing_routes()
         routes[f"/repos/{REPO}/issues/7/comments"].append(
-            {"id": 55, "user": {"login": "github-actions[bot]"},
-             "body": f"<!-- auto-merge-gate:v1 head={HEAD} -->\nolder reasons"})
+            {
+                "id": 55,
+                "user": {"login": "github-actions[bot]"},
+                "body": f"<!-- auto-merge-gate:v1 head={HEAD} -->\nolder reasons",
+            }
+        )
         gh = FakeGitHub(routes)
         gate.run_plan(gh, CFG, "pull_request_target", {"pull_request": {"number": 7}})
         writes = gh.writes()
@@ -331,15 +423,20 @@ class RefusalCommentOncePerHead(Base):
     def test_new_head_gets_a_new_comment(self):
         routes = self.failing_routes()
         routes[f"/repos/{REPO}/issues/7/comments"].append(
-            {"id": 55, "user": {"login": "github-actions[bot]"},
-             "body": f"<!-- auto-merge-gate:v1 head={OLD} -->\nold head"})
+            {
+                "id": 55,
+                "user": {"login": "github-actions[bot]"},
+                "body": f"<!-- auto-merge-gate:v1 head={OLD} -->\nold head",
+            }
+        )
         self.assert_refused(routes, "finished as failure")
 
     def test_marker_from_another_author_does_not_silence_the_gate(self):
         routes = self.failing_routes()
         d = self.evaluate(routes)
         routes[f"/repos/{REPO}/issues/7/comments"].append(
-            {"id": 56, "user": {"login": "someone"}, "body": gate.refusal_body(d)})
+            {"id": 56, "user": {"login": "someone"}, "body": gate.refusal_body(d)}
+        )
         self.assert_refused(routes, "finished as failure")
 
 
@@ -356,12 +453,19 @@ class Merges(Base):
         merged = gate.run_merge(reader, merger, CFG, ready)
         self.assertEqual(merged, ["c" * 40])
 
-        self.assertEqual(merger.calls, [
-            ("PUT", f"/repos/{REPO}/pulls/7/merge", {"merge_method": "squash", "sha": HEAD}),
-        ])
-        self.assertFalse([c for c in reader.calls if c[0] == "PUT"], "the workflow token never merges")
+        self.assertEqual(
+            merger.calls,
+            [
+                ("PUT", f"/repos/{REPO}/pulls/7/merge", {"merge_method": "squash", "sha": HEAD}),
+            ],
+        )
+        self.assertFalse(
+            [c for c in reader.calls if c[0] == "PUT"], "the workflow token never merges"
+        )
         writes = reader.writes()
-        self.assertEqual(writes[0], ("POST", f"/repos/{REPO}/issues/126/labels", {"labels": ["done"]}))
+        self.assertEqual(
+            writes[0], ("POST", f"/repos/{REPO}/issues/126/labels", {"labels": ["done"]})
+        )
         self.assertEqual(writes[1][:2], ("POST", f"/repos/{REPO}/issues/126/comments"))
         self.assertIn("c" * 40, writes[1][2]["body"])
         self.assertEqual(len(writes), 2)
@@ -378,7 +482,12 @@ class Merges(Base):
     def test_github_refuses_the_merge(self):
         routes = passing_routes()
         reader = FakeGitHub(routes)
-        merger = FakeGitHub({}, put_error=gate.GitHubError(409, "Head branch was modified. Review and try the merge again."))
+        merger = FakeGitHub(
+            {},
+            put_error=gate.GitHubError(
+                409, "Head branch was modified. Review and try the merge again."
+            ),
+        )
         self.assertEqual(gate.run_merge(reader, merger, CFG, [7]), [])
         writes = reader.writes()
         self.assertEqual(len(writes), 1)
@@ -404,25 +513,43 @@ class Targets(unittest.TestCase):
     def test_issue_comment_on_an_issue_is_ignored(self):
         gh = FakeGitHub({})
         self.assertEqual(gate.target_prs(gh, CFG, "issue_comment", {"issue": {"number": 4}}), [])
-        self.assertEqual(gate.target_prs(gh, CFG, "issue_comment", {"issue": {"number": 4, "pull_request": {}}}), [4])
+        self.assertEqual(
+            gate.target_prs(gh, CFG, "issue_comment", {"issue": {"number": 4, "pull_request": {}}}),
+            [4],
+        )
 
     def test_dispatch_with_number(self):
-        self.assertEqual(gate.target_prs(FakeGitHub({}), CFG, "workflow_dispatch", {}, " 12 "), [12])
-        self.assertEqual(gate.target_prs(FakeGitHub({}), CFG, "workflow_run",
-                                         {"workflow_run": {"pull_requests": [{"number": 21}]}}), [21])
+        self.assertEqual(
+            gate.target_prs(FakeGitHub({}), CFG, "workflow_dispatch", {}, " 12 "), [12]
+        )
+        self.assertEqual(
+            gate.target_prs(
+                FakeGitHub({}),
+                CFG,
+                "workflow_run",
+                {"workflow_run": {"pull_requests": [{"number": 21}]}},
+            ),
+            [21],
+        )
 
     def test_schedule_and_check_suite_sweep_open_factory_pull_requests(self):
-        gh = FakeGitHub({f"/repos/{REPO}/pulls": [
-            {"number": 1, "draft": False, "user": {"login": "factory-droid[bot]"}},
-            {"number": 2, "draft": True, "user": {"login": "factory-droid[bot]"}},
-            {"number": 3, "draft": False, "user": {"login": "AllisonGaddy"}},
-        ]})
+        gh = FakeGitHub(
+            {
+                f"/repos/{REPO}/pulls": [
+                    {"number": 1, "draft": False, "user": {"login": "factory-droid[bot]"}},
+                    {"number": 2, "draft": True, "user": {"login": "factory-droid[bot]"}},
+                    {"number": 3, "draft": False, "user": {"login": "AllisonGaddy"}},
+                ]
+            }
+        )
         for name in ("schedule", "check_suite", "workflow_dispatch"):
             self.assertEqual(gate.target_prs(gh, CFG, name, {}), [1])
 
     def test_api_error_is_reported_not_swallowed(self):
         errors = []
-        gate.run_plan(FakeGitHub({}), CFG, "pull_request_target", {"pull_request": {"number": 7}}, "", errors)
+        gate.run_plan(
+            FakeGitHub({}), CFG, "pull_request_target", {"pull_request": {"number": 7}}, "", errors
+        )
         self.assertEqual(len(errors), 1)
 
 
@@ -437,8 +564,12 @@ class CodexParsing(unittest.TestCase):
             '<!-- codex-security-review:v1 {"headSha":"8562c853f24363c01944ab8b1d0d3ea1f7599445"} -->\n'
             "## Codex Review Summary\n"
         )
-        state = gate.latest_codex_state([{"user": {"login": "chatgpt-codex-connector[bot]"}, "body": body}])
-        self.assertEqual(state["code_review"]["commit_sha"], "8562c853f24363c01944ab8b1d0d3ea1f7599445")
+        state = gate.latest_codex_state(
+            [{"user": {"login": "chatgpt-codex-connector[bot]"}, "body": body}]
+        )
+        self.assertEqual(
+            state["code_review"]["commit_sha"], "8562c853f24363c01944ab8b1d0d3ea1f7599445"
+        )
         self.assertIs(state["code_review"]["has_unresolved_findings"], True)
 
     def test_job_issue_number(self):
@@ -447,7 +578,13 @@ class CodexParsing(unittest.TestCase):
         self.assertIsNone(gate.job_issue_number(None))
 
 
-def codex_receipt(sha=HEAD, clean=True, security=False, login="chatgpt-codex-connector[bot]", created="2026-11-02T23:18:09Z"):
+def codex_receipt(
+    sha=HEAD,
+    clean=True,
+    security=False,
+    login="chatgpt-codex-connector[bot]",
+    created="2026-11-02T23:18:09Z",
+):
     """The receipt shapes Codex posts on a pull request, copied from pull request #145."""
     if security:
         middle = (
@@ -464,7 +601,13 @@ def codex_receipt(sha=HEAD, clean=True, security=False, login="chatgpt-codex-con
         f"**Reviewed commit:** `{sha[:10]}`\n\n"
         "<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n</details>"
     )
-    return {"id": 901, "user": {"login": login}, "body": body, "created_at": created, "updated_at": created}
+    return {
+        "id": 901,
+        "user": {"login": login},
+        "body": body,
+        "created_at": created,
+        "updated_at": created,
+    }
 
 
 class CodexReceipt(Base):
@@ -501,9 +644,12 @@ class CodexReceipt(Base):
         self.assertEqual(ready, [7])
         self.assertEqual(reader.writes(), [], "a passing pull request gets no refusal comment")
         self.assertEqual(gate.run_merge(reader, merger, CFG, ready), ["c" * 40])
-        self.assertEqual(merger.calls, [
-            ("PUT", f"/repos/{REPO}/pulls/7/merge", {"merge_method": "squash", "sha": HEAD}),
-        ])
+        self.assertEqual(
+            merger.calls,
+            [
+                ("PUT", f"/repos/{REPO}/pulls/7/merge", {"merge_method": "squash", "sha": HEAD}),
+            ],
+        )
 
     def test_clean_receipt_for_head_beats_a_summary_on_an_older_commit(self):
         routes = self.receipt_routes(codex_comment(sha=OLD, unresolved=True), codex_receipt())
@@ -520,20 +666,29 @@ class CodexReceipt(Base):
         self.assertEqual(self.evaluate(self.receipt_routes(receipt)).action, "merge")
 
     def test_clean_receipt_for_an_older_commit_refuses(self):
-        self.assert_refused(self.receipt_routes(codex_receipt(sha=OLD)), f"Codex has not reviewed head {HEAD[:7]} yet")
+        self.assert_refused(
+            self.receipt_routes(codex_receipt(sha=OLD)),
+            f"Codex has not reviewed head {HEAD[:7]} yet",
+        )
 
     def test_older_receipt_does_not_count_for_a_new_head_after_a_summary_on_the_old_one(self):
         routes = self.receipt_routes(codex_comment(sha=OLD), codex_receipt(sha=OLD))
         self.assert_refused(routes, f"its last code review covered {OLD[:7]}")
 
     def test_security_only_receipt_refuses(self):
-        self.assert_refused(self.receipt_routes(codex_receipt(security=True)), "no Codex review summary")
+        self.assert_refused(
+            self.receipt_routes(codex_receipt(security=True)), "no Codex review summary"
+        )
 
     def test_receipt_with_suggestions_refuses(self):
-        self.assert_refused(self.receipt_routes(codex_receipt(clean=False)), "no Codex review summary")
+        self.assert_refused(
+            self.receipt_routes(codex_receipt(clean=False)), "no Codex review summary"
+        )
 
     def test_receipt_from_someone_else_refuses(self):
-        self.assert_refused(self.receipt_routes(codex_receipt(login="someone")), "no Codex review summary")
+        self.assert_refused(
+            self.receipt_routes(codex_receipt(login="someone")), "no Codex review summary"
+        )
 
     def test_receipt_without_a_reviewed_commit_refuses(self):
         receipt = codex_receipt()
@@ -546,20 +701,29 @@ class CodexReceipt(Base):
 
     def test_a_summary_on_this_head_with_null_findings_still_reads_threads(self):
         state = codex_comment()
-        state["body"] = state["body"].replace('"has_unresolved_findings":false', '"has_unresolved_findings":null').replace('"has_any_findings":false', '"has_any_findings":true')
-        routes = self.receipt_routes(state, codex_receipt(), findings=[finding_comment(41, "P1", sha=OLD)])
+        state["body"] = (
+            state["body"]
+            .replace('"has_unresolved_findings":false', '"has_unresolved_findings":null')
+            .replace('"has_any_findings":false', '"has_any_findings":true')
+        )
+        routes = self.receipt_routes(
+            state, codex_receipt(), findings=[finding_comment(41, "P1", sha=OLD)]
+        )
         reader = FakeGitHub(routes)
         reader.review_threads = lambda repo, n: {41: False}
         d = gate.evaluate(reader, CFG, 7)
         self.assertEqual(d.action, "refuse")
-        self.assertTrue(any(f"its thread from {OLD[:7]} is unresolved" in r for r in d.reasons), d.reasons)
+        self.assertTrue(
+            any(f"its thread from {OLD[:7]} is unresolved" in r for r in d.reasons), d.reasons
+        )
 
     def test_security_findings_on_head_still_block_a_clean_receipt(self):
         routes = self.receipt_routes(codex_comment(sha=OLD), codex_receipt())
         state = routes[f"/repos/{REPO}/issues/7/comments"][0]
         state["body"] = state["body"].replace(
             f'"security_review":{{"commit_sha":"{OLD}","has_any_findings":null,"has_unresolved_findings":null',
-            f'"security_review":{{"commit_sha":"{HEAD}","has_any_findings":true,"has_unresolved_findings":true')
+            f'"security_review":{{"commit_sha":"{HEAD}","has_any_findings":true,"has_unresolved_findings":true',
+        )
         self.assert_refused(routes, "Codex security review")
 
     def test_clean_receipt_still_needs_green_checks(self):
@@ -590,8 +754,11 @@ class CodexReceipt(Base):
     def test_clean_receipt_with_an_open_p1_thread_refuses(self):
         self.threads = {41: False}
         routes = self.receipt_routes(codex_receipt(), findings=[finding_comment(41, "P1", sha=OLD)])
-        self.assert_refused(routes, f"Codex P1 code finding \"Parse global pip options before install\" "
-                                    f"(https://github.com/{REPO}/pull/7#discussion_r41) blocks: its thread from {OLD[:7]} is unresolved.")
+        self.assert_refused(
+            routes,
+            f"Codex P1 code finding \"Parse global pip options before install\" "
+            f"(https://github.com/{REPO}/pull/7#discussion_r41) blocks: its thread from {OLD[:7]} is unresolved.",
+        )
 
     def test_clean_receipt_with_an_open_p2_thread_merges(self):
         self.threads = {41: False}
@@ -602,20 +769,29 @@ class CodexReceipt(Base):
         # Codex left a finding on OLD, then posted a clean receipt for HEAD before
         # refreshing its summary. The finding's thread is still open.
         self.threads = {41: False}
-        routes = self.receipt_routes(codex_comment(sha=OLD, unresolved=True), codex_receipt(),
-                                     findings=[finding_comment(41, "P1", sha=OLD)])
+        routes = self.receipt_routes(
+            codex_comment(sha=OLD, unresolved=True),
+            codex_receipt(),
+            findings=[finding_comment(41, "P1", sha=OLD)],
+        )
         self.assert_refused(routes, f"its thread from {OLD[:7]} is unresolved")
 
     def test_clean_receipt_counts_once_older_findings_are_resolved(self):
         self.threads = {41: True}
-        routes = self.receipt_routes(codex_comment(sha=OLD, unresolved=True), codex_receipt(),
-                                     findings=[finding_comment(41, "P1", sha=OLD)])
+        routes = self.receipt_routes(
+            codex_comment(sha=OLD, unresolved=True),
+            codex_receipt(),
+            findings=[finding_comment(41, "P1", sha=OLD)],
+        )
         self.assertEqual(self.evaluate(routes).action, "merge")
 
     def test_clean_receipt_when_threads_cannot_be_read_refuses(self):
         self.threads = gate.GitHubError(502, "down")
         routes = self.receipt_routes(codex_receipt(), findings=[finding_comment(41, "P1", sha=OLD)])
-        self.assert_refused(routes, f"from {OLD[:7]} may still be open: the review threads could not be read (down).")
+        self.assert_refused(
+            routes,
+            f"from {OLD[:7]} may still be open: the review threads could not be read (down).",
+        )
 
     def test_clean_receipt_without_a_thread_reader_refuses(self):
         self.threads = None
@@ -625,7 +801,10 @@ class CodexReceipt(Base):
     def test_clean_receipt_when_review_comments_cannot_be_read_refuses(self):
         routes = self.receipt_routes(codex_receipt())
         del routes[f"/repos/{REPO}/pulls/7/comments"]
-        self.assert_refused(routes, f"Codex posted a clean code review receipt for {HEAD[:7]}, but the review comments could not be read")
+        self.assert_refused(
+            routes,
+            f"Codex posted a clean code review receipt for {HEAD[:7]}, but the review comments could not be read",
+        )
 
     def test_codex_findings_on_this_head_block_a_clean_receipt(self):
         routes = self.receipt_routes(codex_receipt(), findings=[finding_comment(21, "P1")])
@@ -645,14 +824,16 @@ class CodexReceipt(Base):
 
     def test_security_findings_on_head_are_reported_with_an_open_thread(self):
         self.threads = {41: False}
-        routes = self.receipt_routes(codex_comment(sha=OLD), codex_receipt(), findings=[finding_comment(41, "P1", sha=OLD)])
+        routes = self.receipt_routes(
+            codex_comment(sha=OLD), codex_receipt(), findings=[finding_comment(41, "P1", sha=OLD)]
+        )
         state = routes[f"/repos/{REPO}/issues/7/comments"][0]
         state["body"] = state["body"].replace(
             f'"security_review":{{"commit_sha":"{OLD}","has_any_findings":null,"has_unresolved_findings":null',
-            f'"security_review":{{"commit_sha":"{HEAD}","has_any_findings":true,"has_unresolved_findings":true')
+            f'"security_review":{{"commit_sha":"{HEAD}","has_any_findings":true,"has_unresolved_findings":true',
+        )
         body = self.assert_refused(routes, f"its thread from {OLD[:7]} is unresolved")
         self.assertIn("Codex security review", body)
-
 
 
 LCFG = gate.Config(repo=REPO, merge_label="auto-merge")
@@ -709,9 +890,19 @@ class LabelRoute(unittest.TestCase):
     def test_sweep_includes_labelled_pull_requests(self):
         routes = labelled_routes()
         routes[f"/repos/{REPO}/pulls"] = [
-            {"number": 7, "draft": False, "user": {"login": "AllisonGaddy"}, "labels": [{"name": "auto-merge"}]},
+            {
+                "number": 7,
+                "draft": False,
+                "user": {"login": "AllisonGaddy"},
+                "labels": [{"name": "auto-merge"}],
+            },
             {"number": 8, "draft": False, "user": {"login": "AllisonGaddy"}, "labels": []},
-            {"number": 9, "draft": True, "user": {"login": "AllisonGaddy"}, "labels": [{"name": "auto-merge"}]},
+            {
+                "number": 9,
+                "draft": True,
+                "user": {"login": "AllisonGaddy"},
+                "labels": [{"name": "auto-merge"}],
+            },
         ]
         self.assertEqual(gate.target_prs(FakeGitHub(routes), LCFG, "schedule", {}), [7])
 
@@ -724,9 +915,15 @@ class ResolvedThreadsRoute(unittest.TestCase):
     """Codex reports null, not false, once a pull request has ever had findings."""
 
     def _state(self, unresolved=None, any_findings=True, sha=HEAD, status="completed"):
-        return {"code_review": {"commit_sha": sha, "has_any_findings": any_findings,
-                                "has_unresolved_findings": unresolved, "status": status},
-                "security_review": {}}
+        return {
+            "code_review": {
+                "commit_sha": sha,
+                "has_any_findings": any_findings,
+                "has_unresolved_findings": unresolved,
+                "status": status,
+            },
+            "security_review": {},
+        }
 
     @staticmethod
     def _found(*findings, note=None):
@@ -734,17 +931,29 @@ class ResolvedThreadsRoute(unittest.TestCase):
 
     @staticmethod
     def _finding(severity="P1", sha=OLD, resolved=True, kind="code"):
-        return gate.Finding(41, kind, severity, sha, "A finding", "https://example.test/41", resolved)
+        return gate.Finding(
+            41, kind, severity, sha, "A finding", "https://example.test/41", resolved
+        )
 
     def test_null_with_all_threads_resolved_passes(self):
         self.assertEqual(gate.codex_problems(self._state(), HEAD, self._found(self._finding())), [])
 
     def test_null_with_an_open_p1_thread_refuses(self):
         p = gate.codex_problems(self._state(), HEAD, self._found(self._finding(resolved=False)))
-        self.assertEqual(p, [f"Codex P1 code finding \"A finding\" (https://example.test/41) blocks: its thread from {OLD[:7]} is unresolved."])
+        self.assertEqual(
+            p,
+            [
+                f"Codex P1 code finding \"A finding\" (https://example.test/41) blocks: its thread from {OLD[:7]} is unresolved."
+            ],
+        )
 
     def test_null_with_an_open_p2_thread_passes(self):
-        self.assertEqual(gate.codex_problems(self._state(), HEAD, self._found(self._finding("P2", resolved=False))), [])
+        self.assertEqual(
+            gate.codex_problems(
+                self._state(), HEAD, self._found(self._finding("P2", resolved=False))
+            ),
+            [],
+        )
 
     def test_null_without_a_finding_reader_refuses(self):
         p = gate.codex_problems(self._state(), HEAD, None)
@@ -753,19 +962,30 @@ class ResolvedThreadsRoute(unittest.TestCase):
     def test_null_when_review_comments_cannot_be_read_refuses(self):
         def boom():
             raise gate.GitHubError(502, "down")
+
         p = gate.codex_problems(self._state(), HEAD, boom)
         self.assertEqual(len(p), 1)
         self.assertIn("the review comments could not be read (down)", p[0])
 
     def test_null_when_a_p1_thread_cannot_be_read_refuses(self):
-        p = gate.codex_problems(self._state(), HEAD, self._found(
-            self._finding(resolved=None), note="the review threads could not be read (down)"))
+        p = gate.codex_problems(
+            self._state(),
+            HEAD,
+            self._found(
+                self._finding(resolved=None), note="the review threads could not be read (down)"
+            ),
+        )
         self.assertEqual(len(p), 1)
         self.assertIn("may still be open: the review threads could not be read (down).", p[0])
 
     def test_true_with_every_finding_resolved_is_an_evidence_gap(self):
         p = gate.codex_problems(self._state(unresolved=True), HEAD, self._found(self._finding()))
-        self.assertTrue(p and "reports unresolved findings, but the gate found no open Codex code finding comment" in p[0], p)
+        self.assertTrue(
+            p
+            and "reports unresolved findings, but the gate found no open Codex code finding comment"
+            in p[0],
+            p,
+        )
 
     def test_null_without_any_findings_still_refuses(self):
         p = gate.codex_problems(self._state(any_findings=None), HEAD, self._found())
@@ -786,10 +1006,17 @@ class ResolvedThreadsRoute(unittest.TestCase):
         reader.review_threads = lambda repo, n: calls.append(n) or {}
         self.assertEqual(gate.evaluate(reader, CFG, 7).action, "merge")
         self.assertEqual(calls, [], "a false state never needs the thread read")
-        self.assertFalse([c for c in reader.calls if c[1].endswith("/pulls/7/comments")], "nor the review comments")
+        self.assertFalse(
+            [c for c in reader.calls if c[1].endswith("/pulls/7/comments")],
+            "nor the review comments",
+        )
         routes[f"/repos/{REPO}/issues/7/comments"] = [codex_comment()]
         state_comment = routes[f"/repos/{REPO}/issues/7/comments"][0]
-        state_comment["body"] = state_comment["body"].replace('"has_unresolved_findings":false', '"has_unresolved_findings":null').replace('"has_any_findings":false', '"has_any_findings":true')
+        state_comment["body"] = (
+            state_comment["body"]
+            .replace('"has_unresolved_findings":false', '"has_unresolved_findings":null')
+            .replace('"has_any_findings":false', '"has_any_findings":true')
+        )
         routes[f"/repos/{REPO}/pulls/7/comments"] = [finding_comment(41, "P1", sha=OLD)]
         reader = FakeGitHub(routes)
         reader.review_threads = lambda repo, n: calls.append(n) or {41: True}
@@ -813,7 +1040,13 @@ class LabelFallbackAndHeadFindings(unittest.TestCase):
         with self.assertRaises(gate.GitHubError):
             gate.evaluate(FakeGitHub(routes), LCFG, 7)
         errors = []
-        ready = gate.run_plan(FakeGitHub(routes), LCFG, "pull_request_target", {"pull_request": {"number": 7}}, errors=errors)
+        ready = gate.run_plan(
+            FakeGitHub(routes),
+            LCFG,
+            "pull_request_target",
+            {"pull_request": {"number": 7}},
+            errors=errors,
+        )
         self.assertEqual(ready, [])
         self.assertEqual(len(errors), 1, "the failed read fails the run")
 
@@ -825,7 +1058,11 @@ class LabelFallbackAndHeadFindings(unittest.TestCase):
     def _null_routes(self):
         routes = passing_routes()
         c = routes[f"/repos/{REPO}/issues/7/comments"][0]
-        c["body"] = c["body"].replace('"has_unresolved_findings":false', '"has_unresolved_findings":null').replace('"has_any_findings":false', '"has_any_findings":true')
+        c["body"] = (
+            c["body"]
+            .replace('"has_unresolved_findings":false', '"has_unresolved_findings":null')
+            .replace('"has_any_findings":false', '"has_any_findings":true')
+        )
         routes[f"/repos/{REPO}/pulls/7/comments"] = [finding_comment(11, "P1", sha=OLD)]
         return routes
 
@@ -835,16 +1072,27 @@ class LabelFallbackAndHeadFindings(unittest.TestCase):
         return reader
 
     def test_findings_on_an_older_head_resolved_merges(self):
-        self.assertEqual(gate.evaluate(self.reader(self._null_routes(), {11: True}), CFG, 7).action, "merge")
+        self.assertEqual(
+            gate.evaluate(self.reader(self._null_routes(), {11: True}), CFG, 7).action, "merge"
+        )
 
     def test_p1_findings_on_this_head_block_even_when_resolved(self):
         routes = self._null_routes()
-        routes[f"/repos/{REPO}/pulls/7/comments"] += [finding_comment(21, "P1"), finding_comment(22, "P0", title="Second")]
+        routes[f"/repos/{REPO}/pulls/7/comments"] += [
+            finding_comment(21, "P1"),
+            finding_comment(22, "P0", title="Second"),
+        ]
         d = gate.evaluate(self.reader(routes, {11: True, 21: True, 22: True}), CFG, 7)
         self.assertEqual(d.action, "refuse")
         self.assertEqual(len(d.reasons), 2, d.reasons)
-        self.assertIn(f"Codex P1 code finding \"Parse global pip options before install\" (https://github.com/{REPO}/pull/7#discussion_r21) blocks: Codex raised it on head {HEAD[:7]}.", d.reasons)
-        self.assertIn(f"Codex P0 code finding \"Second\" (https://github.com/{REPO}/pull/7#discussion_r22) blocks: Codex raised it on head {HEAD[:7]}.", d.reasons)
+        self.assertIn(
+            f"Codex P1 code finding \"Parse global pip options before install\" (https://github.com/{REPO}/pull/7#discussion_r21) blocks: Codex raised it on head {HEAD[:7]}.",
+            d.reasons,
+        )
+        self.assertIn(
+            f"Codex P0 code finding \"Second\" (https://github.com/{REPO}/pull/7#discussion_r22) blocks: Codex raised it on head {HEAD[:7]}.",
+            d.reasons,
+        )
 
 
 PR214_HEAD = "77c12b54898a379d600463ebe2bf0e20a21fcedd"
@@ -857,11 +1105,17 @@ def pr214_routes():
     routes = passing_routes()
     routes[f"/repos/{REPO}/pulls/7"]["head"]["sha"] = PR214_HEAD
     for suffix in ("check-runs", "status"):
-        routes[f"/repos/{REPO}/commits/{PR214_HEAD}/{suffix}"] = routes.pop(f"/repos/{REPO}/commits/{HEAD}/{suffix}")
+        routes[f"/repos/{REPO}/commits/{PR214_HEAD}/{suffix}"] = routes.pop(
+            f"/repos/{REPO}/commits/{HEAD}/{suffix}"
+        )
     routes[f"/repos/{REPO}/contents/.changeset/126-change.md?ref={PR214_HEAD}"] = content(GOOD_NOTE)
-    routes[f"/repos/{REPO}/contents/.claude-plugin/marketplace.json?ref={PR214_HEAD}"] = content(market())
+    routes[f"/repos/{REPO}/contents/.claude-plugin/marketplace.json?ref={PR214_HEAD}"] = content(
+        market()
+    )
     summary = {
-        "id": 6615828876, "user": {"login": "chatgpt-codex-connector[bot]"}, "updated_at": "2026-11-03T21:32:23Z",
+        "id": 6615828876,
+        "user": {"login": "chatgpt-codex-connector[bot]"},
+        "updated_at": "2026-11-03T21:32:23Z",
         "body": (
             "<!-- codex-pull-request-review-summary -->\n"
             '<!-- codex-review-state:v1 {"code_review":{"commit_sha":"77c12b54898a379d600463ebe2bf0e20a21fcedd",'
@@ -876,12 +1130,23 @@ def pr214_routes():
     security_receipt = codex_receipt(sha=PR214_HEAD, security=True)
     routes[f"/repos/{REPO}/issues/7/comments"] = [summary, security_receipt]
     findings = [
-        finding_comment(4460685575, "P2", PR214_HEAD, title="Parse global pip options before install"),
-        finding_comment(4460685589, "P2", PR214_HEAD, title="Scope pending exceptions to the recorded finding"),
-        finding_comment(4460685601, "P2", PR214_HEAD, title="Install every newly added requirements lock"),
+        finding_comment(
+            4460685575, "P2", PR214_HEAD, title="Parse global pip options before install"
+        ),
+        finding_comment(
+            4460685589, "P2", PR214_HEAD, title="Scope pending exceptions to the recorded finding"
+        ),
+        finding_comment(
+            4460685601, "P2", PR214_HEAD, title="Install every newly added requirements lock"
+        ),
     ]
-    claude = [dict(finding_comment(n, "P2", PR214_HEAD, login="claude[bot]"),
-                   body="\U0001f7e1 (optional) A workflow line that chains a second install ...") for n in (4460455272, 4460455280)]
+    claude = [
+        dict(
+            finding_comment(n, "P2", PR214_HEAD, login="claude[bot]"),
+            body="\U0001f7e1 (optional) A workflow line that chains a second install ...",
+        )
+        for n in (4460455272, 4460455280)
+    ]
     routes[f"/repos/{REPO}/pulls/7/comments"] = claude + findings
     return routes
 
@@ -899,32 +1164,58 @@ class SeverityThreshold(Base):
     def test_pr214_p2_only_review_on_head_does_not_block(self):
         routes = pr214_routes()
         # Every thread is still open, Codex's and claude[bot]'s alike.
-        reader = with_threads(routes, {4460685575: False, 4460685589: False, 4460685601: False,
-                                       4460455272: False, 4460455280: False})
+        reader = with_threads(
+            routes,
+            {
+                4460685575: False,
+                4460685589: False,
+                4460685601: False,
+                4460455272: False,
+                4460455280: False,
+            },
+        )
         merger = FakeGitHub({}, put_result={"sha": "c" * 40, "merged": True})
         ready = gate.run_plan(reader, CFG, "pull_request_target", {"pull_request": {"number": 7}})
         self.assertEqual(ready, [7], gate.evaluate(reader, CFG, 7).reasons)
         self.assertEqual(reader.writes(), [], "no refusal comment")
         self.assertEqual(gate.run_merge(reader, merger, CFG, ready), ["c" * 40])
-        self.assertEqual(merger.calls, [
-            ("PUT", f"/repos/{REPO}/pulls/7/merge", {"merge_method": "squash", "sha": PR214_HEAD})])
+        self.assertEqual(
+            merger.calls,
+            [
+                (
+                    "PUT",
+                    f"/repos/{REPO}/pulls/7/merge",
+                    {"merge_method": "squash", "sha": PR214_HEAD},
+                )
+            ],
+        )
 
     def test_pr214_with_one_finding_raised_to_p1_blocks_and_names_it(self):
         routes = pr214_routes()
         routes[f"/repos/{REPO}/pulls/7/comments"][-1] = finding_comment(
-            4460685601, "P1", PR214_HEAD, title="Install every newly added requirements lock")
+            4460685601, "P1", PR214_HEAD, title="Install every newly added requirements lock"
+        )
         d = gate.evaluate(FakeGitHub(routes), CFG, 7)
         self.assertEqual(d.action, "refuse")
-        self.assertEqual(d.reasons, [
-            "Codex P1 code finding \"Install every newly added requirements lock\" "
-            f"(https://github.com/{REPO}/pull/7#discussion_r4460685601) blocks: Codex raised it on head 77c12b5."])
+        self.assertEqual(
+            d.reasons,
+            [
+                "Codex P1 code finding \"Install every newly added requirements lock\" "
+                f"(https://github.com/{REPO}/pull/7#discussion_r4460685601) blocks: Codex raised it on head 77c12b5."
+            ],
+        )
 
     def test_p0_blocks(self):
         routes = pr214_routes()
-        routes[f"/repos/{REPO}/pulls/7/comments"].append(finding_comment(5, "P0", PR214_HEAD, title="Drops every check"))
+        routes[f"/repos/{REPO}/pulls/7/comments"].append(
+            finding_comment(5, "P0", PR214_HEAD, title="Drops every check")
+        )
         d = gate.evaluate(FakeGitHub(routes), CFG, 7)
         self.assertEqual(d.action, "refuse")
-        self.assertTrue(any(r.startswith("Codex P0 code finding \"Drops every check\"") for r in d.reasons), d.reasons)
+        self.assertTrue(
+            any(r.startswith("Codex P0 code finding \"Drops every check\"") for r in d.reasons),
+            d.reasons,
+        )
 
     def test_p3_does_not_block(self):
         routes = pr214_routes()
@@ -933,20 +1224,32 @@ class SeverityThreshold(Base):
 
     def test_an_open_p1_from_an_older_commit_blocks_and_a_resolved_one_does_not(self):
         routes = pr214_routes()
-        routes[f"/repos/{REPO}/pulls/7/comments"].append(finding_comment(5, "P1", OLD, title="Old one"))
+        routes[f"/repos/{REPO}/pulls/7/comments"].append(
+            finding_comment(5, "P1", OLD, title="Old one")
+        )
         d = gate.evaluate(with_threads(routes, {5: False}), CFG, 7)
-        self.assertEqual(d.reasons, [
-            f"Codex P1 code finding \"Old one\" (https://github.com/{REPO}/pull/7#discussion_r5) blocks: its thread from {OLD[:7]} is unresolved."])
+        self.assertEqual(
+            d.reasons,
+            [
+                f"Codex P1 code finding \"Old one\" (https://github.com/{REPO}/pull/7#discussion_r5) blocks: its thread from {OLD[:7]} is unresolved."
+            ],
+        )
         self.assertEqual(gate.evaluate(with_threads(routes, {5: True}), CFG, 7).action, "merge")
 
     def test_a_finding_with_no_severity_badge_is_an_evidence_gap(self):
         routes = pr214_routes()
-        routes[f"/repos/{REPO}/pulls/7/comments"].append(finding_comment(5, sha=PR214_HEAD, title="No badge", badge=False))
+        routes[f"/repos/{REPO}/pulls/7/comments"].append(
+            finding_comment(5, sha=PR214_HEAD, title="No badge", badge=False)
+        )
         d = gate.evaluate(FakeGitHub(routes), CFG, 7)
         self.assertEqual(d.action, "refuse")
-        self.assertEqual(d.reasons, [
-            f"Codex code finding with no readable severity \"No badge\" (https://github.com/{REPO}/pull/7#discussion_r5) "
-            "blocks: Codex raised it on head 77c12b5. The gate cannot read its severity, so this is a gap in the review evidence, not a pass."])
+        self.assertEqual(
+            d.reasons,
+            [
+                f"Codex code finding with no readable severity \"No badge\" (https://github.com/{REPO}/pull/7#discussion_r5) "
+                "blocks: Codex raised it on head 77c12b5. The gate cannot read its severity, so this is a gap in the review evidence, not a pass."
+            ],
+        )
 
     def test_a_finding_with_two_different_badges_is_an_evidence_gap(self):
         routes = pr214_routes()
@@ -958,28 +1261,47 @@ class SeverityThreshold(Base):
 
     def test_p1_from_someone_else_is_not_trusted_review_evidence(self):
         routes = pr214_routes()
-        routes[f"/repos/{REPO}/pulls/7/comments"].append(finding_comment(5, "P1", PR214_HEAD, login="someone"))
+        routes[f"/repos/{REPO}/pulls/7/comments"].append(
+            finding_comment(5, "P1", PR214_HEAD, login="someone")
+        )
         self.assertEqual(gate.evaluate(FakeGitHub(routes), CFG, 7).action, "merge")
 
     def test_forged_p2_findings_cannot_explain_an_unresolved_summary(self):
         routes = pr214_routes()
         for c in routes[f"/repos/{REPO}/pulls/7/comments"]:
             c["user"] = {"login": "someone"}
-        self.assert_refused_at(routes, "Codex code review on 77c12b5 reports unresolved findings, but the gate found no open Codex code finding comment")
+        self.assert_refused_at(
+            routes,
+            "Codex code review on 77c12b5 reports unresolved findings, but the gate found no open Codex code finding comment",
+        )
 
     def test_codex_replies_are_not_findings(self):
         routes = pr214_routes()
         routes[f"/repos/{REPO}/pulls/7/comments"].append(
-            finding_comment(5, sha=PR214_HEAD, title="Thanks, fixed.", badge=False, reply_to=4460685575))
+            finding_comment(
+                5, sha=PR214_HEAD, title="Thanks, fixed.", badge=False, reply_to=4460685575
+            )
+        )
         self.assertEqual(gate.evaluate(FakeGitHub(routes), CFG, 7).action, "merge")
 
     def test_p2_findings_do_not_stand_in_for_missing_stale_or_incomplete_review(self):
         cases = {
-            "missing": ([], "Codex has not reviewed head 77c12b5 yet (no Codex review summary on this pull request)."),
-            "stale": ([codex_comment(sha=OLD, unresolved=True)], f"Codex has not reviewed head 77c12b5 yet (its last code review covered {OLD[:7]})."),
-            "incomplete": ([codex_comment(sha=PR214_HEAD, status="in_progress", unresolved=True)], "Codex code review on 77c12b5 is in_progress, not completed."),
-            "untrusted": ([dict(codex_comment(sha=PR214_HEAD, unresolved=False), user={"login": "someone"})],
-                          "Codex has not reviewed head 77c12b5 yet (no Codex review summary on this pull request)."),
+            "missing": (
+                [],
+                "Codex has not reviewed head 77c12b5 yet (no Codex review summary on this pull request).",
+            ),
+            "stale": (
+                [codex_comment(sha=OLD, unresolved=True)],
+                f"Codex has not reviewed head 77c12b5 yet (its last code review covered {OLD[:7]}).",
+            ),
+            "incomplete": (
+                [codex_comment(sha=PR214_HEAD, status="in_progress", unresolved=True)],
+                "Codex code review on 77c12b5 is in_progress, not completed.",
+            ),
+            "untrusted": (
+                [dict(codex_comment(sha=PR214_HEAD, unresolved=False), user={"login": "someone"})],
+                "Codex has not reviewed head 77c12b5 yet (no Codex review summary on this pull request).",
+            ),
         }
         for name, (comments, reason) in cases.items():
             with self.subTest(name):
@@ -992,40 +1314,69 @@ class SeverityThreshold(Base):
     def test_security_p1_blocks(self):
         routes = self.security_routes()
         routes[f"/repos/{REPO}/pulls/7/comments"].append(
-            finding_comment(6, "P1", PR214_HEAD, security=True, title="Protect the main-bypass App key from branch workflows"))
+            finding_comment(
+                6,
+                "P1",
+                PR214_HEAD,
+                security=True,
+                title="Protect the main-bypass App key from branch workflows",
+            )
+        )
         d = gate.evaluate(FakeGitHub(routes), CFG, 7)
         self.assertEqual(d.action, "refuse")
-        self.assertEqual(d.reasons, [
-            "Codex P1 security finding \"Security: Protect the main-bypass App key from branch workflows\" "
-            f"(https://github.com/{REPO}/pull/7#discussion_r6) blocks: Codex raised it on head 77c12b5."])
+        self.assertEqual(
+            d.reasons,
+            [
+                "Codex P1 security finding \"Security: Protect the main-bypass App key from branch workflows\" "
+                f"(https://github.com/{REPO}/pull/7#discussion_r6) blocks: Codex raised it on head 77c12b5."
+            ],
+        )
 
     def test_security_p2_alone_does_not_block(self):
         routes = self.security_routes()
         routes[f"/repos/{REPO}/pulls/7/comments"].append(
-            finding_comment(6, "P2", PR214_HEAD, security=True, title="Require trusted approval for resolved Codex findings"))
+            finding_comment(
+                6,
+                "P2",
+                PR214_HEAD,
+                security=True,
+                title="Require trusted approval for resolved Codex findings",
+            )
+        )
         self.assertEqual(gate.evaluate(FakeGitHub(routes), CFG, 7).action, "merge")
 
     def test_security_unresolved_with_no_finding_to_read_is_an_evidence_gap(self):
         d = gate.evaluate(FakeGitHub(self.security_routes()), CFG, 7)
-        self.assertEqual(d.reasons, [
-            "Codex security review on 77c12b5 reports unresolved findings, but the gate found no open Codex security finding comment to read their severity from."])
+        self.assertEqual(
+            d.reasons,
+            [
+                "Codex security review on 77c12b5 reports unresolved findings, but the gate found no open Codex security finding comment to read their severity from."
+            ],
+        )
 
     def test_security_unresolved_when_comments_cannot_be_read_refuses(self):
         routes = self.security_routes()
         summary = routes[f"/repos/{REPO}/issues/7/comments"][0]
         summary["body"] = summary["body"].replace(
             '"has_any_findings":true,"has_unresolved_findings":true,"status":"completed"},"security_review"',
-            '"has_any_findings":false,"has_unresolved_findings":false,"status":"completed"},"security_review"')
+            '"has_any_findings":false,"has_unresolved_findings":false,"status":"completed"},"security_review"',
+        )
         del routes[f"/repos/{REPO}/pulls/7/comments"]
         d = gate.evaluate(FakeGitHub(routes), CFG, 7)
         self.assertEqual(len(d.reasons), 1, d.reasons)
-        self.assertTrue(d.reasons[0].startswith("Codex security review on 77c12b5 reports unresolved findings, but the review comments could not be read"))
+        self.assertTrue(
+            d.reasons[0].startswith(
+                "Codex security review on 77c12b5 reports unresolved findings, but the review comments could not be read"
+            )
+        )
 
     def security_routes(self):
         routes = pr214_routes()
         summary = routes[f"/repos/{REPO}/issues/7/comments"][0]
         summary["body"] = summary["body"].replace(
-            '"has_any_findings":null,"has_unresolved_findings":null', '"has_any_findings":true,"has_unresolved_findings":true')
+            '"has_any_findings":null,"has_unresolved_findings":null',
+            '"has_any_findings":true,"has_unresolved_findings":true',
+        )
         return routes
 
     def assert_refused_at(self, routes, fragment):
@@ -1038,9 +1389,17 @@ class FindingParsing(unittest.TestCase):
     def test_reads_the_real_finding_shapes(self):
         code = finding_comment(1, "P2", title="Parse global pip options before install")
         f = gate.parse_finding(code)
-        self.assertEqual((f.kind, f.severity, f.commit, f.title), ("code", "P2", HEAD, "Parse global pip options before install"))
-        sec = gate.parse_finding(finding_comment(2, "P1", OLD, security=True, title="Pin the recorder handoff"))
-        self.assertEqual((sec.kind, sec.severity, sec.commit, sec.title), ("security", "P1", OLD, "Security: Pin the recorder handoff"))
+        self.assertEqual(
+            (f.kind, f.severity, f.commit, f.title),
+            ("code", "P2", HEAD, "Parse global pip options before install"),
+        )
+        sec = gate.parse_finding(
+            finding_comment(2, "P1", OLD, security=True, title="Pin the recorder handoff")
+        )
+        self.assertEqual(
+            (sec.kind, sec.severity, sec.commit, sec.title),
+            ("security", "P1", OLD, "Security: Pin the recorder handoff"),
+        )
 
     def test_older_findings_without_a_marker_still_carry_a_badge(self):
         body = "**<sub><sub>![P1 Badge](https://img.shields.io/badge/P1-orange?style=flat)</sub></sub>  Old shape**\n\nText."
@@ -1054,17 +1413,48 @@ class FindingParsing(unittest.TestCase):
 class ReviewThreadsQuery(unittest.TestCase):
     def test_maps_first_comment_ids_to_resolution_across_pages(self):
         pages = [
-            {"data": {"repository": {"pullRequest": {"reviewThreads": {
-                "nodes": [{"isResolved": True, "comments": {"nodes": [{"databaseId": 11}]}},
-                          {"isResolved": False, "comments": {"nodes": []}}],
-                "pageInfo": {"hasNextPage": True, "endCursor": "c1"}}}}}},
-            {"data": {"repository": {"pullRequest": {"reviewThreads": {
-                "nodes": [{"isResolved": False, "comments": {"nodes": [{"databaseId": 12}]}}],
-                "pageInfo": {"hasNextPage": False, "endCursor": None}}}}}},
+            {
+                "data": {
+                    "repository": {
+                        "pullRequest": {
+                            "reviewThreads": {
+                                "nodes": [
+                                    {
+                                        "isResolved": True,
+                                        "comments": {"nodes": [{"databaseId": 11}]},
+                                    },
+                                    {"isResolved": False, "comments": {"nodes": []}},
+                                ],
+                                "pageInfo": {"hasNextPage": True, "endCursor": "c1"},
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "data": {
+                    "repository": {
+                        "pullRequest": {
+                            "reviewThreads": {
+                                "nodes": [
+                                    {
+                                        "isResolved": False,
+                                        "comments": {"nodes": [{"databaseId": 12}]},
+                                    }
+                                ],
+                                "pageInfo": {"hasNextPage": False, "endCursor": None},
+                            }
+                        }
+                    }
+                }
+            },
         ]
         gh = gate.GitHub("t")
         sent = []
-        gh._request = lambda method, url, body=None: (sent.append(body["variables"]["a"]) or pages.pop(0), "")
+        gh._request = lambda method, url, body=None: (
+            sent.append(body["variables"]["a"]) or pages.pop(0),
+            "",
+        )
         self.assertEqual(gh.review_threads(REPO, 7), {11: True, 12: False})
         self.assertEqual(sent, [None, "c1"])
 
@@ -1077,10 +1467,23 @@ class ReviewThreadsQuery(unittest.TestCase):
 
 MERGE_BASE = "d" * 40
 BASE_TIP = "e" * 40
-MARKET = {"name": "expert-partners", "plugins": [
-    {"name": "operating-doctrine", "source": "./plugins/operating-doctrine", "version": "2.78.0", "description": "d"},
-    {"name": "brand-voice", "source": "./plugins/brand-voice", "description": "d", "version": "0.6.7"},
-]}
+MARKET = {
+    "name": "expert-partners",
+    "plugins": [
+        {
+            "name": "operating-doctrine",
+            "source": "./plugins/operating-doctrine",
+            "version": "2.78.0",
+            "description": "d",
+        },
+        {
+            "name": "brand-voice",
+            "source": "./plugins/brand-voice",
+            "description": "d",
+            "version": "0.6.7",
+        },
+    ],
+}
 MANIFEST = "plugins/brand-voice/.claude-plugin/plugin.json"
 LOG = "plugins/operating-doctrine/CHANGELOG.md"
 OLD_LOG = "## 2.78.0 - 2026-11-02\n\nNewest.\n## 2.77.0 - 2026-11-01\n\nOlder.\n"
@@ -1109,7 +1512,9 @@ def release_routes(files, before=None, after=None, routes=None):
     routes = routes or passing_routes()
     routes[f"/repos/{REPO}/pulls/7"]["base"]["sha"] = BASE_TIP
     routes[f"/repos/{REPO}/pulls/7/files"] = [{"filename": n, "status": s} for n, s in files]
-    routes[f"/repos/{REPO}/compare/{BASE_TIP}...{HEAD}"] = {"merge_base_commit": {"sha": MERGE_BASE}}
+    routes[f"/repos/{REPO}/compare/{BASE_TIP}...{HEAD}"] = {
+        "merge_base_commit": {"sha": MERGE_BASE}
+    }
     for ref, texts in ((MERGE_BASE, before or {}), (HEAD, after or {})):
         for path, text in texts.items():
             routes[f"/repos/{REPO}/contents/{path}?ref={ref}"] = content(text)
@@ -1121,23 +1526,38 @@ class ReleaseFiles(Base):
 
     def test_changeset_note_alone_merges_reading_only_the_note_and_the_marketplace(self):
         note_path = ".changeset/159-one-owner.md"
-        routes = release_routes([(note_path, "added"), ("tools/release/release.py", "added")],
-                                after={note_path: GOOD_NOTE})
+        routes = release_routes(
+            [(note_path, "added"), ("tools/release/release.py", "added")],
+            after={note_path: GOOD_NOTE},
+        )
         gh = FakeGitHub(routes)
         self.assertEqual(gate.evaluate(gh, CFG, 7).action, "merge")
-        self.assertEqual(sorted(c[1] for c in gh.calls if "/contents/" in c[1] or "/compare/" in c[1]), [
-            f"/repos/{REPO}/contents/.changeset/159-one-owner.md?ref={HEAD}",
-            f"/repos/{REPO}/contents/.claude-plugin/marketplace.json?ref={HEAD}",
-        ])
+        self.assertEqual(
+            sorted(c[1] for c in gh.calls if "/contents/" in c[1] or "/compare/" in c[1]),
+            [
+                f"/repos/{REPO}/contents/.changeset/159-one-owner.md?ref={HEAD}",
+                f"/repos/{REPO}/contents/.claude-plugin/marketplace.json?ref={HEAD}",
+            ],
+        )
 
     def test_plugin_manifest_version_edit_refuses(self):
-        routes = release_routes([(MANIFEST, "modified")], {MANIFEST: manifest()}, {MANIFEST: manifest("0.6.8")})
-        self.assert_refused(routes, f"`{MANIFEST}` changes the brand-voice version from 0.6.7 to 0.6.8.")
+        routes = release_routes(
+            [(MANIFEST, "modified")], {MANIFEST: manifest()}, {MANIFEST: manifest("0.6.8")}
+        )
+        self.assert_refused(
+            routes, f"`{MANIFEST}` changes the brand-voice version from 0.6.7 to 0.6.8."
+        )
 
     def test_marketplace_version_edit_refuses(self):
         path = ".claude-plugin/marketplace.json"
-        routes = release_routes([(path, "modified")], {path: market()}, {path: market(**{"operating-doctrine": "2.79.0"})})
-        body = self.assert_refused(routes, "changes the operating-doctrine version from 2.78.0 to 2.79.0")
+        routes = release_routes(
+            [(path, "modified")],
+            {path: market()},
+            {path: market(**{"operating-doctrine": "2.79.0"})},
+        )
+        body = self.assert_refused(
+            routes, "changes the operating-doctrine version from 2.78.0 to 2.79.0"
+        )
         self.assertIn("add a note in `.changeset/` instead", body)
 
     def test_marketplace_edit_that_keeps_every_version_merges(self):
@@ -1154,18 +1574,32 @@ class ReleaseFiles(Base):
     def test_a_new_plugin_may_carry_its_first_version(self):
         path = ".claude-plugin/marketplace.json"
         data = json.loads(market())
-        data["plugins"].append({"name": "new-plugin", "source": "./plugins/new-plugin", "version": "0.1.0"})
+        data["plugins"].append(
+            {"name": "new-plugin", "source": "./plugins/new-plugin", "version": "0.1.0"}
+        )
         new_manifest = "plugins/new-plugin/.claude-plugin/plugin.json"
         routes = release_routes(
             [(path, "modified"), (new_manifest, "added")],
             {path: market()},
-            {path: json.dumps(data, indent=2) + "\n", new_manifest: '{"name": "new-plugin", "version": "0.1.0"}\n'})
+            {
+                path: json.dumps(data, indent=2) + "\n",
+                new_manifest: '{"name": "new-plugin", "version": "0.1.0"}\n',
+            },
+        )
         self.assertEqual(self.evaluate(routes).action, "merge")
 
     def test_branch_cut_before_a_release_is_judged_against_its_merge_base(self):
         # main has since released 0.6.8, but the branch never touched the version.
-        routes = release_routes([(MANIFEST, "modified")], {MANIFEST: manifest()},
-                                {MANIFEST: json.dumps({"name": "brand-voice", "version": "0.6.7", "description": "x"}, indent=2) + "\n"})
+        routes = release_routes(
+            [(MANIFEST, "modified")],
+            {MANIFEST: manifest()},
+            {
+                MANIFEST: json.dumps(
+                    {"name": "brand-voice", "version": "0.6.7", "description": "x"}, indent=2
+                )
+                + "\n"
+            },
+        )
         routes[f"/repos/{REPO}/contents/{MANIFEST}?ref={BASE_TIP}"] = content(manifest("0.6.8"))
         self.assertEqual(self.evaluate(routes).action, "merge")
 
@@ -1175,11 +1609,19 @@ class ReleaseFiles(Base):
         self.assert_refused(routes, f"`{LOG}` adds a CHANGELOG entry.")
 
     def test_editing_the_top_changelog_entry_refuses(self):
-        routes = release_routes([(LOG, "modified")], {LOG: OLD_LOG}, {LOG: OLD_LOG.replace("Newest.", "Newest, edited.")})
+        routes = release_routes(
+            [(LOG, "modified")],
+            {LOG: OLD_LOG},
+            {LOG: OLD_LOG.replace("Newest.", "Newest, edited.")},
+        )
         self.assert_refused(routes, f"`{LOG}` edits the top CHANGELOG entry.")
 
     def test_editing_an_older_changelog_entry_merges(self):
-        routes = release_routes([(LOG, "modified")], {LOG: OLD_LOG}, {LOG: OLD_LOG.replace("Older.", "Older, corrected.")})
+        routes = release_routes(
+            [(LOG, "modified")],
+            {LOG: OLD_LOG},
+            {LOG: OLD_LOG.replace("Older.", "Older, corrected.")},
+        )
         self.assertEqual(self.evaluate(routes).action, "merge")
 
     def test_a_new_changelog_refuses(self):
@@ -1192,28 +1634,45 @@ class ReleaseFiles(Base):
         self.assertEqual(self.evaluate(routes).action, "merge")
 
     def test_invalid_json_refuses(self):
-        routes = release_routes([(MANIFEST, "modified")], {MANIFEST: manifest()}, {MANIFEST: "{ not json"})
+        routes = release_routes(
+            [(MANIFEST, "modified")], {MANIFEST: manifest()}, {MANIFEST: "{ not json"}
+        )
         self.assert_refused(routes, "is not valid JSON")
 
     def test_unreadable_file_fails_the_run_instead_of_merging(self):
         routes = release_routes([(MANIFEST, "modified")], {MANIFEST: manifest()}, {})
         errors = []
-        self.assertEqual(gate.run_plan(FakeGitHub(routes), CFG, "pull_request_target",
-                                       {"pull_request": {"number": 7}}, "", errors), [])
+        self.assertEqual(
+            gate.run_plan(
+                FakeGitHub(routes),
+                CFG,
+                "pull_request_target",
+                {"pull_request": {"number": 7}},
+                "",
+                errors,
+            ),
+            [],
+        )
         self.assertEqual(len(errors), 1)
 
     def test_every_problem_is_listed_with_the_others(self):
-        routes = release_routes([(MANIFEST, "modified"), (LOG, "modified")],
-                                {MANIFEST: manifest(), LOG: OLD_LOG},
-                                {MANIFEST: manifest("0.7.0"), LOG: "## 2.79.0 - x\n\nY.\n" + OLD_LOG})
+        routes = release_routes(
+            [(MANIFEST, "modified"), (LOG, "modified")],
+            {MANIFEST: manifest(), LOG: OLD_LOG},
+            {MANIFEST: manifest("0.7.0"), LOG: "## 2.79.0 - x\n\nY.\n" + OLD_LOG},
+        )
         routes[f"/repos/{REPO}/commits/{HEAD}/check-runs"][1]["conclusion"] = "failure"
         body = self.assert_refused(routes, "changes the brand-voice version")
         self.assertIn("adds a CHANGELOG entry", body)
         self.assertIn("finished as failure", body)
 
     def test_label_route_is_held_to_the_same_rule(self):
-        routes = release_routes([(MANIFEST, "modified")], {MANIFEST: manifest()}, {MANIFEST: manifest("0.6.8")},
-                                routes=labelled_routes())
+        routes = release_routes(
+            [(MANIFEST, "modified")],
+            {MANIFEST: manifest()},
+            {MANIFEST: manifest("0.6.8")},
+            routes=labelled_routes(),
+        )
         d = gate.evaluate(FakeGitHub(routes), LCFG, 7)
         self.assertEqual(d.action, "refuse")
         self.assertTrue(any("changes the brand-voice version" in r for r in d.reasons))
@@ -1225,12 +1684,19 @@ class OddFileContent(Base):
     def assert_refused_in_the_run(self, routes, fragment):
         errors = []
         gh = FakeGitHub(routes)
-        self.assertEqual(gate.run_plan(gh, CFG, "pull_request_target", {"pull_request": {"number": 7}}, "", errors), [])
+        self.assertEqual(
+            gate.run_plan(
+                gh, CFG, "pull_request_target", {"pull_request": {"number": 7}}, "", errors
+            ),
+            [],
+        )
         self.assertEqual(errors, [], "content problems are refusals, not run failures")
         self.assert_refused(routes, fragment)
 
     def test_manifest_that_is_a_json_list_refuses(self):
-        routes = release_routes([(MANIFEST, "modified")], {MANIFEST: manifest()}, {MANIFEST: "[]\n"})
+        routes = release_routes(
+            [(MANIFEST, "modified")], {MANIFEST: manifest()}, {MANIFEST: "[]\n"}
+        )
         self.assert_refused_in_the_run(routes, f"`{MANIFEST}` is not the JSON object it should be")
 
     def test_marketplace_that_is_json_null_refuses(self):
@@ -1240,7 +1706,9 @@ class OddFileContent(Base):
 
     def test_marketplace_whose_plugins_is_not_a_list_refuses(self):
         path = ".claude-plugin/marketplace.json"
-        routes = release_routes([(path, "modified")], {path: market()}, {path: '{"plugins": {"a": 1}}\n'})
+        routes = release_routes(
+            [(path, "modified")], {path: market()}, {path: '{"plugins": {"a": 1}}\n'}
+        )
         self.assert_refused_in_the_run(routes, f"`{path}` is not the JSON object it should be")
 
     def test_marketplace_plugin_with_an_odd_name_is_ignored(self):
@@ -1251,20 +1719,30 @@ class OddFileContent(Base):
         self.assertEqual(self.evaluate(routes).action, "merge")
 
     def test_changelog_that_is_not_utf8_refuses(self):
-        routes = release_routes([(LOG, "modified")], {LOG: OLD_LOG}, {LOG: OLD_LOG.encode() + b"\xff\xfe"})
+        routes = release_routes(
+            [(LOG, "modified")], {LOG: OLD_LOG}, {LOG: OLD_LOG.encode() + b"\xff\xfe"}
+        )
         self.assert_refused_in_the_run(routes, f"`{LOG}` at {HEAD[:7]} is not UTF-8 text")
 
     def test_changelog_that_is_a_symlink_refuses(self):
         routes = release_routes([(LOG, "modified")], {LOG: OLD_LOG})
-        routes[f"/repos/{REPO}/contents/{LOG}?ref={HEAD}"] = {"type": "symlink", "target": "../x.md"}
-        self.assert_refused_in_the_run(routes, f"`{LOG}` at {HEAD[:7]} is not a text file the gate can read")
+        routes[f"/repos/{REPO}/contents/{LOG}?ref={HEAD}"] = {
+            "type": "symlink",
+            "target": "../x.md",
+        }
+        self.assert_refused_in_the_run(
+            routes, f"`{LOG}` at {HEAD[:7]} is not a text file the gate can read"
+        )
 
     def test_one_odd_pull_request_does_not_stop_the_sweep(self):
-        routes = release_routes([(MANIFEST, "modified")], {MANIFEST: manifest()}, {MANIFEST: "null"})
+        routes = release_routes(
+            [(MANIFEST, "modified")], {MANIFEST: manifest()}, {MANIFEST: "null"}
+        )
         for path, value in passing_routes(number=8, issue=127).items():
             routes.setdefault(path, value)
         routes[f"/repos/{REPO}/pulls"] = [
-            {"number": n, "draft": False, "user": {"login": "factory-droid[bot]"}} for n in (7, 8)]
+            {"number": n, "draft": False, "user": {"login": "factory-droid[bot]"}} for n in (7, 8)
+        ]
         errors = []
         gh = FakeGitHub(routes)
         self.assertEqual(gate.run_plan(gh, CFG, "schedule", {}, "", errors), [8])
@@ -1296,17 +1774,25 @@ class ChangesetNotes(Base):
         self.assertEqual(self.evaluate(note_routes(text)).action, "merge")
 
     def test_unknown_plugin_refuses(self):
-        self.assert_note_refused("---\nno-such-plugin: patch\n---\n\nX.\n",
-                                 "names no-such-plugin, which is not a plugin in `.claude-plugin/marketplace.json`")
+        self.assert_note_refused(
+            "---\nno-such-plugin: patch\n---\n\nX.\n",
+            "names no-such-plugin, which is not a plugin in `.claude-plugin/marketplace.json`",
+        )
 
     def test_bad_bump_refuses(self):
-        self.assert_note_refused("---\nbrand-voice: feature\n---\n\nX.\n", "asks for 'feature' for brand-voice")
+        self.assert_note_refused(
+            "---\nbrand-voice: feature\n---\n\nX.\n", "asks for 'feature' for brand-voice"
+        )
 
     def test_empty_text_refuses(self):
-        self.assert_note_refused("---\nbrand-voice: patch\n---\n\n", "says nothing about the change")
+        self.assert_note_refused(
+            "---\nbrand-voice: patch\n---\n\n", "says nothing about the change"
+        )
 
     def test_missing_closing_line_refuses(self):
-        self.assert_note_refused("---\nbrand-voice: patch\n\nX.\n", "has an opening --- with no closing ---")
+        self.assert_note_refused(
+            "---\nbrand-voice: patch\n\nX.\n", "has an opening --- with no closing ---"
+        )
 
     def test_missing_frontmatter_refuses(self):
         self.assert_note_refused("Just text.\n", "must start with a --- line")
@@ -1315,14 +1801,20 @@ class ChangesetNotes(Base):
         self.assert_note_refused("---\n---\n\nX.\n", "names no plugin")
 
     def test_a_plugin_named_twice_refuses(self):
-        self.assert_note_refused("---\nbrand-voice: patch\nbrand-voice: minor\n---\n\nX.\n", "names brand-voice twice")
+        self.assert_note_refused(
+            "---\nbrand-voice: patch\nbrand-voice: minor\n---\n\nX.\n", "names brand-voice twice"
+        )
 
     def test_an_unreadable_line_refuses(self):
-        self.assert_note_refused("---\nbrand voice is patch\n---\n\nX.\n", "has a line it cannot read")
+        self.assert_note_refused(
+            "---\nbrand voice is patch\n---\n\nX.\n", "has a line it cannot read"
+        )
 
     def test_a_level_two_heading_in_the_text_refuses(self):
-        self.assert_note_refused("---\nbrand-voice: patch\n---\n\nX.\n\n## Breaking changes\n\nY.\n",
-                                 "has a `## ` heading in its text")
+        self.assert_note_refused(
+            "---\nbrand-voice: patch\n---\n\nX.\n\n## Breaking changes\n\nY.\n",
+            "has a `## ` heading in its text",
+        )
 
     def test_a_level_three_heading_in_the_text_merges(self):
         text = "---\nbrand-voice: patch\n---\n\nX.\n\n### Breaking changes\n\nY.\n"
@@ -1331,33 +1823,54 @@ class ChangesetNotes(Base):
     def test_a_note_that_is_not_utf8_refuses_without_failing_the_run(self):
         routes = note_routes(b"---\nbrand-voice: patch\n---\n\n\xff\n")
         errors = []
-        gate.run_plan(FakeGitHub(routes), CFG, "pull_request_target", {"pull_request": {"number": 7}}, "", errors)
+        gate.run_plan(
+            FakeGitHub(routes),
+            CFG,
+            "pull_request_target",
+            {"pull_request": {"number": 7}},
+            "",
+            errors,
+        )
         self.assertEqual(errors, [])
         self.assert_refused(routes, f"`{NOTE_PATH}` at {HEAD[:7]} is not UTF-8 text")
 
     def test_unreadable_marketplace_refuses(self):
         routes = note_routes(GOOD_NOTE)
-        routes[f"/repos/{REPO}/contents/.claude-plugin/marketplace.json?ref={HEAD}"] = content("{ not json")
+        routes[f"/repos/{REPO}/contents/.claude-plugin/marketplace.json?ref={HEAD}"] = content(
+            "{ not json"
+        )
         self.assert_refused(routes, "`.claude-plugin/marketplace.json` is not valid JSON")
 
     def test_a_plugin_added_in_the_same_pull_request_is_known(self):
         path = ".claude-plugin/marketplace.json"
         data = json.loads(market())
-        data["plugins"].append({"name": "new-plugin", "source": "./plugins/new-plugin", "version": "0.1.0"})
-        routes = release_routes([(NOTE_PATH, "added"), (path, "modified")], {path: market()},
-                                {path: json.dumps(data), NOTE_PATH: "---\nnew-plugin: minor\n---\n\nNew.\n"})
+        data["plugins"].append(
+            {"name": "new-plugin", "source": "./plugins/new-plugin", "version": "0.1.0"}
+        )
+        routes = release_routes(
+            [(NOTE_PATH, "added"), (path, "modified")],
+            {path: market()},
+            {path: json.dumps(data), NOTE_PATH: "---\nnew-plugin: minor\n---\n\nNew.\n"},
+        )
         self.assertEqual(self.evaluate(routes).action, "merge")
 
     def test_every_bad_note_is_listed(self):
         other = ".changeset/171-y.md"
-        routes = release_routes([(NOTE_PATH, "added"), (other, "modified")],
-                                after={NOTE_PATH: "Just text.\n", other: "---\nnope: patch\n---\n\nX.\n"})
+        routes = release_routes(
+            [(NOTE_PATH, "added"), (other, "modified")],
+            after={NOTE_PATH: "Just text.\n", other: "---\nnope: patch\n---\n\nX.\n"},
+        )
         body = self.assert_refused(routes, f"`{NOTE_PATH}` must start with a --- line")
         self.assertIn(f"`{other}` names nope", body)
 
     def test_files_the_release_step_never_reads_are_not_read(self):
-        files = [(".changeset/README.md", "modified"), (".changeset/readme.md", "added"),
-                 (".changeset/sub/1-x.md", "added"), (".changeset/1-x.txt", "added"), (NOTE_PATH, "removed")]
+        files = [
+            (".changeset/README.md", "modified"),
+            (".changeset/readme.md", "added"),
+            (".changeset/sub/1-x.md", "added"),
+            (".changeset/1-x.txt", "added"),
+            (NOTE_PATH, "removed"),
+        ]
         gh = FakeGitHub(release_routes(files))
         self.assertEqual(gate.evaluate(gh, CFG, 7).action, "merge")
         self.assertFalse([c for c in gh.calls if "/contents/" in c[1]])
@@ -1456,7 +1969,11 @@ class RestClient(unittest.TestCase):
         self.assertIsNone(req.get_header("Content-type"))
 
     def test_writes_send_json_and_empty_reply_is_none(self):
-        for call, method in ((self.gh.post, "POST"), (self.gh.put, "PUT"), (self.gh.patch, "PATCH")):
+        for call, method in (
+            (self.gh.post, "POST"),
+            (self.gh.put, "PUT"),
+            (self.gh.patch, "PATCH"),
+        ):
             with self.subTest(method=method):
                 self.replies.append(FakeResponse(b""))
                 self.assertIsNone(call("/x", {"a": 1}))
@@ -1466,15 +1983,25 @@ class RestClient(unittest.TestCase):
                 self.assertEqual(req.get_header("Content-type"), "application/json")
 
     def test_http_error_carries_status_and_github_message(self):
-        self.replies.append(urllib.error.HTTPError(
-            "https://api.example.test/x", 422, "Unprocessable", {}, io.BytesIO(b'{"message": "Validation Failed"}')))
+        self.replies.append(
+            urllib.error.HTTPError(
+                "https://api.example.test/x",
+                422,
+                "Unprocessable",
+                {},
+                io.BytesIO(b'{"message": "Validation Failed"}'),
+            )
+        )
         with self.assertRaises(gate.GitHubError) as ctx:
             self.gh.get("/x")
         self.assertEqual((ctx.exception.status, ctx.exception.message), (422, "Validation Failed"))
 
     def test_http_error_with_plain_text_body_keeps_the_text(self):
-        self.replies.append(urllib.error.HTTPError(
-            "https://api.example.test/x", 502, "Bad Gateway", {}, io.BytesIO(b"upstream down")))
+        self.replies.append(
+            urllib.error.HTTPError(
+                "https://api.example.test/x", 502, "Bad Gateway", {}, io.BytesIO(b"upstream down")
+            )
+        )
         with self.assertRaises(gate.GitHubError) as ctx:
             self.gh.put("/x", {})
         self.assertEqual((ctx.exception.status, ctx.exception.message), (502, "upstream down"))
@@ -1485,11 +2012,16 @@ class RestClient(unittest.TestCase):
             FakeResponse(b'{"items": [1, 2]}', nxt),
             FakeResponse(b'{"items": [3]}', '<https://api.example.test/items?page=1>; rel="prev"'),
         ]
-        self.assertEqual(self.gh.paginate("/items", key="items", params={"state": "open"}), [1, 2, 3])
-        self.assertEqual([r.full_url for r in self.sent], [
-            "https://api.example.test/items?state=open&per_page=100",
-            "https://api.example.test/items?page=2",
-        ])
+        self.assertEqual(
+            self.gh.paginate("/items", key="items", params={"state": "open"}), [1, 2, 3]
+        )
+        self.assertEqual(
+            [r.full_url for r in self.sent],
+            [
+                "https://api.example.test/items?state=open&per_page=100",
+                "https://api.example.test/items?page=2",
+            ],
+        )
 
 
 class EntryPoint(unittest.TestCase):
@@ -1503,16 +2035,21 @@ class EntryPoint(unittest.TestCase):
             json.dump({"pull_request": {"number": 7}}, fh)
         self.output = os.path.join(self.tmp, "output")
         self.env = {
-            "GITHUB_REPOSITORY": REPO, "GATE_TOKEN": "synthetic-read", "GITHUB_API_URL": "https://api.example.test",
-            "GITHUB_EVENT_PATH": self.event, "GITHUB_EVENT_NAME": "pull_request_target", "GITHUB_OUTPUT": self.output,
+            "GITHUB_REPOSITORY": REPO,
+            "GATE_TOKEN": "synthetic-read",
+            "GITHUB_API_URL": "https://api.example.test",
+            "GITHUB_EVENT_PATH": self.event,
+            "GITHUB_EVENT_NAME": "pull_request_target",
+            "GITHUB_OUTPUT": self.output,
         }
 
-
     def run_main(self, argv, env, plan=None, merge=None):
-        with mock.patch.dict(os.environ, env, clear=True), \
-             mock.patch.object(gate, "run_plan", side_effect=plan) as run_plan, \
-             mock.patch.object(gate, "run_merge", side_effect=merge) as run_merge, \
-             mock.patch("sys.stderr", new_callable=io.StringIO):
+        with (
+            mock.patch.dict(os.environ, env, clear=True),
+            mock.patch.object(gate, "run_plan", side_effect=plan) as run_plan,
+            mock.patch.object(gate, "run_merge", side_effect=merge) as run_merge,
+            mock.patch("sys.stderr", new_callable=io.StringIO),
+        ):
             return gate.main(argv), run_plan, run_merge
 
     def test_unknown_or_missing_subcommand_is_a_usage_error(self):
@@ -1529,7 +2066,10 @@ class EntryPoint(unittest.TestCase):
         gh, cfg, event_name, event, dispatch, _errors = run_plan.call_args.args
         self.assertEqual((gh.token, gh.api_url), ("synthetic-read", "https://api.example.test"))
         self.assertEqual((cfg.repo, cfg.base_branch, cfg.merge_label), (REPO, "main", ""))
-        self.assertEqual((event_name, event, dispatch), ("pull_request_target", {"pull_request": {"number": 7}}, ""))
+        self.assertEqual(
+            (event_name, event, dispatch),
+            ("pull_request_target", {"pull_request": {"number": 7}}, ""),
+        )
         with open(self.output, encoding="utf-8") as fh:
             self.assertEqual(fh.read(), "merge=7 9\n")
 
@@ -1537,6 +2077,7 @@ class EntryPoint(unittest.TestCase):
         def plan(gh, cfg, name, event, dispatch, errors):
             errors.append("#7: HTTP 502: down")
             return []
+
         code, _, _ = self.run_main(["plan"], self.env, plan=plan)
         self.assertEqual(code, 1)
         with open(self.output, encoding="utf-8") as fh:
@@ -1557,12 +2098,15 @@ class EntryPoint(unittest.TestCase):
         code, _, run_merge = self.run_main(["merge"], env, merge=lambda *a: ["c" * 40])
         self.assertEqual(code, 0)
         gh, merger, cfg, numbers, _errors = run_merge.call_args.args
-        self.assertEqual((gh.token, merger.token, numbers), ("synthetic-read", "synthetic-merge", [7, 12]))
+        self.assertEqual(
+            (gh.token, merger.token, numbers), ("synthetic-read", "synthetic-merge", [7, 12])
+        )
 
     def test_merge_fails_the_run_when_a_pull_request_errored(self):
         def merge(gh, merger, cfg, numbers, errors):
             errors.append("#7: HTTP 409: conflict")
             return []
+
         env = dict(self.env, MERGE_TOKEN="synthetic-merge", GATE_MERGE_PRS="7")
         self.assertEqual(self.run_main(["merge"], env, merge=merge)[0], 1)
 
