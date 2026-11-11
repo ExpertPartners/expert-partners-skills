@@ -28,6 +28,7 @@ Commands
   report    --out DIR
   validate  --derived FILE [--part PART.md ...] [--nav] [--combined]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -47,15 +48,27 @@ import zipfile
 from html.parser import HTMLParser
 from pathlib import Path
 
-TOKEN_CHARS = 4          # one token is estimated as four characters (R12, G16, approximate on purpose)
-SPLIT_TOKENS = 50000     # past about 50,000 tokens the material is split (R12, G16)
-SMALL_CHANGE_LIMIT = 0.34  # a revised source that changed under a third advances the decimal (R31, G14)
-HEADER_ORDER = ["title", "type", "source", "date", "duration", "people", "optimized_for", "optimized_at"]  # R20, R22, G20
+TOKEN_CHARS = 4  # one token is estimated as four characters (R12, G16, approximate on purpose)
+SPLIT_TOKENS = 50000  # past about 50,000 tokens the material is split (R12, G16)
+SMALL_CHANGE_LIMIT = (
+    0.34  # a revised source that changed under a third advances the decimal (R31, G14)
+)
+HEADER_ORDER = [
+    "title",
+    "type",
+    "source",
+    "date",
+    "duration",
+    "people",
+    "optimized_for",
+    "optimized_at",
+]  # R20, R22, G20
 
 
 # ----------------------------------------------------------------------------
 # small helpers
 # ----------------------------------------------------------------------------
+
 
 def sha256_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
@@ -69,7 +82,14 @@ def est_tokens(text: str) -> int:
     return int(round(len(text) / TOKEN_CHARS))
 
 
-LIGATURES = {"\ufb00": "ff", "\ufb01": "fi", "\ufb02": "fl", "\ufb03": "ffi", "\ufb04": "ffl", "\ufb06": "st"}
+LIGATURES = {
+    "\ufb00": "ff",
+    "\ufb01": "fi",
+    "\ufb02": "fl",
+    "\ufb03": "ffi",
+    "\ufb04": "ffl",
+    "\ufb06": "st",
+}
 
 
 def clean_inline(text: str) -> str:
@@ -138,7 +158,9 @@ def render_blocks(blocks, shift=1):
             if not rows:
                 continue
             width = max(len(r) for r in rows)
-            norm = [[(c or "").replace("|", "\\|") for c in r] + [""] * (width - len(r)) for r in rows]
+            norm = [
+                [(c or "").replace("|", "\\|") for c in r] + [""] * (width - len(r)) for r in rows
+            ]
             lines.append("| " + " | ".join(norm[0]) + " |")
             lines.append("|" + "|".join([" --- "] * width) + "|")
             for r in norm[1:]:
@@ -172,8 +194,18 @@ def render_blocks(blocks, shift=1):
 
 
 def block_stats(blocks):
-    stats = {"headings": 0, "paragraphs": 0, "tables": 0, "turns": 0, "cue_groups": 0, "timestamps": 0,
-             "images": 0, "unreadable": 0, "links": 0, "speakers": []}
+    stats = {
+        "headings": 0,
+        "paragraphs": 0,
+        "tables": 0,
+        "turns": 0,
+        "cue_groups": 0,
+        "timestamps": 0,
+        "images": 0,
+        "unreadable": 0,
+        "links": 0,
+        "speakers": [],
+    }
     speakers = []
     for b in blocks:
         t = b["type"]
@@ -207,6 +239,7 @@ def block_stats(blocks):
 # extraction routes (R05, R06, R09)
 # ----------------------------------------------------------------------------
 
+
 def detect_kind(path: Path, kind: str) -> str:
     if kind and kind != "auto":
         return kind
@@ -219,12 +252,26 @@ def detect_kind(path: Path, kind: str) -> str:
         except Exception:
             pass
         return "txt"
-    return {".pdf": "pdf", ".docx": "docx", ".vtt": "vtt", ".srt": "srt", ".md": "md", ".markdown": "md",
-            ".txt": "txt", ".html": "html", ".htm": "html", ".mp3": "audio", ".m4a": "audio", ".wav": "audio",
-            ".mp4": "video", ".mov": "video"}.get(ext, "txt")
+    return {
+        ".pdf": "pdf",
+        ".docx": "docx",
+        ".vtt": "vtt",
+        ".srt": "srt",
+        ".md": "md",
+        ".markdown": "md",
+        ".txt": "txt",
+        ".html": "html",
+        ".htm": "html",
+        ".mp3": "audio",
+        ".m4a": "audio",
+        ".wav": "audio",
+        ".mp4": "video",
+        ".mov": "video",
+    }.get(ext, "txt")
 
 
 # --- Google Doc, from the Docs API JSON with every tab (R05) ----------------
+
 
 def _gdoc_elements_text(elements, notes):
     out = []
@@ -242,10 +289,16 @@ def _gdoc_elements_text(elements, notes):
             out.append("[" + str(pe["footnoteReference"].get("footnoteNumber", "?")) + "]")
         elif "inlineObjectElement" in pe:
             out.append("[image: " + pe["inlineObjectElement"].get("inlineObjectId", "object") + "]")
-            notes.append("inline image " + pe["inlineObjectElement"].get("inlineObjectId", "") + " is kept as a placeholder, the picture itself was not exported")
+            notes.append(
+                "inline image "
+                + pe["inlineObjectElement"].get("inlineObjectId", "")
+                + " is kept as a placeholder, the picture itself was not exported"
+            )
         elif "richLink" in pe:
             rp = pe["richLink"].get("richLinkProperties", {})
-            out.append("[" + rp.get("title", rp.get("uri", "link")) + "](" + rp.get("uri", "") + ")")
+            out.append(
+                "[" + rp.get("title", rp.get("uri", "link")) + "](" + rp.get("uri", "") + ")"
+            )
         elif "person" in pe:
             out.append(pe["person"].get("personProperties", {}).get("name", ""))
         elif "equation" in pe:
@@ -272,7 +325,9 @@ def _gdoc_body(content, blocks, notes, footnotes):
                 continue
             pending_list = None
             if style.startswith("HEADING_"):
-                blocks.append({"type": "heading", "level": int(style.split("_")[1]) + 1, "text": text})
+                blocks.append(
+                    {"type": "heading", "level": int(style.split("_")[1]) + 1, "text": text}
+                )
             elif style in ("TITLE", "SUBTITLE"):
                 blocks.append({"type": "heading", "level": 1, "text": text})
             else:
@@ -286,7 +341,11 @@ def _gdoc_body(content, blocks, notes, footnotes):
                     cell_parts = []
                     for ce in c.get("content", []):
                         if "paragraph" in ce:
-                            cell_parts.append(clean_inline(_gdoc_elements_text(ce["paragraph"].get("elements", []), notes)))
+                            cell_parts.append(
+                                clean_inline(
+                                    _gdoc_elements_text(ce["paragraph"].get("elements", []), notes)
+                                )
+                            )
                     row.append(" ".join(x for x in cell_parts if x))
                 rows.append(row)
             blocks.append({"type": "table", "rows": rows})
@@ -320,15 +379,27 @@ def extract_gdoc_json(path: Path, notes):
             parts = []
             for ce in fn.get("content", []):
                 if "paragraph" in ce:
-                    parts.append(clean_inline(_gdoc_elements_text(ce["paragraph"].get("elements", []), notes)))
-            blocks.append({"type": "para", "text": "[" + fid + "] " + " ".join(x for x in parts if x)})
-    return blocks, {"kind": "Google Doc", "tabs": len(d.get("tabs", [])) or 1, "title": d.get("title", "")}
+                    parts.append(
+                        clean_inline(
+                            _gdoc_elements_text(ce["paragraph"].get("elements", []), notes)
+                        )
+                    )
+            blocks.append(
+                {"type": "para", "text": "[" + fid + "] " + " ".join(x for x in parts if x)}
+            )
+    return blocks, {
+        "kind": "Google Doc",
+        "tabs": len(d.get("tabs", [])) or 1,
+        "title": d.get("title", ""),
+    }
 
 
 # --- Word document (R06) ----------------------------------------------------
 
+
 def extract_docx(path: Path, notes):
     import xml.etree.ElementTree as ET
+
     W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
     R = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
     blocks = []
@@ -403,7 +474,9 @@ def extract_docx(path: Path, notes):
             for tr in el.findall(W + "tr"):
                 row = []
                 for tc in tr.findall(W + "tc"):
-                    row.append(" ".join(x for x in (para_text(p) for p in tc.findall(W + "p")) if x))
+                    row.append(
+                        " ".join(x for x in (para_text(p) for p in tc.findall(W + "p")) if x)
+                    )
                 rows.append(row)
             blocks.append({"type": "table", "rows": rows})
     return blocks, {"kind": "Word document"}
@@ -424,14 +497,26 @@ def _lines_to_paras(lines, cleanup):
         if not text:
             continue
         if cur is None:
-            cur = {"text": text, "size": ln["size"], "lines": 1, "top": ln["top"], "bottom": ln["bottom"]}
+            cur = {
+                "text": text,
+                "size": ln["size"],
+                "lines": 1,
+                "top": ln["top"],
+                "bottom": ln["bottom"],
+            }
             continue
         gap = ln["top"] - cur["bottom"]
         height = max(1.0, ln["bottom"] - ln["top"])
         size_jump = abs(ln["size"] - cur["size"]) > 1.0
         if gap > 0.55 * height or size_jump:
             paras.append(cur)
-            cur = {"text": text, "size": ln["size"], "lines": 1, "top": ln["top"], "bottom": ln["bottom"]}
+            cur = {
+                "text": text,
+                "size": ln["size"],
+                "lines": 1,
+                "top": ln["top"],
+                "bottom": ln["bottom"],
+            }
         else:
             prev = cur["text"]
             if prev.endswith("-") and text[:1].islower():
@@ -461,8 +546,8 @@ def _repair_glyphs(text: str, ref: str, notes, cleanup, page: int) -> str:
         j = i
         while j < len(out) and out[j] == "\x00":
             j += 1
-        pre = out[max(0, i - 8):i]
-        suf = out[j:j + 8]
+        pre = out[max(0, i - 8) : i]
+        suf = out[j : j + 8]
         found = set()
         if ref and (pre.strip() or suf.strip()):
             pat = re.escape(pre) + r"(\S{1,4})" + re.escape(suf)
@@ -472,7 +557,9 @@ def _repair_glyphs(text: str, ref: str, notes, cleanup, page: int) -> str:
             cleanup.add("unmapped glyphs restored from a second read of the same page")
         else:
             out = out[:i] + "[unreadable character]" + out[j:]
-            notes.append("page %d holds a glyph the font does not map, it is marked unreadable" % page)
+            notes.append(
+                "page %d holds a glyph the font does not map, it is marked unreadable" % page
+            )
     return out
 
 
@@ -480,7 +567,12 @@ def _page_reference_text(path: Path, pno: int) -> str:
     if not which("pdftotext"):
         return ""
     try:
-        res = subprocess.run(["pdftotext", "-f", str(pno), "-l", str(pno), str(path), "-"], capture_output=True, text=True, timeout=60)
+        res = subprocess.run(
+            ["pdftotext", "-f", str(pno), "-l", str(pno), str(path), "-"],
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
         return re.sub(r"\s+", " ", res.stdout)
     except Exception:
         return ""
@@ -519,19 +611,38 @@ def extract_pdf(path: Path, work: Path, notes, cleanup):
                 try:
                     page.to_image(resolution=200).save(str(img_path))
                     if which("tesseract"):
-                        res = subprocess.run(["tesseract", str(img_path), "stdout"], capture_output=True, text=True)
+                        res = subprocess.run(
+                            ["tesseract", str(img_path), "stdout"], capture_output=True, text=True
+                        )
                         for chunk in re.split(r"\n\s*\n", res.stdout):
                             c = clean_inline(chunk.replace("\n", " "))
                             if c:
                                 ocr_paras.append(c)
                     else:
-                        notes.append("page %d is a scan and no OCR tool is installed, marked unreadable" % pno)
+                        notes.append(
+                            "page %d is a scan and no OCR tool is installed, marked unreadable"
+                            % pno
+                        )
                 except Exception as exc:  # pragma: no cover
                     notes.append("page %d could not be rendered: %s" % (pno, exc))
-                blk = {"type": "image", "path": "images/page-%d.png" % pno, "note": "scanned page %d" % pno, "ocr": ocr_paras}
+                blk = {
+                    "type": "image",
+                    "path": "images/page-%d.png" % pno,
+                    "note": "scanned page %d" % pno,
+                    "ocr": ocr_paras,
+                }
                 items.append(("image", blk))
                 if not ocr_paras:
-                    items.append(("unreadable", {"type": "unreadable", "note": "scanned page %d, no readable text could be recovered" % pno}))
+                    items.append(
+                        (
+                            "unreadable",
+                            {
+                                "type": "unreadable",
+                                "note": "scanned page %d, no readable text could be recovered"
+                                % pno,
+                            },
+                        )
+                    )
                 page_items.append(items)
                 pages_meta.append({"page": pno, "scanned": True})
                 continue
@@ -545,10 +656,19 @@ def extract_pdf(path: Path, work: Path, notes, cleanup):
                 region = page.crop((0, max(0, y0), page.width, min(page.height, y1)), strict=False)
                 out = []
                 try:
-                    for ln in region.extract_text_lines(layout=False, strip=True, return_chars=True):
+                    for ln in region.extract_text_lines(
+                        layout=False, strip=True, return_chars=True
+                    ):
                         sizes = [c.get("size", 0) for c in ln.get("chars", []) if c.get("size")]
                         size = sorted(sizes)[len(sizes) // 2] if sizes else 0
-                        out.append({"text": ln["text"], "top": ln["top"], "bottom": ln["bottom"], "size": size})
+                        out.append(
+                            {
+                                "text": ln["text"],
+                                "top": ln["top"],
+                                "bottom": ln["bottom"],
+                                "size": size,
+                            }
+                        )
                 except Exception:
                     for t in (region.extract_text() or "").splitlines():
                         out.append({"text": t, "top": 0, "bottom": 0, "size": 0})
@@ -557,7 +677,9 @@ def extract_pdf(path: Path, work: Path, notes, cleanup):
             for t in tables:
                 x0, top, x1, bottom = t.bbox
                 items.append(("lines", band_lines(y, top)))
-                rows = [[clean_inline((c or "").replace("\n", " ")) for c in r] for r in t.extract()]
+                rows = [
+                    [clean_inline((c or "").replace("\n", " ")) for c in r] for r in t.extract()
+                ]
                 # drop columns that are empty in every row
                 if rows:
                     width = max(len(r) for r in rows)
@@ -607,14 +729,35 @@ def extract_pdf(path: Path, work: Path, notes, cleanup):
                         if ref is None:
                             ref = _page_reference_text(path, pno)
                         p["text"] = _repair_glyphs(p["text"], ref, notes, cleanup, pno)
-                    is_heading = (p["lines"] == 1 and len(p["text"]) <= 90 and body_size and p["size"] >= body_size * 1.12
-                                  and not p["text"].endswith((".", ",", ";")))
+                    is_heading = (
+                        p["lines"] == 1
+                        and len(p["text"]) <= 90
+                        and body_size
+                        and p["size"] >= body_size * 1.12
+                        and not p["text"].endswith((".", ",", ";"))
+                    )
                     if is_heading:
-                        blocks.append({"type": "heading", "level": 2, "text": p["text"], "_size": round(p["size"], 1)})
-                    elif fresh_page and blocks and blocks[-1]["type"] == "para" and _continues(blocks[-1]["text"], p["text"]):
+                        blocks.append(
+                            {
+                                "type": "heading",
+                                "level": 2,
+                                "text": p["text"],
+                                "_size": round(p["size"], 1),
+                            }
+                        )
+                    elif (
+                        fresh_page
+                        and blocks
+                        and blocks[-1]["type"] == "para"
+                        and _continues(blocks[-1]["text"], p["text"])
+                    ):
                         # a paragraph that crosses the page break is one paragraph (R10)
                         prev = blocks[-1]["text"]
-                        blocks[-1]["text"] = (prev[:-1] + p["text"]) if prev.endswith("-") else (prev + " " + p["text"])
+                        blocks[-1]["text"] = (
+                            (prev[:-1] + p["text"])
+                            if prev.endswith("-")
+                            else (prev + " " + p["text"])
+                        )
                         cleanup.add("paragraphs rejoined across page breaks")
                     else:
                         blocks.append({"type": "para", "text": p["text"]})
@@ -630,7 +773,9 @@ def extract_pdf(path: Path, work: Path, notes, cleanup):
                 blocks.append(payload)
                 fresh_page = False
     # heading levels follow the distinct heading sizes, the largest is the top level (R17)
-    sizes = sorted({b["_size"] for b in blocks if b["type"] == "heading" and "_size" in b}, reverse=True)
+    sizes = sorted(
+        {b["_size"] for b in blocks if b["type"] == "heading" and "_size" in b}, reverse=True
+    )
     for b in blocks:
         if b["type"] == "heading" and "_size" in b:
             b["level"] = min(3, sizes.index(b.pop("_size")) + 1)
@@ -639,25 +784,39 @@ def extract_pdf(path: Path, work: Path, notes, cleanup):
     m = re.search(r"D:(\d{4})(\d{2})(\d{2})", str(raw))
     if m:
         created = "%s-%s-%s" % m.groups()
-    return blocks, {"kind": "PDF", "pages": page_count, "pdf_created": created, "route": "pdfplumber"}
+    return blocks, {
+        "kind": "PDF",
+        "pages": page_count,
+        "pdf_created": created,
+        "route": "pdfplumber",
+    }
 
 
 def extract_pdf_fallback(path: Path, work: Path, notes, cleanup):
     text = ""
     route = ""
     if which("pdftotext"):
-        res = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True)
+        res = subprocess.run(
+            ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True
+        )
         text = res.stdout
         route = "pdftotext"
     else:
         try:
             from pypdf import PdfReader  # type: ignore
+
             reader = PdfReader(str(path))
             text = "\n\x0c".join((p.extract_text() or "") for p in reader.pages)
             route = "pypdf"
         except ImportError:
-            raise RuntimeError("no PDF reader is available (install pdfplumber, pypdf or pdftotext)")
-    notes.append("tables could not be detected on this route (" + route + "), their layout text is kept as it was")
+            raise RuntimeError(
+                "no PDF reader is available (install pdfplumber, pypdf or pdftotext)"
+            )
+    notes.append(
+        "tables could not be detected on this route ("
+        + route
+        + "), their layout text is kept as it was"
+    )
     blocks = []
     for page in text.split("\x0c"):
         lines = [l.rstrip() for l in page.splitlines()]
@@ -685,7 +844,9 @@ def extract_pdf_fallback(path: Path, work: Path, notes, cleanup):
 
 # --- captions, WebVTT and SRT (R05, R11, G18) -------------------------------
 
-TIMING_RE = re.compile(r"^(\d{1,2}:\d{2}:\d{2}[.,]\d{3}|\d{1,2}:\d{2}[.,]\d{3})\s*-->\s*(\d{1,2}:\d{2}:\d{2}[.,]\d{3}|\d{1,2}:\d{2}[.,]\d{3})")
+TIMING_RE = re.compile(
+    r"^(\d{1,2}:\d{2}:\d{2}[.,]\d{3}|\d{1,2}:\d{2}[.,]\d{3})\s*-->\s*(\d{1,2}:\d{2}:\d{2}[.,]\d{3}|\d{1,2}:\d{2}[.,]\d{3})"
+)
 VOICE_RE = re.compile(r"<v\s+([^>]+)>(.*?)(</v>|$)", re.S)
 LABEL_RE = re.compile(r"^([^:\n]{1,40}?):\s+(.*)$", re.S)
 
@@ -727,14 +888,18 @@ def extract_captions(path: Path, notes, cleanup):
                         break
                 if timing_idx is not None:
                     m = TIMING_RE.match(block[timing_idx].strip())
-                    text = " ".join(clean_inline(x) for x in block[timing_idx + 1:] if clean_inline(x))
+                    text = " ".join(
+                        clean_inline(x) for x in block[timing_idx + 1 :] if clean_inline(x)
+                    )
                     text = re.sub(r"</?[biu]>", "", text)
                     speaker = ""
                     vm = VOICE_RE.search(text)
                     if vm:
                         speaker = clean_inline(vm.group(1))
                         text = clean_inline(VOICE_RE.sub(lambda mm: mm.group(2), text))
-                    cues.append({"start": m.group(1), "end": m.group(2), "text": text, "speaker": speaker})
+                    cues.append(
+                        {"start": m.group(1), "end": m.group(2), "text": text, "speaker": speaker}
+                    )
                 block = []
         else:
             block.append(line)
@@ -770,7 +935,9 @@ def extract_captions(path: Path, notes, cleanup):
                 gap = _ts_seconds(c["start"]) - _ts_seconds(cur["cues"][-1][0])
                 ends_sentence = bool(re.search(r"[.!?\u2026]['\")\]]?$", cur["cues"][-1][1]))
                 # a paragraph ends at a sentence end, never mid sentence (R10)
-                keep = (not ends_sentence and len(cur["cues"]) < 40) or (gap <= 8.0 and len(cur["cues"]) < 12)
+                keep = (not ends_sentence and len(cur["cues"]) < 40) or (
+                    gap <= 8.0 and len(cur["cues"]) < 12
+                )
             if keep:
                 cur["cues"].append([c["start"], c["text"]])
             else:
@@ -778,12 +945,18 @@ def extract_captions(path: Path, notes, cleanup):
                 blocks.append(cur)
             cleanup.add("caption fragments grouped into paragraphs at pauses")
     duration = _duration_words(_ts_seconds(cues[-1]["end"]))
-    return blocks, {"kind": "captions (" + path.suffix.lstrip(".").upper() + ")", "cues": len(cues), "duration": duration,
-                    "duration_basis": "from the last caption end time " + cues[-1]["end"],
-                    "speaker_labels": sorted(labels) if labels else [], "route": "caption parser"}
+    return blocks, {
+        "kind": "captions (" + path.suffix.lstrip(".").upper() + ")",
+        "cues": len(cues),
+        "duration": duration,
+        "duration_basis": "from the last caption end time " + cues[-1]["end"],
+        "speaker_labels": sorted(labels) if labels else [],
+        "route": "caption parser",
+    }
 
 
 # --- plain text and Markdown (R05) ------------------------------------------
+
 
 def extract_text(path: Path, notes, cleanup):
     raw = path.read_text(encoding="utf-8", errors="replace").replace("\r\n", "\n")
@@ -813,10 +986,16 @@ def extract_text(path: Path, notes, cleanup):
         m = re.match(r"^(#{1,6})\s+(.*)$", s)
         if m:
             flush()
-            blocks.append({"type": "heading", "level": len(m.group(1)), "text": clean_inline(m.group(2))})
+            blocks.append(
+                {"type": "heading", "level": len(m.group(1)), "text": clean_inline(m.group(2))}
+            )
             i += 1
             continue
-        if s.startswith("|") and i + 1 < len(lines) and re.match(r"^\|?\s*:?-{3,}", lines[i + 1].strip()):
+        if (
+            s.startswith("|")
+            and i + 1 < len(lines)
+            and re.match(r"^\|?\s*:?-{3,}", lines[i + 1].strip())
+        ):
             flush()
             rows = []
             while i < len(lines) and lines[i].strip().startswith("|"):
@@ -830,7 +1009,10 @@ def extract_text(path: Path, notes, cleanup):
         if re.match(r"^[-*+]\s+", s) or re.match(r"^\d+[.)]\s+", s):
             flush()
             items = []
-            while i < len(lines) and (re.match(r"^[-*+]\s+", lines[i].strip()) or re.match(r"^\d+[.)]\s+", lines[i].strip())):
+            while i < len(lines) and (
+                re.match(r"^[-*+]\s+", lines[i].strip())
+                or re.match(r"^\d+[.)]\s+", lines[i].strip())
+            ):
                 items.append(clean_inline(re.sub(r"^([-*+]|\d+[.)])\s+", "", lines[i].strip())))
                 i += 1
             blocks.append({"type": "list", "items": items})
@@ -852,8 +1034,20 @@ def extract_text(path: Path, notes, cleanup):
 
 # --- web page, navigation and advertising removed (R09) --------------------
 
+
 class _HtmlToBlocks(HTMLParser):
-    SKIP = {"script", "style", "nav", "header", "footer", "aside", "noscript", "iframe", "form", "svg"}
+    SKIP = {
+        "script",
+        "style",
+        "nav",
+        "header",
+        "footer",
+        "aside",
+        "noscript",
+        "iframe",
+        "form",
+        "svg",
+    }
 
     def __init__(self):
         super().__init__(convert_charrefs=True)
@@ -970,27 +1164,43 @@ def extract_html(path: Path, notes, cleanup):
 
 # --- audio and video, transcription with Whisper when available (R09) ------
 
+
 def extract_media(path: Path, work: Path, notes, cleanup):
     if which("whisper"):
         out_dir = work / "transcription"
         out_dir.mkdir(parents=True, exist_ok=True)
-        subprocess.run(["whisper", str(path), "--output_format", "vtt", "--output_dir", str(out_dir)], capture_output=True, text=True)
+        subprocess.run(
+            ["whisper", str(path), "--output_format", "vtt", "--output_dir", str(out_dir)],
+            capture_output=True,
+            text=True,
+        )
         vtts = list(out_dir.glob("*.vtt"))
         if vtts:
             blocks, info = extract_captions(vtts[0], notes, cleanup)
             info["kind"] = "recording transcribed with Whisper"
             return blocks, info
-    raise RuntimeError("the recording could not be transcribed, no Whisper transcription is available in this session")
+    raise RuntimeError(
+        "the recording could not be transcribed, no Whisper transcription is available in this session"
+    )
 
 
 # --- the extract command ----------------------------------------------------
+
 
 def propose_parts(lines):
     """Split rendered Markdown lines into parts at section breaks when the whole is past
     about 50,000 tokens (R12, G16). Returns list of parts, each {start, end, tokens, headings}."""
     total = est_tokens("\n".join(lines))
     if total <= SPLIT_TOKENS:
-        return [{"start": 1, "end": len(lines), "tokens": total, "headings": _headings_in(lines, 0, len(lines)), "break": "whole file"}]
+        return [
+            {
+                "start": 1,
+                "end": len(lines),
+                "tokens": total,
+                "headings": _headings_in(lines, 0, len(lines)),
+                "break": "whole file",
+            }
+        ]
     # sections at the top heading level present
     levels = [len(re.match(r"^(#+)\s", l).group(1)) for l in lines if re.match(r"^(#+)\s", l)]
     if not levels:
@@ -1007,7 +1217,14 @@ def propose_parts(lines):
         sec_tokens = est_tokens("\n".join(lines[s:e]))
         if sec_tokens > SPLIT_TOKENS:
             if cur_start is not None:
-                parts.append({"start": cur_start + 1, "end": s, "tokens": cur_tokens, "break": "section break"})
+                parts.append(
+                    {
+                        "start": cur_start + 1,
+                        "end": s,
+                        "tokens": cur_tokens,
+                        "break": "section break",
+                    }
+                )
                 cur_start, cur_tokens = None, 0
             for sub in propose_parts_sub(lines, s, e, top):
                 parts.append(sub)
@@ -1015,24 +1232,39 @@ def propose_parts(lines):
         if cur_start is None:
             cur_start, cur_tokens = s, sec_tokens
         elif cur_tokens + sec_tokens > SPLIT_TOKENS:
-            parts.append({"start": cur_start + 1, "end": s, "tokens": cur_tokens, "break": "section break"})
+            parts.append(
+                {"start": cur_start + 1, "end": s, "tokens": cur_tokens, "break": "section break"}
+            )
             cur_start, cur_tokens = s, sec_tokens
         else:
             cur_tokens += sec_tokens
     if cur_start is not None:
-        parts.append({"start": cur_start + 1, "end": len(lines), "tokens": cur_tokens, "break": "section break"})
+        parts.append(
+            {
+                "start": cur_start + 1,
+                "end": len(lines),
+                "tokens": cur_tokens,
+                "break": "section break",
+            }
+        )
     for p in parts:
         p["headings"] = _headings_in(lines, p["start"] - 1, p["end"])
     return parts
 
 
 def propose_parts_sub(lines, s, e, top):
-    sub_levels = [len(re.match(r"^(#+)\s", l).group(1)) for l in lines[s + 1:e] if re.match(r"^(#+)\s", l)]
+    sub_levels = [
+        len(re.match(r"^(#+)\s", l).group(1)) for l in lines[s + 1 : e] if re.match(r"^(#+)\s", l)
+    ]
     deeper = [lv for lv in sub_levels if lv > top]
     if not deeper:
         return _split_paragraphs(lines[s:e], offset=s)
     nxt = min(deeper)
-    bounds = [s] + [s + 1 + i for i, l in enumerate(lines[s + 1:e]) if re.match(r"^#{%d}\s" % nxt, l)] + [e]
+    bounds = (
+        [s]
+        + [s + 1 + i for i, l in enumerate(lines[s + 1 : e]) if re.match(r"^#{%d}\s" % nxt, l)]
+        + [e]
+    )
     out = []
     cur_start, cur_tokens = None, 0
     for i in range(len(bounds) - 1):
@@ -1040,19 +1272,30 @@ def propose_parts_sub(lines, s, e, top):
         t = est_tokens("\n".join(lines[a:b]))
         if t > SPLIT_TOKENS:
             if cur_start is not None:
-                out.append({"start": cur_start + 1, "end": a, "tokens": cur_tokens, "break": "section break"})
+                out.append(
+                    {
+                        "start": cur_start + 1,
+                        "end": a,
+                        "tokens": cur_tokens,
+                        "break": "section break",
+                    }
+                )
                 cur_start, cur_tokens = None, 0
             out.extend(_split_paragraphs(lines[a:b], offset=a))
             continue
         if cur_start is None:
             cur_start, cur_tokens = a, t
         elif cur_tokens + t > SPLIT_TOKENS:
-            out.append({"start": cur_start + 1, "end": a, "tokens": cur_tokens, "break": "section break"})
+            out.append(
+                {"start": cur_start + 1, "end": a, "tokens": cur_tokens, "break": "section break"}
+            )
             cur_start, cur_tokens = a, t
         else:
             cur_tokens += t
     if cur_start is not None:
-        out.append({"start": cur_start + 1, "end": e, "tokens": cur_tokens, "break": "section break"})
+        out.append(
+            {"start": cur_start + 1, "end": e, "tokens": cur_tokens, "break": "section break"}
+        )
     return out
 
 
@@ -1068,11 +1311,25 @@ def _split_paragraphs(lines, offset=0):
             j += 1
         t = est_tokens("\n".join(lines[i:j]))
         if cur_tokens + t > SPLIT_TOKENS and j > cur_start:
-            out.append({"start": offset + cur_start + 1, "end": offset + i, "tokens": cur_tokens, "break": "paragraph break, this stretch has no section breaks"})
+            out.append(
+                {
+                    "start": offset + cur_start + 1,
+                    "end": offset + i,
+                    "tokens": cur_tokens,
+                    "break": "paragraph break, this stretch has no section breaks",
+                }
+            )
             cur_start, cur_tokens = i, 0
         cur_tokens += t
         i = j + 1
-    out.append({"start": offset + cur_start + 1, "end": offset + len(lines), "tokens": cur_tokens, "break": "paragraph break, this stretch has no section breaks"})
+    out.append(
+        {
+            "start": offset + cur_start + 1,
+            "end": offset + len(lines),
+            "tokens": cur_tokens,
+            "break": "paragraph break, this stretch has no section breaks",
+        }
+    )
     return out
 
 
@@ -1134,6 +1391,7 @@ def cmd_extract(args):
         "notes": notes,
         "date_from_name": date_from_name,
         "date_from_file": args.source_date or info.get("pdf_created", ""),
+        "date_from_source": args.source_date,
         "duration": info.get("duration", ""),
         "duration_basis": info.get("duration_basis", ""),
         "speaker_labels": info.get("speaker_labels", stats["speakers"]),
@@ -1146,13 +1404,40 @@ def cmd_extract(args):
         shutil.rmtree(parts_dir)
     parts_dir.mkdir()
     for n, p in enumerate(parts, 1):
-        (parts_dir / ("part-%d.md" % n)).write_text("\n".join(lines[p["start"] - 1:p["end"]]) + "\n", encoding="utf-8")
+        (parts_dir / ("part-%d.md" % n)).write_text(
+            "\n".join(lines[p["start"] - 1 : p["end"]]) + "\n", encoding="utf-8"
+        )
         p["number"] = n
     meta["parts"] = parts
     write_json(work / "source.meta.json", meta)
-    summary = {k: meta[k] for k in ("original_name", "kind_label", "route", "chars", "tokens_estimate", "cleanup", "notes", "date_from_name", "date_from_file", "duration", "speaker_labels", "lines")}
+    summary = {
+        k: meta[k]
+        for k in (
+            "original_name",
+            "kind_label",
+            "route",
+            "chars",
+            "tokens_estimate",
+            "cleanup",
+            "notes",
+            "date_from_name",
+            "date_from_file",
+            "duration",
+            "speaker_labels",
+            "lines",
+        )
+    }
     summary["stats"] = stats
-    summary["parts"] = [{"number": p["number"], "lines": "%d-%d" % (p["start"], p["end"]), "tokens": p["tokens"], "break": p["break"], "headings": p["headings"][:12]} for p in parts]
+    summary["parts"] = [
+        {
+            "number": p["number"],
+            "lines": "%d-%d" % (p["start"], p["end"]),
+            "tokens": p["tokens"],
+            "break": p["break"],
+            "headings": p["headings"][:12],
+        }
+        for p in parts
+    ]
     print(json.dumps(summary, ensure_ascii=False, indent=1))
     return 0
 
@@ -1161,9 +1446,15 @@ def cmd_extract(args):
 # assembly (R14 to R18, R21, G12, G16, G20, R33, R34)
 # ----------------------------------------------------------------------------
 
+
 def yaml_scalar(v) -> str:
     s = str(v)
-    if s == "" or re.search(r"[:#\[\]{}&*!|>'\"%@`,]", s) or s.strip() != s or s.lower() in ("yes", "no", "true", "false", "null"):
+    if (
+        s == ""
+        or re.search(r"[:#\[\]{}&*!|>'\"%@`,]", s)
+        or s.strip() != s
+        or s.lower() in ("yes", "no", "true", "false", "null")
+    ):
         return '"' + s.replace("\\", "\\\\").replace('"', '\\"') + '"'
     return s
 
@@ -1194,7 +1485,15 @@ def friendly_title(name: str) -> str:
     t = name
     t = re.sub(r"^\s*(\[[^\]]+\]\s*)+", "", t)
     t = re.sub(r"\.(pdf|docx?|vtt|srt|md|txt|html?|json)$", "", t, flags=re.I)
-    t = t.replace("—", ",").replace("–", ",").replace(":", ",").replace("/", "-").replace("\\", "-").replace("__", " ").replace("_", " ")
+    t = (
+        t.replace("—", ",")
+        .replace("–", ",")
+        .replace(":", ",")
+        .replace("/", "-")
+        .replace("\\", "-")
+        .replace("__", " ")
+        .replace("_", " ")
+    )
     t = re.sub(r"\s*,\s*", ", ", t)
     t = re.sub(r"\s+", " ", t).strip(" ,.")
     return t
@@ -1213,7 +1512,12 @@ def load_derived(derived_dir: Path, name: str):
 
 def _norm_quote(s: str) -> str:
     s = unicodedata.normalize("NFKC", s)
-    s = s.replace("\u2019", "'").replace("\u2018", "'").replace("\u201c", '"').replace("\u201d", '"')
+    s = (
+        s.replace("\u2019", "'")
+        .replace("\u2018", "'")
+        .replace("\u201c", '"')
+        .replace("\u201d", '"')
+    )
     return re.sub(r"\s+", " ", s).strip().lower()
 
 
@@ -1221,7 +1525,8 @@ def takeaway_point(x) -> str:
     return x["point"] if isinstance(x, dict) else str(x)
 
 
-NAME_STOP = set("""a an the and or of to in on at for from by with without under over after before between into through
+NAME_STOP = set(
+    """a an the and or of to in on at for from by with without under over after before between into through
 during about against among per via as is are was were be been being has have had do does did not no nor so yet but if
 then than that this these those it its he she they we you i his her their our your my me him them us one two three four
 five six seven eight nine ten first second third fourth fifth last next later earlier early late also only even still just
@@ -1229,13 +1534,20 @@ both each every all any some several many most few more less much other another 
 where why how here there now today part parts tab tabs section sections page pages chapter chapters summary content key
 takeaways source sources notes note actions decisions line lines paragraph paragraphs speaker speakers question questions
 answer answers step steps record records entry entries item items table tables list lists figure figures opening closing
-greetings introduction background overview discussion conclusion context wrap setup update updates""".split())
+greetings introduction background overview discussion conclusion context wrap setup update updates""".split()
+)
 _BOUND = ".,;:!?()[]{}\"'«»…*`_"
 _SENTENCE_END = ".!?:"
 
 
 def _nraw(t: str) -> str:
-    t = unicodedata.normalize("NFKC", t).replace("’", "'").replace("‘", "'").replace("“", '"').replace("”", '"')
+    t = (
+        unicodedata.normalize("NFKC", t)
+        .replace("’", "'")
+        .replace("‘", "'")
+        .replace("“", '"')
+        .replace("”", '"')
+    )
     return re.sub(r"[‐-―−]", "-", t)
 
 
@@ -1340,7 +1652,11 @@ def _looks_like_term(tok: str) -> bool:
 
 def intake_words(intake: dict) -> str:
     """The intake values the summary and takeaways may carry, the title, date, duration, people and source dates (R07)."""
-    vals = [intake.get("title") or "", intake.get("date") or "", intake.get("duration") or ""] + list(intake.get("people") or [])
+    vals = [
+        intake.get("title") or "",
+        intake.get("date") or "",
+        intake.get("duration") or "",
+    ] + list(intake.get("people") or [])
     sd = intake.get("source_dates") or {}
     vals += [str(v) for v in (sd.values() if isinstance(sd, dict) else sd)]
     return "\n".join(str(v) for v in vals if v)
@@ -1351,46 +1667,88 @@ def validate_derived(d: dict, label: str, part_text: str = "", extra_text: str =
     and every action carries at least one support quote, the speaker's or the author's exact words,
     and when the part text is given each quote must appear in it word for word."""
     summary = d.get("summary")
-    if not isinstance(summary, list) or not (1 <= len(summary) <= 2) or not all(isinstance(x, str) and x.strip() for x in summary):
+    if (
+        not isinstance(summary, list)
+        or not (1 <= len(summary) <= 2)
+        or not all(isinstance(x, str) and x.strip() for x in summary)
+    ):
         raise RuntimeError(label + ": summary must be a list of one or two paragraphs (R16)")
     tk = d.get("takeaways")
     if not isinstance(tk, list) or not (3 <= len(tk) <= 7):
         raise RuntimeError(label + ": takeaways must be three to seven points (R16)")
     hay = _norm_quote(part_text) if part_text else ""
     for i, x in enumerate(tk, 1):
-        if not isinstance(x, dict) or not str(x.get("point", "")).strip() or not isinstance(x.get("support"), list) or not x["support"]:
-            raise RuntimeError(label + ": takeaway %d must be {point, support} with at least one exact quote from the text (G17, G19)" % i)
+        if (
+            not isinstance(x, dict)
+            or not str(x.get("point", "")).strip()
+            or not isinstance(x.get("support"), list)
+            or not x["support"]
+        ):
+            raise RuntimeError(
+                label
+                + ": takeaway %d must be {point, support} with at least one exact quote from the text (G17, G19)"
+                % i
+            )
         for q in x["support"]:
             if not isinstance(q, str) or len(q.strip()) < 8:
-                raise RuntimeError(label + ": takeaway %d has a support quote that is empty or too short to check" % i)
+                raise RuntimeError(
+                    label
+                    + ": takeaway %d has a support quote that is empty or too short to check" % i
+                )
             if hay and _norm_quote(q) not in hay:
-                raise RuntimeError(label + ": takeaway %d support quote is not in the text word for word: %r" % (i, q[:90]))
+                raise RuntimeError(
+                    label
+                    + ": takeaway %d support quote is not in the text word for word: %r"
+                    % (i, q[:90])
+                )
     for s in d.get("sections", []) or []:
-        if not isinstance(s, dict) or not s.get("heading") or not isinstance(s.get("start_line"), int):
+        if (
+            not isinstance(s, dict)
+            or not s.get("heading")
+            or not isinstance(s.get("start_line"), int)
+        ):
             raise RuntimeError(label + ": each section needs a heading and an integer start_line")
     for i, a in enumerate(d.get("actions_decisions", []) or [], 1):
         if not isinstance(a, dict) or not a.get("item"):
             raise RuntimeError(label + ": each action or decision needs an item")
         sup = a.get("support")
         if not isinstance(sup, list) or not sup:
-            raise RuntimeError(label + ": action %d needs at least one exact support quote from the text (R18, G19)" % i)
+            raise RuntimeError(
+                label
+                + ": action %d needs at least one exact support quote from the text (R18, G19)" % i
+            )
         for q in sup:
             if hay and _norm_quote(str(q)) not in hay:
-                raise RuntimeError(label + ": action %d support quote is not in the text word for word: %r" % (i, str(q)[:90]))
+                raise RuntimeError(
+                    label
+                    + ": action %d support quote is not in the text word for word: %r"
+                    % (i, str(q)[:90])
+                )
     if part_text:
         # Every name, number and term the model wrote must be in the text, or the intake, spelled the same way (G17, G19).
         names = names_hay(part_text + "\n" + (extra_text or ""))
         fields = [("summary paragraph %d" % i, x) for i, x in enumerate(summary, 1)]
         fields += [("takeaway %d" % i, takeaway_point(x)) for i, x in enumerate(tk, 1)]
-        fields += [("heading at line %s" % x.get("start_line"), x.get("heading", "")) for x in (d.get("sections") or [])]
-        fields += [("action %d" % i, a.get("item", "")) for i, a in enumerate(d.get("actions_decisions") or [], 1)]
+        fields += [
+            ("heading at line %s" % x.get("start_line"), x.get("heading", ""))
+            for x in (d.get("sections") or [])
+        ]
+        fields += [
+            ("action %d" % i, a.get("item", ""))
+            for i, a in enumerate(d.get("actions_decisions") or [], 1)
+        ]
         problems = []
         for where, text in fields:
             bad = unsourced_names(text, names)
             if bad:
                 problems.append("%s: %s" % (where, ", ".join(repr(b) for b in bad[:6])))
         if problems:
-            raise RuntimeError(label + ": words the source does not carry, spell them as the text does or drop them. " + "; ".join(problems[:12]) + " (G17, G19)")
+            raise RuntimeError(
+                label
+                + ": words the source does not carry, spell them as the text does or drop them. "
+                + "; ".join(problems[:12])
+                + " (G17, G19)"
+            )
 
 
 def insert_sections(part_lines: list, sections: list, notes: list) -> list:
@@ -1406,7 +1764,10 @@ def insert_sections(part_lines: list, sections: list, notes: list) -> list:
         while idx > 0 and out[idx - 1] != "":
             idx -= 1
         if idx < len(out) and re.match(r"^#+\s", out[idx]):
-            notes.append("section heading '%s' was not inserted, the source already has a heading there" % s["heading"])
+            notes.append(
+                "section heading '%s' was not inserted, the source already has a heading there"
+                % s["heading"]
+            )
             continue
         inserts.append((idx, "## " + clean_inline(s["heading"])))
     for idx, h in sorted(inserts, key=lambda x: x[0], reverse=True):
@@ -1417,40 +1778,73 @@ def insert_sections(part_lines: list, sections: list, notes: list) -> list:
 def source_notes_lines(meta: dict, intake: dict, header: dict, extra: dict) -> list:
     stats = meta["stats"]
     lines = []
-    lines.append("- Origin: " + meta["kind_label"] + (", " + meta["route"] if meta.get("route") else "") + extra.get("origin_extra", ""))
+    lines.append(
+        "- Origin: "
+        + meta["kind_label"]
+        + (", " + meta["route"] if meta.get("route") else "")
+        + extra.get("origin_extra", "")
+    )
     lines.append("- Original file: " + meta["original_name"])
-    lines.append("- Date: " + str(header.get("date") or "unknown") + " (" + extra.get("date_basis", "unknown, the source carries no date") + ")")
+    lines.append(
+        "- Date: "
+        + str(header.get("date") or "unknown")
+        + " ("
+        + extra.get("date_basis", "unknown, the source carries no date")
+        + ")"
+    )
     lines.append("- People: " + extra.get("people_note", "unknown"))
     if meta.get("speaker_labels"):
-        lines.append("- Speaker labels: kept exactly as the source writes them, " + ", ".join(meta["speaker_labels"]))
+        lines.append(
+            "- Speaker labels: kept exactly as the source writes them, "
+            + ", ".join(meta["speaker_labels"])
+        )
     elif stats.get("timestamps"):
-        lines.append("- Speaker labels: the source does not label who said what, so no line is attributed to a speaker")
+        lines.append(
+            "- Speaker labels: the source does not label who said what, so no line is attributed to a speaker"
+        )
     if stats.get("timestamps"):
-        lines.append("- Timestamps: %d caption start times kept inline exactly as the source gives them, caption numbers and end times are not carried" % stats["timestamps"])
+        lines.append(
+            "- Timestamps: %d caption start times kept inline exactly as the source gives them, caption numbers and end times are not carried"
+            % stats["timestamps"]
+        )
     lines.append("- Tables: %d kept as tables" % stats.get("tables", 0))
     lines.append("- Links: %d kept exactly" % stats.get("links", 0))
     if stats.get("images"):
         lines.append("- Pictures and scans: %d kept beside their readable text" % stats["images"])
-    lines.append("- Cleanup: " + (", ".join(meta.get("cleanup", [])) if meta.get("cleanup") else "nothing needed removing"))
+    lines.append(
+        "- Cleanup: "
+        + (", ".join(meta.get("cleanup", [])) if meta.get("cleanup") else "nothing needed removing")
+    )
     cnr = list(meta.get("notes", [])) + list(extra.get("could_not_read", []))
     lines.append("- Could not read: " + ("none" if not cnr else "; ".join(cnr)))
     lines.append("- Parts: " + extra.get("parts_note", "single file"))
-    lines.append("- Source fingerprint: sha256 " + meta["fingerprint"] + " of the cleaned source text")
+    lines.append(
+        "- Source fingerprint: sha256 " + meta["fingerprint"] + " of the cleaned source text"
+    )
     for n in extra.get("more", []):
         lines.append("- " + n)
     return lines
 
 
+def resolve_date(meta: dict, intake_date=""):
+    if intake_date:
+        return intake_date, "from the intake"
+    if meta.get("date_from_source"):
+        return meta["date_from_source"], "source date supplied at extraction"
+    candidates = []
+    if meta.get("date_from_name"):
+        candidates.append(
+            "file name shows " + meta["date_from_name"] + ", not confirmed as the meeting date"
+        )
+    if meta.get("date_from_file"):
+        candidates.append(
+            "file metadata shows " + meta["date_from_file"] + ", not confirmed as the meeting date"
+        )
+    return "unknown", "; ".join(candidates) or "unknown, the source carries no date"
+
+
 def resolve_header(meta: dict, intake: dict, derived: dict, title: str):
-    date = intake.get("date") or meta.get("date_from_name") or meta.get("date_from_file") or ""
-    if intake.get("date"):
-        basis = "from the intake"
-    elif meta.get("date_from_name"):
-        basis = "from the file name"
-    elif meta.get("date_from_file"):
-        basis = "from the file's own metadata"
-    else:
-        basis = "unknown, the source carries no date"
+    date, basis = resolve_date(meta, intake.get("date"))
     people = list(intake.get("people") or [])
     for s in meta.get("speaker_labels") or []:
         if s not in people:
@@ -1467,7 +1861,9 @@ def resolve_header(meta: dict, intake: dict, derived: dict, title: str):
         people_note = derived["people_note"]
     header = {
         "title": title,
-        "type": intake.get("type") or derived.get("type") or ("transcript" if meta["stats"].get("timestamps") else "document"),
+        "type": intake.get("type")
+        or derived.get("type")
+        or ("transcript" if meta["stats"].get("timestamps") else "document"),
         "source": meta["original_name"],
         "date": date or "unknown",
         "duration": intake.get("duration") or meta.get("duration") or "",
@@ -1478,7 +1874,9 @@ def resolve_header(meta: dict, intake: dict, derived: dict, title: str):
     return header, {"date_basis": basis, "people_note": people_note}
 
 
-def assemble_single(work: Path, intake: dict, derived_dir: Path, out: Path, version: str, identity: str, title: str):
+def assemble_single(
+    work: Path, intake: dict, derived_dir: Path, out: Path, version: str, identity: str, title: str
+):
     meta = read_json(work / "source.meta.json")
     if meta.get("status") != "ok":
         raise RuntimeError("the source was not extracted: " + str(meta.get("error")))
@@ -1492,7 +1890,15 @@ def assemble_single(work: Path, intake: dict, derived_dir: Path, out: Path, vers
     for p in parts:
         n = p["number"]
         label = "part-%d.json" % n if total_parts > 1 else None
-        d = load_derived(derived_dir, label) if label else (load_derived(derived_dir, "part-1.json") if (derived_dir / "part-1.json").exists() else load_derived(derived_dir, "derived.json"))
+        d = (
+            load_derived(derived_dir, label)
+            if label
+            else (
+                load_derived(derived_dir, "part-1.json")
+                if (derived_dir / "part-1.json").exists()
+                else load_derived(derived_dir, "derived.json")
+            )
+        )
         part_text = (work / "parts" / ("part-%d.md" % n)).read_text(encoding="utf-8")
         validate_derived(d, "part %d" % n, part_text, intake_words(intake))
         part_firsts.append((n, str(d["summary"][0]).strip()))
@@ -1501,11 +1907,23 @@ def assemble_single(work: Path, intake: dict, derived_dir: Path, out: Path, vers
         part_lines = part_text.splitlines()
         notes = []
         body = insert_sections(part_lines, d.get("sections") or [], notes)
-        header, extra = resolve_header(meta, intake, d, title + (", Part %d of %d" % (n, total_parts) if total_parts > 1 else ""))
+        header, extra = resolve_header(
+            meta,
+            intake,
+            d,
+            title + (", Part %d of %d" % (n, total_parts) if total_parts > 1 else ""),
+        )
         if first_header is None:
             first_header = header
         extra["could_not_read"] = list(d.get("could_not_read") or [])
-        extra["parts_note"] = ("Part %d of %d, the navigation page is %s" % (n, total_parts, file_name(identity, version, title, ", Navigation"))) if total_parts > 1 else "single file"
+        extra["parts_note"] = (
+            (
+                "Part %d of %d, the navigation page is %s"
+                % (n, total_parts, file_name(identity, version, title, ", Navigation"))
+            )
+            if total_parts > 1
+            else "single file"
+        )
         extra["more"] = ["Split: " + p["break"]] if total_parts > 1 else []
         if d.get("notes"):
             extra["more"].append("Note: " + clean_inline(d["notes"]))
@@ -1533,9 +1951,22 @@ def assemble_single(work: Path, intake: dict, derived_dir: Path, out: Path, vers
         lines += ["", "## Source Notes", ""]
         lines += source_notes_lines(meta, intake, header, extra)
         text = "\n".join(lines).rstrip() + "\n"
-        name = file_name(identity, version, title, ", Part %d of %d" % (n, total_parts) if total_parts > 1 else "")
+        name = file_name(
+            identity,
+            version,
+            title,
+            ", Part %d of %d" % (n, total_parts) if total_parts > 1 else "",
+        )
         (out / name).write_text(text, encoding="utf-8")
-        files.append({"name": name, "part": n, "tokens_estimate": est_tokens(text), "sha256": sha256_text(text), "headings": _headings_in(body, 0, len(body))})
+        files.append(
+            {
+                "name": name,
+                "part": n,
+                "tokens_estimate": est_tokens(text),
+                "sha256": sha256_text(text),
+                "headings": _headings_in(body, 0, len(body)),
+            }
+        )
         nav_sections.append((n, name, est_tokens(text), _headings_in(body, 0, len(body))))
     if total_parts > 1:
         # The navigation summary is built here from each part's first summary paragraph, in order, so the
@@ -1549,27 +1980,53 @@ def assemble_single(work: Path, intake: dict, derived_dir: Path, out: Path, vers
             nav_paras = [" ".join(pieces[:half]), " ".join(pieces[half:])]
         nav = {"summary": nav_paras, "people_note": first_people_note}
         header, extra = resolve_header(meta, intake, nav, title + ", Navigation")
-        extra["parts_note"] = "navigation page for %d parts, its summary built from each part's first summary paragraph" % total_parts
+        extra["parts_note"] = (
+            "navigation page for %d parts, its summary built from each part's first summary paragraph"
+            % total_parts
+        )
         lines = build_header(header) + ["", "# " + header["title"], "", "## Summary", ""]
         for para in nav["summary"]:
             lines += [clean_inline(para), ""]
         lines += ["## Parts", ""]
         for n, name, tokens, heads in nav_sections:
             desc = ", ".join(h for h in heads if not h.startswith("Content"))
-            lines.append("- " + name + ", about " + "{:,}".format(tokens) + " tokens. Contains " + (desc if desc else "the text in order") + ".")
+            lines.append(
+                "- "
+                + name
+                + ", about "
+                + "{:,}".format(tokens)
+                + " tokens. Contains "
+                + (desc if desc else "the text in order")
+                + "."
+            )
         lines += ["", "## Source Notes", ""] + source_notes_lines(meta, intake, header, extra)
         text = "\n".join(lines).rstrip() + "\n"
         name = file_name(identity, version, title, ", Navigation")
         (out / name).write_text(text, encoding="utf-8")
-        files.append({"name": name, "part": 0, "tokens_estimate": est_tokens(text), "sha256": sha256_text(text), "headings": []})
+        files.append(
+            {
+                "name": name,
+                "part": 0,
+                "tokens_estimate": est_tokens(text),
+                "sha256": sha256_text(text),
+                "headings": [],
+            }
+        )
     return files, meta
 
 
-def assemble_combined(works: list, intake: dict, derived_dir: Path, out: Path, version: str, identity: str, title: str):
+def assemble_combined(
+    works: list, intake: dict, derived_dir: Path, out: Path, version: str, identity: str, title: str
+):
     """Combine related files on the same topic, only when asked (G15, R24). Every section
     keeps its source, exact repeats appear once, disagreements keep both claims with dates."""
     d = load_derived(derived_dir, "combined.json")
-    validate_derived(d, "combined", "\n".join((w / "source.md").read_text(encoding="utf-8") for w in works), intake_words(intake))
+    validate_derived(
+        d,
+        "combined",
+        "\n".join((w / "source.md").read_text(encoding="utf-8") for w in works),
+        intake_words(intake),
+    )
     metas = [read_json(w / "source.meta.json") for w in works]
     for m in metas:
         if m.get("status") != "ok":
@@ -1577,14 +2034,21 @@ def assemble_combined(works: list, intake: dict, derived_dir: Path, out: Path, v
     labels = [chr(ord("A") + i) for i in range(len(works))]
     src_lines = [(w / "source.md").read_text(encoding="utf-8").splitlines() for w in works]
     src_dates = []
+    src_date_bases = []
     for m in metas:
-        src_dates.append((intake.get("source_dates") or {}).get(m["original_name"]) or m.get("date_from_name") or m.get("date_from_file") or "unknown")
+        date, basis = resolve_date(m, (intake.get("source_dates") or {}).get(m["original_name"]))
+        src_dates.append(date)
+        src_date_bases.append(basis)
     seen = {}
     repeats = []
     folded = []
     body = ["## Content", ""]
     for s in d.get("sections") or []:
-        si = labels.index(s["source"]) if s.get("source") in labels else int(s.get("source_index", 0))
+        si = (
+            labels.index(s["source"])
+            if s.get("source") in labels
+            else int(s.get("source_index", 0))
+        )
         a = max(1, s["start_line"]) - 1
         b = min(len(src_lines[si]), s.get("end_line") or len(src_lines[si]))
         sec = []
@@ -1597,7 +2061,10 @@ def assemble_combined(works: list, intake: dict, derived_dir: Path, out: Path, v
                     text = "\n".join(para)
                     key = norm_para(text)
                     if key in seen and not re.match(r"^#+\s", para[0]):
-                        repeats.append("A passage beginning '%s' appears in Source %s and Source %s and is kept once, under %s." % (text[:60], seen[key][0], labels[si], seen[key][1]))
+                        repeats.append(
+                            "A passage beginning '%s' appears in Source %s and Source %s and is kept once, under %s."
+                            % (text[:60], seen[key][0], labels[si], seen[key][1])
+                        )
                     else:
                         seen.setdefault(key, (labels[si], s["heading"]))
                         sec.extend(para)
@@ -1608,11 +2075,16 @@ def assemble_combined(works: list, intake: dict, derived_dir: Path, out: Path, v
             else:
                 para.append(l)
         if not kept_any:
-            folded.append("The section '%s' from Source %s held only passages already kept elsewhere, so it was folded into the earlier copy." % (clean_inline(s["heading"]), labels[si]))
+            folded.append(
+                "The section '%s' from Source %s held only passages already kept elsewhere, so it was folded into the earlier copy."
+                % (clean_inline(s["heading"]), labels[si])
+            )
             continue
         body.append("## " + clean_inline(s["heading"]))
         body.append("")
-        body.append("Source " + labels[si] + ", " + metas[si]["original_name"] + ", " + src_dates[si] + ".")
+        body.append(
+            "Source " + labels[si] + ", " + metas[si]["original_name"] + ", " + src_dates[si] + "."
+        )
         body.append("")
         body.extend(sec)
     conflicts = d.get("conflicts") or []
@@ -1621,7 +2093,19 @@ def assemble_combined(works: list, intake: dict, derived_dir: Path, out: Path, v
         for c in conflicts:
             body.append("- About " + clean_inline(c.get("about", "")) + ".")
             for cl in c.get("claims", []):
-                body.append("  - Source " + str(cl.get("source", "")) + " (" + str(cl.get("date", "unknown")) + "): " + clean_inline(cl.get("text", "")))
+                claim_date = (
+                    src_dates[labels.index(cl.get("source"))]
+                    if cl.get("source") in labels
+                    else "unknown"
+                )
+                body.append(
+                    "  - Source "
+                    + str(cl.get("source", ""))
+                    + " ("
+                    + claim_date
+                    + "): "
+                    + clean_inline(cl.get("text", ""))
+                )
             body.append("  - Both are kept as written. No winner is chosen.")
         body.append("")
     header = {
@@ -1630,7 +2114,9 @@ def assemble_combined(works: list, intake: dict, derived_dir: Path, out: Path, v
         "source": "; ".join(m["original_name"] for m in metas),
         "date": ", ".join(src_dates),
         "duration": "",
-        "people": intake.get("people") or sorted({sp for m in metas for sp in (m.get("speaker_labels") or [])}) or "unknown",
+        "people": intake.get("people")
+        or sorted({sp for m in metas for sp in (m.get("speaker_labels") or [])})
+        or "unknown",
         "optimized_for": intake.get("destination") or "unknown",
         "optimized_at": _dt.date.today().isoformat(),
     }
@@ -1643,17 +2129,52 @@ def assemble_combined(works: list, intake: dict, derived_dir: Path, out: Path, v
     lines += [""] + body
     lines += ["## Source Notes", ""]
     for i, m in enumerate(metas):
-        lines.append("- Source " + labels[i] + ": " + m["original_name"] + ", " + m["kind_label"] + ", dated " + src_dates[i] + ", fingerprint sha256 " + m["fingerprint"])
+        lines.append(
+            "- Source "
+            + labels[i]
+            + ": "
+            + m["original_name"]
+            + ", "
+            + m["kind_label"]
+            + ", dated "
+            + src_dates[i]
+            + " ("
+            + src_date_bases[i]
+            + "), fingerprint sha256 "
+            + m["fingerprint"]
+        )
     lines.append("- Combined because the request asked for it, the sources are on the same topic")
     lines.append("- Repeated passages: " + ("none" if not repeats else " ".join(repeats + folded)))
-    lines.append("- Conflicts: " + ("none found" if not conflicts else "%d flagged above, both claims kept with their dates" % len(conflicts)))
+    lines.append(
+        "- Conflicts: "
+        + (
+            "none found"
+            if not conflicts
+            else "%d flagged above, both claims kept with their dates" % len(conflicts)
+        )
+    )
     lines.append("- People: " + (d.get("people_note") or "as the sources and the intake give them"))
-    lines.append("- Could not read: " + ("none" if not any(m.get("notes") for m in metas) else "; ".join(n for m in metas for n in m.get("notes", []))))
+    lines.append(
+        "- Could not read: "
+        + (
+            "none"
+            if not any(m.get("notes") for m in metas)
+            else "; ".join(n for m in metas for n in m.get("notes", []))
+        )
+    )
     lines.append("- Parts: single file")
     text = "\n".join(lines).rstrip() + "\n"
     name = file_name(identity, version, title)
     (out / name).write_text(text, encoding="utf-8")
-    return [{"name": name, "part": 1, "tokens_estimate": est_tokens(text), "sha256": sha256_text(text), "headings": _headings_in(body, 0, len(body))}], metas[0]
+    return [
+        {
+            "name": name,
+            "part": 1,
+            "tokens_estimate": est_tokens(text),
+            "sha256": sha256_text(text),
+            "headings": _headings_in(body, 0, len(body)),
+        }
+    ], metas[0]
 
 
 def identity_and_title(intake: dict, meta: dict):
@@ -1662,7 +2183,9 @@ def identity_and_title(intake: dict, meta: dict):
     if not identity and m:
         identity = m.group(1)
     if not identity:
-        raise RuntimeError("the company or department file identity is unknown, ask for it in the intake (G13, R31)")
+        raise RuntimeError(
+            "the company or department file identity is unknown, ask for it in the intake (G13, R31)"
+        )
     identity = identity.strip("[] ")
     title = intake.get("title") or friendly_title(meta.get("original_name", "")) or "Untitled"
     return identity, title
@@ -1677,15 +2200,33 @@ def cmd_assemble(args):
     meta0 = read_json(works[0] / "source.meta.json")
     identity, title = identity_and_title(intake, meta0)
     if args.combine or len(works) > 1:
-        files, meta = assemble_combined(works, intake, Path(args.derived), out, version, identity, title)
+        files, meta = assemble_combined(
+            works, intake, Path(args.derived), out, version, identity, title
+        )
     else:
-        files, meta = assemble_single(works[0], intake, Path(args.derived), out, version, identity, title)
-    manifest = {"identity": identity, "title": title, "version": version, "files": files,
-                "parts": len([f for f in files if f["part"] > 0]), "fingerprint": meta["fingerprint"],
-                "could_not_read": meta.get("notes", []), "original_name": meta["original_name"],
-                "destination": intake.get("destination", ""), "works": [str(w) for w in works]}
+        files, meta = assemble_single(
+            works[0], intake, Path(args.derived), out, version, identity, title
+        )
+    manifest = {
+        "identity": identity,
+        "title": title,
+        "version": version,
+        "files": files,
+        "parts": len([f for f in files if f["part"] > 0]),
+        "fingerprint": meta["fingerprint"],
+        "could_not_read": meta.get("notes", []),
+        "original_name": meta["original_name"],
+        "destination": intake.get("destination", ""),
+        "works": [str(w) for w in works],
+    }
     write_json(out / "manifest.json", manifest)
-    print(json.dumps({"files": [f["name"] for f in files], "parts": manifest["parts"], "version": version}, ensure_ascii=False, indent=1))
+    print(
+        json.dumps(
+            {"files": [f["name"] for f in files], "parts": manifest["parts"], "version": version},
+            ensure_ascii=False,
+            indent=1,
+        )
+    )
     return 0
 
 
@@ -1693,19 +2234,24 @@ def cmd_assemble(args):
 # saving to Drive by the company file rules (R13, R31, R32, G12, G14, G23)
 # ----------------------------------------------------------------------------
 
+
 def drive_client(auth: str, impersonate: str):
     if not auth or auth == "none":
         return None
     if auth.startswith("sa:"):
         from google.oauth2 import service_account  # type: ignore
         from googleapiclient.discovery import build  # type: ignore
-        creds = service_account.Credentials.from_service_account_file(auth[3:], scopes=["https://www.googleapis.com/auth/drive"])
+
+        creds = service_account.Credentials.from_service_account_file(
+            auth[3:], scopes=["https://www.googleapis.com/auth/drive"]
+        )
         if impersonate:
             creds = creds.with_subject(impersonate)
         return build("drive", "v3", credentials=creds, cache_discovery=False)
     if auth.startswith("token:"):
         from google.oauth2.credentials import Credentials  # type: ignore
         from googleapiclient.discovery import build  # type: ignore
+
         token = os.environ.get(auth[6:], "")
         if not token:
             raise RuntimeError("the token environment variable is empty")
@@ -1719,8 +2265,22 @@ def brain_tag(identity: str) -> str:
 
 def find_folder(drive, tag: str, which_folder: str):
     """Find the brain's outputs or archive folder by name, never create one (G23)."""
-    q = "mimeType='application/vnd.google-apps.folder' and trashed=false and name contains '[%s-BB]'" % tag
-    res = drive.files().list(q=q, fields="files(id,name,driveId,parents)", supportsAllDrives=True, includeItemsFromAllDrives=True, pageSize=100, corpora="allDrives").execute()
+    q = (
+        "mimeType='application/vnd.google-apps.folder' and trashed=false and name contains '[%s-BB]'"
+        % tag
+    )
+    res = (
+        drive.files()
+        .list(
+            q=q,
+            fields="files(id,name,driveId,parents)",
+            supportsAllDrives=True,
+            includeItemsFromAllDrives=True,
+            pageSize=100,
+            corpora="allDrives",
+        )
+        .execute()
+    )
     for f in res.get("files", []):
         n = f["name"].lower()
         if which_folder == "outputs" and n.endswith("claude outputs [%s-bb]" % tag.lower()):
@@ -1735,7 +2295,11 @@ def private_ancestor(drive, file_id: str):
     seen = 0
     cur = file_id
     while cur and seen < 12:
-        f = drive.files().get(fileId=cur, fields="id,name,parents", supportsAllDrives=True).execute()
+        f = (
+            drive.files()
+            .get(fileId=cur, fields="id,name,parents", supportsAllDrives=True)
+            .execute()
+        )
         if f["name"].lower().startswith("private [") or f["name"].lower().startswith("private["):
             return f
         parents = f.get("parents") or []
@@ -1748,9 +2312,30 @@ VERSION_RE = r"\[V(\d+)\.(\d+)\]"
 
 
 def list_prior(drive, folder_id: str, identity: str, title: str):
-    q = "'%s' in parents and trashed=false and name contains '%s'" % (folder_id, title.replace("'", "\\'"))
-    res = drive.files().list(q=q, fields="files(id,name,md5Checksum,modifiedTime)", supportsAllDrives=True, includeItemsFromAllDrives=True, pageSize=200).execute()
-    pat = re.compile(r"^\[" + re.escape(identity) + r"\]" + VERSION_RE + r" " + re.escape(title) + r"(, Part \d+ of \d+|, Navigation)?\.md$")
+    q = "'%s' in parents and trashed=false and name contains '%s'" % (
+        folder_id,
+        title.replace("'", "\\'"),
+    )
+    res = (
+        drive.files()
+        .list(
+            q=q,
+            fields="files(id,name,md5Checksum,modifiedTime)",
+            supportsAllDrives=True,
+            includeItemsFromAllDrives=True,
+            pageSize=200,
+        )
+        .execute()
+    )
+    pat = re.compile(
+        r"^\["
+        + re.escape(identity)
+        + r"\]"
+        + VERSION_RE
+        + r" "
+        + re.escape(title)
+        + r"(, Part \d+ of \d+|, Navigation)?\.md$"
+    )
     out = {}
     for f in res.get("files", []):
         m = pat.match(f["name"])
@@ -1769,12 +2354,20 @@ def content_paragraphs(text: str) -> list:
     m = re.search(r"^## Content\s*$", text, re.M)
     start = m.end() if m else 0
     end = len(text)
-    for marker in ("\n## Source Notes", "\n## Actions and Decisions", "\n## Conflicts between sources"):
+    for marker in (
+        "\n## Source Notes",
+        "\n## Actions and Decisions",
+        "\n## Conflicts between sources",
+    ):
         i = text.find(marker, start)
         if i != -1:
             end = min(end, i)
     body = text[start:end]
-    return [norm_para(p) for p in re.split(r"\n\s*\n", body) if p.strip() and not re.match(r"^#+\s", p.strip())]
+    return [
+        norm_para(p)
+        for p in re.split(r"\n\s*\n", body)
+        if p.strip() and not re.match(r"^#+\s", p.strip())
+    ]
 
 
 def bump(ver, small: bool) -> str:
@@ -1799,34 +2392,76 @@ def plan_version(drive, folder, manifest_like: dict, new_paras: list, intake: di
             break
     prior_label = "V%d.%d" % top
     if fp and fp == manifest_like["fingerprint"]:
-        return {"version": prior_label, "state": "unchanged", "prior": {"version": prior_label, "files": files}}
+        return {
+            "version": prior_label,
+            "state": "unchanged",
+            "prior": {"version": prior_label, "files": files},
+        }
     prev_paras = []
     for t in texts:
         if ", Navigation.md" in t[:0]:
             continue
         prev_paras.extend(content_paragraphs(t))
-    ratio = difflib.SequenceMatcher(None, prev_paras, new_paras).ratio() if prev_paras and new_paras else 0.0
+    ratio = (
+        difflib.SequenceMatcher(None, prev_paras, new_paras).ratio()
+        if prev_paras and new_paras
+        else 0.0
+    )
     change = round(1.0 - ratio, 3)
     size = intake.get("change_size") or ("small" if change < SMALL_CHANGE_LIMIT else "large")
-    return {"version": bump(top, size == "small"), "state": "revised", "change_fraction": change, "change_size": size,
-            "prior": {"version": prior_label, "files": files}}
+    return {
+        "version": bump(top, size == "small"),
+        "state": "revised",
+        "change_fraction": change,
+        "change_size": size,
+        "prior": {"version": prior_label, "files": files},
+    }
 
 
 def upload_file(drive, folder_id: str, path: Path):
     from googleapiclient.http import MediaInMemoryUpload  # type: ignore
+
     data = path.read_bytes()
     media = MediaInMemoryUpload(data, mimetype="text/markdown", resumable=False)
-    f = drive.files().create(body={"name": path.name, "parents": [folder_id]}, media_body=media, supportsAllDrives=True,
-                             fields="id,name,md5Checksum,webViewLink,parents").execute()
+    f = (
+        drive.files()
+        .create(
+            body={"name": path.name, "parents": [folder_id]},
+            media_body=media,
+            supportsAllDrives=True,
+            fields="id,name,md5Checksum,webViewLink,parents",
+        )
+        .execute()
+    )
     back = drive.files().get_media(fileId=f["id"], supportsAllDrives=True).execute()
     ok = sha256_bytes(back) == sha256_bytes(data)
-    return {"id": f["id"], "name": f["name"], "link": f.get("webViewLink", ""), "verified": ok, "sha256": sha256_bytes(data)}
+    return {
+        "id": f["id"],
+        "name": f["name"],
+        "link": f.get("webViewLink", ""),
+        "verified": ok,
+        "sha256": sha256_bytes(data),
+    }
 
 
 def move_file(drive, file_id: str, to_folder: str):
-    f = drive.files().get(fileId=file_id, fields="id,name,parents", supportsAllDrives=True).execute()
+    f = (
+        drive.files()
+        .get(fileId=file_id, fields="id,name,parents", supportsAllDrives=True)
+        .execute()
+    )
     prev = ",".join(f.get("parents") or [])
-    moved = drive.files().update(fileId=file_id, addParents=to_folder, removeParents=prev, supportsAllDrives=True, fields="id,name,parents").execute()
+    moved = (
+        drive.files()
+        .update(
+            fileId=file_id,
+            addParents=to_folder,
+            removeParents=prev,
+            supportsAllDrives=True,
+            fields="id,name,parents",
+        )
+        .execute()
+    )
     return moved
 
 
@@ -1834,21 +2469,68 @@ def completion_report(manifest: dict, save: dict) -> str:
     """The completion message (G12): file name, where it saved, how many parts, anything unreadable."""
     lines = ["Optimized " + manifest["original_name"] + "."]
     if save.get("state") == "unchanged":
-        lines.append("The source is unchanged since " + save["prior"]["version"] + ", which already sits in " + save.get("folder_name", "the destination") + ". Nothing new was saved.")
+        lines.append(
+            "The source is unchanged since "
+            + save["prior"]["version"]
+            + ", which already sits in "
+            + save.get("folder_name", "the destination")
+            + ". Nothing new was saved."
+        )
     else:
-        where = save.get("folder_name") or "the working folder (Drive save pending, " + save.get("pending_reason", "no Drive route in this session") + ")"
-        lines.append("Saved %d file%s in %s." % (len(manifest["files"]), "" if len(manifest["files"]) == 1 else "s", where))
+        where = (
+            save.get("folder_name")
+            or "the working folder (Drive save pending, "
+            + save.get("pending_reason", "no Drive route in this session")
+            + ")"
+        )
+        lines.append(
+            "Saved %d file%s in %s."
+            % (len(manifest["files"]), "" if len(manifest["files"]) == 1 else "s", where)
+        )
         for f in manifest["files"]:
             link = ""
             for u in save.get("uploaded", []):
                 if u["name"] == f["name"]:
                     link = " " + u["link"] if u.get("link") else ""
-            lines.append("  " + f["name"] + " (about {:,} tokens)".format(f["tokens_estimate"]) + link)
+            lines.append(
+                "  " + f["name"] + " (about {:,} tokens)".format(f["tokens_estimate"]) + link
+            )
     parts = manifest["parts"]
-    lines.append("Parts: " + ("one file, no split needed" if parts <= 1 else "%d numbered parts plus a navigation page, split past about 50,000 tokens" % parts))
+    lines.append(
+        "Parts: "
+        + (
+            "one file, no split needed"
+            if parts <= 1
+            else "%d numbered parts plus a navigation page, split past about 50,000 tokens" % parts
+        )
+    )
     if save.get("state") == "revised":
-        lines.append("Version: " + manifest["version"] + " replaces " + save["prior"]["version"] + " (" + save.get("change_size", "") + " change, about %d percent of the text changed)" % int(round(100 * save.get("change_fraction", 0))) + ". The " + save["prior"]["version"] + " file%s moved to %s, nothing was deleted." % ("s" if len(save["prior"]["files"]) > 1 else "", save.get("archive_name", "the archive")))
-        lines.append("Copies to refresh: any Claude Project or Custom GPT that holds the " + save["prior"]["version"] + " upload needs the " + manifest["version"] + " file" + ("s" if parts > 1 else "") + ". This tool does not reach those uploads.")
+        lines.append(
+            "Version: "
+            + manifest["version"]
+            + " replaces "
+            + save["prior"]["version"]
+            + " ("
+            + save.get("change_size", "")
+            + " change, about %d percent of the text changed)"
+            % int(round(100 * save.get("change_fraction", 0)))
+            + ". The "
+            + save["prior"]["version"]
+            + " file%s moved to %s, nothing was deleted."
+            % (
+                "s" if len(save["prior"]["files"]) > 1 else "",
+                save.get("archive_name", "the archive"),
+            )
+        )
+        lines.append(
+            "Copies to refresh: any Claude Project or Custom GPT that holds the "
+            + save["prior"]["version"]
+            + " upload needs the "
+            + manifest["version"]
+            + " file"
+            + ("s" if parts > 1 else "")
+            + ". This tool does not reach those uploads."
+        )
     elif save.get("state") == "new":
         lines.append("Version: " + manifest["version"] + ", first optimized version.")
     cnr = manifest.get("could_not_read") or []
@@ -1877,7 +2559,10 @@ def cmd_save(args):
     if folder is None:
         folder = find_folder(drive, tag, "outputs")
     if folder is None:
-        raise RuntimeError("no Claude outputs folder was found for the %s brain, and this tool never creates folders (G23)" % tag)
+        raise RuntimeError(
+            "no Claude outputs folder was found for the %s brain, and this tool never creates folders (G23)"
+            % tag
+        )
     archive = find_folder(drive, tag, "archives")
     new_paras = []
     for f in manifest["files"]:
@@ -1894,7 +2579,10 @@ def cmd_save(args):
         print(text)
         return 0
     if plan["version"] != manifest["version"]:
-        raise RuntimeError("the destination already holds %s, assemble again with --version %s" % (plan["prior"]["version"], plan["version"]))
+        raise RuntimeError(
+            "the destination already holds %s, assemble again with --version %s"
+            % (plan["prior"]["version"], plan["version"])
+        )
     if args.dry_run:
         save["dry_run"] = True
         write_json(out / "save-report.json", save)
@@ -1902,12 +2590,17 @@ def cmd_save(args):
         return 0
     if plan["state"] == "revised":
         if archive is None:
-            raise RuntimeError("no Archives folder was found for the %s brain, the superseded version cannot be archived and nothing is deleted (R31, G23)" % tag)
+            raise RuntimeError(
+                "no Archives folder was found for the %s brain, the superseded version cannot be archived and nothing is deleted (R31, G23)"
+                % tag
+            )
         save["archive_name"] = archive["name"]
         save["archived"] = []
         for f in plan["prior"]["files"]:
             moved = move_file(drive, f["id"], archive["id"])
-            save["archived"].append({"id": moved["id"], "name": moved["name"], "parents": moved.get("parents")})
+            save["archived"].append(
+                {"id": moved["id"], "name": moved["name"], "parents": moved.get("parents")}
+            )
     for f in manifest["files"]:
         save["uploaded"].append(upload_file(drive, folder["id"], out / f["name"]))
     save["all_verified"] = all(u["verified"] for u in save["uploaded"])
@@ -1934,10 +2627,23 @@ def cmd_finish(args):
         if folder is None:
             folder = find_folder(drive, tag, "outputs")
         if folder is None:
-            raise RuntimeError("no Claude outputs folder was found for the %s brain, and this tool never creates folders (G23)" % tag)
+            raise RuntimeError(
+                "no Claude outputs folder was found for the %s brain, and this tool never creates folders (G23)"
+                % tag
+            )
         lines = (works[0] / "source.md").read_text(encoding="utf-8")
         probe = {"identity": identity, "title": title, "fingerprint": meta0["fingerprint"]}
-        plan = plan_version(drive, folder, probe, [norm_para(p) for p in re.split(r"\n\s*\n", lines) if p.strip() and not re.match(r"^#+\s", p.strip())], intake)
+        plan = plan_version(
+            drive,
+            folder,
+            probe,
+            [
+                norm_para(p)
+                for p in re.split(r"\n\s*\n", lines)
+                if p.strip() and not re.match(r"^#+\s", p.strip())
+            ],
+            intake,
+        )
         version = plan["version"]
     args.version = version
     rc = cmd_assemble(args)
@@ -1958,8 +2664,12 @@ def cmd_validate(args):
     validate_derived(d, derived_path.name, part_text, intake_words(intake))
     if args.combined:
         for s in d.get("sections") or []:
-            if s.get("source") not in [chr(ord("A") + i) for i in range(26)] or not isinstance(s.get("end_line"), int):
-                raise RuntimeError("each combined section needs source (A, B, ...) and an integer end_line")
+            if s.get("source") not in [chr(ord("A") + i) for i in range(26)] or not isinstance(
+                s.get("end_line"), int
+            ):
+                raise RuntimeError(
+                    "each combined section needs source (A, B, ...) and an integer end_line"
+                )
         for c in d.get("conflicts") or []:
             if not c.get("about") or len(c.get("claims") or []) < 2:
                 raise RuntimeError("each conflict needs about and at least two claims")
@@ -1970,12 +2680,17 @@ def cmd_validate(args):
 def cmd_report(args):
     out = Path(args.out)
     manifest = read_json(out / "manifest.json")
-    save = read_json(out / "save-report.json") if (out / "save-report.json").exists() else {"state": "pending", "pending_reason": "not saved yet"}
+    save = (
+        read_json(out / "save-report.json")
+        if (out / "save-report.json").exists()
+        else {"state": "pending", "pending_reason": "not saved yet"}
+    )
     print(completion_report(manifest, save))
     return 0
 
 
 # ----------------------------------------------------------------------------
+
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="File to Knowledge Base Optimizer engine")
@@ -2009,12 +2724,26 @@ def main(argv=None):
     r.add_argument("--out", required=True)
     v = sub.add_parser("validate")
     v.add_argument("--derived", required=True)
-    v.add_argument("--part", action="append", default=[], help="the part text the quotes must appear in, repeat for several sources")
+    v.add_argument(
+        "--part",
+        action="append",
+        default=[],
+        help="the part text the quotes must appear in, repeat for several sources",
+    )
     v.add_argument("--combined", action="store_true")
-    v.add_argument("--intake", default="", help="the intake file, found in the run folder when not given")
+    v.add_argument(
+        "--intake", default="", help="the intake file, found in the run folder when not given"
+    )
     args = ap.parse_args(argv)
     try:
-        return {"extract": cmd_extract, "assemble": cmd_assemble, "save": cmd_save, "finish": cmd_finish, "report": cmd_report, "validate": cmd_validate}[args.cmd](args)
+        return {
+            "extract": cmd_extract,
+            "assemble": cmd_assemble,
+            "save": cmd_save,
+            "finish": cmd_finish,
+            "report": cmd_report,
+            "validate": cmd_validate,
+        }[args.cmd](args)
     except Exception as exc:
         print("STOPPED: " + str(exc), file=sys.stderr)
         return 2
