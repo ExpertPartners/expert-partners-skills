@@ -64,8 +64,13 @@ class HookCase(unittest.TestCase):
         self.env.pop("EP_ACCESS_MAP_SHEET_ID", None)
         self.env["EP_HEADLESS_ROUTE_DIR"] = str(self.state)
         self.env["EP_HEADLESS_ROUTE_CONFIG"] = str(self.config)
-        self.old_env = {k: os.environ.get(k) for k in ("EP_HEADLESS_ROUTE_DIR", "EP_HEADLESS_ROUTE_CONFIG", "EP_ACCESS_MAP_SHEET_ID")}
-        os.environ.update({k: self.env[k] for k in ("EP_HEADLESS_ROUTE_DIR", "EP_HEADLESS_ROUTE_CONFIG")})
+        self.old_env = {
+            k: os.environ.get(k)
+            for k in ("EP_HEADLESS_ROUTE_DIR", "EP_HEADLESS_ROUTE_CONFIG", "EP_ACCESS_MAP_SHEET_ID")
+        }
+        os.environ.update(
+            {k: self.env[k] for k in ("EP_HEADLESS_ROUTE_DIR", "EP_HEADLESS_ROUTE_CONFIG")}
+        )
         os.environ.pop("EP_ACCESS_MAP_SHEET_ID", None)
 
     def tearDown(self):
@@ -84,15 +89,21 @@ class HookCase(unittest.TestCase):
         self.state.mkdir(parents=True, exist_ok=True)
         (self.state / hrc.STAMP_FILE).touch()
 
-    def run_hook(self, url, tool="mcp__playwright-ember__browser_navigate", tool_input=None, cwd=None):
+    def run_hook(
+        self, url, tool="mcp__playwright-ember__browser_navigate", tool_input=None, cwd=None
+    ):
         if tool_input is None:
             tool_input = {"url": url}
         payload = {"hook_event_name": "PreToolUse", "tool_name": tool, "tool_input": tool_input}
         if cwd is not None:
             payload["cwd"] = cwd
         result = subprocess.run(
-            [sys.executable, str(HOOK)], input=json.dumps(payload), capture_output=True,
-            text=True, env=self.env, timeout=20,
+            [sys.executable, str(HOOK)],
+            input=json.dumps(payload),
+            capture_output=True,
+            text=True,
+            env=self.env,
+            timeout=20,
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stderr, "")
@@ -126,7 +137,9 @@ class Decisions(HookCase):
         self.fresh_stamp()
 
     def test_live_system_is_denied_with_route_and_item(self):
-        reason = self.assertDenied(self.run_hook("https://app.gohighlevel.com/v2/location/abc/contacts"))
+        reason = self.assertDenied(
+            self.run_hook("https://app.gohighlevel.com/v2/location/abc/contacts")
+        )
         self.assertIn("GoHighLevel contacts", reason)
         self.assertIn("GHL API v2 through the n8n connector", reason)
         self.assertIn("GHL Private Integration Token", reason)
@@ -134,8 +147,11 @@ class Decisions(HookCase):
         self.assertIn("denied", self.read(hrc.HOOK_LOG_FILE))
 
     def test_live_wildcard_subdomain_is_denied_for_every_navigation_tool(self):
-        for tool in ("mcp__playwright-allison__browser_navigate", "mcp__claude-in-chrome__navigate",
-                     "mcp__claude-in-chrome__tabs_create_mcp"):
+        for tool in (
+            "mcp__playwright-allison__browser_navigate",
+            "mcp__claude-in-chrome__navigate",
+            "mcp__claude-in-chrome__tabs_create_mcp",
+        ):
             with self.subTest(tool=tool):
                 self.assertDenied(self.run_hook("https://link.leadconnectorhq.com/x", tool))
 
@@ -146,11 +162,16 @@ class Decisions(HookCase):
 
     def test_no_api_is_allowed(self):
         note = self.assertAllowed(self.run_hook("https://portal.vendor.example/login"))
-        self.assertIn("Headless route checked, Vendor portal, no API, Vendor offers no API or export.", note)
+        self.assertIn(
+            "Headless route checked, Vendor portal, no API, Vendor offers no API or export.", note
+        )
         self.assertEqual(self.read(hrc.UNKNOWN_HOSTS_FILE), "")
 
     def test_most_specific_host_wins(self):
-        self.assertIn("Google Sites editor, no API", self.assertAllowed(self.run_hook("https://sites.google.com/edit")))
+        self.assertIn(
+            "Google Sites editor, no API",
+            self.assertAllowed(self.run_hook("https://sites.google.com/edit")),
+        )
         self.assertDenied(self.run_hook("https://docs.google.com/document/d/x"))
 
     def test_unknown_host_is_allowed_and_logged_once(self):
@@ -159,14 +180,23 @@ class Decisions(HookCase):
         self.assertAllowed(self.run_hook("https://new-vendor.example/other"))
         lines = self.read(hrc.UNKNOWN_HOSTS_FILE).splitlines()
         self.assertEqual(len(lines), 1)
-        self.assertEqual(lines[0].split("\t")[1:], ["new-vendor.example", "mcp__playwright-ember__browser_navigate"])
+        self.assertEqual(
+            lines[0].split("\t")[1:],
+            ["new-vendor.example", "mcp__playwright-ember__browser_navigate"],
+        )
 
     def test_lookalike_host_is_not_matched(self):
         self.assertAllowed(self.run_hook("https://notgoogle.com/"))
         self.assertIn("notgoogle.com", self.read(hrc.UNKNOWN_HOSTS_FILE))
 
     def test_non_web_targets_are_allowed_and_not_logged(self):
-        for url in ("about:blank", "chrome://extensions", "http://localhost:3000", "http://127.0.0.1:8080/x", ""):
+        for url in (
+            "about:blank",
+            "chrome://extensions",
+            "http://localhost:3000",
+            "http://127.0.0.1:8080/x",
+            "",
+        ):
             with self.subTest(url=url):
                 self.assertIsNone(self.run_hook(url))
         self.assertEqual(self.read(hrc.UNKNOWN_HOSTS_FILE), "")
@@ -191,8 +221,10 @@ class Decisions(HookCase):
                 self.write_cache(csv_text)
                 note = self.assertAllowed(self.run_hook("https://shared.example/builder"))
                 self.assertIn("Shared app builder, no API, Builder has no API", note)
-                self.assertIn("map-conflict\tshared.example decided by Shared app builder no api",
-                              self.read(hrc.HOOK_LOG_FILE))
+                self.assertIn(
+                    "map-conflict\tshared.example decided by Shared app builder no api",
+                    self.read(hrc.HOOK_LOG_FILE),
+                )
 
     def test_wildcard_covers_subdomains_and_the_exact_row_covers_the_apex(self):
         for name, csv_text in (("sheet order", MAP_CSV), ("reversed", REVERSED_MAP_CSV)):
@@ -206,20 +238,53 @@ class Decisions(HookCase):
         self.assertIn("Example app", self.assertDenied(self.run_hook("https://app.example.com/")))
         self.assertIn("never a block", self.assertAllowed(self.run_hook("https://setup.example/")))
         self.assertEqual(
-            [hrc.normalize_status(s) for s in ("Live", "Live - API", "Setting up", "Set up", "In setup",
-                                               "No API", "No-API", "None", "not live", "")],
-            ["live", "live", "setting up", "setting up", "setting up",
-             "no api", "no api", "no api", "not live", ""],
+            [
+                hrc.normalize_status(s)
+                for s in (
+                    "Live",
+                    "Live - API",
+                    "Setting up",
+                    "Set up",
+                    "In setup",
+                    "No API",
+                    "No-API",
+                    "None",
+                    "not live",
+                    "",
+                )
+            ],
+            [
+                "live",
+                "live",
+                "setting up",
+                "setting up",
+                "setting up",
+                "no api",
+                "no api",
+                "no api",
+                "not live",
+                "",
+            ],
         )
 
     def test_browser_code_that_navigates_to_a_live_system_is_denied(self):
         cases = (
-            ("mcp__playwright-ember__browser_run_code_unsafe",
-             {"code": "async (page) => { await page.goto('https://app.gohighlevel.com/v2/contacts'); }"}),
-            ("mcp__playwright-ember__browser_run_code",
-             {"code": "async (page) => { await page.goto(`https://app.gohighlevel.com/${id}`); }"}),
-            ("mcp__playwright-ember__browser_evaluate",
-             {"function": "() => { window.location.href = \"https://app.gohighlevel.com/x\"; }"}),
+            (
+                "mcp__playwright-ember__browser_run_code_unsafe",
+                {
+                    "code": "async (page) => { await page.goto('https://app.gohighlevel.com/v2/contacts'); }"
+                },
+            ),
+            (
+                "mcp__playwright-ember__browser_run_code",
+                {
+                    "code": "async (page) => { await page.goto(`https://app.gohighlevel.com/${id}`); }"
+                },
+            ),
+            (
+                "mcp__playwright-ember__browser_evaluate",
+                {"function": "() => { window.location.href = \"https://app.gohighlevel.com/x\"; }"},
+            ),
         )
         for tool, tool_input in cases:
             with self.subTest(tool=tool):
@@ -228,16 +293,25 @@ class Decisions(HookCase):
 
     def test_protocol_relative_navigation_to_a_live_system_is_denied(self):
         cases = (
-            ("mcp__playwright-ember__browser_navigate", {"url": "//app.gohighlevel.com/v2/contacts"}),
+            (
+                "mcp__playwright-ember__browser_navigate",
+                {"url": "//app.gohighlevel.com/v2/contacts"},
+            ),
             ("mcp__claude-in-chrome__navigate", {"url": "\\\\app.gohighlevel.com/x"}),
-            ("mcp__playwright-ember__browser_evaluate",
-             {"function": "() => { window.location.href = '//app.gohighlevel.com/x'; }"}),
-            ("mcp__playwright-ember__browser_run_code_unsafe",
-             {"code": "async (page) => { await page.goto('//link.leadconnectorhq.com/x'); }"}),
+            (
+                "mcp__playwright-ember__browser_evaluate",
+                {"function": "() => { window.location.href = '//app.gohighlevel.com/x'; }"},
+            ),
+            (
+                "mcp__playwright-ember__browser_run_code_unsafe",
+                {"code": "async (page) => { await page.goto('//link.leadconnectorhq.com/x'); }"},
+            ),
         )
         for tool, tool_input in cases:
             with self.subTest(tool=tool, tool_input=tool_input):
-                self.assertIn("GoHighLevel contacts", self.assertDenied(self.run_hook(None, tool, tool_input)))
+                self.assertIn(
+                    "GoHighLevel contacts", self.assertDenied(self.run_hook(None, tool, tool_input))
+                )
 
     def test_urls_are_read_the_way_browsers_read_them(self):
         # Each of these opens app.gohighlevel.com in a browser (WHATWG URL Standard), and
@@ -260,7 +334,9 @@ class Decisions(HookCase):
                 self.assertEqual(hrc.target_host(url), "app.gohighlevel.com")
                 self.assertIn("GoHighLevel contacts", self.assertDenied(self.run_hook(url)))
         # The reverse: urlsplit says app.gohighlevel.com, a browser opens evil.example.
-        self.assertEqual(hrc.target_host("https://evil.example\\@app.gohighlevel.com/"), "evil.example")
+        self.assertEqual(
+            hrc.target_host("https://evil.example\\@app.gohighlevel.com/"), "evil.example"
+        )
         self.assertAllowed(self.run_hook("https://evil.example\\@app.gohighlevel.com/"))
 
     def test_escaped_strings_in_browser_code_are_read_as_javascript_reads_them(self):
@@ -273,8 +349,13 @@ class Decisions(HookCase):
         )
         for body in bodies:
             with self.subTest(code=body):
-                reason = self.assertDenied(self.run_hook(
-                    None, "mcp__playwright-ember__browser_run_code_unsafe", {"code": f"async (page) => {{ {body} }}"}))
+                reason = self.assertDenied(
+                    self.run_hook(
+                        None,
+                        "mcp__playwright-ember__browser_run_code_unsafe",
+                        {"code": f"async (page) => {{ {body} }}"},
+                    )
+                )
                 self.assertIn("GoHighLevel contacts", reason)
 
     def test_relative_code_navigation_is_refused(self):
@@ -289,22 +370,30 @@ class Decisions(HookCase):
         )
         for body in bodies:
             with self.subTest(code=body):
-                reason = self.assertDenied(self.run_hook(
-                    None, "mcp__playwright-ember__browser_evaluate", {"function": f"() => {{ {body} }}"}))
+                reason = self.assertDenied(
+                    self.run_hook(
+                        None,
+                        "mcp__playwright-ember__browser_evaluate",
+                        {"function": f"() => {{ {body} }}"},
+                    )
+                )
                 self.assertIn("full https:// URL", reason)
         self.assertIn("unresolved-denied", self.read(hrc.HOOK_LOG_FILE))
         self.assertEqual(self.read(hrc.UNKNOWN_HOSTS_FILE), "")
 
     def test_a_live_host_is_named_before_a_relative_target(self):
         code = "() => { location.href = '/x'; window.open('https://app.gohighlevel.com/'); }"
-        reason = self.assertDenied(self.run_hook(None, "mcp__playwright-ember__browser_evaluate", {"function": code}))
+        reason = self.assertDenied(
+            self.run_hook(None, "mcp__playwright-ember__browser_evaluate", {"function": code})
+        )
         self.assertIn("GHL Private Integration Token", reason)
 
     def test_code_in_a_file_is_checked(self):
         folder = Path(self.tmp.name) / "workspace"
         folder.mkdir()
-        (folder / "job.js").write_text("async (page) => { await page.goto('https://app.gohighlevel.com/'); }",
-                                       encoding="utf-8")
+        (folder / "job.js").write_text(
+            "async (page) => { await page.goto('https://app.gohighlevel.com/'); }", encoding="utf-8"
+        )
         tool = "mcp__playwright-ember__browser_run_code_unsafe"
         cases = (
             ("absolute", {"filename": str(folder / "job.js"), "code": "async (page) => {}"}, None),
@@ -312,17 +401,31 @@ class Decisions(HookCase):
         )
         for name, tool_input, cwd in cases:
             with self.subTest(case=name):
-                self.assertIn("GoHighLevel contacts", self.assertDenied(self.run_hook(None, tool, tool_input, cwd=cwd)))
-        reason = self.assertDenied(self.run_hook(None, tool, {"filename": str(folder / "missing.js")}))
+                self.assertIn(
+                    "GoHighLevel contacts",
+                    self.assertDenied(self.run_hook(None, tool, tool_input, cwd=cwd)),
+                )
+        reason = self.assertDenied(
+            self.run_hook(None, tool, {"filename": str(folder / "missing.js")})
+        )
         self.assertIn("file the hook cannot open", reason)
         # browser_evaluate saves its result to filename, so that file is not read as code.
-        self.assertIsNone(self.run_hook(None, "mcp__playwright-ember__browser_evaluate",
-                                        {"function": "() => document.title", "filename": str(folder / "missing.js")}))
+        self.assertIsNone(
+            self.run_hook(
+                None,
+                "mcp__playwright-ember__browser_evaluate",
+                {"function": "() => document.title", "filename": str(folder / "missing.js")},
+            )
+        )
 
     def test_browser_tabs_new_with_a_url_is_checked(self):
         tool = "mcp__playwright-ember__browser_tabs"
-        self.assertIn("GoHighLevel contacts",
-                      self.assertDenied(self.run_hook(None, tool, {"action": "new", "url": "https://app.gohighlevel.com/"})))
+        self.assertIn(
+            "GoHighLevel contacts",
+            self.assertDenied(
+                self.run_hook(None, tool, {"action": "new", "url": "https://app.gohighlevel.com/"})
+            ),
+        )
         self.assertIsNone(self.run_hook(None, tool, {"action": "new"}))
         self.assertIsNone(self.run_hook(None, tool, {"action": "list"}))
 
@@ -336,23 +439,37 @@ class Decisions(HookCase):
         twin_a = "Twin A,twin.example,Twin A API,Twin A key,Live,\n"
         twin_b = "Twin B,twin.example,Twin B API,Twin B key,Live,\n"
         reasons = []
-        for name, csv_text in (("sheet order", MAP_CSV + twin_a + twin_b),
-                               ("reversed", REVERSED_MAP_CSV + twin_b + twin_a)):
+        for name, csv_text in (
+            ("sheet order", MAP_CSV + twin_a + twin_b),
+            ("reversed", REVERSED_MAP_CSV + twin_b + twin_a),
+        ):
             with self.subTest(order=name):
                 self.write_cache(csv_text)
                 reason = self.assertDenied(self.run_hook("https://twin.example/"))
-                for part in ("Twin A: Twin A API with the 1Password item Twin A key",
-                             "Twin B: Twin B API with the 1Password item Twin B key"):
+                for part in (
+                    "Twin A: Twin A API with the 1Password item Twin A key",
+                    "Twin B: Twin B API with the 1Password item Twin B key",
+                ):
                     self.assertIn(part, reason)
                 reasons.append(reason)
         self.assertEqual(reasons[0], reasons[1])
-        self.assertIn("map-conflict\ttwin.example decided by Twin A, Twin B live", self.read(hrc.HOOK_LOG_FILE))
+        self.assertIn(
+            "map-conflict\ttwin.example decided by Twin A, Twin B live",
+            self.read(hrc.HOOK_LOG_FILE),
+        )
 
     def test_browser_code_without_a_mapped_navigation_is_allowed(self):
         code = "async (page) => { await page.goto('https://portal.vendor.example/'); return page.title(); }"
-        self.assertAllowed(self.run_hook(None, "mcp__playwright-ember__browser_run_code_unsafe", {"code": code}))
-        self.assertIsNone(self.run_hook(None, "mcp__playwright-ember__browser_evaluate",
-                                        {"function": "() => document.title"}))
+        self.assertAllowed(
+            self.run_hook(None, "mcp__playwright-ember__browser_run_code_unsafe", {"code": code})
+        )
+        self.assertIsNone(
+            self.run_hook(
+                None,
+                "mcp__playwright-ember__browser_evaluate",
+                {"function": "() => document.title"},
+            )
+        )
 
     def test_unrecognized_status_is_allowed_with_a_not_checked_line(self):
         self.write_cache(MAP_CSV + "Odd row,odd.example,,,Maybe later,\n")
@@ -361,30 +478,153 @@ class Decisions(HookCase):
         self.assertIn("unknown-status-allowed", self.read(hrc.HOOK_LOG_FILE))
 
     def test_every_navigated_host_gets_a_line(self):
-        code = ("async (page) => { await page.goto('https://portal.vendor.example/');"
-                " await page.goto('https://another-new.example/'); }")
-        note = self.assertAllowed(self.run_hook(None, "mcp__playwright-ember__browser_run_code_unsafe", {"code": code}))
+        code = (
+            "async (page) => { await page.goto('https://portal.vendor.example/');"
+            " await page.goto('https://another-new.example/'); }"
+        )
+        note = self.assertAllowed(
+            self.run_hook(None, "mcp__playwright-ember__browser_run_code_unsafe", {"code": code})
+        )
         self.assertIn("Vendor portal, no API", note)
         self.assertIn("another-new.example, not on the access map", note)
 
     def test_bad_input_is_allowed(self):
-        result = subprocess.run([sys.executable, str(HOOK)], input="not json", capture_output=True,
-                                text=True, env=self.env, timeout=20)
+        result = subprocess.run(
+            [sys.executable, str(HOOK)],
+            input="not json",
+            capture_output=True,
+            text=True,
+            env=self.env,
+            timeout=20,
+        )
         self.assertEqual((result.returncode, result.stdout), (0, ""))
         self.assertIn("hook-error", self.read(hrc.HOOK_LOG_FILE))
+
+
+GITHUB_ROW = "GitHub,github.com,gh CLI with GH_TOKEN from 1Password,GitHub PAT,Live,\n"
+
+
+class FounderOverrides(HookCase):
+    """The 2026-11-11 founder-authorized, path-scoped overrides. The allow cases fail on
+    main before the fix; the deny cases pin the scope so no other path slips through."""
+
+    GHL = "app.gohighlevel.com"
+    SETTINGS = "https://github.com/organizations/ExpertPartners/settings"
+    CHECKS = "https://github.com/ExpertPartners/expert-partners-hub/pull/86/checks"
+
+    def setUp(self):
+        super().setUp()
+        self.write_cache(MAP_CSV + GITHUB_ROW + LEAKY_ROWS)
+        self.fresh_stamp()
+
+    def test_ghl_builder_forms_and_media_paths_are_allowed(self):
+        cases = (
+            f"https://{self.GHL}/v2/location/abc/funnels/page-builder/123",
+            f"https://{self.GHL}/v2/location/abc/forms/builder/xyz",
+            f"https://{self.GHL}/v2/location/abc/media-library",
+            f"https://app.leadconnectorhq.com/v2/location/abc/sites/builder",
+        )
+        for url in cases:
+            with self.subTest(url=url):
+                note = self.assertAllowed(self.run_hook(url))
+                self.assertIn(
+                    "GoHighLevel / PartnerSync builder, no API, no create operation", note
+                )
+        self.assertIn("founder-override-allowed", self.read(hrc.HOOK_LOG_FILE))
+
+    def test_ghl_builder_code_call_with_only_builder_targets_is_allowed(self):
+        code = (
+            "async (page) => { await page.goto('https://app.gohighlevel.com/v2/location/abc/funnels/x');"
+            " await page.goto('https://app.gohighlevel.com/v2/location/abc/media-storage'); }"
+        )
+        note = self.assertAllowed(
+            self.run_hook(None, "mcp__playwright-ember__browser_run_code_unsafe", {"code": code})
+        )
+        self.assertIn("GoHighLevel / PartnerSync builder", note)
+
+    def test_ghl_contacts_and_workflows_stay_denied(self):
+        for path in ("/v2/location/abc/contacts", "/v2/location/abc/workflows"):
+            with self.subTest(path=path):
+                reason = self.assertDenied(self.run_hook(f"https://{self.GHL}{path}"))
+                self.assertIn("GoHighLevel contacts", reason)
+
+    def test_ghl_code_call_with_any_off_scope_target_is_denied(self):
+        code = (
+            "async (page) => { await page.goto('https://app.gohighlevel.com/v2/location/abc/funnels/x');"
+            " await page.goto('https://app.gohighlevel.com/v2/location/abc/contacts'); }"
+        )
+        reason = self.assertDenied(
+            self.run_hook(None, "mcp__playwright-ember__browser_run_code_unsafe", {"code": code})
+        )
+        self.assertIn("GoHighLevel contacts", reason)
+
+    def test_github_settings_paths_and_pr86_checks_are_allowed(self):
+        cases = (
+            f"{self.SETTINGS}/apps/estate-brain-door/permissions",
+            f"{self.SETTINGS}/apps/estate-brain-door/permissions/",
+            f"{self.SETTINGS}/installations",
+            f"{self.SETTINGS}/installations/",
+            self.CHECKS,
+            f"{self.CHECKS}/",
+        )
+        for url in cases:
+            with self.subTest(url=url):
+                note = self.assertAllowed(self.run_hook(url))
+                self.assertIn(
+                    "GitHub organization settings, no API, no installation-permission endpoint",
+                    note,
+                )
+        self.assertIn("founder-override-allowed", self.read(hrc.HOOK_LOG_FILE))
+
+    def test_github_paths_outside_the_grant_stay_denied(self):
+        cases = (
+            "https://github.com/ExpertPartners/expert-partners-hub/pull/86",
+            f"{self.SETTINGS}/installations/177351892",
+            f"{self.SETTINGS}/apps",
+            f"{self.SETTINGS}/apps/estate-brain-door",
+            "https://github.com/",
+            "https://github.com/apps",
+            "https://github.com/login",
+        )
+        for url in cases:
+            with self.subTest(url=url):
+                self.assertIn("GitHub", self.assertDenied(self.run_hook(url)))
+
+    def test_github_code_call_with_any_off_scope_target_is_denied(self):
+        code = (
+            "async (page) => { await page.goto('https://github.com/organizations/ExpertPartners/settings/"
+            "apps/estate-brain-door/permissions'); await page.goto('https://github.com/organizations/"
+            "ExpertPartners/settings/installations/177351892'); }"
+        )
+        reason = self.assertDenied(
+            self.run_hook(None, "mcp__playwright-ember__browser_run_code_unsafe", {"code": code})
+        )
+        self.assertIn("GitHub", reason)
+
+    def test_native_tool_name_as_text_and_example_com_stay_allowed(self):
+        self.assertAllowed(self.run_hook("mcp__playwright-ember__browser_navigate"))
+        note = self.assertAllowed(self.run_hook("https://example.com/pricing"))
+        self.assertIn("Example marketing, no API", note)
 
 
 class MissingCache(HookCase):
     def test_missing_cache_is_allowed_and_logged(self):
         self.fresh_stamp()
         note = self.assertAllowed(self.run_hook("https://app.gohighlevel.com/"))
-        self.assertIn("Headless route checked, app.gohighlevel.com, not checked, no cached access map", note)
+        self.assertIn(
+            "Headless route checked, app.gohighlevel.com, not checked, no cached access map", note
+        )
         self.assertIn("no-cache-allowed\tapp.gohighlevel.com", self.read(hrc.HOOK_LOG_FILE))
 
     def test_relative_code_navigation_without_a_cache_is_allowed_and_logged(self):
         self.fresh_stamp()
-        note = self.assertAllowed(self.run_hook(None, "mcp__playwright-ember__browser_evaluate",
-                                                {"function": "() => { location.href = '/contacts'; }"}))
+        note = self.assertAllowed(
+            self.run_hook(
+                None,
+                "mcp__playwright-ember__browser_evaluate",
+                {"function": "() => { location.href = '/contacts'; }"},
+            )
+        )
         self.assertIn("not checked, no cached access map", note)
         self.assertIn("no-cache-allowed\tunresolved target", self.read(hrc.HOOK_LOG_FILE))
 
@@ -405,7 +645,9 @@ class Refresh(HookCase):
             lines.append(f"sys.stdout.write({csv_text!r})")
         lines.append(f"sys.exit({exit_code})")
         script.write_text("\n".join(lines) + "\n", encoding="utf-8")
-        self.config.write_text(json.dumps({"fetch_command": [sys.executable, str(script)]}), encoding="utf-8")
+        self.config.write_text(
+            json.dumps({"fetch_command": [sys.executable, str(script)]}), encoding="utf-8"
+        )
 
     def test_refresh_writes_the_cache(self):
         self.configure_fetch(MAP_CSV)
@@ -414,7 +656,9 @@ class Refresh(HookCase):
         self.assertNotIn("not live, setting up or no API", message)
         cached = json.loads(self.read(hrc.CACHE_FILE))
         self.assertEqual(len(cached["systems"]), 11)
-        self.assertEqual(cached["systems"][0]["hosts"], ["app.gohighlevel.com", "*.leadconnectorhq.com"])
+        self.assertEqual(
+            cached["systems"][0]["hosts"], ["app.gohighlevel.com", "*.leadconnectorhq.com"]
+        )
         self.assertEqual(cached["systems"][1]["status"], "setting up")
 
     def test_refresh_names_rows_with_an_unknown_status(self):
@@ -461,11 +705,19 @@ class Refresh(HookCase):
         self.fresh_stamp()
         before = self.read(hrc.CACHE_FILE)
         ghl_row = MAP_ROWS.split("\n")[0]
-        system, hosts, rest = ghl_row.split(",", 1)[0], '"app.gohighlevel.com, *.leadconnectorhq.com"', ghl_row.rsplit('"', 1)[1]
+        system, hosts, rest = (
+            ghl_row.split(",", 1)[0],
+            '"app.gohighlevel.com, *.leadconnectorhq.com"',
+            ghl_row.rsplit('"', 1)[1],
+        )
         cases = (
             ("no Hosts", "row 2 has no Hosts", system + ',""' + rest),
             ("no System", "row 2 has no System", "," + hosts + rest),
-            ("no Status", "row 2 has no Status", system + "," + hosts + rest.replace(",Live,", ",,")),
+            (
+                "no Status",
+                "row 2 has no Status",
+                system + "," + hosts + rest.replace(",Live,", ",,"),
+            ),
         )
         for name, expected, row in cases:
             with self.subTest(case=name):
@@ -483,7 +735,9 @@ class Refresh(HookCase):
         self.assertEqual(len(json.loads(self.read(hrc.CACHE_FILE))["systems"]), 11)
 
     def test_the_issue_fixture_parses(self):
-        fixture = "system,hosts,status\nKnown route,example.test,live\nUnresolved route,,setting up\n"
+        fixture = (
+            "system,hosts,status\nKnown route,example.test,live\nUnresolved route,,setting up\n"
+        )
         systems = hrc.parse_map(fixture)
         self.assertEqual([row["system"] for row in systems], ["Known route", "Unresolved route"])
         self.assertEqual((systems[1]["hosts"], systems[1]["status"]), ([], "setting up"))
@@ -492,7 +746,9 @@ class Refresh(HookCase):
         self.fresh_stamp()
         note = self.assertAllowed(self.run_hook("https://example.test/"))
         self.assertIn("not checked, no cached access map", note)
-        self.configure_fetch("system,hosts,status\nKnown route,example.test,live\nUnresolved route,,setting up\n")
+        self.configure_fetch(
+            "system,hosts,status\nKnown route,example.test,live\nUnresolved route,,setting up\n"
+        )
         ok, message = hrc.refresh()
         self.assertTrue(ok, message)
         self.assertIn("1 unresolved, still needing real host evidence", message)
@@ -533,10 +789,12 @@ class Refresh(HookCase):
         before = self.read(hrc.CACHE_FILE)
         ghl_row = MAP_ROWS.split("\n")[0]
         cases = (
-            ("hostless", "the new map drops 2 host(s)",
-             "GoHighLevel contacts,,,,Setting up,"),
-            ("shrunk", "app.gohighlevel.com",
-             'GoHighLevel contacts,*.leadconnectorhq.com,GHL API v2 through the n8n connector,GHL Private Integration Token,Live,'),
+            ("hostless", "the new map drops 2 host(s)", "GoHighLevel contacts,,,,Setting up,"),
+            (
+                "shrunk",
+                "app.gohighlevel.com",
+                'GoHighLevel contacts,*.leadconnectorhq.com,GHL API v2 through the n8n connector,GHL Private Integration Token,Live,',
+            ),
         )
         for name, expected, row in cases:
             with self.subTest(case=name):
@@ -552,8 +810,10 @@ class Refresh(HookCase):
         self.write_cache()
         self.fresh_stamp()
         ghl_row = MAP_ROWS.split("\n")[0]
-        retired = ('GoHighLevel contacts,"app.gohighlevel.com, *.leadconnectorhq.com",'
-                   ",GHL Private Integration Token,No API,Route retired")
+        retired = (
+            'GoHighLevel contacts,"app.gohighlevel.com, *.leadconnectorhq.com",'
+            ",GHL Private Integration Token,No API,Route retired"
+        )
         self.configure_fetch(MAP_CSV.replace(ghl_row, retired, 1))
         ok, message = hrc.refresh()
         self.assertTrue(ok, message)
@@ -575,7 +835,9 @@ class Refresh(HookCase):
         ok, message = hrc.refresh()
         self.assertTrue(ok, message)
         self.assertIn("1 unresolved", message)
-        self.configure_fetch(MAP_CSV + "Future CRM,future-crm.example,Future CRM API,Future CRM key,Live,\n")
+        self.configure_fetch(
+            MAP_CSV + "Future CRM,future-crm.example,Future CRM API,Future CRM key,Live,\n"
+        )
         ok, message = hrc.refresh()
         self.assertTrue(ok, message)
         self.assertNotIn("unresolved", message)
@@ -593,9 +855,18 @@ class Refresh(HookCase):
         self.assertEqual(systems[0]["evidence"], "verified")
         native = systems[1]
         self.assertEqual(
-            {key: native[key] for key in ("hosts", "route", "item", "status", "reason", "evidence")},
-            {"hosts": [], "route": "Existing native connector", "item": "", "status": "live",
-             "reason": "", "evidence": "unresolved"},
+            {
+                key: native[key]
+                for key in ("hosts", "route", "item", "status", "reason", "evidence")
+            },
+            {
+                "hosts": [],
+                "route": "Existing native connector",
+                "item": "",
+                "status": "live",
+                "reason": "",
+                "evidence": "unresolved",
+            },
         )
         self.assertIn("Known route", self.assertDenied(self.run_hook("https://example.test/page")))
         note = self.assertAllowed(self.run_hook("https://native.example/"))
@@ -603,8 +874,11 @@ class Refresh(HookCase):
         self.assertNotIn("Native integration", note)
 
     def test_setting_up_rows_still_declare_unresolved_with_the_host_evidence_column(self):
-        self.configure_fetch(EVIDENCE_HEADER + EVIDENCE_ROWS
-                             + "Future CRM,,,,Setting up,,\nLater CRM,,,,Setting up,,Unresolved\n")
+        self.configure_fetch(
+            EVIDENCE_HEADER
+            + EVIDENCE_ROWS
+            + "Future CRM,,,,Setting up,,\nLater CRM,,,,Setting up,,Unresolved\n"
+        )
         ok, message = hrc.refresh()
         self.assertTrue(ok, message)
         self.assertIn("3 unresolved, still needing real host evidence", message)
@@ -618,7 +892,10 @@ class Refresh(HookCase):
             ("live, another wording", "Half edit,,Some API,,live,,not resolved yet\n"),
             ("setting up, Host evidence verified", "Half edit,,Some API,,setting up,,verified\n"),
             ("no API, Host evidence unresolved", "Half edit,,,,no API,No API at all,unresolved\n"),
-            ("unrecognized status, Host evidence unresolved", "Half edit,,,,Maybe later,,unresolved\n"),
+            (
+                "unrecognized status, Host evidence unresolved",
+                "Half edit,,,,Maybe later,,unresolved\n",
+            ),
         )
         for name, row in cases:
             with self.subTest(case=name):
@@ -643,9 +920,13 @@ class Refresh(HookCase):
                 self.configure_fetch(EVIDENCE_HEADER + row + EVIDENCE_ROWS.split("\n", 1)[1])
                 ok, message = hrc.refresh()
                 self.assertFalse(ok)
-                self.assertIn("the new map drops 1 host(s) the last good copy protects: example.test", message)
+                self.assertIn(
+                    "the new map drops 1 host(s) the last good copy protects: example.test", message
+                )
                 self.assertEqual(self.read(hrc.CACHE_FILE), before)
-                self.assertIn("Known route", self.assertDenied(self.run_hook("https://example.test/page")))
+                self.assertIn(
+                    "Known route", self.assertDenied(self.run_hook("https://example.test/page"))
+                )
 
     def test_unresolved_host_evidence_becoming_a_verified_host_updates_protection(self):
         self.fresh_stamp()
@@ -677,7 +958,9 @@ class Refresh(HookCase):
         deadline = time.time() + 15
         while time.time() < deadline and not (self.state / hrc.CACHE_FILE).exists():
             time.sleep(0.1)
-        self.assertTrue((self.state / hrc.CACHE_FILE).exists(), "background refresh did not write the cache")
+        self.assertTrue(
+            (self.state / hrc.CACHE_FILE).exists(), "background refresh did not write the cache"
+        )
         while time.time() < deadline and "refresh-ok" not in self.read(hrc.HOOK_LOG_FILE):
             time.sleep(0.1)
         self.assertDenied(self.run_hook("https://app.gohighlevel.com/"))
@@ -737,16 +1020,27 @@ class SecretShapes(unittest.TestCase):
 class HooksJson(unittest.TestCase):
     def test_matcher_covers_the_browser_navigation_tools(self):
         config = json.loads((HOOK.parent / "hooks.json").read_text(encoding="utf-8"))
-        group = config["hooks"]["PreToolUse"][0]
+        group = next(
+            g
+            for g in config["hooks"]["PreToolUse"]
+            if "headless_route_check.py" in g["hooks"][0]["command"]
+        )
         matcher = re.compile(group["matcher"])
-        for tool in ("mcp__playwright-ember__browser_navigate", "mcp__playwright-allison__browser_navigate",
-                     "mcp__claude-in-chrome__navigate", "mcp__claude-in-chrome__tabs_create_mcp",
-                     "mcp__playwright-ember__browser_run_code_unsafe", "mcp__playwright-ember__browser_evaluate",
-                     "mcp__playwright-ember__browser_tabs"):
+        for tool in (
+            "mcp__playwright-ember__browser_navigate",
+            "mcp__playwright-allison__browser_navigate",
+            "mcp__claude-in-chrome__navigate",
+            "mcp__claude-in-chrome__tabs_create_mcp",
+            "mcp__playwright-ember__browser_run_code_unsafe",
+            "mcp__playwright-ember__browser_evaluate",
+            "mcp__playwright-ember__browser_tabs",
+        ):
             self.assertTrue(matcher.search(tool), tool)
         for tool in ("mcp__playwright-ember__browser_snapshot", "Bash", "WebFetch"):
             self.assertFalse(matcher.search(tool), tool)
-        self.assertIn("${CLAUDE_PLUGIN_ROOT}/hooks/headless_route_check.py", group["hooks"][0]["command"])
+        self.assertIn(
+            "${CLAUDE_PLUGIN_ROOT}/hooks/headless_route_check.py", group["hooks"][0]["command"]
+        )
 
 
 if __name__ == "__main__":

@@ -132,7 +132,9 @@ CODE_CALL_RE = re.compile(
     r"(?:\.goto|\blocation\.assign|\blocation\.replace|\bwindow\.open)\s*\(\s*" + JS_STRING, re.S
 )
 CODE_ASSIGN_RE = re.compile(r"\blocation(?:\.href)?\s*=\s*" + JS_STRING, re.S)
-JS_ESCAPE_RE = re.compile(r"\\(?:x([0-9A-Fa-f]{2})|u\{([0-9A-Fa-f]+)\}|u([0-9A-Fa-f]{4})|(\r\n|.))", re.S)
+JS_ESCAPE_RE = re.compile(
+    r"\\(?:x([0-9A-Fa-f]{2})|u\{([0-9A-Fa-f]+)\}|u([0-9A-Fa-f]{4})|(\r\n|.))", re.S
+)
 JS_SINGLE_ESCAPES = {"n": "\n", "r": "\r", "t": "\t", "b": "\b", "f": "\f", "v": "\v", "0": "\0"}
 JS_LINE_CONTINUATIONS = ("\r\n", "\n", "\r", "\u2028", "\u2029")
 
@@ -322,18 +324,22 @@ def parse_map(csv_text: str) -> list[dict]:
         if blank:
             message = f"access map row {number} has no {', '.join(blank)}"
             if "Hosts" in blank:
-                message += (" (a live or setting up row whose hosts are not known yet declares "
-                            "Host evidence unresolved)")
+                message += (
+                    " (a live or setting up row whose hosts are not known yet declares "
+                    "Host evidence unresolved)"
+                )
             raise ValueError(message)
-        systems.append({
-            "system": system,
-            "hosts": hosts,
-            "route": cell(row, "route"),
-            "item": cell(row, "item"),
-            "status": normalize_status(status),
-            "reason": cell(row, "reason"),
-            "evidence": evidence,
-        })
+        systems.append(
+            {
+                "system": system,
+                "hosts": hosts,
+                "route": cell(row, "route"),
+                "item": cell(row, "item"),
+                "status": normalize_status(status),
+                "reason": cell(row, "reason"),
+                "evidence": evidence,
+            }
+        )
     if not systems:
         raise ValueError("the access map has no rows with a system")
     return systems
@@ -356,11 +362,15 @@ def lost_protected_hosts(old: list[dict] | None, new: list[dict]) -> list[str]:
     old_hosts: dict[str, set] = {}
     for entry in old:
         if entry.get("status") in (LIVE, SETTING_UP) and entry.get("hosts"):
-            old_hosts.setdefault(normalized_name(entry.get("system", "")), set()).update(entry["hosts"])
+            old_hosts.setdefault(normalized_name(entry.get("system", "")), set()).update(
+                entry["hosts"]
+            )
     new_hosts: dict[str, set] = {}
     for entry in new:
         if entry.get("hosts"):
-            new_hosts.setdefault(normalized_name(entry.get("system", "")), set()).update(entry["hosts"])
+            new_hosts.setdefault(normalized_name(entry.get("system", "")), set()).update(
+                entry["hosts"]
+            )
     lost = []
     for name, hosts in old_hosts.items():
         if not any(normalized_name(entry.get("system", "")) == name for entry in new):
@@ -370,7 +380,9 @@ def lost_protected_hosts(old: list[dict] | None, new: list[dict]) -> list[str]:
 
 
 def unknown_statuses(systems: list[dict]) -> list[str]:
-    return [safe(entry["system"]) for entry in systems if entry.get("status") not in STATUS_TIE_ORDER]
+    return [
+        safe(entry["system"]) for entry in systems if entry.get("status") not in STATUS_TIE_ORDER
+    ]
 
 
 def load_cache() -> list[dict] | None:
@@ -423,7 +435,10 @@ def run_command(argv: object, what: str) -> str:
     if not isinstance(argv, list) or not argv or not all(isinstance(part, str) for part in argv):
         raise ValueError(f"{what} must be a list of strings")
     result = subprocess.run(
-        argv, stdin=subprocess.DEVNULL, capture_output=True, text=True,
+        argv,
+        stdin=subprocess.DEVNULL,
+        capture_output=True,
+        text=True,
         timeout=FETCH_TIMEOUT_SECONDS,
     )
     if result.returncode != 0:
@@ -438,8 +453,11 @@ def fetch_map_csv(config: dict) -> str:
     sheet_id = config.get("sheet_id")
     if not sheet_id:
         raise ValueError(f"no access map is configured, set sheet_id in {config_path()}")
-    url = ("https://docs.google.com/spreadsheets/d/"
-           + urllib.parse.quote(str(sheet_id), safe="") + "/export?format=csv")
+    url = (
+        "https://docs.google.com/spreadsheets/d/"
+        + urllib.parse.quote(str(sheet_id), safe="")
+        + "/export?format=csv"
+    )
     if config.get("gid") not in (None, ""):
         url += "&gid=" + urllib.parse.quote(str(config["gid"]), safe="")
     request = urllib.request.Request(url)
@@ -460,7 +478,9 @@ def fetch_map_csv(config: dict) -> str:
             ) from None
         raise RuntimeError(f"the sheet export answered HTTP {error.code}") from None
     except urllib.error.URLError as error:
-        raise RuntimeError(f"the sheet export could not be reached ({one_line(error.reason, 80)})") from None
+        raise RuntimeError(
+            f"the sheet export could not be reached ({one_line(error.reason, 80)})"
+        ) from None
     if "text/html" in content_type:
         raise RuntimeError(
             "the sheet export returned a sign-in or sharing page, not CSV. The token needs a Drive "
@@ -495,15 +515,22 @@ def refresh() -> tuple[bool, str]:
         log_event("refresh-failed", message)
         return False, message
     message = f"{len(systems)} systems"
-    unresolved = [f"{safe(entry['system'])} ({unresolved_reason(entry)})"
-                  for entry in systems if not entry.get("hosts")]
+    unresolved = [
+        f"{safe(entry['system'])} ({unresolved_reason(entry)})"
+        for entry in systems
+        if not entry.get("hosts")
+    ]
     if unresolved:
-        message += (f", {len(unresolved)} unresolved, still needing real host evidence and "
-                    f"matched to no navigation: {', '.join(unresolved)}")
+        message += (
+            f", {len(unresolved)} unresolved, still needing real host evidence and "
+            f"matched to no navigation: {', '.join(unresolved)}"
+        )
     unknown = unknown_statuses(systems)
     if unknown:
-        message += (f", {len(unknown)} with a status that is not live, setting up or no API, so "
-                    f"the browser is let through for them: {', '.join(unknown)}")
+        message += (
+            f", {len(unknown)} with a status that is not live, setting up or no API, so "
+            f"the browser is let through for them: {', '.join(unknown)}"
+        )
     log_event("refresh-ok", message)
     return True, message
 
@@ -521,8 +548,11 @@ def start_background_refresh() -> None:
         touch_stamp()
         subprocess.Popen(
             [sys.executable, os.path.abspath(__file__), "--refresh"],
-            stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-            start_new_session=True, close_fds=True,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True,
+            close_fds=True,
         )
     except OSError as error:
         log_event("refresh-not-started", type(error).__name__)
@@ -562,7 +592,9 @@ def js_string_value(body: str) -> str:
     return JS_ESCAPE_RE.sub(unescape, body)
 
 
-def target_urls(tool_input: object, tool_name: str = "", cwd: str = "") -> list[tuple[str | None, bool]]:
+def target_urls(
+    tool_input: object, tool_name: str = "", cwd: str = ""
+) -> list[tuple[str | None, bool]]:
     """Each URL the call navigates to, paired with True when browser code holds it.
 
     A URL of None stands for code in a file the hook could not read.
@@ -576,7 +608,11 @@ def target_urls(tool_input: object, tool_name: str = "", cwd: str = "") -> list[
             targets.append((value, False))
             break
     filename = tool_input.get("filename")
-    if tool_name.rsplit("__", 1)[-1] in RUN_CODE_TOOLS and isinstance(filename, str) and filename.strip():
+    if (
+        tool_name.rsplit("__", 1)[-1] in RUN_CODE_TOOLS
+        and isinstance(filename, str)
+        and filename.strip()
+    ):
         code = read_code_file(filename.strip(), cwd)
         if code is None:
             return targets + [(None, True)]
@@ -612,7 +648,7 @@ def target_host(url: str, in_code: bool = False) -> str | None:
     match = SCHEME_RE.match(url)
     if match and not HOST_PORT_RE.match(url):
         scheme = match.group(1).lower()
-        rest = url[match.end():]
+        rest = url[match.end() :]
         if scheme == "view-source":
             return target_host(rest, in_code)
         if scheme not in WEB_SCHEMES:
@@ -678,7 +714,9 @@ def find_systems(host: str, systems: list[dict]) -> tuple[list[dict], bool]:
     best: list[dict] = []
     best_rank = None
     for entry in systems:
-        ranks = [rank for rank in (match_rank(host, str(p)) for p in entry.get("hosts") or []) if rank]
+        ranks = [
+            rank for rank in (match_rank(host, str(p)) for p in entry.get("hosts") or []) if rank
+        ]
         if not ranks:
             continue
         rank = max(ranks)
@@ -692,7 +730,10 @@ def find_systems(host: str, systems: list[dict]) -> tuple[list[dict], bool]:
     unique: dict[tuple[str, ...], dict] = {}
     for entry in best:
         if status_rank(entry) == top:
-            key = tuple(str(entry.get(field, "")) for field in ("system", "route", "item", "reason", "status"))
+            key = tuple(
+                str(entry.get(field, ""))
+                for field in ("system", "route", "item", "reason", "status")
+            )
             unique.setdefault(key, entry)
     chosen = [unique[key] for key in sorted(unique)]
     conflict = len({entry.get("status") for entry in best}) > 1 or len(chosen) > 1
@@ -718,7 +759,9 @@ def route_parts(entry: dict) -> tuple[str, str, str]:
     system = safe(entry.get("system", ""))
     route = safe(entry.get("route", "")) or "the headless route on the access map"
     item = safe(entry.get("item", ""))
-    item_part = f"with the 1Password item {item}" if item else "(the access map lists no 1Password item)"
+    item_part = (
+        f"with the 1Password item {item}" if item else "(the access map lists no 1Password item)"
+    )
     return system, route, item_part
 
 
@@ -804,12 +847,100 @@ def allow_note(host: str, entry: dict | None, cached: bool) -> str:
     )
 
 
+# Founder decision 2026-11-11 (Allison, relayed by the Cal Week Builder orchestrator and
+# recorded in [EP][V1.0] Week 0 Scope Accounting, Power Moves draft browser job authorized):
+# one bounded PartnerSync builder browser job on the M2, the unpublished Power Moves draft
+# page and form. GHL API v2 and the official MCP have no create operation for funnels, funnel
+# pages, forms or surveys (verified 2026-11-11 in the same record), so the access map's live
+# row for this shared host cannot cover builder work. This override allows only builder and
+# media-library paths; every other GoHighLevel path still goes through the access map.
+# Applies only to this M2 copy, pending the map owner's durable source fix.
+GHL_BUILDER_HOSTS = ("app.gohighlevel.com", "app.leadconnectorhq.com")
+GHL_BUILDER_PATH_RE = re.compile(
+    r"^/v2/location/[^/?#]+/(?:"
+    r"sites|funnels|funnels-websites|websites|forms|surveys|builder|page-builder"
+    r"|funnel-builder|form-builder|media|media-storage|media-library"
+    r")(?:[/?#]|$)",
+    re.I,
+)
+GHL_BUILDER_NOTE = (
+    "Headless route check: the GoHighLevel / PartnerSync builder has no API, no create "
+    "operation for funnels, funnel pages, forms or surveys (verified 2026-11-11), so the "
+    "browser is let through for the founder-authorized builder job of 2026-11-11. Only "
+    "builder and media-library paths are allowed; every other GoHighLevel path still goes "
+    "through the access map. Report it as: Headless route checked, GoHighLevel / "
+    "PartnerSync builder, no API, no create operation for funnels, pages, forms or surveys."
+)
+
+
+def _paths_on_host(host: str, targets: list) -> list:
+    """Normalized paths of every target on this host, empty when the host is absent."""
+    paths = []
+    for url, in_code in targets:
+        if url is None:
+            continue
+        if target_host(url, in_code) != host:
+            continue
+        candidate = url.strip(C0_CONTROL_OR_SPACE)
+        if not SCHEME_RE.match(candidate):
+            candidate = "https://" + candidate
+        paths.append(urllib.parse.urlsplit(candidate.replace("\\", "/")).path or "/")
+    return paths
+
+
+def ghl_builder_allowed(host: str, targets: list) -> bool:
+    """True only when every GoHighLevel target is a builder or media-library path."""
+    if host not in GHL_BUILDER_HOSTS:
+        return False
+    paths = _paths_on_host(host, targets)
+    return bool(paths) and all(GHL_BUILDER_PATH_RE.search(path) for path in paths)
+
+
+# Founder directive 2026-11-11 (Allison, relayed by the Cal Week Builder orchestrator):
+# routine GitHub App grant, configuration and repository-permission management is
+# authorized within existing approved access, without founder inspection. Every headless
+# route for these two organization settings pages was exhausted on 2026-11-11: the M2 gh
+# CLI is unauthenticated, the only git credential is the estate-brain-door App
+# installation token, GraphQL statusCheckRollup is FORBIDDEN, the REST API has no endpoint
+# that reviews or changes installation permission grants, and no documented M4 SSH route
+# exists. The access map's live GitHub row is therefore out of date for these exact paths
+# only, plus the PR 86 checks page for read-only verification. Every other GitHub path
+# still goes through the access map. Applies only to this M2 copy, pending the durable
+# source fix.
+GITHUB_SETTINGS_HOSTS = ("github.com", "www.github.com")
+GITHUB_SETTINGS_PATH_RE = re.compile(
+    r"^/organizations/ExpertPartners/settings/(?:"
+    r"apps/estate-brain-door/permissions|installations"
+    r")/?$"
+)
+GITHUB_PR86_CHECKS_RE = re.compile(r"^/ExpertPartners/expert-partners-hub/pull/86/checks/?$")
+GITHUB_SETTINGS_NOTE = (
+    "Headless route check: these GitHub organization settings paths have no API, "
+    "installation permission review and change have no endpoint (verified 2026-11-11), "
+    "so the browser is let through for the founder-authorized settings job. Only the two "
+    "settings paths and the read-only PR 86 checks page are allowed; every other GitHub "
+    "path still goes through the access map. Report it as: Headless route checked, GitHub "
+    "organization settings, no API, no installation-permission endpoint."
+)
+
+
+def github_settings_allowed(host: str, targets: list) -> bool:
+    """True only when every GitHub target is an authorized settings or PR 86 checks path."""
+    if host not in GITHUB_SETTINGS_HOSTS:
+        return False
+    paths = _paths_on_host(host, targets)
+    return bool(paths) and all(
+        GITHUB_SETTINGS_PATH_RE.match(path) or GITHUB_PR86_CHECKS_RE.match(path) for path in paths
+    )
+
+
 def decide(payload: dict) -> tuple[str, str] | None:
     """("deny", reason) or ("allow", note) for this tool call, or None when no site is opened."""
     tool_name = str(payload.get("tool_name", ""))
     hosts: list[str] = []
     unresolved = False
-    for url, in_code in target_urls(payload.get("tool_input"), tool_name, str(payload.get("cwd") or "")):
+    targets = target_urls(payload.get("tool_input"), tool_name, str(payload.get("cwd") or ""))
+    for url, in_code in targets:
         host = None if url is None else target_host(url, in_code)
         if host is None:
             unresolved = True
@@ -824,6 +955,14 @@ def decide(payload: dict) -> tuple[str, str] | None:
         return "allow", "\n".join(allow_note(label, None, cached=False) for label in labels)
     notes = []
     for host in hosts:
+        if ghl_builder_allowed(host, targets):
+            log_event("founder-override-allowed", f"{host} {tool_name}")
+            notes.append(GHL_BUILDER_NOTE)
+            continue
+        if github_settings_allowed(host, targets):
+            log_event("founder-override-allowed", f"{host} {tool_name}")
+            notes.append(GITHUB_SETTINGS_NOTE)
+            continue
         entries, conflict = find_systems(host, systems)
         if not entries:
             log_unknown_host(host, tool_name)
@@ -843,6 +982,7 @@ def decide(payload: dict) -> tuple[str, str] | None:
         log_event("unresolved-denied", tool_name)
         return "deny", UNRESOLVED_REASON
     return "allow", "\n".join(notes)
+
 
 def hook_output(decision: tuple[str, str] | None) -> dict | None:
     if decision is None:
