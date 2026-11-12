@@ -16,6 +16,37 @@ This skill builds and audits offers. The offer is the first domino, a funnel is 
 
 Provenance and boundary. This skill operationalizes Allison Gaddy's own synthesis and worked applications of the XAVIER offer formula (her filled worksheets, her Gateway to Mastery offer buildout, the Expert Partners ICP layer). The original course material stays a private reference library and is never quoted, pasted, or republished here or in any asset this skill produces. Read the plugin's shared reference at plugins/content-engines/references/titans-core.md before working; it is how this family of skills thinks.
 
+## Source brief mode
+
+Use this mode when the request is to extract an offer brief from existing winning work, a workbook or a gameplan, rather than construct or audit an offer. It takes precedence over the construction steps below for that request only. Do not impose a new framework, invent belief chains or redesign the source offer.
+
+Read the named source work and its context, the current offer decisions, product file, proof and order form. Keep source names and revisions with the brief. Current owning business sources determine the audience, not this skill's worked ICP examples.
+
+Extract in this order. Use these section names every time.
+
+1. Audience
+2. Problem
+3. Desired result
+4. Core promise
+5. Value exchange
+6. Client participation
+7. Scope and exclusions
+8. Proof
+9. Commercial terms
+10. Next step
+11. Open decisions
+12. Source notes
+
+For each component in Value exchange, state what the business does, what the client gets, what it enables and why it matters. A proposed component or war-chest idea stays a proposal, not an included deliverable.
+
+Mark unsupported fields Not found and inconsistent fields Conflicting. A newer price does not transfer an older package's scope, delivery date, payment terms, guarantee, bonus or urgency. Keep the primary offer distinct from a smaller acquisition offer. Keep positioning hypotheses distinct from validated customer language and outside examples distinct from the business's own proof.
+
+Compare the completed brief with the source packet on the real task. Check every section, especially audience, responsibility, proof and whether the terms describe the same offer version. Preserve the input, output and comparison in the owning business brain. On a revised source, preserve the prior version, name the change and repeat the same comparison.
+
+Save the brief as a Google Doc in the current owning output folder, using the live document formatting and file naming rules. Return its exact title as a clickable link. Never put private source content, source identifiers or business decisions in this repository.
+
+This mode creates an internal brief. It does not settle missing business decisions, authorize a sale or prove a skill invocation merely because a draft was compared by hand.
+
 ## Step zero, one dream customer
 
 No offer work starts without the customer defined. Simplicity is the fastest path to profitability, one dream customer, one marketplace, one offer.
