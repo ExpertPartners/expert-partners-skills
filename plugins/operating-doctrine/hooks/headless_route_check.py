@@ -132,7 +132,9 @@ CODE_CALL_RE = re.compile(
     r"(?:\.goto|\blocation\.assign|\blocation\.replace|\bwindow\.open)\s*\(\s*" + JS_STRING, re.S
 )
 CODE_ASSIGN_RE = re.compile(r"\blocation(?:\.href)?\s*=\s*" + JS_STRING, re.S)
-JS_ESCAPE_RE = re.compile(r"\\(?:x([0-9A-Fa-f]{2})|u\{([0-9A-Fa-f]+)\}|u([0-9A-Fa-f]{4})|(\r\n|.))", re.S)
+JS_ESCAPE_RE = re.compile(
+    r"\\(?:x([0-9A-Fa-f]{2})|u\{([0-9A-Fa-f]+)\}|u([0-9A-Fa-f]{4})|(\r\n|.))", re.S
+)
 JS_SINGLE_ESCAPES = {"n": "\n", "r": "\r", "t": "\t", "b": "\b", "f": "\f", "v": "\v", "0": "\0"}
 JS_LINE_CONTINUATIONS = ("\r\n", "\n", "\r", "\u2028", "\u2029")
 
@@ -322,18 +324,22 @@ def parse_map(csv_text: str) -> list[dict]:
         if blank:
             message = f"access map row {number} has no {', '.join(blank)}"
             if "Hosts" in blank:
-                message += (" (a live or setting up row whose hosts are not known yet declares "
-                            "Host evidence unresolved)")
+                message += (
+                    " (a live or setting up row whose hosts are not known yet declares "
+                    "Host evidence unresolved)"
+                )
             raise ValueError(message)
-        systems.append({
-            "system": system,
-            "hosts": hosts,
-            "route": cell(row, "route"),
-            "item": cell(row, "item"),
-            "status": normalize_status(status),
-            "reason": cell(row, "reason"),
-            "evidence": evidence,
-        })
+        systems.append(
+            {
+                "system": system,
+                "hosts": hosts,
+                "route": cell(row, "route"),
+                "item": cell(row, "item"),
+                "status": normalize_status(status),
+                "reason": cell(row, "reason"),
+                "evidence": evidence,
+            }
+        )
     if not systems:
         raise ValueError("the access map has no rows with a system")
     return systems
@@ -356,11 +362,15 @@ def lost_protected_hosts(old: list[dict] | None, new: list[dict]) -> list[str]:
     old_hosts: dict[str, set] = {}
     for entry in old:
         if entry.get("status") in (LIVE, SETTING_UP) and entry.get("hosts"):
-            old_hosts.setdefault(normalized_name(entry.get("system", "")), set()).update(entry["hosts"])
+            old_hosts.setdefault(normalized_name(entry.get("system", "")), set()).update(
+                entry["hosts"]
+            )
     new_hosts: dict[str, set] = {}
     for entry in new:
         if entry.get("hosts"):
-            new_hosts.setdefault(normalized_name(entry.get("system", "")), set()).update(entry["hosts"])
+            new_hosts.setdefault(normalized_name(entry.get("system", "")), set()).update(
+                entry["hosts"]
+            )
     lost = []
     for name, hosts in old_hosts.items():
         if not any(normalized_name(entry.get("system", "")) == name for entry in new):
@@ -370,7 +380,9 @@ def lost_protected_hosts(old: list[dict] | None, new: list[dict]) -> list[str]:
 
 
 def unknown_statuses(systems: list[dict]) -> list[str]:
-    return [safe(entry["system"]) for entry in systems if entry.get("status") not in STATUS_TIE_ORDER]
+    return [
+        safe(entry["system"]) for entry in systems if entry.get("status") not in STATUS_TIE_ORDER
+    ]
 
 
 def load_cache() -> list[dict] | None:
@@ -423,7 +435,10 @@ def run_command(argv: object, what: str) -> str:
     if not isinstance(argv, list) or not argv or not all(isinstance(part, str) for part in argv):
         raise ValueError(f"{what} must be a list of strings")
     result = subprocess.run(
-        argv, stdin=subprocess.DEVNULL, capture_output=True, text=True,
+        argv,
+        stdin=subprocess.DEVNULL,
+        capture_output=True,
+        text=True,
         timeout=FETCH_TIMEOUT_SECONDS,
     )
     if result.returncode != 0:
@@ -438,8 +453,11 @@ def fetch_map_csv(config: dict) -> str:
     sheet_id = config.get("sheet_id")
     if not sheet_id:
         raise ValueError(f"no access map is configured, set sheet_id in {config_path()}")
-    url = ("https://docs.google.com/spreadsheets/d/"
-           + urllib.parse.quote(str(sheet_id), safe="") + "/export?format=csv")
+    url = (
+        "https://docs.google.com/spreadsheets/d/"
+        + urllib.parse.quote(str(sheet_id), safe="")
+        + "/export?format=csv"
+    )
     if config.get("gid") not in (None, ""):
         url += "&gid=" + urllib.parse.quote(str(config["gid"]), safe="")
     request = urllib.request.Request(url)
@@ -460,7 +478,9 @@ def fetch_map_csv(config: dict) -> str:
             ) from None
         raise RuntimeError(f"the sheet export answered HTTP {error.code}") from None
     except urllib.error.URLError as error:
-        raise RuntimeError(f"the sheet export could not be reached ({one_line(error.reason, 80)})") from None
+        raise RuntimeError(
+            f"the sheet export could not be reached ({one_line(error.reason, 80)})"
+        ) from None
     if "text/html" in content_type:
         raise RuntimeError(
             "the sheet export returned a sign-in or sharing page, not CSV. The token needs a Drive "
@@ -495,15 +515,22 @@ def refresh() -> tuple[bool, str]:
         log_event("refresh-failed", message)
         return False, message
     message = f"{len(systems)} systems"
-    unresolved = [f"{safe(entry['system'])} ({unresolved_reason(entry)})"
-                  for entry in systems if not entry.get("hosts")]
+    unresolved = [
+        f"{safe(entry['system'])} ({unresolved_reason(entry)})"
+        for entry in systems
+        if not entry.get("hosts")
+    ]
     if unresolved:
-        message += (f", {len(unresolved)} unresolved, still needing real host evidence and "
-                    f"matched to no navigation: {', '.join(unresolved)}")
+        message += (
+            f", {len(unresolved)} unresolved, still needing real host evidence and "
+            f"matched to no navigation: {', '.join(unresolved)}"
+        )
     unknown = unknown_statuses(systems)
     if unknown:
-        message += (f", {len(unknown)} with a status that is not live, setting up or no API, so "
-                    f"the browser is let through for them: {', '.join(unknown)}")
+        message += (
+            f", {len(unknown)} with a status that is not live, setting up or no API, so "
+            f"the browser is let through for them: {', '.join(unknown)}"
+        )
     log_event("refresh-ok", message)
     return True, message
 
@@ -521,8 +548,11 @@ def start_background_refresh() -> None:
         touch_stamp()
         subprocess.Popen(
             [sys.executable, os.path.abspath(__file__), "--refresh"],
-            stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-            start_new_session=True, close_fds=True,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True,
+            close_fds=True,
         )
     except OSError as error:
         log_event("refresh-not-started", type(error).__name__)
@@ -562,7 +592,9 @@ def js_string_value(body: str) -> str:
     return JS_ESCAPE_RE.sub(unescape, body)
 
 
-def target_urls(tool_input: object, tool_name: str = "", cwd: str = "") -> list[tuple[str | None, bool]]:
+def target_urls(
+    tool_input: object, tool_name: str = "", cwd: str = ""
+) -> list[tuple[str | None, bool]]:
     """Each URL the call navigates to, paired with True when browser code holds it.
 
     A URL of None stands for code in a file the hook could not read.
@@ -576,7 +608,11 @@ def target_urls(tool_input: object, tool_name: str = "", cwd: str = "") -> list[
             targets.append((value, False))
             break
     filename = tool_input.get("filename")
-    if tool_name.rsplit("__", 1)[-1] in RUN_CODE_TOOLS and isinstance(filename, str) and filename.strip():
+    if (
+        tool_name.rsplit("__", 1)[-1] in RUN_CODE_TOOLS
+        and isinstance(filename, str)
+        and filename.strip()
+    ):
         code = read_code_file(filename.strip(), cwd)
         if code is None:
             return targets + [(None, True)]
@@ -612,7 +648,7 @@ def target_host(url: str, in_code: bool = False) -> str | None:
     match = SCHEME_RE.match(url)
     if match and not HOST_PORT_RE.match(url):
         scheme = match.group(1).lower()
-        rest = url[match.end():]
+        rest = url[match.end() :]
         if scheme == "view-source":
             return target_host(rest, in_code)
         if scheme not in WEB_SCHEMES:
@@ -678,7 +714,9 @@ def find_systems(host: str, systems: list[dict]) -> tuple[list[dict], bool]:
     best: list[dict] = []
     best_rank = None
     for entry in systems:
-        ranks = [rank for rank in (match_rank(host, str(p)) for p in entry.get("hosts") or []) if rank]
+        ranks = [
+            rank for rank in (match_rank(host, str(p)) for p in entry.get("hosts") or []) if rank
+        ]
         if not ranks:
             continue
         rank = max(ranks)
@@ -692,7 +730,10 @@ def find_systems(host: str, systems: list[dict]) -> tuple[list[dict], bool]:
     unique: dict[tuple[str, ...], dict] = {}
     for entry in best:
         if status_rank(entry) == top:
-            key = tuple(str(entry.get(field, "")) for field in ("system", "route", "item", "reason", "status"))
+            key = tuple(
+                str(entry.get(field, ""))
+                for field in ("system", "route", "item", "reason", "status")
+            )
             unique.setdefault(key, entry)
     chosen = [unique[key] for key in sorted(unique)]
     conflict = len({entry.get("status") for entry in best}) > 1 or len(chosen) > 1
@@ -718,7 +759,9 @@ def route_parts(entry: dict) -> tuple[str, str, str]:
     system = safe(entry.get("system", ""))
     route = safe(entry.get("route", "")) or "the headless route on the access map"
     item = safe(entry.get("item", ""))
-    item_part = f"with the 1Password item {item}" if item else "(the access map lists no 1Password item)"
+    item_part = (
+        f"with the 1Password item {item}" if item else "(the access map lists no 1Password item)"
+    )
     return system, route, item_part
 
 
@@ -809,7 +852,9 @@ def decide(payload: dict) -> tuple[str, str] | None:
     tool_name = str(payload.get("tool_name", ""))
     hosts: list[str] = []
     unresolved = False
-    for url, in_code in target_urls(payload.get("tool_input"), tool_name, str(payload.get("cwd") or "")):
+    for url, in_code in target_urls(
+        payload.get("tool_input"), tool_name, str(payload.get("cwd") or "")
+    ):
         host = None if url is None else target_host(url, in_code)
         if host is None:
             unresolved = True
@@ -843,6 +888,7 @@ def decide(payload: dict) -> tuple[str, str] | None:
         log_event("unresolved-denied", tool_name)
         return "deny", UNRESOLVED_REASON
     return "allow", "\n".join(notes)
+
 
 def hook_output(decision: tuple[str, str] | None) -> dict | None:
     if decision is None:
