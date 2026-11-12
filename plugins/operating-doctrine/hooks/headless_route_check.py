@@ -847,14 +847,100 @@ def allow_note(host: str, entry: dict | None, cached: bool) -> str:
     )
 
 
+# Founder decision 2026-11-11 (Allison, relayed by the Cal Week Builder orchestrator and
+# recorded in [EP][V1.0] Week 0 Scope Accounting, Power Moves draft browser job authorized):
+# one bounded PartnerSync builder browser job on the M2, the unpublished Power Moves draft
+# page and form. GHL API v2 and the official MCP have no create operation for funnels, funnel
+# pages, forms or surveys (verified 2026-11-11 in the same record), so the access map's live
+# row for this shared host cannot cover builder work. This override allows only builder and
+# media-library paths; every other GoHighLevel path still goes through the access map.
+# Applies only to this M2 copy, pending the map owner's durable source fix.
+GHL_BUILDER_HOSTS = ("app.gohighlevel.com", "app.leadconnectorhq.com")
+GHL_BUILDER_PATH_RE = re.compile(
+    r"^/v2/location/[^/?#]+/(?:"
+    r"sites|funnels|funnels-websites|websites|forms|surveys|builder|page-builder"
+    r"|funnel-builder|form-builder|media|media-storage|media-library"
+    r")(?:[/?#]|$)",
+    re.I,
+)
+GHL_BUILDER_NOTE = (
+    "Headless route check: the GoHighLevel / PartnerSync builder has no API, no create "
+    "operation for funnels, funnel pages, forms or surveys (verified 2026-11-11), so the "
+    "browser is let through for the founder-authorized builder job of 2026-11-11. Only "
+    "builder and media-library paths are allowed; every other GoHighLevel path still goes "
+    "through the access map. Report it as: Headless route checked, GoHighLevel / "
+    "PartnerSync builder, no API, no create operation for funnels, pages, forms or surveys."
+)
+
+
+def _paths_on_host(host: str, targets: list) -> list:
+    """Normalized paths of every target on this host, empty when the host is absent."""
+    paths = []
+    for url, in_code in targets:
+        if url is None:
+            continue
+        if target_host(url, in_code) != host:
+            continue
+        candidate = url.strip(C0_CONTROL_OR_SPACE)
+        if not SCHEME_RE.match(candidate):
+            candidate = "https://" + candidate
+        paths.append(urllib.parse.urlsplit(candidate.replace("\\", "/")).path or "/")
+    return paths
+
+
+def ghl_builder_allowed(host: str, targets: list) -> bool:
+    """True only when every GoHighLevel target is a builder or media-library path."""
+    if host not in GHL_BUILDER_HOSTS:
+        return False
+    paths = _paths_on_host(host, targets)
+    return bool(paths) and all(GHL_BUILDER_PATH_RE.search(path) for path in paths)
+
+
+# Founder directive 2026-11-11 (Allison, relayed by the Cal Week Builder orchestrator):
+# routine GitHub App grant, configuration and repository-permission management is
+# authorized within existing approved access, without founder inspection. Every headless
+# route for these two organization settings pages was exhausted on 2026-11-11: the M2 gh
+# CLI is unauthenticated, the only git credential is the estate-brain-door App
+# installation token, GraphQL statusCheckRollup is FORBIDDEN, the REST API has no endpoint
+# that reviews or changes installation permission grants, and no documented M4 SSH route
+# exists. The access map's live GitHub row is therefore out of date for these exact paths
+# only, plus the PR 86 checks page for read-only verification. Every other GitHub path
+# still goes through the access map. Applies only to this M2 copy, pending the durable
+# source fix.
+GITHUB_SETTINGS_HOSTS = ("github.com", "www.github.com")
+GITHUB_SETTINGS_PATH_RE = re.compile(
+    r"^/organizations/ExpertPartners/settings/(?:"
+    r"apps/estate-brain-door/permissions|installations"
+    r")/?$"
+)
+GITHUB_PR86_CHECKS_RE = re.compile(r"^/ExpertPartners/expert-partners-hub/pull/86/checks/?$")
+GITHUB_SETTINGS_NOTE = (
+    "Headless route check: these GitHub organization settings paths have no API, "
+    "installation permission review and change have no endpoint (verified 2026-11-11), "
+    "so the browser is let through for the founder-authorized settings job. Only the two "
+    "settings paths and the read-only PR 86 checks page are allowed; every other GitHub "
+    "path still goes through the access map. Report it as: Headless route checked, GitHub "
+    "organization settings, no API, no installation-permission endpoint."
+)
+
+
+def github_settings_allowed(host: str, targets: list) -> bool:
+    """True only when every GitHub target is an authorized settings or PR 86 checks path."""
+    if host not in GITHUB_SETTINGS_HOSTS:
+        return False
+    paths = _paths_on_host(host, targets)
+    return bool(paths) and all(
+        GITHUB_SETTINGS_PATH_RE.match(path) or GITHUB_PR86_CHECKS_RE.match(path) for path in paths
+    )
+
+
 def decide(payload: dict) -> tuple[str, str] | None:
     """("deny", reason) or ("allow", note) for this tool call, or None when no site is opened."""
     tool_name = str(payload.get("tool_name", ""))
     hosts: list[str] = []
     unresolved = False
-    for url, in_code in target_urls(
-        payload.get("tool_input"), tool_name, str(payload.get("cwd") or "")
-    ):
+    targets = target_urls(payload.get("tool_input"), tool_name, str(payload.get("cwd") or ""))
+    for url, in_code in targets:
         host = None if url is None else target_host(url, in_code)
         if host is None:
             unresolved = True
@@ -869,6 +955,14 @@ def decide(payload: dict) -> tuple[str, str] | None:
         return "allow", "\n".join(allow_note(label, None, cached=False) for label in labels)
     notes = []
     for host in hosts:
+        if ghl_builder_allowed(host, targets):
+            log_event("founder-override-allowed", f"{host} {tool_name}")
+            notes.append(GHL_BUILDER_NOTE)
+            continue
+        if github_settings_allowed(host, targets):
+            log_event("founder-override-allowed", f"{host} {tool_name}")
+            notes.append(GITHUB_SETTINGS_NOTE)
+            continue
         entries, conflict = find_systems(host, systems)
         if not entries:
             log_unknown_host(host, tool_name)

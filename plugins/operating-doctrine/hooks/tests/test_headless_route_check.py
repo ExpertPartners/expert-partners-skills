@@ -501,6 +501,112 @@ class Decisions(HookCase):
         self.assertIn("hook-error", self.read(hrc.HOOK_LOG_FILE))
 
 
+GITHUB_ROW = "GitHub,github.com,gh CLI with GH_TOKEN from 1Password,GitHub PAT,Live,\n"
+
+
+class FounderOverrides(HookCase):
+    """The 2026-11-11 founder-authorized, path-scoped overrides. The allow cases fail on
+    main before the fix; the deny cases pin the scope so no other path slips through."""
+
+    GHL = "app.gohighlevel.com"
+    SETTINGS = "https://github.com/organizations/ExpertPartners/settings"
+    CHECKS = "https://github.com/ExpertPartners/expert-partners-hub/pull/86/checks"
+
+    def setUp(self):
+        super().setUp()
+        self.write_cache(MAP_CSV + GITHUB_ROW + LEAKY_ROWS)
+        self.fresh_stamp()
+
+    def test_ghl_builder_forms_and_media_paths_are_allowed(self):
+        cases = (
+            f"https://{self.GHL}/v2/location/abc/funnels/page-builder/123",
+            f"https://{self.GHL}/v2/location/abc/forms/builder/xyz",
+            f"https://{self.GHL}/v2/location/abc/media-library",
+            f"https://app.leadconnectorhq.com/v2/location/abc/sites/builder",
+        )
+        for url in cases:
+            with self.subTest(url=url):
+                note = self.assertAllowed(self.run_hook(url))
+                self.assertIn(
+                    "GoHighLevel / PartnerSync builder, no API, no create operation", note
+                )
+        self.assertIn("founder-override-allowed", self.read(hrc.HOOK_LOG_FILE))
+
+    def test_ghl_builder_code_call_with_only_builder_targets_is_allowed(self):
+        code = (
+            "async (page) => { await page.goto('https://app.gohighlevel.com/v2/location/abc/funnels/x');"
+            " await page.goto('https://app.gohighlevel.com/v2/location/abc/media-storage'); }"
+        )
+        note = self.assertAllowed(
+            self.run_hook(None, "mcp__playwright-ember__browser_run_code_unsafe", {"code": code})
+        )
+        self.assertIn("GoHighLevel / PartnerSync builder", note)
+
+    def test_ghl_contacts_and_workflows_stay_denied(self):
+        for path in ("/v2/location/abc/contacts", "/v2/location/abc/workflows"):
+            with self.subTest(path=path):
+                reason = self.assertDenied(self.run_hook(f"https://{self.GHL}{path}"))
+                self.assertIn("GoHighLevel contacts", reason)
+
+    def test_ghl_code_call_with_any_off_scope_target_is_denied(self):
+        code = (
+            "async (page) => { await page.goto('https://app.gohighlevel.com/v2/location/abc/funnels/x');"
+            " await page.goto('https://app.gohighlevel.com/v2/location/abc/contacts'); }"
+        )
+        reason = self.assertDenied(
+            self.run_hook(None, "mcp__playwright-ember__browser_run_code_unsafe", {"code": code})
+        )
+        self.assertIn("GoHighLevel contacts", reason)
+
+    def test_github_settings_paths_and_pr86_checks_are_allowed(self):
+        cases = (
+            f"{self.SETTINGS}/apps/estate-brain-door/permissions",
+            f"{self.SETTINGS}/apps/estate-brain-door/permissions/",
+            f"{self.SETTINGS}/installations",
+            f"{self.SETTINGS}/installations/",
+            self.CHECKS,
+            f"{self.CHECKS}/",
+        )
+        for url in cases:
+            with self.subTest(url=url):
+                note = self.assertAllowed(self.run_hook(url))
+                self.assertIn(
+                    "GitHub organization settings, no API, no installation-permission endpoint",
+                    note,
+                )
+        self.assertIn("founder-override-allowed", self.read(hrc.HOOK_LOG_FILE))
+
+    def test_github_paths_outside_the_grant_stay_denied(self):
+        cases = (
+            "https://github.com/ExpertPartners/expert-partners-hub/pull/86",
+            f"{self.SETTINGS}/installations/177351892",
+            f"{self.SETTINGS}/apps",
+            f"{self.SETTINGS}/apps/estate-brain-door",
+            "https://github.com/",
+            "https://github.com/apps",
+            "https://github.com/login",
+        )
+        for url in cases:
+            with self.subTest(url=url):
+                self.assertIn("GitHub", self.assertDenied(self.run_hook(url)))
+
+    def test_github_code_call_with_any_off_scope_target_is_denied(self):
+        code = (
+            "async (page) => { await page.goto('https://github.com/organizations/ExpertPartners/settings/"
+            "apps/estate-brain-door/permissions'); await page.goto('https://github.com/organizations/"
+            "ExpertPartners/settings/installations/177351892'); }"
+        )
+        reason = self.assertDenied(
+            self.run_hook(None, "mcp__playwright-ember__browser_run_code_unsafe", {"code": code})
+        )
+        self.assertIn("GitHub", reason)
+
+    def test_native_tool_name_as_text_and_example_com_stay_allowed(self):
+        self.assertAllowed(self.run_hook("mcp__playwright-ember__browser_navigate"))
+        note = self.assertAllowed(self.run_hook("https://example.com/pricing"))
+        self.assertIn("Example marketing, no API", note)
+
+
 class MissingCache(HookCase):
     def test_missing_cache_is_allowed_and_logged(self):
         self.fresh_stamp()
@@ -914,7 +1020,11 @@ class SecretShapes(unittest.TestCase):
 class HooksJson(unittest.TestCase):
     def test_matcher_covers_the_browser_navigation_tools(self):
         config = json.loads((HOOK.parent / "hooks.json").read_text(encoding="utf-8"))
-        group = config["hooks"]["PreToolUse"][0]
+        group = next(
+            g
+            for g in config["hooks"]["PreToolUse"]
+            if "headless_route_check.py" in g["hooks"][0]["command"]
+        )
         matcher = re.compile(group["matcher"])
         for tool in (
             "mcp__playwright-ember__browser_navigate",
