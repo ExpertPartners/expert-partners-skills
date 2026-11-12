@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "1d35d5001fcb7f0f13d19aa1a45e0d3cfc95aa07"
+    "eps": "f2b220b0e7966294860e81d3c8b5270d2e682610"
   },
   "zones": [
     "surfaces",
@@ -141,7 +141,7 @@
       "renderNote": null,
       "layout": {
         "x": 2022,
-        "y": 4996.3,
+        "y": 5121.8,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -171,7 +171,7 @@
       "renderNote": null,
       "layout": {
         "x": 2027,
-        "y": 5294.3,
+        "y": 5419.8,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -196,7 +196,7 @@
       "renderNote": null,
       "layout": {
         "x": 1053,
-        "y": 8567,
+        "y": 8466,
         "width": 194,
         "height": 63,
         "rectHeight": 48,
@@ -367,7 +367,7 @@
       "renderNote": null,
       "layout": {
         "x": 1028,
-        "y": 8264,
+        "y": 8640,
         "width": 244,
         "height": 77,
         "rectHeight": 62,
@@ -393,7 +393,7 @@
       "renderNote": null,
       "layout": {
         "x": 1725,
-        "y": 5091.8,
+        "y": 5217.3,
         "width": 215,
         "height": 63,
         "rectHeight": 48,
@@ -420,7 +420,7 @@
       "renderNote": null,
       "layout": {
         "x": 1017,
-        "y": 8466,
+        "y": 6516,
         "width": 266,
         "height": 77,
         "rectHeight": 62,
@@ -448,7 +448,7 @@
       "renderNote": null,
       "layout": {
         "x": 1717.5,
-        "y": 5484.3,
+        "y": 5609.8,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -476,7 +476,7 @@
       "renderNote": null,
       "layout": {
         "x": 1041,
-        "y": 6258,
+        "y": 6227,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -511,7 +511,7 @@
       "renderNote": null,
       "layout": {
         "x": 1756,
-        "y": 5175.8,
+        "y": 5301.3,
         "width": 188,
         "height": 77,
         "rectHeight": 62,
@@ -818,7 +818,7 @@
       "renderNote": null,
       "layout": {
         "x": 1038,
-        "y": 5997,
+        "y": 8553,
         "width": 224,
         "height": 63,
         "rectHeight": 48,
@@ -843,7 +843,7 @@
       "renderNote": null,
       "layout": {
         "x": 1039,
-        "y": 8365,
+        "y": 5952,
         "width": 222,
         "height": 77,
         "rectHeight": 62,
@@ -869,7 +869,7 @@
       "renderNote": null,
       "layout": {
         "x": 1042.5,
-        "y": 5722,
+        "y": 5113,
         "width": 215,
         "height": 77,
         "rectHeight": 62,
@@ -895,7 +895,7 @@
       "renderNote": null,
       "layout": {
         "x": 1031.5,
-        "y": 5012,
+        "y": 5865,
         "width": 237,
         "height": 63,
         "rectHeight": 48,
@@ -1003,7 +1003,7 @@
       "renderNote": null,
       "layout": {
         "x": 1047,
-        "y": 5635,
+        "y": 6053,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -1028,7 +1028,7 @@
       "renderNote": null,
       "layout": {
         "x": 1035,
-        "y": 5823,
+        "y": 6617,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -1083,7 +1083,7 @@
       "renderNote": null,
       "layout": {
         "x": 1714,
-        "y": 5375.3,
+        "y": 5500.8,
         "width": 237,
         "height": 77,
         "rectHeight": 62,
@@ -1165,7 +1165,7 @@
       "renderNote": null,
       "layout": {
         "x": 1044,
-        "y": 6359,
+        "y": 8292,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -1224,7 +1224,7 @@
       "renderNote": null,
       "layout": {
         "x": 2043,
-        "y": 4843.3,
+        "y": 4968.8,
         "width": 200,
         "height": 63,
         "rectHeight": 48,
@@ -1309,7 +1309,7 @@
       "renderNote": null,
       "layout": {
         "x": 2027,
-        "y": 4726.3,
+        "y": 4851.8,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -1364,7 +1364,7 @@
       "renderNote": null,
       "layout": {
         "x": 1028,
-        "y": 8062,
+        "y": 4737,
         "width": 244,
         "height": 77,
         "rectHeight": 62,
@@ -1452,7 +1452,7 @@
       "renderNote": null,
       "layout": {
         "x": 2022,
-        "y": 5431.3,
+        "y": 5556.8,
         "width": 152,
         "height": 63,
         "rectHeight": 48,
@@ -1625,7 +1625,7 @@
       "renderNote": null,
       "layout": {
         "x": 1318,
-        "y": 5454,
+        "y": 5579.5,
         "width": 296,
         "height": 77,
         "rectHeight": 62,
@@ -1762,7 +1762,7 @@
       "renderNote": null,
       "layout": {
         "x": 1020.5,
-        "y": 4650,
+        "y": 6791,
         "width": 259,
         "height": 63,
         "rectHeight": 48,
@@ -1817,7 +1817,7 @@
       "renderNote": null,
       "layout": {
         "x": 1039,
-        "y": 6547,
+        "y": 8020,
         "width": 222,
         "height": 77,
         "rectHeight": 62,
@@ -1845,7 +1845,7 @@
       "renderNote": null,
       "layout": {
         "x": 1053,
-        "y": 7790,
+        "y": 7066,
         "width": 194,
         "height": 77,
         "rectHeight": 62,
@@ -1871,7 +1871,7 @@
       "renderNote": null,
       "layout": {
         "x": 1056,
-        "y": 6850,
+        "y": 7442,
         "width": 188,
         "height": 63,
         "rectHeight": 48,
@@ -1896,7 +1896,7 @@
       "renderNote": null,
       "layout": {
         "x": 1050,
-        "y": 7226,
+        "y": 4563,
         "width": 200,
         "height": 63,
         "rectHeight": 48,
@@ -2036,7 +2036,7 @@
       "renderNote": null,
       "layout": {
         "x": 1028,
-        "y": 4476,
+        "y": 5026,
         "width": 244,
         "height": 63,
         "rectHeight": 48,
@@ -2061,7 +2061,7 @@
       "renderNote": null,
       "layout": {
         "x": 1047,
-        "y": 4925,
+        "y": 7933,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -2086,7 +2086,7 @@
       "renderNote": null,
       "layout": {
         "x": 1024,
-        "y": 7602,
+        "y": 6140,
         "width": 252,
         "height": 63,
         "rectHeight": 48,
@@ -2111,7 +2111,7 @@
       "renderNote": null,
       "layout": {
         "x": 1050,
-        "y": 5910,
+        "y": 7355,
         "width": 200,
         "height": 63,
         "rectHeight": 48,
@@ -2136,7 +2136,7 @@
       "renderNote": null,
       "layout": {
         "x": 1035,
-        "y": 7125,
+        "y": 4838,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -2162,7 +2162,7 @@
       "renderNote": null,
       "layout": {
         "x": 1042.5,
-        "y": 4737,
+        "y": 8379,
         "width": 215,
         "height": 63,
         "rectHeight": 48,
@@ -2189,7 +2189,7 @@
       "renderNote": null,
       "layout": {
         "x": 1017,
-        "y": 8163,
+        "y": 7529,
         "width": 266,
         "height": 77,
         "rectHeight": 62,
@@ -2217,7 +2217,7 @@
       "renderNote": null,
       "layout": {
         "x": 1042.5,
-        "y": 7313,
+        "y": 6328,
         "width": 215,
         "height": 77,
         "rectHeight": 62,
@@ -2268,7 +2268,7 @@
       "renderNote": null,
       "layout": {
         "x": 1047,
-        "y": 6084,
+        "y": 8121,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -2297,7 +2297,7 @@
       "renderNote": null,
       "layout": {
         "x": 1002,
-        "y": 5360,
+        "y": 5764,
         "width": 296,
         "height": 77,
         "rectHeight": 62,
@@ -2410,7 +2410,7 @@
       "renderNote": null,
       "layout": {
         "x": 1047,
-        "y": 7891,
+        "y": 4274,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -2460,7 +2460,7 @@
       "renderNote": null,
       "layout": {
         "x": 1035.5,
-        "y": 4187,
+        "y": 4361,
         "width": 229,
         "height": 77,
         "rectHeight": 62,
@@ -2486,7 +2486,7 @@
       "renderNote": null,
       "layout": {
         "x": 1062,
-        "y": 4288,
+        "y": 8205,
         "width": 176,
         "height": 63,
         "rectHeight": 48,
@@ -2511,7 +2511,7 @@
       "renderNote": null,
       "layout": {
         "x": 1035,
-        "y": 7975,
+        "y": 6704,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -2593,7 +2593,7 @@
       "renderNote": null,
       "layout": {
         "x": 1041,
-        "y": 6446,
+        "y": 4462,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -2621,7 +2621,7 @@
       "renderNote": null,
       "layout": {
         "x": 1050,
-        "y": 4375,
+        "y": 7731,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -2649,7 +2649,7 @@
       "renderNote": null,
       "layout": {
         "x": 1041,
-        "y": 7501,
+        "y": 7630,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -2675,7 +2675,7 @@
       "renderNote": null,
       "layout": {
         "x": 1031.5,
-        "y": 7414,
+        "y": 4939,
         "width": 237,
         "height": 63,
         "rectHeight": 48,
@@ -2702,7 +2702,7 @@
       "renderNote": null,
       "layout": {
         "x": 1017,
-        "y": 4824,
+        "y": 5663,
         "width": 266,
         "height": 77,
         "rectHeight": 62,
@@ -2757,7 +2757,7 @@
       "renderNote": null,
       "layout": {
         "x": 1057.5,
-        "y": 5548,
+        "y": 6429,
         "width": 185,
         "height": 63,
         "rectHeight": 48,
@@ -2782,7 +2782,7 @@
       "renderNote": null,
       "layout": {
         "x": 1028,
-        "y": 6171,
+        "y": 4650,
         "width": 244,
         "height": 63,
         "rectHeight": 48,
@@ -2807,7 +2807,7 @@
       "renderNote": null,
       "layout": {
         "x": 1035,
-        "y": 4563,
+        "y": 6878,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -2943,7 +2943,7 @@
       "renderNote": null,
       "layout": {
         "x": 1035,
-        "y": 6648,
+        "y": 7167,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -3150,7 +3150,7 @@
       "renderNote": null,
       "layout": {
         "x": 1318,
-        "y": 7701.8,
+        "y": 7844.8,
         "width": 218,
         "height": 77,
         "rectHeight": 62,
@@ -3206,7 +3206,7 @@
       "renderNote": null,
       "layout": {
         "x": 1032,
-        "y": 6937,
+        "y": 6965,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -3295,7 +3295,7 @@
       "renderNote": null,
       "layout": {
         "x": 1370,
-        "y": 5555,
+        "y": 5680.5,
         "width": 244,
         "height": 77,
         "rectHeight": 62,
@@ -3323,7 +3323,7 @@
       "renderNote": null,
       "layout": {
         "x": 1047,
-        "y": 6749,
+        "y": 8741,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -3353,7 +3353,7 @@
       "renderNote": null,
       "layout": {
         "x": 1074,
-        "y": 7689,
+        "y": 7832,
         "width": 224,
         "height": 77,
         "rectHeight": 62,
@@ -3383,7 +3383,7 @@
       "renderNote": null,
       "layout": {
         "x": 2043,
-        "y": 5181.3,
+        "y": 5306.8,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -3409,7 +3409,7 @@
       "renderNote": null,
       "layout": {
         "x": 1039,
-        "y": 8654,
+        "y": 5388,
         "width": 222,
         "height": 63,
         "rectHeight": 48,
@@ -3544,7 +3544,7 @@
       "renderNote": null,
       "layout": {
         "x": 1046.5,
-        "y": 5273,
+        "y": 5576,
         "width": 207,
         "height": 63,
         "rectHeight": 48,
@@ -3571,7 +3571,7 @@
       "renderNote": null,
       "layout": {
         "x": 1046.5,
-        "y": 5461,
+        "y": 7268,
         "width": 207,
         "height": 63,
         "rectHeight": 48,
@@ -3598,7 +3598,7 @@
       "renderNote": null,
       "layout": {
         "x": 1717.5,
-        "y": 5585.3,
+        "y": 5710.8,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -3637,6 +3637,36 @@
         "subtitleLines": [
           "weekly cash in and out, per",
           "entity"
+        ]
+      }
+    },
+    {
+      "id": "weekly-webinar-playbook",
+      "source": "eps:plugins/content-engines/skills/weekly-webinar-playbook/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "content",
+      "status": "designed",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [
+        "xavier-offer-builder"
+      ],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "source-grounded weekly webinar rehearsal",
+      "renderNote": null,
+      "layout": {
+        "x": 1074,
+        "y": 5475,
+        "width": 224,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "source-grounded weekly webinar",
+          "rehearsal"
         ]
       }
     },
@@ -3685,7 +3715,7 @@
       "renderNote": null,
       "layout": {
         "x": 1318,
-        "y": 5367,
+        "y": 5492.5,
         "width": 212,
         "height": 63,
         "rectHeight": 48,
@@ -3710,7 +3740,7 @@
       "renderNote": null,
       "layout": {
         "x": 1028,
-        "y": 7038,
+        "y": 5301,
         "width": 244,
         "height": 63,
         "rectHeight": 48,
@@ -3735,7 +3765,7 @@
       "renderNote": null,
       "layout": {
         "x": 1062,
-        "y": 5186,
+        "y": 5214,
         "width": 176,
         "height": 63,
         "rectHeight": 48,
@@ -3760,7 +3790,7 @@
       "renderNote": null,
       "layout": {
         "x": 1035.5,
-        "y": 5099,
+        "y": 4187,
         "width": 229,
         "height": 63,
         "rectHeight": 48,
@@ -4002,19 +4032,19 @@
       "points": [
         {
           "x": 1944,
-          "y": 5208.8
+          "y": 5334.3
         },
         {
           "x": 1991,
-          "y": 5208.8
+          "y": 5334.3
         },
         {
           "x": 1991,
-          "y": 5034.8
+          "y": 5160.3
         },
         {
           "x": 2022,
-          "y": 5034.8
+          "y": 5160.3
         }
       ]
     },
@@ -4025,19 +4055,19 @@
       "points": [
         {
           "x": 1944,
-          "y": 5230.8
+          "y": 5356.3
         },
         {
           "x": 1971,
-          "y": 5230.8
+          "y": 5356.3
         },
         {
           "x": 1971,
-          "y": 5315.3
+          "y": 5440.8
         },
         {
           "x": 2027,
-          "y": 5315.3
+          "y": 5440.8
         }
       ]
     },
@@ -4048,19 +4078,19 @@
       "points": [
         {
           "x": 1944,
-          "y": 5197.8
+          "y": 5323.3
         },
         {
           "x": 1981,
-          "y": 5197.8
+          "y": 5323.3
         },
         {
           "x": 1981,
-          "y": 4874.8
+          "y": 5000.3
         },
         {
           "x": 2043,
-          "y": 4874.8
+          "y": 5000.3
         }
       ]
     },
@@ -4071,19 +4101,19 @@
       "points": [
         {
           "x": 1944,
-          "y": 5186.8
+          "y": 5312.3
         },
         {
           "x": 1971,
-          "y": 5186.8
+          "y": 5312.3
         },
         {
           "x": 1971,
-          "y": 4768.3
+          "y": 4893.8
         },
         {
           "x": 2027,
-          "y": 4768.3
+          "y": 4893.8
         }
       ]
     },
@@ -4094,19 +4124,19 @@
       "points": [
         {
           "x": 1944,
-          "y": 5241.8
+          "y": 5367.3
         },
         {
           "x": 1961,
-          "y": 5241.8
+          "y": 5367.3
         },
         {
           "x": 1961,
-          "y": 5452.3
+          "y": 5577.8
         },
         {
           "x": 2022,
-          "y": 5452.3
+          "y": 5577.8
         }
       ]
     },
@@ -4117,11 +4147,11 @@
       "points": [
         {
           "x": 1944,
-          "y": 5219.8
+          "y": 5345.3
         },
         {
           "x": 2043,
-          "y": 5219.8
+          "y": 5345.3
         }
       ]
     },
@@ -4442,27 +4472,27 @@
       "points": [
         {
           "x": 1614,
-          "y": 5492.5
+          "y": 5618
         },
         {
           "x": 1671,
-          "y": 5492.5
+          "y": 5618
         },
         {
           "x": 1671,
-          "y": 5462.3
+          "y": 5587.8
         },
         {
           "x": 1971,
-          "y": 5462.3
+          "y": 5587.8
         },
         {
           "x": 1971,
-          "y": 5336.3
+          "y": 5461.8
         },
         {
           "x": 2027,
-          "y": 5336.3
+          "y": 5461.8
         }
       ]
     },
@@ -4473,27 +4503,27 @@
       "points": [
         {
           "x": 1614,
-          "y": 5511.8
+          "y": 5637.3
         },
         {
           "x": 1651,
-          "y": 5511.8
+          "y": 5637.3
         },
         {
           "x": 1651,
-          "y": 5164.8
+          "y": 5290.3
         },
         {
           "x": 1961,
-          "y": 5164.8
+          "y": 5290.3
         },
         {
           "x": 1961,
-          "y": 4747.3
+          "y": 4872.8
         },
         {
           "x": 2027,
-          "y": 4747.3
+          "y": 4872.8
         }
       ]
     },
@@ -4504,11 +4534,11 @@
       "points": [
         {
           "x": 1614,
-          "y": 5473.3
+          "y": 5598.8
         },
         {
           "x": 2022,
-          "y": 5473.3
+          "y": 5598.8
         }
       ]
     },
@@ -4673,11 +4703,19 @@
       "points": [
         {
           "x": 1298,
-          "y": 5398.5
+          "y": 5802.5
+        },
+        {
+          "x": 1308,
+          "y": 5802.5
+        },
+        {
+          "x": 1308,
+          "y": 5534.5
         },
         {
           "x": 1318,
-          "y": 5398.5
+          "y": 5534.5
         }
       ]
     },
@@ -4988,19 +5026,19 @@
         },
         {
           "x": 935,
-          "y": 7964
+          "y": 8194
         },
         {
           "x": 1308,
-          "y": 7964
+          "y": 8194
         },
         {
           "x": 1308,
-          "y": 7753.2
+          "y": 7896.2
         },
         {
           "x": 1318,
-          "y": 7753.2
+          "y": 7896.2
         }
       ]
     },
@@ -5068,19 +5106,19 @@
       "points": [
         {
           "x": 1614,
-          "y": 5593.5
+          "y": 5719
         },
         {
           "x": 1661,
-          "y": 5593.5
+          "y": 5719
         },
         {
           "x": 1661,
-          "y": 5214.3
+          "y": 5339.8
         },
         {
           "x": 1756,
-          "y": 5214.3
+          "y": 5339.8
         }
       ]
     },
@@ -5103,11 +5141,11 @@
       "points": [
         {
           "x": 1298,
-          "y": 7727.5
+          "y": 7870.5
         },
         {
           "x": 1318,
-          "y": 7727.5
+          "y": 7870.5
         }
       ]
     },
@@ -5212,6 +5250,27 @@
       "points": null
     },
     {
+      "from": "weekly-webinar-playbook",
+      "to": "xavier-offer-builder",
+      "type": "calls",
+      "points": [
+        {
+          "x": 1298,
+          "y": 5513.5
+        },
+        {
+          "x": 1318,
+          "y": 5513.5
+        }
+      ]
+    },
+    {
+      "from": "weekly-webinar-playbook",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
       "from": "wordpress-implementation-routing",
       "to": "operating-doctrine",
       "type": "inherits",
@@ -5234,7 +5293,7 @@
   "layout": {
     "engine": "elkjs layered, single INCLUDE_CHILDREN hierarchy over zones and brand rooms, build-time only",
     "width": 2335,
-    "height": 8747,
+    "height": 8848,
     "zones": [
       {
         "id": "brain",
@@ -5251,7 +5310,7 @@
         "label": "The voices",
         "caption": "one room per brand, registry per ADR 0045",
         "x": 1692,
-        "y": 4644.3,
+        "y": 4769.8,
         "width": 635,
         "height": 1040,
         "rooms": [
@@ -5263,7 +5322,7 @@
             "label": "AG Luxury",
             "parent": null,
             "x": 2006,
-            "y": 4962.3,
+            "y": 5087.8,
             "width": 256,
             "height": 127
           },
@@ -5275,7 +5334,7 @@
             "label": "AG Personal Brand",
             "parent": null,
             "x": 2006,
-            "y": 5113.3,
+            "y": 5238.8,
             "width": 299,
             "height": 260
           },
@@ -5287,7 +5346,7 @@
             "label": "The Strong Ones",
             "parent": "ag-personal-brand",
             "x": 2027,
-            "y": 5147.3,
+            "y": 5272.8,
             "width": 262,
             "height": 127
           },
@@ -5299,7 +5358,7 @@
             "label": "Expert Partners",
             "parent": null,
             "x": 2006,
-            "y": 4692.3,
+            "y": 4817.8,
             "width": 269,
             "height": 246
           },
@@ -5311,7 +5370,7 @@
             "label": "Don Hobbs",
             "parent": "expert-partners",
             "x": 2027,
-            "y": 4809.3,
+            "y": 4934.8,
             "width": 232,
             "height": 113
           },
@@ -5324,7 +5383,7 @@
             "label": "FAM and EPIC",
             "parent": null,
             "x": 2006,
-            "y": 5397.3,
+            "y": 5522.8,
             "width": 184,
             "height": 113
           }
@@ -5337,7 +5396,7 @@
         "x": 980,
         "y": 4139,
         "width": 656,
-        "height": 4600,
+        "height": 4701,
         "rooms": []
       },
       {
