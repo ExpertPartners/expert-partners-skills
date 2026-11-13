@@ -81,8 +81,10 @@ Lead with the relationship or genuine reason for reaching out. Do not disguise a
 
 Use only the sections that fit the request. Do not force every section when the user asked for one simple text.
 
+Preserve any output status the user specifies. When the request says private, internal, unsent, or historical replay, explicitly repeat each requested label in a short status line before the draft. Keep that line outside the customer-facing message. Do not call that output ready to send or imply it was sent, saved, published, or shared. When no status is specified, do not add these labels by default.
+
 ### BEST FOLLOW-UP
-The strongest ready-to-send version for the requested channel.
+The strongest version for the requested channel, respecting the requested output status.
 
 For text or DM:
 - usually 2 to 5 short sentences
@@ -160,6 +162,7 @@ Before delivering, ask internally:
 3. Is there one clear next step rather than a stack of asks?
 4. Could the recipient comfortably say "not yet" or "no" without being shamed?
 5. Is urgency real and sourced, or did the draft manufacture it?
+6. If the user specified private, internal, unsent, or historical replay, does the output explicitly retain every requested label outside the customer-facing message?
 
 Rewrite if any answer reveals pressure, invention, or vagueness.
 
