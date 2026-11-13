@@ -50,7 +50,7 @@
     {
       "name": "real-estate-agent-toolkit",
       "source": "./plugins/real-estate-agent-toolkit",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "description": "Portable, platform-neutral AI skills for real estate agents (forty skills sharing one agent-profile.md)."
     },
     {
