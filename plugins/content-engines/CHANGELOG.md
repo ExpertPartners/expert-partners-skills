@@ -1,3 +1,6 @@
+## 0.11.0 - 2026-11-13
+
+Add Participant Results Brief for one sourced internal participant outcome page. Preserve the four-field order, measurement limits, missing facts, source conflicts and exact sharing scope without inventing participant or cohort results.
 ## 0.10.0 - 2026-11-12
 
 Add a source brief mode to XAVIER Offer Builder for extracting existing offer work without redesigning it, and a designed weekly webinar rehearsal playbook skill. Both preserve missing facts, distinguish proposals from decisions and keep private business sources in their owning brain.
