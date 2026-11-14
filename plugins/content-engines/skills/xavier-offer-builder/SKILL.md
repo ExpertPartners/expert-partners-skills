@@ -41,6 +41,10 @@ For each component in Value exchange, state what the business does, what the cli
 
 Mark unsupported fields Not found and inconsistent fields Conflicting. A newer price does not transfer an older package's scope, delivery date, payment terms, guarantee, bonus or urgency. Keep the primary offer distinct from a smaller acquisition offer. Keep positioning hypotheses distinct from validated customer language and outside examples distinct from the business's own proof.
 
+In Scope and exclusions and Commercial terms, distinguish current included scope, explicit exclusions, proposals, historical or superseded terms, conflicts and unknowns. A service limit or term that is not supplied is Not found, not an affirmative exclusion and not an included commitment. Recheck each affected field against the newest owning decision individually. A settled current field does not stay Conflicting merely because historical versions differ, and an unknown detail does not erase the known part.
+
+Within Source notes, map material scope, price, payment, refund, proof and responsibility claims to the supplied source title, revision and section or fixture label. Include the owning playbook title and pointer when supplied. Disclose excerpt-only use and missing source pointers rather than claiming full original-source reads. Keep the twelve headings unchanged.
+
 Compare the completed brief with the source packet on the real task. Check every section, especially audience, responsibility, proof and whether the terms describe the same offer version. Preserve the input, output and comparison in the owning business brain. On a revised source, preserve the prior version, name the change and repeat the same comparison.
 
 Save the brief as a Google Doc in the current owning output folder, using the live document formatting and file naming rules. Return its exact title as a clickable link. Never put private source content, source identifiers or business decisions in this repository.
