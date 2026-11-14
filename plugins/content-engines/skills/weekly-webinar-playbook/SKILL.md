@@ -54,6 +54,8 @@ Keep the primary offer, strategy-call route and smaller acquisition offer distin
 
 The rehearsal sequence covers the opening promise, problem recognition, teaching and questions, consequences, summary, transition to help, agreed offer recap, one real next step and questions. Use timing only when supplied or clearly proposed. Never present an internal placeholder as a working booking or checkout link.
 
+In the spoken offer recap, describe scope only at the level the owning source approves. Do not give each stage or component its own activity, asset or result unless a source supplies it, and do not map proposed components onto approved stages as deliverables. Recheck each commercial term against the newest owning decision, state known terms, keep unknown details Not found and label planned options not live. When a question touches an unresolved term, say that the detail is not decided yet. Do not promise that a call or later step will settle it.
+
 The operating loop records registrations, attendees, show rate, acquisition-offer sales by tested price, calls booked and completed, primary-offer sales, collected revenue and ad spend. Keep cohorts and offer revenues separate. Compute show rate as attendees divided by registrations, and report it as not calculable when registrations are zero. Targets come from current business decisions, never a default benchmark.
 
 ## Test on the real draft
