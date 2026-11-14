@@ -25,9 +25,11 @@ If no real participant record exists, do not create a fictional participant or a
 
 > Send the participant's actual starting point and its source, the artifact or workflow they built and its current stage, the metric with its unit, baseline, comparison period and source, and any documented permission with its exact scope and date. Unknown items can stay unknown.
 
-If some evidence exists, retain the supported facts and mark missing fields unknown, unmeasured or not supplied. Label the page incomplete. Do not turn a missing measurement into a zero or an estimated improvement. Ask only for the missing evidence, in the same single batch.
+If some evidence exists, retain the supported facts and mark missing fields unknown, unmeasured or not supplied. Do not turn a missing measurement into a zero or an estimated improvement. Ask only for the missing evidence, in the same single batch.
 
-If sources conflict, do not finalize the brief or silently choose the later, larger or more convenient claim. Identify the conflicting field and both sources, preserve uncontested facts, and ask for one authoritative correction. A revised source changes only the fields it supports. Keep the earlier source and the reason for the change traceable.
+Choose the status label from what the records hold. Label the page incomplete only when a specific measurement or source is expected and still pending. When no record holds a timed or counted measure, label the result qualitative only, and do not imply a number is coming.
+
+If sources conflict, do not finalize the brief or silently choose the later, larger or more convenient claim. Identify the conflicting field and both sources, preserve uncontested facts, and ask for one authoritative correction. A conflict you note but cannot settle, such as two sources giving different counts, goes into the batched request rather than staying a passing remark. A revised source changes only the fields it supports. Keep the earlier source and the reason for the change traceable.
 
 ## Write the four fields
 
@@ -35,7 +37,7 @@ Use these headings in this order, with a short internal or incomplete status abo
 
 ### Starting point
 
-State the participant's actual starting situation. Include the source and date. Do not invent an identity, problem or baseline to make the narrative work.
+State the participant's actual starting situation before the change. Include the source and date. Do not invent an identity, problem or baseline to make the narrative work. Rules, corrections or instructions the participant gave to produce the change belong under What they built, not here.
 
 ### What they built
 
@@ -56,5 +58,9 @@ Keep the brief internal by default. When permission is limited to an anonymized 
 ## Save and check
 
 Save in the owning business's existing results or evidence home when its instructions identify one. Preserve an existing brief's location on revision. If the destination is unknown, return the internal draft and state that it is not saved rather than inventing a home. Follow the active document-formatting rules and deliver a named link only after a save succeeds.
+
+When any field stays unknown or any conflict stays open, end the page with a Missing sources section holding the one batched request, and say which items block the brief and which do not.
+
+The saved page must read as a standalone document. Do not copy chat or run-state wording into it, such as addressing the requester as you, naming the executor or describing what this run left untouched. Report run state in the reply, not in the brief.
 
 Before delivery, check that every factual claim has a source, every unknown remains explicit, build stages stay distinct, measurement limits are visible and sharing stays within documented scope. Report the actual save and invocation state. A source read or manual replay is not proof of a native marketplace invocation or a completed participant run.
