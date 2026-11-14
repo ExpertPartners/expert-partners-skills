@@ -1,3 +1,6 @@
+## 0.11.1 - 2026-11-14
+
+participant-results-brief now carries what its first real participant-zero output taught. The status label says qualitative only when no record holds a measure, and incomplete only when a measure is still pending. Rules the participant gave go under What they built. A page with open gaps or conflicts ends with one batched Missing sources request, and the saved page holds no chat or run-state wording.
 ## 0.11.0 - 2026-11-13
 
 Add Participant Results Brief for one sourced internal participant outcome page. Preserve the four-field order, measurement limits, missing facts, source conflicts and exact sharing scope without inventing participant or cohort results.
