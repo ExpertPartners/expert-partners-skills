@@ -1,3 +1,6 @@
+## 0.11.2 - 2026-11-14
+
+Source-fidelity improvements from real playbook-only outputs, recorded in the owning playbooks before this package. xavier-offer-builder source brief mode now separates included scope, explicit exclusions, proposals, historical terms, conflicts and unknowns, so a term that was never supplied is not turned into an exclusion. It also rechecks each current field against the newest decision and maps material claims to source pointers. weekly-webinar-playbook now keeps the spoken offer recap at the level the source approves, without inventing stage-by-stage deliverables, and answers unresolved terms as not decided yet instead of promising a call will settle them.
 ## 0.11.1 - 2026-11-14
 
 participant-results-brief now carries what its first real participant-zero output taught. The status label says qualitative only when no record holds a measure, and incomplete only when a measure is still pending. Rules the participant gave go under What they built. A page with open gaps or conflicts ends with one batched Missing sources request, and the saved page holds no chat or run-state wording.
