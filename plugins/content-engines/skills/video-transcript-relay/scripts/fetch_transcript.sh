@@ -1,16 +1,38 @@
 #!/usr/bin/env bash
 # video-transcript-relay: fetch and clean a video transcript
-# Usage: ./fetch_transcript.sh "<video URL>" [output_dir]
+# Usage: ./fetch_transcript.sh "<video URL>" [output_dir] [--cookies-from-browser PROFILE]
 # Prints: metadata summary, then the paths of the cleaned transcript and JSON sidecar.
 # Exit 0 = transcript produced. Exit 3 = no subtitle track exists (caller falls back to whisper).
 
 set -euo pipefail
 
 URL="${1:-}"
-OUTDIR="${2:-$HOME/Claude/transcripts}"
+OUTDIR="$HOME/Claude/transcripts"
+[[ $# -eq 0 ]] || shift
+if [[ $# -gt 0 && "$1" != --* ]]; then
+  OUTDIR="$1"
+  shift
+fi
+YTDLP_ARGS=()
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --cookies-from-browser)
+      if [[ $# -lt 2 || -z "$2" || "$2" == --* ]]; then
+        echo "--cookies-from-browser requires a browser profile." >&2
+        exit 1
+      fi
+      YTDLP_ARGS+=(--cookies-from-browser "$2")
+      shift 2
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      exit 1
+      ;;
+  esac
+done
 
 if [[ -z "$URL" ]]; then
-  echo "Usage: $0 \"<video URL>\" [output_dir]" >&2
+  echo "Usage: $0 \"<video URL>\" [output_dir] [--cookies-from-browser PROFILE]" >&2
   exit 1
 fi
 
@@ -25,7 +47,7 @@ trap 'rm -rf "$WORK"' EXIT
 
 echo "Reading video metadata..."
 META_JSON="$WORK/meta.json"
-yt-dlp --no-warnings --skip-download --dump-single-json "$URL" > "$META_JSON"
+yt-dlp ${YTDLP_ARGS[@]+"${YTDLP_ARGS[@]}"} --no-playlist --no-warnings --skip-download --dump-single-json "$URL" > "$META_JSON"
 
 read_meta() {
   python3 -c "
@@ -60,7 +82,7 @@ fetch_subs() {
   local mode="$1" langs="$2"
   local flag="--write-subs"
   [[ "$mode" == "auto" ]] && flag="--write-auto-subs"
-  yt-dlp --no-warnings --skip-download $flag \
+  yt-dlp ${YTDLP_ARGS[@]+"${YTDLP_ARGS[@]}"} --no-playlist --no-warnings --skip-download "$flag" \
     --sub-langs "$langs" --sub-format "vtt/best" \
     -o "$WORK/sub.%(ext)s" "$URL" >/dev/null 2>&1 || true
   compgen -G "$WORK/sub*.vtt" >/dev/null 2>&1
@@ -160,5 +182,5 @@ echo ""
 echo "TRANSCRIPT: $TXT"
 echo "SIDECAR:    $SIDECAR"
 echo ""
-echo "Next: upload the transcript to Google Drive folder \"Video Transcripts\" via the"
-echo "SA plus DWD path impersonating allison@expertpartners.com, then report the file ID and link."
+echo "Next: upload to the existing Google Drive folder \"Video Transcripts\" with a"
+echo "write-capable Drive connection, verify the saved content, and report its link and metadata."

@@ -1,7 +1,6 @@
 ---
 name: "video-transcript-relay"
-description: "Relay any video to Claude Code for transcription and bring the transcript back to Cowork automatically via Google Drive, with zero clipboard courier work by Allison. Fires the moment a video URL or video file appears in a Cowork conversation with any intent to use what is said in it: transcribe this video, pull the transcript, what does this video say, take this YouTube video and, analyze this reference film, mine this for hooks, turn this training video into a module, or just a bare YouTube, Vimeo, Loom, or Instagram link pasted with an instruction attached. Fires even when Allison never says the word transcribe, because Cowork's network cannot reach video hosts and the fetch must route to Claude Code. Never ask Allison to paste a transcript by hand; that is the failure condition this skill exists to remove. It inherits the operating-doctrine and never overrides it."
-# --- skill-map metadata (zone, tier, status required -- ruling 14) ---
+description: "Fetch a video transcript, save it to Google Drive, and use it for the requested analysis, hooks, posts or training. Use for a YouTube, Vimeo, Loom or Instagram URL or video file with intent to use what is said, including pull the transcript, what does this video say, mine this for hooks, or analyze this reference film. On a local Mac run the bundled script directly. In ChatGPT, Claude chat, Cowork or cloud sandboxes dispatch through the existing Factory connection and read the result from Drive. Never ask the user to paste a transcript or relay a prompt. Inherits operating-doctrine."
 tier: plugin
 zone: content
 status: live
@@ -12,122 +11,138 @@ subtitle: "video to transcript relay"
 
 # Video Transcript Relay
 
-The verified constraint that created this skill, 2026-07-29. Cowork cannot reach video hosts. Two paths were tested live and both failed. The Anthropic web fetcher returns 429 on youtu.be, and a direct curl from the Cowork container returns 403 with header `x-deny-reason: host_not_allowed`, because youtube.com and googlevideo.com are not on the container allowlist. This is a real environment constraint, investigated and verified, not an unfamiliar path.
+One canonical skill, with execution chosen by the capabilities of the current surface.
+The user supplies a video and intent, not a transcript or a prompt for another AI.
+Run the work and return the result without paste blocks, pins or manual relays.
 
-Claude Code on the M4 has unrestricted network access. So the fetch belongs there. The relay is the system that moves the video one way and the transcript back the other way without Allison carrying anything in a clipboard.
+## Choose the execution lane
 
-Verified addendum, 2026-07-31. Remote Claude Code sessions (Claude Code on the web, cloud containers) can also run the full relay. yt-dlp installs and fetches YouTube through the session's agent proxy, and Drive delivery works from there too via the write-capable Google Drive connector (see leg three). So the fetch lane is any Claude Code surface, not only the M4. The Cowork constraint is unchanged; Cowork still cannot fetch video hosts.
+### Local Mac shell
 
-## The one rule of this skill
+Claude Code, Codex and local Factory Droid on either authorized Mac run
+`scripts/fetch_transcript.sh` from this installed skill directly. A shell in a
+cloud container is not this lane. Choose the available Mac by resources, not by
+product name. M4 work is invisible background work only. All browser and visible
+work belongs on Ember's M2.
 
-Allison never pastes a transcript. She pastes exactly one prompt block, once per video. Everything else is machinery.
+1. Capture the video URL or file and the intent already present in the request.
+   If intent is unknown, fetch anyway and retain that uncertainty.
+2. Check for `yt-dlp`, installing it with `brew install yt-dlp` or
+   `pipx install yt-dlp` if absent.
+3. Run `bash scripts/fetch_transcript.sh "<URL>" "<output_dir>"` from the skill
+   directory. It selects manual English, manual any-language, auto English,
+   then auto any-language captions, and prints the cleaned text and JSON paths.
+4. Read the cleaned text and sidecar. Check that speech is readable, nonempty
+   and from the requested video. Use the recovery paths below when needed.
+5. Upload to the existing Drive folder, verify the saved content, then return
+   the Drive link and metadata. Local paths alone are not delivery.
 
-If a response written under this skill ever asks Allison to open a video, click Show transcript, copy, and paste it back, that response is a doctrine violation and gets rebuilt. The transcript is a file. Files move through Drive, not through her hands.
+For a supplied file, use its authorized accessible location. If no captions
+exist, transcribe its audio locally with Whisper or faster-whisper and continue
+with the same Drive delivery and provenance.
 
-## The relay, end to end
+### Chat or cloud surface
 
-Four legs. Cowork owns legs one and four, Code owns legs two and three.
+ChatGPT, claude.ai chat, Cowork and cloud sandboxes do not fetch YouTube in their
+sandbox. Use the existing Factory connection, following `factory-operator`.
+Loading this skill does not itself install that connection.
 
-Leg one, Cowork. Capture the video reference and the downstream intent. Ship one paste block routed to Claude Code per the code-block-routing skill. Never ship the block without knowing what the transcript is for, or at minimum flagging that the intent is still open.
+1. Call `find_owner` first with the video and requested work. Reuse a matching
+   existing assignment and read its result rather than starting a duplicate.
+   Work owned by an existing mission goes through its orchestrator.
+2. For a new bounded fetch, call `start_and_watch` once, with the first prompt
+   line `Control Room - Video transcript`. Use Auto Model and High autonomy,
+   and select an online authorized Mac by current resources. Do not select a
+   cloud container for YouTube.
+3. Give the session the complete URL or accessible file reference, downstream
+   intent, this canonical skill path, and the local-lane steps above. Require
+   it to run the bundled script, use the cookies fallback if needed, save and
+   verify the transcript in the existing `Video Transcripts` Drive folder,
+   and return its Drive file ID and link, title, channel, upload date,
+   duration, word count and caption or transcription provenance. Never put
+   credentials in a dispatch.
+4. Read the completed result through the connection. A session ID or accepted
+   dispatch is not completion. Read the actual transcript from Drive through
+   the chat's Drive connection and perform the user's downstream request.
+   Do not replace a failed fetch with a guessed summary.
 
-Leg two, Code. Fetch and clean. Run `scripts/fetch_transcript.sh` with the URL. It resolves subtitles in this priority order, manual English, then manual any-language, then auto-generated English, then auto-generated any-language. It writes a clean plain-text transcript plus a JSON sidecar of the metadata, and it prints both paths.
+If the Factory connection is absent, follow the existing `factory-operator`
+Control Room direct line, including its completion receipt. Do not build a new
+server or relay, create a platform-only skill, or ask the user to carry a prompt.
+If neither the connection nor that existing writable route can be reached,
+report the exact attempted route and unresolved execution gap honestly.
 
-Leg three, Code. Deliver to Drive. On the M4, upload the transcript to Google Drive using the SA plus DWD path impersonating allison@expertpartners.com, per the systems map. Never the read-only Google connectors. In a remote Claude Code session, where the SA JSON and 1Password CLI physically do not exist in the container, use the session's write-capable Google Drive connector (create_file) instead; verified live 2026-07-31, the file lands owned by allison@expertpartners.com. That connector is not one of the forbidden read-only connectors; the read-only ban exists because read-only connectors cannot write. Report back the Drive file ID, the shareable link, the title, the channel, the duration, the word count, and whether the captions were manual or auto-generated.
+## YouTube network and cookies recovery
 
-Leg four, Cowork. Read the transcript from Drive via the Google Drive connector, then run the downstream skill against it. This is the part that closes the loop with no paste. Cowork can read Drive natively, so once the file lands there the transcript is in context without Allison touching it.
+Verified 2026-11-13, cloud Claude Code containers hit YouTube's
+`Sign in to confirm you're not a bot` response with yt-dlp. This supersedes
+the 2026-07-31 finding that a cloud agent proxy could fetch successfully.
+Chat sandbox host restrictions are a separate limitation. Neither is evidence
+that captions do not exist. Route cloud work to the local Mac lane.
 
-## Where things land
+On a local Mac, if YouTube requires an authenticated session, retry the script
+with yt-dlp's supported browser-cookie option on the authorized existing profile.
+For example, on M2 with its existing signed-in Default Chrome profile
 
-Transcripts go to Google Workspace, in Drive, at `Video Transcripts/`. The canonical folder exists as of 2026-07-31, at My Drive root, owned by allison@expertpartners.com. Search for it by its exact title before uploading; never create a second folder with the same job. Per the systems map, Workspace is delivery and reference, and transcripts are named there explicitly as belonging in Workspace. Transcripts are never canonical, so they never go to GitHub.
-
-Filename, per the document formatting standard, date-prefixed and readable.
-
+```sh
+bash scripts/fetch_transcript.sh "<URL>" "<output_dir>" --cookies-from-browser "chrome:Default"
 ```
+
+The flag reaches both metadata and subtitle requests. Do not export cookies to
+a file, print them, copy a profile, send them to a cloud container, or open or
+control M4's browser. A profile read is not a browser-control action. Do not
+bypass a CAPTCHA or an account-access restriction. If local authentication still
+fails, record the actual error and keep the dependent result unverified.
+
+## Drive delivery
+
+Search Drive for the exact folder title `Video Transcripts`, restricted to folders
+and not trashed. Use the existing canonical folder, never create a second one.
+If multiple results are ambiguous, resolve the owner and location from existing
+records rather than picking by name alone.
+
+Use a write-capable Drive connector or the existing service-account plus
+domain-wide delegation route. Read-only access cannot upload. Resolve credentials
+from 1Password at runtime and never expose them in a response, sidecar or dispatch.
+Do not change sharing to public.
+
+Name the plain-text working input
+
+```text
 YYYY-MM-DD <Channel> - <Video Title> transcript
 ```
 
-The raw transcript file stays plain text. It is working input, not a deliverable, so it does not get Poppins treatment. Anything Claude then writes from the transcript (an analysis, a module, a brief) is a deliverable and does get the full document formatting standard and the styled Google Doc delivery.
+Read the uploaded file back, check its parent and content against the local text,
+and return the Drive file ID and link with title, channel, upload date, duration,
+word count and manual, auto-generated or local-audio provenance. Raw text and
+metadata are working input, not business knowledge for GitHub. Any analysis,
+module or brief produced from it follows `document-formatting-standard`.
 
-## The session lane
+## Downstream intent
 
-All video fetches route to one Claude Code session. One lane per workstream. It holds yt-dlp, the script, the Drive delivery path, and the accumulating library of what has already been pulled, so the second video costs a fraction of the first.
+Use what the user already asked for. Fetching and saving are not completion of a
+request for hooks, an analysis or training.
 
+- Reference film or About Me adaptation, use `brand-film-reverse-engineering`.
+- Website hero or listing film, use `hero-video-preproduction`.
+- Training, SOP or onboarding, use `gemini-notebook-training-architect`.
+- Hooks, posts, reels or scripts, use `rare-content-engine`.
+- Positioning, funnel, offer or campaign strategy, use `master-marketer-free-agent-builder`.
+- The user's own talk, use the matching current brand voice skill.
 
-## The paste block template
+## Other failures
 
-Routing line above the fence, then the block, per code-block-routing. One block per response. Substitute the real URL.
+- No subtitles, exit 3. Attempt local bestaudio download and Whisper or
+  faster-whisper transcription, then deliver with audio provenance. Do not
+  silently treat an authentication or network failure as absent captions.
+- Unreadable auto-captions. Use the local audio path and verify readable speech.
+- Drive upload failure. Check the actual write route and matching 1Password
+  credential, then the next existing supported route. Do not claim delivery.
+- Playlist or multiple videos. Preserve the user's stated scope, process
+  sequentially with one Drive file per video, and report the count and links.
 
-```
+## Adaptation boundary
 
-Fetch and deliver a video transcript.
-
-URL: <URL>
-
-1. Ensure yt-dlp is present. If missing, install it (pipx install yt-dlp, or brew install yt-dlp).
-2. Run the relay script from this skill's scripts directory:
-   ./fetch_transcript.sh "<URL>"
-   If the script is not on this machine, replicate its behavior: pull the best available subtitle track in the priority order manual-en, manual-any, auto-en, auto-any; strip VTT timestamps, cue numbers, positioning tags, and the duplicate rolling lines that auto-captions produce; collapse to clean paragraphs.
-3. Report inline: title, channel, upload date, duration, caption type (manual or auto), and word count.
-4. Upload the cleaned transcript to Google Drive using the SA plus DWD path impersonating allison@expertpartners.com. Folder: Video Transcripts. Filename: YYYY-MM-DD <Channel> - <Video Title> transcript
-5. Return the Drive file ID and the shareable link.
-6. If no subtitle track of any kind exists, say so explicitly, then fall back to audio: download bestaudio, transcribe locally with whisper (or faster-whisper), and continue from step 3. Name which path you used.
-
-Do not paste the transcript body into your reply. The Drive file is the handoff. Report the metadata and the link only.
-```
-
-That last line matters. A transcript pasted into Code's output just moves the courier problem one surface over. The file is the handoff.
-
-## Downstream routing, what the transcript is for
-
-The transcript is never the deliverable. Something gets built from it. Read the intent from the request before shipping the block, because it changes what gets captured in leg four.
-
-Route by intent:
-
-- A reference film, competitor brand video, or About Me video to be adapted, go to brand-film-reverse-engineering. That skill wants structure, cadence, and narrative beats, not just words.
-- A hero video or website film for a listing or a market, go to hero-video-preproduction.
-- A training video, SOP walkthrough, or onboarding session, go to gemini-notebook-training-architect.
-- Raw material to be mined for hooks, posts, reels, or scripts, go to rare-content-engine.
-- Positioning, funnel, offer, or campaign strategy from a talk or interview, go to master-marketer-free-agent-builder.
-- A recording of Allison's own talk, keynote, or panel, go to the matching brand voice skill, ag-personal-brand for her own platform, fam-epic-brand for coaching and EPIC, ag-luxury-brand for consumer real estate. Moxie Signature Group is retired.
-
-If the intent is genuinely unknown, say so on the routing line and fetch anyway. The fetch is cheap and the transcript is reusable. Do not stall the relay waiting on a decision that can be made once the words are in hand.
-
-## Use boundary on other people's video
-
-A transcript of someone else's video is their copyrighted material. It is working input for analysis and adaptation, and it is never output.
-
-What this skill supports: analyzing structure, pacing, hook architecture, narrative sequence, and rhetorical moves, then rebuilding those patterns with Allison's own story, market, proof, and voice. That is the whole premise of brand-film-reverse-engineering and it is legitimate.
-
-What this skill never supports: reproducing a transcript or substantial passages of it as Allison's content, or lightly rewording someone else's script and shipping it as original. If a downstream request drifts toward reproduction rather than adaptation, name the line and redirect to structural adaptation.
-
-Allison's own recordings carry no such limit. Her words are hers.
-
-## Failure modes and what to do
-
-Subtitles disabled entirely on the video. The script says so and exits nonzero. Fall back to the whisper audio path in step 6 of the block. Do not report the video as untranscribable until the audio path has actually been attempted.
-
-Age-gated, members-only, or private video. yt-dlp needs cookies. Have Code export cookies from the browser profile on the M4 and retry with `--cookies-from-browser`. Only if that fails is there a real blocker to name.
-
-Auto-captions come back as unreadable mush. Auto-captions on heavy-accent or music-heavy audio degrade badly. If the cleaned text reads as noise, skip it and go straight to the whisper path, which is materially better on the same audio.
-
-Drive upload fails. Test the SA plus DWD path live before concluding the credential is missing, per the verify-first protocol. Check 1Password across all vaults for the service account JSON. Try four verified routes before reporting a blocker.
-
-Playlist or multi-video URL. Fetch sequentially with the same script, one Drive file each, and report the count and links.
-
-## The hand-off choreography
-
-Per code-block-routing and the pin rule, in this order and no other.
-
-One, the response carries the routing line, the single paste block, and one plain sentence naming what comes back once she pastes. No pin yet.
-
-Two, Allison pastes.
-
-Three, the pin fires, with a real timestamp from `TZ=America/Chicago date "+%Y-%m-%d %H:%M %Z"`, In flight naming the specific video, Awaiting naming the Drive link and metadata.
-
-Then Cowork reads the file from Drive and the downstream skill runs.
-
-## Version
-
-v1.1, 2026-07-31. First live run (youtu.be/N4Q4iM05PPc, remote Claude Code session) surfaced and fixed three loose ends: the cleaning script now decodes HTML entities (speaker markers arrived as `&gt;&gt;`) and strips non-speech noise tags like `[music]`; leg three gained the verified remote-session Drive delivery path via the write-capable Drive connector; the canonical Video Transcripts folder now exists and its ID is recorded above so no duplicate is ever created. Also moved into the canonical skills repo (plugins/content-engines), which v1.0 never reached.
-
-v1.0, 2026-07-29. Authored for Allison Gaddy. Created after a live verified network block on youtu.be from Cowork, both via the Anthropic fetcher (429) and via direct container curl (403 host_not_allowed). Inherits operating-doctrine, code-block-routing, expert-partners-systems-map, and document-formatting-standard. Overrides none of them.
+Use another person's video as working input for analysis of structure, pacing,
+hooks and narrative, not as a script to reproduce or lightly reword as original.
+Build the requested output from the user's own story, proof and voice.
