@@ -121,7 +121,7 @@ $RUN_STAMP). Execute the full sweep per the skill: all three heads, all five out
 Firecrawl primary. Write the Capability Watch and Capability Refresh Changelog Docs \
 and the run record in HQ Business Brain, Company Core. Use the Google Docs connector \
 if you have it. If you do not (a long-lived token cannot reach connectors), use \
-$HERE/drive_docs.py (read, prepend, replace) instead. Do not touch the \
+$HERE/drive_docs.py (read, prepend, replace, create) instead. Do not touch the \
 capability-refresh skill. Nothing texts Allison \
 unless she has an action to take, and any message honors the CI Alert Redesign three \
 message rules."
