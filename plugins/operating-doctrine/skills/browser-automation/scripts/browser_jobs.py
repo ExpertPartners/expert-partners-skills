@@ -232,6 +232,26 @@ def failed_cleanup_js(args, remove):
     )
 
 
+WINDOW_IDS_JS = (
+    STATE_JS
+    + "return {ids:await s.connector.evaluate(async()=>(await chrome.windows.getAll()).map(w=>w.id))};"
+)
+
+
+def window_ids(client):
+    return code(client, WINDOW_IDS_JS).get("ids")
+
+
+def removal_issued(job):
+    # Receipts written before the flag was saved on the live path recorded the
+    # same route-issued window removal only as this timing stage.
+    return bool(job.get("window_removal_issued")) or any(
+        stage[0] == "live_window_scheduled"
+        for record in job.get("timings", [])
+        for stage in record.get("stages", [])
+    )
+
+
 def failure_stage(error):
     # Refusal codes are static; any other exception keeps only its class name.
     return "failed:" + (str(error) if type(error) is Refusal else type(error).__name__)
@@ -494,14 +514,17 @@ class Route:
             yield client
         finally:
             try:
+                # This connector is its window's only tab, so nothing else can
+                # census its own removal. Its page close event is the proof.
                 closed = code(
                     client,
-                    STATE_JS
-                    + "return await s.connector.evaluate(async()=>{const t=await chrome.tabs.getCurrent();const tabs=await chrome.tabs.query({windowId:t.windowId});if(tabs.length!==1||tabs[0].id!==t.id)throw Error('maintenance_window_not_exclusive');setTimeout(()=>chrome.windows.remove(t.windowId),250);return {scheduled:true,windowId:t.windowId};});",
+                    STATE_JS + "const gone=new Promise(r=>s.connector.once('close',()=>r(true)));"
+                    "const windowId=await s.connector.evaluate(async()=>{const t=await chrome.tabs.getCurrent();const tabs=await chrome.tabs.query({windowId:t.windowId});if(tabs.length!==1||tabs[0].id!==t.id)throw Error('maintenance_window_not_exclusive');setTimeout(()=>chrome.windows.remove(t.windowId),250);return t.windowId;});"
+                    "const seen=await Promise.race([gone,new Promise(r=>setTimeout(()=>r(false),5000))]);"
+                    "return {windowId,closed:seen};",
                 )
-                time.sleep(0.4)
-                if "windowId" in closed:
-                    verify_window_closed(closed["windowId"])
+                if closed.get("closed") is not True:
+                    raise Refusal("maintenance_window_closure_unobserved")
             finally:
                 client.close()
 
@@ -842,11 +865,16 @@ class Route:
         self.mark(job, "live_metadata")
         code(client, STATE_JS + "await s.closeCreated();return {closed:true};")
         self.mark(job, "live_pages_closed")
+        # Saved first so failed-job reconciliation can attribute a vanished
+        # window to this route if the close below is interrupted.
+        job["window_removal_issued"] = True
+        self.checkpoint(job)
         closing = code(client, STATE_JS + "return await s.closeWindow();")
         self.mark(job, "live_window_scheduled")
         time.sleep(0.4)
         if not closing.get("shared"):
-            verify_window_closed(job["metadata"]["windowId"])
+            with self.maintenance_connector() as census:
+                verify_window_closed(job["metadata"]["windowId"], lambda: window_ids(census))
         job["window_disposition"] = "preserved_shared" if closing.get("shared") else "closed"
         client.close()
         job["ownership_pending"] = False
@@ -889,7 +917,7 @@ class Route:
                 "old": old,
                 "clientName": job["client_name"],
                 "connectorOrigin": EXTENSION,
-                "removalIssued": bool(job.get("window_removal_issued")),
+                "removalIssued": removal_issued(job),
                 "pendingSince": pending_since,
             }
             outcome = code(client, failed_cleanup_js(args, remove=False))
@@ -902,7 +930,7 @@ class Route:
                 outcome = code(client, failed_cleanup_js(args, remove=True))
             if outcome.get("closed") is not True:
                 raise Refusal("failed_cleanup_uncertain")
-            verify_window_closed(old["windowId"])
+            verify_window_closed(old["windowId"], lambda: window_ids(client))
             job["window_disposition"] = "closed"
             job["ownership_pending"] = False
 

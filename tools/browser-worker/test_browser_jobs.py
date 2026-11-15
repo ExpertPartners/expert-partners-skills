@@ -569,7 +569,7 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
                     )
                     return {"closed": True, "count": 1} if removing else {"ready": True, "count": 1}
                 if "maintenance_window_not_exclusive" in body:
-                    return {"scheduled": True, "windowId": 77}
+                    return {"windowId": 77, "closed": True}
                 return {"ready": True}
 
             with (
@@ -582,7 +582,8 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
             ):
                 route.finish(job)
             self.assertEqual(seen, [(False, None), (True, True)])
-            self.assertEqual([c.args[0] for c in verified.call_args_list], [5, 77])
+            # The maintenance window proves its own closure by its page close event.
+            self.assertEqual([c.args[0] for c in verified.call_args_list], [5])
             row = json.loads(receipt.read_text())
             self.assertEqual((row["status"], row["window_disposition"]), ("finished", "closed"))
 
@@ -633,7 +634,7 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
                         else {"ready": True}
                     )
                 if "maintenance_window_not_exclusive" in body:
-                    return {"scheduled": True, "windowId": 77}
+                    return {"windowId": 77, "closed": True}
                 return {"ready": True}
 
             with (
@@ -995,7 +996,7 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
                         else {"ready": True}
                     )
                 if "maintenance_window_not_exclusive" in body:
-                    return {"scheduled": True, "windowId": 77}
+                    return {"windowId": 77, "closed": True}
                 return {"ready": True}
 
             with (
@@ -1233,26 +1234,112 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
             b.projection(failing("Page has been closed\nError: saved_owned_tab_missing"))
         self.assertEqual(str(caught.exception), "owned_operation_failed:saved_owned_tab_missing")
 
-    def test_window_closure_is_polled_briefly(self):
+    def test_window_closure_is_polled_briefly_without_applescript(self):
         w = sys.modules["chrome_job_window"]
 
-        outputs = iter(["5, 6", "5, 6", "6"])
+        def no_subprocess(*_, **__):
+            raise AssertionError("closure must not shell out to AppleScript")
+
+        outputs = iter([[5, 6], [5, 6], [6]])
+        calls = []
+
+        def observe():
+            calls.append(True)
+            return next(outputs)
+
         with (
-            patch.object(
-                w.subprocess,
-                "run",
-                side_effect=lambda *a, **k: SimpleNamespace(stdout=next(outputs)),
-            ) as run,
+            patch.object(w.subprocess, "run", side_effect=no_subprocess),
             patch.object(w.time, "sleep"),
         ):
-            w.verify_window_closed(5)
-        self.assertEqual(run.call_count, 3)
-        with (
-            patch.object(w.subprocess, "run", return_value=SimpleNamespace(stdout="5")),
-            patch.object(w.time, "sleep"),
-        ):
+            w.verify_window_closed(5, observe)
+            self.assertEqual(len(calls), 3)
             with self.assertRaises(w.InvalidLaunch):
-                w.verify_window_closed(5)
+                w.verify_window_closed(5, lambda: [5])
+            for unreadable in (None, ["5"], {"ids": []}):
+                with self.subTest(unreadable=unreadable):
+                    with self.assertRaises(w.InvalidLaunch):
+                        w.verify_window_closed(5, lambda: unreadable)
+
+    def test_window_census_reads_chrome_windows_api(self):
+        sent = []
+
+        def fake(client, body):
+            sent.append((client, body))
+            return {"ids": [1, 2]}
+
+        with patch.object(b, "code", side_effect=fake):
+            self.assertEqual(b.window_ids("census"), [1, 2])
+        self.assertEqual(sent[0][0], "census")
+        self.assertIn("chrome.windows.getAll()", sent[0][1])
+
+    def test_live_finish_records_removal_and_verifies_through_census(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            job = self.full_job(route, "ready")
+            job["metadata"]["newestTabId"] = 10
+            job["client"] = SimpleNamespace(closed=False, close=lambda: None)
+            route.metadata = lambda _, strict=True: dict(job["metadata"])
+            receipt = Path(root) / (job["job_id"] + ".json")
+            order = []
+
+            @contextlib.contextmanager
+            def maintenance():
+                order.append("census_opened")
+                yield "census"
+
+            route.maintenance_connector = maintenance
+
+            def fake(client, body):
+                if "s.closeWindow()" in body:
+                    order.append(
+                        ("issued", json.loads(receipt.read_text()).get("window_removal_issued"))
+                    )
+                    return {"scheduled": True, "shared": False, "windowId": 5}
+                if "chrome.windows.getAll()" in body:
+                    order.append(("census", client))
+                    return {"ids": [9]}
+                return {"closed": True}
+
+            with patch.object(b, "code", side_effect=fake), patch.object(b.time, "sleep"):
+                route.finish(job)
+            self.assertEqual(order, [("issued", True), "census_opened", ("census", "census")])
+            row = json.loads(receipt.read_text())
+            self.assertEqual((row["status"], row["window_disposition"]), ("finished", "closed"))
+
+    def test_unobserved_maintenance_closure_refuses(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            closed = []
+            client = SimpleNamespace(close=lambda: closed.append(True))
+
+            def fake(_, body):
+                if "maintenance_window_not_exclusive" in body:
+                    return {"windowId": 77, "closed": False}
+                return {"ready": True}
+
+            with (
+                patch.object(route, "client", create=True, return_value=client),
+                patch.object(b, "code", side_effect=fake),
+            ):
+                with self.assertRaises(Refusal) as caught:
+                    with route.maintenance_connector():
+                        pass
+            self.assertEqual(str(caught.exception), "maintenance_window_closure_unobserved")
+            self.assertEqual(closed, [True])
+
+    def test_legacy_live_schedule_stage_counts_as_issued_removal(self):
+        legacy = {
+            "timings": [
+                {"tool": "finish", "stages": [["received", 1], ["live_window_scheduled", 2]]}
+            ]
+        }
+        self.assertTrue(b.removal_issued(legacy))
+        self.assertTrue(b.removal_issued({"window_removal_issued": True}))
+        self.assertFalse(b.removal_issued({"timings": [{"stages": [["live_pages_closed", 1]]}]}))
+        self.assertFalse(b.removal_issued({}))
+        # The receipt shape of jobs whose live close hung in the old verifier.
+        out = self.failed_cleanup([], removal_issued=b.removal_issued(legacy))
+        self.assertEqual(out["v"], {"closed": True, "count": 0, "alreadyClosed": True})
 
     def sealed_route(self, root):
         route = self.route(root)
