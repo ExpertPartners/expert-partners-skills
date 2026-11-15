@@ -65,26 +65,20 @@ def chrome_is_running():
         return False
 
 
-def verify_window_closed(window_id, attempts=10, pause=0.2):
-    """Chrome's scripting window ID equals its extension window ID on macOS.
+def verify_window_closed(window_id, observe, attempts=10, pause=0.2):
+    """Poll an extension-side chrome.windows census until the exact window is gone.
 
+    Chrome's AppleScript interface can stop answering while the browser keeps
+    working, for example behind an Automation consent prompt for a parent app
+    that lacks the apple-events entitlement, so it is never consulted here.
     Closure lands asynchronously, so a just-removed window is polled briefly.
     """
     if type(window_id) is not int or window_id < 0:
         raise InvalidLaunch("Invalid owned window identity")
     for attempt in range(attempts):
-        observed = subprocess.run(
-            [
-                "/usr/bin/osascript",
-                "-e",
-                'tell application "Google Chrome" to get id of every window',
-            ],
-            capture_output=True,
-            text=True,
-            timeout=5,
-            check=True,
-        )
-        ids = {int(x.strip()) for x in observed.stdout.strip().split(",") if x.strip()}
+        ids = observe()
+        if not isinstance(ids, list) or any(type(x) is not int for x in ids):
+            raise InvalidLaunch("Window census was not readable")
         if window_id not in ids:
             return
         if attempt < attempts - 1:
