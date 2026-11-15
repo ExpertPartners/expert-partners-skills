@@ -54,7 +54,15 @@ Keep the primary offer, strategy-call route and smaller acquisition offer distin
 
 The rehearsal sequence covers the opening promise, problem recognition, teaching and questions, consequences, summary, transition to help, agreed offer recap, one real next step and questions. Use timing only when supplied or clearly proposed. Never present an internal placeholder as a working booking or checkout link.
 
-In the spoken offer recap, describe scope only at the level the owning source approves. Do not give each stage or component its own activity, asset or result unless a source supplies it, and do not map proposed components onto approved stages as deliverables. Recheck each commercial term against the newest owning decision, state known terms, keep unknown details Not found and label planned options not live. When a question touches an unresolved term, say that the detail is not decided yet. Do not promise that a call or later step will settle it.
+In the spoken offer recap, describe scope only at the level the owning source approves. Do not give each stage or component its own activity, asset or result unless a source supplies it, and do not map proposed components onto approved stages as deliverables.
+
+Recheck commercial terms against the newest owning decision field by field. Preserve each known clause alongside adjacent unknowns. Treat each option's source status as indivisible, including its direction, approval, availability, future setup and undecided fields. Keep that full status wherever the option appears, including Known direction, section 4 missing-input lists and table rows, spoken paraphrases, prepared answers, language checks and assumptions. A missing-input heading or assumption label is not an exception.
+
+For a future subscription, preserve its separate future direction, type, approval and availability status, and explicitly say which terms are not decided yet, as supplied by the source. Listing unknown field names under Not found does not replace the known direction or the not-decided-yet clause. Do not replace an undecided price with no price, or erase a known direction with nothing has been decided.
+
+For payment, preserve the supplied alternatives and every status clause together, including a known future setup direction, not-live status and undecided installment details. Planned and not live alone do not preserve a source that also says will be set up. Never change planned or will be set up into being set up, underway or available without an owning decision that records actual implementation.
+
+When a question touches an unresolved term, say plainly that the detail is not decided yet and preserve the known direction in the same answer. Do not promise that a call or later step will settle it, and do not improvise an answer.
 
 The operating loop records registrations, attendees, show rate, acquisition-offer sales by tested price, calls booked and completed, primary-offer sales, collected revenue and ad spend. Keep cohorts and offer revenues separate. Compute show rate as attendees divided by registrations, and report it as not calculable when registrations are zero. Targets come from current business decisions, never a default benchmark.
 
