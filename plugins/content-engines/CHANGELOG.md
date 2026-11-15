@@ -1,3 +1,6 @@
+## 0.11.5 - 2026-11-15
+
+Make video-transcript-relay platform-neutral with direct local Mac execution and bounded Factory dispatch from chat surfaces. Remove manual prompt and pin relays, document the cloud YouTube bot-wall finding, and support browser-cookie fallback for both metadata and caption requests without exporting credentials.
 ## 0.11.4 - 2026-11-15
 
 Preserve complete source commercial status throughout webinar drafts, including missing-input rows, spoken recaps, prepared answers and assumptions. Keep known future direction beside explicitly undecided terms without implying that planned options are already being implemented.
