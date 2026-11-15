@@ -1,3 +1,6 @@
+## 0.11.3 - 2026-11-15
+
+Keep the supplied owning playbook title, revision and complete URL visibly in source-brief Source notes, rather than relying only on a hyperlink target. Preserve source mappings and honest excerpt-only disclosure.
 ## 0.11.2 - 2026-11-14
 
 Source-fidelity improvements from real playbook-only outputs, recorded in the owning playbooks before this package. xavier-offer-builder source brief mode now separates included scope, explicit exclusions, proposals, historical terms, conflicts and unknowns, so a term that was never supplied is not turned into an exclusion. It also rechecks each current field against the newest decision and maps material claims to source pointers. weekly-webinar-playbook now keeps the spoken offer recap at the level the source approves, without inventing stage-by-stage deliverables, and answers unresolved terms as not decided yet instead of promising a call will settle them.
