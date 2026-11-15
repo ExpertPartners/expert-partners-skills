@@ -305,6 +305,27 @@ retained connection and a window created before attachment. The shared skill tea
 the procedure, while the installed launcher and consumer prove its actual behavior.
 Verify source publication, local delivery and real use separately.
 
+## Execution by surface
+
+Claude Code, Codex and Factory sessions with the installed `playwright-ember`
+route run browser jobs directly as this skill describes.
+
+Loading this skill in ChatGPT, Claude chat or Cowork does not give that chat a
+shell. On those surfaces use the existing Factory connection, following
+`factory-operator`. Call `find_owner` first and reuse a matching existing
+assignment. Otherwise call `start_and_watch` once with the first prompt line
+`Control Room - Browser job`, Auto Model and High autonomy, on Ember's M2, the only machine for
+browser and visible work. Never open or control M4's browser. Give the
+session the inputs, the user's request, this canonical skill path and the steps
+below. Read the completed result and its saved outputs before reporting. A
+session ID or accepted dispatch is not completion. Never put credentials in a
+dispatch, and never ask the user to paste a prompt or relay output. If the
+connection is absent, use the `factory-operator` Control Room direct line. If
+neither route can be reached, report the attempted route and the execution gap.
+
+The session runs its own browser job, finishes it, saves any evidence or document
+to its existing Drive home, and returns the links and the two report lines.
+
 ## Reporting
 
 Say what ran, where, and what came back, with real output and links. A page that loaded is

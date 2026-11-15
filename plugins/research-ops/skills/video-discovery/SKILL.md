@@ -28,6 +28,28 @@ and implemented but unexercised adapters.
 
 Team guide: Video Discovery Team Guide, in HQ Business Brain Skills Vault.
 
+## Execution by surface
+
+Claude Code, Codex and local Factory Droid on an authorized Mac run the packaged
+tool directly. M4 work is invisible background work only.
+
+Loading this skill in ChatGPT, Claude chat or Cowork does not give that chat a
+shell. On those surfaces use the existing Factory connection, following
+`factory-operator`. Call `find_owner` first and reuse a matching existing
+assignment. Otherwise call `start_and_watch` once with the first prompt line
+`Control Room - Video discovery`, Auto Model and High autonomy, on an online authorized Mac chosen by
+current resources. Give the
+session the inputs, the user's request, this canonical skill path and the steps
+below. Read the completed result and its saved outputs before reporting. A
+session ID or accepted dispatch is not completion. Never put credentials in a
+dispatch, and never ask the user to paste a prompt or relay output. If the
+connection is absent, use the `factory-operator` Control Room direct line. If
+neither route can be reached, report the attempted route and the execution gap.
+
+The dispatched run keeps the same public, read-only scope, budgets, block stops
+and frozen candidate sets as below. It uses no cookies, browser profiles or
+signed-in sessions.
+
 ## Inputs and scope
 
 Accept creator name, YouTube URL, Vimeo URL, website domain and, when available,

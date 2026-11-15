@@ -49,7 +49,9 @@ Write the cards in the card markup described in references/format-spec.md, then 
 1. python3 scripts/stage_cards.py check cards.txt. Shows each card's size choice and any card that will not fit.
 2. python3 scripts/stage_cards.py create cards.txt --title "<file name>". Builds the Google Doc through the Google Docs API, exports it to PDF, and confirms the page count equals the card count and each card starts on its own page. Prints the Doc link.
 
-Name the Doc the way the company names files, [Brand-Department][Version] Name, for example [EXPNTX][V1.0] Speaker Cards. If the user is on a surface that cannot run scripts or reach the Docs API, give the cards as a numbered block in chat, one card per block, and say plainly that the Doc was not built and nothing was fit-checked.
+Name the Doc the way the company names files, [Brand-Department][Version] Name, for example [EXPNTX][V1.0] Speaker Cards.
+
+On a local Mac shell, run both commands directly. ChatGPT, Claude chat and Cowork do not run them in the chat. Use the existing Factory connection, following `factory-operator`. Call `find_owner` first, otherwise `start_and_watch` once with the first prompt line `Control Room - Stage cards`, Auto Model and High autonomy, on an online authorized Mac. Give it the finished text, the file name and this skill path, then read back the Doc link and page check before reporting. Never replace the Doc with cards pasted in chat. If no route can be reached, report the attempted route and that the Doc was not built.
 
 Credentials come from the environment, never from this repository. See the top of scripts/stage_cards.py.
 

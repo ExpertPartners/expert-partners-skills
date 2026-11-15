@@ -22,11 +22,33 @@ Rulings behind it, all in the live Decision Log. The optimizer spec is approved 
 
 As the slash command, or on its own when someone asks to prepare, clean, format or optimize a file, a transcript, a Notion export or a document for a Claude Project, a Custom GPT or a knowledge base, or asks to combine related transcripts on one topic. Never change an original file. The original stays where it is and as it is.
 
+## Execution by surface
+
+Claude Code, Codex and local Factory Droid on an authorized Mac run
+scripts/optimize.py directly.
+
+Loading this skill in ChatGPT, Claude chat or Cowork does not give that chat a
+shell. On those surfaces use the existing Factory connection, following
+`factory-operator`. Call `find_owner` first and reuse a matching existing
+assignment. Otherwise call `start_and_watch` once with the first prompt line
+`Control Room - Knowledge base optimizer`, Auto Model and High autonomy, on an online authorized Mac chosen by
+current resources. Give the
+session the inputs, the user's request, this canonical skill path and the steps
+below. Read the completed result and its saved outputs before reporting. A
+session ID or accepted dispatch is not completion. Never put credentials in a
+dispatch, and never ask the user to paste a prompt or relay output. If the
+connection is absent, use the `factory-operator` Control Room direct line. If
+neither route can be reached, report the attempted route and the execution gap.
+
+Pass the source as an accessible Drive reference or address, with any intake
+answers already given. The session saves the output where Step 6 says and
+returns its link.
+
 ## Check first
 
 1. Read the live HQ Rulebook, How we build, for the file rules, and the Decision Log entries above (R31, G21).
 2. Find where the source lives. Its own name may carry the company or department identity, and a source that sits in a brain's Private folder keeps its output in that Private folder (G13, R32, Decision Log 2026-10-28, The EP Business Brain gets a Claude Outputs folder).
-3. Use a Python 3 runtime to run scripts/optimize.py in this session. The script has no required dependencies. pdfplumber gives better tables and page layout for PDFs when it is installed (R09, G18, G22).
+3. Use a Python 3 runtime to run scripts/optimize.py in this session, or dispatch as Execution by surface says. The script has no required dependencies. pdfplumber gives better tables and page layout for PDFs when it is installed (R09, G18, G22).
 4. Find the Drive route this session already holds, a connector or the service account the machine is set up with. Check 1Password and the routes already set up for credentials (R13, R32).
 
 ## Step 1, take in the source (R05, R06, G22)

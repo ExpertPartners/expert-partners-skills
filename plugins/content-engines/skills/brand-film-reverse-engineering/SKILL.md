@@ -14,6 +14,28 @@ subtitle: "reverse-engineer a reference brand film"
 
 Turn a reference film into a client-specific production plan. The output is a numbered deliverables package (up to 15 documents + README index), not a video: this skill ends at the creative summary and README. Never invent the client's biography. Write the script and generate video/AI footage once the client's story answers and assets are in.
 
+## Execution by surface
+
+Claude Code, Codex and local Factory Droid on an authorized Mac run the steps
+and bundled scripts below directly. M4 work is invisible background work only.
+
+Loading this skill in ChatGPT, Claude chat or Cowork does not give that chat a
+shell. On those surfaces use the existing Factory connection, following
+`factory-operator`. Call `find_owner` first and reuse a matching existing
+assignment. Otherwise call `start_and_watch` once with the first prompt line
+`Control Room - Brand film analysis`, Auto Model and High autonomy, on an online authorized Mac chosen by
+current resources. Give the
+session the inputs, the user's request, this canonical skill path and the steps
+below. Read the completed result and its saved outputs before reporting. A
+session ID or accepted dispatch is not completion. Never put credentials in a
+dispatch, and never ask the user to paste a prompt or relay output. If the
+connection is absent, use the `factory-operator` Control Room direct line. If
+neither route can be reached, report the attempted route and the execution gap.
+
+Pass the uploaded film as an accessible Drive file reference. The session saves
+the deliverables package to the client's existing Drive folder and returns its
+link. The package still stops at the creative summary and README.
+
 ## Workflow
 
 Work in a dedicated dir (e.g. `~/film_analysis/`) with a `deliverables/` subfolder. Full deliverable specs: `references/deliverable_specs.md`. Method details and pitfalls: `references/analysis_method.md` (read it before Steps 2 and 5).
