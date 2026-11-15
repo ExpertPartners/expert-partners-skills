@@ -1,3 +1,6 @@
+## 0.11.4 - 2026-11-15
+
+Preserve complete source commercial status throughout webinar drafts, including missing-input rows, spoken recaps, prepared answers and assumptions. Keep known future direction beside explicitly undecided terms without implying that planned options are already being implemented.
 ## 0.11.3 - 2026-11-15
 
 Keep the supplied owning playbook title, revision and complete URL visibly in source-brief Source notes, rather than relying only on a hyperlink target. Preserve source mappings and honest excerpt-only disclosure.
