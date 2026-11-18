@@ -1,3 +1,6 @@
+## 0.7.3 - 2026-11-18
+
+Make normal Custom Instruction Builder use retrieve and apply the verified private original template and completion evidence, with explicit current-authority departures and no silent reconstructed fallback or public raw-source copy.
 ## 0.7.2 - 2026-11-09
 
 Restore Brand Guardian's Anti AI score from 0 to 100 and PASS threshold of 90, retaining problems alongside the score and keeping brand, factual and calibrated voice findings separate. Add an optional score-record checker and boundary tests.
