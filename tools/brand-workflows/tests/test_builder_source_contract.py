@@ -49,6 +49,13 @@ class BuilderSourceContractTest(unittest.TestCase):
         )
         self.assertNotIn("# Custom Instructions for [Company Name]", self.text)
 
+    def test_review_note_delivered_not_internalized(self):
+        self.assertIn("200-word threshold", self.text)
+        self.assertIn("3-plus-1 critique", self.text)
+        self.assertIn("separate note outside the copy", self.text)
+        self.assertIn("not a per-company count", self.text)
+        self.assertNotIn("separate internal review", self.text)
+
     def test_retains_existing_caller_and_output_contract(self):
         self.assertIn("marketing-workspace-custom-instructions.md", self.text)
         self.assertIn("at most 1,000 words", self.text)
