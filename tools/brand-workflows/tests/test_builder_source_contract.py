@@ -96,6 +96,30 @@ class BuilderSourceContractTest(unittest.TestCase):
         self.assertIn("literal post-hoc check, not semantic rule coverage", self.text)
         self.assertIn("confirmed by independent review", self.text)
 
+    def test_settled_rules_and_locked_canon_always_carried(self):
+        """Settled rules, locked canon and privacy defaults are carried, not disclosed away."""
+        self.assertIn("Settled company rules, locked canon and privacy defaults", self.text)
+        self.assertIn("always carried", self.text)
+        self.assertIn("disclosure never substitutes for carrying a settled rule", self.text)
+        self.assertIn(
+            "obsolete mechanism may be dropped while the underlying rule or default",
+            self.text,
+        )
+        self.assertIn("genuinely unsettled or explicitly superseded", self.text)
+        self.assertIn("citing the source that makes it unsettled or superseded", self.text)
+
+    def test_budget_drops_prose_before_any_rule(self):
+        self.assertIn("pressures wording, not coverage", self.text)
+        self.assertIn("drop lower-priority prose before dropping any supported rule", self.text)
+
+    def test_no_permitted_alternative_inside_prohibition(self):
+        self.assertIn(
+            "Never place a permitted alternative inside a prohibition bullet",
+            self.text,
+        )
+        self.assertIn("positive Always Do instructions", self.text)
+        self.assertNotIn("may place a permitted alternative inside a prohibition bullet", self.text)
+
     def run_validator(self, candidate, phrases=None):
         cmd = [sys.executable, str(VALIDATOR), str(candidate)]
         if phrases is not None:
