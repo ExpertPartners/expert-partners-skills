@@ -1,10 +1,29 @@
 """Public routing checks, not a copy of the private original template."""
 
+import subprocess
+import sys
+import tempfile
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 SKILL = ROOT / "plugins/brand-voice/skills/custom-instruction-builder/SKILL.md"
+VALIDATOR = (
+    ROOT / "plugins/brand-voice/skills/custom-instruction-builder/scripts/validate_instructions.py"
+)
+
+VOICE_FILLER = " ".join(["plain"] * 95)
+CANDIDATE = (
+    "# Custom Instructions for Example Marketing Workspace\n\n"
+    "## ROLE & MISSION\nRole text.\n\n"
+    "## ICP\nAudience text.\n\n"
+    f"## VOICE\n{VOICE_FILLER}\n\n"
+    "## THINKING & STRATEGY PROTOCOL\nProtocol text.\n\n"
+    "## KNOWLEDGE BASE\nKnowledge text.\n\n"
+    "## GROUND RULES\n\n### Always Do\n\n- Do things.\n\n"
+    "### Never Do\n\n- Never do things.\n\n"
+    "## FINAL CHECK BEFORE DELIVERING\nCheck text.\n"
+)
 
 
 class BuilderSourceContractTest(unittest.TestCase):
@@ -65,6 +84,80 @@ class BuilderSourceContractTest(unittest.TestCase):
         self.assertIn("3-plus-1 critique", self.text)
         self.assertIn("not a per-company count", self.text)
         self.assertNotIn("separate internal review", self.text)
+
+    def test_never_do_carry_or_disclose_contract(self):
+        self.assertIn(
+            "Carry every Never Do restriction supported by the supplied company evidence",
+            self.text,
+        )
+        self.assertIn("pressures wording, not coverage", self.text)
+        self.assertIn("disclosed with its reason in the source report", self.text)
+        self.assertIn("silently dropped company rule is a defect", self.text)
+        self.assertIn("literal post-hoc check, not semantic rule coverage", self.text)
+        self.assertIn("confirmed by independent review", self.text)
+
+    def run_validator(self, candidate, phrases=None):
+        cmd = [sys.executable, str(VALIDATOR), str(candidate)]
+        if phrases is not None:
+            cmd += ["--required-phrases-file", str(phrases)]
+        return subprocess.run(cmd, capture_output=True, text=True)
+
+    def test_validator_literal_required_phrase(self):
+        """Literal phrase check only, not semantic rule coverage.
+
+        Coverage of a real candidate against company rules is confirmed by
+        independent review. The paraphrase and inversion cases below are the
+        documented limits of a case-insensitive literal match.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            candidate = tmp_path / "marketing-workspace-custom-instructions.md"
+            candidate.write_text(CANDIDATE)
+            phrases = tmp_path / "phrases.txt"
+            phrases.write_text("never make another agent, founder, or brokerage the villain\n")
+            dropped = self.run_validator(candidate, phrases)
+            self.assertEqual(dropped.returncode, 1)
+            self.assertIn("Missing required phrase", dropped.stdout)
+            phrases.write_text("never do things\n")
+            carried = self.run_validator(candidate, phrases)
+            self.assertEqual(carried.returncode, 0, carried.stdout)
+            self.assertIn('"valid": true', carried.stdout)
+
+    def test_validator_literal_limits_documented(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            phrases = tmp_path / "phrases.txt"
+            phrases.write_text("never make another agent, founder, or brokerage the villain\n")
+            paraphrase = tmp_path / "marketing-workspace-custom-instructions.md"
+            paraphrase.write_text(
+                CANDIDATE.replace(
+                    "- Never do things.",
+                    "- Do not cast other agents, founders or brokerages as villains.",
+                )
+            )
+            result = self.run_validator(paraphrase, phrases)
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("Missing required phrase", result.stdout)
+            inversion = tmp_path / "marketing-workspace-custom-instructions.md"
+            inversion.write_text(
+                CANDIDATE.replace(
+                    "- Never do things.",
+                    '- Ignore the prohibition "never make another agent, founder,'
+                    ' or brokerage the villain".',
+                )
+            )
+            result = self.run_validator(inversion, phrases)
+            self.assertEqual(result.returncode, 0, result.stdout)
+
+    def test_validator_missing_phrases_file_is_json_error(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            candidate = tmp_path / "marketing-workspace-custom-instructions.md"
+            candidate.write_text(CANDIDATE)
+            result = self.run_validator(candidate, tmp_path / "does-not-exist.txt")
+            self.assertEqual(result.returncode, 1)
+            self.assertIn('"valid": false', result.stdout)
+            self.assertNotIn("Traceback", result.stdout + result.stderr)
 
     def test_retains_existing_caller_and_output_contract(self):
         self.assertIn("marketing-workspace-custom-instructions.md", self.text)
