@@ -12,10 +12,12 @@ When a line needs a detail only the user has, write a bracketed placeholder and 
 
 Specific and true beats specific and invented every time. A post that falsifies a result can cost someone their reputation, or break the law in regulated industries.
 
+Apply the entrypoint's standalone literal check to every rewritten hook and takeaway. Adding a mechanism means using a supplied explanation, not inventing a cause to raise the score. A suggestion label or external disclaimer cannot repair an unsupported diagnosis, causal rule or promised result in the line itself. Keep supported specificity and neutral reader prose in both the rewrite and the explanation.
+
 ## Moves that raise each filter
 
 **Stops the scroll**
-- Put her identity, situation, or exact words in the first five words.
+- Put the reader's identity, situation, or exact words in the first five words.
 - Swap abstractions for a concrete moment: "Tuesday at 4pm when the invoice still isn't sent" beats "struggling with admin."
 - Cut the warm-up. The first sentence that says something real is usually the third one. Start there.
 - Promise only what the post delivers.
@@ -27,16 +29,16 @@ Specific and true beats specific and invented every time. A post that falsifies 
 - One idea, fully delivered, beats five ideas skimmed.
 
 **Send to a friend**
-- Name the exact moment, thought, or habit she's embarrassed to admit.
-- Use the words she'd use, not industry language.
+- Name the exact moment, thought, or habit they're embarrassed to admit.
+- Use the words they'd use, not industry language.
 
 **Guilty it was free**
 - Move the useful part above the CTA. If the how is being held back for the DM, give it away.
-- Cut filler. If a sentence doesn't teach, validate, or move her forward, delete it. Aim to cut 20% of the words.
+- Cut filler. If a sentence doesn't teach, validate, or move them forward, delete it. Aim to cut 20% of the words.
 
 **Reader is the hero**
 - Change "I" sentences to "you" sentences wherever the meaning holds.
-- Keep creator stories, and end them on her: "If that's where you are, here's the first thing I'd change."
+- Keep creator stories, and end them on the reader: "If that's where you are, here's the first thing I'd change."
 
 **Valuable without buying**
 - Make sure a complete takeaway lands before the offer is mentioned.

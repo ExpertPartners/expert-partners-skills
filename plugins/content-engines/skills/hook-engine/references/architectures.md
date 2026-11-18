@@ -4,7 +4,9 @@ These patterns show up again and again in high-performing short-form content acr
 
 **About the examples:** every example below is illustrative and was written for this guide. The numbers and stories are placeholders showing the shape of the pattern. Never reuse them as if they were the user's proof.
 
-**Needs proof:** patterns 1-4 need real material from the user's "My real proof." Patterns 5-12 need none.
+The formulas illustrate structure, not permission to assert their premises. Before using any pattern, read the resulting line alone without a suggestion label or external disclaimer. Support every literal assertion at its stated scope from supplied material. In particular, Wrong Answer, Signs You're, Mistake Warning, Bold Declaration and Her Exact Words must not turn a reported problem into an unsupported universal cause or reader diagnosis. A quote's authenticity does not establish the explanation appended to it. Keep strong specific claims when supported; otherwise change the line itself to a bounded observation, open question, proposed action without a guaranteed result or flagged placeholder.
+
+**Availability:** evaluate each pattern's `Requires`, not a blanket proof/no-proof split. Patterns 1-4 need their stated achieved outcome, story, result or verifiable credential/number. Wrong Answer needs a supplied contrarian take or mechanism; Her Exact Words needs authentic customer language permitted for the intended use; Hot Seat needs a permitted real situation or an explicitly hypothetical one. Expertise and opinion patterns still cannot invent facts, admissions or causal claims. Check these conditions again when suggesting what would unlock a pattern.
 
 ---
 
@@ -12,7 +14,7 @@ These patterns show up again and again in high-performing short-form content acr
 
 **Requires:** the user has achieved the outcome, for themselves or for clients.
 **Formula:** "If I had to [reach outcome] from zero in [timeframe], here's exactly what I'd do." or "If I lost [key asset] tomorrow, these are the first [number] moves I'd make."
-**Why it works:** it removes the "easy for you to say" objection. The reader builds her own plan alongside yours.
+**Why it works:** it removes the "easy for you to say" objection. The reader builds their own plan alongside yours.
 **Best for:** reach, shares, and teaching a process.
 **Examples:**
 - "If I had to fill a new yoga studio from zero in 90 days, here's the exact order I'd do it in."
@@ -143,13 +145,13 @@ These patterns show up again and again in high-performing short-form content acr
 
 **Requires:** customer language (the "Her words" line in the profile, or pasted DMs, reviews, or transcripts).
 **Formula:** open with a real phrase a client said, in quotes or as your own first line, then turn it. "'[Exact client phrase].' I hear this every week. Here's what's going on." or use the phrase directly as the hook.
-**Why it works:** the reader hears her own inner monologue. Nothing feels more written-for-her than her own words.
+**Why it works:** the reader hears their own inner monologue. Nothing feels more written-for-them than their own words.
 **Best for:** connection, conversion, and ads.
 **Examples:**
 - "'I know what to do, I just don't do it.' If that's you, the problem isn't discipline."
 - "'I feel like I'm always behind on my books.' You're not behind. Your system is built for someone with more hours than you."
 
-**Note:** strip names and identifying details. Confirm the quote is real, and never invent one.
+**Note:** strip names and identifying details. Confirm the quote is real and permitted for the intended use, and never invent one. A historical quote or private source alone does not grant public testimonial permission. Do not turn one phrase into a claim about how often customers say it.
 
 ---
 
@@ -157,7 +159,7 @@ These patterns show up again and again in high-performing short-form content acr
 
 **Requires:** a real client situation (anonymized, with permission), or a scenario clearly framed as hypothetical.
 **Formula:** "[Business type], [key detail], wants [goal]. Here's the first thing I'd change." or "Say you run a [business] doing [range]. Here's where your money's leaking."
-**Why it works:** it feels like overhearing a private coaching session, and every viewer swaps in her own situation.
+**Why it works:** it feels like overhearing a private coaching session, and every viewer swaps in their own situation.
 **Best for:** comments, showing expertise, and community engagement.
 **Examples:**
 - "Dog groomer, two vans, fully booked, still not profitable. Here's the first thing I'd look at."
@@ -181,11 +183,11 @@ A strong hook usually uses at least two of these:
 
 | Ingredient | What it does |
 |---|---|
-| Curiosity | Breaks the reader's prediction, so she thinks "wait, what?" |
+| Curiosity | Breaks the reader's prediction, so they think "wait, what?" |
 | Specificity | Numbers, dates, places, and names make it real. |
 | Stakes | Something is on the line: money, time, relationships, reputation. |
 | Tension | A contrast, a disagreement, or an unresolved question. |
-| Clear value | She knows what she'll get and what shape it arrives in. |
+| Clear value | They know what they'll get and what shape it arrives in. |
 
 ## Common ways hooks fail
 

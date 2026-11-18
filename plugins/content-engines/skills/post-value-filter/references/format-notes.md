@@ -13,7 +13,7 @@ The seven filters apply to every format, but where each filter lives changes. Re
 
 - **Hook** = slide 1. It needs a clear promise readable in about two seconds, so large text and few words.
 - One idea per slide. A slide that tries to hold two ideas usually loses both.
-- Each slide should make her swipe to the next one. A dead slide in the middle loses readers.
+- Each slide should make them swipe to the next one. A dead slide in the middle loses readers.
 - The payoff lands before the CTA slide. The last content slide is where "guilty it was free" is won or lost.
 - Save-worthiness matters here more than anywhere. Frameworks, checklists, and step-by-steps score well on filters 2 and 4.
 - Score the caption too, lightly. It should add context, not repeat the slides.
@@ -42,7 +42,7 @@ The seven filters apply to every format, but where each filter lives changes. Re
 
 ## Story sequence (Instagram, Facebook stories)
 
-- **Hook** = frame 1. It must make her tap forward instead of swiping away.
+- **Hook** = frame 1. It must make them tap forward instead of swiping away.
 - Each frame earns the next tap. Three to seven frames is typical.
 - Interactive stickers (polls, questions, sliders) can serve as the CTA and score well on filter 7 when they're easy and relevant.
 - Stories are more casual, so a lower polish bar is fine. The value bar stays the same.

@@ -12,6 +12,8 @@ Ask **one or two questions at a time**, conversationally. Don't dump all nine at
 
 If the user shares a website, bio, sales page, or a few past posts, read them first and pre-fill what you can. Then ask only about the gaps.
 
+Use the audience's stated pronouns, or they/their when unspecified or gender-neutral. The legacy `Her bad day`, `Her words` and `What she wants` field names below stay unchanged for compatibility; their values and generated copy must not infer gender from those labels. Reuse existing profiles as supplied. Mark unsupported fields missing, inference as inference and task-only choices as task-only. A suggested phrase count is not permission to invent quotes, and historical customer language is not public testimonial permission.
+
 ## The nine questions
 
 **1. What do you do, and who do you do it for?**
@@ -19,14 +21,14 @@ One or two sentences. Example: "I'm a bookkeeper for restaurant owners doing $1M
 Push if vague: "If you could only work with one type of client, who would it be?"
 
 **2. Describe your ideal reader on a bad day.**
-What's going wrong, what has she already tried, and what does she say to herself about it?
-Push if vague: "What's the exact sentence she'd type into Google, or say to a friend at 11pm?"
+What's going wrong, what have they already tried, and what do they say to themselves about it?
+Push if vague: "What's the exact sentence they'd type into Google, or say to a friend at 11pm?"
 
-**3. What does she say, word for word?**
-Phrases your clients use in DMs, sales calls, reviews, or intake forms. Paste real messages if you have them (remove names). Her exact words make the best hooks.
+**3. What do they say, word for word?**
+Phrases your clients use in DMs, sales calls, reviews, or intake forms. Paste real messages if you have them (remove names). Their exact words make the best hooks.
 
-**4. What does she want instead?**
-The outcome in her words. "Stop dreading Sunday nights," not "achieve work-life integration."
+**4. What do they want instead?**
+The outcome in their words. "Stop dreading Sunday nights," not "achieve work-life integration."
 
 **5. What do you know that most people in your space get wrong or never say?**
 Contrarian takes, the mistakes you see constantly, the mechanism behind the problem.
@@ -51,7 +53,7 @@ If there's no profile and they want hooks or a verdict right away, ask only thes
 
 > Quick three so this fits your audience:
 > 1. Who is this for? (one sentence)
-> 2. What's her biggest frustration right now?
+> 2. What's their biggest frustration right now?
 > 3. Any real result, number, or story I can use? ("None" is fine.)
 
 Do the work, then add one line at the end: "Want the full two-minute setup so everything from here is sharper?"
@@ -64,10 +66,10 @@ When the interview is done, write the profile in exactly this format. Keep each 
 CONTENT PROFILE
 (used by Hook Engine and Post Value Filter)
 Business: [what they do + for whom]
-Ideal reader: [who she is, specifically]
-Her bad day: [the struggle, what she's tried, what she says to herself]
+Ideal reader: [who they are, specifically]
+Her bad day: [the struggle, what they've tried, what they say to themselves]
 Her words: [2-5 exact phrases clients use]
-What she wants: [the outcome, in her words]
+What she wants: [the outcome, in their words]
 What I know that others miss: [2-4 contrarian takes, mechanisms, or common mistakes]
 My real proof: [true results, credentials, and stories I'm willing to share, or "none yet"]
 Offer + usual CTA: [what they sell + the next step they ask for]
