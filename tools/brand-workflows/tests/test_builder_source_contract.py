@@ -97,20 +97,31 @@ class BuilderSourceContractTest(unittest.TestCase):
         self.assertIn("confirmed by independent review", self.text)
 
     def test_settled_rules_and_locked_canon_always_carried(self):
-        """Settled rules, locked canon and privacy defaults are carried, not disclosed away."""
+        """Wording presence and polarity only, not runtime coverage.
+
+        The negation rejections pin the polarity of the affirmative wording;
+        actual carry behavior is observed in real runs and independent review.
+        """
         self.assertIn("Settled company rules, locked canon and privacy defaults", self.text)
         self.assertIn("always carried", self.text)
+        self.assertNotIn("are not always carried", self.text)
         self.assertIn("disclosure never substitutes for carrying a settled rule", self.text)
         self.assertIn(
             "obsolete mechanism may be dropped while the underlying rule or default",
             self.text,
         )
+        self.assertNotIn("No obsolete mechanism may be dropped", self.text)
         self.assertIn("genuinely unsettled or explicitly superseded", self.text)
         self.assertIn("citing the source that makes it unsettled or superseded", self.text)
 
     def test_budget_drops_prose_before_any_rule(self):
+        """Wording presence and polarity only, not runtime budget behavior."""
         self.assertIn("pressures wording, not coverage", self.text)
         self.assertIn("drop lower-priority prose before dropping any supported rule", self.text)
+        self.assertNotIn(
+            "never drop lower-priority prose before dropping any supported rule",
+            self.text,
+        )
 
     def test_no_permitted_alternative_inside_prohibition(self):
         self.assertIn(
