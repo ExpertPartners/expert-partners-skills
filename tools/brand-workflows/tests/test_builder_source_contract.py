@@ -49,10 +49,20 @@ class BuilderSourceContractTest(unittest.TestCase):
         )
         self.assertNotIn("# Custom Instructions for [Company Name]", self.text)
 
-    def test_review_note_delivered_not_internalized(self):
+    def test_review_note_wording_contract(self):
+        """Affirmative wording presence only, not delivery coverage.
+
+        Actual delivery evidence is the observed run critique note, kept
+        with the run receipt, not asserted here.
+        """
+        self.assertIn(
+            "deliver the critique to the user as a separate note outside the copy",
+            self.text,
+        )
+        self.assertNotIn("never deliver the critique to the user", self.text)
+        self.assertNotIn("not deliver the critique to the user", self.text)
         self.assertIn("200-word threshold", self.text)
         self.assertIn("3-plus-1 critique", self.text)
-        self.assertIn("separate note outside the copy", self.text)
         self.assertIn("not a per-company count", self.text)
         self.assertNotIn("separate internal review", self.text)
 
