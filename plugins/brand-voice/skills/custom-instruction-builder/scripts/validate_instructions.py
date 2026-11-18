@@ -21,7 +21,7 @@ def word_count(text):
     return len(re.findall(r"\S+", text))
 
 
-def validate(text, filename):
+def validate(text, filename, required_phrases=None):
     errors = []
     if Path(filename).name != "marketing-workspace-custom-instructions.md":
         errors.append("Use marketing-workspace-custom-instructions.md")
@@ -34,7 +34,7 @@ def validate(text, filename):
     if words > 1000:
         errors.append(f"Total length is {words} words, maximum 1000")
     sections = {
-        m.group(1): text[m.end():matches[i + 1].start() if i + 1 < len(matches) else len(text)]
+        m.group(1): text[m.end() : matches[i + 1].start() if i + 1 < len(matches) else len(text)]
         for i, m in enumerate(matches)
     }
     voice_words = word_count(sections.get("VOICE", ""))
@@ -46,17 +46,40 @@ def validate(text, filename):
     # This catches mechanical inventory leaks, not arbitrary document titles.
     if re.search(r"\b[\w.-]+\.(?:md|docx?|pdf|txt|csv|xlsx?)\b|https?://", text, re.I):
         errors.append("Remove file references and URLs from the paste-ready instructions")
-    if re.search(r"\[(?:company(?: name)?|insert\b[^]]*|todo|tbd|missing\b[^]]*)\]|\b(?:TODO|TBD)\b", text, re.I):
+    if re.search(
+        r"\[(?:company(?: name)?|insert\b[^]]*|todo|tbd|missing\b[^]]*)\]|\b(?:TODO|TBD)\b",
+        text,
+        re.I,
+    ):
         errors.append("Resolve placeholders before delivering finished instructions")
+    for phrase in required_phrases or []:
+        if phrase.lower() not in text.lower():
+            errors.append(f"Missing required phrase: {phrase}")
     return {"valid": not errors, "words": words, "voice_words": voice_words, "errors": errors}
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("file", type=Path)
+    parser.add_argument(
+        "--required-phrases-file",
+        type=Path,
+        default=None,
+        help="Optional file with one literal required phrase per line. Each phrase must "
+        "appear in the candidate (case-insensitive literal match). This is a post-hoc "
+        "literal check, not semantic rule coverage: paraphrases fail and quoted "
+        "inversions pass.",
+    )
     args = parser.parse_args()
     try:
-        result = validate(args.file.read_text(encoding="utf-8"), args.file.name)
+        required = None
+        if args.required_phrases_file is not None:
+            required = [
+                line.strip()
+                for line in args.required_phrases_file.read_text(encoding="utf-8").splitlines()
+                if line.strip() and not line.startswith("#")
+            ]
+        result = validate(args.file.read_text(encoding="utf-8"), args.file.name, required)
     except (OSError, UnicodeError) as exc:
         result = {"valid": False, "errors": [str(exc)]}
     print(json.dumps(result, indent=2))
