@@ -132,6 +132,18 @@ class BuilderSourceContractTest(unittest.TestCase):
             self.text,
         )
 
+    def test_autonomy_scope_contract(self):
+        """Wording presence and polarity only, not runtime behavior."""
+        self.assertIn("retires human approval and permission gates only", self.text)
+        self.assertIn(
+            "truth, quality and publish-readiness conditions are never treated as retired gates",
+            self.text,
+        )
+        self.assertNotIn(
+            "truth, quality and publish-readiness conditions may be treated as retired gates",
+            self.text,
+        )
+
     def run_validator(self, candidate, phrases=None):
         cmd = [sys.executable, str(VALIDATOR), str(candidate)]
         if phrases is not None:
