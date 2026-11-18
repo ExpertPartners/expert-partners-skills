@@ -85,51 +85,52 @@ class BuilderSourceContractTest(unittest.TestCase):
         self.assertIn("not a per-company count", self.text)
         self.assertNotIn("separate internal review", self.text)
 
-    def test_never_do_carry_or_disclose_contract(self):
-        self.assertIn(
+    def test_no_carry_everything_overreach(self):
+        """The 0.7.4/0.7.5 carry-everything rule was overreach and is removed."""
+        self.assertNotIn(
             "Carry every Never Do restriction supported by the supplied company evidence",
             self.text,
         )
-        self.assertIn("pressures wording, not coverage", self.text)
-        self.assertIn("disclosed with its reason in the source report", self.text)
-        self.assertIn("silently dropped company rule is a defect", self.text)
-        self.assertIn("literal post-hoc check, not semantic rule coverage", self.text)
-        self.assertIn("confirmed by independent review", self.text)
-
-    def test_settled_rules_and_locked_canon_always_carried(self):
-        """Wording presence and polarity only, not runtime coverage.
-
-        The negation rejections pin the polarity of the affirmative wording;
-        actual carry behavior is observed in real runs and independent review.
-        """
-        self.assertIn("Settled company rules, locked canon and privacy defaults", self.text)
-        self.assertIn("always carried", self.text)
-        self.assertNotIn("are not always carried", self.text)
-        self.assertIn("disclosure never substitutes for carrying a settled rule", self.text)
-        self.assertIn(
-            "obsolete mechanism may be dropped while the underlying rule or default",
-            self.text,
-        )
-        self.assertNotIn("No obsolete mechanism may be dropped", self.text)
-        self.assertIn("genuinely unsettled or explicitly superseded", self.text)
-        self.assertIn("citing the source that makes it unsettled or superseded", self.text)
-
-    def test_budget_drops_prose_before_any_rule(self):
-        """Wording presence and polarity only, not runtime budget behavior."""
-        self.assertIn("pressures wording, not coverage", self.text)
-        self.assertIn("drop lower-priority prose before dropping any supported rule", self.text)
+        self.assertNotIn("always carried", self.text)
+        self.assertNotIn("pressures wording, not coverage", self.text)
         self.assertNotIn(
-            "never drop lower-priority prose before dropping any supported rule",
-            self.text,
-        )
-
-    def test_no_permitted_alternative_inside_prohibition(self):
-        self.assertIn(
             "Never place a permitted alternative inside a prohibition bullet",
             self.text,
         )
-        self.assertIn("positive Always Do instructions", self.text)
-        self.assertNotIn("may place a permitted alternative inside a prohibition bullet", self.text)
+        self.assertIn("literal post-hoc check, not semantic rule coverage", self.text)
+        self.assertIn("stays with independent review", self.text)
+
+    def test_original_bullet_count_and_fixed_wording(self):
+        """Wording presence and polarity only, not runtime drafting behavior."""
+        self.assertIn("one to two supported company-specific bullets per list", self.text)
+        self.assertNotIn("more than two supported company-specific bullets per list", self.text)
+        self.assertIn("most critical supported rules with legal and compliance first", self.text)
+        self.assertIn("original's fixed wording exactly", self.text)
+        self.assertIn("fixed banned-word list", self.text)
+        self.assertNotIn("Do not restore the original's fixed wording", self.text)
+        self.assertIn("accepted calibration does not remove a fixed original rule", self.text)
+        self.assertNotIn("accepted calibration may remove a fixed original rule", self.text)
+        self.assertIn("stays authoritative in the workspace knowledge", self.text)
+
+    def test_conjunction_polarity_contract(self):
+        """Wording presence and polarity only, not runtime drafting behavior."""
+        self.assertIn("Never join a permitted alternative to a prohibition", self.text)
+        self.assertNotIn("may join a permitted alternative to a prohibition", self.text)
+        self.assertIn("its own affirmative instruction", self.text)
+        self.assertIn("positive phrasing inside its Never Do bullets verbatim", self.text)
+        self.assertNotIn("remove the original's positive phrasing", self.text)
+
+    def test_honest_disposition_contract(self):
+        """Wording presence and polarity only, not runtime reporting behavior."""
+        self.assertIn("reported as kept there", self.text)
+        self.assertIn("never framed as an open business question", self.text)
+        self.assertNotIn("may be framed as an open business question", self.text)
+        self.assertIn("never relabeled as a mere value", self.text)
+        self.assertNotIn("may be relabeled as a mere value", self.text)
+        self.assertIn(
+            "explicit instruction that overrides settled knowledge remains a defect",
+            self.text,
+        )
 
     def run_validator(self, candidate, phrases=None):
         cmd = [sys.executable, str(VALIDATOR), str(candidate)]
