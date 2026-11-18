@@ -1,3 +1,6 @@
+## 0.7.6 - 2026-11-18
+
+Builder ground rules return to the original method: restore the original's fixed wording exactly, including its fixed banned-word list; add only one to two supported company-specific bullets per list, most critical rules with legal and compliance first; everything else stays authoritative in workspace knowledge. The original's own positive phrasing inside Never Do stays verbatim; only a permitted alternative joined to a prohibition with "and" is split into its own affirmative instruction. Source reports must call a settled rule kept in knowledge kept, never an open business question, and never relabel a lock as a mere value.
 ## 0.7.5 - 2026-11-18
 
 Builder ground rules: settled company rules, locked canon and privacy defaults are always carried; disclosure covers only genuinely unsettled or superseded clauses with a cited source; an obsolete mechanism may be dropped while its underlying default is kept; the word budget drops lower-priority prose before any supported rule; permitted alternatives never sit inside prohibition bullets.
