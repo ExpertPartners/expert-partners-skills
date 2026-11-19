@@ -21,6 +21,7 @@ import subprocess
 import sys
 import threading
 import time
+from urllib.parse import quote
 import uuid
 
 from chrome_job_window import existing_signed_in_profile, chrome_is_running, verify_window_closed
@@ -177,6 +178,34 @@ def reported_close_reason(reply):
     return CLOSE_REASONS[found.group(1)] if found else "unknown"
 
 
+# Playwright Extension 0.6.0 answers getStatus with sessions; 0.5.0 answered
+# getConnectionStatus with connections. Both normalize to the 0.5.0 shape.
+CONNECTION_STATUS_JS = (
+    "const connectionStatus=async()=>{"
+    "const n=await chrome.runtime.sendMessage({type:'getStatus'}).catch(()=>null);"
+    "if(n&&Array.isArray(n.sessions))return n.sessions.map(c=>({clientName:c.clientName,connectedTabIds:Array.isArray(c.tabIds)?c.tabIds:[]}));"
+    "const o=await chrome.runtime.sendMessage({type:'getConnectionStatus'});"
+    "if(o&&Array.isArray(o.connections))return o.connections;"
+    "throw Error('connection_status_unavailable');};"
+)
+
+
+def adopt_connector_js(client_name):
+    """Extension 0.6.0 turns its connect tab into this client's own about:blank tab.
+
+    Navigating that one owned tab back to the extension's connect page, without
+    a relay URL or token, restores the privileged connector page the route uses
+    for chrome.* census and window ownership. Any other page state is left alone
+    for the freshness check to refuse.
+    """
+    url = EXTENSION + "?client=" + quote(json.dumps({"name": client_name}), safe="")
+    return (
+        "const pages=page.context().pages();"
+        "if(pages.length!==1||page.url()!=='about:blank')return {adopted:false};"
+        "await page.goto(" + json.dumps(url) + ");return {adopted:true};"
+    )
+
+
 def connection_diagnostics_js(scope, client_name, reason="unknown"):
     """Read extension state without selecting, attaching or changing any tab."""
     return (
@@ -187,9 +216,8 @@ def connection_diagnostics_js(scope, client_name, reason="unknown"):
         "if(reason==='unknown'&&out.connector_present==='no')out.close_reason='connector_closed';"
         "out.unavailable=[];"
         # Only this job's exact client and saved tab IDs are read back.
-        "try{const status=await chrome.runtime.sendMessage({type:'getConnectionStatus'});"
-        "if(!status||!Array.isArray(status.connections))throw 0;"
-        "out.connection_lists_owned_tabs=status.connections.some(c=>c.clientName===clientName&&Array.isArray(c.connectedTabIds)&&c.connectedTabIds.some(id=>scope.tabIds.includes(id)))?'yes':'no';"
+        "try{" + CONNECTION_STATUS_JS + "const connections=await connectionStatus();"
+        "out.connection_lists_owned_tabs=connections.some(c=>c.clientName===clientName&&Array.isArray(c.connectedTabIds)&&c.connectedTabIds.some(id=>scope.tabIds.includes(id)))?'yes':'no';"
         "}catch{out.unavailable.push('diagnostics_unavailable:connection_status');}"
         "try{const targets=await chrome.debugger.getTargets();"
         "for(const id of scope.tabIds)out.debugger_attached[id]=targets.some(t=>t.tabId===id&&t.attached)?'yes':'no';"
@@ -283,7 +311,8 @@ def failed_cleanup_js(args, remove):
         # When the connector survives, anchor to its exact client identity.
         "const connector=live.find(t=>t.id===old.connectorId);"
         "if(connector){const u=new URL(connector.url);if(u.protocol+'//'+u.host+u.pathname!==connectorOrigin||JSON.parse(u.searchParams.get('client')).name!==clientName)throw Error('connector_identity_changed');}"
-        "const status=await chrome.runtime.sendMessage({type:'getConnectionStatus'});if(!status||!Array.isArray(status.connections))throw Error('connection_status_unavailable');"
+        + CONNECTION_STATUS_JS
+        + "const status={connections:await connectionStatus()};"
         "const targets=await chrome.debugger.getTargets();"
         "for(const t of live){if(t.windowId!==old.windowId||(t.groupId!==old.groupId&&t.groupId!==-1)||targets.some(x=>x.tabId===t.id&&x.attached)||status.connections.some(c=>(c.connectedTabIds||[]).includes(t.id)))throw Error('ownership_changed');"
         "if(t.groupId!==-1){const g=await chrome.tabGroups.get(t.groupId);if(g.title!==old.groupTitle)throw Error('group_identity_changed');}}"
@@ -580,8 +609,10 @@ class Route:
 
     @contextmanager
     def maintenance_connector(self):
-        client = self.client("EP cleanup " + uuid.uuid4().hex)
+        name = "EP cleanup " + uuid.uuid4().hex
+        client = self.client(name)
         try:
+            code(client, adopt_connector_js(name))
             code(
                 client,
                 "const p=Buffer.constructor('return process')();if(page.context().pages().length!==1||!page.url().startsWith("
@@ -676,6 +707,7 @@ class Route:
         client = self.client(job["client_name"])
         job["client"] = client
         job["allocation_stage"] = "connector_identity"
+        code(client, adopt_connector_js(job["client_name"]))
         observed = code(client, CONNECTOR_PROBE_JS)
         count = observed.get("sdk_page_count")
         connectors = observed.get("sdk_connector_count")

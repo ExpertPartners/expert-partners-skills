@@ -174,7 +174,9 @@ class JobTests(unittest.TestCase):
                 }
                 with patch.object(b, "code", return_value=projected) as probe:
                     row = decode(route.start("fixture"))
-                self.assertEqual(probe.call_count, 1)
+                self.assertEqual(probe.call_count, 2)
+                self.assertIn("adopted", probe.call_args_list[0].args[1])
+                self.assertEqual(probe.call_args_list[1].args[1], b.CONNECTOR_PROBE_JS)
                 self.assertEqual(
                     row["allocation_failure"]["class"], "owned_operation_failed:not_fresh_connector"
                 )
@@ -850,7 +852,7 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
 const state=__STATE__;const calls=[];
 const fail=name=>{calls.push(name);throw Error('SYNTHETIC_CANARY '+name);};
 global.chrome={tabs:{query:async()=>{calls.push('tabs.query');return state.tabs;}},
-  runtime:{sendMessage:async(m)=>{if(state.statusFails)fail('runtime.sendMessage');calls.push('runtime.sendMessage:'+m.type);return {connections:state.connections||[]};}},
+  runtime:{sendMessage:async(m)=>{if(state.statusFails)fail('runtime.sendMessage');calls.push('runtime.sendMessage:'+m.type);if(m.type==='getStatus')return state.sessions?{success:true,sessions:state.sessions}:undefined;return {connections:state.connections||[]};}},
   debugger:{getTargets:async()=>{if(state.targetsFail)fail('debugger.getTargets');calls.push('debugger.getTargets');return (state.attached||[]).map(tabId=>({tabId,attached:true}));}}};
 process.__epBrowserJob={connector:{evaluate:async(fn,arg)=>await fn(arg)}};
 async function attempt(){__BODY__}
@@ -957,12 +959,57 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
                     <= {
                         "tabs.query",
                         "runtime.sendMessage:getConnectionStatus",
+                        "runtime.sendMessage:getStatus",
                         "runtime.sendMessage",
                         "debugger.getTargets",
                     }
                 )
                 self.assertNotIn("SYNTHETIC_CANARY", json.dumps(v))
                 self.assertNotIn("connect.html", json.dumps(v))
+
+    def test_extension_060_status_sessions_are_normalized(self):
+        for ids, expected in (([1, 10], "yes"), ([70], "no"), (None, "no")):
+            with self.subTest(ids=ids):
+                out = self.diagnostics(
+                    tabs=[{"id": 1}],
+                    sessions=[{"clientName": "fixture", "tabIds": ids}],
+                )
+                self.assertEqual(out["v"]["connection_lists_owned_tabs"], expected)
+                self.assertIn("runtime.sendMessage:getStatus", out["calls"])
+                self.assertNotIn("runtime.sendMessage:getConnectionStatus", out["calls"])
+
+    def test_connector_adoption_changes_only_one_owned_blank_page(self):
+        for urls, expected in (
+            (["about:blank"], True),
+            ([self.CONNECTOR_URL], False),
+            (["https://fixture.invalid"], False),
+            (["about:blank", "about:blank"], False),
+        ):
+            with self.subTest(urls=urls):
+                source = (
+                    "const urls=" + json.dumps(urls) + ";const navigations=[];"
+                    "const page={context:()=>({pages:()=>urls}),url:()=>urls[0],"
+                    "goto:async u=>navigations.push(u)};"
+                    "async function run(){"
+                    + b.adopt_connector_js('EP test "quoted"')
+                    + "}run().then(result=>console.log(JSON.stringify({result,navigations})));"
+                )
+                run = subprocess.run(
+                    ["node", "-e", source], capture_output=True, text=True, timeout=10
+                )
+                self.assertEqual(run.returncode, 0, run.stderr)
+                out = json.loads(run.stdout)
+                self.assertEqual(out["result"], {"adopted": expected})
+                if expected:
+                    from urllib.parse import parse_qs, urlparse
+
+                    url = urlparse(out["navigations"][0])
+                    self.assertEqual(url.scheme + "://" + url.netloc + url.path, b.EXTENSION)
+                    self.assertEqual(
+                        parse_qs(url.query), {"client": ['{"name": "EP test \\"quoted\\""}']}
+                    )
+                else:
+                    self.assertEqual(out["navigations"], [])
 
     def test_close_reason_comes_only_from_the_relay_wording(self):
         def failing(text):
