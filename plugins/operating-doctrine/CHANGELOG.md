@@ -1,3 +1,6 @@
+## 3.8.8 - 2026-11-19
+
+Keep the owned extension connector as the default even when experimental relay dependencies are installed. Make the relay an explicit opt-in and accept the pinned Playwright MCP relay's IPv6 loopback endpoint without broadening non-loopback access.
 ## 3.8.7 - 2026-11-19
 
 Add version-gated ownership for Playwright extension 0.6, with durable exact tab claims on the live relay and an independently authorized Aqua helper for guarded recovery after relay loss. The 0.5 connector path is unchanged.
