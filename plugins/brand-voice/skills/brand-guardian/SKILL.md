@@ -41,9 +41,13 @@ Review in this order.
 
 Use actual excerpt, source title and revision, reason, suggested change and disposition for each material finding. A rule sourced only from the generic reference is an editorial suggestion, not company policy. If canon intentionally uses a word the reference discourages, preserve the canon and explain precedence. Do not enforce arbitrary quotas, mandatory three-item lists or automatic percentage cuts.
 
+## Gate details before scoring
+
+Before any numeric score, check every identifying or specific detail in the draft against two requirements. The detail must be supported by a source fact, and it must be relevant and necessary for the company's ideal client. For Expert Partners that client is real estate agents; for AG and other brands use their own current Ideal Client file. Reject details that are sourced but irrelevant, and private details that are unnecessary. An upstream instruction to preserve details does not override this gate. Never replace a rejected detail with an invented fact about this or any other client. If any detail fails, return GATE FAIL, list each failed detail with its reason, and give no numeric score until the draft is revised.
+
 ## Return useful work
 
-Score every reviewed draft against the Anti AI Writing Guide from 0 to 100. Report `Anti AI score`, `Anti AI result` and `Problems` together. The editorial result is `PASS` at 90 or above and `FAIL` below 90. Explain the score using the actual guide observations and draft excerpts, not an invented weighted rubric or a claim of measured accuracy.
+Score every reviewed draft that passes the detail gate against the Anti AI Writing Guide from 0 to 100. A GATE FAIL draft receives no numeric score until it is revised and passes the gate. Report `Anti AI score`, `Anti AI result` and `Problems` together. The editorial result is `PASS` at 90 or above and `FAIL` below 90. Explain the score using the actual guide observations and draft excerpts, not an invented weighted rubric or a claim of measured accuracy.
 
 Keep every identified problem alongside the score, even at 90 or 100. Use an explicit empty problems list only when none was found. Keep factual, privacy, brand and voice findings and their dispositions separate from the editorial result. An Anti AI PASS does not clear those findings, prove authorship or authorize delivery. Current company canon and accepted calibration still take precedence over generic guide preferences; explain any applicable exception rather than penalizing approved voice.
 
