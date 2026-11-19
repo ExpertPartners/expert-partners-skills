@@ -13,7 +13,9 @@ import re
 import subprocess
 import sys
 import time
-from urllib.parse import urlsplit
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+
+from relay_rpc import relay_rpc
 
 
 class InvalidLaunch(ValueError):
@@ -109,6 +111,22 @@ def browser_arguments(arguments):
     return ["--new-window", profile, connector]
 
 
+def bridge_connector(args, socket_path):
+    """Pass only the local vendor relay endpoint to the private broker."""
+    parsed = urlsplit(args[-1])
+    fields = parse_qsl(parsed.query, keep_blank_values=True, max_num_fields=24)
+    urls = [v for k, v in fields if k == "mcpRelayUrl"]
+    if len(urls) != 1 or [v for k, v in fields if k == "protocolVersion"] != ["2"]:
+        raise InvalidLaunch("Protocol-v2 relay launch required")
+    endpoint = relay_rpc(socket_path, "install", url=urls[0])
+    if not isinstance(endpoint, str) or not re.fullmatch(
+        r"ws://127\.0\.0\.1:[1-9]\d{0,4}/extension/[0-9a-f-]{36}", endpoint
+    ):
+        raise InvalidLaunch("Private relay endpoint required")
+    query = urlencode([(k, endpoint if k == "mcpRelayUrl" else v) for k, v in fields])
+    return [*args[:-1], urlunsplit(parsed._replace(query=query))]
+
+
 def main(
     arguments=None, environment=None, execute=os.execv, profile_root=None, running=chrome_is_running
 ):
@@ -128,9 +146,12 @@ def main(
         path = Path(binary)
         if not path.is_absolute() or not path.is_file() or not os.access(path, os.X_OK):
             raise InvalidLaunch("Existing Chrome executable is unavailable")
+        broker = environment.get("EP_BROWSER_RELAY_SOCKET")
+        if broker:
+            args = bridge_connector(args, broker)
         execute(str(path), [str(path), *args])
         return 0
-    except (InvalidLaunch, OSError):
+    except (ValueError, OSError):
         # OSError and argv may contain the credential-bearing connector URL.
         print(
             "Chrome job window launch refused; verify the existing signed-in profile, expected account, running browser and connector",

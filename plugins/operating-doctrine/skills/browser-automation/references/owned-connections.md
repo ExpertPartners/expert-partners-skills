@@ -213,6 +213,45 @@ Completion is proven, never guessed from age or idle time.
   produced runtime and leaves running transports alone.
 ## Deployment and acceptance
 
+### Extension 0.6 ownership
+
+The token-authenticated 0.6 launch blanks its connector before Playwright can
+inspect it. The facade verifies the enabled profile manifest and uses the
+vendor protocol-v2 initial Chrome tab event followed by `extension.initialized`.
+A private relay broker checkpoints the Chrome tab and window IDs before it
+forwards a claim, and binds the Playwright page by matching a transient random
+marker through the exact relay-owned tab. A blank page without that binding
+never qualifies. Version 0.5 keeps
+the existing connector-page checks and cleanup rules.
+
+The 0.6 route owns tabs, not entire windows or groups. Protocol v2 does not
+provide explicit window placement, a global window census, or window/group
+control. A browser job can therefore own tabs in different windows. Normal
+finish removes only exact live claims. It never explicitly closes a window,
+and it verifies that the recorded IDs disappeared. Popup ownership requires
+an opener already owned by the job. Moves and ambiguous claims fail closed.
+
+After relay loss, an Aqua LaunchAgent invokes a signed, digest-pinned Swift
+helper. It lists only tab ID, window ID and URL class and closes only the
+requested exact ID in the recorded window after checking the URL class again.
+The durable ledger serializes recovery with facade claims; the Chrome
+generation and latest claim must match, and a superseding claim is never
+treated as released back to an old job. Unknown dispositions stay on the
+receipt instead of being counted as closed. Only facade consumers are in this
+ledger. A prohibited non-facade connection can take ownership without a
+ledger event; keep all consumers on the existing jobs facade.
+
+The signed helper needs macOS Automation permission in Ember's Aqua login
+session. Routine inventory and removal never prompt. Use the helper's
+`request-consent` action explicitly in Aqua only for initial setup. Use a
+stable certificate-leaf signing requirement for replacement builds; pin
+each verified binary by digest. The normal `install_job_route.py --upgrade`
+accepts an owner-only `--relay-v2-settings` file containing absolute `node`,
+`bundle` and `helper` paths, plus `bundle_sha256` and `helper_sha256`. The
+installer validates the independent census before enabling this option.
+Removing the option from private configuration disables future 0.6 jobs;
+it does not reconcile their old claims or restart Chrome.
+
 Use the existing producer and owning runtime configuration. Do not hand-edit a
 marketplace cache or change a shared launcher while another job owns it. Keep the
 previous executable-path setting so rollback is one step, and start a fresh job
