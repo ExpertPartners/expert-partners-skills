@@ -74,6 +74,80 @@ class JobTests(unittest.TestCase):
                 with self.assertRaises(Refusal):
                     route.call("browser_navigate", args)
 
+    def test_v2_requires_binding_before_working_page(self):
+        generation = {"pid": 123, "started": "synthetic"}
+        connector = {
+            "connectorId": 17,
+            "windowId": 25,
+            "groupId": None,
+            "groupTitle": None,
+            "tabIds": [17],
+            "workingPage": "none",
+        }
+        for claims in (
+            [{"tabId": 17, "windowId": 25, "urlClass": "blank"}],
+            [],
+            [{"tabId": 19, "windowId": 25, "urlClass": "blank"}],
+        ):
+            with self.subTest(claims=claims), tempfile.TemporaryDirectory() as root:
+                route = self.route(root)
+                route.config = {"relay_v2": {}}
+                route.aqua_cleanup = lambda: SimpleNamespace(inventory=lambda: [])
+                route.client = lambda *_: object()
+                route.metadata = lambda *_: {**connector, "tabIds": [17, 18], "workingPage": "live"}
+                broker = SimpleNamespace(
+                    socket=Path(root) / "broker.sock",
+                    proc=SimpleNamespace(pid=283),
+                    rpc=lambda _: {"initialized": True, "claims": claims},
+                )
+                job = {
+                    "job_id": "a" * 32,
+                    "generation": generation,
+                    "client_name": "test",
+                    "label": "test",
+                    "status": "starting",
+                    "metadata": None,
+                }
+                with (
+                    patch.object(b, "RelayBroker", return_value=broker),
+                    patch.object(
+                        b, "code", side_effect=[dict(connector), {"created": True}]
+                    ) as code,
+                ):
+                    if claims and claims[0]["tabId"] == 17:
+                        route.connect_relay(job, True)
+                        self.assertEqual(job["status"], "ready")
+                        self.assertEqual(job["metadata"]["tabIds"], [17, 18])
+                        self.assertEqual(code.call_count, 2)
+                    else:
+                        with self.assertRaises(Refusal):
+                            route.connect_relay(job, True)
+                        self.assertEqual(code.call_count, 1)
+
+    def test_legacy_path_still_runs_with_v2_dependencies_configured(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            route.config = {"relay_v2": {"enabled": True}}
+            route.relay_version = lambda: (0, 5)
+            route.client = lambda _: object()
+            with (
+                patch.object(
+                    b,
+                    "code",
+                    return_value={
+                        "sdk_page_count": 1,
+                        "sdk_connector_count": 0,
+                        "expected_url_matches": False,
+                        "observed": "about_blank",
+                    },
+                ) as probe,
+                patch.object(route, "connect_relay") as v2,
+            ):
+                result = decode(route.start("legacy refusal"))
+                self.assertEqual(result["allocation_failure"]["stage"], "connector_identity")
+                probe.assert_called_once()
+                v2.assert_not_called()
+
     def test_start_failure_returns_owned_handle_without_retry(self):
         with tempfile.TemporaryDirectory() as root:
             route = self.route(root)

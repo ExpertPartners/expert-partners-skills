@@ -26,6 +26,9 @@ import uuid
 from chrome_job_window import existing_signed_in_profile, chrome_is_running, verify_window_closed
 from job_transport import StdioClient, Refusal
 from browser_lifecycle import bind, ledger_lock, owner_path, identifier
+from aqua_cleanup import AquaCleanup
+from relay_facade import RelayBroker, generation_key, initialization_js
+from relay_ownership import OwnershipLedger
 
 
 EXTENSION = "chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/connect.html"
@@ -462,7 +465,7 @@ class Route:
             fcntl.flock(fd, fcntl.LOCK_UN)
             os.close(fd)
 
-    def client(self, name):
+    def client(self, name, relay_socket=None):
         self.preflight()
         env = {k: os.environ[k] for k in SAFE_ENV if k in os.environ}
         env.update(
@@ -473,6 +476,8 @@ class Route:
             npm_config_logs_max="0",
             EP_BROWSER_EXPECTED_ACCOUNT=self.config["expected_account"],
         )
+        if relay_socket:
+            env["EP_BROWSER_RELAY_SOCKET"] = str(relay_socket)
         wrapper = str(Path(__file__).with_name("chrome_job_window.py"))
         client = StdioClient(
             [self.config["launcher"], "--executable-path", wrapper],
@@ -533,6 +538,10 @@ class Route:
             row["window_disposition"] = job["window_disposition"]
         if job.get("window_removal_issued"):
             row["window_removal_issued"] = True
+        if job.get("relay_mode"):
+            row["relay_mode"] = True
+            row["relay_pid"] = job.get("relay_pid")
+            row["relay_cleanup"] = job.get("relay_cleanup", {})
         path = self.root / (job["job_id"] + ".json")
         # A stale facade never reopens a receipt another route already settled.
         # Check and replace under one host-wide lock, so a sweep or reconciliation
@@ -672,6 +681,8 @@ class Route:
             snapshot["unavailable"] = ["diagnostics_unavailable:" + failed]
 
     def connect(self, job, working=True):
+        if getattr(self, "config", {}).get("relay_v2") and self.relay_version() == (0, 6):
+            return self.connect_relay(job, working)
         job["allocation_stage"] = "launcher_handshake"
         client = self.client(job["client_name"])
         job["client"] = client
@@ -731,6 +742,67 @@ class Route:
             code(client, STATE_JS + "s.task=await s.create();return {created:!s.task.isClosed()};")
             job["metadata"] = self.metadata(client)
             job["metadata"].pop("workingPage", None)
+            if len(job["metadata"]["tabIds"]) != 2:
+                raise Refusal("owned_page_count_mismatch")
+            job["ownership_pending"] = False
+            self.checkpoint(job, "ready")
+        return client
+
+    def relay_version(self):
+        profile = Path.home() / "Library/Application Support/Google/Chrome" / self.config["profile"]
+        extension = EXTENSION.split("/")[2]
+        try:
+            prefs = json.loads((profile / "Secure Preferences").read_text())
+            entry = prefs["extensions"]["settings"][extension]
+            version = entry["manifest"]["version"]
+            expected = f"{extension}/{version}_0"
+            manifest = json.loads((profile / "Extensions" / expected / "manifest.json").read_text())
+            if (
+                entry.get("disable_reasons") != []
+                or entry["path"] != expected
+                or manifest["version"] != version
+                or not re.fullmatch(r"0\.[56]\.\d+", version)
+            ):
+                raise ValueError()
+        except (OSError, ValueError, KeyError, TypeError) as error:
+            raise Refusal("relay_extension_version_unverified") from error
+        return tuple(map(int, version.split(".")[:2]))
+
+    def aqua_cleanup(self):
+        config = self.config["relay_v2"]
+        return AquaCleanup(config["helper"], config["helper_sha256"], self.root)
+
+    def connect_relay(self, job, working):
+        # Prove the independent cleanup channel before creating a tab.
+        self.aqua_cleanup().inventory()
+        job["relay_mode"] = True
+        broker = RelayBroker(self.root, self.config["relay_v2"], job["generation"], job["job_id"])
+        job["relay_broker"] = broker
+        job["relay_pid"] = broker.proc.pid
+        self.checkpoint(job)
+        client = self.client(job["client_name"], broker.socket)
+        job["client"] = client
+        job["allocation_stage"] = "connector_identity"
+        observed = code(client, initialization_js(broker.socket))
+        status = broker.rpc("status")
+        if not status.get("initialized") or len(status.get("claims", [])) != 1:
+            raise Refusal("connector_identity_unavailable")
+        claim = status["claims"][0]
+        if (
+            observed["connectorId"] != claim["tabId"]
+            or observed["windowId"] != claim["windowId"]
+            or claim["urlClass"] != "blank"
+        ):
+            raise Refusal("connector_identity_changed")
+        observed.pop("workingPage", None)
+        job["metadata"] = observed
+        self.checkpoint(job, "connecting")
+        if working:
+            job["allocation_stage"] = "working_page"
+            job["ownership_pending"] = True
+            self.checkpoint(job)
+            code(client, STATE_JS + "s.task=await s.create();return {created:!s.task.isClosed()};")
+            job["metadata"] = self.verify_connection(job)
             if len(job["metadata"]["tabIds"]) != 2:
                 raise Refusal("owned_page_count_mismatch")
             job["ownership_pending"] = False
@@ -976,6 +1048,8 @@ class Route:
         return result(value, "error" in value)
 
     def dispose_live(self, job):
+        if job.get("relay_mode"):
+            return self.dispose_relay_live(job)
         client = job["client"]
         if self.preflight() != job["generation"]:
             raise Refusal("browser_generation_changed_no_cleanup")
@@ -1004,6 +1078,8 @@ class Route:
 
     def dispose_failed(self, job, reason="unknown"):
         """Use a fresh own connector to reconcile exact unclaimed old IDs only."""
+        if job.get("relay_mode"):
+            return self.dispose_relay_failed(job)
         if job["client"] and not job["client"].closed:
             # Capture any page created just before an interrupted response while
             # this exact live connection can still prove its scope.
@@ -1056,6 +1132,63 @@ class Route:
             verify_window_closed(old["windowId"], lambda: window_ids(client))
             job["window_disposition"] = "closed"
             job["ownership_pending"] = False
+
+    def dispose_relay_live(self, job):
+        if self.preflight() != job["generation"]:
+            raise Refusal("browser_generation_changed_no_cleanup")
+        broker = job["relay_broker"]
+        # The relay proves current ownership at close; the separate census
+        # confirms that only our recorded tabs disappeared.
+        code(job["client"], STATE_JS + "await s.closeCreated();return {closed:true};")
+        for claim in broker.rpc("status")["claims"]:
+            broker.rpc("close", tabId=claim["tabId"])
+        self.verify_relay_absent(job)
+        broker.stop()
+        job["client"].close()
+        job["ownership_pending"] = False
+        job["window_disposition"] = "owned_tabs_closed"
+
+    def verify_relay_absent(self, job):
+        generation = generation_key(job["generation"])
+        ledger = OwnershipLedger(self.root / "relay-claims.sqlite3")
+        claims = ledger.job_claims(generation, job["job_id"])
+        seen = {row["tabId"] for row in self.aqua_cleanup().inventory()}
+        if not claims or any(c["state"] != "closed" or c["tabId"] in seen for c in claims):
+            raise Refusal("relay_exact_cleanup_unverified")
+
+    def dispose_relay_failed(self, job):
+        if self.preflight() != job["generation"]:
+            raise Refusal("browser_generation_changed_no_cleanup")
+        broker = job.get("relay_broker")
+        if broker:
+            broker.stop()
+        if job.get("client") and not job["client"].closed:
+            job["client"].close()
+        pid = job.get("relay_pid")
+        if type(pid) is not int or pid <= 1:
+            raise Refusal("relay_process_identity_unavailable")
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            pass
+        else:
+            raise Refusal("relay_process_still_present")
+        generation = generation_key(job["generation"])
+        ledger = OwnershipLedger(self.root / "relay-claims.sqlite3")
+        claims = ledger.job_claims(generation, job["job_id"])
+        if not claims:
+            raise Refusal("creation_outcome_unknown_requires_reconciliation")
+        cleanup = self.aqua_cleanup()
+        for claim in claims:
+            ledger.mark_released(claim)
+            outcome = ledger.recover(
+                claim, lambda: generation_key(self.preflight()), cleanup.inventory, cleanup.close
+            )
+            job.setdefault("relay_cleanup", {})[str(claim["tabId"])] = outcome
+            self.checkpoint(job)
+        self.verify_relay_absent(job)
+        job["window_disposition"] = "owned_tabs_closed"
+        job["ownership_pending"] = False
 
     def finish(self, job):
         if job["status"] == "finished":

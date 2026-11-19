@@ -19,6 +19,7 @@ import sys
 import tempfile
 
 from chrome_job_window import existing_signed_in_profile, chrome_is_running
+from aqua_cleanup import AquaCleanup
 
 
 class InstallRefusal(Exception):
@@ -43,6 +44,15 @@ def verified_runtime(root):
         "browser_lifecycle.py",
         "browser_window_cleanup.py",
         "install_browser_lifecycle.py",
+        "aqua_cleanup.py",
+        "chrome_exact_cleanup.swift",
+        "owned_pages_v2.js",
+        "relay_bridge.cjs",
+        "relay_broker.cjs",
+        "relay_claims.cjs",
+        "relay_facade.py",
+        "relay_ownership.py",
+        "relay_rpc.py",
     ):
         relative = "scripts/" + name
         path = root / relative
@@ -181,7 +191,7 @@ def rollback(destination):
         os.close(fd)
 
 
-def upgrade(destination, runtime, interpreter):
+def upgrade(destination, runtime, interpreter, relay_settings=None):
     """Update future facades only, preserving the original bootstrap/rollback."""
     runtime = verified_runtime(runtime)
     destination = Path(destination)
@@ -198,6 +208,7 @@ def upgrade(destination, runtime, interpreter):
     fd = os.open(config["bootstrap_lock"], os.O_RDWR | os.O_NOFOLLOW)
     try:
         fcntl.flock(fd, fcntl.LOCK_EX)
+        config = json.loads(destination.read_text())
         rollback_path = destination.with_suffix(".rollback.json")
         record = json.loads(rollback_path.read_text())
         entry, backup = Path(record["entry"]), Path(record["backup"])
@@ -221,11 +232,36 @@ def upgrade(destination, runtime, interpreter):
             )
             + "\n"
         ).encode()
+        if relay_settings is not None:
+            if set(relay_settings) != {
+                "node",
+                "bundle",
+                "bundle_sha256",
+                "helper",
+                "helper_sha256",
+            }:
+                raise InstallRefusal("relay_configuration_invalid")
+            node, bundle = (Path(relay_settings[key]) for key in ("node", "bundle"))
+            if (
+                not node.is_absolute()
+                or not os.access(node, os.X_OK)
+                or not bundle.is_absolute()
+                or not bundle.is_file()
+                or digest(bundle.read_bytes()) != relay_settings["bundle_sha256"]
+            ):
+                raise InstallRefusal("relay_dependencies_unverified")
+            state = Path(config["state_dir"]).expanduser()
+            AquaCleanup(
+                relay_settings["helper"], relay_settings["helper_sha256"], state
+            ).inventory()
+            config["relay_v2"] = relay_settings
         changed = entry.read_bytes() != wrapper
         if changed:
             atomic(entry, wrapper, 0o700)
             record["installed_sha256"] = digest(wrapper)
             atomic(rollback_path, (json.dumps(record, sort_keys=True) + "\n").encode(), 0o600)
+        if relay_settings is not None:
+            atomic(destination, (json.dumps(config, sort_keys=True) + "\n").encode(), 0o600)
         return {"changed": changed, "entry": str(entry), "existing_transports_untouched": True}
     finally:
         os.close(fd)
@@ -239,12 +275,16 @@ def main():
     parser.add_argument("--python", type=Path)
     parser.add_argument("--rollback", action="store_true")
     parser.add_argument("--upgrade", action="store_true")
+    parser.add_argument("--relay-v2-settings", type=Path)
     args = parser.parse_args()
     try:
         if args.rollback:
             report = rollback(args.config)
         elif args.upgrade:
-            report = upgrade(args.config, args.runtime, args.python)
+            relay_settings = (
+                json.loads(args.relay_v2_settings.read_text()) if args.relay_v2_settings else None
+            )
+            report = upgrade(args.config, args.runtime, args.python, relay_settings)
         else:
             if not all((args.settings, args.runtime, args.python)):
                 raise InstallRefusal("installation_arguments_required")
