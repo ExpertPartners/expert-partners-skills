@@ -57,6 +57,52 @@ SEALED_OUTCOMES = {"ok": None, "error": "sealed_code_failed"}
 OWNED_ERROR_CODES = frozenset(
     re.findall(r"Error\('([a-z_]+)'\)", OWNED_SOURCE + Path(__file__).read_text())
 )
+ALLOCATION_REFUSALS = {
+    "bootstrap_busy_retry_not_replay",
+    "mcp_version_changed",
+    "protocol_incompatible",
+    "response_timeout",
+    "transport_closed",
+    "server_error",
+    "client_closed",
+    "connector_initialization_failed",
+    "connector_identity_unavailable",
+    "connector_identity_changed",
+    "owned_page_count_mismatch",
+    "owned_operation_failed",
+    "owned_projection_shape",
+    "owned_projection_heading",
+    "owned_projection_json",
+    "owned_projection_type",
+}
+FRESH_CONNECTOR_JS = (
+    "if(page.context().pages().length!==1||!page.url().startsWith("
+    + json.dumps(EXTENSION + "?")
+    + "))throw Error('not_fresh_connector');"
+)
+
+
+def allocation_failure(error):
+    """Never persist arbitrary exception text, browser output or launch arguments."""
+    if type(error) is Refusal:
+        reason = str(error)
+        prefix = "owned_operation_failed:"
+        if reason in ALLOCATION_REFUSALS:
+            return reason
+        if reason.startswith(prefix):
+            label = reason[len(prefix) :]
+            if label in OWNED_ERROR_CODES or label in {item[0] for item in VENDOR_ERROR_CLASSES}:
+                return reason
+        return "refused"
+    if isinstance(error, TimeoutError):
+        return "timeout"
+    if isinstance(error, OSError):
+        return "os_error"
+    if not isinstance(error, Exception):
+        return "interrupted"
+    return "internal_error"
+
+
 # Fixed Playwright and extension failure phrases (MCP 0.0.83), checked in order.
 # Only the static label is kept, so page text that happens to match leaks nothing.
 VENDOR_ERROR_CLASSES = (
@@ -456,6 +502,10 @@ class Route:
         row["control_socket"] = job.get("control_socket") or getattr(self, "control_socket", None)
         if job.get("connection_diagnostics"):
             row["connection_diagnostics"] = job["connection_diagnostics"]
+        if job.get("allocation_failure"):
+            row["allocation_failure"] = job["allocation_failure"]
+        if job.get("initial_connector"):
+            row["initial_connector"] = job["initial_connector"]
         if job.get("window_disposition"):
             row["window_disposition"] = job["window_disposition"]
         if job.get("window_removal_issued"):
@@ -599,24 +649,42 @@ class Route:
             snapshot["unavailable"] = ["diagnostics_unavailable:" + failed]
 
     def connect(self, job, working=True):
+        job["allocation_stage"] = "launcher_handshake"
         client = self.client(job["client_name"])
         job["client"] = client
+        job["allocation_stage"] = "connector_identity"
+        observed = code(
+            client,
+            FRESH_CONNECTOR_JS
+            + "return await page.evaluate(async()=>{const t=await chrome.tabs.getCurrent();"
+            "return {connectorId:t.id,windowId:t.windowId};});",
+        )
+        fields = ("connectorId", "windowId")
+        if not all(type(observed.get(k)) is int and observed[k] >= 0 for k in fields):
+            raise Refusal("connector_identity_unavailable")
+        # This pre-isolation observation cannot authorize cleanup. Only the
+        # existing verified metadata path supplies cleanup IDs.
+        job["initial_connector"] = {k: observed[k] for k in fields}
+        self.checkpoint(job)
+        job["allocation_stage"] = "connector_isolation"
         # State is in this private Node process, not the ephemeral VM globals.
         initialized = code(
             client,
             OWNED_SOURCE
             + "const p=Buffer.constructor('return process')();if(p.__epBrowserJob)throw Error('already_attempted');"
-            "if(page.context().pages().length!==1||!page.url().startsWith("
-            + json.dumps(EXTENSION + "?")
-            + "))throw Error('not_fresh_connector');"
-            "p.__epBrowserJob=await newOwnedState(page);const s=p.__epBrowserJob;return {ready:true,ownership:{...s.initial,tabIds:[...s.ids.values()],unboundOwnedPages:0}};",
+            + FRESH_CONNECTOR_JS
+            + "p.__epBrowserJob=await newOwnedState(page);const s=p.__epBrowserJob;return {ready:true,ownership:{...s.initial,tabIds:[...s.ids.values()],unboundOwnedPages:0}};",
         )
         if initialized.get("ready") is not True:
             raise Refusal("connector_initialization_failed")
+        if initialized.get("ownership", {}).get("connectorId") != observed["connectorId"]:
+            raise Refusal("connector_identity_changed")
         job["metadata"] = initialized["ownership"]
         self.checkpoint(job, "connecting")
+        job["allocation_stage"] = "connector_verification"
         self.verify_connection(job)
         if working:
+            job["allocation_stage"] = "working_page"
             job["ownership_pending"] = True
             self.checkpoint(job)
             code(client, STATE_JS + "s.task=await s.create();return {created:!s.task.isClosed()};")
@@ -648,6 +716,7 @@ class Route:
             "updated": time.time(),
             "ownership_pending": False,
             "client": None,
+            "allocation_stage": "bootstrap_lock",
             "lock": threading.RLock(),
         }
         with self.lock:
@@ -655,13 +724,21 @@ class Route:
         with job["lock"]:
             try:
                 with self.bootstrap():
+                    job["allocation_stage"] = "profile_preflight"
                     job["generation"] = self.preflight()
                     self.checkpoint(job)
                     if owner_session_id is not None:
+                        job["allocation_stage"] = "session_binding"
                         bind(self.root, job_id, owner_session_id)
+                    job["allocation_stage"] = "launcher_handshake"
                     self.connect(job)
                 return result(self.summary(job))
             except BaseException as error:
+                job["allocation_failure"] = {
+                    "stage": job["allocation_stage"],
+                    "class": allocation_failure(error),
+                }
+                self.checkpoint(job, "failed")
                 if isinstance(error, Exception):
                     self.capture_connection_diagnostics(
                         job, "allocation", reason=getattr(error, "close_reason", "unknown")
@@ -672,6 +749,7 @@ class Route:
                 return result(
                     {
                         **self.summary(job),
+                        "allocation_failure": job["allocation_failure"],
                         "error": "Allocation failed; finish or recover this exact job before replacing it.",
                     },
                     True,
