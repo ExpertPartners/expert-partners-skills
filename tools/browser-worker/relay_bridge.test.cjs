@@ -8,9 +8,13 @@ const path = "/extension/01234567-abcd-4def-8123-0123456789ab";
 
 test("vendor endpoint is strictly loopback and requires the relay path", () => {
   assert.equal(vendorEndpoint("ws://127.0.0.1:3456" + path), "ws://127.0.0.1:3456" + path);
+  assert.equal(vendorEndpoint("ws://[::1]:3456" + path), "ws://[::1]:3456" + path);
   for (const value of [
     "ws://127.0.0.1:3456/other",
     "ws://127.0.0.2:3456" + path,
+    "ws://[::]:3456" + path,
+    "ws://[::ffff:127.0.0.1]:3456" + path,
+    "ws://[2001:db8::1]:3456" + path,
     "ws://127.0.0.1:70000" + path,
     "ws://example.com:3456" + path,
     "ws://127.0.0.1:3456" + path + "?a=1",
@@ -20,7 +24,7 @@ test("vendor endpoint is strictly loopback and requires the relay path", () => {
 
 test("the proxy gates wire traffic on durable claim hooks", {skip: !bundle, timeout: 4000}, async () => {
   const wire = require(bundle);
-  const vendor = new wire.wsServer({host: "127.0.0.1", port: 0});
+  const vendor = new wire.wsServer({host: "::1", port: 0});
   await once(vendor, "listening");
   const records = [];
   const bridge = await startBridge(wire, {
@@ -30,7 +34,7 @@ test("the proxy gates wire traffic on durable claim hooks", {skip: !bundle, time
   });
   try {
     const connected = once(vendor, "connection");
-    const extension = new wire.ws(bridge.install("ws://127.0.0.1:" + vendor.address().port + path));
+    const extension = new wire.ws(bridge.install("ws://[::1]:" + vendor.address().port + path));
     await once(extension, "open");
     const [upstream] = await connected;
     const first = once(upstream, "message");

@@ -712,7 +712,8 @@ class Route:
             snapshot["unavailable"] = ["diagnostics_unavailable:" + failed]
 
     def connect(self, job, working=True):
-        if getattr(self, "config", {}).get("relay_v2") and self.relay_version() == (0, 6):
+        relay = getattr(self, "config", {}).get("relay_v2", {})
+        if relay.get("enabled") is True and self.relay_version() == (0, 6):
             return self.connect_relay(job, working)
         job["allocation_stage"] = "launcher_handshake"
         client = self.client(job["client_name"])

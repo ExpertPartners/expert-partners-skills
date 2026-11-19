@@ -191,7 +191,9 @@ def rollback(destination):
         os.close(fd)
 
 
-def upgrade(destination, runtime, interpreter, relay_settings=None):
+def upgrade(destination, runtime, interpreter, relay_settings=None, enable_relay_v2=False):
+    if enable_relay_v2 and relay_settings is None:
+        raise InstallRefusal("relay_configuration_required")
     """Update future facades only, preserving the original bootstrap/rollback."""
     runtime = verified_runtime(runtime)
     destination = Path(destination)
@@ -254,7 +256,7 @@ def upgrade(destination, runtime, interpreter, relay_settings=None):
             AquaCleanup(
                 relay_settings["helper"], relay_settings["helper_sha256"], state
             ).inventory()
-            config["relay_v2"] = relay_settings
+            config["relay_v2"] = {**relay_settings, "enabled": enable_relay_v2}
         changed = entry.read_bytes() != wrapper
         if changed:
             atomic(entry, wrapper, 0o700)
@@ -276,6 +278,7 @@ def main():
     parser.add_argument("--rollback", action="store_true")
     parser.add_argument("--upgrade", action="store_true")
     parser.add_argument("--relay-v2-settings", type=Path)
+    parser.add_argument("--enable-experimental-relay-v2", action="store_true")
     args = parser.parse_args()
     try:
         if args.rollback:
@@ -284,7 +287,13 @@ def main():
             relay_settings = (
                 json.loads(args.relay_v2_settings.read_text()) if args.relay_v2_settings else None
             )
-            report = upgrade(args.config, args.runtime, args.python, relay_settings)
+            report = upgrade(
+                args.config,
+                args.runtime,
+                args.python,
+                relay_settings,
+                args.enable_experimental_relay_v2,
+            )
         else:
             if not all((args.settings, args.runtime, args.python)):
                 raise InstallRefusal("installation_arguments_required")
