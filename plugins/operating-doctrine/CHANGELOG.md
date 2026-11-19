@@ -1,3 +1,6 @@
+## 3.8.6 - 2026-11-19
+
+Restore fresh owned browser connections after Playwright Extension 0.6.0 turns its initial connector into about:blank. Adopt only the connection's single blank page back onto its own connector, and normalize the new extension status response while retaining 0.5.0 support.
 ## 3.8.5 - 2026-11-19
 
 Distinguish SDK page count and redacted connector URL failures in the browser allocation receipt without exposing any private URL or changing cleanup authorization.
