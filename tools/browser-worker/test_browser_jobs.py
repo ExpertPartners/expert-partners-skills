@@ -104,7 +104,15 @@ class JobTests(unittest.TestCase):
             def browser_code(_, source):
                 nonlocal receipt
                 if "newOwnedState(page)" not in source:
-                    return {"connectorId": 17, "windowId": 25, "extra": "do not persist"}
+                    return {
+                        "connectorId": 17,
+                        "windowId": 25,
+                        "extra": "do not persist",
+                        "sdk_page_count": 1,
+                        "sdk_connector_count": 1,
+                        "observed": "expected_connect_with_query",
+                        "expected_url_matches": True,
+                    }
                 job_id = next(iter(route.jobs))
                 receipt = Path(root) / (job_id + ".json")
                 saved = json.loads(receipt.read_text())
@@ -142,6 +150,49 @@ class JobTests(unittest.TestCase):
             receipt = Path(root) / (row["job_id"] + ".json")
             self.assertNotIn("private connector URL", receipt.read_text())
             self.assertNotIn("initial_connector", json.loads(receipt.read_text()))
+
+    def test_freshness_failure_records_only_safe_count_and_url_class(self):
+        for count, connectors, url_class, matches in (
+            (2, 1, "expected_connect_with_query", True),
+            (1, 0, "other_extension_page", False),
+            (3, 0, "other_page", False),
+        ):
+            with (
+                self.subTest(count=count, observed=url_class),
+                tempfile.TemporaryDirectory() as root,
+            ):
+                route = self.route(root)
+                route.client = lambda _: object()
+                projected = {
+                    "sdk_page_count": count,
+                    "sdk_connector_count": connectors,
+                    "observed": url_class,
+                    "expected_url_matches": matches,
+                    "url": "https://fixture.invalid/private?token=do_not_store",
+                    "connectorId": 77,
+                    "windowId": 99,
+                }
+                with patch.object(b, "code", return_value=projected) as probe:
+                    row = decode(route.start("fixture"))
+                self.assertEqual(probe.call_count, 1)
+                self.assertEqual(
+                    row["allocation_failure"]["class"], "owned_operation_failed:not_fresh_connector"
+                )
+                receipt = (Path(root) / (row["job_id"] + ".json")).read_text()
+                saved = json.loads(receipt)
+                self.assertEqual(
+                    saved["connector_probe"],
+                    {
+                        "sdk_page_count": count,
+                        "sdk_connector_count": connectors,
+                        "expected_connect_url": b.EXTENSION + "?[redacted]",
+                        "observed_url_class": url_class,
+                        "expected_url_matches": matches,
+                    },
+                )
+                self.assertIsNone(saved["metadata"])
+                self.assertNotIn("initial_connector", saved)
+                self.assertNotIn("do_not_store", receipt)
 
     def test_policy_denial_never_reaches_browser(self):
         with tempfile.TemporaryDirectory() as root:
