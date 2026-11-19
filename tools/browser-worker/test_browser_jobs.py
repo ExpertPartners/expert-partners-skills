@@ -87,6 +87,61 @@ class JobTests(unittest.TestCase):
             receipt = Path(root) / (row["job_id"] + ".json")
             self.assertEqual(receipt.stat().st_mode & 0o777, 0o600)
             self.assertNotIn("client", json.loads(receipt.read_text()))
+            self.assertEqual(
+                row["allocation_failure"],
+                {
+                    "stage": "launcher_handshake",
+                    "class": "refused",
+                },
+            )
+
+    def test_connector_identity_is_checkpointed_before_isolation(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            route.client = lambda _: object()
+            receipt = None
+
+            def browser_code(_, source):
+                nonlocal receipt
+                if "newOwnedState(page)" not in source:
+                    return {"connectorId": 17, "windowId": 25, "extra": "do not persist"}
+                job_id = next(iter(route.jobs))
+                receipt = Path(root) / (job_id + ".json")
+                saved = json.loads(receipt.read_text())
+                self.assertEqual(saved["initial_connector"], {"connectorId": 17, "windowId": 25})
+                self.assertIsNone(saved["metadata"])
+                raise Refusal("owned_operation_failed:owned_window_isolation_failed")
+
+            with patch.object(b, "code", side_effect=browser_code):
+                row = decode(route.start("fixture"))
+            self.assertEqual(
+                row["allocation_failure"],
+                {
+                    "stage": "connector_isolation",
+                    "class": "owned_operation_failed:owned_window_isolation_failed",
+                },
+            )
+            saved = json.loads(receipt.read_text())
+            self.assertIsNone(saved["metadata"])
+            self.assertEqual(saved["allocation_failure"], row["allocation_failure"])
+            self.assertNotIn("do not persist", receipt.read_text())
+
+    def test_allocation_failure_does_not_keep_arbitrary_exception_details(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            route.client = lambda _: object()
+            with patch.object(b, "code", side_effect=OSError("private connector URL")):
+                row = decode(route.start("fixture"))
+            self.assertEqual(
+                row["allocation_failure"],
+                {
+                    "stage": "connector_identity",
+                    "class": "os_error",
+                },
+            )
+            receipt = Path(root) / (row["job_id"] + ".json")
+            self.assertNotIn("private connector URL", receipt.read_text())
+            self.assertNotIn("initial_connector", json.loads(receipt.read_text()))
 
     def test_policy_denial_never_reaches_browser(self):
         with tempfile.TemporaryDirectory() as root:
