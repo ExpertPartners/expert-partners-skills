@@ -703,6 +703,43 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
             route.checkpoint(stale, "starting")
             self.assertEqual(json.loads(receipt.read_text())["status"], "starting")
 
+    def test_receipt_settled_during_a_stale_write_stays_finished(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            stale = self.full_job(route)
+            route.save(stale)
+            receipt = Path(root) / (stale["job_id"] + ".json")
+            settled = {**json.loads(receipt.read_text()), "status": "finished"}
+            settled["window_disposition"] = "closed"
+            with b.ledger_lock(root, "receipts.lock"):
+                writer = threading.Thread(target=route.checkpoint, args=(stale, "failed"))
+                writer.start()
+                writer.join(0.3)
+                self.assertTrue(writer.is_alive())
+                # A peer settles the receipt while the stale write waits.
+                receipt.write_text(json.dumps(settled))
+            writer.join(5)
+            self.assertEqual(json.loads(receipt.read_text()), settled)
+            self.assertEqual(stale["status"], "finished")
+
+    def test_receipt_loaded_from_disk_keeps_its_owning_facade_socket(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            route.control_socket = "control-" + "1" * 16 + ".sock"
+            fresh = self.full_job(route)
+            route.save(fresh)
+            receipt = Path(root) / (fresh["job_id"] + ".json")
+            self.assertEqual(
+                json.loads(receipt.read_text())["control_socket"], route.control_socket
+            )
+            loaded = {**json.loads(receipt.read_text()), "client": None}
+            sweeper = self.route(root)
+            sweeper.control_socket = "control-" + "2" * 16 + ".sock"
+            sweeper.checkpoint(loaded, "failed")
+            self.assertEqual(
+                json.loads(receipt.read_text())["control_socket"], route.control_socket
+            )
+
     DIAGNOSTICS_FIXTURE = r"""
 const state=__STATE__;const calls=[];
 const fail=name=>{calls.push(name);throw Error('SYNTHETIC_CANARY '+name);};

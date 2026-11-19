@@ -25,7 +25,7 @@ import uuid
 
 from chrome_job_window import existing_signed_in_profile, chrome_is_running, verify_window_closed
 from job_transport import StdioClient, Refusal
-from browser_lifecycle import bind, owner_path, identifier
+from browser_lifecycle import bind, ledger_lock, owner_path, identifier
 
 
 EXTENSION = "chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/connect.html"
@@ -451,7 +451,9 @@ class Route:
         row["sealed"] = job.get("sealed", False)
         # Stage names and wall times only, so a hung call shows where it stopped.
         row["timings"] = job.get("timings", [])
-        row["control_socket"] = getattr(self, "control_socket", None)
+        # A receipt loaded from disk (lifecycle sweep fallback) keeps the socket of
+        # the facade that owns the job, not this short-lived route's own socket.
+        row["control_socket"] = job.get("control_socket") or getattr(self, "control_socket", None)
         if job.get("connection_diagnostics"):
             row["connection_diagnostics"] = job["connection_diagnostics"]
         if job.get("window_disposition"):
@@ -459,21 +461,23 @@ class Route:
         if job.get("window_removal_issued"):
             row["window_removal_issued"] = True
         path = self.root / (job["job_id"] + ".json")
-        if self.settled_elsewhere(job):
-            # Another route (sweep or reconciliation) already settled this job.
-            # A stale facade never reopens a finished receipt.
-            job["status"] = "finished"
-            return
-        tmp = path.with_suffix(".tmp")
-        fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
-        try:
-            with os.fdopen(fd, "w") as f:
-                json.dump(row, f)
-                f.flush()
-                os.fsync(f.fileno())
-            os.replace(tmp, path)
-        finally:
-            tmp.unlink(missing_ok=True)
+        # A stale facade never reopens a receipt another route already settled.
+        # Check and replace under one host-wide lock, so a sweep or reconciliation
+        # that settles the receipt between the two can never be overwritten.
+        with ledger_lock(self.root, "receipts.lock"):
+            if self.settled_elsewhere(job):
+                job["status"] = "finished"
+                return
+            tmp = path.with_suffix(".tmp")
+            fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+            try:
+                with os.fdopen(fd, "w") as f:
+                    json.dump(row, f)
+                    f.flush()
+                    os.fsync(f.fileno())
+                os.replace(tmp, path)
+            finally:
+                tmp.unlink(missing_ok=True)
 
     def settled_elsewhere(self, job):
         if job.get("receipt_owned") or job.get("status") == "finished":
