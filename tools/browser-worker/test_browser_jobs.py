@@ -15,7 +15,7 @@ import threading
 import time
 from types import SimpleNamespace
 import unittest
-from unittest.mock import patch
+from unittest.mock import call, patch
 
 SCRIPTS = (
     Path(__file__).resolve().parents[2]
@@ -125,11 +125,20 @@ class JobTests(unittest.TestCase):
                         self.assertEqual(code.call_count, 1)
 
     def test_legacy_path_still_runs_with_v2_dependencies_configured(self):
+        for settings, version, version_checked in (
+            ({"helper": "/retained/helper"}, (0, 6), False),
+            ({"enabled": False}, (0, 6), False),
+            ({"enabled": True}, (0, 5), True),
+        ):
+            with self.subTest(settings=settings, version=version):
+                self.assert_connector_adoption(settings, version, version_checked)
+
+    def assert_connector_adoption(self, settings, version, version_checked):
         with tempfile.TemporaryDirectory() as root:
             route = self.route(root)
-            route.config = {"relay_v2": {"enabled": True}}
-            route.relay_version = lambda: (0, 5)
-            route.client = lambda _: object()
+            route.config = {"relay_v2": settings}
+            client = object()
+            route.client = lambda _: client
             with (
                 patch.object(
                     b,
@@ -142,11 +151,34 @@ class JobTests(unittest.TestCase):
                     },
                 ) as probe,
                 patch.object(route, "connect_relay") as v2,
+                patch.object(route, "relay_version", return_value=version) as detect,
             ):
                 result = decode(route.start("legacy refusal"))
                 self.assertEqual(result["allocation_failure"]["stage"], "connector_identity")
-                probe.assert_called_once()
+                self.assertEqual(
+                    probe.call_args_list,
+                    [
+                        call(
+                            client,
+                            b.adopt_connector_js(route.jobs[result["job_id"]]["client_name"]),
+                        ),
+                        call(client, b.CONNECTOR_PROBE_JS),
+                    ],
+                )
+                self.assertEqual(detect.call_count, int(version_checked))
                 v2.assert_not_called()
+
+    def test_only_explicit_opt_in_dispatches_experimental_v2(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            route.config = {"relay_v2": {"enabled": True}}
+            job = {}
+            with (
+                patch.object(route, "connect_relay") as v2,
+                patch.object(route, "relay_version", return_value=(0, 6)),
+            ):
+                route.connect(job)
+                v2.assert_called_once_with(job, True)
 
     def test_start_failure_returns_owned_handle_without_retry(self):
         with tempfile.TemporaryDirectory() as root:

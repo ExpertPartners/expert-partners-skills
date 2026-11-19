@@ -8,6 +8,7 @@ import socket
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 SCRIPTS = (
     Path(__file__).resolve().parents[2]
@@ -116,6 +117,26 @@ class InstallerTests(unittest.TestCase):
             with self.assertRaises(producer.InstallRefusal):
                 self.apply(settings, runtime, dest)
             self.assertEqual(Path(settings["launcher"]).read_bytes(), original)
+
+    def test_upgrade_requires_separate_relay_opt_in(self):
+        with tempfile.TemporaryDirectory() as root:
+            settings, runtime, dest, _ = self.fixture(root)
+            self.apply(settings, runtime, dest)
+            bundle = runtime / "fixture.cjs"
+            bundle.write_text("fixture")
+            relay = {
+                "node": sys.executable,
+                "bundle": str(bundle),
+                "bundle_sha256": hashlib.sha256(bundle.read_bytes()).hexdigest(),
+                "helper": "/fixture/helper",
+                "helper_sha256": "0" * 64,
+            }
+            with patch.object(producer, "AquaCleanup"):
+                for enabled in (True, False):
+                    producer.upgrade(dest, runtime, sys.executable, relay, enabled)
+                    self.assertIs(json.loads(dest.read_text())["relay_v2"]["enabled"], enabled)
+            with self.assertRaises(producer.InstallRefusal):
+                producer.upgrade(dest, runtime, sys.executable, enable_relay_v2=True)
 
     def test_unsigned_profile_stops_before_activation(self):
         with tempfile.TemporaryDirectory() as root:

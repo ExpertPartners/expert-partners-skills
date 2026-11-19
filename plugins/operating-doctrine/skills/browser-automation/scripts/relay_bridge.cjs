@@ -8,7 +8,7 @@ const maxFrame = 16 * 1024 * 1024;
 
 function vendorEndpoint(value) {
   if (typeof value !== "string" ||
-      !/^ws:\/\/127\.0\.0\.1:[1-9]\d{0,4}\/extension\/[a-f0-9-]{36}$/.test(value))
+      !/^ws:\/\/(?:127\.0\.0\.1|\[::1\]):[1-9]\d{0,4}\/extension\/[a-f0-9-]{36}$/.test(value))
     throw Error("relay_endpoint_invalid");
   const url = new URL(value);
   if (!url.port || Number(url.port) > 65535)
@@ -122,7 +122,8 @@ async function startBridge({ ws: WebSocket, wsServer: WebSocketServer }, callbac
       if (destination || stopped)
         throw Error("relay_endpoint_already_bound");
       destination = vendorEndpoint(value);
-      if (Number(new URL(destination).port) === server.address().port) {
+      const vendor = new URL(destination);
+      if (vendor.hostname === "127.0.0.1" && Number(vendor.port) === server.address().port) {
         destination = undefined;
         throw Error("relay_endpoint_is_bridge");
       }
