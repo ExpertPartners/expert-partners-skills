@@ -128,3 +128,7 @@ class RelayOwnershipTests(unittest.TestCase):
                 ),
                 "browser_generation_changed",
             )
+
+
+if __name__ == "__main__":
+    unittest.main()

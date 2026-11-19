@@ -1,4 +1,5 @@
 import hashlib
+import importlib.util
 from pathlib import Path
 import sys
 from tempfile import TemporaryDirectory
@@ -11,7 +12,10 @@ SCRIPTS = (
 )
 sys.path.insert(0, str(SCRIPTS))
 try:
-    from aqua_cleanup import AquaCleanup, AquaRefusal
+    spec = importlib.util.spec_from_file_location("aqua_cleanup", SCRIPTS / "aqua_cleanup.py")
+    helper = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(helper)
+    AquaCleanup, AquaRefusal = helper.AquaCleanup, helper.AquaRefusal
 finally:
     sys.path.pop(0)
 
@@ -46,3 +50,7 @@ class AquaCleanupTests(unittest.TestCase):
         with patch.object(client, "_invoke", return_value={"tabs": [{**valid, "tabId": False}]}):
             with self.assertRaisesRegex(AquaRefusal, "inventory_invalid"):
                 client.inventory()
+
+
+if __name__ == "__main__":
+    unittest.main()
