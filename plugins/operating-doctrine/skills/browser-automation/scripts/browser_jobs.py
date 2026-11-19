@@ -80,6 +80,27 @@ FRESH_CONNECTOR_JS = (
     + json.dumps(EXTENSION + "?")
     + "))throw Error('not_fresh_connector');"
 )
+CONNECTOR_PROBE_JS = (
+    "const pages=page.context().pages();const url=page.url();const origin="
+    + json.dumps(EXTENSION)
+    + ";const matches=url.startsWith(origin+'?');"
+    "const observed=matches?'expected_connect_with_query':url===origin?'expected_connect_without_query':"
+    "url.startsWith('chrome-extension://')?'other_extension_page':url==='about:blank'?'about_blank':'other_page';"
+    "const probe={sdk_page_count:pages.length,observed,expected_url_matches:matches,"
+    "sdk_connector_count:pages.filter(p=>p.url().startsWith(origin+'?')).length};"
+    "if(pages.length!==1||!matches)return probe;"
+    "return {...probe,...await page.evaluate(async()=>{const t=await chrome.tabs.getCurrent();"
+    "return {connectorId:t.id,windowId:t.windowId};})};"
+)
+CONNECTOR_URL_CLASSES = frozenset(
+    {
+        "expected_connect_with_query",
+        "expected_connect_without_query",
+        "other_extension_page",
+        "about_blank",
+        "other_page",
+    }
+)
 
 
 def allocation_failure(error):
@@ -506,6 +527,8 @@ class Route:
             row["allocation_failure"] = job["allocation_failure"]
         if job.get("initial_connector"):
             row["initial_connector"] = job["initial_connector"]
+        if job.get("connector_probe"):
+            row["connector_probe"] = job["connector_probe"]
         if job.get("window_disposition"):
             row["window_disposition"] = job["window_disposition"]
         if job.get("window_removal_issued"):
@@ -653,12 +676,30 @@ class Route:
         client = self.client(job["client_name"])
         job["client"] = client
         job["allocation_stage"] = "connector_identity"
-        observed = code(
-            client,
-            FRESH_CONNECTOR_JS
-            + "return await page.evaluate(async()=>{const t=await chrome.tabs.getCurrent();"
-            "return {connectorId:t.id,windowId:t.windowId};});",
-        )
+        observed = code(client, CONNECTOR_PROBE_JS)
+        count = observed.get("sdk_page_count")
+        connectors = observed.get("sdk_connector_count")
+        url_class = observed.get("observed")
+        matches = observed.get("expected_url_matches")
+        if not (
+            type(count) is int
+            and type(connectors) is int
+            and 0 <= connectors <= count
+            and isinstance(url_class, str)
+            and url_class in CONNECTOR_URL_CLASSES
+            and type(matches) is bool
+            and matches == (url_class == "expected_connect_with_query")
+        ):
+            raise Refusal("connector_identity_unavailable")
+        job["connector_probe"] = {
+            "sdk_page_count": count,
+            "sdk_connector_count": connectors,
+            "expected_connect_url": EXTENSION + "?[redacted]",
+            "observed_url_class": url_class,
+            "expected_url_matches": matches,
+        }
+        if count != 1 or not matches:
+            raise Refusal("owned_operation_failed:not_fresh_connector")
         fields = ("connectorId", "windowId")
         if not all(type(observed.get(k)) is int and observed[k] >= 0 for k in fields):
             raise Refusal("connector_identity_unavailable")
@@ -1096,6 +1137,8 @@ class Route:
                             metadata=None,
                             client=None,
                         )
+                        for key in ("initial_connector", "connector_probe", "allocation_failure"):
+                            job.pop(key, None)
                         self.checkpoint(job, "starting")
                         self.connect(job)
                     return result(
