@@ -1,3 +1,6 @@
+## 3.8.5 - 2026-11-19
+
+Distinguish SDK page count and redacted connector URL failures in the browser allocation receipt without exposing any private URL or changing cleanup authorization.
 ## 3.8.4 - 2026-11-19
 
 Record safe browser allocation failure stages and the first proven connector identifiers without treating those identifiers as cleanup authorization.
