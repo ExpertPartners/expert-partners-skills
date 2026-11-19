@@ -1,0 +1,30 @@
+name: marketing employee runtime
+
+on:
+  pull_request:
+    paths:
+      - 'plugins/content-engines/lib/marketing-employees.*'
+      - 'plugins/content-engines/skills/meta-ads-analyst/**'
+      - 'plugins/content-engines/skills/meta-ad-spy/**'
+      - 'plugins/content-engines/skills/ig-gold-miner/**'
+      - 'tools/marketing-employees/**'
+      - '.github/workflows/marketing-employee-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'plugins/content-engines/lib/marketing-employees.*'
+      - 'tools/marketing-employees/**'
+      - '.github/workflows/marketing-employee-tests.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - run: node --test tools/marketing-employees/index.test.mjs
