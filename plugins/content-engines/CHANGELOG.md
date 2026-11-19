@@ -1,3 +1,6 @@
+## 0.12.0 - 2026-11-19
+
+Add the read-only Meta Ads Analyst, Meta Ad Spy and IG Gold Miner skills, their evidence-grounded runtime and public research acquisition path. Each is an original substitute, not a recovered course employee.
 ## 0.11.7 - 2026-11-18
 
 Keep Hook Engine and Post Value Filter suggestions within supplied source and audience limits, align pattern-unlock advice with each pattern's requirements, and preserve neutral reader references without changing scoring or shared-profile compatibility.
