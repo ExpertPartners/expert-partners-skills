@@ -1,3 +1,6 @@
+## 3.8.7 - 2026-11-19
+
+Add version-gated ownership for Playwright extension 0.6, with durable exact tab claims on the live relay and an independently authorized Aqua helper for guarded recovery after relay loss. The 0.5 connector path is unchanged.
 ## 3.8.6 - 2026-11-19
 
 Restore fresh owned browser connections after Playwright Extension 0.6.0 turns its initial connector into about:blank. Adopt only the connection's single blank page back onto its own connector, and normalize the new extension status response while retaining 0.5.0 support.
