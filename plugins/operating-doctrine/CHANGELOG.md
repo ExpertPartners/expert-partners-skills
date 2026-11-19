@@ -1,3 +1,6 @@
+## 3.8.4 - 2026-11-19
+
+Record safe browser allocation failure stages and the first proven connector identifiers without treating those identifiers as cleanup authorization.
 ## 3.8.3 - 2026-11-19
 
 Browser job receipts never move back from finished. The facade checks for a settled receipt and replaces the file under one host-wide receipts lock, so a sweep or reconciliation that finishes a job between the check and the write is kept. A receipt loaded from disk by the lifecycle sweep keeps the control socket of the facade that owns the job instead of taking the sweep's short-lived socket.
