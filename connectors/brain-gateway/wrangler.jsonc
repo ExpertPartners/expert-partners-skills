@@ -1,0 +1,32 @@
+// Drive brain gateway Worker. Secrets live in 1Password and are set with wrangler secret, never here.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "brain-gateway",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-03-10",
+  "compatibility_flags": ["nodejs_compat"],
+  "account_id": "c4a6597a8d775d575401befb7d52846b",
+  "workers_dev": true,
+  "preview_urls": false,
+  "vars": {
+    "MCP_RESOURCE": "https://brain-gateway.expert-partners.workers.dev/mcp",
+    "ALLOWED_EMAILS": "allison@expertpartners.com",
+    // Scopes the gateway may read. Private, finance and HR folders stay out until Allison adds them here.
+    "ALLOWED_SCOPES": "hq-core,hq-skills,hq-operations,hq-analytics,hq-partnersync,hq-library,ep-core,ep-discovery,ep-marketing,ep-sales,ep-client-experience,ep-operations,ep-outputs,ag-core,ag-marketing,ag-sales,ag-listings,ag-client-experience,ag-operations,ag-outputs"
+  },
+  "kv_namespaces": [{ "binding": "OAUTH_KV", "id": "252f106a69c14ab5a4009e0024edcdd1" }],
+  "observability": { "enabled": true },
+  "dev": { "port": 8789 },
+  "secrets": {
+    "required": [
+      "GOOGLE_SA_KEY",
+      "HUB_API_TOKEN",
+      "ACCESS_CLIENT_ID",
+      "ACCESS_CLIENT_SECRET",
+      "ACCESS_TOKEN_URL",
+      "ACCESS_AUTHORIZATION_URL",
+      "ACCESS_JWKS_URL",
+      "COOKIE_ENCRYPTION_KEY"
+    ]
+  }
+}

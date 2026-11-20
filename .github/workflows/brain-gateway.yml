@@ -1,0 +1,35 @@
+name: brain-gateway
+
+# Type check and unit tests for the Drive brain gateway Worker (connectors/brain-gateway).
+# It deploys to Cloudflare on its own toolchain, so it is checked here rather than by the
+# marketplace producer gates under tools/.
+
+on:
+  pull_request:
+    paths:
+      - 'connectors/brain-gateway/**'
+      - '.github/workflows/brain-gateway.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'connectors/brain-gateway/**'
+      - '.github/workflows/brain-gateway.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: connectors/brain-gateway
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci --ignore-scripts
+      - run: npx wrangler types
+      - run: npm run type-check
+      - run: npm test
