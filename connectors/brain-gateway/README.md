@@ -24,7 +24,8 @@ Reads fail closed. A partial export, a changed document, an incomplete listing o
 ## Scope and permissions
 
 - Scopes are the routing keys in `src/brain.ts`, copied from the Hub reader. The live Departments, Workspaces and Brain Folders map owns what each folder is.
-- Only scopes named in the `ALLOWED_SCOPES` var in `wrangler.jsonc` are reachable. Private, finance and HR scopes are left out until Allison adds them.
+- Only scopes named in the `ALLOWED_SCOPES` var in `wrangler.jsonc` are reachable. The approved department homes include `hq-hr`, `hq-employees` and `hq-finance`, using their existing registry entries. Private scopes remain excluded. Routine Audits remains excluded while its department-home assignment is proposed.
+- Registration permits read-only gateway routing, not new Drive permissions or company-wide access. Existing sign-in, department instructions, leader and specific exception constraints still apply. Deployment must preserve the existing Worker identity, secrets and service account. Verify each added scope through live `list_scopes` and `discover`, checking its registered folder identity and current direct children.
 - Drive access is a dedicated service account with the `drive.readonly` scope only. It has no domain-wide delegation and no delegated user. It sees only the folders and shared drives it was added to as a Viewer. The client refuses any path outside the Drive v3 files API and any method other than GET.
 
 ## Secrets
