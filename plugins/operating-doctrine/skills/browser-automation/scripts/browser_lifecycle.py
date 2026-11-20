@@ -16,6 +16,7 @@ import time
 
 
 OWNER_RETENTION = 30 * 24 * 3600
+NO_ARTIFACTS = "failed_no_artifacts_by_census"
 
 
 def identifier(value):
@@ -124,6 +125,86 @@ def control(root, receipt, request):
         return reply
 
 
+def census_path(root, job_id):
+    return Path(root) / "census" / (job_identifier(job_id) + ".json")
+
+
+def last_allocation_activity(receipt):
+    """Latest moment the allocation itself could have created a page.
+
+    Later finish attempts only refuse, so they never move this watermark."""
+    moments = [
+        stage[1]
+        for timing in receipt.get("timings") or []
+        if timing.get("tool") != "finish"
+        for stage in timing.get("stages") or []
+        if len(stage) > 1 and isinstance(stage[1], (int, float))
+    ]
+    for item in (receipt.get("connection_diagnostics") or {}).values():
+        if isinstance(item, dict) and isinstance(item.get("at"), (int, float)):
+            moments.append(item["at"])
+    return max(moments) if moments else None
+
+
+def census_eligible(receipt):
+    """Only a failed allocation that never recorded any window, tab or relay claim.
+
+    Anything with a real ID has an exact reconciliation path and stays blocking."""
+    return (
+        receipt.get("status") == "failed"
+        and isinstance(receipt.get("allocation_failure"), dict)
+        and receipt.get("metadata") is None
+        and receipt.get("initial_connector") is None
+        and not receipt.get("ownership_pending")
+        and not receipt.get("relay_mode")
+        and receipt.get("relay_pid") is None
+        and not receipt.get("relay_cleanup")
+        and receipt.get("window_disposition") is None
+        and last_allocation_activity(receipt) is not None
+    )
+
+
+def census_attests(root, job_id, receipt):
+    try:
+        note = json.loads(census_path(root, job_id).read_text())
+    except (OSError, ValueError):
+        return None
+    if (
+        not census_eligible(receipt)
+        or not isinstance(note, dict)
+        or note.get("job_id") != job_id
+        or note.get("orphans") != 0
+        or not isinstance(note.get("census_at"), (int, float))
+        or note["census_at"] <= last_allocation_activity(receipt)
+        or note["census_at"] > time.time() + 60
+    ):
+        return None
+    return note
+
+
+def record_census(root, job_id, census_at, windows, tabs, reference):
+    """Record an exact-process census that found no unmapped automation window or tab."""
+    with ledger_lock(root):
+        receipt = json.loads((Path(root) / (job_identifier(job_id) + ".json")).read_text())
+        if not census_eligible(receipt):
+            raise ValueError("receipt_has_ownership_ids_or_is_not_a_failed_allocation")
+        if census_at <= last_allocation_activity(receipt):
+            raise ValueError("census_predates_allocation")
+        if not reference or len(reference) > 500:
+            raise ValueError("census_reference_required")
+        row = {
+            "job_id": job_id,
+            "census_at": census_at,
+            "windows": windows,
+            "tabs": tabs,
+            "orphans": 0,
+            "reference": reference,
+            "recorded_at": time.time(),
+        }
+        atomic_json(census_path(root, job_id), row)
+        return row
+
+
 def sweep(config, session_id=None):
     """Terminal owner evidence is mandatory. Unknown/active receipts are untouched."""
     with ledger_lock(config["state_dir"], "sweep.lock"):
@@ -149,6 +230,14 @@ def _sweep(config, session_id=None):
                     outcomes.append({"job_id": job_id, "status": "owner_record_retired"})
                 else:
                     outcomes.append({"job_id": job_id, "status": "already_finished"})
+                continue
+            note = census_attests(root, job_id, receipt)
+            if note:
+                # The receipt stays failed. Without saved IDs there is nothing
+                # exact to close, and the census found nothing left to close.
+                outcomes.append(
+                    {"job_id": job_id, "status": NO_ARTIFACTS, "census_at": note["census_at"]}
+                )
                 continue
             try:
                 control(
@@ -179,9 +268,25 @@ def main():
     parser.add_argument("--request", action="store_true")
     parser.add_argument("--sweep", action="store_true")
     parser.add_argument("--session")
+    parser.add_argument("--record-census", metavar="JOB_ID")
+    parser.add_argument("--census-at", type=float, help="UTC epoch seconds of the census")
+    parser.add_argument("--windows", type=int)
+    parser.add_argument("--tabs", type=int)
+    parser.add_argument("--reference", help="where the census note is recorded")
     args = parser.parse_args()
     config = json.loads(args.config.read_text())
-    if args.sweep:
+    if args.record_census:
+        if None in (args.census_at, args.windows, args.tabs):
+            parser.error("--record-census needs --census-at, --windows and --tabs")
+        report = record_census(
+            Path(config["state_dir"]).expanduser(),
+            args.record_census,
+            args.census_at,
+            args.windows,
+            args.tabs,
+            args.reference,
+        )
+    elif args.sweep:
         report = sweep(config, args.session)
     else:
         request = json.loads(sys.stdin.read(1048576))

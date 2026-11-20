@@ -62,8 +62,20 @@ def handle(payload, dispatch):
     elif event in ("Stop", "SessionEnd", "Interrupt") and marker.exists():
         # Sessions that never started a browser job never reach the M2, so an
         # unreachable browser host cannot hold up ordinary turns.
-        dispatch({"action": "finish_session", "session_id": session_id, "event": event})
+        report = dispatch({"action": "finish_session", "session_id": session_id, "event": event})
         marker.unlink(missing_ok=True)
+        unresolved = sorted(
+            x["job_id"]
+            for x in (report if isinstance(report, list) else [])
+            if isinstance(x, dict) and x.get("status") == "failed_no_artifacts_by_census"
+        )
+        if unresolved:
+            # Not clean: these receipts stay failed. They only stop blocking.
+            return {
+                "systemMessage": "Browser jobs "
+                + ", ".join(unresolved)
+                + " failed, no artifacts by census. Receipts remain failed, not finished."
+            }
     return {}
 
 
@@ -105,6 +117,10 @@ def dispatch(request):
     )
     if result.returncode:
         raise RuntimeError("browser_cleanup_incomplete")
+    try:
+        return json.loads(result.stdout)
+    except ValueError:
+        return None
 
 
 def main():

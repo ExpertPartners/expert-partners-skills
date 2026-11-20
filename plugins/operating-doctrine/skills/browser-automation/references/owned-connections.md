@@ -162,6 +162,16 @@ Completion is proven, never guessed from age or idle time.
   tabs close and the receipt records `window_disposition: preserved_shared`. A facade
   that has exited is reconciled through exact saved IDs, and any uncertainty preserves
   the receipt as `preserved_uncertain`.
+- Null-ID failed allocations. A failed receipt whose `metadata` and `initial_connector`
+  are both null, with no pending ownership, relay claim or disposition, has no exact ID
+  to reconcile, so it would stay `preserved_uncertain` forever. Take a census of the
+  signed-in Chrome by process ID (not by application name, which can reach a separate
+  temporary Playwright Chrome). If no window or tab is left unmapped, record it with
+  `browser_lifecycle.py --config <route.json> --record-census <job_id> --census-at
+  <epoch> --windows <n> --tabs <n> --reference <where the note lives>`. The recorder
+  refuses a receipt with any ID and a census taken before the allocation's last
+  activity. The sweep then reports `failed_no_artifacts_by_census`. Stop no longer
+  blocks on it, the hook reports it as failed, and the receipt stays failed.
 - Failed-job reconciliation. A fresh maintenance connector first proves ownership
   without closing anything, records `window_removal_issued`, then removes the exact
   saved window and polls briefly until Chrome stops listing it. A missing connector is
