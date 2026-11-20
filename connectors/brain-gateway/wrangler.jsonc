@@ -10,7 +10,7 @@
   "preview_urls": false,
   "vars": {
     "MCP_RESOURCE": "https://brain-gateway.expert-partners.workers.dev/mcp",
-    "ALLOWED_EMAILS": "allison@expertpartners.com",
+    "ALLOWED_EMAILS": "allison@expertpartners.com,don@expertpartners.com",
     // Approved department homes only. Private and proposed department scopes stay excluded.
     "ALLOWED_SCOPES": "hq-core,hq-hr,hq-employees,hq-skills,hq-finance,hq-operations,hq-analytics,hq-partnersync,hq-library,ep-core,ep-discovery,ep-marketing,ep-sales,ep-client-experience,ep-operations,ep-outputs,ag-core,ag-marketing,ag-sales,ag-listings,ag-client-experience,ag-operations,ag-outputs"
   },
