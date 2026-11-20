@@ -28,6 +28,16 @@ Reads fail closed. A partial export, a changed document, an incomplete listing o
 - Registration permits read-only gateway routing, not new Drive permissions or company-wide access. Existing sign-in, department instructions, leader and specific exception constraints still apply. Deployment must preserve the existing Worker identity, secrets and service account. Verify each added scope through live `list_scopes` and `discover`, checking its registered folder identity and current direct children.
 - Drive access is a dedicated service account with the `drive.readonly` scope only. It has no domain-wide delegation and no delegated user. It sees only the folders and shared drives it was added to as a Viewer. The client refuses any path outside the Drive v3 files API and any method other than GET.
 
+## Who can read what
+
+Access is enforced in the gateway, in `src/access.ts`, from the November 20, 2026 Decision Log entries on leader-level access and department access. Instructions and folder maps do not create Drive permissions, so the gateway applies the limits itself.
+
+- Leaders. Allison reads HQ, EP and AG. Don reads HQ and EP and never AG. Any other signed-in person gets no scopes.
+- Departments. A department identity reads its own folders from the Departments, Workspaces and Brain Folders map, its company's outputs folder, and shared HQ governance (`hq-core`). Marketing departments also read `hq-library`. A department reaches another department only through a named exception in `DEPARTMENTS[...].exceptions`, which stays empty until a decision names the source.
+- Effective scopes are always the deployed `ALLOWED_SCOPES` intersected with the caller's profile, so a profile can never widen the allowlist.
+- The Hub token acts as Allison and may narrow itself with the `X-Brain-Department` header. Department tokens are fixed to their department. They are stored only as SHA-256 hashes in the `DEPARTMENT_TOKEN_HASHES` secret (`{"<hash>":"<department id>"}`), and none are issued yet.
+- MCP sign-in uses the signed-in person's profile. Per-department narrowing on MCP needs a separate sign-in identity per department, which comes with each department's Week 4 decision rights.
+
 ## Secrets
 
 Secrets live only in 1Password and in the Worker's Cloudflare secrets. Nothing in this folder holds one. Load or rotate them by piping from `op` into `wrangler secret bulk`, never on a command line.
