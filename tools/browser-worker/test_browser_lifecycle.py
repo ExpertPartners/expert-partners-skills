@@ -221,6 +221,101 @@ class LifecycleTests(unittest.TestCase):
             self.assertEqual(report[0]["status"], "preserved_uncertain")
             self.assertEqual(json.loads((Path(root) / (row["job_id"] + ".json")).read_text()), row)
 
+    def null_id_failure(self, root, job_id="f" * 32, **fields):
+        return self.receipt(
+            root,
+            job_id,
+            status="failed",
+            metadata=None,
+            allocation_failure={
+                "stage": "connector_identity",
+                "class": "owned_operation_failed:not_fresh_connector",
+            },
+            connection_diagnostics={"first_failure": {"stage": "allocation", "at": 1000.0}},
+            timings=[{"tool": "finish", "stages": [["failed:x", 5000.0]]}],
+            **fields,
+        )
+
+    def test_null_id_failure_with_census_stops_blocking_but_stays_failed(self):
+        with tempfile.TemporaryDirectory() as root:
+            row = self.null_id_failure(root)
+            lifecycle.bind(root, row["job_id"], "done")
+            lifecycle.terminal(root, "done", "Stop")
+            with patch.object(
+                lifecycle, "control", side_effect=RuntimeError("live_cleanup_refused")
+            ) as control:
+                self.assertEqual(
+                    lifecycle.sweep({"state_dir": root})[0]["status"], "preserved_uncertain"
+                )
+                # A finish refusal after the allocation must not count as allocation time.
+                lifecycle.record_census(root, row["job_id"], 2000.0, 1, 1, "handoff note")
+                report = lifecycle.sweep({"state_dir": root})
+                self.assertEqual(control.call_count, 1)
+            self.assertEqual(
+                report,
+                [
+                    {
+                        "job_id": row["job_id"],
+                        "status": lifecycle.NO_ARTIFACTS,
+                        "census_at": 2000.0,
+                    }
+                ],
+            )
+            self.assertEqual(json.loads((Path(root) / (row["job_id"] + ".json")).read_text()), row)
+
+    def test_census_never_excuses_receipts_with_ids_or_older_census(self):
+        with tempfile.TemporaryDirectory() as root:
+            cases = {
+                "1" * 32: {"metadata": {"windowId": 5, "tabIds": [6]}},
+                "2" * 32: {"initial_connector": {"connectorId": 6, "windowId": 5}},
+                "3" * 32: {"ownership_pending": True},
+                "4" * 32: {"relay_mode": True, "relay_pid": 99},
+                "5" * 32: {"status": "ready"},
+            }
+            for job_id, fields in cases.items():
+                row = self.null_id_failure(root, job_id)
+                row.update(fields)
+                lifecycle.atomic_json(Path(root) / (job_id + ".json"), row)
+                with self.assertRaisesRegex(ValueError, "ownership_ids"):
+                    lifecycle.record_census(root, job_id, 2000.0, 1, 1, "note")
+                # A note written by hand still does not unblock it.
+                lifecycle.atomic_json(
+                    lifecycle.census_path(root, job_id),
+                    {"job_id": job_id, "census_at": 2000.0, "orphans": 0},
+                )
+                lifecycle.bind(root, job_id, "done")
+            old = self.null_id_failure(root, "6" * 32)
+            with self.assertRaisesRegex(ValueError, "predates"):
+                lifecycle.record_census(root, old["job_id"], 999.0, 1, 1, "note")
+            lifecycle.atomic_json(
+                lifecycle.census_path(root, old["job_id"]),
+                {"job_id": old["job_id"], "census_at": 999.0, "orphans": 0},
+            )
+            lifecycle.bind(root, old["job_id"], "done")
+            active = self.null_id_failure(root, "7" * 32)
+            lifecycle.record_census(root, active["job_id"], 2000.0, 1, 1, "note")
+            lifecycle.bind(root, active["job_id"], "still-running")
+            lifecycle.terminal(root, "done", "Stop")
+            with patch.object(lifecycle, "control", side_effect=RuntimeError("refused")):
+                report = lifecycle.sweep({"state_dir": root})
+            self.assertEqual(len(report), 6)
+            self.assertEqual({x["status"] for x in report}, {"preserved_uncertain"})
+
+    def test_stop_reports_census_failures_as_failed_not_clean(self):
+        (Path(self.sessions.name) / "s9").touch()
+        report = [
+            {"job_id": "f" * 32, "status": "failed_no_artifacts_by_census", "census_at": 2.0},
+            {"job_id": "a" * 32, "status": "already_finished"},
+        ]
+        output = hook.handle({"session_id": "s9", "hook_event_name": "Stop"}, lambda _: report)
+        self.assertNotIn("decision", output)
+        self.assertIn("f" * 32 + " failed, no artifacts by census", output["systemMessage"])
+        self.assertIn("remain failed", output["systemMessage"])
+        (Path(self.sessions.name) / "s9").touch()
+        self.assertEqual(
+            hook.handle({"session_id": "s9", "hook_event_name": "Stop"}, lambda _: [report[1]]), {}
+        )
+
     def test_live_private_channel_checks_terminal_session_and_serializes_finish(self):
         with tempfile.TemporaryDirectory(dir="/tmp") as root:
             guard = Path(root) / "policy.py"
