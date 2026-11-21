@@ -129,8 +129,20 @@ item or saved account names. A sign-up page or new consent screen is a human ste
 open and tell Allison.
 
 Never ask her which browser to use or whether you are signed in. Do not use the Claude in Chrome extension for this work. It
-drives Allison's own Chrome on the M4. `playwright-ember` is the only browser tool that
-reaches the M2.
+drives Allison's own Chrome on the M4. The `playwright-ember`, `playwright-allison` and
+`playwright-don` routes are the only browser tools that reach the M2.
+
+### Which profile
+
+Start in Ember's profile with `playwright-ember`. Switch to `playwright-allison` or
+`playwright-don` when the work has to act as that person, or when a sign-in in Ember's
+profile shows the account belongs to Allison or Don and neither 1Password nor single
+sign-on gets Ember in. Their profiles are already signed in to their own accounts, so try
+that route before reporting a sign-in block. Changes made there show under their name.
+
+In Don's profile `page.goto` currently fails with "Target page, context or browser has
+been closed" (found Nov 21, 2026). Navigate there with
+`await page.evaluate(u => { location.href = u }, url)` and then `page.waitForURL`.
 
 ## Rule 2b. When Allison is watching, pause and let her help
 
@@ -213,9 +225,10 @@ differ, the SOP wins. Verified live Nov 2, 2026, after the Nov 1 M2 rebuild.
 | Item | Value |
 |---|---|
 | Machine | Ember's M2 only. One Mac user, `ember`. There is no `/Users/allison` on the M2 any more |
-| Chrome profile | `Default` only (ember@expertpartners.com, allison@ also added in Google), Playwright Extension installed. The Atlas profile did not come back after the rebuild |
+| Chrome profiles | Three, all in the one Chrome, each with the Playwright Extension. `Default` is Ember (ember@expertpartners.com, allison@ also added in Google). `Profile 2` is Don (don@expertpartners.com). `Profile 3` is Allison (allison@expertpartners.com). Verified Nov 21, 2026 |
+| Routes | `playwright-ember` reaches `Default` through `/Users/ember/maintenance/chrome-signed-in-mcp.sh`. `playwright-don` reaches `Profile 2` through `chrome-don-mcp.sh`. `playwright-allison` reaches `Profile 3` through `chrome-allison-mcp.sh`. All three run the same job route and close their windows the same way |
 | Shared connector | `/Users/ember/maintenance/chrome-signed-in-mcp.sh` (Playwright MCP 0.0.83, pinned, `--extension`) |
-| Extension token | 1Password, Automation vault, item ID `2i4x6x47noqy4ec475ez3zovpu`. The connector reads an owner-only copy at `~/.config/ember/playwright-extension-token`, because SSH sessions cannot unlock the Keychain |
+| Extension tokens | One per profile, in the 1Password Automation vault. Ember is item ID `2i4x6x47noqy4ec475ez3zovpu`, Don is `Playwright MCP Extension Token - Don`, Allison is `Playwright MCP Extension Token - Allison`. Each route reads an owner-only copy in `~/.config/ember/` (`playwright-extension-token`, `-don`, `-allison`), because SSH sessions cannot unlock the Keychain |
 | Job runner | None since the rebuild. `pw-run` is gone |
 
 Claude Code and Codex start on Allison's M4 and reach that Chrome through the named
