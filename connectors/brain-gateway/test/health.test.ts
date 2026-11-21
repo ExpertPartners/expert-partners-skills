@@ -31,6 +31,7 @@ test("a healthy brain passes every check without keeping any document text", asy
 	const r = await runDeepCheck("hq-core,ep-core", drive(), () => NOW);
 	assert.equal(r.ok, true, JSON.stringify(r.checks.filter((c) => !c.ok)));
 	assert.ok(r.checks.some((c) => c.name === "decision log freshness" && c.ok));
+	assert.ok(r.checks.some((c) => c.name === "rulebook present" && c.ok));
 	assert.ok(!JSON.stringify(r).includes("Newest decision"), "no document text in the result");
 	assert.equal(r.checkedAt, NOW.toISOString());
 });

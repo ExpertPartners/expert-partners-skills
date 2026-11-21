@@ -40,7 +40,7 @@ Access is enforced in the gateway, in `src/access.ts`, from the November 20, 202
 
 ## Daily health check
 
-A cron trigger runs a live check every day at 12:00 UTC (Decision Log, Nov 20 2026, Business Brain connection monitoring). It lists every allowed scope completely, reads the whole current Decision Log and checks that its newest entry is under 14 days old, and reads the HQ Rulebook whole. The result keeps only counts, versions, dates and error codes, never document text, and a later pass never hides an earlier failure. Leaders read it at `GET /api/health/deep` with the Hub token, and `?run=1` runs it now. Failures also log to Worker logs. Alerting to Allison goes through Ember's question line once that is live.
+A cron trigger runs a live check every day at 12:00 UTC (Decision Log, Nov 20 2026, Business Brain connection monitoring). It probes every allowed scope, lists one scope completely each day on a rotation, reads the whole current Decision Log and checks that its newest entry is under 14 days old, and confirms the HQ Rulebook is present with a current version. Workers allow a limited number of outbound requests per run, which is why only one scope is listed completely per day. The result keeps only counts, versions, dates and error codes, never document text, and a later pass never hides an earlier failure. Leaders read it at `GET /api/health/deep` with the Hub token, and `?run=1` runs it now. Failures also log to Worker logs. Alerting to Allison goes through Ember's question line once that is live.
 
 ## Secrets
 
