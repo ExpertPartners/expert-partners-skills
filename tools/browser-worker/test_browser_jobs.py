@@ -1004,6 +1004,146 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
             row = json.loads(receipt.read_text())
             self.assertEqual((row["status"], row["window_disposition"]), ("finished", "closed"))
 
+    def reconnect_route(self, root):
+        import fcntl
+
+        route, job, receipt, seen, peer, release, patches = self.contended_route(root)
+        peer["contend"] = False
+
+        def hold():
+            fd = os.open(Path(root) / "receipts.lock", os.O_CREAT | os.O_RDWR, 0o600)
+            fcntl.flock(fd, fcntl.LOCK_EX)
+            peer["fd"] = fd
+            peer["receipt"] = receipt.read_bytes()
+
+        return route, job, receipt, peer, hold, release, patches
+
+    def recover_while_held(self, route, job, peer):
+        started = time.monotonic()
+        reply = route.call("browser_job_recover", {"job_id": job["job_id"]})
+        elapsed = time.monotonic() - started
+        # Returned within one bound plus slack while the peer still holds it.
+        self.assertIsNotNone(peer["fd"])
+        self.assertLess(elapsed, 0.3 + 1.0)
+        self.assertTrue(reply.get("isError"), reply)
+        self.assertIn("Recovery refused", decode(reply)["error"])
+        return reply
+
+    def test_recover_reconnect_bootstrap_contention_keeps_the_finished_receipt(self):
+        with tempfile.TemporaryDirectory() as root:
+            route, job, receipt, peer, hold, release, patches = self.reconnect_route(root)
+            entries = []
+            real_bootstrap = route.bootstrap
+
+            @contextlib.contextmanager
+            def bootstrap():
+                with real_bootstrap():
+                    entries.append(True)
+                    if len(entries) == 2:
+                        hold()
+                    yield
+
+            route.bootstrap = bootstrap
+            route.connect = lambda _: self.fail("no connection after a refused starting save")
+            with patches:
+                try:
+                    self.recover_while_held(route, job, peer)
+                    self.assertEqual(receipt.read_bytes(), peer["receipt"])
+                finally:
+                    release()
+            row = json.loads(receipt.read_text())
+            self.assertEqual((row["status"], row["window_disposition"]), ("finished", "closed"))
+            # Memory agrees with disk: the old pages closed and nothing new exists.
+            self.assertEqual(job["status"], "finished")
+            self.assertEqual(job["metadata"], row["metadata"])
+            self.assertIsNone(job["client"])
+            with self.assertRaisesRegex(Refusal, "only_failed_jobs_recover"):
+                route.call("browser_job_recover", {"job_id": job["job_id"]})
+
+    def test_recover_contention_inside_new_connection_keeps_exact_ids_durable(self):
+        with tempfile.TemporaryDirectory() as root:
+            route, job, receipt, peer, hold, release, patches = self.reconnect_route(root)
+
+            def connect(j):
+                j["metadata"] = {**self.OLD, "unboundOwnedPages": 0}
+                route.checkpoint(j, "connecting")
+                hold()
+                route.checkpoint(j, "ready")
+
+            route.connect = connect
+            with patches:
+                try:
+                    self.recover_while_held(route, job, peer)
+                    self.assertEqual(receipt.read_bytes(), peer["receipt"])
+                    row = json.loads(receipt.read_text())
+                    # Never ready and never closed: the IDs saved before the
+                    # contention remain the exact reconciliation input.
+                    self.assertEqual(row["status"], "connecting")
+                    self.assertEqual(row["metadata"]["windowId"], self.OLD["windowId"])
+                    self.assertNotIn("window_disposition", row)
+                    self.assertEqual(job["status"], "failed")
+                finally:
+                    release()
+                route.call("browser_job_finish", {"job_id": job["job_id"]})
+            row = json.loads(receipt.read_text())
+            self.assertEqual((row["status"], row["window_disposition"]), ("finished", "closed"))
+
+    def test_recover_connection_failure_under_contention_stays_unsettled(self):
+        lifecycle_spec = importlib.util.spec_from_file_location(
+            "lifecycle_for_recover", SCRIPTS / "browser_lifecycle.py"
+        )
+        lifecycle = importlib.util.module_from_spec(lifecycle_spec)
+        lifecycle_spec.loader.exec_module(lifecycle)
+        with tempfile.TemporaryDirectory() as root:
+            route, job, receipt, peer, hold, release, patches = self.reconnect_route(root)
+
+            def connect(j):
+                hold()
+                raise Refusal("connector_identity_unavailable")
+
+            route.connect = connect
+            with patches:
+                try:
+                    self.recover_while_held(route, job, peer)
+                    self.assertEqual(receipt.read_bytes(), peer["receipt"])
+                    row = json.loads(receipt.read_text())
+                    # The creation outcome is unknown: neither settled nor
+                    # eligible for the no-artifacts census.
+                    self.assertEqual(row["status"], "starting")
+                    self.assertIsNone(row["metadata"])
+                    self.assertFalse(lifecycle.census_eligible(row))
+                    self.assertEqual(job["status"], "failed")
+                finally:
+                    release()
+                reply = route.call("browser_job_recover", {"job_id": job["job_id"]})
+            self.assertTrue(reply.get("isError"), reply)
+            row = json.loads(receipt.read_text())
+            self.assertEqual(row["status"], "failed")
+            self.assertNotIn("window_disposition", row)
+            self.assertEqual(
+                job["timings"][-1]["stages"][-1][0],
+                "failed:creation_outcome_unknown_requires_reconciliation",
+            )
+
+    def test_uncontended_recover_reports_ready_without_the_old_disposition(self):
+        with tempfile.TemporaryDirectory() as root:
+            route, job, receipt, peer, hold, release, patches = self.reconnect_route(root)
+
+            def connect(j):
+                j["metadata"] = {**self.OLD, "windowId": 6, "unboundOwnedPages": 0}
+                route.checkpoint(j, "connecting")
+                route.checkpoint(j, "ready")
+
+            route.connect = connect
+            with patches:
+                reply = route.call("browser_job_recover", {"job_id": job["job_id"]})
+            self.assertFalse(reply.get("isError"), reply)
+            self.assertTrue(decode(reply)["previous_pages_closed"])
+            row = json.loads(receipt.read_text())
+            self.assertEqual((row["status"], row["metadata"]["windowId"]), ("ready", 6))
+            self.assertNotIn("window_disposition", row)
+            self.assertNotIn("window_removal_issued", row)
+
     def test_destructive_call_timeout_is_bounded_and_restored(self):
         client = SimpleNamespace(timeout=120)
         observed = []

@@ -1655,6 +1655,67 @@ class Route:
             self.checkpoint(job, "finished")
         return result(self.summary(job))
 
+    def recover(self, job):
+        refused = (
+            "Recovery refused or incomplete; preserve the exact receipt and do not replay work."
+        )
+        try:
+            self.finish(job)
+        except Exception:
+            self.failure_checkpoint(job, "failed")
+            return result({**self.summary(job), "error": refused}, True)
+        settled = dict(job)
+        diagnostics = copy.deepcopy(job.get("connection_diagnostics"))
+        try:
+            # The new connection gets fresh snapshots; the old ones stay one level back.
+            earlier = job.pop("connection_diagnostics", None)
+            if earlier:
+                earlier.pop("previous", None)
+                job["connection_diagnostics"] = {"previous": earlier}
+            with self.bootstrap():
+                job.update(
+                    client_name="EP " + job["label"] + " [" + uuid.uuid4().hex[:8] + "]",
+                    generation=self.preflight(),
+                    metadata=None,
+                    client=None,
+                )
+                # The old window's disposition and issued removal describe the
+                # closed allocation; carried over, they would let the new one
+                # read as closed or settle a vanished window as its own removal.
+                for key in (
+                    "initial_connector",
+                    "connector_probe",
+                    "allocation_failure",
+                    "window_disposition",
+                    "window_removal_issued",
+                ):
+                    job.pop(key, None)
+                try:
+                    self.checkpoint(job, "starting")
+                except Refusal as error:
+                    if str(error) != "receipts_lock_busy":
+                        raise
+                    # Nothing new was created, so the job stays exactly as the
+                    # finished receipt on disk says, rather than a failed job
+                    # with no IDs that no route could ever reconcile.
+                    job.clear()
+                    job.update(settled)
+                    if diagnostics is not None:
+                        job["connection_diagnostics"] = diagnostics
+                    return result({**self.summary(job), "error": refused}, True)
+                self.connect(job)
+            return result(
+                {
+                    **self.summary(job),
+                    "previous_pages_closed": True,
+                    "business_actions_replayed": False,
+                    "task_state_lost": True,
+                }
+            )
+        except Exception:
+            self.failure_checkpoint(job, "failed")
+            return result({**self.summary(job), "error": refused}, True)
+
     def call(self, name, arguments):
         if name == "browser_job_start":
             return self.start(arguments.get("name"), arguments.get("owner_session_id"))
@@ -1686,41 +1747,10 @@ class Route:
             if name == "browser_job_recover":
                 if job["status"] != "failed":
                     raise Refusal("only_failed_jobs_recover")
-                refused = "Recovery refused or incomplete; preserve the exact receipt and do not replay work."
+                # Every receipt save of the whole recovery, including the new
+                # connection's, waits a bounded time on a peer-held lock.
                 with bounded_saves():
-                    try:
-                        self.finish(job)
-                    except Exception:
-                        self.failure_checkpoint(job, "failed")
-                        return result({**self.summary(job), "error": refused}, True)
-                try:
-                    # The new connection gets fresh snapshots; the old ones stay one level back.
-                    earlier = job.pop("connection_diagnostics", None)
-                    if earlier:
-                        earlier.pop("previous", None)
-                        job["connection_diagnostics"] = {"previous": earlier}
-                    with self.bootstrap():
-                        job.update(
-                            client_name="EP " + job["label"] + " [" + uuid.uuid4().hex[:8] + "]",
-                            generation=self.preflight(),
-                            metadata=None,
-                            client=None,
-                        )
-                        for key in ("initial_connector", "connector_probe", "allocation_failure"):
-                            job.pop(key, None)
-                        self.checkpoint(job, "starting")
-                        self.connect(job)
-                    return result(
-                        {
-                            **self.summary(job),
-                            "previous_pages_closed": True,
-                            "business_actions_replayed": False,
-                            "task_state_lost": True,
-                        }
-                    )
-                except Exception:
-                    self.checkpoint(job, "failed")
-                    return result({**self.summary(job), "error": refused}, True)
+                    return self.recover(job)
             if name == "browser_install" or name not in {t["name"] for t in self.inventory or []}:
                 raise Refusal("unknown_browser_tool")
             denied, note = self.policy(name, args)
