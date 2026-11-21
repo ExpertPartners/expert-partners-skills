@@ -497,6 +497,20 @@ PRE_REMOVAL_REFUSALS = frozenset(
     )
 )
 HELD_RECEIPTS = threading.local()
+# Set while finish or recover runs, so every receipt save on that path waits a
+# bounded time. After one wait has timed out, later saves on the same path only
+# try once, so the caller gets its refusal after about one bound, not several.
+BOUNDED_SAVES = threading.local()
+
+
+@contextmanager
+def bounded_saves():
+    previous = getattr(BOUNDED_SAVES, "state", None)
+    BOUNDED_SAVES.state = previous or {"busy": False}
+    try:
+        yield
+    finally:
+        BOUNDED_SAVES.state = previous
 
 
 def release_lock(fd):
@@ -507,7 +521,9 @@ def release_lock(fd):
 @contextmanager
 def bounded_receipts_lock(root, timeout=None):
     """receipts.lock with a bounded wait; this thread's own saves reuse it."""
-    timeout = RECEIPTS_LOCK_TIMEOUT if timeout is None else timeout
+    state = getattr(BOUNDED_SAVES, "state", None)
+    if timeout is None:
+        timeout = 0 if state and state["busy"] else RECEIPTS_LOCK_TIMEOUT
     fd = os.open(Path(root) / "receipts.lock", os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
     deadline = time.monotonic() + timeout
     try:
@@ -516,17 +532,20 @@ def bounded_receipts_lock(root, timeout=None):
                 fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
                 break
             except BlockingIOError:
-                if time.monotonic() > deadline:
+                if time.monotonic() >= deadline:
+                    if state is not None:
+                        state["busy"] = True
                     raise Refusal("receipts_lock_busy") from None
                 time.sleep(0.05)
     except BaseException:
         os.close(fd)
         raise
+    outer = getattr(HELD_RECEIPTS, "root", None)
     HELD_RECEIPTS.root = str(root)
     try:
         yield
     finally:
-        HELD_RECEIPTS.root = None
+        HELD_RECEIPTS.root = outer
         try:
             release_lock(fd)
         except OSError:
@@ -803,8 +822,13 @@ class Route:
         # A stale facade never reopens a receipt another route already settled.
         # Check and replace under one host-wide lock, so a sweep or reconciliation
         # that settles the receipt between the two can never be overwritten.
-        held = getattr(HELD_RECEIPTS, "root", None) == str(self.root)
-        with contextlib.nullcontext() if held else ledger_lock(self.root, "receipts.lock"):
+        if getattr(HELD_RECEIPTS, "root", None) == str(self.root):
+            guard = contextlib.nullcontext()
+        elif getattr(BOUNDED_SAVES, "state", None) is not None:
+            guard = bounded_receipts_lock(self.root)
+        else:
+            guard = ledger_lock(self.root, "receipts.lock")
+        with guard:
             if self.settled_elsewhere(job):
                 job["status"] = "finished"
                 return
@@ -833,6 +857,18 @@ class Route:
         records = job.get("timings")
         if records:
             records[-1]["stages"].append([stage, round(time.time(), 3)])
+
+    def failure_checkpoint(self, job, status=None):
+        """Record a failure without waiting again on a peer-held receipts.lock.
+
+        When the lock stays busy the receipt keeps its last durable state, which
+        never claims more than happened, and the in-memory job is saved on the
+        next attempt."""
+        try:
+            self.checkpoint(job, status)
+        except Refusal as error:
+            if str(error) != "receipts_lock_busy":
+                raise
 
     def checkpoint(self, job, status=None):
         if status:
@@ -1598,24 +1634,25 @@ class Route:
             {"tool": "finish", "sealed": False, "stages": [["received", round(time.time(), 3)]]}
         )
         del job["timings"][:-TIMING_RECORDS]
-        try:
-            with self.bootstrap():
-                if job["status"] == "ready" and job["client"] and not job["client"].closed:
-                    try:
-                        self.dispose_live(job)
-                    except Exception as error:
-                        self.mark(job, "live_" + failure_stage(error))
-                        self.checkpoint(job, "failed")
-                        self.dispose_failed(job, getattr(error, "close_reason", "unknown"))
-                else:
-                    self.dispose_failed(job)
-        except Exception as error:
-            # The caller sees one generic refusal; the receipt keeps the static step.
-            self.mark(job, failure_stage(error))
-            self.checkpoint(job)
-            raise
-        self.mark(job, "finished")
-        self.checkpoint(job, "finished")
+        with bounded_saves():
+            try:
+                with self.bootstrap():
+                    if job["status"] == "ready" and job["client"] and not job["client"].closed:
+                        try:
+                            self.dispose_live(job)
+                        except Exception as error:
+                            self.mark(job, "live_" + failure_stage(error))
+                            self.failure_checkpoint(job, "failed")
+                            self.dispose_failed(job, getattr(error, "close_reason", "unknown"))
+                    else:
+                        self.dispose_failed(job)
+            except Exception as error:
+                # The caller sees one generic refusal; the receipt keeps the static step.
+                self.mark(job, failure_stage(error))
+                self.failure_checkpoint(job)
+                raise
+            self.mark(job, "finished")
+            self.checkpoint(job, "finished")
         return result(self.summary(job))
 
     def call(self, name, arguments):
@@ -1649,8 +1686,14 @@ class Route:
             if name == "browser_job_recover":
                 if job["status"] != "failed":
                     raise Refusal("only_failed_jobs_recover")
+                refused = "Recovery refused or incomplete; preserve the exact receipt and do not replay work."
+                with bounded_saves():
+                    try:
+                        self.finish(job)
+                    except Exception:
+                        self.failure_checkpoint(job, "failed")
+                        return result({**self.summary(job), "error": refused}, True)
                 try:
-                    self.finish(job)
                     # The new connection gets fresh snapshots; the old ones stay one level back.
                     earlier = job.pop("connection_diagnostics", None)
                     if earlier:
@@ -1677,13 +1720,7 @@ class Route:
                     )
                 except Exception:
                     self.checkpoint(job, "failed")
-                    return result(
-                        {
-                            **self.summary(job),
-                            "error": "Recovery refused or incomplete; preserve the exact receipt and do not replay work.",
-                        },
-                        True,
-                    )
+                    return result({**self.summary(job), "error": refused}, True)
             if name == "browser_install" or name not in {t["name"] for t in self.inventory or []}:
                 raise Refusal("unknown_browser_tool")
             denied, note = self.policy(name, args)

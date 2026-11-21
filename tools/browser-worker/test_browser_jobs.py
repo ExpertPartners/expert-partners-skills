@@ -909,53 +909,100 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
                 self.assertNotEqual(row.get("window_disposition"), "closed")
                 self.assertNotIn("CANARY", receipt.read_text())
 
-    def test_busy_receipts_lock_refuses_before_issuing_removal(self):
+    def contended_route(self, root):
         import fcntl
 
+        route, job, receipt, seen, fake = self.removal_route(root, {"closed": True, "count": 1})
+        route.jobs[job["job_id"]] = job
+        peer = {"fd": None, "contend": True}
+
+        def phase_one_then_hold(client, body):
+            out = fake(client, body)
+            if "async({old,clientName," in body and peer["contend"] and peer["fd"] is None:
+                # A peer takes receipts.lock between the phases and keeps it
+                # until after the caller has returned.
+                fd = os.open(Path(root) / "receipts.lock", os.O_CREAT | os.O_RDWR, 0o600)
+                fcntl.flock(fd, fcntl.LOCK_EX)
+                peer["fd"] = fd
+                peer["receipt"] = receipt.read_bytes()
+            return out
+
+        def release():
+            if peer["fd"] is not None:
+                fcntl.flock(peer["fd"], fcntl.LOCK_UN)
+                os.close(peer["fd"])
+                peer["fd"] = None
+            peer["contend"] = False
+
+        patches = contextlib.ExitStack()
+        patches.enter_context(
+            patch.object(
+                route, "client", create=True, return_value=SimpleNamespace(close=lambda: None)
+            )
+        )
+        patches.enter_context(patch.object(b, "code", side_effect=phase_one_then_hold))
+        patches.enter_context(patch.object(b, "verify_window_closed"))
+        patches.enter_context(patch.object(b, "RECEIPTS_LOCK_TIMEOUT", 0.3))
+        return route, job, receipt, seen, peer, release, patches
+
+    def assert_contended_refusal(self, receipt, seen, peer, elapsed):
+        # One bound plus slack, while the peer still holds the lock, and no
+        # write at all once the peer took it.
+        self.assertLess(elapsed, 0.3 + 1.0)
+        self.assertEqual(seen, [(False, None)])
+        self.assertEqual(receipt.read_bytes(), peer["receipt"])
+        row = json.loads(receipt.read_text())
+        self.assertEqual(row["status"], "failed")
+        self.assertNotIn("window_removal_issued", row)
+        self.assertNotIn("window_disposition", row)
+
+    def test_real_finish_returns_after_one_bound_while_peer_holds_receipts_lock(self):
         with tempfile.TemporaryDirectory() as root:
-            route, job, receipt, seen, fake = self.removal_route(root, {"closed": True, "count": 1})
-            held = []
+            route, job, receipt, seen, peer, release, patches = self.contended_route(root)
+            with patches:
+                try:
+                    started = time.monotonic()
+                    with self.assertRaisesRegex(Refusal, "^receipts_lock_busy$"):
+                        route.call("browser_job_finish", {"job_id": job["job_id"]})
+                    elapsed = time.monotonic() - started
+                    self.assertIsNotNone(peer["fd"])
+                    self.assert_contended_refusal(receipt, seen, peer, elapsed)
+                    self.assertNotEqual(job["status"], "finished")
+                    self.assertNotIn("window_removal_issued", job)
+                    self.assertEqual(
+                        job["timings"][-1]["stages"][-1][0], "failed:receipts_lock_busy"
+                    )
+                finally:
+                    release()
+                # Once the peer is gone the same job retries and settles closed.
+                seen.clear()
+                route.call("browser_job_finish", {"job_id": job["job_id"]})
+            self.assertEqual(seen, [(False, None), (True, True)])
+            row = json.loads(receipt.read_text())
+            self.assertEqual((row["status"], row["window_disposition"]), ("finished", "closed"))
+            self.assertIs(row["ownership_pending"], False)
 
-            def phase_one_then_hold(client, body):
-                out = fake(client, body)
-                if "async({old,clientName," in body and not held:
-                    # A peer takes receipts.lock between the two phases.
-                    fd = os.open(Path(root) / "receipts.lock", os.O_CREAT | os.O_RDWR, 0o600)
-                    fcntl.flock(fd, fcntl.LOCK_EX)
-                    held.append(fd)
-                return out
-
-            save = route.save
-
-            def release_then_save(j):
-                # Only a later save may wait on the peer; free it first so a
-                # wrong blocking path fails the assertions instead of hanging.
-                while held:
-                    fd = held.pop()
-                    fcntl.flock(fd, fcntl.LOCK_UN)
-                    os.close(fd)
-                save(j)
-
-            with (
-                patch.object(
-                    route,
-                    "client",
-                    create=True,
-                    return_value=SimpleNamespace(close=lambda: None),
-                ),
-                patch.object(b, "code", side_effect=phase_one_then_hold),
-                patch.object(b, "verify_window_closed"),
-                patch.object(b, "RECEIPTS_LOCK_TIMEOUT", 0.2),
-                patch.object(route, "save", side_effect=release_then_save),
-            ):
-                with self.assertRaisesRegex(Refusal, "receipts_lock_busy"):
-                    route.dispose_failed(job)
-            for fd in held:
-                fcntl.flock(fd, fcntl.LOCK_UN)
-                os.close(fd)
-            self.assertEqual(seen, [(False, None)])
-            self.assertNotIn("window_removal_issued", job)
-            self.assertNotIn("window_removal_issued", json.loads(receipt.read_text()))
+    def test_real_recover_returns_after_one_bound_while_peer_holds_receipts_lock(self):
+        with tempfile.TemporaryDirectory() as root:
+            route, job, receipt, seen, peer, release, patches = self.contended_route(root)
+            route.connect = lambda _: self.fail("recover must not reconnect after a refusal")
+            with patches:
+                try:
+                    started = time.monotonic()
+                    reply = route.call("browser_job_recover", {"job_id": job["job_id"]})
+                    elapsed = time.monotonic() - started
+                    self.assertIsNotNone(peer["fd"])
+                    self.assertTrue(reply.get("isError"), reply)
+                    self.assertIn("Recovery refused", decode(reply)["error"])
+                    self.assert_contended_refusal(receipt, seen, peer, elapsed)
+                    self.assertEqual(job["status"], "failed")
+                finally:
+                    release()
+                seen.clear()
+                route.call("browser_job_finish", {"job_id": job["job_id"]})
+            self.assertEqual(seen, [(False, None), (True, True)])
+            row = json.loads(receipt.read_text())
+            self.assertEqual((row["status"], row["window_disposition"]), ("finished", "closed"))
 
     def test_destructive_call_timeout_is_bounded_and_restored(self):
         client = SimpleNamespace(timeout=120)
