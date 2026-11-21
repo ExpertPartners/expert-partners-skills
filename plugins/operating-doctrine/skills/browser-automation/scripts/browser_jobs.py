@@ -168,6 +168,21 @@ DIAGNOSTIC_UNAVAILABLE = (
 DIAGNOSTIC_SKIPS = frozenset(
     ("metadata_missing", "generation_changed", "reconciliation_refused", "sealed_job")
 )
+DIAGNOSTIC_REFUSALS = frozenset(
+    (
+        "creation_outcome_unknown_requires_reconciliation",
+        "uncheckpointed_page_creation_requires_reconciliation",
+        "unbound_owned_pages_require_reconciliation",
+        "browser_generation_changed_requires_reconciliation",
+        "bootstrap_busy_retry_not_replay",
+        "maintenance_window_closure_unobserved",
+    )
+)
+DIAGNOSTIC_CODES = DIAGNOSTIC_REFUSALS | {
+    "receipt_unreadable",
+    "diagnostic_not_applicable",
+    "diagnostic_unavailable",
+}
 
 
 def reported_close_reason(reply):
@@ -282,30 +297,61 @@ def projection(reply):
     return value
 
 
-def failed_cleanup_js(args, remove):
+def failed_cleanup_js(args, remove, diagnose=False):
     """Reconcile a failed job's saved IDs from a fresh maintenance connector.
 
-    Phase one (remove=False) only proves ownership; phase two repeats every
-    check and closes the exact saved window.
+    Phase one (remove=False) only proves ownership and returns a content-free
+    proof digest; phase two must observe that same digest at its start, after
+    every asynchronous check and immediately before closing the exact saved
+    window. Chrome has no compare-and-remove, so a change after the last read
+    is caught only by the post-close inventory, which then refuses success.
+    diagnose=True never removes and reports only integer IDs and static codes.
     """
     return (
         STATE_JS
-        + "return await s.connector.evaluate(async({old,clientName,connectorOrigin,removalIssued,pendingSince,remove})=>{"
-        "const incomplete=tabs=>{const descendants=new Set(old.tabIds);let changed;do{changed=false;for(const t of tabs)if(descendants.has(t.openerTabId)&&!descendants.has(t.id)){descendants.add(t.id);changed=true;}}while(changed);return tabs.some(t=>(t.windowId===old.windowId||descendants.has(t.id))&&!old.tabIds.includes(t.id));};"
+        + "return await s.connector.evaluate(async({old,clientName,connectorOrigin,removalIssued,pendingSince,peers,expectedProof,remove,diagnose})=>{"
+        "const exact=(t,name)=>{try{const u=new URL(t.url);return u.protocol+'//'+u.host+u.pathname===connectorOrigin&&JSON.parse(u.searchParams.get('client')).name===name;}catch{return false;}};"
+        "const descendantsOf=tabs=>{const d=new Set(old.tabIds);let changed;do{changed=false;for(const t of tabs)if(d.has(t.openerTabId)&&!d.has(t.id)){d.add(t.id);changed=true;}}while(changed);return d;};"
+        "const incomplete=tabs=>{const d=descendantsOf(tabs);return tabs.some(t=>(t.windowId===old.windowId||d.has(t.id))&&!old.tabIds.includes(t.id));};"
         "const self=pendingSince===null?null:(await chrome.tabs.getCurrent()).id;"
+        + CONNECTION_STATUS_JS
+        # Only Extension 0.6.0 sessions can bind a peer; any other or partial
+        # shape leaves every newer tab unknown.
+        + "const sessions=async()=>{const n=await chrome.runtime.sendMessage({type:'getStatus'}).catch(()=>null);"
+        "if(!n||!Array.isArray(n.sessions)||n.sessions.some(c=>!c||typeof c.clientName!=='string'||!Array.isArray(c.tabIds)||c.tabIds.some(i=>!Number.isInteger(i))))return null;return n.sessions;};"
         # An interrupted call may have created a page and then closed it,
         # orphaning a popup it opened elsewhere. Chrome tab IDs only grow
         # within one browser generation, so any surviving tab born after the
         # last proven inventory, other than this maintenance connector, may be
-        # that orphan. A peer's new tab is refused too, never adopted.
-        "const unproven=tabs=>self!==null&&tabs.some(t=>t.id>pendingSince&&t.id!==self&&!old.tabIds.includes(t.id));"
-        "const before=await chrome.tabs.query({});"
-        "if(incomplete(before)||unproven(before))throw Error('uncheckpointed_page_arrival');"
+        # that orphan. It is excused only when exactly one live ready peer
+        # receipt recorded it as its own birth ID (receipt tabIds) and that
+        # peer's exact connector and single session still hold it. Session
+        # membership or a client name alone never excuses a tab, and the
+        # names are same-user assertions, not a privilege boundary.
+        "const newer=tabs=>self===null?[]:tabs.filter(t=>t.id>pendingSince&&t.id!==self&&!old.tabIds.includes(t.id)).map(t=>t.id);"
+        "const excused=(id,tabs,list)=>{if(!list)return false;const owners=peers.filter(p=>p.tabIds.includes(id));if(owners.length!==1)return false;const p=owners[0];"
+        "const t=tabs.find(x=>x.id===id),c=tabs.find(x=>x.id===p.connectorId);"
+        "if(!t||!c||p.windowId===old.windowId||t.windowId!==p.windowId||c.windowId!==p.windowId||!exact(c,p.clientName))return false;"
+        "if(t.openerTabId!==undefined&&!p.tabIds.includes(t.openerTabId))return false;"
+        "const named=list.filter(x=>x.clientName===p.clientName);if(named.length!==1||!named[0].tabIds.includes(p.connectorId)||!named[0].tabIds.includes(id))return false;"
+        "return !list.some(x=>x!==named[0]&&x.tabIds.includes(id));};"
+        "const ids=a=>[...a].sort((x,y)=>x-y);"
+        "const read=async()=>{const tabs=await chrome.tabs.query({});const list=self===null?null:await sessions();"
+        "let status=null;try{status=await connectionStatus();}catch{}"
+        "const fresh=newer(tabs);const peerIds=fresh.filter(id=>excused(id,tabs,list));"
+        "const key=JSON.stringify([tabs.map(t=>[t.id,t.windowId,t.groupId,t.openerTabId??null]).sort((a,b)=>a[0]-b[0]),list===null?null:list.map(x=>[x.clientName,ids(x.tabIds)]).sort(),status===null?null:status.map(x=>[x.clientName,ids(x.connectedTabIds||[])]).sort()]);"
+        "const proof=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(key))),b=>b.toString(16).padStart(2,'0')).join('');"
+        "return {tabs,status,peerIds,unknownIds:fresh.filter(id=>!peerIds.includes(id)),proof};};"
+        "const r=await read();"
+        "const stable=async()=>{if((await read()).proof!==r.proof)throw Error('cleanup_proof_changed');};"
+        "const verify=async(check)=>{const before=r.tabs;"
+        # Target extras and descendants block before any peer exemption.
+        "if(incomplete(before))throw Error('uncheckpointed_page_arrival');"
         "const live=before.filter(t=>old.tabIds.includes(t.id));"
         # Every saved tab gone is explained only by a removal this route
         # already issued. Otherwise a popup may have escaped and lost its
         # opener link when its parent closed.
-        "if(!live.length){if(removalIssued&&!before.some(t=>t.windowId===old.windowId))return {closed:true,count:0,alreadyClosed:true};throw Error('saved_owned_tab_missing');}"
+        "if(!live.length){if(removalIssued&&!before.some(t=>t.windowId===old.windowId)){if(r.unknownIds.length)throw Error('uncheckpointed_page_arrival');return {alreadyClosed:true};}throw Error('saved_owned_tab_missing');}"
         # The connector is an extension page that never opens popups, so its
         # absence alone cannot hide an unrecorded descendant. A missing
         # working page can, so that still refuses.
@@ -313,20 +359,44 @@ def failed_cleanup_js(args, remove):
         # The extension intentionally ungroups its tabs after disconnect.
         # When the connector survives, anchor to its exact client identity.
         "const connector=live.find(t=>t.id===old.connectorId);"
-        "if(connector){const u=new URL(connector.url);if(u.protocol+'//'+u.host+u.pathname!==connectorOrigin||JSON.parse(u.searchParams.get('client')).name!==clientName)throw Error('connector_identity_changed');}"
-        + CONNECTION_STATUS_JS
-        + "const status={connections:await connectionStatus()};"
-        "const targets=await chrome.debugger.getTargets();"
-        "for(const t of live){if(t.windowId!==old.windowId||(t.groupId!==old.groupId&&t.groupId!==-1)||targets.some(x=>x.tabId===t.id&&x.attached)||status.connections.some(c=>(c.connectedTabIds||[]).includes(t.id)))throw Error('ownership_changed');"
-        "if(t.groupId!==-1){const g=await chrome.tabGroups.get(t.groupId);if(g.title!==old.groupTitle)throw Error('group_identity_changed');}}"
-        "if(!remove)return {ready:true,count:live.length,connectorMissing:!connector};"
+        "if(connector&&!exact(connector,clientName))throw Error('connector_identity_changed');"
+        "if(r.status===null)throw Error('connection_status_unavailable');"
+        "const targets=await chrome.debugger.getTargets();await check();"
+        "for(const t of live){if(t.windowId!==old.windowId||(t.groupId!==old.groupId&&t.groupId!==-1)||targets.some(x=>x.tabId===t.id&&x.attached)||r.status.some(c=>(c.connectedTabIds||[]).includes(t.id)))throw Error('ownership_changed');"
+        "if(t.groupId!==-1){const g=await chrome.tabGroups.get(t.groupId);await check();if(g.title!==old.groupTitle)throw Error('group_identity_changed');}}"
+        "if(r.unknownIds.length)throw Error('uncheckpointed_page_arrival');"
+        "return {live,connector};};"
+        "if(diagnose){let code=null;try{await verify(async()=>{});}catch(e){code=e.message;}"
+        "const d=descendantsOf(r.tabs);const liveIds=new Set(r.tabs.map(t=>t.id));"
+        "return {diagnostic:true,ready:code===null,code,"
+        "targetExtraIds:ids(r.tabs.filter(t=>t.windowId===old.windowId&&!old.tabIds.includes(t.id)).map(t=>t.id)),"
+        "descendantIds:ids(r.tabs.filter(t=>d.has(t.id)&&t.windowId!==old.windowId&&!old.tabIds.includes(t.id)).map(t=>t.id)),"
+        "missingSavedIds:ids(old.tabIds.filter(id=>!liveIds.has(id))),peerIds:ids(r.peerIds),unknownIds:ids(r.unknownIds)};}"
+        # A dry-run or phase-one digest is never authority by itself; phase
+        # two must still observe exactly the same inventory.
+        "if(expectedProof!==null&&r.proof!==expectedProof)throw Error('cleanup_proof_changed');"
+        "const v=await verify(stable);"
+        "if(v.alreadyClosed)return {closed:true,count:0,alreadyClosed:true};"
+        "if(!remove)return {ready:true,count:v.live.length,connectorMissing:!v.connector,proof:r.proof,peerIds:ids(r.peerIds)};"
+        "await stable();"
         "await chrome.windows.remove(old.windowId);"
-        "const beforeIds=new Set(before.map(t=>t.id));"
+        "const beforeIds=new Set(r.tabs.map(t=>t.id));"
         # Chrome can still list a removed window's tabs for a moment.
         "let after;for(let i=0;i<20;i++){after=await chrome.tabs.query({});if(!after.some(t=>old.tabIds.includes(t.id)||t.windowId===old.windowId))break;await new Promise(r=>setTimeout(r,100));}"
-        "if(after.some(t=>old.tabIds.includes(t.id)||t.windowId===old.windowId||!beforeIds.has(t.id))||incomplete(after))throw Error('owned_cleanup_inventory_uncertain');"
-        "return {closed:true,count:live.length,connectorMissing:!connector};},"
-        + json.dumps({"pendingSince": None, **args, "remove": remove})
+        # A tab that was not saved and vanished with the window was foreign;
+        # that closure cannot be undone, but it must never read as success.
+        "if(after.some(t=>old.tabIds.includes(t.id)||t.windowId===old.windowId||!beforeIds.has(t.id))||incomplete(after)||r.tabs.some(t=>!old.tabIds.includes(t.id)&&!after.some(a=>a.id===t.id)))throw Error('owned_cleanup_inventory_uncertain');"
+        "return {closed:true,count:v.live.length,connectorMissing:!v.connector};},"
+        + json.dumps(
+            {
+                "pendingSince": None,
+                "peers": [],
+                "expectedProof": None,
+                **args,
+                "remove": remove,
+                "diagnose": diagnose,
+            }
+        )
         + ");"
     )
 
@@ -397,6 +467,83 @@ def chrome_generation():
     if not stamp:
         raise Refusal("chrome_generation_missing")
     return {"pid": int(ids[0]), "started": stamp}
+
+
+PEER_SOURCE_LIMIT = 64
+DIAGNOSTIC_ID_LIMIT = 64
+DIAGNOSTIC_ID_FIELDS = (
+    "targetExtraIds",
+    "descendantIds",
+    "missingSavedIds",
+    "peerIds",
+    "unknownIds",
+)
+
+
+def peer_proof_source(row, owner, generation, job_id):
+    """A peer receipt can excuse only its own birth tab IDs, and only while live.
+
+    Anything short of a strictly shaped, ready, not pending, same-generation
+    receipt with an active owner returns None, so its tabs stay unknown.
+    """
+    if not (isinstance(row, dict) and isinstance(owner, dict)):
+        return None
+    meta = row.get("metadata")
+    name = row.get("client_name")
+    if not (
+        row.get("job_id") == job_id
+        and owner.get("job_id") == job_id
+        and owner.get("state") == "active"
+        and row.get("status") == "ready"
+        and row.get("ownership_pending") is False
+        and row.get("sealed") is False
+        and not row.get("relay_mode")
+        and row.get("window_disposition") is None
+        and row.get("generation") == generation
+        and isinstance(name, str)
+        and 0 < len(name) <= 512
+        and isinstance(meta, dict)
+        and meta.get("unboundOwnedPages") == 0
+    ):
+        return None
+    connector, window, tabs = meta.get("connectorId"), meta.get("windowId"), meta.get("tabIds")
+    if not (
+        type(connector) is int
+        and type(window) is int
+        and connector >= 0
+        and window >= 0
+        and isinstance(tabs, list)
+        and 0 < len(tabs) <= 256
+        and all(type(t) is int and t >= 0 for t in tabs)
+        and len(set(tabs)) == len(tabs)
+        and connector in tabs
+    ):
+        return None
+    return {"connectorId": connector, "windowId": window, "tabIds": tabs, "clientName": name}
+
+
+def diagnostic_projection(value):
+    """Whitelist integer IDs and static codes; drop everything else."""
+    out = {"authority": False, "observer": "temporary_maintenance_connector"}
+    code_value = value.get("code") if isinstance(value, dict) else None
+    out["ready"] = isinstance(value, dict) and value.get("ready") is True and code_value is None
+    if out["ready"]:
+        out["code"] = None
+    elif isinstance(code_value, str) and (
+        code_value in OWNED_ERROR_CODES or code_value in DIAGNOSTIC_CODES
+    ):
+        out["code"] = code_value
+    else:
+        out["code"] = "diagnostic_unclassified"
+    for field in DIAGNOSTIC_ID_FIELDS:
+        ids = value.get(field) if isinstance(value, dict) else None
+        if not (isinstance(ids, list) and all(type(i) is int and i >= 0 for i in ids)):
+            out[field] = None
+            continue
+        out[field] = ids[:DIAGNOSTIC_ID_LIMIT]
+        if len(ids) > DIAGNOSTIC_ID_LIMIT:
+            out[field + "Truncated"] = True
+    return out
 
 
 class Route:
@@ -1125,16 +1272,7 @@ class Route:
             job["client"].close()
         old = job["metadata"]
         try:
-            if not old:
-                raise Refusal("creation_outcome_unknown_requires_reconciliation")
-            pending_since = old.get("newestTabId") if job.get("ownership_pending") else None
-            if job.get("ownership_pending") and type(pending_since) is not int:
-                # No proven pre-call watermark, so an orphaned popup could escape.
-                raise Refusal("uncheckpointed_page_creation_requires_reconciliation")
-            if old.get("unboundOwnedPages"):
-                raise Refusal("unbound_owned_pages_require_reconciliation")
-            if self.preflight() != job["generation"]:
-                raise Refusal("browser_generation_changed_requires_reconciliation")
+            pending_since = self.reconcile_scope(job)
         except Exception:
             # Reconciliation opens no connector here, so neither do diagnostics.
             self.capture_connection_diagnostics(
@@ -1145,26 +1283,148 @@ class Route:
         with self.maintenance_connector() as client:
             self.capture_connection_diagnostics(job, "reconcile", client=client, reason=reason)
             self.checkpoint(job)
+            peers, digests = self.peer_sources(job, pending_since)
             args = {
                 "old": old,
                 "clientName": job["client_name"],
                 "connectorOrigin": EXTENSION,
                 "removalIssued": removal_issued(job),
                 "pendingSince": pending_since,
+                "peers": peers,
             }
             outcome = code(client, failed_cleanup_js(args, remove=False))
             self.mark(job, "reconcile_proven")
             if outcome.get("ready") is True:
+                proof = outcome.get("proof")
+                excused = outcome.get("peerIds")
+                if not (
+                    isinstance(proof, str)
+                    and re.fullmatch(r"[0-9a-f]{64}", proof)
+                    and isinstance(excused, list)
+                    and all(type(i) is int for i in excused)
+                ):
+                    raise Refusal("failed_cleanup_uncertain")
+                used = sorted(
+                    i for i, p in enumerate(peers) if any(t in p["tabIds"] for t in excused)
+                )
                 # Recorded before removal so a retry after an interrupted close
                 # can prove the vanished window was this route's own removal.
                 job["window_removal_issued"] = True
                 self.checkpoint(job)
-                outcome = code(client, failed_cleanup_js(args, remove=True))
+                if self.preflight() != job["generation"]:
+                    raise Refusal("browser_generation_changed_requires_reconciliation")
+                # Peers checkpoint under this lock, so the receipts that excuse
+                # a tab cannot change while the destructive phase runs.
+                with ledger_lock(self.root, "receipts.lock"):
+                    again, now = self.peer_sources(job, pending_since)
+                    if again != peers or any(now[i] != digests[i] for i in used):
+                        raise Refusal("peer_proof_changed")
+                    outcome = code(
+                        client, failed_cleanup_js({**args, "expectedProof": proof}, remove=True)
+                    )
+                    again, now = self.peer_sources(job, pending_since)
+                    if outcome.get("closed") is True and (
+                        again != peers or any(now[i] != digests[i] for i in used)
+                    ):
+                        raise Refusal("failed_cleanup_uncertain")
+                if self.preflight() != job["generation"]:
+                    raise Refusal("failed_cleanup_uncertain")
             if outcome.get("closed") is not True:
                 raise Refusal("failed_cleanup_uncertain")
             verify_window_closed(old["windowId"], lambda: window_ids(client))
             job["window_disposition"] = "closed"
             job["ownership_pending"] = False
+
+    def reconcile_scope(self, job):
+        """Static preconditions shared by cleanup and the read-only diagnostic."""
+        old = job.get("metadata")
+        if not old:
+            raise Refusal("creation_outcome_unknown_requires_reconciliation")
+        pending_since = old.get("newestTabId") if job.get("ownership_pending") else None
+        if job.get("ownership_pending") and type(pending_since) is not int:
+            # No proven pre-call watermark, so an orphaned popup could escape.
+            raise Refusal("uncheckpointed_page_creation_requires_reconciliation")
+        if old.get("unboundOwnedPages"):
+            raise Refusal("unbound_owned_pages_require_reconciliation")
+        if self.preflight() != job["generation"]:
+            raise Refusal("browser_generation_changed_requires_reconciliation")
+        return pending_since
+
+    def peer_sources(self, job, pending_since):
+        """Live ready peer receipts in this state_dir and generation, with digests.
+
+        Unreadable or malformed receipts are skipped as sources, which leaves
+        their tabs unknown rather than excused. Too many sources excuse nothing.
+        """
+        if pending_since is None:
+            return [], []
+        peers, digests = [], []
+        for path in sorted(self.root.glob("*.json")):
+            peer_id = path.stem
+            if peer_id == job["job_id"] or not re.fullmatch(r"[0-9a-f]{32}", peer_id):
+                continue
+            try:
+                raw = path.read_bytes()
+                owner_raw = owner_path(self.root, peer_id).read_bytes()
+                source = peer_proof_source(
+                    json.loads(raw), json.loads(owner_raw), job["generation"], peer_id
+                )
+            except (OSError, ValueError):
+                continue
+            if source:
+                peers.append(source)
+                digests.append(hashlib.sha256(raw + b"\0" + owner_raw).hexdigest())
+        if len(peers) > PEER_SOURCE_LIMIT:
+            return [], []
+        return peers, digests
+
+    def diagnose_failed(self, job_id):
+        """Read-only proof inventory for a saved failed receipt.
+
+        Never calls dispose_failed, never writes any receipt or owner row and
+        never removes a tab or window. The only browser footprint is the
+        temporary maintenance connector window, whose closure is verified.
+        The result is not authority for a later close.
+        """
+        if not isinstance(job_id, str) or not re.fullmatch(r"[0-9a-f]{32}", job_id):
+            raise Refusal("valid_job_id_required")
+        try:
+            row = json.loads((self.root / (job_id + ".json")).read_text())
+            if not isinstance(row, dict) or row.get("job_id") != job_id:
+                raise ValueError()
+        except (OSError, ValueError):
+            return diagnostic_projection({"code": "receipt_unreadable"})
+        if row.get("status") != "failed" or row.get("relay_mode"):
+            return diagnostic_projection({"code": "diagnostic_not_applicable"})
+        job = {
+            "job_id": job_id,
+            "metadata": row.get("metadata"),
+            "ownership_pending": row.get("ownership_pending"),
+            "generation": row.get("generation"),
+        }
+        try:
+            pending_since = self.reconcile_scope(job)
+            peers, _ = self.peer_sources(job, pending_since)
+            args = {
+                "old": job["metadata"],
+                "clientName": row.get("client_name"),
+                "connectorOrigin": EXTENSION,
+                "removalIssued": removal_issued(row),
+                "pendingSince": pending_since,
+                "peers": peers,
+            }
+            with self.bootstrap(), self.maintenance_connector() as client:
+                value = code(client, failed_cleanup_js(args, remove=False, diagnose=True))
+            if self.preflight() != job["generation"]:
+                raise Refusal("browser_generation_changed_requires_reconciliation")
+        except Refusal as error:
+            reason = str(error)
+            return diagnostic_projection(
+                {"code": reason if reason in DIAGNOSTIC_REFUSALS else "diagnostic_unavailable"}
+            )
+        except Exception:
+            return diagnostic_projection({"code": "diagnostic_unavailable"})
+        return diagnostic_projection(value)
 
     def dispose_relay_live(self, job):
         if self.preflight() != job["generation"]:
@@ -1526,10 +1786,21 @@ def serve(route):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", required=True, type=Path)
+    parser.add_argument(
+        "--diagnose-failed",
+        metavar="JOB_ID",
+        help="Print a read-only, content-free cleanup proof inventory and exit",
+    )
     args = parser.parse_args()
     try:
         config = json.loads(args.config.read_text())
         route = Route(config)
+        if args.diagnose_failed:
+            try:
+                print(json.dumps(route.diagnose_failed(args.diagnose_failed)))
+            finally:
+                route.close_control()
+            return 0
 
         def terminate(_signum, _frame):
             raise SystemExit(0)

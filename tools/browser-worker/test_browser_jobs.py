@@ -781,7 +781,11 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
                     seen.append(
                         (removing, json.loads(receipt.read_text()).get("window_removal_issued"))
                     )
-                    return {"closed": True, "count": 1} if removing else {"ready": True, "count": 1}
+                    return (
+                        {"closed": True, "count": 1}
+                        if removing
+                        else {"ready": True, "count": 1, "proof": "a" * 64, "peerIds": []}
+                    )
                 if "maintenance_window_not_exclusive" in body:
                     return {"windowId": 77, "closed": True}
                 return {"ready": True}
@@ -845,7 +849,7 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
                     return (
                         {"closed": True, "count": 1}
                         if '"remove": true' in body
-                        else {"ready": True}
+                        else {"ready": True, "proof": "a" * 64, "peerIds": []}
                     )
                 if "maintenance_window_not_exclusive" in body:
                     return {"windowId": 77, "closed": True}
@@ -1289,7 +1293,7 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
                     return (
                         {"closed": True, "count": 1}
                         if '"remove": true' in body
-                        else {"ready": True}
+                        else {"ready": True, "proof": "a" * 64, "peerIds": []}
                     )
                 if "maintenance_window_not_exclusive" in body:
                     return {"windowId": 77, "closed": True}
@@ -1636,6 +1640,465 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
         # The receipt shape of jobs whose live close hung in the old verifier.
         out = self.failed_cleanup([], removal_issued=b.removal_issued(legacy))
         self.assertEqual(out["v"], {"closed": True, "count": 0, "alreadyClosed": True})
+
+    PEER_NAME = "EP peer CANARY_LABEL [abcd1234]"
+    PEER_URL = (
+        "chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/connect.html?client="
+        + "%7B%22name%22%3A%22EP%20peer%20CANARY_LABEL%20%5Babcd1234%5D%22%7D"
+    )
+    PEER = {"connectorId": 70, "windowId": 8, "tabIds": [70, 71, 75], "clientName": PEER_NAME}
+    PEER_FIXTURE = r"""
+const state=__STATE__;let removed=[];const hits={};
+const hit=name=>{hits[name]=(hits[name]||0)+1;const m=state.mutations&&state.mutations[name+':'+hits[name]];if(!m)return;
+  for(const op of m){if(op.move)state.tabs=state.tabs.map(t=>t.id===op.move?{...t,windowId:op.to}:t);
+    if(op.add)state.tabs=state.tabs.concat([op.add]);if(op.sessions)state.sessions=op.sessions;}};
+global.chrome={tabs:{query:async()=>{hit('query');return state.tabs.map(t=>({...t}));},getCurrent:async()=>({id:200})},
+  windows:{remove:async(id)=>{removed.push(id);state.tabs=state.tabs.filter(t=>t.windowId!==id);}},
+  tabGroups:{get:async()=>{hit('group');return {title:'fixture'};}},
+  debugger:{getTargets:async()=>{hit('debugger');return [];}},
+  runtime:{sendMessage:async(m)=>{hit('status');if(m.type==='getStatus')return state.sessions===undefined?{}:{sessions:state.sessions};return {connections:[]};}}};
+process.__epBrowserJob={connector:{evaluate:async(fn,arg)=>await fn(arg)}};
+async function attempt(){__BODY__}
+attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({...o,removed,hits})));
+"""
+
+    def peer_tabs(self):
+        return [
+            {
+                "id": 10,
+                "windowId": 5,
+                "groupId": -1,
+                "title": "CANARY_TITLE",
+                "url": "https://canary.invalid/?q=CANARY_QUERY",
+            },
+            {"id": 200, "windowId": 20, "groupId": -1},
+            {"id": 70, "windowId": 8, "groupId": 3, "url": self.PEER_URL},
+            {"id": 71, "windowId": 8, "groupId": 3, "openerTabId": 70},
+            {"id": 75, "windowId": 8, "groupId": 3},
+        ]
+
+    def peer_session(self, tabs=(70, 71, 75), name=None, sid=1):
+        return {"id": sid, "clientName": name or self.PEER_NAME, "tabIds": list(tabs)}
+
+    def peer_cleanup(
+        self,
+        tabs=None,
+        sessions="default",
+        peers=None,
+        remove=True,
+        expected=None,
+        diagnose=False,
+        mutations=None,
+        old=None,
+    ):
+        state = {"tabs": self.peer_tabs() if tabs is None else tabs, "mutations": mutations or {}}
+        if sessions == "default":
+            state["sessions"] = [self.peer_session()]
+        elif sessions is not None:
+            state["sessions"] = sessions
+        body = b.failed_cleanup_js(
+            {
+                "old": old or self.OLD,
+                "clientName": "fixture",
+                "connectorOrigin": b.EXTENSION,
+                "removalIssued": False,
+                "pendingSince": 60,
+                "peers": [self.PEER] if peers is None else peers,
+                "expectedProof": expected,
+            },
+            remove,
+            diagnose,
+        )
+        script = self.PEER_FIXTURE.replace("__STATE__", json.dumps(state)).replace("__BODY__", body)
+        run = subprocess.run(["node", "-e", script], capture_output=True, text=True, timeout=10)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        return json.loads(run.stdout)
+
+    def assert_peer_blocks(self, expected="uncheckpointed_page_arrival", **kwargs):
+        out = self.peer_cleanup(**kwargs)
+        self.assertEqual(out.get("e"), expected, out)
+        self.assertEqual(out["removed"], [])
+        return out
+
+    def test_live_ready_peer_birth_tabs_are_excused_but_never_closed(self):
+        phase_one = self.peer_cleanup(remove=False)["v"]
+        self.assertTrue(phase_one["ready"])
+        self.assertEqual(phase_one["peerIds"], [70, 71, 75])
+        self.assertRegex(phase_one["proof"], r"^[0-9a-f]{64}$")
+        out = self.peer_cleanup(expected=phase_one["proof"])
+        self.assertEqual(out["v"], {"closed": True, "count": 1, "connectorMissing": True})
+        # Only the target's exact saved window is removed; peer tabs stay.
+        self.assertEqual(out["removed"], [5])
+
+    def test_peer_exemption_requires_every_birth_and_binding_link(self):
+        tabs = self.peer_tabs()
+        orphan = {"id": 63, "windowId": 8, "groupId": 3}
+        cases = {
+            # A target orphan in a live peer session but not in its receipt.
+            "orphan_in_session_only": dict(
+                tabs=tabs + [orphan], sessions=[self.peer_session((70, 71, 75, 63))]
+            ),
+            "moved_out_of_peer_window": dict(
+                tabs=[{**t, "windowId": 9} if t["id"] == 71 else t for t in tabs]
+            ),
+            "duplicate_client_name": dict(
+                sessions=[self.peer_session(), self.peer_session((90,), sid=2)]
+            ),
+            "session_lacks_connector": dict(sessions=[self.peer_session((71, 75))]),
+            "connector_client_mismatch": dict(
+                tabs=[{**t, "url": self.CONNECTOR_URL} if t["id"] == 70 else t for t in tabs]
+            ),
+            "connector_wrong_origin": dict(
+                tabs=[
+                    {**t, "url": "https://canary.invalid/connect.html"} if t["id"] == 70 else t
+                    for t in tabs
+                ]
+            ),
+            "other_session_claims_tab": dict(
+                sessions=[
+                    self.peer_session(),
+                    self.peer_session((71,), name="EP other [ffff0000]", sid=2),
+                ]
+            ),
+            "unsupported_status_schema": dict(sessions=None),
+            "partial_status": dict(sessions=[{"clientName": self.PEER_NAME, "tabIds": [70, "71"]}]),
+            "no_peer_receipt": dict(peers=[]),
+            "overlapping_receipts": dict(peers=[self.PEER, {**self.PEER, "connectorId": 75}]),
+            "foreign_opener": dict(
+                tabs=[{**t, "openerTabId": 300} if t["id"] == 75 else t for t in tabs]
+            ),
+        }
+        for name, kwargs in cases.items():
+            with self.subTest(name):
+                self.assert_peer_blocks(**kwargs)
+
+    def test_target_extras_and_descendants_block_even_when_a_peer_claims_them(self):
+        descendant = {"id": 72, "windowId": 8, "groupId": 3, "openerTabId": 10}
+        hop = {"id": 73, "windowId": 9, "groupId": -1, "openerTabId": 72}
+        extra = {"id": 74, "windowId": 5, "groupId": -1}
+        claimed = {**self.PEER, "tabIds": [70, 71, 72, 73, 74, 75]}
+        session = [self.peer_session((70, 71, 72, 73, 74, 75))]
+        for added in ([descendant], [descendant, hop], [extra]):
+            with self.subTest(added=[t["id"] for t in added]):
+                self.assert_peer_blocks(
+                    tabs=self.peer_tabs() + added, peers=[claimed], sessions=session
+                )
+        # A missing saved working tab still refuses before any exemption.
+        self.assert_peer_blocks(
+            expected="saved_owned_tab_missing",
+            tabs=[t for t in self.peer_tabs() if t["id"] != 10],
+        )
+
+    def test_changed_proof_during_any_async_boundary_never_removes(self):
+        grouped_old = {**self.OLD}
+        grouped = [{**t, "groupId": 7} if t["id"] == 10 else t for t in self.peer_tabs()]
+        moved_in = [{"move": 71, "to": 5}]
+        drop = [{"sessions": [self.peer_session((70, 75))]}]
+        stray = [{"add": {"id": 64, "windowId": 9, "groupId": -1}}]
+        cases = {
+            "during_debugger": dict(mutations={"debugger:1": moved_in}),
+            "during_group_title": dict(tabs=grouped, old=grouped_old, mutations={"group:1": drop}),
+            "new_orphan_during_debugger": dict(mutations={"debugger:1": stray}),
+            # Reads: 1 initial, 2 after debugger, 3 final before remove. Each
+            # read sends two getStatus messages after its tab query.
+            "immediately_before_remove": dict(mutations={"status:5": drop}),
+        }
+        for name, kwargs in cases.items():
+            with self.subTest(name):
+                self.assert_peer_blocks(expected="cleanup_proof_changed", **kwargs)
+        # A phase-one digest that no longer matches refuses at phase-two start.
+        out = self.peer_cleanup(expected="b" * 64)
+        self.assertEqual((out.get("e"), out["removed"]), ("cleanup_proof_changed", []))
+
+    def test_change_after_last_read_is_reported_uncertain_not_success(self):
+        # Chrome has no compare-and-remove. A tab moved into the target window
+        # after the final read is closed with it; the post-close inventory must
+        # refuse success rather than hide the foreign closure.
+        out = self.peer_cleanup(mutations={"status:6": [{"move": 71, "to": 5}]})
+        self.assertEqual(out.get("e"), "owned_cleanup_inventory_uncertain")
+        self.assertEqual(out["removed"], [5])
+
+    def test_diagnostic_inventory_is_content_free_and_never_removes(self):
+        orphan = {"id": 63, "windowId": 9, "groupId": -1, "title": "CANARY_TITLE"}
+        out = self.peer_cleanup(tabs=self.peer_tabs() + [orphan], diagnose=True)
+        self.assertEqual(out["removed"], [])
+        self.assertEqual(out["hits"].get("group"), None)
+        projected = b.diagnostic_projection({**out["v"], "extra": "CANARY_EXTRA"})
+        self.assertEqual(
+            projected,
+            {
+                "authority": False,
+                "observer": "temporary_maintenance_connector",
+                "ready": False,
+                "code": "uncheckpointed_page_arrival",
+                "targetExtraIds": [],
+                "descendantIds": [],
+                "missingSavedIds": [1],
+                "peerIds": [70, 71, 75],
+                "unknownIds": [63],
+            },
+        )
+        self.assertNotIn("CANARY", json.dumps(out["v"]) + json.dumps(projected))
+        self.assertEqual(
+            b.diagnostic_projection({"code": "CANARY_TEXT"})["code"], "diagnostic_unclassified"
+        )
+        many = b.diagnostic_projection({"unknownIds": list(range(100)), "peerIds": ["CANARY"]})
+        self.assertEqual(
+            (len(many["unknownIds"]), many["unknownIdsTruncated"], many["peerIds"]),
+            (64, True, None),
+        )
+
+    def peer_receipt(self, generation, **changes):
+        row = {
+            "job_id": "e" * 32,
+            "status": "ready",
+            "client_name": self.PEER_NAME,
+            "generation": generation,
+            "metadata": {
+                "connectorId": 70,
+                "windowId": 8,
+                "tabIds": [70, 71, 75],
+                "unboundOwnedPages": 0,
+            },
+            "ownership_pending": False,
+            "sealed": False,
+        }
+        row.update(changes)
+        return row
+
+    def test_only_live_ready_same_generation_peer_receipts_are_sources(self):
+        gen = {"pid": 123, "started": "synthetic"}
+        active = {"job_id": "e" * 32, "state": "active"}
+        self.assertEqual(
+            b.peer_proof_source(self.peer_receipt(gen), active, gen, "e" * 32),
+            {
+                "connectorId": 70,
+                "windowId": 8,
+                "tabIds": [70, 71, 75],
+                "clientName": self.PEER_NAME,
+            },
+        )
+        meta = self.peer_receipt(gen)["metadata"]
+        refused = {
+            "pending": (self.peer_receipt(gen, ownership_pending=True), active),
+            "pending_missing": (
+                {k: v for k, v in self.peer_receipt(gen).items() if k != "ownership_pending"},
+                active,
+            ),
+            "failed": (self.peer_receipt(gen, status="failed"), active),
+            "finished": (self.peer_receipt(gen, status="finished"), active),
+            "terminal_owner": (self.peer_receipt(gen), {**active, "state": "terminal"}),
+            "other_generation": (self.peer_receipt({"pid": 9, "started": "other"}), active),
+            "relay": (self.peer_receipt(gen, relay_mode=True), active),
+            "sealed": (self.peer_receipt(gen, sealed=True), active),
+            "disposed": (self.peer_receipt(gen, window_disposition="closed"), active),
+            "bool_id": (self.peer_receipt(gen, metadata={**meta, "windowId": True}), active),
+            "connector_not_owned": (
+                self.peer_receipt(gen, metadata={**meta, "tabIds": [71, 75]}),
+                active,
+            ),
+            "duplicate_ids": (
+                self.peer_receipt(gen, metadata={**meta, "tabIds": [70, 71, 71]}),
+                active,
+            ),
+            "unbound_pages": (
+                self.peer_receipt(gen, metadata={**meta, "unboundOwnedPages": 1}),
+                active,
+            ),
+            "wrong_job": (self.peer_receipt(gen, job_id="f" * 32), active),
+        }
+        for name, (row, owner) in refused.items():
+            with self.subTest(name):
+                self.assertIsNone(b.peer_proof_source(row, owner, gen, "e" * 32))
+
+    def write_peer(self, root, row, state="active"):
+        (Path(root) / (row["job_id"] + ".json")).write_text(json.dumps(row))
+        owners = Path(root) / "owners"
+        owners.mkdir(exist_ok=True)
+        (owners / (row["job_id"] + ".json")).write_text(
+            json.dumps({"job_id": row["job_id"], "state": state, "session_id": "s"})
+        )
+
+    def test_peer_sources_read_only_this_state_dir_and_skip_unreadable(self):
+        with tempfile.TemporaryDirectory() as root, tempfile.TemporaryDirectory() as elsewhere:
+            route = self.route(root)
+            job = self.full_job(route)
+            self.write_peer(elsewhere, self.peer_receipt(job["generation"]))
+            self.assertEqual(route.peer_sources(job, 60), ([], []))
+            self.write_peer(root, self.peer_receipt(job["generation"]))
+            (Path(root) / ("c" * 32 + ".json")).write_text("{not json")
+            peers, digests = route.peer_sources(job, 60)
+            self.assertEqual([p["connectorId"] for p in peers], [70])
+            self.assertEqual(len(digests), 1)
+            # No pending call means no watermark, so no peer is consulted.
+            self.assertEqual(route.peer_sources(job, None), ([], []))
+
+    def pending_peer_route(self, root, on_phase_one=None, generations=None):
+        route = self.route(root)
+        job = self.full_job(route)
+        job["ownership_pending"] = True
+        job["metadata"]["newestTabId"] = 60
+        route.save(job)
+        self.write_peer(root, self.peer_receipt(job["generation"]))
+        phases = []
+        if generations is not None:
+            sequence = iter(generations)
+            route.preflight = lambda: next(sequence)
+
+        def fake(_, body):
+            if "async({old,clientName," in body:
+                removing = '"remove": true' in body
+                phases.append(removing)
+                if removing:
+                    return {"closed": True, "count": 1}
+                if on_phase_one:
+                    on_phase_one()
+                return {"ready": True, "count": 1, "proof": "a" * 64, "peerIds": [71]}
+            if "maintenance_window_not_exclusive" in body:
+                return {"windowId": 77, "closed": True}
+            return {"ready": True}
+
+        return route, job, phases, fake
+
+    def run_pending_finish(self, route, job, fake):
+        with (
+            patch.object(
+                route, "client", create=True, return_value=SimpleNamespace(close=lambda: None)
+            ),
+            patch.object(b, "code", side_effect=fake),
+            patch.object(b, "verify_window_closed"),
+            patch.object(b.time, "sleep"),
+        ):
+            route.dispose_failed(job)
+
+    def test_peer_receipt_change_between_phases_never_removes(self):
+        gen = {"pid": 123, "started": "synthetic"}
+        changes = {
+            "new_tab": dict(
+                metadata={
+                    "connectorId": 70,
+                    "windowId": 8,
+                    "tabIds": [70, 71, 75, 76],
+                    "unboundOwnedPages": 0,
+                }
+            ),
+            "turned_failed": dict(status="failed"),
+            "turned_pending": dict(ownership_pending=True),
+            "same_fields_new_bytes": dict(updated=1),
+        }
+        for name, change in changes.items():
+            with self.subTest(name), tempfile.TemporaryDirectory() as root:
+                holder = {}
+                route, job, phases, fake = self.pending_peer_route(
+                    root,
+                    on_phase_one=lambda: self.write_peer(
+                        holder["root"], self.peer_receipt(gen, **change)
+                    ),
+                )
+                holder["root"] = root
+                with self.assertRaisesRegex(Refusal, "peer_proof_changed"):
+                    self.run_pending_finish(route, job, fake)
+                self.assertEqual(phases, [False])
+        with tempfile.TemporaryDirectory() as root:
+            route, job, phases, fake = self.pending_peer_route(
+                root,
+                on_phase_one=lambda: self.write_peer(
+                    root, self.peer_receipt(gen), state="terminal"
+                ),
+            )
+            with self.assertRaisesRegex(Refusal, "peer_proof_changed"):
+                self.run_pending_finish(route, job, fake)
+            self.assertEqual(phases, [False])
+
+    def test_generation_is_checked_at_use_before_and_after_removal(self):
+        gen = {"pid": 123, "started": "synthetic"}
+        other = {"pid": 124, "started": "restarted"}
+        # Calls: scope check, before phase two, after removal.
+        for sequence, expected, phases in (
+            ([gen, other], "browser_generation_changed_requires_reconciliation", [False]),
+            ([gen, gen, other], "failed_cleanup_uncertain", [False, True]),
+        ):
+            with self.subTest(sequence=sequence), tempfile.TemporaryDirectory() as root:
+                route, job, seen, fake = self.pending_peer_route(root, generations=sequence)
+                with self.assertRaisesRegex(Refusal, expected):
+                    self.run_pending_finish(route, job, fake)
+                self.assertEqual(seen, phases)
+                self.assertNotEqual(job.get("window_disposition"), "closed")
+                self.assertTrue(job["ownership_pending"])
+
+    def test_diagnostic_entry_point_has_no_dispose_or_receipt_side_effects(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            route.bootstrap = contextlib.nullcontext
+            job = self.full_job(route)
+            job["ownership_pending"] = True
+            job["metadata"]["newestTabId"] = 60
+            route.save(job)
+            live = SimpleNamespace(closed=False, close=lambda: self.fail("live client closed"))
+            route.jobs[job["job_id"]] = {**job, "client": live, "status": "ready"}
+            self.write_peer(root, self.peer_receipt(job["generation"]))
+            before = {p.name: p.read_bytes() for p in Path(root).rglob("*.json")}
+            bodies = []
+
+            def fake(_, body):
+                bodies.append(body)
+                if "async({old,clientName," in body:
+                    return {
+                        "diagnostic": True,
+                        "ready": False,
+                        "code": "uncheckpointed_page_arrival",
+                        "unknownIds": [63],
+                        "peerIds": [71],
+                        "targetExtraIds": [],
+                        "descendantIds": [],
+                        "missingSavedIds": [],
+                        "label": "CANARY_LABEL",
+                    }
+                if "maintenance_window_not_exclusive" in body:
+                    return {"windowId": 77, "closed": True}
+                return {"ready": True}
+
+            with (
+                patch.object(
+                    route, "client", create=True, return_value=SimpleNamespace(close=lambda: None)
+                ),
+                patch.object(b, "code", side_effect=fake),
+                patch.object(route, "save", side_effect=AssertionError("receipt write")),
+                patch.object(route, "dispose_failed", side_effect=AssertionError("dispose")),
+                patch.object(route, "dispose_live", side_effect=AssertionError("dispose live")),
+                patch.object(
+                    route, "capture_connection_diagnostics", side_effect=AssertionError("diag")
+                ),
+            ):
+                out = route.diagnose_failed(job["job_id"])
+            self.assertEqual(
+                (out["ready"], out["code"], out["unknownIds"]),
+                (False, "uncheckpointed_page_arrival", [63]),
+            )
+            self.assertFalse(out["authority"])
+            self.assertNotIn("CANARY", json.dumps(out))
+            self.assertTrue(any('"diagnose": true' in body for body in bodies))
+            self.assertFalse(any('"remove": true' in body for body in bodies))
+            self.assertEqual({p.name: p.read_bytes() for p in Path(root).rglob("*.json")}, before)
+
+            def boom(_, body):
+                if "async({old,clientName," in body:
+                    raise RuntimeError("CANARY_EXCEPTION https://canary.invalid/?token=CANARY")
+                return fake(_, body)
+
+            with (
+                patch.object(
+                    route, "client", create=True, return_value=SimpleNamespace(close=lambda: None)
+                ),
+                patch.object(b, "code", side_effect=boom),
+                patch.object(route, "save", side_effect=AssertionError("receipt write")),
+            ):
+                out = route.diagnose_failed(job["job_id"])
+            self.assertEqual(out["code"], "diagnostic_unavailable")
+            self.assertNotIn("CANARY", json.dumps(out))
+            with self.assertRaises(Refusal):
+                route.diagnose_failed("../" + "a" * 29)
+            self.assertEqual(route.diagnose_failed("a" * 32)["code"], "receipt_unreadable")
 
     def sealed_route(self, root):
         route = self.route(root)
