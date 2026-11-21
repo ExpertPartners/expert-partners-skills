@@ -36,6 +36,7 @@ Access is enforced in the gateway, in `src/access.ts`, from the November 20, 202
 - Departments. A department identity reads its own folders from the Departments, Workspaces and Brain Folders map, its company's outputs folder, and shared HQ governance (`hq-core`). Marketing departments also read `hq-library`. A department reaches another department only through a named exception in `DEPARTMENTS[...].exceptions`, which stays empty until a decision names the source.
 - Effective scopes are always the deployed `ALLOWED_SCOPES` intersected with the caller's profile, so a profile can never widen the allowlist.
 - The Hub token acts as Allison and may narrow itself with the `X-Brain-Department` header. Department tokens are fixed to their department. They are stored only as SHA-256 hashes in the `DEPARTMENT_TOKEN_HASHES` secret (`{"<hash>":"<department id>"}`), and none are issued yet.
+- Withheld sources. A historical or unapproved document that still sits in an approved folder is withheld by its Drive file id in the `WITHHELD_SOURCES` secret, a JSON array such as `["<file id>"]`. `discover` never lists it, including by name query, and reports only a `withheld` count. `read` refuses it with 403 before any Drive call. An unreadable or malformed list refuses every tool call instead of withholding nothing, and an empty array withholds nothing. The ids live in the Worker secret, not here, because this repository is public. The source's owning department decides which ids belong there.
 - MCP sign-in uses the signed-in person's profile. Per-department narrowing on MCP needs a separate sign-in identity per department, which comes with each department's Week 4 decision rights.
 
 ## Daily health check
@@ -53,6 +54,7 @@ Secrets live only in 1Password and in the Worker's Cloudflare secrets. Nothing i
 | `COOKIE_ENCRYPTION_KEY` | Encrypts the approval cookie |
 | `ACCESS_CLIENT_ID`, `ACCESS_CLIENT_SECRET` | Cloudflare Access OIDC app |
 | `ACCESS_AUTHORIZATION_URL`, `ACCESS_TOKEN_URL`, `ACCESS_JWKS_URL` | Access OIDC endpoints |
+| `WITHHELD_SOURCES` | JSON array of Drive file ids withheld from discovery and reads (not a credential, kept out of this public repository) |
 
 ## Develop and deploy
 

@@ -246,3 +246,35 @@ test("the service account assertion asks only for drive.readonly", async () => {
 	assert.throws(() => parseKey(undefined), /not set/);
 	assert.throws(() => parseKey("{}"), /not a service account key/);
 });
+
+test("a withheld source is neither listed nor readable, by id or by name query", async () => {
+	const legacy = file("legacy1", { name: "n-legacy-historical" });
+	const env = { ALLOWED_SCOPES: SCOPES, WITHHELD_SOURCES: JSON.stringify(["legacy1"]) };
+	const { drive, calls } = fakeDrive({ pages: [[file("d1"), legacy]], bodies: { d1: "hi", legacy1: "old" } });
+	const listed = await runTool("discover", { scope: "ep-core" }, env, drive);
+	assert.ok(listed.ok);
+	assert.deepEqual((listed.result as any).files.map((f: F) => f.id), ["d1"]);
+	assert.equal((listed.result as any).withheld, 1);
+	assert.doesNotMatch(JSON.stringify(listed), /legacy-historical/);
+	const byName = await runTool("discover", { scope: "ep-core", query: "legacy" }, env, drive);
+	assert.doesNotMatch(JSON.stringify(byName), /legacy1|legacy-historical/);
+	const before = calls.length;
+	const read = await runTool("read", { scope: "ep-core", id: "legacy1" }, env, drive);
+	assert.equal(read.ok, false);
+	assert.equal(read.status, 403);
+	assert.equal(calls.length, before, "a withheld read makes no Drive call");
+	assert.doesNotMatch(JSON.stringify(read), /old|legacy-historical/);
+	const other = await runTool("read", { scope: "ep-core", id: "d1" }, env, drive);
+	assert.ok(other.ok);
+});
+
+test("a malformed withheld list fails closed instead of serving everything", async () => {
+	const { drive } = fakeDrive({ pages: [[file("d1")]], bodies: { d1: "hi" } });
+	for (const bad of ["not json", "{\"a\":1}", "[\"ok\", 5]", "[\"../x\"]"]) {
+		const r = await runTool("discover", { scope: "ep-core" }, { ALLOWED_SCOPES: SCOPES, WITHHELD_SOURCES: bad }, drive);
+		assert.equal(r.ok, false);
+		assert.equal(r.status, 502);
+	}
+	const unset = await runTool("discover", { scope: "ep-core" }, { ALLOWED_SCOPES: SCOPES }, drive);
+	assert.ok(unset.ok && (unset.result as any).withheld === 0);
+});

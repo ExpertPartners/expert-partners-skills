@@ -42,7 +42,7 @@ test("new department scopes discover only their exact registered direct children
 		assert.equal(calls.length, 1);
 		if (result.ok) {
 			const discovery = result.result as { scope: string; folderId: string; files: unknown[]; complete: boolean; readAt: string };
-			assert.deepEqual({ ...discovery, readAt: undefined }, { scope, folderId: BRAIN_FOLDERS[scope], files: [], complete: true, readAt: undefined });
+			assert.deepEqual({ ...discovery, readAt: undefined }, { scope, folderId: BRAIN_FOLDERS[scope], files: [], complete: true, withheld: 0, readAt: undefined });
 			assert.ok(Number.isFinite(Date.parse(discovery.readAt)));
 		}
 	}

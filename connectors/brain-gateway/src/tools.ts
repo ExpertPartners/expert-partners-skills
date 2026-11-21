@@ -8,6 +8,7 @@ import {
 	BRAIN_FOLDERS,
 	createBrainReads,
 	DEFAULT_PAGE_CHARS,
+	parseWithheld,
 	type DriveFetch,
 	MAX_PAGE_CHARS,
 } from "./brain.ts";
@@ -16,6 +17,7 @@ import { driveFetch } from "./google.ts";
 export interface ToolEnv {
 	GOOGLE_SA_KEY?: string;
 	ALLOWED_SCOPES?: string;
+	WITHHELD_SOURCES?: string;
 }
 
 export interface ToolDef {
@@ -84,7 +86,7 @@ export async function runTool(name: string, args: unknown, env: ToolEnv, drive?:
 	const parsed = tool.schema.safeParse(args ?? {});
 	if (!parsed.success) return { ok: false, error: "Invalid arguments", status: 400, detail: parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ") };
 	try {
-		const reads = createBrainReads(drive ?? driveFetch(env.GOOGLE_SA_KEY));
+		const reads = createBrainReads(drive ?? driveFetch(env.GOOGLE_SA_KEY), undefined, parseWithheld(env.WITHHELD_SOURCES));
 		return { ok: true, result: await tool.run(parsed.data, reads, effectiveScopes(env.ALLOWED_SCOPES, principal)), status: 200 };
 	} catch (e) {
 		// Never echo provider payloads, URLs, credentials or document text in errors.
