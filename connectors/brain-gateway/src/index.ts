@@ -1,5 +1,6 @@
 // Drive brain gateway: one read-only Worker serving Claude, ChatGPT and Factory (remote MCP at /mcp,
 // OAuth through Cloudflare Access, Allison only) and the Expert Partners Hub (bearer HTTP at /api).
+import { maybeAlert, type AlertEnv } from "./alert.ts";
 import { env } from "cloudflare:workers";
 import OAuthProvider from "@cloudflare/workers-oauth-provider";
 import { McpServer } from "@modelcontextprotocol/server";
@@ -125,6 +126,7 @@ export default {
 				const result = await runDeepCheck(bindings.ALLOWED_SCOPES, driveFetch(bindings.GOOGLE_SA_KEY));
 				await storeResult(bindings.OAUTH_KV, result);
 				if (!result.ok) console.error("[brain-gateway] daily check failed:", JSON.stringify(result.checks.filter((c) => !c.ok)));
+				console.log("[brain-gateway] alert:", await maybeAlert(bindings.OAUTH_KV, bindings as unknown as AlertEnv, result));
 			})(),
 		);
 	},

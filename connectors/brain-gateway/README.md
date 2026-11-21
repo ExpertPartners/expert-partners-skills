@@ -66,3 +66,7 @@ npm test
 Deploy with `npx wrangler deploy` after the KV namespace id in `wrangler.jsonc` is real and the secrets above are set.
 
 The base comes from Cloudflare's MIT licensed `remote-mcp-cf-access` demo through `connectors/factory-connection`. The scope map, discovery and verified-read contract come from the Expert Partners Hub reader.
+
+## Failure alerts
+
+The daily check texts Allison through the existing Sendblue line when a check fails, and once when it recovers (`src/alert.ts`). Secrets set with `wrangler secret put` from 1Password (Ember vault, Sendblue API and Secret Key): `SENDBLUE_API_KEY_ID`, `SENDBLUE_API_SECRET`, `ALERT_TO`, `ALERT_FROM`. The text names failed checks and short error codes, never document text. A refused send keeps state so the next run retries.
