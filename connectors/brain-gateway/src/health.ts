@@ -9,8 +9,10 @@ export type HealthResult = { ok: boolean; checkedAt: string; checks: Check[] };
 const MAX_DECISION_AGE_DAYS = 14;
 
 function fail(name: string, e: unknown): Check {
-	const code = (e as { code?: string })?.code ?? "error";
-	return { name, ok: false, detail: `failed (${code})` };
+	const code = (e as { code?: string })?.code;
+	// Unexpected errors keep a short message (for example a request limit). Drive errors carry no document text.
+	const msg = code ? "" : `: ${String((e as Error)?.message ?? e).slice(0, 80)}`;
+	return { name, ok: false, detail: `failed (${code ?? "error"})${msg}` };
 }
 
 export async function runDeepCheck(allowedList: string | undefined, drive: DriveFetch, now = () => new Date()): Promise<HealthResult> {
@@ -19,11 +21,19 @@ export async function runDeepCheck(allowedList: string | undefined, drive: Drive
 	const scopes = allowedScopes(allowedList);
 	checks.push({ name: "allowlist", ok: scopes.length > 0, detail: `${scopes.length} scopes allowed` });
 
-	// Reachability, completeness and scope: every allowed scope lists its registered folder completely.
+	// Workers allow a limited number of outbound requests per run, so most scopes get one cheap probe and
+	// one scope per day (rotating) gets a complete listing. Every scope is fully listed within a few weeks.
+	const day = Math.floor(now().getTime() / 86_400_000);
+	const full = scopes.length ? scopes[day % scopes.length] : undefined;
 	for (const scope of scopes) {
 		try {
-			const r = await reads.discover(scope);
-			checks.push({ name: `scope ${scope}`, ok: r.complete && r.folderId === BRAIN_FOLDERS[scope], detail: `${r.files.length} files, complete` });
+			if (scope === full) {
+				const r = await reads.discover(scope);
+				checks.push({ name: `scope ${scope}`, ok: r.complete && r.folderId === BRAIN_FOLDERS[scope], detail: `${r.files.length} files, complete listing (today's full pass)` });
+			} else {
+				const r = await reads.probe(scope);
+				checks.push({ name: `scope ${scope}`, ok: r.reachable && r.folderId === BRAIN_FOLDERS[scope], detail: "folder answers" });
+			}
 		} catch (e) {
 			checks.push(fail(`scope ${scope}`, e));
 		}
@@ -40,15 +50,13 @@ export async function runDeepCheck(allowedList: string | undefined, drive: Drive
 		checks.push(fail("decision log complete read", e));
 	}
 
-	// Content completeness: a representative company document reads whole in the HQ core scope.
+	// The HQ Rulebook is findable in the HQ core scope with a current version (a cheap presence check).
 	try {
 		const list = await reads.discover("hq-core", "Rulebook");
-		const doc = list.files.find((f) => f.name.includes("HQ Rulebook")) ?? list.files[0];
-		if (!doc) throw Object.assign(new Error("no rulebook"), { code: "not_found" });
-		const r = await reads.read("hq-core", doc.id, 0, 1000);
-		checks.push({ name: "rulebook complete read", ok: r.totalChars > 1000 && r.text.length > 0, detail: `${r.totalChars} characters, version ${doc.version}` });
+		const doc = list.files.find((f) => f.name.includes("HQ Rulebook"));
+		checks.push({ name: "rulebook present", ok: !!doc && !!doc.version, detail: doc ? `version ${doc.version}` : "not found" });
 	} catch (e) {
-		checks.push(fail("rulebook complete read", e));
+		checks.push(fail("rulebook present", e));
 	}
 	checks.push({ name: "decision log id registered", ok: CURRENT_DECISION_LOG.length > 10, detail: "current log id present" });
 

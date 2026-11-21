@@ -171,6 +171,22 @@ export function createBrainReads(drive: DriveFetch, now = () => new Date()) {
 		return { scope, folderId: BRAIN_FOLDERS[scope], files, complete: true, readAt: now().toISOString() };
 	}
 
+	/** One cheap request: the scope's registered folder answers and lists. Used by the daily check, which has a request budget. */
+	async function probe(scope: BrainScope) {
+		const params = new URLSearchParams({
+			q: `'${BRAIN_FOLDERS[scope]}' in parents and trashed=false`,
+			pageSize: "1",
+			fields: "incompleteSearch,files(id)",
+			supportsAllDrives: "true",
+			includeItemsFromAllDrives: "true",
+		});
+		const res = await drive(`/drive/v3/files?${params}`);
+		if (!res.ok) throw new BrainError("drive_error", `Drive probe answered ${res.status}.`);
+		const body = (await res.json()) as { files?: unknown[]; incompleteSearch?: boolean };
+		if (!Array.isArray(body.files) || body.incompleteSearch) throw new BrainError("incomplete_discovery", "Drive probe was incomplete.");
+		return { scope, folderId: BRAIN_FOLDERS[scope], reachable: true };
+	}
+
 	/** Reads one whole document. Verifies direct membership in scope before and after, and that the version did not change. */
 	async function readWhole(scope: BrainScope, id: string) {
 		const inventory = await discover(scope);
@@ -220,5 +236,5 @@ export function createBrainReads(drive: DriveFetch, now = () => new Date()) {
 		};
 	}
 
-	return { discover, read, decisions };
+	return { discover, probe, read, decisions };
 }
