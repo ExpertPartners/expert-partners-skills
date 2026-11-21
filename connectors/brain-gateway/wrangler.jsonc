@@ -28,6 +28,10 @@
       "ACCESS_AUTHORIZATION_URL",
       "ACCESS_JWKS_URL",
       "COOKIE_ENCRYPTION_KEY",
+      "SENDBLUE_API_KEY_ID",
+      "SENDBLUE_API_SECRET",
+      "ALERT_TO",
+      "ALERT_FROM",
       "WITHHELD_SOURCES"
     ]
   }
