@@ -1095,10 +1095,11 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
                 source = (
                     "const urls=" + json.dumps(urls) + ";const navigations=[];"
                     "const page={context:()=>({pages:()=>urls}),url:()=>urls[0],"
-                    "goto:async u=>navigations.push(u)};"
+                    "goto:async u=>navigations.push(u),"
+                    "evaluate:async(fn,arg)=>labels.push(arg)};const labels=[];"
                     "async function run(){"
                     + b.adopt_connector_js('EP test "quoted"')
-                    + "}run().then(result=>console.log(JSON.stringify({result,navigations})));"
+                    + "}run().then(result=>console.log(JSON.stringify({result,navigations,labels})));"
                 )
                 run = subprocess.run(
                     ["node", "-e", source], capture_output=True, text=True, timeout=10
@@ -1114,8 +1115,10 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
                     self.assertEqual(
                         parse_qs(url.query), {"client": ['{"name": "EP test \\"quoted\\""}']}
                     )
+                    self.assertEqual(out["labels"], ['EP test "quoted"'])
                 else:
                     self.assertEqual(out["navigations"], [])
+                    self.assertEqual(out["labels"], [])
 
     def test_close_reason_comes_only_from_the_relay_wording(self):
         def failing(text):

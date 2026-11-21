@@ -200,12 +200,24 @@ def adopt_connector_js(client_name):
     a relay URL or token, restores the privileged connector page the route uses
     for chrome.* census and window ownership. Any other page state is left alone
     for the freshness check to refuse.
+
+    Without a relay URL the vendor page renders "Missing mcpRelayUrl parameter in
+    URL.", which reads as a failure to anyone watching. The adopted page's body is
+    replaced with a plain status line; the URL, which the ownership checks read,
+    is unchanged.
     """
     url = EXTENSION + "?client=" + quote(json.dumps({"name": client_name}), safe="")
     return (
         "const pages=page.context().pages();"
         "if(pages.length!==1||page.url()!=='about:blank')return {adopted:false};"
-        "await page.goto(" + json.dumps(url) + ");return {adopted:true};"
+        "await page.goto(" + json.dumps(url) + ");"
+        "try{await page.evaluate((name)=>{document.title='AI browser job connection';"
+        "const p=document.createElement('p');"
+        "p.style.cssText='font:16px -apple-system,sans-serif;margin:40px;color:#1f2937';"
+        "p.textContent='Connected. This tab belongs to the AI browser job '+name+"
+        "'. It closes when the job finishes. Nothing is wrong.';"
+        "document.body.replaceChildren(p);}," + json.dumps(client_name) + ");}catch{}"
+        "return {adopted:true};"
     )
 
 
