@@ -638,9 +638,11 @@ process.__epBrowserJob={connector:{evaluate:async(fn,arg)=>await fn(arg)}};
             # all saved parent tabs have already disappeared.
             script = (
                 fixture
-                + "async function attempt(){"
+                + "async function run(){"
                 + body
                 + "}\n"
+                + "async function attempt(){const v=await run();"
+                + "if(v&&v.refused){assert.deepEqual(removed,[]);throw Error(v.refused);}return v;}\n"
                 + r'''
 (async()=>{for(const w of [5,6])for(const gone of [false,true]){
   unknownWindow=w;parentGone=gone;removed=[];
@@ -683,6 +685,15 @@ async function attempt(){__BODY__}
 attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({...o,removed})));
 """
 
+    def refusal_as_error(self, out):
+        # The removing phase returns pre-removal refusals instead of throwing,
+        # so the caller can restore its issued-removal flag. None may remove.
+        refused = out.get("v", {}).get("refused") if isinstance(out.get("v"), dict) else None
+        if refused is None:
+            return out
+        self.assertEqual(out["removed"], [], out)
+        return {**{k: v for k, v in out.items() if k != "v"}, "e": refused, "preRemoval": True}
+
     def failed_cleanup(self, tabs, remove=True, removal_issued=False, pending_since=None, **state):
         body = b.failed_cleanup_js(
             {
@@ -699,7 +710,7 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
         ).replace("__BODY__", body)
         run = subprocess.run(["node", "-e", script], capture_output=True, text=True, timeout=10)
         self.assertEqual(run.returncode, 0, run.stderr)
-        return json.loads(run.stdout)
+        return self.refusal_as_error(json.loads(run.stdout))
 
     def test_missing_connector_with_only_owned_survivor_closes_exact_window(self):
         survivor = [
@@ -853,7 +864,11 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
                     seen.append(
                         (removing, json.loads(receipt.read_text()).get("window_removal_issued"))
                     )
-                    return {"closed": True, "count": 1} if removing else {"ready": True, "count": 1}
+                    return (
+                        {"closed": True, "count": 1}
+                        if removing
+                        else {"ready": True, "count": 1, "proof": "a" * 64, "peerIds": []}
+                    )
                 if "maintenance_window_not_exclusive" in body:
                     return {"windowId": 77, "closed": True}
                 return {"ready": True}
@@ -872,6 +887,366 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
             self.assertEqual([c.args[0] for c in verified.call_args_list], [5])
             row = json.loads(receipt.read_text())
             self.assertEqual((row["status"], row["window_disposition"]), ("finished", "closed"))
+
+    def test_retargeted_connector_with_unchanged_ids_changes_the_proof(self):
+        # Tab IDs, windows and groups stay identical; only the connector URL
+        # moves to another client between the proof read and the re-read.
+        fixture = self.CLEANUP_FIXTURE.replace(
+            "tabs:{query:async()=>{",
+            "tabs:{query:async()=>{state.reads=(state.reads||0)+1;"
+            "if(state.reads===state.flipAt){for(const t of state.tabs)if(t.id===1)t.url=state.flipUrl;}",
+        )
+        tabs = [
+            {"id": 1, "windowId": 5, "groupId": 7, "url": self.CONNECTOR_URL},
+            {"id": 10, "windowId": 5, "groupId": 7},
+        ]
+        for remove in (False, True):
+            with self.subTest(remove=remove):
+                body = b.failed_cleanup_js(
+                    {
+                        "old": self.OLD,
+                        "clientName": "fixture",
+                        "connectorOrigin": b.EXTENSION,
+                        "removalIssued": False,
+                        "pendingSince": None,
+                    },
+                    remove,
+                )
+                state = {
+                    "tabs": tabs,
+                    "flipAt": 2,
+                    "flipUrl": self.CONNECTOR_URL.replace("fixture", "other"),
+                }
+                script = fixture.replace("__STATE__", json.dumps(state)).replace("__BODY__", body)
+                run = subprocess.run(
+                    ["node", "-e", script], capture_output=True, text=True, timeout=10
+                )
+                self.assertEqual(run.returncode, 0, run.stderr)
+                out = self.refusal_as_error(json.loads(run.stdout))
+                self.assertEqual(out.get("e"), "cleanup_proof_changed", out)
+                self.assertEqual(out["removed"], [])
+
+    def removal_route(self, root, removing_reply):
+        route = self.route(root)
+        job = self.full_job(route)
+        route.save(job)
+        receipt = Path(root) / (job["job_id"] + ".json")
+        seen = []
+
+        def fake(_, body):
+            if "async({old,clientName," in body:
+                removing = '"remove": true' in body
+                seen.append(
+                    (removing, json.loads(receipt.read_text()).get("window_removal_issued"))
+                )
+                if removing:
+                    return removing_reply
+                return {"ready": True, "count": 1, "proof": "a" * 64, "peerIds": []}
+            if "maintenance_window_not_exclusive" in body:
+                return {"windowId": 77, "closed": True}
+            return {"ready": True}
+
+        return route, job, receipt, seen, fake
+
+    def test_pre_removal_refusal_restores_the_issued_removal_flag(self):
+        for reply, expected, prior in (
+            ({"refused": "cleanup_proof_changed"}, "cleanup_proof_changed", None),
+            ({"refused": "uncheckpointed_page_arrival"}, "uncheckpointed_page_arrival", None),
+            ({"refused": "TypeError: CANARY"}, "cleanup_precheck_failed", None),
+            ({"refused": "cleanup_proof_changed"}, "cleanup_proof_changed", True),
+        ):
+            with self.subTest(reply=reply, prior=prior), tempfile.TemporaryDirectory() as root:
+                route, job, receipt, seen, fake = self.removal_route(root, reply)
+                if prior:
+                    job["window_removal_issued"] = True
+                    route.save(job)
+                with (
+                    patch.object(
+                        route,
+                        "client",
+                        create=True,
+                        return_value=SimpleNamespace(close=lambda: None),
+                    ),
+                    patch.object(b, "code", side_effect=fake),
+                    patch.object(b, "verify_window_closed"),
+                    patch.object(b.time, "sleep"),
+                ):
+                    with self.assertRaisesRegex(Refusal, "^" + expected + "$"):
+                        route.dispose_failed(job)
+                # Set only for the removing call itself, then put back.
+                self.assertEqual(seen, [(False, prior), (True, True)])
+                row = json.loads(receipt.read_text())
+                self.assertEqual(row.get("window_removal_issued"), prior)
+                self.assertEqual(job.get("window_removal_issued"), prior)
+                self.assertNotEqual(row.get("window_disposition"), "closed")
+                self.assertNotIn("CANARY", receipt.read_text())
+
+    def contended_route(self, root):
+        import fcntl
+
+        route, job, receipt, seen, fake = self.removal_route(root, {"closed": True, "count": 1})
+        route.jobs[job["job_id"]] = job
+        peer = {"fd": None, "contend": True}
+
+        def phase_one_then_hold(client, body):
+            out = fake(client, body)
+            if "async({old,clientName," in body and peer["contend"] and peer["fd"] is None:
+                # A peer takes receipts.lock between the phases and keeps it
+                # until after the caller has returned.
+                fd = os.open(Path(root) / "receipts.lock", os.O_CREAT | os.O_RDWR, 0o600)
+                fcntl.flock(fd, fcntl.LOCK_EX)
+                peer["fd"] = fd
+                peer["receipt"] = receipt.read_bytes()
+            return out
+
+        def release():
+            if peer["fd"] is not None:
+                fcntl.flock(peer["fd"], fcntl.LOCK_UN)
+                os.close(peer["fd"])
+                peer["fd"] = None
+            peer["contend"] = False
+
+        patches = contextlib.ExitStack()
+        patches.enter_context(
+            patch.object(
+                route, "client", create=True, return_value=SimpleNamespace(close=lambda: None)
+            )
+        )
+        patches.enter_context(patch.object(b, "code", side_effect=phase_one_then_hold))
+        patches.enter_context(patch.object(b, "verify_window_closed"))
+        patches.enter_context(patch.object(b, "RECEIPTS_LOCK_TIMEOUT", 0.3))
+        return route, job, receipt, seen, peer, release, patches
+
+    def assert_contended_refusal(self, receipt, seen, peer, elapsed):
+        # One bound plus slack, while the peer still holds the lock, and no
+        # write at all once the peer took it.
+        self.assertLess(elapsed, 0.3 + 1.0)
+        self.assertEqual(seen, [(False, None)])
+        self.assertEqual(receipt.read_bytes(), peer["receipt"])
+        row = json.loads(receipt.read_text())
+        self.assertEqual(row["status"], "failed")
+        self.assertNotIn("window_removal_issued", row)
+        self.assertNotIn("window_disposition", row)
+
+    def test_real_finish_returns_after_one_bound_while_peer_holds_receipts_lock(self):
+        with tempfile.TemporaryDirectory() as root:
+            route, job, receipt, seen, peer, release, patches = self.contended_route(root)
+            with patches:
+                try:
+                    started = time.monotonic()
+                    with self.assertRaisesRegex(Refusal, "^receipts_lock_busy$"):
+                        route.call("browser_job_finish", {"job_id": job["job_id"]})
+                    elapsed = time.monotonic() - started
+                    self.assertIsNotNone(peer["fd"])
+                    self.assert_contended_refusal(receipt, seen, peer, elapsed)
+                    self.assertNotEqual(job["status"], "finished")
+                    self.assertNotIn("window_removal_issued", job)
+                    self.assertEqual(
+                        job["timings"][-1]["stages"][-1][0], "failed:receipts_lock_busy"
+                    )
+                finally:
+                    release()
+                # Once the peer is gone the same job retries and settles closed.
+                seen.clear()
+                route.call("browser_job_finish", {"job_id": job["job_id"]})
+            self.assertEqual(seen, [(False, None), (True, True)])
+            row = json.loads(receipt.read_text())
+            self.assertEqual((row["status"], row["window_disposition"]), ("finished", "closed"))
+            self.assertIs(row["ownership_pending"], False)
+
+    def test_real_recover_returns_after_one_bound_while_peer_holds_receipts_lock(self):
+        with tempfile.TemporaryDirectory() as root:
+            route, job, receipt, seen, peer, release, patches = self.contended_route(root)
+            route.connect = lambda _: self.fail("recover must not reconnect after a refusal")
+            with patches:
+                try:
+                    started = time.monotonic()
+                    reply = route.call("browser_job_recover", {"job_id": job["job_id"]})
+                    elapsed = time.monotonic() - started
+                    self.assertIsNotNone(peer["fd"])
+                    self.assertTrue(reply.get("isError"), reply)
+                    self.assertIn("Recovery refused", decode(reply)["error"])
+                    self.assert_contended_refusal(receipt, seen, peer, elapsed)
+                    self.assertEqual(job["status"], "failed")
+                finally:
+                    release()
+                seen.clear()
+                route.call("browser_job_finish", {"job_id": job["job_id"]})
+            self.assertEqual(seen, [(False, None), (True, True)])
+            row = json.loads(receipt.read_text())
+            self.assertEqual((row["status"], row["window_disposition"]), ("finished", "closed"))
+
+    def reconnect_route(self, root):
+        import fcntl
+
+        route, job, receipt, seen, peer, release, patches = self.contended_route(root)
+        peer["contend"] = False
+
+        def hold():
+            fd = os.open(Path(root) / "receipts.lock", os.O_CREAT | os.O_RDWR, 0o600)
+            fcntl.flock(fd, fcntl.LOCK_EX)
+            peer["fd"] = fd
+            peer["receipt"] = receipt.read_bytes()
+
+        return route, job, receipt, peer, hold, release, patches
+
+    def recover_while_held(self, route, job, peer):
+        started = time.monotonic()
+        reply = route.call("browser_job_recover", {"job_id": job["job_id"]})
+        elapsed = time.monotonic() - started
+        # Returned within one bound plus slack while the peer still holds it.
+        self.assertIsNotNone(peer["fd"])
+        self.assertLess(elapsed, 0.3 + 1.0)
+        self.assertTrue(reply.get("isError"), reply)
+        self.assertIn("Recovery refused", decode(reply)["error"])
+        return reply
+
+    def test_recover_reconnect_bootstrap_contention_keeps_the_finished_receipt(self):
+        with tempfile.TemporaryDirectory() as root:
+            route, job, receipt, peer, hold, release, patches = self.reconnect_route(root)
+            entries = []
+            real_bootstrap = route.bootstrap
+
+            @contextlib.contextmanager
+            def bootstrap():
+                with real_bootstrap():
+                    entries.append(True)
+                    if len(entries) == 2:
+                        hold()
+                    yield
+
+            route.bootstrap = bootstrap
+            route.connect = lambda _: self.fail("no connection after a refused starting save")
+            with patches:
+                try:
+                    self.recover_while_held(route, job, peer)
+                    self.assertEqual(receipt.read_bytes(), peer["receipt"])
+                finally:
+                    release()
+            row = json.loads(receipt.read_text())
+            self.assertEqual((row["status"], row["window_disposition"]), ("finished", "closed"))
+            # Memory agrees with disk: the old pages closed and nothing new exists.
+            self.assertEqual(job["status"], "finished")
+            self.assertEqual(job["metadata"], row["metadata"])
+            self.assertIsNone(job["client"])
+            with self.assertRaisesRegex(Refusal, "only_failed_jobs_recover"):
+                route.call("browser_job_recover", {"job_id": job["job_id"]})
+
+    def test_recover_contention_inside_new_connection_keeps_exact_ids_durable(self):
+        with tempfile.TemporaryDirectory() as root:
+            route, job, receipt, peer, hold, release, patches = self.reconnect_route(root)
+
+            def connect(j):
+                j["metadata"] = {**self.OLD, "unboundOwnedPages": 0}
+                route.checkpoint(j, "connecting")
+                hold()
+                route.checkpoint(j, "ready")
+
+            route.connect = connect
+            with patches:
+                try:
+                    self.recover_while_held(route, job, peer)
+                    self.assertEqual(receipt.read_bytes(), peer["receipt"])
+                    row = json.loads(receipt.read_text())
+                    # Never ready and never closed: the IDs saved before the
+                    # contention remain the exact reconciliation input.
+                    self.assertEqual(row["status"], "connecting")
+                    self.assertEqual(row["metadata"]["windowId"], self.OLD["windowId"])
+                    self.assertNotIn("window_disposition", row)
+                    self.assertEqual(job["status"], "failed")
+                finally:
+                    release()
+                route.call("browser_job_finish", {"job_id": job["job_id"]})
+            row = json.loads(receipt.read_text())
+            self.assertEqual((row["status"], row["window_disposition"]), ("finished", "closed"))
+
+    def test_recover_connection_failure_under_contention_stays_unsettled(self):
+        lifecycle_spec = importlib.util.spec_from_file_location(
+            "lifecycle_for_recover", SCRIPTS / "browser_lifecycle.py"
+        )
+        lifecycle = importlib.util.module_from_spec(lifecycle_spec)
+        lifecycle_spec.loader.exec_module(lifecycle)
+        with tempfile.TemporaryDirectory() as root:
+            route, job, receipt, peer, hold, release, patches = self.reconnect_route(root)
+
+            def connect(j):
+                hold()
+                raise Refusal("connector_identity_unavailable")
+
+            route.connect = connect
+            with patches:
+                try:
+                    self.recover_while_held(route, job, peer)
+                    self.assertEqual(receipt.read_bytes(), peer["receipt"])
+                    row = json.loads(receipt.read_text())
+                    # The creation outcome is unknown: neither settled nor
+                    # eligible for the no-artifacts census.
+                    self.assertEqual(row["status"], "starting")
+                    self.assertIsNone(row["metadata"])
+                    self.assertFalse(lifecycle.census_eligible(row))
+                    self.assertEqual(job["status"], "failed")
+                finally:
+                    release()
+                reply = route.call("browser_job_recover", {"job_id": job["job_id"]})
+            self.assertTrue(reply.get("isError"), reply)
+            row = json.loads(receipt.read_text())
+            self.assertEqual(row["status"], "failed")
+            self.assertNotIn("window_disposition", row)
+            self.assertEqual(
+                job["timings"][-1]["stages"][-1][0],
+                "failed:creation_outcome_unknown_requires_reconciliation",
+            )
+
+    def test_uncontended_recover_reports_ready_without_the_old_disposition(self):
+        with tempfile.TemporaryDirectory() as root:
+            route, job, receipt, peer, hold, release, patches = self.reconnect_route(root)
+
+            def connect(j):
+                j["metadata"] = {**self.OLD, "windowId": 6, "unboundOwnedPages": 0}
+                route.checkpoint(j, "connecting")
+                route.checkpoint(j, "ready")
+
+            route.connect = connect
+            with patches:
+                reply = route.call("browser_job_recover", {"job_id": job["job_id"]})
+            self.assertFalse(reply.get("isError"), reply)
+            self.assertTrue(decode(reply)["previous_pages_closed"])
+            row = json.loads(receipt.read_text())
+            self.assertEqual((row["status"], row["metadata"]["windowId"]), ("ready", 6))
+            self.assertNotIn("window_disposition", row)
+            self.assertNotIn("window_removal_issued", row)
+
+    def test_destructive_call_timeout_is_bounded_and_restored(self):
+        client = SimpleNamespace(timeout=120)
+        observed = []
+        with patch.object(b, "code", side_effect=lambda c, _: observed.append(c.timeout) or {}):
+            b.bounded_code(client, "body", b.DESTRUCTIVE_CALL_TIMEOUT)
+            self.assertEqual(observed, [b.DESTRUCTIVE_CALL_TIMEOUT])
+            self.assertEqual(client.timeout, 120)
+            with patch.object(b, "code", side_effect=RuntimeError("transport")):
+                with self.assertRaises(RuntimeError):
+                    b.bounded_code(client, "body", 5)
+            self.assertEqual(client.timeout, 120)
+
+    def test_diagnostic_route_binds_no_control_socket(self):
+        with tempfile.TemporaryDirectory() as root:
+            hook = Path(root) / "hook.py"
+            hook.write_text("def decide(*_):\n    return None\n")
+            state = Path(root) / "state"
+            config = {"state_dir": str(state), "headless_hook": str(hook)}
+            threads = threading.active_count()
+            route = b.Route(config, control=False)
+            self.assertIsNone(route.control_socket)
+            self.assertIsNone(route.control_listener)
+            self.assertEqual(list(state.glob("*.sock")), [])
+            self.assertEqual(threading.active_count(), threads)
+            route.close_control()
+            live = b.Route(config)
+            try:
+                self.assertEqual(len(list(state.glob("*.sock"))), 1)
+            finally:
+                live.close_control()
+            self.assertEqual(list(state.glob("*.sock")), [])
 
     def test_post_action_verify_failure_finishes_through_watermarked_reconciliation(self):
         with tempfile.TemporaryDirectory() as root:
@@ -917,7 +1292,7 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
                     return (
                         {"closed": True, "count": 1}
                         if '"remove": true' in body
-                        else {"ready": True}
+                        else {"ready": True, "proof": "a" * 64, "peerIds": []}
                     )
                 if "maintenance_window_not_exclusive" in body:
                     return {"windowId": 77, "closed": True}
@@ -1044,7 +1419,7 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
         )
         run = subprocess.run(["node", "-e", script], capture_output=True, text=True, timeout=10)
         self.assertEqual(run.returncode, 0, run.stderr)
-        return json.loads(run.stdout)
+        return self.refusal_as_error(json.loads(run.stdout))
 
     def test_connection_diagnostics_read_only_the_owned_scope(self):
         owned = [{"id": 1, "windowId": 5, "url": self.CONNECTOR_URL}, {"id": 10, "windowId": 5}]
@@ -1364,7 +1739,7 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
                     return (
                         {"closed": True, "count": 1}
                         if '"remove": true' in body
-                        else {"ready": True}
+                        else {"ready": True, "proof": "a" * 64, "peerIds": []}
                     )
                 if "maintenance_window_not_exclusive" in body:
                     return {"windowId": 77, "closed": True}
@@ -1711,6 +2086,466 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
         # The receipt shape of jobs whose live close hung in the old verifier.
         out = self.failed_cleanup([], removal_issued=b.removal_issued(legacy))
         self.assertEqual(out["v"], {"closed": True, "count": 0, "alreadyClosed": True})
+
+    PEER_NAME = "EP peer CANARY_LABEL [abcd1234]"
+    PEER_URL = (
+        "chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/connect.html?client="
+        + "%7B%22name%22%3A%22EP%20peer%20CANARY_LABEL%20%5Babcd1234%5D%22%7D"
+    )
+    PEER = {"connectorId": 70, "windowId": 8, "tabIds": [70, 71, 75], "clientName": PEER_NAME}
+    PEER_FIXTURE = r"""
+const state=__STATE__;let removed=[];const hits={};
+const hit=name=>{hits[name]=(hits[name]||0)+1;const m=state.mutations&&state.mutations[name+':'+hits[name]];if(!m)return;
+  for(const op of m){if(op.move)state.tabs=state.tabs.map(t=>t.id===op.move?{...t,windowId:op.to}:t);
+    if(op.add)state.tabs=state.tabs.concat([op.add]);if(op.sessions)state.sessions=op.sessions;}};
+global.chrome={tabs:{query:async()=>{hit('query');return state.tabs.map(t=>({...t}));},getCurrent:async()=>({id:200})},
+  windows:{remove:async(id)=>{removed.push(id);state.tabs=state.tabs.filter(t=>t.windowId!==id);}},
+  tabGroups:{get:async()=>{hit('group');return {title:'fixture'};}},
+  debugger:{getTargets:async()=>{hit('debugger');return [];}},
+  runtime:{sendMessage:async(m)=>{hit('status');if(m.type==='getStatus')return state.sessions===undefined?{}:{sessions:state.sessions};return {connections:[]};}}};
+process.__epBrowserJob={connector:{evaluate:async(fn,arg)=>await fn(arg)}};
+async function attempt(){__BODY__}
+attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({...o,removed,hits})));
+"""
+
+    def peer_tabs(self):
+        return [
+            {
+                "id": 10,
+                "windowId": 5,
+                "groupId": -1,
+                "title": "CANARY_TITLE",
+                "url": "https://canary.invalid/?q=CANARY_QUERY",
+            },
+            {"id": 200, "windowId": 20, "groupId": -1},
+            {"id": 70, "windowId": 8, "groupId": 3, "url": self.PEER_URL},
+            {"id": 71, "windowId": 8, "groupId": 3, "openerTabId": 70},
+            {"id": 75, "windowId": 8, "groupId": 3},
+        ]
+
+    def peer_session(self, tabs=(70, 71, 75), name=None, sid=1):
+        return {"id": sid, "clientName": name or self.PEER_NAME, "tabIds": list(tabs)}
+
+    def peer_cleanup(
+        self,
+        tabs=None,
+        sessions="default",
+        peers=None,
+        remove=True,
+        expected=None,
+        diagnose=False,
+        mutations=None,
+        old=None,
+    ):
+        state = {"tabs": self.peer_tabs() if tabs is None else tabs, "mutations": mutations or {}}
+        if sessions == "default":
+            state["sessions"] = [self.peer_session()]
+        elif sessions is not None:
+            state["sessions"] = sessions
+        body = b.failed_cleanup_js(
+            {
+                "old": old or self.OLD,
+                "clientName": "fixture",
+                "connectorOrigin": b.EXTENSION,
+                "removalIssued": False,
+                "pendingSince": 60,
+                "peers": [self.PEER] if peers is None else peers,
+                "expectedProof": expected,
+            },
+            remove,
+            diagnose,
+        )
+        script = self.PEER_FIXTURE.replace("__STATE__", json.dumps(state)).replace("__BODY__", body)
+        run = subprocess.run(["node", "-e", script], capture_output=True, text=True, timeout=10)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        return self.refusal_as_error(json.loads(run.stdout))
+
+    def assert_peer_blocks(self, expected="uncheckpointed_page_arrival", **kwargs):
+        out = self.peer_cleanup(**kwargs)
+        self.assertEqual(out.get("e"), expected, out)
+        self.assertEqual(out["removed"], [])
+        return out
+
+    def test_live_ready_peer_birth_tabs_are_excused_but_never_closed(self):
+        phase_one = self.peer_cleanup(remove=False)["v"]
+        self.assertTrue(phase_one["ready"])
+        self.assertEqual(phase_one["peerIds"], [70, 71, 75])
+        self.assertRegex(phase_one["proof"], r"^[0-9a-f]{64}$")
+        out = self.peer_cleanup(expected=phase_one["proof"])
+        self.assertEqual(out["v"], {"closed": True, "count": 1, "connectorMissing": True})
+        # Only the target's exact saved window is removed; peer tabs stay.
+        self.assertEqual(out["removed"], [5])
+
+    def test_peer_exemption_requires_every_birth_and_binding_link(self):
+        tabs = self.peer_tabs()
+        orphan = {"id": 63, "windowId": 8, "groupId": 3}
+        cases = {
+            # A target orphan in a live peer session but not in its receipt.
+            "orphan_in_session_only": dict(
+                tabs=tabs + [orphan], sessions=[self.peer_session((70, 71, 75, 63))]
+            ),
+            "moved_out_of_peer_window": dict(
+                tabs=[{**t, "windowId": 9} if t["id"] == 71 else t for t in tabs]
+            ),
+            "duplicate_client_name": dict(
+                sessions=[self.peer_session(), self.peer_session((90,), sid=2)]
+            ),
+            "session_lacks_connector": dict(sessions=[self.peer_session((71, 75))]),
+            "connector_client_mismatch": dict(
+                tabs=[{**t, "url": self.CONNECTOR_URL} if t["id"] == 70 else t for t in tabs]
+            ),
+            "connector_wrong_origin": dict(
+                tabs=[
+                    {**t, "url": "https://canary.invalid/connect.html"} if t["id"] == 70 else t
+                    for t in tabs
+                ]
+            ),
+            "other_session_claims_tab": dict(
+                sessions=[
+                    self.peer_session(),
+                    self.peer_session((71,), name="EP other [ffff0000]", sid=2),
+                ]
+            ),
+            "unsupported_status_schema": dict(sessions=None),
+            "partial_status": dict(sessions=[{"clientName": self.PEER_NAME, "tabIds": [70, "71"]}]),
+            "no_peer_receipt": dict(peers=[]),
+            "overlapping_receipts": dict(peers=[self.PEER, {**self.PEER, "connectorId": 75}]),
+            "foreign_opener": dict(
+                tabs=[{**t, "openerTabId": 300} if t["id"] == 75 else t for t in tabs]
+            ),
+        }
+        for name, kwargs in cases.items():
+            with self.subTest(name):
+                self.assert_peer_blocks(**kwargs)
+
+    def test_target_extras_and_descendants_block_even_when_a_peer_claims_them(self):
+        descendant = {"id": 72, "windowId": 8, "groupId": 3, "openerTabId": 10}
+        hop = {"id": 73, "windowId": 9, "groupId": -1, "openerTabId": 72}
+        extra = {"id": 74, "windowId": 5, "groupId": -1}
+        claimed = {**self.PEER, "tabIds": [70, 71, 72, 73, 74, 75]}
+        session = [self.peer_session((70, 71, 72, 73, 74, 75))]
+        for added in ([descendant], [descendant, hop], [extra]):
+            with self.subTest(added=[t["id"] for t in added]):
+                self.assert_peer_blocks(
+                    tabs=self.peer_tabs() + added, peers=[claimed], sessions=session
+                )
+        # A missing saved working tab still refuses before any exemption.
+        self.assert_peer_blocks(
+            expected="saved_owned_tab_missing",
+            tabs=[t for t in self.peer_tabs() if t["id"] != 10],
+        )
+
+    def test_changed_proof_during_any_async_boundary_never_removes(self):
+        grouped_old = {**self.OLD}
+        grouped = [{**t, "groupId": 7} if t["id"] == 10 else t for t in self.peer_tabs()]
+        moved_in = [{"move": 71, "to": 5}]
+        drop = [{"sessions": [self.peer_session((70, 75))]}]
+        stray = [{"add": {"id": 64, "windowId": 9, "groupId": -1}}]
+        cases = {
+            "during_debugger": dict(mutations={"debugger:1": moved_in}),
+            "during_group_title": dict(tabs=grouped, old=grouped_old, mutations={"group:1": drop}),
+            "new_orphan_during_debugger": dict(mutations={"debugger:1": stray}),
+            # Reads: 1 initial, 2 after debugger, 3 final before remove. Each
+            # read sends two getStatus messages after its tab query.
+            "immediately_before_remove": dict(mutations={"status:5": drop}),
+        }
+        for name, kwargs in cases.items():
+            with self.subTest(name):
+                self.assert_peer_blocks(expected="cleanup_proof_changed", **kwargs)
+        # A phase-one digest that no longer matches refuses at phase-two start.
+        out = self.peer_cleanup(expected="b" * 64)
+        self.assertEqual((out.get("e"), out["removed"]), ("cleanup_proof_changed", []))
+
+    def test_change_after_last_read_is_reported_uncertain_not_success(self):
+        # Chrome has no compare-and-remove. A tab moved into the target window
+        # after the final read is closed with it; the post-close inventory must
+        # refuse success rather than hide the foreign closure.
+        out = self.peer_cleanup(mutations={"status:6": [{"move": 71, "to": 5}]})
+        self.assertEqual(out.get("e"), "owned_cleanup_inventory_uncertain")
+        self.assertEqual(out["removed"], [5])
+
+    def test_diagnostic_inventory_is_content_free_and_never_removes(self):
+        orphan = {"id": 63, "windowId": 9, "groupId": -1, "title": "CANARY_TITLE"}
+        out = self.peer_cleanup(tabs=self.peer_tabs() + [orphan], diagnose=True)
+        self.assertEqual(out["removed"], [])
+        self.assertEqual(out["hits"].get("group"), None)
+        projected = b.diagnostic_projection({**out["v"], "extra": "CANARY_EXTRA"})
+        self.assertEqual(
+            projected,
+            {
+                "authority": False,
+                "observer": "temporary_maintenance_connector",
+                "ready": False,
+                "code": "uncheckpointed_page_arrival",
+                "targetExtraIds": [],
+                "descendantIds": [],
+                "missingSavedIds": [1],
+                "peerIds": [70, 71, 75],
+                "unknownIds": [63],
+            },
+        )
+        self.assertNotIn("CANARY", json.dumps(out["v"]) + json.dumps(projected))
+        self.assertEqual(
+            b.diagnostic_projection({"code": "CANARY_TEXT"})["code"], "diagnostic_unclassified"
+        )
+        many = b.diagnostic_projection({"unknownIds": list(range(100)), "peerIds": ["CANARY"]})
+        self.assertEqual(
+            (len(many["unknownIds"]), many["unknownIdsTruncated"], many["peerIds"]),
+            (64, True, None),
+        )
+
+    def peer_receipt(self, generation, **changes):
+        row = {
+            "job_id": "e" * 32,
+            "status": "ready",
+            "client_name": self.PEER_NAME,
+            "generation": generation,
+            "metadata": {
+                "connectorId": 70,
+                "windowId": 8,
+                "tabIds": [70, 71, 75],
+                "unboundOwnedPages": 0,
+            },
+            "ownership_pending": False,
+            "sealed": False,
+        }
+        row.update(changes)
+        return row
+
+    def test_only_live_ready_same_generation_peer_receipts_are_sources(self):
+        gen = {"pid": 123, "started": "synthetic"}
+        active = {"job_id": "e" * 32, "state": "active"}
+        self.assertEqual(
+            b.peer_proof_source(self.peer_receipt(gen), active, gen, "e" * 32),
+            {
+                "connectorId": 70,
+                "windowId": 8,
+                "tabIds": [70, 71, 75],
+                "clientName": self.PEER_NAME,
+            },
+        )
+        meta = self.peer_receipt(gen)["metadata"]
+        refused = {
+            "pending": (self.peer_receipt(gen, ownership_pending=True), active),
+            "pending_missing": (
+                {k: v for k, v in self.peer_receipt(gen).items() if k != "ownership_pending"},
+                active,
+            ),
+            "failed": (self.peer_receipt(gen, status="failed"), active),
+            "finished": (self.peer_receipt(gen, status="finished"), active),
+            "terminal_owner": (self.peer_receipt(gen), {**active, "state": "terminal"}),
+            "other_generation": (self.peer_receipt({"pid": 9, "started": "other"}), active),
+            "relay": (self.peer_receipt(gen, relay_mode=True), active),
+            "sealed": (self.peer_receipt(gen, sealed=True), active),
+            "disposed": (self.peer_receipt(gen, window_disposition="closed"), active),
+            "bool_id": (self.peer_receipt(gen, metadata={**meta, "windowId": True}), active),
+            "connector_not_owned": (
+                self.peer_receipt(gen, metadata={**meta, "tabIds": [71, 75]}),
+                active,
+            ),
+            "duplicate_ids": (
+                self.peer_receipt(gen, metadata={**meta, "tabIds": [70, 71, 71]}),
+                active,
+            ),
+            "unbound_pages": (
+                self.peer_receipt(gen, metadata={**meta, "unboundOwnedPages": 1}),
+                active,
+            ),
+            "wrong_job": (self.peer_receipt(gen, job_id="f" * 32), active),
+        }
+        for name, (row, owner) in refused.items():
+            with self.subTest(name):
+                self.assertIsNone(b.peer_proof_source(row, owner, gen, "e" * 32))
+
+    def write_peer(self, root, row, state="active"):
+        (Path(root) / (row["job_id"] + ".json")).write_text(json.dumps(row))
+        owners = Path(root) / "owners"
+        owners.mkdir(exist_ok=True)
+        (owners / (row["job_id"] + ".json")).write_text(
+            json.dumps({"job_id": row["job_id"], "state": state, "session_id": "s"})
+        )
+
+    def test_peer_sources_read_only_this_state_dir_and_skip_unreadable(self):
+        with tempfile.TemporaryDirectory() as root, tempfile.TemporaryDirectory() as elsewhere:
+            route = self.route(root)
+            job = self.full_job(route)
+            self.write_peer(elsewhere, self.peer_receipt(job["generation"]))
+            self.assertEqual(route.peer_sources(job, 60), ([], []))
+            self.write_peer(root, self.peer_receipt(job["generation"]))
+            (Path(root) / ("c" * 32 + ".json")).write_text("{not json")
+            peers, digests = route.peer_sources(job, 60)
+            self.assertEqual([p["connectorId"] for p in peers], [70])
+            self.assertEqual(len(digests), 1)
+            # No pending call means no watermark, so no peer is consulted.
+            self.assertEqual(route.peer_sources(job, None), ([], []))
+
+    def pending_peer_route(self, root, on_phase_one=None, generations=None):
+        route = self.route(root)
+        job = self.full_job(route)
+        job["ownership_pending"] = True
+        job["metadata"]["newestTabId"] = 60
+        route.save(job)
+        self.write_peer(root, self.peer_receipt(job["generation"]))
+        phases = []
+        if generations is not None:
+            sequence = iter(generations)
+            route.preflight = lambda: next(sequence)
+
+        def fake(_, body):
+            if "async({old,clientName," in body:
+                removing = '"remove": true' in body
+                phases.append(removing)
+                if removing:
+                    return {"closed": True, "count": 1}
+                if on_phase_one:
+                    on_phase_one()
+                return {"ready": True, "count": 1, "proof": "a" * 64, "peerIds": [71]}
+            if "maintenance_window_not_exclusive" in body:
+                return {"windowId": 77, "closed": True}
+            return {"ready": True}
+
+        return route, job, phases, fake
+
+    def run_pending_finish(self, route, job, fake):
+        with (
+            patch.object(
+                route, "client", create=True, return_value=SimpleNamespace(close=lambda: None)
+            ),
+            patch.object(b, "code", side_effect=fake),
+            patch.object(b, "verify_window_closed"),
+            patch.object(b.time, "sleep"),
+        ):
+            route.dispose_failed(job)
+
+    def test_peer_receipt_change_between_phases_never_removes(self):
+        gen = {"pid": 123, "started": "synthetic"}
+        changes = {
+            "new_tab": dict(
+                metadata={
+                    "connectorId": 70,
+                    "windowId": 8,
+                    "tabIds": [70, 71, 75, 76],
+                    "unboundOwnedPages": 0,
+                }
+            ),
+            "turned_failed": dict(status="failed"),
+            "turned_pending": dict(ownership_pending=True),
+            "same_fields_new_bytes": dict(updated=1),
+        }
+        for name, change in changes.items():
+            with self.subTest(name), tempfile.TemporaryDirectory() as root:
+                holder = {}
+                route, job, phases, fake = self.pending_peer_route(
+                    root,
+                    on_phase_one=lambda: self.write_peer(
+                        holder["root"], self.peer_receipt(gen, **change)
+                    ),
+                )
+                holder["root"] = root
+                with self.assertRaisesRegex(Refusal, "peer_proof_changed"):
+                    self.run_pending_finish(route, job, fake)
+                self.assertEqual(phases, [False])
+                self.assertNotIn("window_removal_issued", job)
+        with tempfile.TemporaryDirectory() as root:
+            route, job, phases, fake = self.pending_peer_route(
+                root,
+                on_phase_one=lambda: self.write_peer(
+                    root, self.peer_receipt(gen), state="terminal"
+                ),
+            )
+            with self.assertRaisesRegex(Refusal, "peer_proof_changed"):
+                self.run_pending_finish(route, job, fake)
+            self.assertEqual(phases, [False])
+
+    def test_generation_is_checked_at_use_before_and_after_removal(self):
+        gen = {"pid": 123, "started": "synthetic"}
+        other = {"pid": 124, "started": "restarted"}
+        # Calls: scope check, before phase two, after removal.
+        for sequence, expected, phases in (
+            ([gen, other], "browser_generation_changed_requires_reconciliation", [False]),
+            ([gen, gen, other], "failed_cleanup_uncertain", [False, True]),
+        ):
+            with self.subTest(sequence=sequence), tempfile.TemporaryDirectory() as root:
+                route, job, seen, fake = self.pending_peer_route(root, generations=sequence)
+                with self.assertRaisesRegex(Refusal, expected):
+                    self.run_pending_finish(route, job, fake)
+                self.assertEqual(seen, phases)
+                self.assertNotEqual(job.get("window_disposition"), "closed")
+                self.assertTrue(job["ownership_pending"])
+
+    def test_diagnostic_entry_point_has_no_dispose_or_receipt_side_effects(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            route.bootstrap = contextlib.nullcontext
+            job = self.full_job(route)
+            job["ownership_pending"] = True
+            job["metadata"]["newestTabId"] = 60
+            route.save(job)
+            live = SimpleNamespace(closed=False, close=lambda: self.fail("live client closed"))
+            route.jobs[job["job_id"]] = {**job, "client": live, "status": "ready"}
+            self.write_peer(root, self.peer_receipt(job["generation"]))
+            before = {p.name: p.read_bytes() for p in Path(root).rglob("*.json")}
+            bodies = []
+
+            def fake(_, body):
+                bodies.append(body)
+                if "async({old,clientName," in body:
+                    return {
+                        "diagnostic": True,
+                        "ready": False,
+                        "code": "uncheckpointed_page_arrival",
+                        "unknownIds": [63],
+                        "peerIds": [71],
+                        "targetExtraIds": [],
+                        "descendantIds": [],
+                        "missingSavedIds": [],
+                        "label": "CANARY_LABEL",
+                    }
+                if "maintenance_window_not_exclusive" in body:
+                    return {"windowId": 77, "closed": True}
+                return {"ready": True}
+
+            with (
+                patch.object(
+                    route, "client", create=True, return_value=SimpleNamespace(close=lambda: None)
+                ),
+                patch.object(b, "code", side_effect=fake),
+                patch.object(route, "save", side_effect=AssertionError("receipt write")),
+                patch.object(route, "dispose_failed", side_effect=AssertionError("dispose")),
+                patch.object(route, "dispose_live", side_effect=AssertionError("dispose live")),
+                patch.object(
+                    route, "capture_connection_diagnostics", side_effect=AssertionError("diag")
+                ),
+            ):
+                out = route.diagnose_failed(job["job_id"])
+            self.assertEqual(
+                (out["ready"], out["code"], out["unknownIds"]),
+                (False, "uncheckpointed_page_arrival", [63]),
+            )
+            self.assertFalse(out["authority"])
+            self.assertNotIn("CANARY", json.dumps(out))
+            self.assertTrue(any('"diagnose": true' in body for body in bodies))
+            self.assertFalse(any('"remove": true' in body for body in bodies))
+            self.assertEqual({p.name: p.read_bytes() for p in Path(root).rglob("*.json")}, before)
+
+            def boom(_, body):
+                if "async({old,clientName," in body:
+                    raise RuntimeError("CANARY_EXCEPTION https://canary.invalid/?token=CANARY")
+                return fake(_, body)
+
+            with (
+                patch.object(
+                    route, "client", create=True, return_value=SimpleNamespace(close=lambda: None)
+                ),
+                patch.object(b, "code", side_effect=boom),
+                patch.object(route, "save", side_effect=AssertionError("receipt write")),
+            ):
+                out = route.diagnose_failed(job["job_id"])
+            self.assertEqual(out["code"], "diagnostic_unavailable")
+            self.assertNotIn("CANARY", json.dumps(out))
+            with self.assertRaises(Refusal):
+                route.diagnose_failed("../" + "a" * 29)
+            self.assertEqual(route.diagnose_failed("a" * 32)["code"], "receipt_unreadable")
 
     def sealed_route(self, root):
         route = self.route(root)

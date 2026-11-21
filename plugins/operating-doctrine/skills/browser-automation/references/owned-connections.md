@@ -189,8 +189,24 @@ Completion is proven, never guessed from age or idle time.
   watermark. When a call fails after it may have opened a page, cleanup reconciles
   through the same two phases only if no surviving tab anywhere is newer than that
   watermark, apart from the maintenance connector itself, so an orphaned popup cannot
-  escape. Any newer tab, even a peer's, refuses and is preserved. A receipt with no
-  watermark still requires manual reconciliation. Finish records each cleanup step
+  escape. A newer tab is excused only when exactly one live, ready, not pending,
+  same-generation peer receipt in the same state directory, with an active owner,
+  recorded it as its own birth tab, it sits in that peer's saved window, the peer's
+  exact connector page carries the peer's client name, and exactly one extension
+  session with that name holds both the connector and the tab. Client names are
+  same-user assertions, not a privilege boundary. The rule guards against counting
+  this job's orphan as a peer's tab. An excused tab is never closed, attached or
+  read. Target-window extras, opener descendants and missing working tabs refuse
+  first, whatever a peer claims. Every other newer tab refuses and is preserved.
+  Phase two must observe the same content-free inventory digest at its start, after
+  each asynchronous check and just before removal, the excusing peer receipts must
+  be byte-identical, and the browser generation is checked again before and after
+  removal. Chrome has no compare-and-remove, so a change after the last read is
+  reported as uncertain, never success. A receipt with no watermark still requires
+  manual reconciliation. `browser_jobs.py --config <file> --diagnose-failed <job_id>`
+  prints the same inventory as integer IDs and static codes. It writes no receipt,
+  opens only a temporary maintenance connector whose closure it verifies, and is
+  never authority for a close. Finish records each cleanup step
   and the static failure code in the receipt timings, including a swallowed live
   cleanup failure.
 - Connection diagnostics. At a job's first route-side failure (allocation, prime,
