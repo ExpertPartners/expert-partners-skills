@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@types/node": "22.20.5",
-    "knip": "6.44.1",
+    "knip": "6.44.2",
     "typescript": "7.0.2"
   }
 }
