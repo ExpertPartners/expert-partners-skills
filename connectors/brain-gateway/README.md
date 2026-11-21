@@ -38,6 +38,10 @@ Access is enforced in the gateway, in `src/access.ts`, from the November 20, 202
 - The Hub token acts as Allison and may narrow itself with the `X-Brain-Department` header. Department tokens are fixed to their department. They are stored only as SHA-256 hashes in the `DEPARTMENT_TOKEN_HASHES` secret (`{"<hash>":"<department id>"}`), and none are issued yet.
 - MCP sign-in uses the signed-in person's profile. Per-department narrowing on MCP needs a separate sign-in identity per department, which comes with each department's Week 4 decision rights.
 
+## Daily health check
+
+A cron trigger runs a live check every day at 12:00 UTC (Decision Log, Nov 20 2026, Business Brain connection monitoring). It lists every allowed scope completely, reads the whole current Decision Log and checks that its newest entry is under 14 days old, and reads the HQ Rulebook whole. The result keeps only counts, versions, dates and error codes, never document text, and a later pass never hides an earlier failure. Leaders read it at `GET /api/health/deep` with the Hub token, and `?run=1` runs it now. Failures also log to Worker logs. Alerting to Allison goes through Ember's question line once that is live.
+
 ## Secrets
 
 Secrets live only in 1Password and in the Worker's Cloudflare secrets. Nothing in this folder holds one. Load or rotate them by piping from `op` into `wrangler secret bulk`, never on a command line.

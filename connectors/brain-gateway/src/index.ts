@@ -6,6 +6,8 @@ import { McpServer } from "@modelcontextprotocol/server";
 import { createMcpHandler, getMcpAuthContext } from "agents/mcp/server";
 import { handleAccessRequest } from "./access-handler";
 import { departmentForToken, DEPARTMENTS } from "./access.ts";
+import { lastResults, runDeepCheck, storeResult } from "./health.ts";
+import { driveFetch } from "./google.ts";
 import { isAllowedEmail } from "./allow";
 import { runTool, TOOLS } from "./tools";
 import type { Principal } from "./access.ts";
@@ -68,6 +70,15 @@ async function handleHubApi(request: Request, bindings: Env) {
 		if (id) principal = { kind: "department", id };
 	}
 	if (!principal) return json({ error: "unauthorized" }, 401);
+	// Health: leaders only. GET shows the last stored daily result and the last failure; ?run=1 runs it now.
+	if (request.method === "GET" && url.pathname === "/api/health/deep") {
+		if (principal.kind !== "person" || principal.department) return json({ error: "forbidden" }, 403);
+		if (url.searchParams.get("run") === "1") {
+			const result = await runDeepCheck(bindings.ALLOWED_SCOPES, driveFetch(bindings.GOOGLE_SA_KEY));
+			await storeResult(bindings.OAUTH_KV, result);
+		}
+		return json(await lastResults(bindings.OAUTH_KV));
+	}
 	if (request.method === "GET" && url.pathname === "/api/tools") {
 		return json({ tools: TOOLS.map((t) => ({ name: t.name, description: t.description, readOnly: true })) });
 	}
@@ -95,7 +106,7 @@ const defaultHandler = {
 	},
 };
 
-export default new OAuthProvider<Env>({
+const provider = new OAuthProvider<Env>({
 	apiHandler: { fetch: (req: Request, b: Env, ctx: ExecutionContext) => mcpHandler(req, b, ctx) },
 	apiRoute: "/mcp",
 	authorizeEndpoint: "/authorize",
@@ -104,3 +115,17 @@ export default new OAuthProvider<Env>({
 	tokenEndpoint: "/token",
 	resourceMetadata: { resource: env.MCP_RESOURCE },
 });
+
+export default {
+	fetch: (request: Request, bindings: Env, ctx: ExecutionContext) => provider.fetch(request, bindings, ctx),
+	// Daily live check of the Business Brain connection (cron in wrangler.jsonc).
+	async scheduled(_event: ScheduledController, bindings: Env, ctx: ExecutionContext) {
+		ctx.waitUntil(
+			(async () => {
+				const result = await runDeepCheck(bindings.ALLOWED_SCOPES, driveFetch(bindings.GOOGLE_SA_KEY));
+				await storeResult(bindings.OAUTH_KV, result);
+				if (!result.ok) console.error("[brain-gateway] daily check failed:", JSON.stringify(result.checks.filter((c) => !c.ok)));
+			})(),
+		);
+	},
+};
