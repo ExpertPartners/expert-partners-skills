@@ -1,3 +1,6 @@
+## 3.8.14 - 2026-11-21
+
+The browser skills now know all three Chrome profiles on Ember's M2, Ember, Allison and Don, each with the Playwright Extension and its own route (`playwright-ember`, `playwright-allison`, `playwright-don`). Sessions start in Ember's profile and switch to Allison's or Don's when the work must act as that person or a sign-in shows the account is theirs. Don's profile has a known `page.goto` failure, with the working navigation written down.
 ## 3.8.13 - 2026-11-21
 
 Keep strict browser ownership verification available through the job's own connector while its retained working page has a file chooser open, so the same job can complete the upload.
