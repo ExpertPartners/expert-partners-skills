@@ -66,6 +66,10 @@ tool list or an old config. Verified live Nov 2, 2026 after the Nov 1 M2 rebuild
   `ember` that starts `/Users/ember/maintenance/chrome-signed-in-mcp.sh` on the M2. It
   attaches to the M2's signed-in Chrome, `Default` profile (ember@expertpartners.com),
   through the Playwright Extension, with no debugging prompt.
+- `playwright-allison` and `playwright-don` start `chrome-allison-mcp.sh` and
+  `chrome-don-mcp.sh` on the M2 and reach Allison's profile (`Profile 3`) and Don's
+  profile (`Profile 2`) in the same Chrome. Use them only when the work must act as that
+  person, as browser-automation's Which profile section says.
 - `cua_ember` and the underscore `playwright_ember` launcher (`--user-data-dir
   .../ember-codex`) are retired. Both pointed at `/Users/allison` on the M2, an account that
   no longer exists, and the second one started a separate automation profile. Both are
