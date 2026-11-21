@@ -1,3 +1,6 @@
+## 3.8.10 - 2026-11-21
+
+The browser job connector page now says the AI job is connected instead of showing the extension's "Missing mcpRelayUrl parameter in URL." error. Browser automation now requires a real 1Password attempt on every sign-in page, with a sealed 1Password fill when the inline fill is not offered. A new Rule 2b pauses browser work and brings the job's window forward whenever Allison is watching or a human-only sign-in step appears. The Chrome settings section now names the real login item and Chrome AI launcher and says when a restart to hide the debugging bar is safe.
 ## 3.8.9 - 2026-11-20
 
 Browser lifecycle cleanup no longer blocks Stop forever on a failed allocation that never recorded a window, tab or relay claim, once an exact-process census of the signed-in Chrome, taken after the allocation, is recorded with `browser_lifecycle.py --record-census`. The sweep reports such a job as `failed_no_artifacts_by_census` and the hook says so; the receipt stays failed and is never marked finished. Receipts with real window or page IDs, pending ownership, relay claims or a live state keep blocking as before.
