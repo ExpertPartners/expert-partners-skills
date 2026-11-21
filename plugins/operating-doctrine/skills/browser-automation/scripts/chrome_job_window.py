@@ -67,6 +67,74 @@ def chrome_is_running():
         return False
 
 
+# A connector URL handed to a Chrome that is still starting (or to no Chrome,
+# which makes the binary cold-start one) loads before the extension does and
+# lands on ERR_BLOCKED_BY_CLIENT. Only hand off to a browser that has settled.
+SETTLED_SECONDS = 15
+SETTLE_WAIT_SECONDS = 20
+
+
+def elapsed_seconds(value):
+    """Parse ps etime, [[dd-]hh:]mm:ss."""
+    days, _, clock = value.strip().rpartition("-")
+    parts = clock.split(":")
+    if (
+        (days and not days.isdigit())
+        or not 2 <= len(parts) <= 3
+        or not all(p.isdigit() for p in parts)
+    ):
+        raise ValueError("Unreadable process age")
+    seconds = 0
+    for part in parts:
+        seconds = seconds * 60 + int(part)
+    return seconds + int(days or 0) * 86400
+
+
+def chrome_has_settled(minimum=SETTLED_SECONDS):
+    """True when some main Chrome process has been up for at least minimum seconds.
+
+    A peer job's handoff briefly runs a second short-lived main process, so any
+    long-lived match counts.
+    """
+    try:
+        ids = subprocess.run(
+            ["/usr/bin/pgrep", "-x", "Google Chrome"],
+            capture_output=True,
+            text=True,
+            timeout=3,
+            check=False,
+        ).stdout.split()
+        for pid in ids:
+            if not pid.isdigit():
+                continue
+            age = subprocess.run(
+                ["/bin/ps", "-p", pid, "-o", "etime="],
+                capture_output=True,
+                text=True,
+                timeout=3,
+                check=False,
+            ).stdout
+            if age.strip() and elapsed_seconds(age) >= minimum:
+                return True
+    except (OSError, subprocess.TimeoutExpired, ValueError):
+        return False
+    return False
+
+
+def wait_for_settled_chrome(
+    running, settled, wait=SETTLE_WAIT_SECONDS, sleep=time.sleep, clock=time.monotonic
+):
+    deadline = clock() + wait
+    while True:
+        if not running():
+            raise InvalidLaunch("The existing Chrome process is not running")
+        if settled():
+            return
+        if clock() >= deadline:
+            raise InvalidLaunch("The existing Chrome process is still starting")
+        sleep(0.5)
+
+
 def verify_window_closed(window_id, observe, attempts=10, pause=0.2):
     """Poll an extension-side chrome.windows census until the exact window is gone.
 
@@ -128,7 +196,13 @@ def bridge_connector(args, socket_path):
 
 
 def main(
-    arguments=None, environment=None, execute=os.execv, profile_root=None, running=chrome_is_running
+    arguments=None,
+    environment=None,
+    execute=os.execv,
+    profile_root=None,
+    running=chrome_is_running,
+    settled=chrome_has_settled,
+    settle_wait=SETTLE_WAIT_SECONDS,
 ):
     arguments = sys.argv[1:] if arguments is None else arguments
     environment = os.environ if environment is None else environment
@@ -138,8 +212,6 @@ def main(
         existing_signed_in_profile(
             directory, environment.get("EP_BROWSER_EXPECTED_ACCOUNT"), profile_root
         )
-        if not running():
-            raise InvalidLaunch("The existing Chrome process is not running")
         binary = environment.get(
             "EP_BROWSER_EXECUTABLE", "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
         )
@@ -149,6 +221,8 @@ def main(
         broker = environment.get("EP_BROWSER_RELAY_SOCKET")
         if broker:
             args = bridge_connector(args, broker)
+        # Checked last so the gap between this check and the handoff stays minimal.
+        wait_for_settled_chrome(running, settled, settle_wait)
         execute(str(path), [str(path), *args])
         return 0
     except (ValueError, OSError):
