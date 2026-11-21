@@ -34,6 +34,19 @@ from relay_ownership import OwnershipLedger
 
 EXTENSION = "chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/connect.html"
 STATE_JS = "const s=Buffer.constructor('return process')().__epBrowserJob;if(!s)throw Error('owned_state_missing');"
+FILE_CHOOSER_MARKER = "- [File chooser]: can be handled by browser_file_upload"
+CHOOSER_SNAPSHOT_JS = (
+    STATE_JS + "if(page!==s.connector)throw Error('chooser_connector_not_owned');"
+    "const snapshot=await s.snapshot();const task=s.task;"
+    "if(!task||task===page||!s.created.has(task)||!s.ids.has(task)||task.isClosed())"
+    "throw Error('chooser_page_not_owned');"
+    "const sym=Object.getOwnPropertySymbols(task).find(k=>typeof task[k]?.modalStates==='function');"
+    "if(!sym)throw Error('chooser_state_unavailable');"
+    "const states=task[sym].modalStates();"
+    "const chooser=states.length===1&&states[0].type==='fileChooser'&&states[0].fileChooser;"
+    "if(states.length&&(!chooser||chooser.page()!==task))throw Error('chooser_page_not_owned');"
+    "return {snapshot,taskId:s.ids.get(task),taskIndex:page.context().pages().indexOf(task),pending:!!chooser};"
+)
 OWNED_SOURCE = Path(__file__).with_name("owned_pages.js").read_text()
 SAFE_ENV = ("HOME", "USER", "LOGNAME", "PATH", "LANG", "LC_ALL", "TMPDIR")
 # Silences this private MCP process's Tab capture before the vendor builds the
@@ -1032,20 +1045,31 @@ class Route:
         self.mark(job, "prime_verify")
         own = code(
             job["client"],
-            STATE_JS
-            + "if(!s.task||s.task.isClosed())throw Error('owned_page_closed');return {index:s.connector.context().pages().indexOf(s.task)};",
+            STATE_JS + "if(!s.task||s.task.isClosed())throw Error('owned_page_closed');"
+            "const pages=s.connector.context().pages();"
+            "return {index:pages.indexOf(s.task),connectorIndex:pages.indexOf(s.connector)};",
         )
         self.mark(job, "prime_own_index")
+        job["chooser_connector_index"] = own.get("connectorIndex")
+        self.select_private_tab(job, own["index"])
+        self.mark(job, "prime_select")
+
+    @staticmethod
+    def select_private_tab(job, index):
+        if type(index) is not int or index < 0:
+            raise Refusal("owned_page_selection_failed")
         reply = job["client"].call(
             "tools/call",
-            {"name": "browser_tabs", "arguments": {"action": "select", "index": own["index"]}},
+            {"name": "browser_tabs", "arguments": {"action": "select", "index": index}},
         )
         if reply.get("isError"):
             raise Refusal("owned_page_selection_failed")
-        self.mark(job, "prime_select")
 
     def verify_connection(self, job):
-        observed = self.metadata(job["client"])
+        return self.verify_observed(job, self.metadata(job["client"]))
+
+    @staticmethod
+    def verify_observed(job, observed):
         old = job["metadata"]
         if not old or any(
             observed[k] != old[k] for k in ("connectorId", "windowId", "groupId", "groupTitle")
@@ -1056,6 +1080,22 @@ class Route:
         # stays open, which closes the Page without changing any tab ID.
         job["working_page"] = observed.pop("workingPage", None)
         return observed
+
+    def check_file_chooser(self, job):
+        """Use the connector for strict checks while the task is modal-gated."""
+        self.select_private_tab(job, job.get("chooser_connector_index"))
+        state = code(job["client"], CHOOSER_SNAPSHOT_JS)
+        observed = self.verify_observed(job, state["snapshot"])
+        task = state["taskId"]
+        old_ids = job["metadata"]["tabIds"]
+        if (
+            observed["tabIds"] != old_ids
+            or task not in old_ids
+            or task == observed["connectorId"]
+            or job.get("chooser_task_id", task) != task
+        ):
+            raise Refusal("chooser_page_not_owned")
+        return observed, state
 
     def tabs(self, job, args):
         action = args.get("action")
@@ -1338,6 +1378,9 @@ class Route:
                     )
             if name == "browser_install" or name not in {t["name"] for t in self.inventory or []}:
                 raise Refusal("unknown_browser_tool")
+            pending_chooser = "chooser_task_id" in job
+            if pending_chooser and name != "browser_file_upload":
+                return result({"error": "file_chooser_pending_use_upload_or_finish"}, True)
             denied, note = self.policy(name, args)
             if denied:
                 return denied
@@ -1360,7 +1403,15 @@ class Route:
                     self.checkpoint(job)
                     reply = self.tabs(job, args)
                 else:
-                    self.prime(job)
+                    if pending_chooser:
+                        if job["status"] != "ready" or self.preflight() != job["generation"]:
+                            raise Refusal("browser_generation_changed_no_replay")
+                        _, state = self.check_file_chooser(job)
+                        if state["pending"] is not True:
+                            raise Refusal("owned_file_chooser_missing")
+                        self.select_private_tab(job, state["taskIndex"])
+                    else:
+                        self.prime(job)
                     job["ownership_pending"] = True
                     self.mark(job, "tool_start")
                     self.checkpoint(job)
@@ -1373,7 +1424,27 @@ class Route:
                     notes.append(VENDOR_ERROR_NOTE)
                     reported = reported_close_reason(reply)
                 capture_stage = "post_call"
-                job["metadata"] = self.verify_connection(job)
+                opened_chooser = (
+                    name == "browser_click"
+                    and not job.get("relay_mode")
+                    and any(
+                        FILE_CHOOSER_MARKER in block.get("text", "").splitlines()
+                        for block in reply.get("content", [])
+                        if block.get("type") == "text"
+                    )
+                )
+                if opened_chooser or pending_chooser:
+                    observed, state = self.check_file_chooser(job)
+                    if opened_chooser and state["pending"] is not True:
+                        raise Refusal("owned_file_chooser_missing")
+                    if state["pending"] is True:
+                        job["chooser_task_id"] = state["taskId"]
+                    else:
+                        job.pop("chooser_task_id", None)
+                        self.select_private_tab(job, state["taskIndex"])
+                    job["metadata"] = observed
+                else:
+                    job["metadata"] = self.verify_connection(job)
                 job["ownership_pending"] = False
                 self.mark(job, "post_metadata")
                 if job.get("working_page") == "closed":

@@ -74,6 +74,78 @@ class JobTests(unittest.TestCase):
                 with self.assertRaises(Refusal):
                     route.call("browser_navigate", args)
 
+    def test_owned_file_chooser_round_trip(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            names = ("browser_click", "browser_file_upload")
+            route.inventory += [{"name": name} for name in names]
+            metadata = route.metadata(None) | {"tabIds": [1, 2]}
+            marker = b.FILE_CHOOSER_MARKER
+            calls = []
+
+            def vendor(_, req):
+                calls.append(req["name"])
+                if req["name"] == "browser_click":
+                    return {"content": [{"type": "text", "text": marker}]}
+                return {"content": []}
+
+            jid = "a" * 32
+            client = SimpleNamespace(call=vendor)
+            job = {
+                "job_id": jid,
+                "label": "synthetic",
+                "lock": threading.RLock(),
+                "status": "ready",
+                "client": client,
+                "generation": route.preflight(),
+                "metadata": metadata,
+                "chooser_connector_index": 0,
+            }
+            route.jobs[jid] = job
+            route.checkpoint = lambda job, status=None: job.update(status=status or job["status"])
+            states = [
+                {"snapshot": metadata.copy(), "taskId": 2, "taskIndex": 1, "pending": pending}
+                for pending in (True, True, False)
+            ]
+            with patch.object(b, "code", side_effect=states):
+                answer = route.call("browser_click", {"job_id": jid, "target": "fixture"})
+                self.assertIn(marker, answer["content"][0]["text"])
+                self.assertEqual(job["chooser_task_id"], 2)
+                with self.assertRaises(Refusal):
+                    route.call("browser_file_upload", {"job_id": "b" * 32})
+                self.assertTrue(route.call("browser_navigate", {"job_id": jid})["isError"])
+                route.call("browser_file_upload", {"job_id": jid, "paths": ["/tmp/proof.txt"]})
+            self.assertNotIn("chooser_task_id", job)
+            self.assertEqual(job["status"], "ready")
+            self.assertEqual(calls.count("browser_file_upload"), 1)
+
+    def test_chooser_refuses_wrong_or_unowned_page(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            metadata = route.metadata(None) | {"tabIds": [1, 2, 3]}
+            job = {
+                "client": SimpleNamespace(call=lambda *_: {}),
+                "metadata": metadata,
+                "chooser_connector_index": 0,
+                "chooser_task_id": 2,
+            }
+            for task, ids in ((1, [1, 2, 3]), (3, [1, 2, 3]), (9, [1, 2, 3]), (2, [1, 2, 3, 9])):
+                with (
+                    self.subTest(task=task, ids=ids),
+                    patch.object(
+                        b,
+                        "code",
+                        return_value={
+                            "snapshot": metadata | {"tabIds": ids},
+                            "taskId": task,
+                            "taskIndex": 1,
+                            "pending": True,
+                        },
+                    ),
+                ):
+                    with self.assertRaisesRegex(Refusal, "chooser_page_not_owned"):
+                        route.check_file_chooser(job)
+
     def test_v2_requires_binding_before_working_page(self):
         generation = {"pid": 123, "started": "synthetic"}
         connector = {
