@@ -6,14 +6,18 @@ from pathlib import Path
 import tempfile
 import unittest
 
-SOURCE = (Path(__file__).resolve().parents[2] / "plugins/operating-doctrine/skills/"
-          "browser-automation/scripts/chrome_job_window.py")
+SOURCE = (
+    Path(__file__).resolve().parents[2] / "plugins/operating-doctrine/skills/"
+    "browser-automation/scripts/chrome_job_window.py"
+)
 spec = importlib.util.spec_from_file_location("chrome_job_window", SOURCE)
 wrapper = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(wrapper)
 
-CONNECTOR = ("chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/connect.html"
-             "?mcpRelayUrl=ws%3A%2F%2F127.0.0.1%3A1234&token=SYNTHETIC_CANARY")
+CONNECTOR = (
+    "chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/connect.html"
+    "?mcpRelayUrl=ws%3A%2F%2F127.0.0.1%3A1234&token=SYNTHETIC_CANARY"
+)
 
 
 class ChromeWindowTests(unittest.TestCase):
@@ -24,7 +28,14 @@ class ChromeWindowTests(unittest.TestCase):
         for name in ("Default", "Profile 1"):
             (root / name).mkdir()
             metadata["profile"]["info_cache"][name] = {"user_name": "worker@example.test"}
-            (root / name / "Preferences").write_text(json.dumps({"account_info": [{"email": "worker@example.test"}], "signin": {"allowed": True}}))
+            (root / name / "Preferences").write_text(
+                json.dumps(
+                    {
+                        "account_info": [{"email": "worker@example.test"}],
+                        "signin": {"allowed": True},
+                    }
+                )
+            )
         (root / "Local State").write_text(json.dumps(metadata))
         return root
 
@@ -37,24 +48,48 @@ class ChromeWindowTests(unittest.TestCase):
             calls = []
             out, err = io.StringIO(), io.StringIO()
             with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
-                result = wrapper.main(["--profile-directory=Profile 1", CONNECTOR],
-                                      {"EP_BROWSER_EXECUTABLE": str(binary), "EP_BROWSER_EXPECTED_ACCOUNT": "worker@example.test"},
-                                      lambda *args: calls.append(args), profile_root=root, running=lambda: True)
+                result = wrapper.main(
+                    ["--profile-directory=Profile 1", CONNECTOR],
+                    {
+                        "EP_BROWSER_EXECUTABLE": str(binary),
+                        "EP_BROWSER_EXPECTED_ACCOUNT": "worker@example.test",
+                    },
+                    lambda *args: calls.append(args),
+                    profile_root=root,
+                    running=lambda: True,
+                    settled=lambda: True,
+                )
             self.assertEqual(result, 0)
-            self.assertEqual(calls, [(str(binary), [str(binary), "--new-window", "--profile-directory=Profile 1", CONNECTOR])])
+            self.assertEqual(
+                calls,
+                [
+                    (
+                        str(binary),
+                        [str(binary), "--new-window", "--profile-directory=Profile 1", CONNECTOR],
+                    )
+                ],
+            )
             self.assertEqual(out.getvalue() + err.getvalue(), "")
 
     def test_default_profile(self):
-        self.assertEqual(wrapper.browser_arguments(["--profile-directory=Default", CONNECTOR]),
-                         ["--new-window", "--profile-directory=Default", CONNECTOR])
+        self.assertEqual(
+            wrapper.browser_arguments(["--profile-directory=Default", CONNECTOR]),
+            ["--new-window", "--profile-directory=Default", CONNECTOR],
+        )
 
     def test_unsigned_missing_and_wrong_profiles_are_refused(self):
         with tempfile.TemporaryDirectory() as directory:
             root = self.profile_fixture(directory)
             wrapper.existing_signed_in_profile("Default", "WORKER@example.test", root)
-            for name, expected in [("Profile 99", "worker@example.test"), ("Default", None),
-                                   ("Default", "other@example.test")]:
-                with self.subTest(name=name, expected=expected), self.assertRaises(wrapper.InvalidLaunch):
+            for name, expected in [
+                ("Profile 99", "worker@example.test"),
+                ("Default", None),
+                ("Default", "other@example.test"),
+            ]:
+                with (
+                    self.subTest(name=name, expected=expected),
+                    self.assertRaises(wrapper.InvalidLaunch),
+                ):
                     wrapper.existing_signed_in_profile(name, expected, root)
             local = json.loads((root / "Local State").read_text())
             local["profile"]["info_cache"]["Profile 1"]["user_name"] = ""
@@ -66,7 +101,10 @@ class ChromeWindowTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = self.profile_fixture(directory)
             target = root / "Default/Preferences"
-            for data in [{"account_info": []}, {"account_info": [{"email": "worker@example.test"}], "signin": {"allowed": False}}]:
+            for data in [
+                {"account_info": []},
+                {"account_info": [{"email": "worker@example.test"}], "signin": {"allowed": False}},
+            ]:
                 target.write_text(json.dumps(data))
                 with self.assertRaises(wrapper.InvalidLaunch):
                     wrapper.existing_signed_in_profile("Default", "worker@example.test", root)
@@ -80,22 +118,98 @@ class ChromeWindowTests(unittest.TestCase):
             called = []
             err = io.StringIO()
             with contextlib.redirect_stderr(err):
-                result = wrapper.main(["--profile-directory=Default", CONNECTOR],
-                                      {"EP_BROWSER_EXPECTED_ACCOUNT": "worker@example.test"},
-                                      lambda *args: called.append(args), profile_root=root, running=lambda: False)
+                result = wrapper.main(
+                    ["--profile-directory=Default", CONNECTOR],
+                    {"EP_BROWSER_EXPECTED_ACCOUNT": "worker@example.test"},
+                    lambda *args: called.append(args),
+                    profile_root=root,
+                    running=lambda: False,
+                    settled=lambda: False,
+                )
             self.assertEqual(result, 2)
             self.assertEqual(called, [])
             self.assertNotIn("SYNTHETIC_CANARY", err.getvalue())
 
+    def test_waits_for_a_starting_browser_then_hands_off(self):
+        with tempfile.TemporaryDirectory() as directory:
+            binary = Path(directory) / "fake-chrome"
+            binary.write_text("#!/bin/sh\nexit 0\n")
+            binary.chmod(0o700)
+            root = self.profile_fixture(directory)
+            answers = iter([False, False, True])
+            calls = []
+            result = wrapper.main(
+                ["--profile-directory=Default", CONNECTOR],
+                {
+                    "EP_BROWSER_EXECUTABLE": str(binary),
+                    "EP_BROWSER_EXPECTED_ACCOUNT": "worker@example.test",
+                },
+                lambda *args: calls.append(args),
+                profile_root=root,
+                running=lambda: True,
+                settled=lambda: next(answers),
+                settle_wait=5,
+            )
+            self.assertEqual(result, 0)
+            self.assertEqual(len(calls), 1)
+
+    def test_never_hands_a_connector_to_a_browser_that_has_not_settled(self):
+        with tempfile.TemporaryDirectory() as directory:
+            binary = Path(directory) / "fake-chrome"
+            binary.write_text("#!/bin/sh\nexit 0\n")
+            binary.chmod(0o700)
+            root = self.profile_fixture(directory)
+            calls = []
+            err = io.StringIO()
+            with contextlib.redirect_stderr(err):
+                result = wrapper.main(
+                    ["--profile-directory=Default", CONNECTOR],
+                    {
+                        "EP_BROWSER_EXECUTABLE": str(binary),
+                        "EP_BROWSER_EXPECTED_ACCOUNT": "worker@example.test",
+                    },
+                    lambda *args: calls.append(args),
+                    profile_root=root,
+                    running=lambda: True,
+                    settled=lambda: False,
+                    settle_wait=0,
+                )
+            self.assertEqual((result, calls), (2, []))
+            self.assertNotIn("SYNTHETIC_CANARY", err.getvalue())
+
+    def test_browser_that_quits_while_waiting_is_not_restarted(self):
+        states = iter([True, False])
+        with self.assertRaises(wrapper.InvalidLaunch):
+            wrapper.wait_for_settled_chrome(
+                lambda: next(states), lambda: False, wait=5, sleep=lambda _: None
+            )
+
+    def test_process_age_parsing(self):
+        for value, seconds in [
+            ("00:07", 7),
+            ("15:22", 922),
+            ("01:02:03", 3723),
+            ("2-00:00:01", 172801),
+            (" 05:00 \n", 300),
+        ]:
+            self.assertEqual(wrapper.elapsed_seconds(value), seconds)
+        for value in ["", "7", "x-00:01", "1:2:3:4", "aa:bb"]:
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                wrapper.elapsed_seconds(value)
+
     def test_refuses_other_origins_paths_profiles_and_browser_modes(self):
         cases = [
-            ["--incognito", CONNECTOR], ["--guest", CONNECTOR],
+            ["--incognito", CONNECTOR],
+            ["--guest", CONNECTOR],
             ["--user-data-dir=/tmp/fresh", CONNECTOR],
             ["--remote-debugging-port=9222", CONNECTOR],
             ["--profile-directory=../Default", CONNECTOR],
             ["--profile-directory=Default", "https://example.test/"],
             ["--profile-directory=Default", CONNECTOR.replace("/connect.html", "/status.html")],
-            ["--profile-directory=Default", CONNECTOR.replace("mmlmfjhmonkocbjadbfplnigmagldckm", "other-extension")],
+            [
+                "--profile-directory=Default",
+                CONNECTOR.replace("mmlmfjhmonkocbjadbfplnigmagldckm", "other-extension"),
+            ],
             ["--profile-directory=Default", CONNECTOR + "#extra"],
             ["--profile-directory=Default", CONNECTOR + "\n"],
             ["--profile-directory=Default", CONNECTOR, "--incognito"],
@@ -110,16 +224,42 @@ class ChromeWindowTests(unittest.TestCase):
             binary.write_text("#!/bin/sh\nexit 0\n")
             binary.chmod(0o700)
             root = self.profile_fixture(directory)
+
             def fail(*_):
                 raise OSError(CONNECTOR)
+
             for arguments, env, execute in [
-                (["--profile-directory=Default", CONNECTOR], {"EP_BROWSER_EXECUTABLE": str(binary), "EP_BROWSER_EXPECTED_ACCOUNT": "worker@example.test"}, fail),
+                (
+                    ["--profile-directory=Default", CONNECTOR],
+                    {
+                        "EP_BROWSER_EXECUTABLE": str(binary),
+                        "EP_BROWSER_EXPECTED_ACCOUNT": "worker@example.test",
+                    },
+                    fail,
+                ),
                 (["--guest", CONNECTOR], {}, fail),
-                (["--profile-directory=Default", CONNECTOR], {"EP_BROWSER_EXECUTABLE": "/missing", "EP_BROWSER_EXPECTED_ACCOUNT": "worker@example.test"}, fail),
+                (
+                    ["--profile-directory=Default", CONNECTOR],
+                    {
+                        "EP_BROWSER_EXECUTABLE": "/missing",
+                        "EP_BROWSER_EXPECTED_ACCOUNT": "worker@example.test",
+                    },
+                    fail,
+                ),
             ]:
                 err = io.StringIO()
                 with contextlib.redirect_stderr(err):
-                    self.assertEqual(wrapper.main(arguments, env, execute, profile_root=root, running=lambda: True), 2)
+                    self.assertEqual(
+                        wrapper.main(
+                            arguments,
+                            env,
+                            execute,
+                            profile_root=root,
+                            running=lambda: True,
+                            settled=lambda: True,
+                        ),
+                        2,
+                    )
                 self.assertNotIn("SYNTHETIC_CANARY", err.getvalue())
                 self.assertNotIn("chrome-extension://", err.getvalue())
 
