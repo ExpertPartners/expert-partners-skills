@@ -1,3 +1,6 @@
+## 3.8.16 - 2026-11-21
+
+Corrects the Don profile note. Its working page closes after any navigation, not only `page.goto`, so the skill no longer offers `location.href` as a workaround and says to use Ember's profile until it is fixed.
 ## 3.8.15 - 2026-11-21
 
 Failed-job cleanup after an interrupted call no longer refuses every newer peer tab. A newer tab is excused only when a live ready peer receipt recorded it as its own birth tab and that peer's exact connector and single extension session still hold it. Target extras, opener descendants and missing working tabs still refuse first. The destructive phase re-reads a content-free inventory digest after every asynchronous check and just before removal, holds the receipt lock, and checks the browser generation at use. A new read-only `--diagnose-failed` entry point reports the inventory as integer IDs and static codes without writing any receipt.
