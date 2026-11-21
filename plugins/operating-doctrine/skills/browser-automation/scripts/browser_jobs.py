@@ -6,6 +6,7 @@ credentials remain inside that launcher. There is no network listener or schedul
 """
 
 import argparse
+import contextlib
 from contextlib import contextmanager
 import copy
 import fcntl
@@ -339,11 +340,17 @@ def failed_cleanup_js(args, remove, diagnose=False):
         "const read=async()=>{const tabs=await chrome.tabs.query({});const list=self===null?null:await sessions();"
         "let status=null;try{status=await connectionStatus();}catch{}"
         "const fresh=newer(tabs);const peerIds=fresh.filter(id=>excused(id,tabs,list));"
-        "const key=JSON.stringify([tabs.map(t=>[t.id,t.windowId,t.groupId,t.openerTabId??null]).sort((a,b)=>a[0]-b[0]),list===null?null:list.map(x=>[x.clientName,ids(x.tabIds)]).sort(),status===null?null:status.map(x=>[x.clientName,ids(x.connectedTabIds||[])]).sort()]);"
+        # Connector URLs are not hashed, so each connector's exact() verdict
+        # and the derived sets are, otherwise a retargeted connector with
+        # unchanged IDs would keep the same digest.
+        "const own=tabs.find(t=>t.id===old.connectorId);const bits=[own?exact(own,clientName):null,peers.map(p=>{const c=tabs.find(t=>t.id===p.connectorId);return !!c&&exact(c,p.clientName);})];"
+        "const unknownIds=fresh.filter(id=>!peerIds.includes(id));"
+        "const key=JSON.stringify([tabs.map(t=>[t.id,t.windowId,t.groupId,t.openerTabId??null]).sort((a,b)=>a[0]-b[0]),list===null?null:list.map(x=>[x.clientName,ids(x.tabIds)]).sort(),status===null?null:status.map(x=>[x.clientName,ids(x.connectedTabIds||[])]).sort(),bits,ids(peerIds),ids(unknownIds)]);"
         "const proof=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(key))),b=>b.toString(16).padStart(2,'0')).join('');"
-        "return {tabs,status,peerIds,unknownIds:fresh.filter(id=>!peerIds.includes(id)),proof};};"
+        "return {tabs,status,peerIds,unknownIds,proof};};"
         "const r=await read();"
-        "const stable=async()=>{if((await read()).proof!==r.proof)throw Error('cleanup_proof_changed');};"
+        "const same=(a,b)=>JSON.stringify(ids(a))===JSON.stringify(ids(b));"
+        "const stable=async()=>{const n=await read();if(n.proof!==r.proof||!same(n.peerIds,r.peerIds)||!same(n.unknownIds,r.unknownIds))throw Error('cleanup_proof_changed');};"
         "const verify=async(check)=>{const before=r.tabs;"
         # Target extras and descendants block before any peer exemption.
         "if(incomplete(before))throw Error('uncheckpointed_page_arrival');"
@@ -374,11 +381,14 @@ def failed_cleanup_js(args, remove, diagnose=False):
         "missingSavedIds:ids(old.tabIds.filter(id=>!liveIds.has(id))),peerIds:ids(r.peerIds),unknownIds:ids(r.unknownIds)};}"
         # A dry-run or phase-one digest is never authority by itself; phase
         # two must still observe exactly the same inventory.
-        "if(expectedProof!==null&&r.proof!==expectedProof)throw Error('cleanup_proof_changed');"
-        "const v=await verify(stable);"
+        # In the removing phase every refusal before windows.remove is returned,
+        # not thrown, so the caller knows no removal was issued and can restore
+        # its issued-removal flag. Anything thrown is after removal or unknown.
+        "let v;try{if(expectedProof!==null&&r.proof!==expectedProof)throw Error('cleanup_proof_changed');"
+        "v=await verify(stable);if(remove&&!v.alreadyClosed)await stable();}"
+        "catch(e){if(remove)return {refused:String(e&&e.message)};throw e;}"
         "if(v.alreadyClosed)return {closed:true,count:0,alreadyClosed:true};"
         "if(!remove)return {ready:true,count:v.live.length,connectorMissing:!v.connector,proof:r.proof,peerIds:ids(r.peerIds)};"
-        "await stable();"
         "await chrome.windows.remove(old.windowId);"
         "const beforeIds=new Set(r.tabs.map(t=>t.id));"
         # Chrome can still list a removed window's tabs for a moment.
@@ -470,6 +480,72 @@ def chrome_generation():
 
 
 PEER_SOURCE_LIMIT = 64
+# The destructive cleanup call holds receipts.lock, which every peer's
+# checkpoint also takes. Both waits are bounded so a stuck transport stalls
+# peers for at most DESTRUCTIVE_CALL_TIMEOUT, and a busy lock skips cleanup.
+RECEIPTS_LOCK_TIMEOUT = 10
+DESTRUCTIVE_CALL_TIMEOUT = 20
+PRE_REMOVAL_REFUSALS = frozenset(
+    (
+        "cleanup_proof_changed",
+        "uncheckpointed_page_arrival",
+        "saved_owned_tab_missing",
+        "connector_identity_changed",
+        "connection_status_unavailable",
+        "ownership_changed",
+        "group_identity_changed",
+    )
+)
+HELD_RECEIPTS = threading.local()
+
+
+def release_lock(fd):
+    fcntl.flock(fd, fcntl.LOCK_UN)
+    os.close(fd)
+
+
+@contextmanager
+def bounded_receipts_lock(root, timeout=None):
+    """receipts.lock with a bounded wait; this thread's own saves reuse it."""
+    timeout = RECEIPTS_LOCK_TIMEOUT if timeout is None else timeout
+    fd = os.open(Path(root) / "receipts.lock", os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+    deadline = time.monotonic() + timeout
+    try:
+        while True:
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                break
+            except BlockingIOError:
+                if time.monotonic() > deadline:
+                    raise Refusal("receipts_lock_busy") from None
+                time.sleep(0.05)
+    except BaseException:
+        os.close(fd)
+        raise
+    HELD_RECEIPTS.root = str(root)
+    try:
+        yield
+    finally:
+        HELD_RECEIPTS.root = None
+        try:
+            release_lock(fd)
+        except OSError:
+            # The removal outcome may be fine, but an unreleased lock is not
+            # a state cleanup may report as settled.
+            raise Refusal("receipts_lock_release_failed") from None
+
+
+def bounded_code(client, body, timeout):
+    previous = getattr(client, "timeout", None)
+    if type(previous) not in (int, float):
+        return code(client, body)
+    client.timeout = min(previous, timeout)
+    try:
+        return code(client, body)
+    finally:
+        client.timeout = previous
+
+
 DIAGNOSTIC_ID_LIMIT = 64
 DIAGNOSTIC_ID_FIELDS = (
     "targetExtraIds",
@@ -547,7 +623,7 @@ def diagnostic_projection(value):
 
 
 class Route:
-    def __init__(self, config):
+    def __init__(self, config, control=True):
         self.config = config
         self.root = Path(config["state_dir"]).expanduser()
         self.root.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -564,6 +640,11 @@ class Route:
         self.jobs = {}
         self.lock = threading.RLock()
         self.inventory = None
+        self.control_socket = self.control_listener = None
+        if not control:
+            # The read-only diagnostic owns no job, so it serves no finish
+            # channel and leaves no socket in state_dir.
+            return
         self.control_socket = "control-" + uuid.uuid4().hex[:16] + ".sock"
         self.control_listener = socket.socket(socket.AF_UNIX)
         self.control_listener.bind(str(self.root / self.control_socket))
@@ -603,7 +684,7 @@ class Route:
 
     def close_control(self):
         listener = getattr(self, "control_listener", None)
-        if listener:
+        if listener and self.control_socket:
             listener.close()
             (self.root / self.control_socket).unlink(missing_ok=True)
 
@@ -722,7 +803,8 @@ class Route:
         # A stale facade never reopens a receipt another route already settled.
         # Check and replace under one host-wide lock, so a sweep or reconciliation
         # that settles the receipt between the two can never be overwritten.
-        with ledger_lock(self.root, "receipts.lock"):
+        held = getattr(HELD_RECEIPTS, "root", None) == str(self.root)
+        with contextlib.nullcontext() if held else ledger_lock(self.root, "receipts.lock"):
             if self.settled_elsewhere(job):
                 job["status"] = "finished"
                 return
@@ -1307,21 +1389,37 @@ class Route:
                 used = sorted(
                     i for i, p in enumerate(peers) if any(t in p["tabIds"] for t in excused)
                 )
-                # Recorded before removal so a retry after an interrupted close
-                # can prove the vanished window was this route's own removal.
-                job["window_removal_issued"] = True
-                self.checkpoint(job)
                 if self.preflight() != job["generation"]:
                     raise Refusal("browser_generation_changed_requires_reconciliation")
                 # Peers checkpoint under this lock, so the receipts that excuse
                 # a tab cannot change while the destructive phase runs.
-                with ledger_lock(self.root, "receipts.lock"):
+                with bounded_receipts_lock(self.root):
                     again, now = self.peer_sources(job, pending_since)
                     if again != peers or any(now[i] != digests[i] for i in used):
                         raise Refusal("peer_proof_changed")
-                    outcome = code(
-                        client, failed_cleanup_js({**args, "expectedProof": proof}, remove=True)
+                    # Recorded just before the removing call so a retry after an
+                    # interrupted close can prove the vanished window was this
+                    # route's own removal. A refusal the browser code reports
+                    # before windows.remove restores the earlier value.
+                    issued_before = job.get("window_removal_issued")
+                    job["window_removal_issued"] = True
+                    self.checkpoint(job)
+                    outcome = bounded_code(
+                        client,
+                        failed_cleanup_js({**args, "expectedProof": proof}, remove=True),
+                        DESTRUCTIVE_CALL_TIMEOUT,
                     )
+                    if "refused" in outcome:
+                        job["window_removal_issued"] = issued_before
+                        if not issued_before:
+                            job.pop("window_removal_issued", None)
+                        self.checkpoint(job)
+                        refused = outcome["refused"]
+                        raise Refusal(
+                            refused
+                            if refused in PRE_REMOVAL_REFUSALS
+                            else "cleanup_precheck_failed"
+                        )
                     again, now = self.peer_sources(job, pending_since)
                     if outcome.get("closed") is True and (
                         again != peers or any(now[i] != digests[i] for i in used)
@@ -1384,6 +1482,8 @@ class Route:
         Never calls dispose_failed, never writes any receipt or owner row and
         never removes a tab or window. The only browser footprint is the
         temporary maintenance connector window, whose closure is verified.
+        Constructed with control=False, it binds no control socket and starts
+        no listener thread. It takes the shared bootstrap lock while observing.
         The result is not authority for a later close.
         """
         if not isinstance(job_id, str) or not re.fullmatch(r"[0-9a-f]{32}", job_id):
@@ -1794,7 +1894,7 @@ def main():
     args = parser.parse_args()
     try:
         config = json.loads(args.config.read_text())
-        route = Route(config)
+        route = Route(config, control=not args.diagnose_failed)
         if args.diagnose_failed:
             try:
                 print(json.dumps(route.diagnose_failed(args.diagnose_failed)))

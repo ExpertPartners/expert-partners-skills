@@ -566,9 +566,11 @@ process.__epBrowserJob={connector:{evaluate:async(fn,arg)=>await fn(arg)}};
             # all saved parent tabs have already disappeared.
             script = (
                 fixture
-                + "async function attempt(){"
+                + "async function run(){"
                 + body
                 + "}\n"
+                + "async function attempt(){const v=await run();"
+                + "if(v&&v.refused){assert.deepEqual(removed,[]);throw Error(v.refused);}return v;}\n"
                 + r'''
 (async()=>{for(const w of [5,6])for(const gone of [false,true]){
   unknownWindow=w;parentGone=gone;removed=[];
@@ -611,6 +613,15 @@ async function attempt(){__BODY__}
 attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({...o,removed})));
 """
 
+    def refusal_as_error(self, out):
+        # The removing phase returns pre-removal refusals instead of throwing,
+        # so the caller can restore its issued-removal flag. None may remove.
+        refused = out.get("v", {}).get("refused") if isinstance(out.get("v"), dict) else None
+        if refused is None:
+            return out
+        self.assertEqual(out["removed"], [], out)
+        return {**{k: v for k, v in out.items() if k != "v"}, "e": refused, "preRemoval": True}
+
     def failed_cleanup(self, tabs, remove=True, removal_issued=False, pending_since=None, **state):
         body = b.failed_cleanup_js(
             {
@@ -627,7 +638,7 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
         ).replace("__BODY__", body)
         run = subprocess.run(["node", "-e", script], capture_output=True, text=True, timeout=10)
         self.assertEqual(run.returncode, 0, run.stderr)
-        return json.loads(run.stdout)
+        return self.refusal_as_error(json.loads(run.stdout))
 
     def test_missing_connector_with_only_owned_survivor_closes_exact_window(self):
         survivor = [
@@ -805,6 +816,179 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
             row = json.loads(receipt.read_text())
             self.assertEqual((row["status"], row["window_disposition"]), ("finished", "closed"))
 
+    def test_retargeted_connector_with_unchanged_ids_changes_the_proof(self):
+        # Tab IDs, windows and groups stay identical; only the connector URL
+        # moves to another client between the proof read and the re-read.
+        fixture = self.CLEANUP_FIXTURE.replace(
+            "tabs:{query:async()=>{",
+            "tabs:{query:async()=>{state.reads=(state.reads||0)+1;"
+            "if(state.reads===state.flipAt){for(const t of state.tabs)if(t.id===1)t.url=state.flipUrl;}",
+        )
+        tabs = [
+            {"id": 1, "windowId": 5, "groupId": 7, "url": self.CONNECTOR_URL},
+            {"id": 10, "windowId": 5, "groupId": 7},
+        ]
+        for remove in (False, True):
+            with self.subTest(remove=remove):
+                body = b.failed_cleanup_js(
+                    {
+                        "old": self.OLD,
+                        "clientName": "fixture",
+                        "connectorOrigin": b.EXTENSION,
+                        "removalIssued": False,
+                        "pendingSince": None,
+                    },
+                    remove,
+                )
+                state = {
+                    "tabs": tabs,
+                    "flipAt": 2,
+                    "flipUrl": self.CONNECTOR_URL.replace("fixture", "other"),
+                }
+                script = fixture.replace("__STATE__", json.dumps(state)).replace("__BODY__", body)
+                run = subprocess.run(
+                    ["node", "-e", script], capture_output=True, text=True, timeout=10
+                )
+                self.assertEqual(run.returncode, 0, run.stderr)
+                out = self.refusal_as_error(json.loads(run.stdout))
+                self.assertEqual(out.get("e"), "cleanup_proof_changed", out)
+                self.assertEqual(out["removed"], [])
+
+    def removal_route(self, root, removing_reply):
+        route = self.route(root)
+        job = self.full_job(route)
+        route.save(job)
+        receipt = Path(root) / (job["job_id"] + ".json")
+        seen = []
+
+        def fake(_, body):
+            if "async({old,clientName," in body:
+                removing = '"remove": true' in body
+                seen.append(
+                    (removing, json.loads(receipt.read_text()).get("window_removal_issued"))
+                )
+                if removing:
+                    return removing_reply
+                return {"ready": True, "count": 1, "proof": "a" * 64, "peerIds": []}
+            if "maintenance_window_not_exclusive" in body:
+                return {"windowId": 77, "closed": True}
+            return {"ready": True}
+
+        return route, job, receipt, seen, fake
+
+    def test_pre_removal_refusal_restores_the_issued_removal_flag(self):
+        for reply, expected, prior in (
+            ({"refused": "cleanup_proof_changed"}, "cleanup_proof_changed", None),
+            ({"refused": "uncheckpointed_page_arrival"}, "uncheckpointed_page_arrival", None),
+            ({"refused": "TypeError: CANARY"}, "cleanup_precheck_failed", None),
+            ({"refused": "cleanup_proof_changed"}, "cleanup_proof_changed", True),
+        ):
+            with self.subTest(reply=reply, prior=prior), tempfile.TemporaryDirectory() as root:
+                route, job, receipt, seen, fake = self.removal_route(root, reply)
+                if prior:
+                    job["window_removal_issued"] = True
+                    route.save(job)
+                with (
+                    patch.object(
+                        route,
+                        "client",
+                        create=True,
+                        return_value=SimpleNamespace(close=lambda: None),
+                    ),
+                    patch.object(b, "code", side_effect=fake),
+                    patch.object(b, "verify_window_closed"),
+                    patch.object(b.time, "sleep"),
+                ):
+                    with self.assertRaisesRegex(Refusal, "^" + expected + "$"):
+                        route.dispose_failed(job)
+                # Set only for the removing call itself, then put back.
+                self.assertEqual(seen, [(False, prior), (True, True)])
+                row = json.loads(receipt.read_text())
+                self.assertEqual(row.get("window_removal_issued"), prior)
+                self.assertEqual(job.get("window_removal_issued"), prior)
+                self.assertNotEqual(row.get("window_disposition"), "closed")
+                self.assertNotIn("CANARY", receipt.read_text())
+
+    def test_busy_receipts_lock_refuses_before_issuing_removal(self):
+        import fcntl
+
+        with tempfile.TemporaryDirectory() as root:
+            route, job, receipt, seen, fake = self.removal_route(root, {"closed": True, "count": 1})
+            held = []
+
+            def phase_one_then_hold(client, body):
+                out = fake(client, body)
+                if "async({old,clientName," in body and not held:
+                    # A peer takes receipts.lock between the two phases.
+                    fd = os.open(Path(root) / "receipts.lock", os.O_CREAT | os.O_RDWR, 0o600)
+                    fcntl.flock(fd, fcntl.LOCK_EX)
+                    held.append(fd)
+                return out
+
+            save = route.save
+
+            def release_then_save(j):
+                # Only a later save may wait on the peer; free it first so a
+                # wrong blocking path fails the assertions instead of hanging.
+                while held:
+                    fd = held.pop()
+                    fcntl.flock(fd, fcntl.LOCK_UN)
+                    os.close(fd)
+                save(j)
+
+            with (
+                patch.object(
+                    route,
+                    "client",
+                    create=True,
+                    return_value=SimpleNamespace(close=lambda: None),
+                ),
+                patch.object(b, "code", side_effect=phase_one_then_hold),
+                patch.object(b, "verify_window_closed"),
+                patch.object(b, "RECEIPTS_LOCK_TIMEOUT", 0.2),
+                patch.object(route, "save", side_effect=release_then_save),
+            ):
+                with self.assertRaisesRegex(Refusal, "receipts_lock_busy"):
+                    route.dispose_failed(job)
+            for fd in held:
+                fcntl.flock(fd, fcntl.LOCK_UN)
+                os.close(fd)
+            self.assertEqual(seen, [(False, None)])
+            self.assertNotIn("window_removal_issued", job)
+            self.assertNotIn("window_removal_issued", json.loads(receipt.read_text()))
+
+    def test_destructive_call_timeout_is_bounded_and_restored(self):
+        client = SimpleNamespace(timeout=120)
+        observed = []
+        with patch.object(b, "code", side_effect=lambda c, _: observed.append(c.timeout) or {}):
+            b.bounded_code(client, "body", b.DESTRUCTIVE_CALL_TIMEOUT)
+            self.assertEqual(observed, [b.DESTRUCTIVE_CALL_TIMEOUT])
+            self.assertEqual(client.timeout, 120)
+            with patch.object(b, "code", side_effect=RuntimeError("transport")):
+                with self.assertRaises(RuntimeError):
+                    b.bounded_code(client, "body", 5)
+            self.assertEqual(client.timeout, 120)
+
+    def test_diagnostic_route_binds_no_control_socket(self):
+        with tempfile.TemporaryDirectory() as root:
+            hook = Path(root) / "hook.py"
+            hook.write_text("def decide(*_):\n    return None\n")
+            state = Path(root) / "state"
+            config = {"state_dir": str(state), "headless_hook": str(hook)}
+            threads = threading.active_count()
+            route = b.Route(config, control=False)
+            self.assertIsNone(route.control_socket)
+            self.assertIsNone(route.control_listener)
+            self.assertEqual(list(state.glob("*.sock")), [])
+            self.assertEqual(threading.active_count(), threads)
+            route.close_control()
+            live = b.Route(config)
+            try:
+                self.assertEqual(len(list(state.glob("*.sock"))), 1)
+            finally:
+                live.close_control()
+            self.assertEqual(list(state.glob("*.sock")), [])
+
     def test_post_action_verify_failure_finishes_through_watermarked_reconciliation(self):
         with tempfile.TemporaryDirectory() as root:
             route = self.route(root)
@@ -976,7 +1160,7 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
         )
         run = subprocess.run(["node", "-e", script], capture_output=True, text=True, timeout=10)
         self.assertEqual(run.returncode, 0, run.stderr)
-        return json.loads(run.stdout)
+        return self.refusal_as_error(json.loads(run.stdout))
 
     def test_connection_diagnostics_read_only_the_owned_scope(self):
         owned = [{"id": 1, "windowId": 5, "url": self.CONNECTOR_URL}, {"id": 10, "windowId": 5}]
@@ -1712,7 +1896,7 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
         script = self.PEER_FIXTURE.replace("__STATE__", json.dumps(state)).replace("__BODY__", body)
         run = subprocess.run(["node", "-e", script], capture_output=True, text=True, timeout=10)
         self.assertEqual(run.returncode, 0, run.stderr)
-        return json.loads(run.stdout)
+        return self.refusal_as_error(json.loads(run.stdout))
 
     def assert_peer_blocks(self, expected="uncheckpointed_page_arrival", **kwargs):
         out = self.peer_cleanup(**kwargs)
@@ -1999,6 +2183,7 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
                 with self.assertRaisesRegex(Refusal, "peer_proof_changed"):
                     self.run_pending_finish(route, job, fake)
                 self.assertEqual(phases, [False])
+                self.assertNotIn("window_removal_issued", job)
         with tempfile.TemporaryDirectory() as root:
             route, job, phases, fake = self.pending_peer_route(
                 root,
