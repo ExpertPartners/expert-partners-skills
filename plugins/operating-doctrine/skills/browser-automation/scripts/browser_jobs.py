@@ -22,7 +22,7 @@ import subprocess
 import sys
 import threading
 import time
-from urllib.parse import quote
+from urllib.parse import quote, urlsplit
 import uuid
 
 from chrome_job_window import existing_signed_in_profile, chrome_is_running, verify_window_closed
@@ -36,6 +36,10 @@ from relay_ownership import OwnershipLedger
 EXTENSION = "chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/connect.html"
 STATE_JS = "const s=Buffer.constructor('return process')().__epBrowserJob;if(!s)throw Error('owned_state_missing');"
 FILE_CHOOSER_MARKER = "- [File chooser]: can be handled by browser_file_upload"
+NAVIGATION_REPLACEMENT_JS = (
+    STATE_JS + "if(page!==s.connector)throw Error('replacement_connector_not_owned');"
+    "return {candidate:await s.navigationReplacement(__EP_EXPECTED_REPLACEMENT__)};"
+)
 CHOOSER_SNAPSHOT_JS = (
     STATE_JS + "if(page!==s.connector)throw Error('chooser_connector_not_owned');"
     "const snapshot=await s.snapshot();const task=s.task;"
@@ -1333,6 +1337,40 @@ class Route:
     def verify_connection(self, job):
         return self.verify_observed(job, self.metadata(job["client"]))
 
+    def recover_navigation_page(self, job):
+        """Bind only a Page the existing extension connection already reattached."""
+        self.select_private_tab(job, job.get("chooser_connector_index"))
+
+        def inspect(expected):
+            return code(
+                job["client"],
+                NAVIGATION_REPLACEMENT_JS.replace(
+                    "__EP_EXPECTED_REPLACEMENT__", json.dumps(expected)
+                ),
+            )["candidate"]
+
+        candidate = inspect(None)
+        if not candidate:
+            return False
+        origin = urlsplit(candidate["origin"])
+        if (
+            origin.scheme != "https"
+            or not origin.hostname
+            or origin.username is not None
+            or origin.password is not None
+            or any((origin.path, origin.query, origin.fragment))
+        ):
+            raise Refusal("owned_replacement_unproven")
+        denied, _ = self.policy("browser_navigate", {"url": candidate["origin"] + "/"})
+        if denied:
+            raise Refusal("owned_replacement_policy_denied")
+        if self.preflight() != job["generation"]:
+            raise Refusal("browser_generation_changed_no_replay")
+        if inspect(candidate) != candidate:
+            raise Refusal("owned_replacement_changed")
+        self.mark(job, "owned_navigation_page_rebound")
+        return True
+
     @staticmethod
     def verify_observed(job, observed):
         old = job["metadata"]
@@ -1871,13 +1909,24 @@ class Route:
                         self.select_private_tab(job, state["taskIndex"])
                     job["metadata"] = observed
                 else:
+                    if (
+                        name == "browser_navigate"
+                        and not job.get("relay_mode")
+                        and type(job.get("chooser_connector_index")) is int
+                        and isinstance(args.get("url"), str)
+                        and args["url"].startswith("https://")
+                        and self.recover_navigation_page(job)
+                    ):
+                        notes.append(
+                            "Browser job route: reattached to the same owned Chrome tab. "
+                            "The navigation was not replayed. Take a fresh snapshot."
+                        )
                     job["metadata"] = self.verify_connection(job)
                 job["ownership_pending"] = False
                 self.mark(job, "post_metadata")
                 if job.get("working_page") == "closed":
-                    # The tab may still be open and showing the page, but no
-                    # later call can prove it is the same document. Never
-                    # re-bind or replay; finish or recover closes it by exact ID.
+                    # No exact replacement Page was proved. Never continue or
+                    # replay; finish or recover closes the tab by its saved ID.
                     self.mark(job, "failed:working_page_lost")
                     self.capture_connection_diagnostics(job, "post_call", reason=reported)
                     self.checkpoint(job, "failed")

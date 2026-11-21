@@ -81,6 +81,60 @@ async function newOwnedState(connector) {
     }
   };
 
+  // Extension 0.6.0 can reannounce a still-owned tab after a native debugger
+  // target closes. Let that private transport attach; never attach or navigate
+  // a target ourselves. The pinned in-process SDK exposes the CDP target ID.
+  s.navigationReplacement = async (expected) => {
+    const old = s.task;
+    if (!old || !old.isClosed()) return null;
+    const id = s.ids.get(old);
+    if (!s.created.has(old) || !s.tabIds.has(id) || s.closedIds.has(id) ||
+        id === initial.connectorId || s.pendingIds.size) throw Error('owned_replacement_unproven');
+    const knownIds = [...s.tabIds].filter(tabId => !s.closedIds.has(tabId));
+    for (let attempt = 0; attempt < (expected ? 1 : 10); attempt++) {
+      const observed = await connector.evaluate(async ({initial, knownIds, id}) => {
+        const self = await chrome.tabs.getCurrent();
+        const group = await chrome.tabGroups.get(self.groupId);
+        const tabs = await chrome.tabs.query({windowId: initial.windowId});
+        if (self.id !== initial.connectorId || self.windowId !== initial.windowId ||
+            self.groupId !== initial.groupId || group.title !== initial.groupTitle ||
+            tabs.length !== knownIds.length ||
+            tabs.some(t => t.groupId !== initial.groupId || !knownIds.includes(t.id)))
+          throw Error('owned_replacement_unproven');
+        const task = tabs.find(t => t.id === id);
+        if (!task || !task.url?.startsWith('https://')) return null;
+        if (task.pendingUrl || task.status !== 'complete') return {};
+        const targets = (await chrome.debugger.getTargets()).filter(t =>
+          t.tabId === id && t.type === 'page');
+        if (targets.length !== 1 || !targets[0].attached || !targets[0].id) return {};
+        return {targetId: targets[0].id, origin: new URL(task.url).origin};
+      }, {initial, knownIds, id});
+      if (observed === null) return null;
+      const unknown = context.pages().filter(p => !s.created.has(p));
+      if (unknown.length > 1) throw Error('owned_replacement_unproven');
+      if (observed.targetId && unknown.length === 1) {
+        const page = unknown[0];
+        const sdkTarget = page._connection?.toImpl?.(page)?.delegate?._targetId;
+        if (page.isClosed() || sdkTarget !== observed.targetId ||
+            new URL(page.url()).origin !== observed.origin ||
+            context.pages().some(p => p !== page && !s.ids.has(p)))
+          throw Error('owned_replacement_unproven');
+        if (expected) {
+          if (expected.targetId !== observed.targetId || expected.origin !== observed.origin)
+            throw Error('owned_replacement_changed');
+          s.created.delete(old);
+          s.ids.delete(old);
+          s.created.add(page);
+          s.ids.set(page, id);
+          s.task = page;
+        }
+        return observed;
+      }
+      if (!expected) await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    return null;
+  };
+
   s.snapshot = async (strict = true) => {
     await s.discoverPopups();
     const knownIds = [...s.tabIds].filter(id => !s.closedIds.has(id));
