@@ -1,3 +1,6 @@
+## 3.8.17 - 2026-11-21
+
+Preserve an owned HTTPS navigation job when the pinned Playwright extension automatically reattaches to the same Chrome tab. Require the exact Chrome and Playwright target IDs to match, recheck redirect policy and ownership, and never replay navigation.
 ## 3.8.16 - 2026-11-21
 
 Corrects the Don profile note. Its working page closes after any navigation, not only `page.goto`, so the skill no longer offers `location.href` as a workaround and says to use Ember's profile until it is fixed.
