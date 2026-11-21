@@ -215,7 +215,7 @@ differ, the SOP wins. Verified live Nov 2, 2026, after the Nov 1 M2 rebuild.
 | Machine | Ember's M2 only. One Mac user, `ember`. There is no `/Users/allison` on the M2 any more |
 | Chrome profile | `Default` only (ember@expertpartners.com, allison@ also added in Google), Playwright Extension installed. The Atlas profile did not come back after the rebuild |
 | Shared connector | `/Users/ember/maintenance/chrome-signed-in-mcp.sh` (Playwright MCP 0.0.83, pinned, `--extension`) |
-| Extension token | 1Password, Automation vault, item ID `tzqvnlgilv4evwffp27amnwxw4`. The connector reads an owner-only copy at `~/.config/ember/playwright-extension-token`, because SSH sessions cannot unlock the Keychain |
+| Extension token | 1Password, Automation vault, item ID `2i4x6x47noqy4ec475ez3zovpu`. The connector reads an owner-only copy at `~/.config/ember/playwright-extension-token`, because SSH sessions cannot unlock the Keychain |
 | Job runner | None since the rebuild. `pw-run` is gone |
 
 Claude Code and Codex start on Allison's M4 and reach that Chrome through the named
@@ -304,7 +304,10 @@ that ends with only the connector's Welcome tab.
 Open the extension's status page in the `Default` profile, click "Generate new token",
 copy it, and replace the value in the 1Password item. Copying it with its
 `PLAYWRIGHT_MCP_EXTENSION_TOKEN=` label is fine, because the connector strips the label.
-Never print, log, or paste the token anywhere else.
+Then copy it from 1Password into `~/.config/ember/playwright-extension-token` (owner-only)
+with `op read`, and run the health check. Repairing or reinstalling the extension in
+Chrome also makes a new token, and the extension then answers "invalid token provided"
+until both copies are updated. Never print, log, or paste the token anywhere else.
 
 ## 1Password
 
