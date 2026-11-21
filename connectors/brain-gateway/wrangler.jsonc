@@ -31,7 +31,8 @@
       "SENDBLUE_API_KEY_ID",
       "SENDBLUE_API_SECRET",
       "ALERT_TO",
-      "ALERT_FROM"
+      "ALERT_FROM",
+      "WITHHELD_SOURCES"
     ]
   }
 }

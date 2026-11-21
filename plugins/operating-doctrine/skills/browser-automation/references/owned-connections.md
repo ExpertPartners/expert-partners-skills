@@ -12,7 +12,10 @@ pinned MCP version, profile and credential. Configure `EP_BROWSER_EXPECTED_ACCOU
 from the current assigned account before enabling this route. The adapter reads the
 existing profile directory, Chrome's current profile identity metadata and that
 profile's account metadata, and refuses if the expected account is missing or does
-not match. It also refuses while Chrome is stopped. It does not create a profile,
+not match. It also refuses while Chrome is stopped. Right before the handoff it
+waits up to 20 seconds for a Chrome main process that has been up at least 15
+seconds, and refuses if none appears. A connector page handed to a Chrome that is
+still starting loads before the extension and shows ERR_BLOCKED_BY_CLIENT. It does not create a profile,
 choose a fallback account, start a stopped browser or perform a sign-in.
 
 `EP_BROWSER_EXECUTABLE` may name the

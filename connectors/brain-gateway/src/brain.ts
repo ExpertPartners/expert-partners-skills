@@ -139,7 +139,26 @@ function escapeQuery(s: string) {
 	return s.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
 }
 
-export function createBrainReads(drive: DriveFetch, now = () => new Date()) {
+/**
+ * Files withheld from every scope, from the WITHHELD_SOURCES secret: a JSON array of Drive file ids.
+ * Ids stay out of this public repository. A historical source that still sits in an approved folder is
+ * neither listed nor readable, so its title cannot surface. A malformed value refuses every read
+ * instead of silently withholding nothing.
+ */
+export function parseWithheld(json: string | undefined): ReadonlySet<string> {
+	if (json === undefined || json.trim() === "") return new Set();
+	let ids: unknown;
+	try {
+		ids = JSON.parse(json);
+	} catch {
+		throw new BrainError("withheld_invalid", "The withheld source list is unreadable. No source was served.");
+	}
+	if (!Array.isArray(ids) || ids.some((id) => typeof id !== "string" || !/^[\w-]+$/.test(id)))
+		throw new BrainError("withheld_invalid", "The withheld source list is malformed. No source was served.");
+	return new Set(ids as string[]);
+}
+
+export function createBrainReads(drive: DriveFetch, now = () => new Date(), withheld: ReadonlySet<string> = new Set()) {
 	async function discover(scope: BrainScope, query?: string) {
 		const files: BrainFile[] = [];
 		const seen = new Set<string>();
@@ -168,7 +187,8 @@ export function createBrainReads(drive: DriveFetch, now = () => new Date()) {
 			if (pageToken && seen.has(pageToken)) throw new BrainError("incomplete_discovery", "Drive repeated a discovery page.");
 			seen.add(pageToken);
 		} while (pageToken);
-		return { scope, folderId: BRAIN_FOLDERS[scope], files, complete: true, readAt: now().toISOString() };
+		const listed = files.filter((f) => !withheld.has(f.id));
+		return { scope, folderId: BRAIN_FOLDERS[scope], files: listed, complete: true, withheld: files.length - listed.length, readAt: now().toISOString() };
 	}
 
 	/** One cheap request: the scope's registered folder answers and lists. Used by the daily check, which has a request budget. */
@@ -189,6 +209,7 @@ export function createBrainReads(drive: DriveFetch, now = () => new Date()) {
 
 	/** Reads one whole document. Verifies direct membership in scope before and after, and that the version did not change. */
 	async function readWhole(scope: BrainScope, id: string) {
+		if (withheld.has(id)) throw new BrainError("not_in_scope", "The file is not a readable document in this scope.");
 		const inventory = await discover(scope);
 		const found = inventory.files.find((f) => f.id === id);
 		if (!found || !READABLE_MIME.includes(found.mimeType))

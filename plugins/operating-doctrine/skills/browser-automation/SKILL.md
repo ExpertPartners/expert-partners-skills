@@ -95,9 +95,7 @@ block.
 - MFA, CAPTCHA, or a human approval screen appears.
 - A sign-up page or a new consent screen appears, which is new account access.
 
-When blocked by a human-only screen, leave it open on the M2, tell Allison the one thing
-only she can do and where, and pick up again when she says done. If a better tool exists,
-use it.
+When blocked by a human-only screen, follow Rule 2b. If a better tool exists, use it.
 
 ## Rule 2a. Follow the trail before you ask
 
@@ -109,10 +107,17 @@ about access before following that trail is the most common way AI stalls her wo
    file the setup job when it could have one.
 2. Otherwise open the page with the `playwright-ember` tool. You are almost always already signed
    in. Look before you assume you are not.
-3. Only on a real sign-in page, use the saved login that 1Password offers in Chrome, or the
-   site's Sign in with Google or other single sign-on button, then keep working. Never read a
-   password into the session's own context.
-4. Only if all of that truly fails, tell Allison the one thing only she can do.
+3. On a real sign-in page, use 1Password before anything else, every time. Saying you
+   cannot sign in without an actual 1Password attempt is a failure of this rule.
+   - If the 1Password inline menu or icon appears in the username or password field, use
+     it to fill the saved login.
+   - Otherwise fill from the matching 1Password item with one sealed call, as the
+     1Password section below shows. The password goes from 1Password to the page inside
+     that call and never enters the session.
+   - Or use the site's Sign in with Google or other single sign-on button for an account
+     already linked to it.
+4. Only if all of that truly fails, follow Rule 2b and tell Allison the one thing only
+   she can do.
 
 <!-- RULED-BY: HQ Business Brain, [HQ][V1.0] Decision Log, 2026-11-03 entry "AI uses the sign-ins Allison set up, without waiting for her" date:2026-11-03 -->
 
@@ -126,6 +131,27 @@ open and tell Allison.
 Never ask her which browser to use or whether you are signed in. Do not use the Claude in Chrome extension for this work. It
 drives Allison's own Chrome on the M4. `playwright-ember` is the only browser tool that
 reaches the M2.
+
+## Rule 2b. When Allison is watching, pause and let her help
+
+Allison sometimes watches the M2 screen and wants to help get a sign-in through. Pause
+whenever she says she is watching or offers to help, and whenever MFA, a CAPTCHA, a
+consent screen or a sign-in that 1Password and single sign-on could not clear appears.
+
+1. Stop every browser action in this job at once. No clicks, typing, navigation, reloads
+   or retries while she is acting.
+2. Bring this job's window to the front so she can see it. From the job's connector page,
+   `chrome.windows.update(windowId, {focused: true})` on the job's own window only.
+3. Tell her in one short message which window, what is on the screen and the one thing to
+   do, for example "The HighLevel window is asking for the code sent to your phone. Type it
+   there and tell me done."
+4. Wait for her answer in the same turn. In Factory use AskUser so the turn stays open.
+   Ending the turn lets the lifecycle hook close the job's window and lose her screen.
+5. When she says done, read the page to confirm she got through, then carry on. If she
+   says she is not at the screen, keep the job open, record the pending tab as Rule 4
+   says, and continue any work that does not need that page.
+
+Never finish the job, close her screen or move to another page while she is helping.
 
 ## Rule 3. Most durable and fastest, not easiest
 
@@ -189,7 +215,7 @@ differ, the SOP wins. Verified live Nov 2, 2026, after the Nov 1 M2 rebuild.
 | Machine | Ember's M2 only. One Mac user, `ember`. There is no `/Users/allison` on the M2 any more |
 | Chrome profile | `Default` only (ember@expertpartners.com, allison@ also added in Google), Playwright Extension installed. The Atlas profile did not come back after the rebuild |
 | Shared connector | `/Users/ember/maintenance/chrome-signed-in-mcp.sh` (Playwright MCP 0.0.83, pinned, `--extension`) |
-| Extension token | 1Password, Automation vault, item ID `tzqvnlgilv4evwffp27amnwxw4`. The connector reads an owner-only copy at `~/.config/ember/playwright-extension-token`, because SSH sessions cannot unlock the Keychain |
+| Extension token | 1Password, Automation vault, item ID `2i4x6x47noqy4ec475ez3zovpu`. The connector reads an owner-only copy at `~/.config/ember/playwright-extension-token`, because SSH sessions cannot unlock the Keychain |
 | Job runner | None since the rebuild. `pw-run` is gone |
 
 Claude Code and Codex start on Allison's M4 and reach that Chrome through the named
@@ -216,12 +242,23 @@ in [ember-browser-routing](../ember-browser-routing/SKILL.md).
 
 ### Chrome settings that keep the M2 clean
 
-- Chrome runs with `--silent-debugger-extension-api`, which hides the "Playwright Extension
-  started debugging this browser" bar. The login item
-  `~/Library/LaunchAgents/com.expertpartners.chrome-ai.plist` starts Chrome that way at login.
-  If Chrome must be restarted, quit it normally and reopen it with
-  `open -a "Google Chrome" --args --silent-debugger-extension-api`, after noting any open
-  tabs, because Chrome is not set to restore them. Confirm the flag with `ps`.
+- Chrome must run with `--silent-debugger-extension-api`, which hides the "Playwright
+  Extension started debugging this browser" bar. The login item
+  `~/Library/LaunchAgents/com.expertpartners.chrome-quiet.plist` opens
+  `~/Applications/Chrome AI.app`, which starts Chrome with that flag, last-session restore
+  and the Default profile. Chrome started any other way (a crash relaunch, Finder,
+  Spotlight, a link from another app) runs without the flag and the bar comes back.
+- Check it at the start of browser work with `ps -axo args | grep "Google Chrome.app/Contents/MacOS/Google Chrome"`.
+  If the flag is missing, restart Chrome only when the extension's `getStatus` lists no
+  other connected AI job and Allison is not using the M2 screen. Quit Chrome normally with
+  `osascript -e 'quit app "Google Chrome"'`, reopen it with
+  `open "$HOME/Applications/Chrome AI.app"`, and confirm the flag with `ps`. If another
+  job is connected, leave Chrome running and say the bar stays until the next clean
+  restart.
+- The job's first tab is the extension's connector page. It shows "Connected. This tab
+  belongs to the AI browser job ..." and closes when the job finishes. A connector page
+  that says "Missing mcpRelayUrl parameter in URL." comes from a facade started before
+  that fix was installed. The connection still works, and a fresh job shows the new text.
 - In both profiles, Settings, Appearance, "Automatically pin new tab groups to the bookmarks
   bar" and "Show tab groups in bookmarks bar" are off, so AI tab groups never pile up on the
   bar. If buttons ever reappear, turning "Show tab groups in bookmarks bar" off clears them
@@ -267,15 +304,44 @@ that ends with only the connector's Welcome tab.
 Open the extension's status page in the `Default` profile, click "Generate new token",
 copy it, and replace the value in the 1Password item. Copying it with its
 `PLAYWRIGHT_MCP_EXTENSION_TOKEN=` label is fine, because the connector strips the label.
-Never print, log, or paste the token anywhere else.
+Then copy it from 1Password into `~/.config/ember/playwright-extension-token` (owner-only)
+with `op read`, and run the health check. Repairing or reinstalling the extension in
+Chrome also makes a new token, and the extension then answers "invalid token provided"
+until both copies are updated. Never print, log, or paste the token anywhere else.
 
 ## 1Password
 
-For a browser sign-in, use the saved login 1Password offers in Chrome or the site's single
-sign-on, as Rule 2a says. Never read a password with `op` for a browser sign-in. Use the `op`
-command with the service account only for secrets a script or the connector needs, such as the
-extension token. Read such a secret at the moment it is needed and never print, log, save, or
-commit it. If a GHL session has expired, sign back in with the 1Password fill or single sign-on
+For a browser sign-in, use 1Password as Rule 2a says, every time a sign-in page appears.
+When the 1Password inline fill is not offered in the page, fill the login from its
+1Password item with one sealed `browser_run_code_unsafe` call. Inside that call, read the
+AI Workers service-account token from `/Users/ember/.config/ember/op-sa-token` and run
+`/opt/homebrew/bin/op read "op://<vault>/<item id>/password"` (and `username`) with
+`OP_SERVICE_ACCOUNT_TOKEN` set only in that child process, then fill the fields and submit.
+Find the item and its ID first with `op item list` metadata, never `op item get` with
+fields revealed. Stage the page with ordinary read-only calls first, and confirm the result
+with a fresh job, because a sealed job then accepts only status and finish. Run the sealed
+call while the job's current page is its working page. A sealed call that fails returns
+only `sealed_outcome_uncertain` and leaves the job failed, so check the page from a new job
+before trying again.
+
+```js
+async (page) => {
+  const proc = Buffer.constructor('return process')();
+  const fs = proc.getBuiltinModule('node:fs');
+  const cp = proc.getBuiltinModule('node:child_process');
+  const env = {...proc.env, OP_SERVICE_ACCOUNT_TOKEN:
+    fs.readFileSync('/Users/ember/.config/ember/op-sa-token', 'utf8').trim()};
+  const read = (f) => cp.execFileSync('/opt/homebrew/bin/op',
+    ['read', 'op://VAULT/ITEM_ID/' + f], {env, encoding: 'utf8'}).trim();
+  await page.getByLabel(/email|user/i).fill(read('username'));
+  await page.getByLabel(/password/i).fill(read('password'));
+  await page.getByRole('button', {name: /sign in|log in|continue/i}).click();
+}
+```
+
+Never print, log, save or commit a secret, and never read a password into the session's
+own context. Use the `op` command the same way for secrets a script or the connector
+needs, such as the extension token. If a GHL session has expired, sign back in with the 1Password fill or single sign-on
 before reporting anything.
 
 ## GoHighLevel guardrails
