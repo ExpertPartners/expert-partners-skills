@@ -1905,6 +1905,46 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
                 ["tool_end", "post_metadata", "failed:working_page_lost"],
             )
 
+    def test_reannounced_navigation_page_is_bound_only_after_origin_policy(self):
+        candidate = {"targetId": "replacement", "origin": "https://login.example.com"}
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            job = self.ready_job(route, b.result({"navigated": True}))
+            job["chooser_connector_index"] = 0
+            self.working_page_after(route, "live")
+            routed = []
+            job["client"].call = lambda _, req: routed.append(req["name"]) or b.result({})
+            checked = []
+            route.guard.decide = lambda req: checked.append(req["tool_input"]["url"])
+            with patch.object(b, "code", side_effect=[{"candidate": candidate}] * 2) as code:
+                reply = route.call(
+                    "browser_navigate", {"job_id": job["job_id"], "url": "https://example.com/"}
+                )
+            self.assertEqual(checked, ["https://example.com/", "https://login.example.com/"])
+            self.assertEqual(routed, ["browser_navigate", "browser_tabs"])
+            self.assertIn("was not replayed", reply["content"][-1]["text"])
+            self.assertEqual(job["status"], "ready")
+            self.assertIn('"targetId": "replacement"', code.call_args.args[1])
+            self.assertNotIn("replacement", (Path(root) / (job["job_id"] + ".json")).read_text())
+
+    def test_navigation_replacement_refuses_denied_or_changed_target(self):
+        candidate = {"targetId": "replacement", "origin": "https://login.example.com"}
+        for outcome in ("policy", "generation", "changed"):
+            with self.subTest(outcome=outcome), tempfile.TemporaryDirectory() as root:
+                route = self.route(root)
+                job = self.ready_job(route, b.result({}))
+                job["chooser_connector_index"] = 0
+                if outcome == "policy":
+                    route.guard.decide = lambda _: ("deny", "use headless")
+                elif outcome == "generation":
+                    route.preflight = lambda: {"pid": 456}
+                with patch.object(
+                    b, "code", side_effect=[{"candidate": candidate}, {"candidate": None}]
+                ) as calls:
+                    with self.assertRaises(Refusal):
+                        route.recover_navigation_page(job)
+                self.assertEqual(calls.call_count, 2 if outcome == "changed" else 1)
+
     def test_ordinary_vendor_error_is_labelled_and_the_job_stays_ready(self):
         vendor = {
             "isError": True,
@@ -1941,11 +1981,36 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
   group:async({tabIds,groupId})=>{for(const id of tabIds)tabs.get(id).groupId=groupId;},
   getCurrent:async()=>tabs.get(current.id),get:async(id)=>tabs.get(id),
   query:async(q)=>[...tabs.values()].filter(t=>(q.windowId===undefined||t.windowId===q.windowId)&&(q.groupId===undefined||t.groupId===q.groupId))},
-  tabGroups:{get:async()=>({title:'fixture'})}};
+  tabGroups:{get:async()=>({title:'fixture'})},
+  debugger:{getTargets:async()=>[{tabId:10,type:'page',id:'replacement',attached:true}]}};
 (async()=>{const s=await newOwnedState(page(1));s.task=await s.create();
   assert.equal((await s.snapshot()).workingPage,'live');
-  s.task.closed=true; // Debugger detached; Chrome keeps tab 10 open.
+  const old=s.task;
+  old.closed=true; // Debugger detached; Chrome keeps tab 10 open.
   const m=await s.snapshot();assert.equal(m.workingPage,'closed');assert.deepEqual(m.tabIds,[1,10]);
+  const reattached=page(10);
+  const tab=tabs.get(10);
+  const info={delegate:{_targetId:'different-target'}};
+  reattached._connection={toImpl:()=>info};
+  tab.url='chrome://extensions/';
+  assert.equal(await s.navigationReplacement(null),null);
+  tab.url='https://login.example.com/';tab.status='complete';
+  await assert.rejects(s.navigationReplacement(null),/unproven/);
+  info.delegate._targetId='replacement';
+  tab.groupId=2;
+  await assert.rejects(s.navigationReplacement(null),/unproven/);
+  tab.groupId=7;
+  const extra=page(11);
+  await assert.rejects(s.navigationReplacement(null),/unproven/);
+  extra.closed=true;tabs.delete(11);
+  const candidate=await s.navigationReplacement(null);
+  assert.equal(s.task,old);
+  assert.deepEqual(candidate,{targetId:'replacement',origin:'https://login.example.com'});
+  await assert.rejects(s.navigationReplacement({...candidate,origin:'https://wrong.example.com'}),/changed/);
+  assert.deepEqual(await s.navigationReplacement(candidate),candidate);
+  assert.equal(s.task,reattached);
+  assert.equal(s.ids.has(old),false);
+  assert.deepEqual((await s.snapshot()).tabIds,[1,10]);
   s.task=null;assert.equal((await s.snapshot()).workingPage,'none');
 })().catch(e=>{console.error(e);process.exitCode=1;});
 '''
