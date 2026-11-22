@@ -1,3 +1,6 @@
+## 3.8.19 - 2026-11-22
+
+Don's Chrome profile works with `playwright-don` again. LastPass stays installed with its site access set to On click, and the skill says how to spot the same problem if it comes back.
 ## 3.8.18 - 2026-11-22
 
 An owned browser job now tells raw MCP callers to call `tools/list` first and records pre-forward inventory or policy failures without saving tool arguments or secret-bearing exception text.
