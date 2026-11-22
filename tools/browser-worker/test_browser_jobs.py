@@ -1927,6 +1927,62 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
             self.assertIn('"targetId": "replacement"', code.call_args.args[1])
             self.assertNotIn("replacement", (Path(root) / (job["job_id"] + ".json")).read_text())
 
+    def test_click_that_leaves_the_origin_rebinds_the_owned_tab(self):
+        # Job 0b384cad: a click inside browser_run_code_unsafe sent the owned
+        # tab to PayPal, Chrome swapped its target and the Page closed.
+        candidate = {"targetId": "replacement", "origin": "https://www.paypal.com"}
+        vendor = {
+            "isError": True,
+            "content": [
+                {
+                    "type": "text",
+                    "text": "### Error\nError: browserBackend.callTool: Target page, context or browser has been closed",
+                }
+            ],
+        }
+        for name, args in (
+            ("browser_run_code_unsafe", {"code": "async (page) => page.click('#pay')"}),
+            ("browser_click", {"element": "Pay", "ref": "e9"}),
+        ):
+            with self.subTest(tool=name), tempfile.TemporaryDirectory() as root:
+                route = self.route(root)
+                route.inventory.append({"name": name, "inputSchema": {"type": "object"}})
+                job = self.ready_job(route, vendor)
+                job["client"].call = lambda _, req, tool=name: (
+                    copy.deepcopy(vendor) if req["name"] == tool else b.result({})
+                )
+                job["chooser_connector_index"] = 0
+                # Right after the call, then after the rebind.
+                states = iter(["closed", "live"])
+                base = route.metadata(None)
+                route.metadata = lambda _, strict=True: {**base, "workingPage": next(states)}
+                checked = []
+                route.guard.decide = lambda req: checked.append(req["tool_input"].get("url"))
+                with patch.object(b, "code", side_effect=[{"candidate": candidate}] * 2):
+                    reply = route.call(name, {"job_id": job["job_id"], **args})
+                self.assertIn("https://www.paypal.com/", checked)
+                self.assertEqual(reply["content"][-1]["text"], b.NAVIGATION_REBOUND_NOTE)
+                self.assertEqual(job["status"], "ready")
+                row = json.loads((Path(root) / (job["job_id"] + ".json")).read_text())
+                stages = [s for s, _ in row["timings"][-1]["stages"]]
+                self.assertIn("owned_navigation_page_rebound", stages)
+                self.assertNotIn("failed:working_page_lost", stages)
+
+    def test_click_without_a_proven_replacement_still_fails_the_job(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            route.inventory.append({"name": "browser_click", "inputSchema": {"type": "object"}})
+            job = self.ready_job(route, b.result({}))
+            job["chooser_connector_index"] = 0
+            self.working_page_after(route, "closed")
+            with patch.object(b, "code", side_effect=[{"candidate": None}]):
+                reply = route.call(
+                    "browser_click", {"job_id": job["job_id"], "element": "Pay", "ref": "e9"}
+                )
+            self.assertEqual(reply["content"][-1]["text"], b.WORKING_PAGE_LOST_NOTE)
+            row = json.loads((Path(root) / (job["job_id"] + ".json")).read_text())
+            self.assertEqual(row["status"], "failed")
+
     def test_navigation_replacement_refuses_denied_or_changed_target(self):
         candidate = {"targetId": "replacement", "origin": "https://login.example.com"}
         for outcome in ("policy", "generation", "changed"):

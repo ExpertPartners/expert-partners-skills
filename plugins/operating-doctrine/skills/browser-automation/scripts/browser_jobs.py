@@ -36,6 +36,10 @@ from relay_ownership import OwnershipLedger
 EXTENSION = "chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/connect.html"
 STATE_JS = "const s=Buffer.constructor('return process')().__epBrowserJob;if(!s)throw Error('owned_state_missing');"
 FILE_CHOOSER_MARKER = "- [File chooser]: can be handled by browser_file_upload"
+NAVIGATION_REBOUND_NOTE = (
+    "Browser job route: reattached to the same owned Chrome tab. "
+    "The navigation was not replayed. Take a fresh snapshot."
+)
 NAVIGATION_REPLACEMENT_JS = (
     STATE_JS + "if(page!==s.connector)throw Error('replacement_connector_not_owned');"
     "return {candidate:await s.navigationReplacement(__EP_EXPECTED_REPLACEMENT__)};"
@@ -1953,11 +1957,20 @@ class Route:
                         and args["url"].startswith("https://")
                         and self.recover_navigation_page(job)
                     ):
-                        notes.append(
-                            "Browser job route: reattached to the same owned Chrome tab. "
-                            "The navigation was not replayed. Take a fresh snapshot."
-                        )
+                        notes.append(NAVIGATION_REBOUND_NOTE)
                     job["metadata"] = self.verify_connection(job)
+                    # A click or script can also leave the page for another
+                    # origin. Chrome swaps the tab's target, which closes the
+                    # retained Page while the tab and its IDs stay the same.
+                    if (
+                        job.get("working_page") == "closed"
+                        and name != "browser_navigate"
+                        and not job.get("relay_mode")
+                        and type(job.get("chooser_connector_index")) is int
+                        and self.recover_navigation_page(job)
+                    ):
+                        notes.append(NAVIGATION_REBOUND_NOTE)
+                        job["metadata"] = self.verify_connection(job)
                 job["ownership_pending"] = False
                 self.mark(job, "post_metadata")
                 if job.get("working_page") == "closed":
