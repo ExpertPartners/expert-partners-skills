@@ -907,6 +907,22 @@ class Route:
         job["updated"] = time.time()
         self.save(job)
 
+    def refuse_before_forwarding(self, job, sealed, reason, message):
+        # Only route-defined values go in the receipt, never the supplied tool
+        # name, arguments or exception text. No operation was forwarded.
+        job.setdefault("timings", []).append(
+            {
+                "tool": "pre_forward",
+                "sealed": sealed,
+                "stages": [["received", round(time.time(), 3)]],
+            }
+        )
+        del job["timings"][:-TIMING_RECORDS]
+        self.mark(job, "refused:" + reason)
+        with bounded_saves():
+            self.failure_checkpoint(job)
+        return result({"code": reason, "error": message}, True)
+
     def metadata(self, client, strict=True):
         return code(client, STATE_JS + "return await s.snapshot(" + json.dumps(strict) + ");")
 
@@ -1841,12 +1857,32 @@ class Route:
                 # connection's, waits a bounded time on a peer-held lock.
                 with bounded_saves():
                     return self.recover(job)
-            if name == "browser_install" or name not in {t["name"] for t in self.inventory or []}:
-                raise Refusal("unknown_browser_tool")
+            if self.inventory is None:
+                return self.refuse_before_forwarding(
+                    job,
+                    sealed,
+                    "tool_inventory_required",
+                    "On this same browser transport, call tools/list first.",
+                )
+            if name == "browser_install" or name not in {t["name"] for t in self.inventory}:
+                return self.refuse_before_forwarding(
+                    job,
+                    sealed,
+                    "unknown_browser_tool",
+                    "Use a browser tool advertised by tools/list.",
+                )
             pending_chooser = "chooser_task_id" in job
             if pending_chooser and name != "browser_file_upload":
                 return result({"error": "file_chooser_pending_use_upload_or_finish"}, True)
-            denied, note = self.policy(name, args)
+            try:
+                denied, note = self.policy(name, args)
+            except Exception:
+                return self.refuse_before_forwarding(
+                    job,
+                    sealed,
+                    "headless_policy_failed",
+                    "The headless route policy could not be checked.",
+                )
             if denied:
                 return denied
             job.setdefault("timings", []).append(
