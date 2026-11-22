@@ -140,10 +140,12 @@ profile shows the account belongs to Allison or Don and neither 1Password nor si
 sign-on gets Ember in. Their profiles are already signed in to their own accounts, so try
 that route before reporting a sign-in block. Changes made there show under their name.
 
-Don's route connects, but its working page closes right after any navigation, by
-`page.goto` or `location.href`, with "Target page, context or browser has been closed"
-(found Nov 21, 2026). Ember's profile does not do this. Until that is fixed, do Don's
-work in Ember's profile where his account allows it, and report the block otherwise.
+Don's profile keeps LastPass, which Don uses, with its site access set to On click. When
+LastPass ran on every page, the working page lost its connection right after any
+navigation, with "Target page, context or browser has been closed". With On click,
+navigation works (verified Nov 22, 2026). If that error comes back in any profile, check
+whether a password manager or other extension that runs on every page was added or reset
+to run on all sites, and set it to On click.
 
 ## Rule 2b. When Allison is watching, pause and let her help
 
