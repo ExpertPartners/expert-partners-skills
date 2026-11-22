@@ -25,9 +25,11 @@ Find each source through the authorized Google Drive or Docs connector by its ti
 
 1. Confirm who the work is for (the agent, team or client) and what they want from this step.
 2. Gather what the method needs before starting, usually an agent who wants to be interviewed, or a saved partial interview to resume. Ask for what is missing in plain words, one item at a time.
-3. Follow the source method exactly, in its order, using its own names for frameworks and sections.
-4. Produce the interview itself, one question set at a time, then the completed Brand Blueprint findings, in the format the method sets.
-5. Close by naming what this output hands to the next step in the suite, as the Suite Index orders it.
+3. Follow the source method exactly, in its order, using its own names for sections. The method is judged by result, not time, so run it as a live conversation, one question at a time, and stop when the method's finish conditions are met rather than when a list runs out.
+4. Keep the agent-facing interview to the questions, the playbacks and the send off the method sets. Do not show the agent findings, strategy, recommendations or scores.
+5. Deliver to the team only what the method's team output section names, the complete conversation kept whole plus the team summary it describes, through the submission route the method or the hub provides for the run.
+6. Leave production numbers, database, marketing channels and brokerage brand rules out of this step. They belong to the separate fact sheet.
+7. Close by naming what this output hands to the next step in the suite, using the function name from the Suite Index rather than a step number until the order is confirmed.
 
 When the output is written in Don's own voice, also apply the brand-voice plugin's don-hobbs-brand skill. When it is written for an agent client, use the client's own voice and facts, never Don's.
 
