@@ -1,3 +1,6 @@
+## 3.8.18 - 2026-11-22
+
+An owned browser job now tells raw MCP callers to call `tools/list` first and records pre-forward inventory or policy failures without saving tool arguments or secret-bearing exception text.
 ## 3.8.17 - 2026-11-21
 
 Preserve an owned HTTPS navigation job when the pinned Playwright extension automatically reattaches to the same Chrome tab. Require the exact Chrome and Playwright target IDs to match, recheck redirect policy and ownership, and never replay navigation.
