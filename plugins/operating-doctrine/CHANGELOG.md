@@ -1,3 +1,6 @@
+## 3.8.20 - 2026-11-22
+
+Allow the exact HeyGen developer Usage page in the browser for professional voice clone slot billing, while keeping voice operations and other protected HeyGen routes API-first.
 ## 3.8.19 - 2026-11-22
 
 Don's Chrome profile works with `playwright-don` again. LastPass stays installed with its site access set to On click, and the skill says how to spot the same problem if it comes back.
