@@ -607,6 +607,50 @@ class FounderOverrides(HookCase):
         self.assertIn("Example marketing, no API", note)
 
 
+class HeyGenBillingRoute(HookCase):
+    HOST = "platform.heygen.com"
+    USAGE = f"https://{HOST}/usage"
+    CODE_TOOL = "mcp__playwright-ember__browser_run_code_unsafe"
+
+    def setUp(self):
+        super().setUp()
+        self.write_cache(
+            MAP_CSV + "HeyGen,platform.heygen.com;app.heygen.com,HeyGen API,HEYGEN-API-KEY,Live,\n"
+        )
+        self.fresh_stamp()
+
+    def test_official_usage_page_is_allowed_for_pvc_billing(self):
+        for url in (self.USAGE, f"{self.USAGE}/"):
+            with self.subTest(url=url):
+                self.assertIn("HeyGen PVC billing, no API", self.assertAllowed(self.run_hook(url)))
+        code = f"async (page) => {{ await page.goto('{self.USAGE}'); }}"
+        note = self.assertAllowed(self.run_hook(None, self.CODE_TOOL, {"code": code}))
+        self.assertIn("HeyGen PVC billing, no API", note)
+
+    def test_other_paths_and_noncanonical_usage_urls_stay_denied(self):
+        for url in (
+            f"https://{self.HOST}/",
+            f"https://{self.HOST}/api-keys",
+            f"{self.USAGE}/more",
+            f"{self.USAGE}?next=/api-keys",
+            f"{self.USAGE}#/api-keys",
+            f"http://{self.HOST}/usage",
+            f"https://{self.HOST}:444/usage",
+            f"https://{self.HOST}/%75sage",
+            "https://app.heygen.com/usage",
+        ):
+            with self.subTest(url=url):
+                self.assertIn("HeyGen API", self.assertDenied(self.run_hook(url)))
+
+    def test_usage_does_not_allow_mixed_off_scope_code(self):
+        code = (
+            f"async (page) => {{ await page.goto('{self.USAGE}');"
+            f" await page.goto('https://{self.HOST}/api-keys'); }}"
+        )
+        reason = self.assertDenied(self.run_hook(None, self.CODE_TOOL, {"code": code}))
+        self.assertIn("HeyGen API", reason)
+
+
 class MissingCache(HookCase):
     def test_missing_cache_is_allowed_and_logged(self):
         self.fresh_stamp()

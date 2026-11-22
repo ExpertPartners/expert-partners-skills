@@ -934,6 +934,27 @@ def github_settings_allowed(host: str, targets: list) -> bool:
     )
 
 
+# HeyGen's public PVC API trains and lists voices, but directs slot purchases
+# to this page: https://developers.heygen.com/docs/voices/professional-voice-clone
+HEYGEN_BILLING_HOST = "platform.heygen.com"
+HEYGEN_BILLING_URL = f"https://{HEYGEN_BILLING_HOST}/usage"
+HEYGEN_BILLING_NOTE = (
+    "HeyGen slot purchases use the official Usage page on Ember. Voice listing, training "
+    "and synthesis remain API-first. Report it as: Headless route checked, HeyGen PVC billing, "
+    "no API, official Usage page."
+)
+
+
+def heygen_billing_allowed(host: str, targets: list) -> bool:
+    """Allow only canonical HTTPS Usage URLs, without query or fragment."""
+    if host != HEYGEN_BILLING_HOST:
+        return False
+    urls = [
+        url for url, in_code in targets if url is not None and target_host(url, in_code) == host
+    ]
+    return bool(urls) and all(url in (HEYGEN_BILLING_URL, HEYGEN_BILLING_URL + "/") for url in urls)
+
+
 def decide(payload: dict) -> tuple[str, str] | None:
     """("deny", reason) or ("allow", note) for this tool call, or None when no site is opened."""
     tool_name = str(payload.get("tool_name", ""))
@@ -962,6 +983,10 @@ def decide(payload: dict) -> tuple[str, str] | None:
         if github_settings_allowed(host, targets):
             log_event("founder-override-allowed", f"{host} {tool_name}")
             notes.append(GITHUB_SETTINGS_NOTE)
+            continue
+        if heygen_billing_allowed(host, targets):
+            log_event("web-only-billing-allowed", f"{host} {tool_name}")
+            notes.append(HEYGEN_BILLING_NOTE)
             continue
         entries, conflict = find_systems(host, systems)
         if not entries:
