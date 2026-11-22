@@ -78,3 +78,7 @@ class PreForwardRefusals(unittest.TestCase):
         self.route.guard = SimpleNamespace(decide=Mock(side_effect=ValueError("synthetic-secret")))
         reply = self.route.call("browser_run_code_unsafe", self.args)
         self.assert_refusal(reply, "headless_policy_failed")
+
+
+if __name__ == "__main__":
+    unittest.main(defaultTest=PreForwardRefusals.__name__)
