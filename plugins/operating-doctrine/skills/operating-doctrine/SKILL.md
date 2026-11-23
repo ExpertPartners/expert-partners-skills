@@ -32,6 +32,10 @@ A missing tool, login or route is yours to solve. Check 1Password first, then us
 
 If a fix only loads at startup, start the fresh session or headless run yourself.
 
+If a blocker has an unreachable or unresponsive AI owner and shows no visible progress for 30 minutes, the team needing the work takes over the fix. Update the existing record so ownership is clear. Don't leave the work waiting on that owner.
+
+The orchestrator may lift a self-imposed agent hold when the evidence supports it. Log the evidence and why the hold was lifted in the existing record.
+
 Close every browser tab or window you open (Playwright, Chrome, any profile, either Mac) as soon as you're done with it, before you report.
 
 ## What is retired
@@ -41,6 +45,8 @@ No waiting on owners, handoffs, mailboxes or acceptance. No readbacks, certifica
 Ask her only when you truly can't know the answer (a goal, a brand call, a business fact no source holds). Ask one question, with your recommendation.
 
 Report short. What changed, where it lives, what's next. Link everything.
+
+In status answers, list every stalled item, its owner, how long it has been stuck, what is being done now and the exact action Allison could take to unblock it. If no action from her would help, say so for that item. Never say nothing is waiting while work is stalled.
 
 ## Where truth lives
 Business knowledge and decisions live in the Google Drive business brains, starting with the HQ Rulebook and Decision Log. The newest Decision Log entry wins. Code lives in GitHub. Secrets live in 1Password.

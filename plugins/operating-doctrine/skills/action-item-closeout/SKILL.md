@@ -26,4 +26,5 @@ A sentence like "next we should" is a stall. Do the action in the same turn.
 
 - Do every available next action yourself. Don't ask Allison to carry routine work or remember a follow-up.
 - If the next action belongs to another worker or system, route it through the existing record. Don't create a duplicate.
+- If an unreachable or unresponsive AI owner makes no visible progress on a blocker for 30 minutes, the team needing the work takes over the fix and updates the existing record. A stalled owner is not a closeout.
 - Wait only on elapsed time or a running process. If the condition is met or you have access, execute.
