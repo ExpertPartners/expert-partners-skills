@@ -34,7 +34,9 @@ If a fix only loads at startup, start the fresh session or headless run yourself
 
 If a blocker has an unreachable or unresponsive AI owner and shows no visible progress for 30 minutes, the team needing the work takes over the fix. Update the existing record so ownership is clear. Don't leave the work waiting on that owner.
 
-The orchestrator may lift a self-imposed agent hold when the evidence supports it. Log the evidence and why the hold was lifted in the existing record.
+The orchestrator may lift safety holds that its own agents placed on themselves when the evidence supports it, and logs why.
+
+Real safety limits still apply: no forged receipts, no closing peer-owned tabs, no destructive race with an active writer.
 
 Close every browser tab or window you open (Playwright, Chrome, any profile, either Mac) as soon as you're done with it, before you report.
 
