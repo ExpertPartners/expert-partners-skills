@@ -175,6 +175,16 @@ Completion is proven, never guessed from age or idle time.
   refuses a receipt with any ID and a census taken before the allocation's last
   activity. The sweep then reports `failed_no_artifacts_by_census`. Stop no longer
   blocks on it, the hook reports it as failed, and the receipt stays failed.
+- Dead browser generation. A terminal failed job from an earlier Chrome process can
+  be reconciled with `browser_lifecycle.py --config <route.json>
+  --reconcile-generation <job_id> --reference <evidence note>`. The command reads
+  the unique running main Chrome process identity and refuses the original generation,
+  active owners, missing generation evidence and relay jobs. It writes a separate
+  generation receipt, not a closure receipt. The original failed receipt and IDs stay
+  unchanged. The sweep rechecks the observed process identity and reports
+  `failed_no_artifacts_by_generation` without contacting a transport or sending old
+  IDs to Chrome. This means the original process is gone, not that restored tabs were
+  closed or that the current browser has no unattributed tabs.
 - Failed-job reconciliation. A fresh maintenance connector first proves ownership
   without closing anything, records `window_removal_issued`, then removes the exact
   saved window and polls briefly until Chrome stops listing it. A missing connector is
