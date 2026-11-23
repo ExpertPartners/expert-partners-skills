@@ -15,8 +15,10 @@ const dept = (id: string) => ({ kind: "department" as const, id });
 test("Allison leads all three brains, Don leads HQ and EP only, AG is Allison alone", () => {
 	const a = effectiveScopes(ALLOWED, person("allison@expertpartners.com"));
 	assert.deepEqual(a, allowed);
+	assert.ok(a.includes("ep-private"));
 	const d = effectiveScopes(ALLOWED, person(" Don@ExpertPartners.com "));
 	assert.ok(d.length > 0);
+	assert.ok(d.includes("ep-private"), "Don must be able to read EP Private as a leader");
 	assert.ok(d.every((s) => s.startsWith("hq-") || s.startsWith("ep-")));
 	assert.ok(!d.some((s) => s.startsWith("ag-")));
 	assert.ok(d.includes("hq-finance") && d.includes("ep-sales"), "leader level means the whole HQ and EP brain");
