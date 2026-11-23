@@ -1,3 +1,6 @@
+## 0.3.1 - 2026-11-23
+
+Remove the Brand Blueprint Interviewer skill's stale separate-fact-sheet instruction. Practical questions and team records now defer to the current live Drive method, preventing the retrieval skill from overriding a later method revision.
 ## 0.3.0 - 2026-11-23
 
 Add Hobbs IP Miner as a portable skill that retrieves its current method from the authorized Drive Business Brain. Keep private instructions and source material out of the public marketplace, preserve separate caller access, and distinguish available source collections from chat history that has not been transferred between platforms.
