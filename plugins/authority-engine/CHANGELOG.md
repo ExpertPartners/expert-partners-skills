@@ -1,3 +1,6 @@
+## 0.3.0 - 2026-11-23
+
+Add Hobbs IP Miner as a portable skill that retrieves its current method from the authorized Drive Business Brain. Keep private instructions and source material out of the public marketplace, preserve separate caller access, and distinguish available source collections from chat history that has not been transferred between platforms.
 ## 0.2.0 - 2026-11-22
 
 brand-blueprint-interviewer now runs the redesigned Step One interview. The run procedure treats the interview as a live, result-judged conversation, keeps findings and strategy away from the agent, hands the complete conversation and team summary to the team only, and leaves production numbers and brokerage brand rules to the separate fact sheet. The method itself was updated in its live Drive source, not in this repository.
