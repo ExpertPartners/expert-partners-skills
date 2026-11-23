@@ -1,3 +1,6 @@
+## 3.8.23 - 2026-11-23
+
+Record terminal failed browser jobs from a verified dead Chrome generation separately from successful closure. The lifecycle sweep preserves failed receipts and never sends old IDs to the current browser.
 ## 3.8.22 - 2026-11-23
 
 Take over blockers after 30 minutes without visible progress from an unreachable or unresponsive AI owner. Let orchestrators lift evidence-backed self-imposed holds with a logged reason, and report every stalled item with its owner, duration, current action and any exact action Allison could take.
