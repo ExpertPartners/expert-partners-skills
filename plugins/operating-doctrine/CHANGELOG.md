@@ -1,3 +1,6 @@
+## 3.8.22 - 2026-11-23
+
+Take over blockers after 30 minutes without visible progress from an unreachable or unresponsive AI owner. Let orchestrators lift evidence-backed self-imposed holds with a logged reason, and report every stalled item with its owner, duration, current action and any exact action Allison could take.
 ## 3.8.21 - 2026-11-22
 
 The owned browser route now re-binds the job's own Chrome tab after a click or script sends it to another site, not only after `browser_navigate`. Chrome swaps the tab's page target on a cross-site move, so a click that opened a payment approval page used to close the retained page and fail the job. The same proof applies as before: the exact saved tab, window and group, one attached target, an https origin that passes the headless route policy, and an unchanged Chrome generation. Nothing is replayed, and the job still fails when no replacement is proven.
