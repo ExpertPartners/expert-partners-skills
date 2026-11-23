@@ -11,15 +11,15 @@ const config = JSON.parse(
 const env = { ALLOWED_SCOPES: config.vars.ALLOWED_SCOPES as string };
 const homes = ["hq-hr", "hq-employees", "hq-finance"] as const;
 
-test("deployed allowlist includes mapped department homes without private or proposed scopes", async () => {
+test("deployed allowlist includes mapped department homes and ep-private, without ag-private or proposed scopes", async () => {
 	const expected = [
 		"hq-core", "hq-hr", "hq-employees", "hq-skills", "hq-finance", "hq-operations", "hq-analytics", "hq-partnersync", "hq-library",
-		"ep-core", "ep-discovery", "ep-marketing", "ep-sales", "ep-client-experience", "ep-operations", "ep-outputs",
+		"ep-core", "ep-discovery", "ep-marketing", "ep-sales", "ep-client-experience", "ep-operations", "ep-outputs", "ep-private",
 		"ag-core", "ag-marketing", "ag-sales", "ag-listings", "ag-client-experience", "ag-operations", "ag-outputs",
 	];
 	assert.deepEqual(allowedScopes(env.ALLOWED_SCOPES), expected);
-	assert.equal(new Set(allowedScopes(env.ALLOWED_SCOPES)).size, 23);
-	for (const denied of ["ep-private", "ag-private", "hq-audits", "hq-outputs", "bogus"])
+	assert.equal(new Set(allowedScopes(env.ALLOWED_SCOPES)).size, 24);
+	for (const denied of ["ag-private", "hq-audits", "hq-outputs", "bogus"])
 		assert.throws(() => assertScope(env.ALLOWED_SCOPES, denied));
 	const listed = await runTool("list_scopes", {}, env, async () => { throw new Error("Listing scopes must not read Drive"); });
 	assert.equal(listed.ok, true);
