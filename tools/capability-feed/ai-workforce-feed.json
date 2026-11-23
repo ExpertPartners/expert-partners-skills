@@ -1,8 +1,8 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-11-23T23:47:36Z",
-  "verifiedAt": "2026-11-23T23:47:36Z",
+  "generatedAt": "2026-11-23T23:57:41Z",
+  "verifiedAt": "2026-11-23T23:57:41Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
@@ -127,11 +127,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the authority-engine plugin, version 0.3.0, in the expert-partners plugin marketplace.",
+        "Packaged as the authority-engine plugin, version 0.3.1, in the expert-partners plugin marketplace.",
         "Contains 7 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.3.0.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.3.1.",
       "containsSkillIds": [
         "brand-blueprint-interviewer",
         "brand-story-architect",
@@ -145,7 +145,7 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/authority-engine",
-        "packageVersion": "0.3.0",
+        "packageVersion": "0.3.1",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
         "skillCount": "7"
@@ -1291,7 +1291,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Authority Engine plugin, version 0.3.0.",
+        "Packaged in the Authority Engine plugin, version 0.3.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1306,7 +1306,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "authority-engine plugin v0.3.0 (expert-partners marketplace)",
+        "packaging": "authority-engine plugin v0.3.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -1584,7 +1584,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Authority Engine plugin, version 0.3.0.",
+        "Packaged in the Authority Engine plugin, version 0.3.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1599,7 +1599,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "authority-engine plugin v0.3.0 (expert-partners marketplace)",
+        "packaging": "authority-engine plugin v0.3.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -3657,7 +3657,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Authority Engine plugin, version 0.3.0.",
+        "Packaged in the Authority Engine plugin, version 0.3.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3672,7 +3672,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "authority-engine plugin v0.3.0 (expert-partners marketplace)",
+        "packaging": "authority-engine plugin v0.3.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -4798,7 +4798,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Authority Engine plugin, version 0.3.0.",
+        "Packaged in the Authority Engine plugin, version 0.3.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4813,7 +4813,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "authority-engine plugin v0.3.0 (expert-partners marketplace)",
+        "packaging": "authority-engine plugin v0.3.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -5794,7 +5794,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Authority Engine plugin, version 0.3.0.",
+        "Packaged in the Authority Engine plugin, version 0.3.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -5809,7 +5809,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "authority-engine plugin v0.3.0 (expert-partners marketplace)",
+        "packaging": "authority-engine plugin v0.3.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -5863,7 +5863,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Authority Engine plugin, version 0.3.0.",
+        "Packaged in the Authority Engine plugin, version 0.3.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -5878,7 +5878,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "authority-engine plugin v0.3.0 (expert-partners marketplace)",
+        "packaging": "authority-engine plugin v0.3.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -7236,7 +7236,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Authority Engine plugin, version 0.3.0.",
+        "Packaged in the Authority Engine plugin, version 0.3.1.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7251,7 +7251,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "authority-engine plugin v0.3.0 (expert-partners marketplace)",
+        "packaging": "authority-engine plugin v0.3.1 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
