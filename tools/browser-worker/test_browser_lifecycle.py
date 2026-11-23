@@ -315,6 +315,96 @@ class LifecycleTests(unittest.TestCase):
         self.assertEqual(
             hook.handle({"session_id": "s9", "hook_event_name": "Stop"}, lambda _: [report[1]]), {}
         )
+        (Path(self.sessions.name) / "s9").touch()
+        report.append({"job_id": "b" * 32, "status": "failed_no_artifacts_by_generation"})
+        mixed = hook.handle({"session_id": "s9", "hook_event_name": "Stop"}, lambda _: report)
+        self.assertIn("no artifacts by census", mixed["systemMessage"])
+        self.assertIn("old browser generation gone", mixed["systemMessage"])
+        self.assertIn("No browser close issued", mixed["systemMessage"])
+
+    def test_dead_generation_is_recorded_without_closing_or_rewriting_receipt(self):
+        with tempfile.TemporaryDirectory() as root:
+            old = {"pid": 8222, "started": "old process"}
+            current = {"pid": 49559, "started": "new process"}
+            row = self.receipt(
+                root,
+                status="failed",
+                generation=old,
+                ownership_pending=True,
+                metadata={"windowId": 5, "tabIds": [6]},
+            )
+            lifecycle.bind(root, row["job_id"], "done")
+            lifecycle.terminal(root, "done", "Stop")
+            with patch.object(browser_jobs, "chrome_generation", return_value=current):
+                note = lifecycle.record_generation(root, row["job_id"], "test evidence")
+                with patch.object(lifecycle, "control") as control:
+                    report = lifecycle.sweep({"state_dir": root})
+                control.assert_not_called()
+            self.assertEqual(report[0]["status"], "failed_no_artifacts_by_generation")
+            self.assertFalse(note["browser_close_issued"])
+            self.assertEqual(note["previous_generation"], old)
+            self.assertEqual(note["observed_generation"], current)
+            self.assertEqual(json.loads((Path(root) / (row["job_id"] + ".json")).read_text()), row)
+            # A stale note never overrides a different live generation.
+            for observed in (old, {"pid": 60000, "started": "third process"}):
+                with patch.object(browser_jobs, "chrome_generation", return_value=observed):
+                    with patch.object(lifecycle, "control") as control:
+                        self.assertEqual(
+                            lifecycle.sweep({"state_dir": root})[0]["status"], "preserved_uncertain"
+                        )
+                    control.assert_not_called()
+            for contents in ("invalid json", "[]", "{}"):
+                lifecycle.generation_path(root, row["job_id"]).write_text(contents)
+                with patch.object(lifecycle, "control") as control:
+                    self.assertEqual(
+                        lifecycle.sweep({"state_dir": root})[0]["status"], "preserved_uncertain"
+                    )
+                control.assert_not_called()
+            lifecycle.atomic_json(lifecycle.generation_path(root, row["job_id"]), note)
+            with patch.object(
+                browser_jobs, "chrome_generation", side_effect=RuntimeError("ambiguous")
+            ):
+                with patch.object(lifecycle, "control") as control:
+                    self.assertEqual(
+                        lifecycle.sweep({"state_dir": root})[0]["status"], "preserved_uncertain"
+                    )
+                control.assert_not_called()
+            self.assertEqual(json.loads((Path(root) / (row["job_id"] + ".json")).read_text()), row)
+            self.assertEqual(
+                json.loads(lifecycle.generation_path(root, row["job_id"]).read_text()), note
+            )
+
+    def test_generation_reconciliation_refuses_live_active_missing_and_relay(self):
+        with tempfile.TemporaryDirectory() as root:
+            old = {"pid": 8222, "started": "old process"}
+            current = {"pid": 49559, "started": "new process"}
+            for i, fields in enumerate(
+                (
+                    {},
+                    {"status": "ready"},
+                    {"generation": None},
+                    {"relay_mode": True},
+                    {"generation": {"pid": "8222", "started": "old"}},
+                )
+            ):
+                row = self.receipt(root, str(i) * 32, status="failed", generation=old)
+                row.update(fields)
+                lifecycle.atomic_json(Path(root) / (row["job_id"] + ".json"), row)
+                lifecycle.bind(root, row["job_id"], "done")
+            lifecycle.terminal(root, "done", "Stop")
+            with patch.object(browser_jobs, "chrome_generation", return_value=old):
+                with self.assertRaises(ValueError):
+                    lifecycle.record_generation(root, "0" * 32, "note")
+            with patch.object(browser_jobs, "chrome_generation", return_value=current):
+                for i in range(1, 5):
+                    with self.assertRaises(ValueError):
+                        lifecycle.record_generation(root, str(i) * 32, "note")
+                active = self.receipt(root, "a" * 32, status="failed", generation=old)
+                lifecycle.bind(root, active["job_id"], "active")
+                with self.assertRaises(ValueError):
+                    lifecycle.record_generation(root, active["job_id"], "note")
+                with self.assertRaises(ValueError):
+                    lifecycle.record_generation(root, "0" * 32, "")
 
     def test_live_private_channel_checks_terminal_session_and_serializes_finish(self):
         with tempfile.TemporaryDirectory(dir="/tmp") as root:

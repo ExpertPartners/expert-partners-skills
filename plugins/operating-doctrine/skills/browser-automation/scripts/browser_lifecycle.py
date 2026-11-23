@@ -17,6 +17,7 @@ import time
 
 OWNER_RETENTION = 30 * 24 * 3600
 NO_ARTIFACTS = "failed_no_artifacts_by_census"
+NO_GENERATION = "failed_no_artifacts_by_generation"
 
 
 def identifier(value):
@@ -211,6 +212,88 @@ def sweep(config, session_id=None):
         return _sweep(config, session_id)
 
 
+def valid_generation(value):
+    return (
+        isinstance(value, dict)
+        and type(value.get("pid")) is int
+        and value["pid"] > 0
+        and isinstance(value.get("started"), str)
+        and bool(value["started"].strip())
+    )
+
+
+def generation_path(root, job_id):
+    return Path(root) / "generation" / (job_identifier(job_id) + ".json")
+
+
+def generation_eligible(receipt):
+    return (
+        receipt.get("status") == "failed"
+        and valid_generation(receipt.get("generation"))
+        and not receipt.get("relay_mode")
+        and receipt.get("relay_pid") is None
+    )
+
+
+def record_generation(root, job_id, reference):
+    """Retire only a terminal failed job's dead-process IDs, never close current IDs."""
+    from browser_jobs import chrome_generation
+
+    with ledger_lock(root):
+        receipt = json.loads((Path(root) / (job_identifier(job_id) + ".json")).read_text())
+        owner = json.loads(owner_path(root, job_id).read_text())
+        current = chrome_generation()
+        if (
+            receipt.get("job_id") != job_id
+            or owner.get("job_id") != job_id
+            or owner.get("state") != "terminal"
+            or not generation_eligible(receipt)
+            or not valid_generation(current)
+            or current == receipt["generation"]
+        ):
+            raise ValueError("terminal_failed_dead_generation_required")
+        if not reference or len(reference) > 500:
+            raise ValueError("generation_reference_required")
+        row = {
+            "job_id": job_id,
+            "status": NO_GENERATION,
+            "previous_generation": receipt["generation"],
+            "observed_generation": current,
+            "recorded_at": time.time(),
+            "reference": reference,
+            "browser_close_issued": False,
+        }
+        atomic_json(generation_path(root, job_id), row)
+        return row
+
+
+def generation_attests(root, job_id, receipt):
+    from browser_jobs import chrome_generation
+
+    path = generation_path(root, job_id)
+    try:
+        contents = path.read_text()
+    except FileNotFoundError:
+        if path.is_symlink():
+            raise ValueError("generation_note_unreadable") from None
+        return None
+    # An existing note owns the disposition, even when its evidence is stale
+    # or unreadable. Fail closed instead of falling through to a live transport.
+    note = json.loads(contents)
+    if (
+        generation_eligible(receipt)
+        and note.get("job_id") == job_id
+        and note.get("status") == NO_GENERATION
+        and note.get("browser_close_issued") is False
+        and note.get("previous_generation") == receipt["generation"]
+        and valid_generation(note.get("observed_generation"))
+        and note["observed_generation"] != receipt["generation"]
+        and chrome_generation() == note["observed_generation"]
+    ):
+        return note
+    raise ValueError("generation_note_requires_reconciliation")
+
+
 def _sweep(config, session_id=None):
     root = Path(config["state_dir"]).expanduser()
     outcomes = []
@@ -230,6 +313,16 @@ def _sweep(config, session_id=None):
                     outcomes.append({"job_id": job_id, "status": "owner_record_retired"})
                 else:
                     outcomes.append({"job_id": job_id, "status": "already_finished"})
+                continue
+            generation = generation_attests(root, job_id, receipt)
+            if generation:
+                outcomes.append(
+                    {
+                        "job_id": job_id,
+                        "status": NO_GENERATION,
+                        "recorded_at": generation["recorded_at"],
+                    }
+                )
                 continue
             note = census_attests(root, job_id, receipt)
             if note:
@@ -269,13 +362,18 @@ def main():
     parser.add_argument("--sweep", action="store_true")
     parser.add_argument("--session")
     parser.add_argument("--record-census", metavar="JOB_ID")
+    parser.add_argument("--reconcile-generation", metavar="JOB_ID")
     parser.add_argument("--census-at", type=float, help="UTC epoch seconds of the census")
     parser.add_argument("--windows", type=int)
     parser.add_argument("--tabs", type=int)
     parser.add_argument("--reference", help="where the census note is recorded")
     args = parser.parse_args()
     config = json.loads(args.config.read_text())
-    if args.record_census:
+    if args.reconcile_generation:
+        report = record_generation(
+            Path(config["state_dir"]).expanduser(), args.reconcile_generation, args.reference
+        )
+    elif args.record_census:
         if None in (args.census_at, args.windows, args.tabs):
             parser.error("--record-census needs --census-at, --windows and --tabs")
         report = record_census(

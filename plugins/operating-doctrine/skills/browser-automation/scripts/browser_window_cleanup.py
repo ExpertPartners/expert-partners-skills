@@ -69,13 +69,28 @@ def handle(payload, dispatch):
             for x in (report if isinstance(report, list) else [])
             if isinstance(x, dict) and x.get("status") == "failed_no_artifacts_by_census"
         )
+        generations = sorted(
+            x["job_id"]
+            for x in (report if isinstance(report, list) else [])
+            if isinstance(x, dict) and x.get("status") == "failed_no_artifacts_by_generation"
+        )
+        messages = []
         if unresolved:
             # Not clean: these receipts stay failed. They only stop blocking.
-            return {
-                "systemMessage": "Browser jobs "
+            messages.append(
+                "Browser jobs "
                 + ", ".join(unresolved)
                 + " failed, no artifacts by census. Receipts remain failed, not finished."
-            }
+            )
+        if generations:
+            messages.append(
+                "Browser jobs "
+                + ", ".join(generations)
+                + " failed, old browser generation gone. No browser close issued. "
+                + "Receipts remain failed, not finished."
+            )
+        if messages:
+            return {"systemMessage": " ".join(messages)}
     return {}
 
 
