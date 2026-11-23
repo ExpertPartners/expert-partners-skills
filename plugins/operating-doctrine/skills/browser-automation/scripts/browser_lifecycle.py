@@ -270,22 +270,28 @@ def record_generation(root, job_id, reference):
 def generation_attests(root, job_id, receipt):
     from browser_jobs import chrome_generation
 
+    path = generation_path(root, job_id)
     try:
-        note = json.loads(generation_path(root, job_id).read_text())
-        if (
-            generation_eligible(receipt)
-            and note.get("job_id") == job_id
-            and note.get("status") == NO_GENERATION
-            and note.get("browser_close_issued") is False
-            and note.get("previous_generation") == receipt["generation"]
-            and valid_generation(note.get("observed_generation"))
-            and note["observed_generation"] != receipt["generation"]
-            and chrome_generation() == note["observed_generation"]
-        ):
-            return note
-    except (OSError, ValueError, AttributeError):
-        pass
-    return None
+        contents = path.read_text()
+    except FileNotFoundError:
+        if path.is_symlink():
+            raise ValueError("generation_note_unreadable") from None
+        return None
+    # An existing note owns the disposition, even when its evidence is stale
+    # or unreadable. Fail closed instead of falling through to a live transport.
+    note = json.loads(contents)
+    if (
+        generation_eligible(receipt)
+        and note.get("job_id") == job_id
+        and note.get("status") == NO_GENERATION
+        and note.get("browser_close_issued") is False
+        and note.get("previous_generation") == receipt["generation"]
+        and valid_generation(note.get("observed_generation"))
+        and note["observed_generation"] != receipt["generation"]
+        and chrome_generation() == note["observed_generation"]
+    ):
+        return note
+    raise ValueError("generation_note_requires_reconciliation")
 
 
 def _sweep(config, session_id=None):

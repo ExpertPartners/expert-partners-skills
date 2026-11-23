@@ -13,7 +13,9 @@ import test_browser_jobs as fixtures
 
 class PreForwardRefusals(unittest.TestCase):
     def setUp(self):
-        directory = self.enterContext(tempfile.TemporaryDirectory())
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        directory = temporary.name
         self.route = fixtures.JobTests().route(directory)
         self.jid = "a" * 32
         self.receipt = Path(directory) / f"{self.jid}.json"

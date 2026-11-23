@@ -185,6 +185,8 @@ Completion is proven, never guessed from age or idle time.
   `failed_no_artifacts_by_generation` without contacting a transport or sending old
   IDs to Chrome. This means the original process is gone, not that restored tabs were
   closed or that the current browser has no unattributed tabs.
+  An existing note that is stale, unreadable or ambiguous stays
+  `preserved_uncertain`, with no live transport fallback.
 - Failed-job reconciliation. A fresh maintenance connector first proves ownership
   without closing anything, records `window_removal_issued`, then removes the exact
   saved window and polls briefly until Chrome stops listing it. A missing connector is

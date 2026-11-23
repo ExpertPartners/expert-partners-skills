@@ -346,11 +346,33 @@ class LifecycleTests(unittest.TestCase):
             self.assertEqual(note["observed_generation"], current)
             self.assertEqual(json.loads((Path(root) / (row["job_id"] + ".json")).read_text()), row)
             # A stale note never overrides a different live generation.
-            with patch.object(browser_jobs, "chrome_generation", return_value=old):
-                with patch.object(lifecycle, "control", side_effect=RuntimeError("refused")):
+            for observed in (old, {"pid": 60000, "started": "third process"}):
+                with patch.object(browser_jobs, "chrome_generation", return_value=observed):
+                    with patch.object(lifecycle, "control") as control:
+                        self.assertEqual(
+                            lifecycle.sweep({"state_dir": root})[0]["status"], "preserved_uncertain"
+                        )
+                    control.assert_not_called()
+            for contents in ("invalid json", "[]", "{}"):
+                lifecycle.generation_path(root, row["job_id"]).write_text(contents)
+                with patch.object(lifecycle, "control") as control:
                     self.assertEqual(
                         lifecycle.sweep({"state_dir": root})[0]["status"], "preserved_uncertain"
                     )
+                control.assert_not_called()
+            lifecycle.atomic_json(lifecycle.generation_path(root, row["job_id"]), note)
+            with patch.object(
+                browser_jobs, "chrome_generation", side_effect=RuntimeError("ambiguous")
+            ):
+                with patch.object(lifecycle, "control") as control:
+                    self.assertEqual(
+                        lifecycle.sweep({"state_dir": root})[0]["status"], "preserved_uncertain"
+                    )
+                control.assert_not_called()
+            self.assertEqual(json.loads((Path(root) / (row["job_id"] + ".json")).read_text()), row)
+            self.assertEqual(
+                json.loads(lifecycle.generation_path(root, row["job_id"]).read_text()), note
+            )
 
     def test_generation_reconciliation_refuses_live_active_missing_and_relay(self):
         with tempfile.TemporaryDirectory() as root:
