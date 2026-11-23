@@ -11,7 +11,7 @@ const config = JSON.parse(
 const env = { ALLOWED_SCOPES: config.vars.ALLOWED_SCOPES as string };
 const homes = ["hq-hr", "hq-employees", "hq-finance"] as const;
 
-test("deployed allowlist includes EP Private for leaders and mapped department homes", async () => {
+test("deployed allowlist includes mapped department homes and ep-private, without ag-private or proposed scopes", async () => {
 	const expected = [
 		"hq-core", "hq-hr", "hq-employees", "hq-skills", "hq-finance", "hq-operations", "hq-analytics", "hq-partnersync", "hq-library",
 		"ep-core", "ep-discovery", "ep-marketing", "ep-sales", "ep-client-experience", "ep-operations", "ep-outputs", "ep-private",
