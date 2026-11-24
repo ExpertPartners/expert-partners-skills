@@ -74,8 +74,8 @@ class MCP:
             if result.get("error") == "browser_transport_closed":
                 raise RuntimeError("browser_transport_closed")
 
-    def tool(self, name, **args):
-        return self.request("tools/call", {"name": name, "arguments": args})
+    def tool(self, tool_name, **args):
+        return self.request("tools/call", {"name": tool_name, "arguments": args})
 
     def code(self, job, code):
         raw = self.tool("browser_run_code_unsafe", job_id=job, code=code)
