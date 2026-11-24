@@ -10,12 +10,14 @@ calls:
   - canonical-categories
   - entity-separation
 brand-scope: null
-subtitle: "review the monthly close against bank and Stripe"
+subtitle: "review the monthly close against bank and PayPal"
 ---
 
 # Monthly Close Review
 
 Inherits the operating-doctrine skill and the Fractional CFO project instructions. Read-only: this skill reviews the close, it does not perform the close. It never posts, edits, or deletes anything in QuickBooks.
+
+Payment processor rule. PayPal is the only payment processor for every business line (HQ Decision Log, November 24, 2026, Stripe and PayPal). Stripe is discontinued. Never connect, authenticate to, configure, build against or recommend Stripe. Helcim was not approved and is not an option. Any Stripe money still moving (a reserve release, a final payout, a refund Allison already authorized) is legacy Stripe wind-down, reported from the Mercury side and labeled that way, never treated as a live revenue source.
 
 ## What this produces
 
@@ -29,11 +31,11 @@ A close summary per entity that answers three questions: do the books match the 
 
 3. Pull Mercury: getAccountStatements for the period for every account, plus listTransactions for the period as the detail layer.
 
-4. Pull Stripe: charges, refunds, fees, and payouts for the period.
+4. Pull PayPal: sales, subscription payments, invoice payments, refunds, fees, disputes, and transfers to the bank for the period.
 
 5. Reconcile cash. QuickBooks bank account balances at period end versus Mercury statement ending balances, account by account. List every difference with the amount.
 
-6. Reconcile revenue. Stripe gross charges minus refunds for the period versus revenue booked in QuickBooks for Stripe-collected income. Reconcile Stripe fees against cod-merchant-fees in the books. Flag timing differences (payouts in transit at period end) separately from real mismatches.
+6. Reconcile revenue. PayPal gross receipts minus refunds for the period versus revenue booked in QuickBooks for PayPal-collected income. Reconcile PayPal fees against cod-merchant-fees in the books. Flag timing differences (transfers in transit at period end, PayPal balance not yet moved to Mercury) separately from real mismatches. List any legacy Stripe wind-down activity on its own line.
 
 7. Analyze the P&L through canonical categories: revenue by canonical line, expenses by canonical line, gross margin, net income, and the three largest movements versus prior month with the driver named for each.
 

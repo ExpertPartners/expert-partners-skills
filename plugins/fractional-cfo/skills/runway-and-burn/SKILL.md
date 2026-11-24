@@ -17,6 +17,8 @@ subtitle: "burn, runway, and revenue sensitivity"
 
 Inherits the operating-doctrine skill and the Fractional CFO project instructions. Read-only. All computation in code with the work shown.
 
+Payment processor rule. PayPal is the only payment processor for every business line (HQ Decision Log, November 24, 2026, Stripe and PayPal). Stripe is discontinued. Never connect, authenticate to, configure, build against or recommend Stripe. Helcim was not approved and is not an option. Any Stripe money still moving (a reserve release, a final payout, a refund Allison already authorized) is legacy Stripe wind-down, reported from the Mercury side and labeled that way, never treated as a live revenue source.
+
 ## What this produces
 
 Per entity: net monthly burn or surplus, months of runway at current trajectory, and a sensitivity table showing how runway moves when revenue moves.
@@ -32,7 +34,7 @@ Available cash: Mercury operating balances. Treasury balances get shown separate
 
 1. Pull Mercury balances per account per entity, tagged as operating, treasury, or tax reserve based on account names and the systems map. If an account's role is ambiguous, tag it by best judgment, say so in the report and record the tag in project memory.
 
-2. Compute trailing burn from Mercury transactions: 3-month and 6-month trailing averages of inflows and outflows through canonical categories, transfers excluded. Show both windows; if they diverge more than 20 percent, name what changed.
+2. Compute trailing burn from Mercury transactions: 3-month and 6-month trailing averages of inflows and outflows through canonical categories, transfers excluded. Show both windows; if they diverge more than 20 percent, name what changed. Legacy Stripe wind-down inflows (reserve releases, final payouts) are one-time and stay out of the trailing revenue run rate.
 
 3. Cross-check against QuickBooks: trailing P&L expense average versus Mercury outflow average. Material divergence usually means timing (annual prepays, credit card float) or booking issues; name which.
 
@@ -42,7 +44,7 @@ Available cash: Mercury operating balances. Treasury balances get shown separate
 
 6. Sensitivity table: runway at revenue of minus 30 percent, minus 15 percent, current, plus 15 percent, and plus 30 percent, holding expenses flat. Then one line on what expense flex exists (the largest discretionary canonical categories) if revenue drops.
 
-7. Stripe forward signal: current active subscription MRR and its 3-month trend, as the leading indicator on the revenue side of the model.
+7. PayPal forward signal: current active PayPal subscription MRR (coaching and any other recurring plans) and its 3-month trend, as the leading indicator on the revenue side of the model.
 
 ## Report format
 

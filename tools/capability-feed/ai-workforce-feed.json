@@ -1,8 +1,8 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-11-24T14:37:28Z",
-  "verifiedAt": "2026-11-24T14:37:28Z",
+  "generatedAt": "2026-11-24T14:39:32Z",
+  "verifiedAt": "2026-11-24T14:39:32Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
@@ -2102,7 +2102,7 @@
       "id": "canonical-categories",
       "humanName": "Canonical Categories",
       "kind": "skill",
-      "summary": "Background translation layer for normalizing financial data across Mercury, QuickBooks, Stripe, and Monarch into one canonical category scheme.",
+      "summary": "Background translation layer for normalizing financial data across Mercury, QuickBooks, PayPal, and Monarch (plus legacy Stripe history) into one canonical category scheme.",
       "status": "Unknown",
       "maintainer": "Allison Gaddy",
       "collectionIds": [],
@@ -2142,11 +2142,15 @@
         "data",
         "financial",
         "fractional",
+        "history",
         "layer",
+        "legacy",
         "mercury",
         "monarch",
         "money",
         "normalizing",
+        "paypal",
+        "plus",
         "quickbooks",
         "scheme",
         "source",
@@ -6428,12 +6432,12 @@
         "money",
         "month",
         "monthly",
+        "paypal",
         "review",
-        "run",
-        "stripe"
+        "run"
       ],
       "bestFor": [
-        "review the monthly close against bank and Stripe"
+        "review the monthly close against bank and PayPal"
       ],
       "useCases": [
         "Use whenever she asks to review the month, check the close, reconcile the books, compare QuickBooks to the bank, review the P and L, \"how did the month look\", or any request that reconciles accounting records against actual bank and payment activity."
@@ -9320,7 +9324,7 @@
       "id": "weekly-cash-flow-review",
       "humanName": "Weekly Cash Flow Review",
       "kind": "skill",
-      "summary": "Run Allison's weekly cash flow review across Mercury and Stripe.",
+      "summary": "Run Allison's weekly cash flow review across Mercury and PayPal.",
       "status": "Unknown",
       "maintainer": "Allison Gaddy",
       "collectionIds": [],
@@ -9362,9 +9366,9 @@
         "mercury",
         "money",
         "out",
+        "paypal",
         "review",
         "run",
-        "stripe",
         "weekly"
       ],
       "bestFor": [
