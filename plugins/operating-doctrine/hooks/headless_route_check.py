@@ -874,6 +874,22 @@ GHL_BUILDER_NOTE = (
 )
 
 
+# GoHighLevel has no public API to create, read the steps of, or edit workflows (verified
+# 2026-10-20 and rechecked 2026-11-24; still an open request on HighLevel's ideas board), so
+# the access map's live GoHighLevel row cannot cover the workflow builder. Contacts, tags,
+# custom fields and other API-covered paths still go through the access map.
+GHL_WORKFLOW_PATH_RE = re.compile(
+    r"^/v2/location/[^/?#]+/(?:automation/workflows|workflows|workflow)(?:[/?#]|$)",
+    re.I,
+)
+GHL_WORKFLOW_NOTE = (
+    "Headless route check: GoHighLevel has no public workflow API, so the workflow builder "
+    "is let through for reading and editing workflows. Every other GoHighLevel path still "
+    "goes through the access map. Report it as: Headless route checked, GoHighLevel "
+    "workflows, no API, no public workflow API."
+)
+
+
 def _paths_on_host(host: str, targets: list) -> list:
     """Normalized paths of every target on this host, empty when the host is absent."""
     paths = []
@@ -890,11 +906,24 @@ def _paths_on_host(host: str, targets: list) -> list:
 
 
 def ghl_builder_allowed(host: str, targets: list) -> bool:
-    """True only when every GoHighLevel target is a builder or media-library path."""
+    """True only when every GoHighLevel target is a builder, media-library or workflow path."""
     if host not in GHL_BUILDER_HOSTS:
         return False
     paths = _paths_on_host(host, targets)
-    return bool(paths) and all(GHL_BUILDER_PATH_RE.search(path) for path in paths)
+    return bool(paths) and all(
+        GHL_BUILDER_PATH_RE.search(path) or GHL_WORKFLOW_PATH_RE.search(path) for path in paths
+    )
+
+
+def ghl_builder_notes(host: str, targets: list) -> list:
+    """The report notes that match the kinds of GoHighLevel paths in this call."""
+    paths = _paths_on_host(host, targets)
+    notes = []
+    if any(GHL_BUILDER_PATH_RE.search(path) for path in paths):
+        notes.append(GHL_BUILDER_NOTE)
+    if any(GHL_WORKFLOW_PATH_RE.search(path) for path in paths):
+        notes.append(GHL_WORKFLOW_NOTE)
+    return notes
 
 
 # Founder directive 2026-11-11 (Allison, relayed by the Cal Week Builder orchestrator):
@@ -979,7 +1008,7 @@ def decide(payload: dict) -> tuple[str, str] | None:
     for host in hosts:
         if ghl_builder_allowed(host, targets):
             log_event("founder-override-allowed", f"{host} {tool_name}")
-            notes.append(GHL_BUILDER_NOTE)
+            notes.extend(ghl_builder_notes(host, targets))
             continue
         if github_settings_allowed(host, targets):
             log_event("founder-override-allowed", f"{host} {tool_name}")
