@@ -28,7 +28,7 @@ and no one maintains a separate list.
 
 `feed.config.json` is a presentation policy, not a registry. It lists no capabilities.
 Today it says two things. The Real Estate Agent Toolkit is shown as one portable
-collection of its 40 skills. The household ACN line is left off the Expert Partners HQ,
+collection of its 43 skills. The household ACN line is left off the Expert Partners HQ,
 because its own plugin.json says it is structurally separate from Expert Partners LLC.
 
 The feed is a pure function of this repository's tree.
@@ -152,4 +152,4 @@ Each JSON file in a source directory has this shape.
 
 They also prove the envelope passes HQ's own schema (mirrored in `lib/hq-contract.mjs`
 from HQ commit `5cc9811`), and that the real
-Real Estate Agent Toolkit stays one collection of 40 portable skills.
+Real Estate Agent Toolkit stays one collection containing every canonical portable skill in its package.
