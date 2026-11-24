@@ -859,7 +859,8 @@ GHL_BUILDER_HOSTS = ("app.gohighlevel.com", "app.leadconnectorhq.com")
 GHL_BUILDER_PATH_RE = re.compile(
     r"^/v2/location/[^/?#]+/(?:"
     r"sites|funnels|funnels-websites|websites|forms|surveys|builder|page-builder"
-    r"|funnel-builder|form-builder|media|media-storage|media-library"
+    r"|funnel-builder|form-builder|form-builder-v2|survey-builder|survey-builder-v2"
+    r"|media|media-storage|media-library"
     r")(?:[/?#]|$)",
     re.I,
 )

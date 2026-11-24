@@ -521,6 +521,11 @@ class FounderOverrides(HookCase):
         cases = (
             f"https://{self.GHL}/v2/location/abc/funnels/page-builder/123",
             f"https://{self.GHL}/v2/location/abc/forms/builder/xyz",
+            f"https://{self.GHL}/v2/location/abc/form-builder-v2/xyz",
+            f"https://{self.GHL}/v2/location/abc/survey-builder/xyz",
+            f"https://{self.GHL}/v2/location/abc/survey-builder-v2/xyz",
+            "https://app.leadconnectorhq.com/v2/location/abc/form-builder-v2/xyz",
+            "https://app.leadconnectorhq.com/v2/location/abc/survey-builder-v2/xyz",
             f"https://{self.GHL}/v2/location/abc/media-library",
             f"https://app.leadconnectorhq.com/v2/location/abc/sites/builder",
         )
@@ -543,7 +548,12 @@ class FounderOverrides(HookCase):
         self.assertIn("GoHighLevel / PartnerSync builder", note)
 
     def test_ghl_contacts_and_workflows_stay_denied(self):
-        for path in ("/v2/location/abc/contacts", "/v2/location/abc/workflows"):
+        for path in (
+            "/v2/location/abc/contacts",
+            "/v2/location/abc/workflows",
+            "/v2/location/abc/form-builder-v2-other/xyz",
+            "/v2/location/abc/survey-builder-v2-other/xyz",
+        ):
             with self.subTest(path=path):
                 reason = self.assertDenied(self.run_hook(f"https://{self.GHL}{path}"))
                 self.assertIn("GoHighLevel contacts", reason)
