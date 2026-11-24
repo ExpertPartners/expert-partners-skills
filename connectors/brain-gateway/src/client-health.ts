@@ -19,6 +19,7 @@ const uuid = z.uuid();
 const finishBody = z.object({ conversationId: uuid.optional(), runnerError: z.enum(["none", "browser_error", "cleanup_failed"]).optional() }).strict();
 const failedDelivery = new Set(["ERROR", "DECLINED"]);
 const delivered = new Set(["DELIVERED", "READ", "RECEIVED"]);
+const deliveryStatus = (data: any): string => typeof data.status === "string" ? data.status : typeof data.status?.status === "string" ? data.status.status : "UNKNOWN";
 const json = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status, headers: { "content-type": "application/json" } });
 const get = async <T>(kv: KVNamespace, key: string): Promise<T | null> => {
 	const raw = await kv.get(key);
@@ -110,7 +111,7 @@ export async function notifyClient(kv: KVNamespace, env: AlertEnv, client: Clien
 			const r = await doFetch(`https://api.sendblue.co/api/status?handle=${encodeURIComponent(previous.handle)}`, { headers });
 			if (r.ok) {
 				const d: any = await r.json();
-				delivery = typeof d.status === "string" ? d.status : "UNKNOWN";
+				delivery = deliveryStatus(d);
 				await kv.put(key, JSON.stringify({ ...previous, delivery }));
 			}
 		}
@@ -118,8 +119,8 @@ export async function notifyClient(kv: KVNamespace, env: AlertEnv, client: Clien
 		const r = await doFetch("https://api.sendblue.co/api/send-message", { method: "POST", headers, body: JSON.stringify({ number: env.ALERT_TO, from_number: env.ALERT_FROM, content: noticeText(client, state, test) }) });
 		if (!r.ok) return { action: "send_failed" };
 		const d: any = await r.json();
-		if (!d.message_handle || failedDelivery.has(d.status) || d.error_code) return { action: "send_failed" };
-		const notice: Notice = { state, at: now.toISOString(), handle: d.message_handle, delivery: d.status ?? "UNKNOWN" };
+		if (!d.message_handle || failedDelivery.has(deliveryStatus(d)) || d.error_code) return { action: "send_failed" };
+		const notice: Notice = { state, at: now.toISOString(), handle: d.message_handle, delivery: deliveryStatus(d) };
 		await kv.put(key, JSON.stringify(notice));
 		// Bounded metadata-only history, including drill receipts. No phone numbers or message bodies.
 		await kv.put(`${key}:sent:${notice.handle}`, JSON.stringify(notice), { expirationTtl: 30 * 86400 });

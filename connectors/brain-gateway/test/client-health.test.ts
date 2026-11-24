@@ -68,7 +68,7 @@ test("delivery failure is retried and an HTTP 200 provider rejection is not succ
 	assert.equal((await notifyClient(k, env, "don", "failed", false, reject, now)).action, "send_failed");
 	assert.ok(!k.values.has("health:chatgpt:don:notice"));
 	await notifyClient(k, env, "don", "failed", false, send, now);
-	const delayedError = (async (url: any, init: any) => String(url).includes("/status?") ? new Response(JSON.stringify({ status: "ERROR" })) : send(url, init)) as typeof fetch;
+	const delayedError = (async (url: any, init: any) => String(url).includes("/status?") ? new Response(JSON.stringify({ status: { status: "ERROR" } })) : send(url, init)) as typeof fetch;
 	assert.equal((await notifyClient(k, env, "don", "failed", false, delayedError, now)).action, "sent");
 });
 
