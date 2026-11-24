@@ -43,6 +43,18 @@ Access is enforced in the gateway, in `src/access.ts`, from the November 20, 202
 
 A cron trigger runs a live check every day at 12:00 UTC (Decision Log, Nov 20 2026, Business Brain connection monitoring). It probes every allowed scope, lists one scope completely each day on a rotation, reads the whole current Decision Log and checks that its newest entry is under 14 days old, and confirms the HQ Rulebook is present with a current version. Workers allow a limited number of outbound requests per run, which is why only one scope is listed completely per day. The result keeps only counts, versions, dates and error codes, never document text, and a later pass never hides an earlier failure. Leaders read it at `GET /api/health/deep` with the Hub token, and `?run=1` runs it now. Failures also log to Worker logs. Alerting to Allison goes through Ember's question line once that is live.
 
+## ChatGPT client checks
+
+The daily Codex heartbeat runs `scripts/chatgpt_check.py` on the existing signed-in M2 profiles for both leaders. It verifies the ChatGPT identity, uses the existing gateway connection, and closes its owned browser job in `finally`. It never reconnects an account. Private runtime settings supply the existing profile routes, proof conversation IDs, app ID, gateway URL and the existing Hub-token 1Password item. No token value is written to settings or passed on a command line.
+
+Each run starts through the existing authenticated leader API at `POST /api/health/clients/{allison|don}/start`. A temporary `health_run_id` on the same four MCP read tools lets the gateway record actual authenticated outcomes. The canary checks leader scopes, current Rulebook discovery and verified read, current Decision Log read, decisions, private-scope denial and cross-scope denial. HTTP tool calls cannot attest a client check, a different identity cannot fill it, and the finalizer cannot accept a claimed PASS. Receipts contain only counts, versions, codes and proof identifiers, never source text. Short-lived run observations expire after a day.
+
+`GET /api/health/clients` shows the latest receipts and notification state. `POST /api/health/clients/evaluate` runs the same missing-receipt evaluator used hourly at fifteen minutes past the hour. A receipt older than 26 hours, including a runner that never starts or never finishes, triggers a missed-check alert. The original 12:00 UTC server-to-Drive check is unchanged. Client and server states remain separate.
+
+The existing Sendblue line sends one failure, missed-check or recovery notice per state transition. HTTP refusal or provider rejection does not advance the state. Pending deliveries are checked through the documented Sendblue status endpoint, and failed delivery is retried. The leader-only `POST /api/health/clients/drill` accepts a client and `failed`, `healthy` or `missed` state only after a real passing baseline. It exercises the same deadline evaluator and sender against an isolated, TEST-labelled receipt; it cannot alter production health or fabricate a successful client run.
+
+KV replication is eventually consistent. The M2 runner allows a new lease to propagate before asking ChatGPT to execute and waits for bounded observation propagation before finalizing. Keep the client monitor on the existing gateway and the native Codex automation; do not add a second gateway, OAuth link or local scheduler.
+
 ## Secrets
 
 Secrets live only in 1Password and in the Worker's Cloudflare secrets. Nothing in this folder holds one. Load or rotate them by piping from `op` into `wrangler secret bulk`, never on a command line.
