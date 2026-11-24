@@ -10,7 +10,7 @@ subtitle: "recover reusable systems from authorized past work"
 
 # Hobbs IP Miner
 
-Keep mining within the caller's requested job under the operating-doctrine Stay on the job rule. A department responsibility list or recovered idea does not expand the current assignment. Read the newest applicable HQ decisions before applying company priorities, commercial eligibility or membership inclusions.
+Keep mining within the caller's requested job under the operating-doctrine Stay on the job rule. A department responsibility list or recovered idea does not expand the current assignment. Read the newest applicable HQ decisions before applying company priorities, commercial eligibility or membership inclusions. Freedom Funnel and high-ticket funnel work keeps the join EPIC option, where the offer is to join EPIC or buy the product being sold.
 
 Retrieve the document titled "[EP][V1.0] Hobbs IP Miner Method" from EP Business Brain, Private. With Drive brain gateway, use `discover` in `ep-private` to find that exact title, then `read` every page. An authorized Drive or Docs connector may retrieve the same live document by title. The source method and private inputs stay in Drive, never in this public plugin.
 

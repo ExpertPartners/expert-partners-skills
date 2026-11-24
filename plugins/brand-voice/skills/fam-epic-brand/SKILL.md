@@ -24,7 +24,7 @@ Use the owning brain index and the selected canon's current references when the 
 
 ## Commercial scope stays live
 
-Read the newest applicable HQ decisions and owning canon for company priorities, commercial eligibility and membership inclusions before applying an exclusion. Do not revive a superseded selling ban from an older source. Choosing this source route does not expand the caller's job to retention or recruiting. Keep membership inclusions distinct from separately sold offers using the live records.
+Read the newest applicable HQ decisions and owning canon for company priorities, commercial eligibility and membership inclusions before applying an exclusion. Do not revive a superseded selling ban from an older source. Choosing this source route does not expand the caller's job to retention or recruiting. Keep membership inclusions distinct from separately sold offers using the live records. Freedom Funnel and high-ticket funnel work keeps the join EPIC option, where the offer is to join EPIC or buy the product being sold.
 
 ## Workflow
 
