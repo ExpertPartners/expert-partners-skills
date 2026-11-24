@@ -38,7 +38,7 @@ This list only says what to look up. The numbers live in the Rulebook.
 - Every document uses Poppins throughout, for every brand and every room, AG Luxury included, with the Rulebook's title, heading, and body sizes. Expert Partners and HQ documents set Heading 2 in the Rulebook's Brand Blue.
 - AG Luxury documents stay black and white, with the Rulebook's Rich Gold only for small details. Italiana and Manrope are the allisongaddy.com website fonts and belong only to public, client-facing design, never to working documents.
 - Line spacing is whatever the Rulebook says today.
-- No empty line sits between paragraphs. Line spacing and a small space after each paragraph do the separating, and headings keep their own spacing.
+- No empty line sits between paragraphs. Line spacing and the Rulebook's paragraph spacing do the separating, with set space after body paragraphs, above and below headings, between list items, and after the last item of a list.
 - Paragraphs stay short, one or two sentences that carry one idea.
 - No bold, no italics, no em dashes, and no horizontal dividers.
 
@@ -46,7 +46,7 @@ This list only says what to look up. The numbers live in the Rulebook.
 
 The standard covers every Google Doc already in the HQ, Expert Partners and AG Business Brains, not only new ones. When you open, edit, or touch an existing Doc that is off standard, restyle it to the Rulebook in the same pass. Restyling changes formatting only, never wording, and never counts as an unrequested change to a business-brain file.
 
-Restyling means Poppins throughout, the Rulebook's line spacing, real named heading styles in place of enlarged or bold paragraphs, removal of empty paragraphs used as spacers, removal of bold and italics in body text, and the brand's color rules.
+Restyling means Poppins throughout, the Rulebook's line and paragraph spacing, real named heading styles in place of enlarged or bold paragraphs, removal of empty paragraphs used as spacers, removal of bold and italics in body text, and the brand's color rules.
 
 ## Names, home, sharing, and delivery
 
@@ -64,7 +64,7 @@ These notes translate the Rulebook's values. They never replace them.
 - Create the Doc through the service account impersonating allison@expertpartners.com where that path is reachable, otherwise through a write-capable Drive or Docs connector, so ownership is native.
 - In the Google Docs API, insert the text, then apply updateTextStyle with weightedFontFamily and the Rulebook's sizes, and updateParagraphStyle with lineSpacing set to the Rulebook value times 100 (1.5 becomes 150).
 - Use the native named styles (TITLE, HEADING_1, HEADING_2, NORMAL_TEXT) so the outline works. A visually enlarged paragraph is not a heading.
-- Never insert empty paragraphs to make space. Use spaceBelow on body paragraphs instead.
+- Never insert empty paragraphs to make space. Set the Rulebook's spacing with spaceAbove and spaceBelow on body paragraphs, headings, and list items, giving the last item of each list the larger after-list space.
 - In docx-js, line spacing is the Rulebook value times 240 and font sizes are in half points.
 - Apply the font, line spacing and heading styles as you build, with no empty paragraphs between paragraphs.
 
