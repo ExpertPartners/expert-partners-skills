@@ -1,3 +1,6 @@
+## 0.12.2 - 2026-11-24
+
+Keep the join EPIC option in Freedom Funnel and high-ticket funnel work when applying the stay-on-the-job and live commercial scope rules.
 ## 0.12.1 - 2026-11-24
 
 Keep each chat on its requested job rather than a department responsibility list. Resolve commercial eligibility and membership inclusions from current Drive authority instead of reviving older blanket exclusions. Preserve brand voice and the live Authority Engine methods.
