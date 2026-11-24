@@ -547,10 +547,37 @@ class FounderOverrides(HookCase):
         )
         self.assertIn("GoHighLevel / PartnerSync builder", note)
 
-    def test_ghl_contacts_and_workflows_stay_denied(self):
+    def test_ghl_workflow_builder_paths_are_allowed(self):
+        cases = (
+            f"https://{self.GHL}/v2/location/abc/automation/workflows",
+            f"https://{self.GHL}/v2/location/abc/automation/workflows?listTab=all",
+            f"https://{self.GHL}/v2/location/abc/automation/workflows/wf123",
+            f"https://{self.GHL}/v2/location/abc/workflows",
+            f"https://{self.GHL}/v2/location/abc/workflow/wf123",
+            "https://app.leadconnectorhq.com/v2/location/abc/automation/workflows/wf123",
+        )
+        for url in cases:
+            with self.subTest(url=url):
+                note = self.assertAllowed(self.run_hook(url))
+                self.assertIn("GoHighLevel workflows, no API, no public workflow API", note)
+                self.assertNotIn("PartnerSync builder", note)
+
+    def test_ghl_code_call_mixing_builder_and_workflow_paths_names_both(self):
+        code = (
+            "async (page) => { await page.goto('https://app.gohighlevel.com/v2/location/abc/survey-builder-v2/x');"
+            " await page.goto('https://app.gohighlevel.com/v2/location/abc/automation/workflows/y'); }"
+        )
+        note = self.assertAllowed(
+            self.run_hook(None, "mcp__playwright-ember__browser_run_code_unsafe", {"code": code})
+        )
+        self.assertIn("GoHighLevel / PartnerSync builder", note)
+        self.assertIn("GoHighLevel workflows, no API", note)
+
+    def test_ghl_contacts_and_other_paths_stay_denied(self):
         for path in (
             "/v2/location/abc/contacts",
-            "/v2/location/abc/workflows",
+            "/v2/location/abc/workflows-other",
+            "/v2/location/abc/automation/other",
             "/v2/location/abc/form-builder-v2-other/xyz",
             "/v2/location/abc/survey-builder-v2-other/xyz",
         ):
