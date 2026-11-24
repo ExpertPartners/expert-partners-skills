@@ -1,3 +1,6 @@
+## 0.2.0 - 2026-11-24
+
+Add three original HQ-owned skills for agent-attraction roleplay, listing buyer-needs analysis and marketing, and decision-clarity coaching. They provide replacements for the jobs previously handled by externally owned GPTs, without claiming to copy those creators' instructions. Preserve the shared agent profile, current source facts and task-specific execution scope.
 ## 0.1.2 - 2026-11-13
 
 Client Follow-Up Writer explicitly preserves requested private, internal, unsent and historical-replay labels outside the customer-facing message, without adding them to ordinary requests or implying a send or save.
