@@ -22,6 +22,10 @@ This entry point supports two source routes. Select the route that belongs to th
 
 Use the owning brain index and the selected canon's current references when the task needs a voice guide, visual system, program facts or proof. The former local voice and token reference files are not current sources and are not fallback material.
 
+## Commercial scope stays live
+
+Read the newest applicable HQ decisions and owning canon for company priorities, commercial eligibility and membership inclusions before applying an exclusion. Do not revive a superseded selling ban from an older source. Choosing this source route does not expand the caller's job to retention or recruiting. Keep membership inclusions distinct from separately sold offers using the live records.
+
 ## Workflow
 
 1. Resolve the requested brand, speaker, audience, output format and channel.

@@ -43,6 +43,10 @@ Confirm the current brand relationship, status and exclusions in those live sour
 4. Draft only after the applicable sources are read. Apply their current voice, perspective, claims, visual inputs and exclusions.
 5. Review the output against the same current sources. A missing fact stays unverified rather than being completed from memory or an archive.
 
+## Commercial scope stays live
+
+For Expert Partners or EPIC work, resolve current company priorities, commercial eligibility and membership inclusions from the newest applicable HQ decisions and owning canon. A brand route or member label is not a blanket selling ban. Keep the requested job separate from the department's wider responsibilities and do not introduce another program merely because the skill can cover it.
+
 ## Keeping the boundary
 
 Correct business canon in its owning Drive document through its current steward. Correct skill mechanics here through the canonical marketplace source and normal producer/review path. Never export, synchronize or copy the canon, a voice bank or an editable business summary into this plugin. Historical preservation packages remain historical evidence, not fallback instructions.

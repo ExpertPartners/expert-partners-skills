@@ -18,6 +18,10 @@ Use for the Expert Partners company deliverable requested by the caller. Resolve
 
 Read Expert Partners Brand Canon in EP Business Brain, Company Core, and Shared Writing Rules in HQ Business Brain, Company Core. When the task concerns EPIC, also read EPIC Brand Canon from the same owning brain and use `fam-epic-brand` for that program's task mechanics. Use the owning brain index and linked current records for offerings, ideal-client facts, evidence or verified claims.
 
+## Commercial scope stays live
+
+Read the newest applicable HQ decisions and owning canon for company priorities, commercial eligibility and membership inclusions before applying an exclusion. Do not revive a superseded selling ban from an older source. Do not expand the caller's job to program retention or recruiting because a department owns those responsibilities.
+
 ## Workflow
 
 1. Identify the company or program scope, speaking role, audience, channel and deliverable.
