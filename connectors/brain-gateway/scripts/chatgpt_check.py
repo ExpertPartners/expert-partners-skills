@@ -44,6 +44,8 @@ class MCP:
             json.dumps({"jsonrpc": "2.0", "method": "notifications/initialized"}) + "\n"
         )
         self.proc.stdin.flush()
+        # The owned-job facade loads its pinned vendor inventory during tools/list.
+        self.request("tools/list", {})
 
     def _read(self):
         for line in self.proc.stdout:
@@ -74,8 +76,8 @@ class MCP:
             if result.get("error") == "browser_transport_closed":
                 raise RuntimeError("browser_transport_closed")
 
-    def tool(self, name, **args):
-        return self.request("tools/call", {"name": name, "arguments": args})
+    def tool(self, tool_name, **args):
+        return self.request("tools/call", {"name": tool_name, "arguments": args})
 
     def code(self, job, code):
         raw = self.tool("browser_run_code_unsafe", job_id=job, code=code)
