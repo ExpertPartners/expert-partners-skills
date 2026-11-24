@@ -1,3 +1,6 @@
+## 3.9.0 - 2026-11-24
+
+Document formatting standard v4.2 follows Decision Log 2026-11-23. Line spacing is 1.15, and the standard now covers every existing Google Doc in the HQ, EP and AG brains, with a restyle-on-touch rule for off-standard documents.
 ## 3.8.23 - 2026-11-23
 
 Record terminal failed browser jobs from a verified dead Chrome generation separately from successful closure. The lifecycle sweep preserves failed receipts and never sends old IDs to the current browser.
