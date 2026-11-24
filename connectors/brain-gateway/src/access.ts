@@ -5,7 +5,7 @@
 // - Leader-level access, whole brain: Allison and Don for Expert Partners and HQ, Allison alone for AG Luxury.
 // - Department AIs start with their own department folder plus shared HQ governance, and reach another
 //   department only through a named, approved exception.
-// - Private, proposed and system folders stay out unless the allowlist names them.
+// - Private and system folders stay out unless the allowlist names them.
 import { allowedScopes, BrainError, type BrainScope } from "./brain.ts";
 
 export type Principal =
@@ -21,6 +21,7 @@ export const PEOPLE: Record<string, { label: string; match: Match }> = {
 	"don@expertpartners.com": { label: "Don, leader of HQ and EP (not AG)", match: prefix("hq-", "ep-") },
 };
 
+const HQ_SYSTEM = ["hq-outputs"];
 const EP_SYSTEM = ["ep-outputs"];
 const AG_SYSTEM = ["ag-outputs"];
 // Shared HQ governance (Rulebook, Decision Log) is context for every department in both companies.
@@ -42,9 +43,9 @@ export const DEPARTMENTS: Record<string, { label: string; scopes: BrainScope[]; 
 	"ag-cro": { label: "AG Chief Revenue Officer", scopes: ["ag-sales", "ag-listings", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
 	"ag-cco": { label: "AG Chief Client Officer", scopes: ["ag-client-experience", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
 	"ag-coo": { label: "AG Chief Operations Officer", scopes: ["ag-operations", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
-	"hq-chro": { label: "HQ Chief HR Officer", scopes: ["hq-hr", "hq-employees", "hq-skills", ...GOVERNANCE] as BrainScope[], exceptions: [] },
-	"hq-cfo": { label: "HQ Chief Finance Officer", scopes: ["hq-finance", ...GOVERNANCE] as BrainScope[], exceptions: [] },
-	"hq-caio": { label: "HQ Chief AI Officer", scopes: ["hq-operations", "hq-analytics", "hq-partnersync", ...GOVERNANCE] as BrainScope[], exceptions: [] },
+	"hq-chro": { label: "HQ Chief HR Officer", scopes: ["hq-hr", "hq-employees", "hq-skills", ...HQ_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
+	"hq-cfo": { label: "HQ Chief Finance Officer", scopes: ["hq-finance", ...HQ_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
+	"hq-caio": { label: "HQ Chief AI Officer", scopes: ["hq-operations", "hq-analytics", "hq-partnersync", "hq-audits", ...HQ_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
 };
 
 function departmentScopes(id: string): BrainScope[] {

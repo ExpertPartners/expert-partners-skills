@@ -4,6 +4,7 @@ import { z } from "zod";
 import { effectiveScopes, type Principal } from "./access.ts";
 import {
 	BrainError,
+	canonicalScope,
 	type BrainScope,
 	BRAIN_FOLDERS,
 	createBrainReads,
@@ -29,6 +30,7 @@ export interface ToolDef {
 }
 
 function inScope(scopes: BrainScope[], scope: string): BrainScope {
+	scope = canonicalScope(scope);
 	if (!scopes.includes(scope as BrainScope)) throw new BrainError("scope_not_allowed", `Scope "${scope}" is not available through this gateway.`);
 	return scope as BrainScope;
 }
