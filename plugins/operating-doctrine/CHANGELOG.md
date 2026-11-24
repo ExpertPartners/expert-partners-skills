@@ -1,3 +1,6 @@
+## 3.10.2 - 2026-11-24
+
+The headless route check now lets the GoHighLevel workflow builder through (`/v2/location/{id}/automation/workflows`, `/workflows` and `/workflow` paths) for reading and editing workflows, because GoHighLevel has no public workflow API. It reports the line "Headless route checked, GoHighLevel workflows, no API, no public workflow API". Contacts and every other API-covered GoHighLevel path still go through the access map.
 ## 3.10.1 - 2026-11-24
 
 Allow the current GoHighLevel form and survey builder routes through the existing path-scoped no-API exception. Keep unrelated paths and near-matching route names denied, with regression coverage for both supported hosts.
