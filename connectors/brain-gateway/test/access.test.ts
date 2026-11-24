@@ -23,7 +23,7 @@ test("Allison leads all three brains, Don leads HQ and EP only, AG is Allison al
 	assert.ok(!d.some((s) => s.startsWith("ag-")));
 	assert.ok(d.includes("hq-finance") && d.includes("ep-sales"), "leader level means the whole HQ and EP brain");
 	assert.ok(d.includes("ep-private"), "Don reads EP Private");
-	assert.equal(d.length, 17, "Don gets all 9 HQ scopes, all 7 EP department scopes and EP Private");
+	assert.equal(d.length, 19, "Don gets all 11 HQ scopes and all 8 EP scopes");
 });
 
 test("anyone else signed in gets no scopes at all", () => {
@@ -53,7 +53,7 @@ test("every department stays inside its own folders plus governance, never priva
 	const cro = effectiveScopes(ALLOWED, dept("ep-cro"));
 	assert.deepEqual(cro.sort(), ["ep-outputs", "ep-sales", "hq-core"]);
 	assert.ok(!cro.includes("ep-marketing") && !cro.includes("hq-finance") && !cro.includes("ag-sales"));
-	assert.deepEqual(effectiveScopes(ALLOWED, dept("hq-cfo")).sort(), ["hq-core", "hq-finance"]);
+	assert.deepEqual(effectiveScopes(ALLOWED, dept("hq-cfo")).sort(), ["hq-core", "hq-finance", "hq-outputs"]);
 	assert.deepEqual(effectiveScopes(ALLOWED, dept("ag-cro")).sort(), ["ag-listings", "ag-outputs", "ag-sales", "hq-core"]);
 });
 

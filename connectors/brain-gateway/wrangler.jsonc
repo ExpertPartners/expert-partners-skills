@@ -11,8 +11,8 @@
   "vars": {
     "MCP_RESOURCE": "https://brain-gateway.expert-partners.workers.dev/mcp",
     "ALLOWED_EMAILS": "allison@expertpartners.com,don@expertpartners.com",
-    // Approved department homes plus ep-private, named here for Don and Allison (Decision Log leader-level access: HQ and EP whole brain, AG Allison alone). ag-private and proposed scopes stay excluded.
-    "ALLOWED_SCOPES": "hq-core,hq-hr,hq-employees,hq-skills,hq-finance,hq-operations,hq-analytics,hq-partnersync,hq-library,ep-core,ep-discovery,ep-marketing,ep-sales,ep-client-experience,ep-operations,ep-outputs,ep-private,ag-core,ag-marketing,ag-sales,ag-listings,ag-client-experience,ag-operations,ag-outputs"
+    // Approved department homes plus ep-private, named here for Don and Allison (Decision Log leader-level access: HQ and EP whole brain, AG Allison alone). ag-private stays excluded.
+    "ALLOWED_SCOPES": "hq-core,hq-hr,hq-employees,hq-skills,hq-finance,hq-operations,hq-analytics,hq-audits,hq-outputs,hq-partnersync,hq-library,ep-core,ep-discovery,ep-marketing,ep-sales,ep-client-experience,ep-operations,ep-outputs,ep-private,ag-core,ag-marketing,ag-sales,ag-listings,ag-client-experience,ag-operations,ag-outputs"
   },
   "kv_namespaces": [{ "binding": "OAUTH_KV", "id": "252f106a69c14ab5a4009e0024edcdd1" }],
   "triggers": { "crons": ["0 12 * * *", "15 * * * *"] },

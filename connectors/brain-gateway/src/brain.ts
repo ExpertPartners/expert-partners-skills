@@ -10,6 +10,8 @@ export const BRAIN_FOLDERS = {
 	"hq-skills": "1PO-DnL5z3v2W_gPkyu7btZmd8yxEUi-w",
 	"hq-finance": "1Nw46FjauvrOILS1-mE8rkxVaS5jqRXaF",
 	"hq-operations": "1hmbZa0J-9wF-xAEPyaj9PSh97vr9zFyk",
+	"hq-audits": "1YTZ3MD7mQKH8fpswJsYvM0p59u491bBA",
+	"hq-outputs": "1ABDlp7H_zvG2PO_XAhPej8Sf6y1YBCJ_",
 	"hq-analytics": "1Yp9EEiJENMvztLNWTxVWJ1TdntFaDs2d",
 	"hq-partnersync": "1N4bLj6BlDjdn_UCE7YWiUd-RTUAAgJqj",
 	"hq-library": "1YADuyGnPhDHoLcJHV873QoipltoNtBwE",
@@ -48,7 +50,13 @@ export function allowedScopes(list: string | undefined): BrainScope[] {
 		.filter((s): s is BrainScope => Object.prototype.hasOwnProperty.call(BRAIN_FOLDERS, s));
 }
 
+/** Legacy EP client key resolves before authorization, so it never widens access. */
+export function canonicalScope(scope: string): string {
+	return scope === "ep-client" ? "ep-client-experience" : scope;
+}
+
 export function assertScope(list: string | undefined, scope: string): BrainScope {
+	scope = canonicalScope(scope);
 	if (!allowedScopes(list).includes(scope as BrainScope)) {
 		throw new BrainError("scope_not_allowed", `Scope "${scope}" is not available through this gateway.`);
 	}
