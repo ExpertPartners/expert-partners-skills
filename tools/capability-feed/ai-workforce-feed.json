@@ -1,19 +1,20 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-11-24T15:52:31Z",
-  "verifiedAt": "2026-11-24T15:52:31Z",
+  "generatedAt": "2026-11-24T18:57:44Z",
+  "verifiedAt": "2026-11-24T18:57:44Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
       "humanName": "Real Estate Agent Toolkit",
       "kind": "collection",
-      "summary": "Portable, platform-neutral AI skills for real estate agents (forty skills sharing one agent-profile.md).",
+      "summary": "Portable, platform-neutral AI skills for real estate agents (forty-three skills sharing one agent-profile.md).",
       "status": "Designed",
       "maintainer": "ExpertPartners",
       "collectionIds": [],
       "categories": [
         "Setup and positioning",
+        "Practice and decision support",
         "Social and short-form content",
         "YouTube and video",
         "Lead generation, follow-up, and proof",
@@ -26,7 +27,7 @@
         "Choose a skill in this collection, then use it in any AI assistant that can load skills or read a text file."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.1.2.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.2.1.",
       "containsSkillIds": [
         "agent-brain-builder",
         "brand-direction-builder",
@@ -36,6 +37,8 @@
         "daily-planner",
         "market-research-skill",
         "competitor-analysis-skill",
+        "agent-attraction-roleplay",
+        "decision-clarity-coach",
         "content-multiplier",
         "hook-generator",
         "reel-script-writer",
@@ -63,6 +66,7 @@
         "client-welcome-pack-writer",
         "google-business-profile-skill",
         "listing-ad-copy-skill",
+        "listing-buyer-profile-marketing",
         "notion-content-board-builder",
         "gamma-presentation-builder",
         "canva-assistant",
@@ -73,10 +77,10 @@
       "accessNote": "Designed, not yet deployed. Availability depends on what your AI assistant can load.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/real-estate-agent-toolkit",
-        "packageVersion": "0.1.2",
+        "packageVersion": "0.2.1",
         "marketplace": "expert-partners",
         "presentedAs": "collection",
-        "skillCount": "40"
+        "skillCount": "43"
       },
       "keywords": [
         "agent",
@@ -84,6 +88,7 @@
         "app",
         "client",
         "content",
+        "decision",
         "estate",
         "follow",
         "form",
@@ -97,6 +102,7 @@
         "platform",
         "portable",
         "positioning",
+        "practice",
         "profile",
         "proof",
         "real",
@@ -104,6 +110,8 @@
         "sharing",
         "short",
         "social",
+        "support",
+        "three",
         "toolkit",
         "video",
         "youtube"
@@ -898,6 +906,72 @@
       "example": false
     },
     {
+      "id": "agent-attraction-roleplay",
+      "humanName": "Agent Attraction Roleplay",
+      "kind": "skill",
+      "summary": "Practice a real estate agent-attraction or brokerage recruiting conversation with a simulated prospect, realistic objections and feedback on the user's replies.",
+      "status": "Designed",
+      "maintainer": "ExpertPartners",
+      "collectionIds": [
+        "real-estate-agent-toolkit"
+      ],
+      "categories": [
+        "The marketing engines",
+        "Practice and decision support"
+      ],
+      "portable": true,
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Part of the Real Estate Agent Toolkit collection.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose.",
+        "Works with any AI assistant that can load skills or read a text file."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: designed.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "real-estate-agent-toolkit"
+      ],
+      "accessNote": "Designed, not yet deployed. Availability depends on what your AI assistant can load.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/real-estate-agent-toolkit/skills/agent-attraction-roleplay/SKILL.md",
+        "lifecycle": "designed",
+        "tier": "plugin",
+        "zone": "content",
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
+      },
+      "keywords": [
+        "agent",
+        "attraction",
+        "brokerage",
+        "conversation",
+        "decision",
+        "engines",
+        "estate",
+        "feedback",
+        "marketing",
+        "objections",
+        "owned",
+        "practice",
+        "prospect",
+        "real",
+        "realistic",
+        "recruiting",
+        "replies",
+        "roleplay",
+        "simulated",
+        "support",
+        "toolkit",
+        "user"
+      ],
+      "bestFor": [
+        "HQ-owned recruiting conversation practice"
+      ],
+      "useCases": [],
+      "askExamples": [],
+      "example": false
+    },
+    {
       "id": "agent-bio-writer",
       "humanName": "Agent Bio Writer",
       "kind": "skill",
@@ -930,7 +1004,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -1004,7 +1078,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "brain",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -1384,7 +1458,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "brands",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "about",
@@ -1918,7 +1992,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "activities",
@@ -2199,7 +2273,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -2397,7 +2471,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -2467,7 +2541,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -2541,7 +2615,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "active",
@@ -2617,7 +2691,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -2745,7 +2819,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "brain",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -3004,7 +3078,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -3193,7 +3267,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -3224,6 +3298,73 @@
       "useCases": [
         "Use when the agent says plan my day, here's my to-do list, plan my week, or I'm overwhelmed, sort this out."
       ],
+      "askExamples": [],
+      "example": false
+    },
+    {
+      "id": "decision-clarity-coach",
+      "humanName": "Decision Clarity Coach",
+      "kind": "skill",
+      "summary": "Help clarify a business issue, compare options and choose a concrete next action.",
+      "status": "Designed",
+      "maintainer": "ExpertPartners",
+      "collectionIds": [
+        "real-estate-agent-toolkit"
+      ],
+      "categories": [
+        "The marketing engines",
+        "Practice and decision support"
+      ],
+      "portable": true,
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Part of the Real Estate Agent Toolkit collection.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose.",
+        "Works with any AI assistant that can load skills or read a text file."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: designed.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "real-estate-agent-toolkit"
+      ],
+      "accessNote": "Designed, not yet deployed. Availability depends on what your AI assistant can load.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/real-estate-agent-toolkit/skills/decision-clarity-coach/SKILL.md",
+        "lifecycle": "designed",
+        "tier": "plugin",
+        "zone": "content",
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
+      },
+      "keywords": [
+        "action",
+        "agent",
+        "business",
+        "choose",
+        "clarify",
+        "clarity",
+        "coach",
+        "coaching",
+        "compare",
+        "concrete",
+        "decision",
+        "engines",
+        "estate",
+        "help",
+        "issue",
+        "marketing",
+        "next",
+        "options",
+        "owned",
+        "practice",
+        "real",
+        "support",
+        "toolkit"
+      ],
+      "bestFor": [
+        "HQ-owned issue and decision coaching"
+      ],
+      "useCases": [],
       "askExamples": [],
       "example": false
     },
@@ -4352,7 +4493,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -4669,7 +4810,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "addressed",
@@ -4739,7 +4880,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -5064,7 +5205,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -5196,7 +5337,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -5555,7 +5696,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -5626,7 +5767,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -5701,7 +5842,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -5774,7 +5915,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "ads",
@@ -5818,6 +5959,77 @@
       "example": false
     },
     {
+      "id": "listing-buyer-profile-marketing",
+      "humanName": "Listing Buyer Profile Marketing",
+      "kind": "skill",
+      "summary": "Turn verified property facts into buyer-needs hypotheses and listing marketing drafts such as descriptions, emails and Reels.",
+      "status": "Designed",
+      "maintainer": "ExpertPartners",
+      "collectionIds": [
+        "real-estate-agent-toolkit"
+      ],
+      "categories": [
+        "The marketing engines",
+        "Listing and client lifecycle"
+      ],
+      "portable": true,
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Part of the Real Estate Agent Toolkit collection.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose.",
+        "Works with any AI assistant that can load skills or read a text file."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: designed.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "real-estate-agent-toolkit"
+      ],
+      "accessNote": "Designed, not yet deployed. Availability depends on what your AI assistant can load.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/real-estate-agent-toolkit/skills/listing-buyer-profile-marketing/SKILL.md",
+        "lifecycle": "designed",
+        "tier": "plugin",
+        "zone": "content",
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
+      },
+      "keywords": [
+        "agent",
+        "analysis",
+        "buyer",
+        "client",
+        "copy",
+        "descriptions",
+        "drafts",
+        "emails",
+        "engines",
+        "estate",
+        "facts",
+        "hypotheses",
+        "lifecycle",
+        "listing",
+        "marketing",
+        "needs",
+        "owned",
+        "profile",
+        "property",
+        "real",
+        "reels",
+        "such",
+        "toolkit",
+        "turn",
+        "verified"
+      ],
+      "bestFor": [
+        "HQ-owned buyer-needs analysis and listing copy"
+      ],
+      "useCases": [
+        "Use when an agent asks who a listing may suit or wants copy for those needs."
+      ],
+      "askExamples": [],
+      "example": false
+    },
+    {
       "id": "listing-marketing-skill",
       "humanName": "Listing Marketing Skill",
       "kind": "skill",
@@ -5850,7 +6062,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -5917,7 +6129,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -6131,7 +6343,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "brain",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -6203,7 +6415,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -6474,7 +6686,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -6666,7 +6878,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "actually",
@@ -6734,7 +6946,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -6808,7 +7020,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "across",
@@ -6883,7 +7095,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "actually",
@@ -6959,7 +7171,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -7361,7 +7573,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -7618,7 +7830,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -7699,7 +7911,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -8013,7 +8225,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -9001,7 +9213,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "actually",
@@ -9294,7 +9506,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -9720,7 +9932,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -9786,7 +9998,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "agent",
@@ -9857,7 +10069,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "real-estate-agent-toolkit collection v0.1.2 (expert-partners marketplace)"
+        "packaging": "real-estate-agent-toolkit collection v0.2.1 (expert-partners marketplace)"
       },
       "keywords": [
         "actually",
