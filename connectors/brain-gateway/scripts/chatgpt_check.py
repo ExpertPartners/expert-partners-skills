@@ -192,7 +192,6 @@ class Monitor:
                 + json.dumps(prompt)
                 + ");await page.locator('button[aria-label=\"Send\"]:visible').evaluate(x=>x.click());return {sent:true}}",
             )
-            completed_at = None
             while time.monotonic() - started < 480:
                 time.sleep(10)
                 browser = mcp.code(
@@ -203,11 +202,8 @@ class Monitor:
                 receipt = self.api(f"/{client}/runs/{run['id']}")
                 if all(receipt["checks"].values()):
                     break
-                if not browser["running"]:
-                    completed_at = completed_at or time.monotonic()
-                    # Missing observations may still be replicating. Never turn a model PASS into one.
-                    if time.monotonic() - completed_at > 100:
-                        break
+                # Browser completion is not a receipt deadline. Different regions can still
+                # be propagating observations after the ChatGPT response has finished.
         except Exception as exc:
             error = str(exc) if isinstance(exc, RuntimeError) else type(exc).__name__
         finally:
@@ -223,11 +219,16 @@ class Monitor:
                 finally:
                     mcp.close()
         outcome = {
-            "runnerError": "cleanup_failed" if not closed else "browser_error" if error else "none"
+            "runnerError": "cleanup_failed" if not closed else "browser_error" if error else "none",
+            "allowIncomplete": bool(error) or time.monotonic() - started >= 480,
         }
         if proof:
             outcome["conversationId"] = proof
         result = self.api(f"/{client}/runs/{run['id']}/finish", outcome)
+        while result.get("pending"):
+            time.sleep(10)
+            outcome["allowIncomplete"] = time.monotonic() - started >= 550
+            result = self.api(f"/{client}/runs/{run['id']}/finish", outcome)
         return {"client": client, "browserClosed": closed, "runnerError": error, **result}
 
 

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { CHECKS, MAX_AGE_MS, clientState, evaluateClients, notifyClient, observeClientTool, runReceipt, startRun, type Receipt } from "../src/client-health.ts";
+import { CHECKS, MAX_AGE_MS, clientHealthApi, clientState, evaluateClients, notifyClient, observeClientTool, runReceipt, startRun, type Receipt } from "../src/client-health.ts";
 import { CURRENT_DECISION_LOG } from "../src/brain.ts";
 
 function kv() {
@@ -81,4 +81,16 @@ test("independent evaluator finds a missing run even when no runner calls finish
 	const receipt = { checkedAt: now.toISOString(), ok: true } as Receipt;
 	assert.equal(clientState(receipt, now.toISOString(), now), "healthy");
 	assert.equal(clientState(receipt, now.toISOString(), later), "missed");
+});
+
+test("a finalizer waits for regional observations unless the runner explicitly gives up", async () => {
+	const k = kv(); const run = await startRun(k, "don");
+	const url = `https://gateway.invalid/api/health/clients/don/runs/${run.id}/finish`;
+	let response = await clientHealthApi(new Request(url, { method: "POST", body: "{}" }), k, {});
+	assert.equal(response.status, 202);
+	assert.equal(k.values.has("health:chatgpt:don:last"), false);
+	assert.equal(k.values.has("health:chatgpt:don:active"), true);
+	response = await clientHealthApi(new Request(url, { method: "POST", body: JSON.stringify({ allowIncomplete: true, runnerError: "browser_error" }) }), k, {});
+	assert.equal(response.status, 200);
+	assert.equal(JSON.parse(k.values.get("health:chatgpt:don:last")!).ok, false);
 });
