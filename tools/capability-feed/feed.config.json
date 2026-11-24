@@ -4,7 +4,7 @@
     "real-estate-agent-toolkit": {
       "presentAs": "collection",
       "portable": true,
-      "evidence": "plugins/real-estate-agent-toolkit/README.md, opening paragraph: forty portable AI skills that work with any AI assistant that can load skills or read a text file. HQ product model: one collection of portable skills."
+      "evidence": "plugins/real-estate-agent-toolkit/README.md, opening paragraph: forty-three portable AI skills that work with any AI assistant that can load skills or read a text file. HQ product model: one collection of portable skills."
     },
     "acn-advisor": {
       "presentAs": "excluded",

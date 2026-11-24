@@ -347,7 +347,12 @@ describe('live repository', () => {
     const recs = byId(env);
     const toolkit = recs.get('real-estate-agent-toolkit');
     assert.equal(toolkit.kind, 'collection');
-    assert.equal(toolkit.containsSkillIds.length, 40, 'the Real Estate Agent Toolkit stays one collection of 40 skills');
+    const skillRoot = path.join(LIVE_REPO, 'plugins/real-estate-agent-toolkit/skills');
+    const canonicalIds = fs.readdirSync(skillRoot, { withFileTypes: true })
+      .filter(entry => entry.isDirectory() && fs.existsSync(path.join(skillRoot, entry.name, 'SKILL.md')))
+      .map(entry => entry.name).sort();
+    assert.deepEqual([...toolkit.containsSkillIds].sort(), canonicalIds,
+      'the Real Estate Agent Toolkit includes every canonical skill exactly once');
     assert.equal(toolkit.portable, true);
     for (const id of toolkit.containsSkillIds) {
       assert.deepEqual(recs.get(id).collectionIds, ['real-estate-agent-toolkit'], id);

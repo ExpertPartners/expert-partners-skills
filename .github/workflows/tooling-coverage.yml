@@ -70,6 +70,8 @@ jobs:
           for producer in tools/capability-feed tools/skill-map; do
             (cd "$producer" && npm ci --ignore-scripts --no-audit --no-fund)
           done
+      - name: Regenerate canonical skill graph for live feed tests
+        run: node tools/skill-map/extract-skills-graph.mjs --eps . --out tools/skill-map/skills-graph.json
       - name: auto-merge-gate coverage floor (Python)
         run: |
           python -m coverage run --data-file=.coverage.auto-merge-gate --source=tools/auto-merge-gate -m unittest discover -s tools/auto-merge-gate/tests -p 'test_*.py'

@@ -105,6 +105,10 @@ jobs:
           bash tools/skill-deploy/test/test-deploy-skill.sh
           python3 -m unittest discover -s tools/skills-graph-ci/tests -p 'test_*.py' -v
 
+      - name: Extract and validate (fails on any dangling reference)
+        working-directory: eps/tools/skill-map
+        run: node extract-skills-graph.mjs --eps "$GITHUB_WORKSPACE/eps" --out "$GITHUB_WORKSPACE/eps/tools/skill-map/skills-graph.json"
+
       # The feed producer's own proofs (determinism, refusal on invalid sources, no
       # leaks, relationships and collection membership resolve, nothing promoted to
       # Active without verification, drift detection, source-change behavior).
@@ -114,10 +118,6 @@ jobs:
           set -euo pipefail
           npm ci
           npm test
-
-      - name: Extract and validate (fails on any dangling reference)
-        working-directory: eps/tools/skill-map
-        run: node extract-skills-graph.mjs --eps "$GITHUB_WORKSPACE/eps" --out "$GITHUB_WORKSPACE/eps/tools/skill-map/skills-graph.json"
 
       # Built from the graph the step above just regenerated. On main the feed file is
       # rewritten (only when its records change) and committed with the graph below.
