@@ -45,7 +45,7 @@ Confirm the current brand relationship, status and exclusions in those live sour
 
 ## Commercial scope stays live
 
-For Expert Partners or EPIC work, resolve current company priorities, commercial eligibility and membership inclusions from the newest applicable HQ decisions and owning canon. A brand route or member label is not a blanket selling ban. Keep the requested job separate from the department's wider responsibilities and do not introduce another program merely because the skill can cover it.
+For Expert Partners or EPIC work, resolve current company priorities, commercial eligibility and membership inclusions from the newest applicable HQ decisions and owning canon. A brand route or member label is not a blanket selling ban. Keep the requested job separate from the department's wider responsibilities and do not introduce another program merely because the skill can cover it. Freedom Funnel and high-ticket funnel work keeps the join EPIC option, where the offer is to join EPIC or buy the product being sold.
 
 ## Keeping the boundary
 

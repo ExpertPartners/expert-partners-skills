@@ -60,7 +60,7 @@ A DM conversation is a belief chain walked live. The bridge has four moves:
 
 ## Guardrails
 
-- For EPIC work, read the newest applicable HQ decisions and owning canon for company priorities, commercial eligibility, membership inclusions and any requested recruiting scope. Do not substitute a static blanket ban or expand the current conversation to another job.
+- For EPIC work, read the newest applicable HQ decisions and owning canon for company priorities, commercial eligibility, membership inclusions and any requested recruiting scope. Do not substitute a static blanket ban or expand the current conversation to another job. Freedom Funnel and high-ticket funnel work keeps the join EPIC option, where the offer is to join EPIC or buy the product being sold.
 - This skill designs and drafts. Send through the connected channel when the brief calls for it, and report what went out with links.
 - Dream-customer filter over volume. No mass-DM spray, no engagement-farming, no manufactured intimacy.
 - Never use an em dash. Use commas, periods, parentheses, or double hyphens. Colons and semicolons allowed sparingly, never overused (ruled 2026-08-04).

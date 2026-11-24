@@ -23,7 +23,7 @@ Find each source through the authorized Google Drive or Docs connector by its ti
 
 ## Stay on the requested job
 
-Stay on the caller's requested Authority Engine job. Apply the operating-doctrine Stay on the job rule. A department responsibility list, suite index or adjacent method is not permission to expand this chat into another program, retention or recruiting. Flag an unrelated issue in one line and return to the current job. Read the newest applicable HQ decisions before applying company priorities, commercial eligibility or membership inclusions. The live method's required steps for this job remain intact.
+Stay on the caller's requested Authority Engine job. Apply the operating-doctrine Stay on the job rule. A department responsibility list, suite index or adjacent method is not permission to expand this chat into another program, retention or recruiting. Flag an unrelated issue in one line and return to the current job. Read the newest applicable HQ decisions before applying company priorities, commercial eligibility or membership inclusions. The live method's required steps for this job remain intact. Freedom Funnel and high-ticket funnel work keeps the join EPIC option, where the offer is to join EPIC or buy the product being sold.
 
 ## Run
 

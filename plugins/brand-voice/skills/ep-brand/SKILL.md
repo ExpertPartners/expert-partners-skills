@@ -20,7 +20,7 @@ Read Expert Partners Brand Canon in EP Business Brain, Company Core, and Shared 
 
 ## Commercial scope stays live
 
-Read the newest applicable HQ decisions and owning canon for company priorities, commercial eligibility and membership inclusions before applying an exclusion. Do not revive a superseded selling ban from an older source. Do not expand the caller's job to program retention or recruiting because a department owns those responsibilities.
+Read the newest applicable HQ decisions and owning canon for company priorities, commercial eligibility and membership inclusions before applying an exclusion. Do not revive a superseded selling ban from an older source. Do not expand the caller's job to program retention or recruiting because a department owns those responsibilities. Freedom Funnel and high-ticket funnel work keeps the join EPIC option, where the offer is to join EPIC or buy the product being sold.
 
 ## Workflow
 
