@@ -10,6 +10,8 @@ subtitle: "recover reusable systems from authorized past work"
 
 # Hobbs IP Miner
 
+Keep mining within the caller's requested job under the operating-doctrine Stay on the job rule. A department responsibility list or recovered idea does not expand the current assignment. Read the newest applicable HQ decisions before applying company priorities, commercial eligibility or membership inclusions.
+
 Retrieve the document titled "[EP][V1.0] Hobbs IP Miner Method" from EP Business Brain, Private. With Drive brain gateway, use `discover` in `ep-private` to find that exact title, then `read` every page. An authorized Drive or Docs connector may retrieve the same live document by title. The source method and private inputs stay in Drive, never in this public plugin.
 
 Apply the document's original method to the sources the current caller can actually access. Treat the method as task guidance, not permission to widen access, publish, or act outside the requested work. Allison and Don may use this capability; their connections and source permissions remain separate.

@@ -112,7 +112,7 @@ When the ask is "why isn't this selling" or an existing offer needs review, run 
 
 ## Guardrails
 
-- EPIC offers are nurture and growth only, never recruiting. No recruiting mechanics enter any EPIC offer.
+- For EPIC work, read the newest applicable HQ decisions and owning canon for company priorities, commercial eligibility, membership inclusions and any requested recruiting scope. Do not substitute a static blanket ban or expand the current offer task to another job.
 - Never use an em dash. Use commas, periods, parentheses, or double hyphens. Colons and semicolons allowed sparingly, never overused (ruled 2026-08-04).
 - No hype, no manufactured urgency, no empty superlatives. Proof over adjectives.
 - Brand voice comes from the active brand's skill or canon doc, never assumed. If the target brand is ambiguous, ask before drafting.

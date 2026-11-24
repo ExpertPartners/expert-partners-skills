@@ -22,4 +22,4 @@ Roster and governance: the Titans family scoping plan (2026-08-04), governed by 
 - xavier-offer-builder (shipped, gate one). Offer construction and audit, six elements on a false-belief chain.
 - dm-to-dollars (shipped, gate two). Profile audits, daily lead-flow math, conversation-to-offer bridging.
 - Content Machine (verdict deferred). Extend-candidate for rare-content-engine; decided at its own turn.
-- Secret MLM Hacks, library-only by decision. Anything it lends must pass the no-recruiting rule first. EPIC is nurture and growth only, never recruiting.
+- Secret MLM Hacks remains library-only. Before using any idea, read the newest applicable HQ decisions and owning canon for the requested job, company priorities, commercial eligibility, membership inclusions and recruiting scope. Do not use an older blanket ban as current authority or let a library reference expand the caller's job.
