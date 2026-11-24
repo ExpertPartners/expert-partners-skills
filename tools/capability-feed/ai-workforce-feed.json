@@ -1,8 +1,8 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-11-24T14:39:32Z",
-  "verifiedAt": "2026-11-24T14:39:32Z",
+  "generatedAt": "2026-11-24T14:45:22Z",
+  "verifiedAt": "2026-11-24T14:45:22Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
@@ -356,11 +356,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the fractional-cfo plugin, version 0.1.1, in the expert-partners plugin marketplace.",
+        "Packaged as the fractional-cfo plugin, version 0.1.2, in the expert-partners plugin marketplace.",
         "Contains 5 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.1.1.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.1.2.",
       "containsSkillIds": [
         "canonical-categories",
         "entity-separation",
@@ -372,7 +372,7 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/fractional-cfo",
-        "packageVersion": "0.1.1",
+        "packageVersion": "0.1.2",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
         "skillCount": "5"
@@ -423,11 +423,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the funnel-operations plugin, version 0.3.2, in the expert-partners plugin marketplace.",
+        "Packaged as the funnel-operations plugin, version 0.3.3, in the expert-partners plugin marketplace.",
         "Contains 6 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 0.3.2.",
+      "lastVerified": "Not yet verified on any platform. Package version 0.3.3.",
       "containsSkillIds": [
         "funnel-build",
         "funnel-documentation",
@@ -440,7 +440,7 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/funnel-operations",
-        "packageVersion": "0.3.2",
+        "packageVersion": "0.3.3",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
         "skillCount": "6"
@@ -2112,7 +2112,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Fractional Cfo plugin, version 0.1.1.",
+        "Packaged in the Fractional Cfo plugin, version 0.1.2.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2128,7 +2128,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "finance",
-        "packaging": "fractional-cfo plugin v0.1.1 (expert-partners marketplace)",
+        "packaging": "fractional-cfo plugin v0.1.2 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "entity-separation"
       },
@@ -3474,7 +3474,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Fractional Cfo plugin, version 0.1.1.",
+        "Packaged in the Fractional Cfo plugin, version 0.1.2.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3489,7 +3489,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "finance",
-        "packaging": "fractional-cfo plugin v0.1.1 (expert-partners marketplace)",
+        "packaging": "fractional-cfo plugin v0.1.2 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -4062,7 +4062,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Funnel Operations plugin, version 0.3.2.",
+        "Packaged in the Funnel Operations plugin, version 0.3.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4078,7 +4078,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "funnel-operations plugin v0.3.2 (expert-partners marketplace)",
+        "packaging": "funnel-operations plugin v0.3.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "funnel-documentation"
       },
@@ -4136,7 +4136,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Funnel Operations plugin, version 0.3.2.",
+        "Packaged in the Funnel Operations plugin, version 0.3.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4151,7 +4151,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "funnel-operations plugin v0.3.2 (expert-partners marketplace)",
+        "packaging": "funnel-operations plugin v0.3.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -4196,7 +4196,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Funnel Operations plugin, version 0.3.2.",
+        "Packaged in the Funnel Operations plugin, version 0.3.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4212,7 +4212,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "funnel-operations plugin v0.3.2 (expert-partners marketplace)",
+        "packaging": "funnel-operations plugin v0.3.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "funnel-documentation"
       },
@@ -4396,7 +4396,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Funnel Operations plugin, version 0.3.2.",
+        "Packaged in the Funnel Operations plugin, version 0.3.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4411,7 +4411,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "funnel-operations plugin v0.3.2 (expert-partners marketplace)",
+        "packaging": "funnel-operations plugin v0.3.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -4456,7 +4456,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Funnel Operations plugin, version 0.3.2.",
+        "Packaged in the Funnel Operations plugin, version 0.3.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4472,7 +4472,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "funnel-operations plugin v0.3.2 (expert-partners marketplace)",
+        "packaging": "funnel-operations plugin v0.3.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "ghl-asset-inventory"
       },
@@ -4519,7 +4519,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Funnel Operations plugin, version 0.3.2.",
+        "Packaged in the Funnel Operations plugin, version 0.3.3.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4534,7 +4534,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "funnel-operations plugin v0.3.2 (expert-partners marketplace)",
+        "packaging": "funnel-operations plugin v0.3.3 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6399,7 +6399,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Fractional Cfo plugin, version 0.1.1.",
+        "Packaged in the Fractional Cfo plugin, version 0.1.2.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6416,7 +6416,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "finance",
-        "packaging": "fractional-cfo plugin v0.1.1 (expert-partners marketplace)",
+        "packaging": "fractional-cfo plugin v0.1.2 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "canonical-categories, entity-separation"
       },
@@ -7946,7 +7946,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Fractional Cfo plugin, version 0.1.1.",
+        "Packaged in the Fractional Cfo plugin, version 0.1.2.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7963,7 +7963,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "finance",
-        "packaging": "fractional-cfo plugin v0.1.1 (expert-partners marketplace)",
+        "packaging": "fractional-cfo plugin v0.1.2 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "canonical-categories, entity-separation"
       },
@@ -9334,7 +9334,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Fractional Cfo plugin, version 0.1.1.",
+        "Packaged in the Fractional Cfo plugin, version 0.1.2.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -9351,7 +9351,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "finance",
-        "packaging": "fractional-cfo plugin v0.1.1 (expert-partners marketplace)",
+        "packaging": "fractional-cfo plugin v0.1.2 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "canonical-categories, entity-separation"
       },
