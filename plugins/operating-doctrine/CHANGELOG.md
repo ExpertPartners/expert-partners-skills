@@ -1,3 +1,6 @@
+## 3.9.1 - 2026-11-24
+
+Document formatting standard v4.3 follows the newest November 23 correction to 1.5 line spacing and the paragraph, heading and list spacing decisions. Corrects the superseded 1.15 tool example, preserves wording and file placement during restyling, and keeps deliberate card layouts intact.
 ## 3.9.0 - 2026-11-24
 
 Document formatting standard v4.2 follows Decision Log 2026-11-23. Line spacing is 1.15, and the standard now covers every existing Google Doc in the HQ, EP and AG brains, with a restyle-on-touch rule for off-standard documents.
