@@ -1,6 +1,6 @@
 ---
 name: "document-formatting-standard"
-description: "Allison's formatting and delivery standard (v4.2) for every document an AI makes. The live HQ Rulebook's Document formatting section owns every number: Google Docs, Poppins throughout for every brand and room, AG Luxury included, the Rulebook's current line spacing, no blank lines between paragraphs, short paragraphs, and no bold, italics, em dashes, or dividers. Files take Cal's naming and go to their brain home, delivered as a link named for the document. Covers every Google Doc in the HQ, EP and AG brains, existing ones included. Read the Rulebook live, then apply it with the tool notes here. Use whenever creating, restyling, or delivering a document."
+description: "Allison's formatting and delivery standard (v4.3) for every document an AI makes. The live HQ Rulebook's Document formatting section owns every number: Google Docs, Poppins throughout for every brand and room, AG Luxury included, the Rulebook's current line spacing, no blank lines between paragraphs, short paragraphs, and no bold, italics, em dashes, or dividers. Files take Cal's naming and go to their brain home, delivered as a link named for the document. Covers every Google Doc in the HQ, EP and AG brains, existing ones included. Read the Rulebook live, then apply it with the tool notes here. Use whenever creating, restyling, or delivering a document."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -12,7 +12,7 @@ brand-scope: null
 subtitle: "the Rulebook sets the look, this skill applies it"
 ---
 
-# Document Formatting Standard (v4.2, 2026-11-23)
+# Document Formatting Standard (v4.3, 2026-11-23)
 
 <!-- RULED-BY: intake/2026-10-22-disclosure-rulebook-sync-formatting-tabs-session-wrap.md date:2026-10-22 -->
 
@@ -20,13 +20,13 @@ This version supersedes the hard-coded values, plain-title filenames, Aura Docs 
 
 v4.1 follows Decision Log 2026-10-24, Every document made in work with Allison uses Poppins. AG Luxury documents no longer take Italiana and Manrope. Assigned by [HQ 🧠] - Chief HR Officer.
 
-v4.2 follows Decision Log 2026-11-23, Company documents use 1.15 line spacing, every brain, existing documents included. The standard is no longer new documents only. Assigned by [HQ 🧠] - Chief HR Officer.
+v4.2 extended the standard to existing documents. v4.3 follows the newer November 23 correction, Company documents stay at 1.5 line spacing, every brain, existing documents included, and the same-day paragraph, heading and bullet spacing decisions. The earlier 1.15 entry is superseded. Assigned by [HQ 🧠] - Chief HR Officer.
 
 ## The source is the Rulebook
 
 The Document formatting section of the HQ Rulebook sets every number for company documents. That covers fonts, sizes, colors, line spacing, and paragraph spacing. The Decision Log records each change.
 
-Read that section live before you make or restyle a document. Do not rely on a remembered value. Line spacing alone moved from 1.5 to 1.15 and back to 1.5 during October 2026, then to 1.15 on November 23, 2026.
+Read that section live before you make or restyle a document. Do not rely on a remembered value. Line spacing alone moved from 1.5 to 1.15 and back to 1.5 during October 2026. November 23's 1.15 entry was corrected to 1.5 the same day. The newest Decision Log entry wins.
 
 If this skill and the Rulebook ever differ, the Rulebook wins. Fix this skill to match and say so in your report.
 
@@ -48,6 +48,8 @@ The standard covers every Google Doc already in the HQ, Expert Partners and AG B
 
 Restyling means Poppins throughout, the Rulebook's line spacing, real named heading styles in place of enlarged or bold paragraphs, removal of empty paragraphs used as spacers, removal of bold and italics in body text, and the brand's color rules.
 
+Preserve wording, hyperlinks, file names and file locations. Deliberate special layouts, such as 4x6 speaker cards, keep their layout and Poppins rather than being flattened into a working-document layout.
+
 ## Names, home, sharing, and delivery
 
 - Name the file the way the Rulebook's naming rule says, which follows Cal's convention.
@@ -62,9 +64,9 @@ Claude Code paste blocks, commands, snippets, and quick factual answers stay in 
 These notes translate the Rulebook's values. They never replace them.
 
 - Create the Doc through the service account impersonating allison@expertpartners.com where that path is reachable, otherwise through a write-capable Drive or Docs connector, so ownership is native.
-- In the Google Docs API, insert the text, then apply updateTextStyle with weightedFontFamily and the Rulebook's sizes, and updateParagraphStyle with lineSpacing set to the Rulebook value times 100 (1.15 becomes 115).
+- In the Google Docs API, insert the text, then apply updateTextStyle with weightedFontFamily and the Rulebook's sizes, and updateParagraphStyle with lineSpacing set to the Rulebook value times 100 (1.5 becomes 150).
 - Use the native named styles (TITLE, HEADING_1, HEADING_2, NORMAL_TEXT) so the outline works. A visually enlarged paragraph is not a heading.
-- Never insert empty paragraphs to make space. Use spaceBelow on body paragraphs instead.
+- Never insert empty paragraphs to make space. Apply the live Rulebook's paragraph rhythm through spaceAbove and spaceBelow. The November 23 rules set body spaceBelow to 12 PT, headings spaceAbove to 18 PT and spaceBelow to 6 PT, list-item spaceBelow to 6 PT, and the final item in each list to 12 PT.
 - In docx-js, line spacing is the Rulebook value times 240 and font sizes are in half points.
 - Apply the font, line spacing and heading styles as you build, with no empty paragraphs between paragraphs.
 
