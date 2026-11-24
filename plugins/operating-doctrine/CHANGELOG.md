@@ -1,3 +1,6 @@
+## 3.10.0 - 2026-11-24
+
+Adds find-it-first, the company policy that if AI can find it we never ask the client (Decision Log 2026-11-23, extended to AG Luxury 2026-11-24). Every client-facing AI searches first, presents what it found as a reveal to confirm, and asks only for what no source holds.
 ## 3.9.2 - 2026-11-24
 
 Keep each chat on its requested job rather than a department responsibility list. Resolve commercial eligibility and membership inclusions from current Drive authority instead of reviving older blanket exclusions. Preserve brand voice and the live Authority Engine methods.
