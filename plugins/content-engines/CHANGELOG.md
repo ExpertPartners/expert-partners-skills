@@ -1,3 +1,6 @@
+## 0.13.0 - 2026-11-24
+
+Add a portable Launch Formula Coach that retrieves the preserved original method, and a separate connected launch workflow that coordinates the three source methods with explicit attribution and honest source coverage. Business teaching and source material remain in the owning Drive Brain.
 ## 0.12.2 - 2026-11-24
 
 Keep the join EPIC option in Freedom Funnel and high-ticket funnel work when applying the stay-on-the-job and live commercial scope rules.
