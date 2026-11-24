@@ -1,6 +1,8 @@
 // Drive brain gateway: one read-only Worker serving Claude, ChatGPT and Factory (remote MCP at /mcp,
 // OAuth through Cloudflare Access, Allison only) and the Expert Partners Hub (bearer HTTP at /api).
 import { maybeAlert, type AlertEnv } from "./alert.ts";
+import { clientHealthApi, evaluateClients, observeClientTool } from "./client-health.ts";
+import { z } from "zod";
 import { env } from "cloudflare:workers";
 import OAuthProvider from "@cloudflare/workers-oauth-provider";
 import { McpServer } from "@modelcontextprotocol/server";
@@ -25,11 +27,13 @@ function createServer() {
 			t.name,
 			{
 				description: t.description,
-				inputSchema: t.schema,
+				inputSchema: t.schema.extend({ health_run_id: z.uuid().optional().describe("Only for an authorized ChatGPT health check: the temporary run id supplied by the existing monitor. Omit in normal business work.") }),
 				annotations: { readOnlyHint: true, openWorldHint: true },
 			},
 			async (args: unknown) => {
 				const r = await runTool(t.name, args, env, undefined, { kind: "person", email: props.email });
+				try { await observeClientTool(env.OAUTH_KV, props.email, t.name, args, r); }
+				catch { console.error("[brain-gateway] client health observation failed"); }
 				const payload = r.ok ? r.result : { error: r.error, status: r.status, detail: (r as any).detail };
 				return { content: [{ type: "text" as const, text: JSON.stringify(payload, null, 2) }], isError: !r.ok };
 			},
@@ -71,6 +75,10 @@ async function handleHubApi(request: Request, bindings: Env) {
 		if (id) principal = { kind: "department", id };
 	}
 	if (!principal) return json({ error: "unauthorized" }, 401);
+	if (url.pathname.startsWith("/api/health/clients")) {
+		if (principal.kind !== "person" || principal.department) return json({ error: "forbidden" }, 403);
+		return clientHealthApi(request, bindings.OAUTH_KV, bindings as unknown as AlertEnv);
+	}
 	// Health: leaders only. GET shows the last stored daily result and the last failure; ?run=1 runs it now.
 	if (request.method === "GET" && url.pathname === "/api/health/deep") {
 		if (principal.kind !== "person" || principal.department) return json({ error: "forbidden" }, 403);
@@ -120,9 +128,13 @@ const provider = new OAuthProvider<Env>({
 export default {
 	fetch: (request: Request, bindings: Env, ctx: ExecutionContext) => provider.fetch(request, bindings, ctx),
 	// Daily live check of the Business Brain connection (cron in wrangler.jsonc).
-	async scheduled(_event: ScheduledController, bindings: Env, ctx: ExecutionContext) {
+	async scheduled(event: ScheduledController, bindings: Env, ctx: ExecutionContext) {
 		ctx.waitUntil(
 			(async () => {
+				if (event.cron === "15 * * * *") {
+					console.log("[brain-gateway] ChatGPT client checks:", JSON.stringify(await evaluateClients(bindings.OAUTH_KV, bindings as unknown as AlertEnv)));
+					return;
+				}
 				const result = await runDeepCheck(bindings.ALLOWED_SCOPES, driveFetch(bindings.GOOGLE_SA_KEY));
 				await storeResult(bindings.OAUTH_KV, result);
 				if (!result.ok) console.error("[brain-gateway] daily check failed:", JSON.stringify(result.checks.filter((c) => !c.ok)));
