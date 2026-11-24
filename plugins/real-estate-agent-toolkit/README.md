@@ -1,6 +1,6 @@
 # Real Estate Agent Toolkit
 
-Forty portable AI skills for real estate agents. They work with any AI assistant that can
+Forty-three portable AI skills for real estate agents. They work with any AI assistant that can
 load skills or read a text file. Every skill shares one profile file, `agent-profile.md`,
 written by the Agent Brain Builder. The contract is in
 [agent-profile-contract.md](skills/agent-brain-builder/references/agent-profile-contract.md).
@@ -24,6 +24,10 @@ Setup and positioning
 - business-plan-builder, daily-planner
 - market-research-skill, competitor-analysis-skill
 
+Practice and decision support
+- agent-attraction-roleplay: simulate a recruiting conversation and debrief the actual replies
+- decision-clarity-coach: clarify a business issue, compare options and choose a concrete next action
+
 Social and short-form content
 - content-multiplier, hook-generator, reel-script-writer, carousel-writer
 - instagram-story-skill, this-week-in-city-writer
@@ -41,6 +45,7 @@ Lead generation, follow-up, and proof
 Listing and client lifecycle
 - listing-marketing-skill, open-house-kit-writer, pre-listing-package-writer
 - client-welcome-pack-writer, google-business-profile-skill, listing-ad-copy-skill
+- listing-buyer-profile-marketing: connect verified listing features to buyer needs and requested copy
 
 Named-app skills
 - notion-content-board-builder, gamma-presentation-builder, canva-assistant
