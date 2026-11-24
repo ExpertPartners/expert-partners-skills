@@ -1,3 +1,6 @@
+## 0.3.3 - 2026-11-24
+
+PayPal is the only payment processor per the HQ Decision Log, November 24, 2026. Retire live Stripe instructions from CFO reviews and funnel operations, preserve labeled legacy wind-down history, and exclude Helcim.
 ## 0.3.2 - 2026-11-10
 
 Second instruction sweep pass, November 9, 2026. Funnel skills send Code bridge blocks to Factory through the Factory connection, or to Claude Code or Codex when they fit, instead of dispatching a Chat to Code job. factory-operator drops a pointer to a workflow file that no longer exists, repo-standards names Claude Code and Codex beside Factory, and the retired pin and job-list-heartbeat skills get retired subtitles.

@@ -26,7 +26,7 @@
     {
       "name": "funnel-operations",
       "source": "./plugins/funnel-operations",
-      "version": "0.3.2",
+      "version": "0.3.3",
       "description": "Build, migrate, and document funnels for Expert Partners and EPIC, with Notion as the single source of truth, plus GoHighLevel inventory, automation design, and safe tag cleanup."
     },
     {
@@ -56,7 +56,7 @@
     {
       "name": "fractional-cfo",
       "source": "./plugins/fractional-cfo",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "description": "Read-only Fractional CFO reviews (weekly cash flow, runway and burn, monthly close) over canonical categories and entity separation, for Expert Partners LLC and Moxie Signature Group."
     },
     {
