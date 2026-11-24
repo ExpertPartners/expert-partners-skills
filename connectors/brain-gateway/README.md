@@ -15,8 +15,10 @@ One read-only Cloudflare Worker that gives authorized AI environments current, s
 Four read tools, no write tools.
 
 - `list_scopes` lists the scopes the gateway may read.
-- `discover` lists the current direct children of one scope, newest first, across every page, with an optional name filter.
-- `read` returns one document in pages after verifying the whole document. It fetches the full export, checks the file version before and after, and checks the file is still a direct child of the scope.
+- `discover` lists the current direct children of one scope, newest first, across every page, with an optional name filter. An optional `folder` lists inside a subfolder of the scope instead.
+- `read` returns one document in pages after verifying the whole document. It fetches the full export, checks the file version before and after, and checks the file is still a direct child of the scope, or of the given `folder`.
+
+Nested folders. `folder` takes a subfolder id from `discover`. The gateway walks its parents up to the scope's registered root, at most four levels, before listing and again after every read. Each step must be one real folder, untrashed, not withheld, with exactly one parent, in the root's shared drive. Anything else, including a shortcut or a folder moved out mid-read, is refused with `not_in_scope` or `left_scope`. `folder` never widens scope: the scope check runs first. Responses carry `folder: { id, depth }` only when `folder` was given, so callers that omit it see the same contract as before.
 - `decisions` reads the complete current Decision Log and returns every heading that shares the newest date.
 
 Reads fail closed. A partial export, a changed document, an incomplete listing or a document above two million characters returns an error and never a best guess. Nothing is cached.
@@ -25,6 +27,7 @@ Reads fail closed. A partial export, a changed document, an incomplete listing o
 
 - Scopes are the routing keys in `src/brain.ts`, copied from the Hub reader. The live Departments, Workspaces and Brain Folders map owns what each folder is.
 - Only scopes named in the `ALLOWED_SCOPES` var in `wrangler.jsonc` are reachable. The approved department homes include `hq-hr`, `hq-employees` and `hq-finance`, using their existing registry entries. EP Private is included for Allison and Don as leaders. Department profiles cannot reach it. Other private scopes remain excluded. The mapped Routine Audits folder and shared HQ Outputs folder are included. Routing Routine Audits does not settle its proposed organizational assignment.
+- Workspace and shelf homes that sit inside another department's folder have their own scopes, so the department that owns them reaches them directly: `hq-library-marketing` (EP and AG Growth), `ep-events` (Event Planning, under EP Growth), `ep-acn` (ACN Advisor, under EP CEO), `ag-strong-ones` (The Strong Ones, under AG Growth) and `ag-case-studies` (AG CEO). Don never reaches the AG ones.
 - `ep-client` is a compatibility alias for `ep-client-experience`. It resolves before the caller scope check, keeps the canonical key in responses and `list_scopes`, and grants no additional access.
 - Registration permits read-only gateway routing, not new Drive permissions or company-wide access. Existing sign-in, department instructions, leader and specific exception constraints still apply. Deployment must preserve the existing Worker identity, secrets and service account. Verify each added scope through live `list_scopes` and `discover`, checking its registered folder identity and current direct children.
 - Drive access is a dedicated service account with the `drive.readonly` scope only. It has no domain-wide delegation and no delegated user. It sees only the folders and shared drives it was added to as a Viewer. The client refuses any path outside the Drive v3 files API and any method other than GET.

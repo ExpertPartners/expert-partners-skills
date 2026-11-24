@@ -11,6 +11,7 @@ import {
 	DEFAULT_PAGE_CHARS,
 	parseWithheld,
 	type DriveFetch,
+	MAX_NESTED_DEPTH,
 	MAX_PAGE_CHARS,
 } from "./brain.ts";
 import { driveFetch } from "./google.ts";
@@ -36,6 +37,11 @@ function inScope(scopes: BrainScope[], scope: string): BrainScope {
 }
 
 const scope = z.string().describe('A brain scope key from list_scopes, for example "hq-core", "ep-core" or "ag-core".');
+const folder = z
+	.string()
+	.regex(/^[\w-]+$/)
+	.optional()
+	.describe(`Optional subfolder id from discover. It must sit inside the scope, at most ${MAX_NESTED_DEPTH} levels down. Omit it for the scope's own folder.`);
 
 export const TOOLS: ToolDef[] = [
 	{
@@ -47,21 +53,22 @@ export const TOOLS: ToolDef[] = [
 	{
 		name: "discover",
 		description:
-			"List the current direct children of one brain scope, newest first, across every page. Optional query filters by file name. Folders are listed but only documents can be read.",
-		schema: z.object({ scope, query: z.string().max(200).optional().describe("Filter by file name containing this text.") }),
-		run: async (a, r, scopes) => r.discover(inScope(scopes, a.scope), a.query),
+			"List the current direct children of one brain scope, newest first, across every page. Optional query filters by file name. Folders are listed but only documents can be read. Pass a listed subfolder id as folder to list inside it.",
+		schema: z.object({ scope, query: z.string().max(200).optional().describe("Filter by file name containing this text."), folder }),
+		run: async (a, r, scopes) => r.discover(inScope(scopes, a.scope), a.query, a.folder),
 	},
 	{
 		name: "read",
 		description:
-			"Read one document that is currently a direct child of the scope (get its id from discover). The whole document is fetched and verified (same version before and after, still in scope) and returned in pages: pass nextOffset back as offset until it is null.",
+			"Read one document that is currently a direct child of the scope, or of the subfolder given as folder (get its id from discover). The whole document is fetched and verified (same version before and after, still in scope) and returned in pages: pass nextOffset back as offset until it is null.",
 		schema: z.object({
 			scope,
 			id: z.string().regex(/^[\w-]+$/).describe("A file id returned by discover for this scope."),
 			offset: z.number().int().min(0).optional(),
 			max_chars: z.number().int().min(1).max(MAX_PAGE_CHARS).optional().describe(`Page size, default ${DEFAULT_PAGE_CHARS}.`),
+			folder,
 		}),
-		run: async (a, r, scopes) => r.read(inScope(scopes, a.scope), a.id, a.offset ?? 0, a.max_chars ?? DEFAULT_PAGE_CHARS),
+		run: async (a, r, scopes) => r.read(inScope(scopes, a.scope), a.id, a.offset ?? 0, a.max_chars ?? DEFAULT_PAGE_CHARS, a.folder),
 	},
 	{
 		name: "decisions",

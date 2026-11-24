@@ -31,6 +31,12 @@ export const BRAIN_FOLDERS = {
 	"ag-operations": "1NXOwo8Cq5Jb7MTsnzZ5XNRkbybi89RV1",
 	"ag-outputs": "14MfoyCMP2011nGdhf2VowNfpCk8Mh1Hh",
 	"ag-private": "1jvcBly_KLDJnyTKFADtPjVTSWxfGLL8A",
+	// Workspace and shelf homes that sit inside another department folder.
+	"hq-library-marketing": "1bjwhy6jGjUZBDHtbdXsKRM_q04GTy7PO",
+	"ep-events": "1AVq7ONpjLZxrtppVd5qEussIEPnjZuua",
+	"ep-acn": "1-OlQOuM1rVQkG8cyAGxTym_O7S4ySnoK",
+	"ag-strong-ones": "1QK-anvUQ7wYyperKEMs5SpsjIdyUPeZT",
+	"ag-case-studies": "1bBsS9eFbM3iNvwhpVLrkkNBsphn4VkxN",
 } as const;
 export type BrainScope = keyof typeof BRAIN_FOLDERS;
 export const CURRENT_DECISION_LOG = "1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc";
@@ -38,6 +44,9 @@ export const DECISION_LOG_SCOPE: BrainScope = "hq-core";
 export const MAX_CHARS = 2_000_000;
 export const DEFAULT_PAGE_CHARS = 60_000;
 export const MAX_PAGE_CHARS = 200_000;
+/** Subfolders below a scope root are reachable this many levels down, no further. */
+export const MAX_NESTED_DEPTH = 4;
+const FOLDER_MIME = "application/vnd.google-apps.folder";
 
 export const READABLE_MIME = ["application/vnd.google-apps.document", "text/plain", "text/markdown"];
 
@@ -167,13 +176,49 @@ export function parseWithheld(json: string | undefined): ReadonlySet<string> {
 }
 
 export function createBrainReads(drive: DriveFetch, now = () => new Date(), withheld: ReadonlySet<string> = new Set()) {
-	async function discover(scope: BrainScope, query?: string) {
+	type FolderMeta = { id?: string; mimeType?: string; parents?: string[]; trashed?: boolean; driveId?: string };
+	async function folderMeta(id: string): Promise<FolderMeta> {
+		const params = new URLSearchParams({ fields: "id,mimeType,parents,trashed,driveId", supportsAllDrives: "true" });
+		const res = await drive(`/drive/v3/files/${encodeURIComponent(id)}?${params}`);
+		if (res.status === 404) throw new BrainError("not_in_scope", "The folder is not inside this scope.");
+		if (!res.ok) throw new BrainError("drive_error", `Drive folder lookup answered ${res.status}.`);
+		return (await res.json()) as FolderMeta;
+	}
+
+	/**
+	 * Proves a subfolder sits under the scope root by walking its parents upward, at most MAX_NESTED_DEPTH
+	 * hops. Every hop must be one real folder (not a shortcut), untrashed, not withheld, with exactly one
+	 * parent, in the same shared drive as the root. Anything else is refused rather than guessed.
+	 */
+	async function nestedFolder(scope: BrainScope, folder: string) {
+		const root = BRAIN_FOLDERS[scope];
+		if (folder === root) return { id: root, depth: 0 };
+		if (withheld.has(folder)) throw new BrainError("not_in_scope", "The folder is not inside this scope.");
+		const rootMeta = await folderMeta(root);
+		let id = folder;
+		for (let depth = 1; depth <= MAX_NESTED_DEPTH; depth++) {
+			const meta = await folderMeta(id);
+			if (meta.id !== id || meta.mimeType !== FOLDER_MIME || meta.trashed !== false || withheld.has(id))
+				throw new BrainError("not_in_scope", "The folder is not inside this scope.");
+			if (!Array.isArray(meta.parents) || meta.parents.length !== 1 || meta.driveId !== rootMeta.driveId)
+				throw new BrainError("not_in_scope", "The folder is not inside this scope.");
+			const parent = meta.parents[0]!;
+			if (parent === root) return { id: folder, depth: depth };
+			if (withheld.has(parent)) throw new BrainError("not_in_scope", "The folder is not inside this scope.");
+			id = parent;
+		}
+		throw new BrainError("not_in_scope", `The folder is more than ${MAX_NESTED_DEPTH} levels below this scope.`);
+	}
+
+	async function discover(scope: BrainScope, query?: string, folder?: string) {
+		const nested = folder === undefined ? undefined : await nestedFolder(scope, folder);
+		const parentId = nested?.id ?? BRAIN_FOLDERS[scope];
 		const files: BrainFile[] = [];
 		const seen = new Set<string>();
 		let pageToken = "";
 		do {
 			const q =
-				`'${BRAIN_FOLDERS[scope]}' in parents and trashed=false` +
+				`'${parentId}' in parents and trashed=false` +
 				(query ? ` and name contains '${escapeQuery(query)}'` : "");
 			const params = new URLSearchParams({
 				q,
@@ -196,7 +241,15 @@ export function createBrainReads(drive: DriveFetch, now = () => new Date(), with
 			seen.add(pageToken);
 		} while (pageToken);
 		const listed = files.filter((f) => !withheld.has(f.id));
-		return { scope, folderId: BRAIN_FOLDERS[scope], files: listed, complete: true, withheld: files.length - listed.length, readAt: now().toISOString() };
+		return {
+			scope,
+			folderId: BRAIN_FOLDERS[scope],
+			...(nested ? { folder: nested } : {}),
+			files: listed,
+			complete: true,
+			withheld: files.length - listed.length,
+			readAt: now().toISOString(),
+		};
 	}
 
 	/** One cheap request: the scope's registered folder answers and lists. Used by the daily check, which has a request budget. */
@@ -216,9 +269,9 @@ export function createBrainReads(drive: DriveFetch, now = () => new Date(), with
 	}
 
 	/** Reads one whole document. Verifies direct membership in scope before and after, and that the version did not change. */
-	async function readWhole(scope: BrainScope, id: string) {
+	async function readWhole(scope: BrainScope, id: string, folder?: string) {
 		if (withheld.has(id)) throw new BrainError("not_in_scope", "The file is not a readable document in this scope.");
-		const inventory = await discover(scope);
+		const inventory = await discover(scope, undefined, folder);
 		const found = inventory.files.find((f) => f.id === id);
 		if (!found || !READABLE_MIME.includes(found.mimeType))
 			throw new BrainError("not_in_scope", "The file is not a readable document in this scope.");
@@ -231,20 +284,25 @@ export function createBrainReads(drive: DriveFetch, now = () => new Date(), with
 		const text = await fullText(res);
 		const after = await fileVersion(drive, id);
 		if (after.version !== before.version) throw new BrainError("changed_during_read", "Document changed during the read. Read again.");
-		const membership = await discover(scope);
+		// Rechecks the whole parent chain too, so a folder moved out of scope mid-read is refused.
+		const membership = await discover(scope, undefined, folder).catch((e) => {
+			if (e instanceof BrainError && e.code === "not_in_scope") throw new BrainError("left_scope", "Document left the selected scope during the read.");
+			throw e;
+		});
 		if (!membership.files.some((f) => f.id === id)) throw new BrainError("left_scope", "Document left the selected scope during the read.");
-		return { file: before, text, readAt: now().toISOString() };
+		return { file: before, text, readAt: now().toISOString(), folder: inventory.folder };
 	}
 
 	/** Whole document verified, returned in pages so large documents fit an MCP reply. */
-	async function read(scope: BrainScope, id: string, offset = 0, maxChars = DEFAULT_PAGE_CHARS) {
-		const { file, text, readAt } = await readWhole(scope, id);
+	async function read(scope: BrainScope, id: string, offset = 0, maxChars = DEFAULT_PAGE_CHARS, folder?: string) {
+		const { file, text, readAt, folder: nested } = await readWhole(scope, id, folder);
 		const size = Math.min(Math.max(1, maxChars), MAX_PAGE_CHARS);
 		const start = Math.min(Math.max(0, offset), text.length);
 		const end = Math.min(text.length, start + size);
 		return {
 			file,
 			scope,
+			...(nested ? { folder: nested } : {}),
 			readAt,
 			totalChars: text.length,
 			offset: start,

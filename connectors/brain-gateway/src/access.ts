@@ -33,13 +33,13 @@ const GOVERNANCE = ["hq-core"];
  * approved cross-department sources only and stays empty until a decision names the source.
  */
 export const DEPARTMENTS: Record<string, { label: string; scopes: BrainScope[]; exceptions: BrainScope[] }> = {
-	"ep-ceo": { label: "EP Chief Executive Officer", scopes: ["ep-core", "ep-discovery", ...EP_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
-	"ep-cgo": { label: "EP Chief Growth Officer", scopes: ["ep-marketing", "hq-library", ...EP_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
+	"ep-ceo": { label: "EP Chief Executive Officer", scopes: ["ep-core", "ep-discovery", "ep-acn", ...EP_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
+	"ep-cgo": { label: "EP Chief Growth Officer", scopes: ["ep-marketing", "ep-events", "hq-library", "hq-library-marketing", ...EP_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
 	"ep-cro": { label: "EP Chief Revenue Officer", scopes: ["ep-sales", ...EP_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
 	"ep-cco": { label: "EP Chief Client Officer", scopes: ["ep-client-experience", ...EP_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
 	"ep-coo": { label: "EP Chief Operations Officer", scopes: ["ep-operations", ...EP_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
-	"ag-ceo": { label: "AG Chief Executive Officer", scopes: ["ag-core", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
-	"ag-cgo": { label: "AG Chief Growth Officer", scopes: ["ag-marketing", "hq-library", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
+	"ag-ceo": { label: "AG Chief Executive Officer", scopes: ["ag-core", "ag-case-studies", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
+	"ag-cgo": { label: "AG Chief Growth Officer", scopes: ["ag-marketing", "ag-strong-ones", "hq-library", "hq-library-marketing", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
 	"ag-cro": { label: "AG Chief Revenue Officer", scopes: ["ag-sales", "ag-listings", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
 	"ag-cco": { label: "AG Chief Client Officer", scopes: ["ag-client-experience", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
 	"ag-coo": { label: "AG Chief Operations Officer", scopes: ["ag-operations", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
