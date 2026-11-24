@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "061b4f1cdd31a3c295503f319dc0b70501850491"
+    "eps": "c5341dd805427060c3e0dbe8529ecd20c9d2a87a"
   },
   "zones": [
     "surfaces",
@@ -112,7 +112,7 @@
       "renderNote": null,
       "layout": {
         "x": 99.5,
-        "y": 1682,
+        "y": 1601.6,
         "width": 192,
         "height": 63,
         "rectHeight": 48,
@@ -681,7 +681,7 @@
       "renderNote": null,
       "layout": {
         "x": 89.5,
-        "y": 1887.6,
+        "y": 1786.6,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -975,7 +975,7 @@
       "renderNote": null,
       "layout": {
         "x": 624,
-        "y": 1830.3,
+        "y": 1749.9,
         "width": 274,
         "height": 77,
         "rectHeight": 62,
@@ -1137,7 +1137,7 @@
       "renderNote": null,
       "layout": {
         "x": 356,
-        "y": 1769,
+        "y": 1688.6,
         "width": 200,
         "height": 77,
         "rectHeight": 62,
@@ -1194,7 +1194,7 @@
       "renderNote": null,
       "layout": {
         "x": 84,
-        "y": 1769,
+        "y": 1688.6,
         "width": 252,
         "height": 77,
         "rectHeight": 62,
@@ -1251,7 +1251,7 @@
       "renderNote": null,
       "layout": {
         "x": 55,
-        "y": 2639.6,
+        "y": 1974.6,
         "width": 206,
         "height": 77,
         "rectHeight": 62,
@@ -1336,7 +1336,7 @@
       "renderNote": null,
       "layout": {
         "x": 89.5,
-        "y": 1581,
+        "y": 1500.6,
         "width": 212,
         "height": 77,
         "rectHeight": 62,
@@ -1488,6 +1488,33 @@
           "turns any source file into",
           "clean, structured knowledge base",
           "Markdown"
+        ]
+      }
+    },
+    {
+      "id": "find-it-first",
+      "source": "eps:plugins/operating-doctrine/skills/find-it-first/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "routing",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "if AI can find it, we don't ask",
+      "renderNote": null,
+      "layout": {
+        "x": 80.5,
+        "y": 2277.6,
+        "width": 230,
+        "height": 63,
+        "rectHeight": 48,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "if AI can find it, we don't ask"
         ]
       }
     },
@@ -2009,7 +2036,7 @@
       "renderNote": null,
       "layout": {
         "x": 106.5,
-        "y": 2277.6,
+        "y": 1887.6,
         "width": 178,
         "height": 63,
         "rectHeight": 48,
@@ -2036,7 +2063,7 @@
       "renderNote": null,
       "layout": {
         "x": 92.5,
-        "y": 1988.6,
+        "y": 2552.6,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -2868,7 +2895,7 @@
       "renderNote": null,
       "layout": {
         "x": 122.5,
-        "y": 2552.6,
+        "y": 1312.6,
         "width": 146,
         "height": 63,
         "rectHeight": 48,
@@ -3140,7 +3167,7 @@
       "renderNote": null,
       "layout": {
         "x": 77.5,
-        "y": 1379,
+        "y": 1399.6,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -3825,7 +3852,7 @@
       "renderNote": null,
       "layout": {
         "x": 55,
-        "y": 1480,
+        "y": 2639.6,
         "width": 281,
         "height": 77,
         "rectHeight": 62,
@@ -4031,11 +4058,11 @@
         },
         {
           "x": 584,
-          "y": 1881.7
+          "y": 1801.3
         },
         {
           "x": 624,
-          "y": 1881.7
+          "y": 1801.3
         }
       ]
     },
@@ -4322,11 +4349,11 @@
         },
         {
           "x": 18,
-          "y": 1856
+          "y": 1775.6
         },
         {
           "x": 624,
-          "y": 1856
+          "y": 1775.6
         }
       ]
     },
@@ -4353,11 +4380,11 @@
         },
         {
           "x": 8,
-          "y": 2678.1
+          "y": 2013.1
         },
         {
           "x": 55,
-          "y": 2678.1
+          "y": 2013.1
         }
       ]
     },
@@ -4473,11 +4500,11 @@
       "points": [
         {
           "x": 336,
-          "y": 1807.5
+          "y": 1727.1
         },
         {
           "x": 356,
-          "y": 1807.5
+          "y": 1727.1
         }
       ]
     },
@@ -4543,6 +4570,12 @@
     },
     {
       "from": "file-to-knowledge-base-optimizer",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "find-it-first",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -5576,9 +5609,9 @@
         "label": "Session machinery",
         "caption": "routing, ledgers, session lifecycle",
         "x": 33,
-        "y": 1331,
+        "y": 1264.6,
         "width": 887,
-        "height": 1616.6,
+        "height": 1683,
         "rooms": []
       },
       {
