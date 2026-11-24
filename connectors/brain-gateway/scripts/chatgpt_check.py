@@ -44,6 +44,8 @@ class MCP:
             json.dumps({"jsonrpc": "2.0", "method": "notifications/initialized"}) + "\n"
         )
         self.proc.stdin.flush()
+        # The owned-job facade loads its pinned vendor inventory during tools/list.
+        self.request("tools/list", {})
 
     def _read(self):
         for line in self.proc.stdout:
