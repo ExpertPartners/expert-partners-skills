@@ -8,19 +8,19 @@
     {
       "name": "operating-doctrine",
       "source": "./plugins/operating-doctrine",
-      "version": "3.9.1",
+      "version": "3.9.2",
       "description": "The non-negotiable operating standard. Loads at every session."
     },
     {
       "name": "brand-voice",
       "source": "./plugins/brand-voice",
       "description": "Canonical brand context for the Estate brand registry (Expert Partners, EPIC, AG Personal Brand, AG Luxury, FAM, Don Hobbs)",
-      "version": "0.7.8"
+      "version": "0.7.9"
     },
     {
       "name": "content-engines",
       "source": "./plugins/content-engines",
-      "version": "0.12.0",
+      "version": "0.12.1",
       "description": "Allison Gaddy content and marketing engines (master-marketer-free-agent-builder, rare-content-engine, xavier-offer-builder, dm-to-dollars, video-transcript-relay, content-coach, hook-engine, post-grader, post-scheduler, post-value-filter, social-analyzer, speaker-introduction-writer, stage-cards), plus training and film pre-production (gemini-notebook-training-architect, hero-video-preproduction, brand-film-reverse-engineering)."
     },
     {
@@ -62,7 +62,7 @@
     {
       "name": "authority-engine",
       "source": "./plugins/authority-engine",
-      "version": "0.3.1",
+      "version": "0.3.2",
       "description": "Don Hobbs's Authority Engine suite (interview, market ownership, market domination architecture, brand story, execution, quarterly recalibration). Reads Don's method from Drive; inherits operating-doctrine."
     }
   ]

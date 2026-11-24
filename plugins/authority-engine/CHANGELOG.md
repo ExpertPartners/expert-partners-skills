@@ -1,3 +1,6 @@
+## 0.3.2 - 2026-11-24
+
+Keep each chat on its requested job rather than a department responsibility list. Resolve commercial eligibility and membership inclusions from current Drive authority instead of reviving older blanket exclusions. Preserve brand voice and the live Authority Engine methods.
 ## 0.3.1 - 2026-11-23
 
 Remove the Brand Blueprint Interviewer skill's stale separate-fact-sheet instruction. Practical questions and team records now defer to the current live Drive method, preventing the retrieval skill from overriding a later method revision.

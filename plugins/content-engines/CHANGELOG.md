@@ -1,3 +1,6 @@
+## 0.12.1 - 2026-11-24
+
+Keep each chat on its requested job rather than a department responsibility list. Resolve commercial eligibility and membership inclusions from current Drive authority instead of reviving older blanket exclusions. Preserve brand voice and the live Authority Engine methods.
 ## 0.12.0 - 2026-11-19
 
 Add the read-only Meta Ads Analyst, Meta Ad Spy and IG Gold Miner skills, their evidence-grounded runtime and public research acquisition path. Each is an original substitute, not a recovered course employee.

@@ -1,3 +1,6 @@
+## 3.9.2 - 2026-11-24
+
+Keep each chat on its requested job rather than a department responsibility list. Resolve commercial eligibility and membership inclusions from current Drive authority instead of reviving older blanket exclusions. Preserve brand voice and the live Authority Engine methods.
 ## 3.9.1 - 2026-11-24
 
 Document formatting standard v4.3 follows the newest November 23 correction to 1.5 line spacing and the paragraph, heading and list spacing decisions. Corrects the superseded 1.15 tool example, preserves wording and file placement during restyling, and keeps deliberate card layouts intact.
