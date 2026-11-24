@@ -1,6 +1,6 @@
 ---
 name: canonical-categories
-description: Background translation layer for normalizing financial data across Mercury, QuickBooks, Stripe, and Monarch into one canonical category scheme. Load whenever any analysis aggregates, compares, or reports transactions from more than one source, or whenever category mapping, normalization, or unmapped transactions come up. This skill is background knowledge, not a user-facing workflow.
+description: Background translation layer for normalizing financial data across Mercury, QuickBooks, PayPal, and Monarch (plus legacy Stripe history) into one canonical category scheme. Load whenever any analysis aggregates, compares, or reports transactions from more than one source, or whenever category mapping, normalization, or unmapped transactions come up. This skill is background knowledge, not a user-facing workflow.
 disable-model-invocation: false
 user-invocable: false
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
@@ -17,6 +17,8 @@ subtitle: "one category scheme across every money source"
 # Canonical Categories (Background Skill)
 
 Inherits the operating-doctrine skill and the Fractional CFO project instructions.
+
+Payment processor rule. PayPal is the only payment processor for every business line (HQ Decision Log, November 24, 2026, Stripe and PayPal). Stripe is discontinued. Never connect, authenticate to, configure, build against or recommend Stripe. Helcim was not approved and is not an option. Stripe rows already in the map stay, so historical transactions still translate, but no new Stripe source gets added.
 
 ## What this skill does
 
@@ -36,7 +38,7 @@ The authoritative map lives in project knowledge at canonical-categories.md. Tha
 
 ## Unmapped handling
 
-When a source category, Stripe product, or Monarch category has no row in the map:
+When a source category, PayPal plan, product or invoice item, or Monarch category has no row in the map:
 
 1. Do not guess silently and do not dump it into an other bucket.
 2. Propose a mapping with one line of reasoning.

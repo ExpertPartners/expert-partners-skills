@@ -27,6 +27,8 @@ subtitle: "per-funnel walk from old location to clean location"
 
 STATUS (2026-07-27): STALE, retirement pending. The migration this skill served is over: EPIC went clean-in-place on its live location (partnersync ADR 0006) and the "EPIC New" build location became AG Personal Brand. Do not run this skill against the current estate without first reading section 7.1 of the PartnerSync Identity Canon in Drive (02 - Identity Canon), locations by ID never by name, and confirming from the live canon that a genuine funnel move is in play.
 
+Payment processor rule. PayPal is the only payment processor (HQ Decision Log, November 24, 2026, Stripe and PayPal). A Stripe connection on a source funnel does not migrate. Rebuild payment on PayPal in the destination and flag the old Stripe connection for removal. Helcim was not approved and is not an option.
+
 This is the per-funnel walk for moving one funnel from the old PartnerSync location (legacy Expert Partners GHL) into a clean location, EPIC or Expert Partners. It verifies every object-model element, verifies the cutover with a live test, then runs Funnel Documentation so the funnel is born documented in the same pass. This skill is temporary. It retires after both migrations are complete.
 
 ## Who you are talking to
@@ -51,7 +53,7 @@ Every element below must make it across, or be explicitly marked not applicable.
 - Calendars, if booking is involved
 - Products and order forms, if it takes payment
 - Email templates, SMS templates, and snippets
-- Post-load layer: domain, phone, Stripe, integrations. These never transfer automatically and are where migrations silently break. Treat this layer as the highest risk in any migration.
+- Post-load layer: domain, phone, PayPal, integrations. These never transfer automatically and are where migrations silently break. Treat this layer as the highest risk in any migration.
 
 ## Where things live
 
@@ -99,7 +101,7 @@ Check every email, SMS, and snippet is recreated in the destination with the rig
 
 ### Step 7: The post-load layer
 
-This is where migrations silently break, so do it deliberately. Check each one in the destination: domain mapped and resolving, phone number assigned, Stripe connected if the funnel takes payment, and every integration reconnected. Nothing here transfers automatically. Do not let this layer be assumed.
+This is where migrations silently break, so do it deliberately. Check each one in the destination: domain mapped and resolving, phone number assigned, PayPal connected if the funnel takes payment (never Stripe), and every integration reconnected. Nothing here transfers automatically. Do not let this layer be assumed.
 
 ### Step 8: Verify the cutover (Code)
 
@@ -121,7 +123,7 @@ Then continue the walk with what came back.
 
 Use this in Step 3. Fill in the funnel name.
 
-"Read the live GHL funnel for [funnel name] in the old PartnerSync location (legacy Expert Partners GHL). Pull the full object model: pages and steps with slugs and the public entry link, embedded forms and surveys, workflows and triggers, tags, pipeline and stage, trigger links, custom fields and custom values, calendars, products and order forms, and every email, SMS, and snippet with its trigger and sequence order. Also pull the post-load layer: domain, phone, Stripe, integrations. Write the result to a single structured file and print DONE with the file path."
+"Read the live GHL funnel for [funnel name] in the old PartnerSync location (legacy Expert Partners GHL). Pull the full object model: pages and steps with slugs and the public entry link, embedded forms and surveys, workflows and triggers, tags, pipeline and stage, trigger links, custom fields and custom values, calendars, products and order forms, and every email, SMS, and snippet with its trigger and sequence order. Also pull the post-load layer: domain, phone, payment processor connection (PayPal expected, and flag any Stripe connection for removal), integrations. Write the result to a single structured file and print DONE with the file path."
 
 ### Block: verify the cutover
 

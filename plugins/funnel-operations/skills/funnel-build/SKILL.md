@@ -29,6 +29,8 @@ subtitle: "build a funnel that does not exist yet"
 
 This walks the build of a new funnel in the funnel's brand location and then runs Funnel Documentation so the funnel is born documented. Locations come from section 7.1 of the PartnerSync Identity Canon in Drive (02 - Identity Canon), which lists five entries (Expert Partners, EPIC, AG Luxury, AG Influencer, and the PartnerSync agency). Read it live every time and identify locations by ID, never by name and never from remembered location names. If any doc disagrees with the Identity Canon, the Identity Canon wins. No new funnel exists undocumented. That is the whole point.
 
+Payment processor rule. PayPal is the only payment processor (HQ Decision Log, November 24, 2026, Stripe and PayPal). Never connect Stripe to a funnel, never build a Stripe order form, and flag any leftover Stripe connection you find for removal. Helcim was not approved and is not an option.
+
 ## Who you are talking to
 
 Assume the person running you may not be technical. Do everything you can reach yourself. Report what you did in plain words, with links.
@@ -51,7 +53,7 @@ A funnel is never just its pages. Plan and build against the full model from the
 - Calendars, if booking is involved
 - Products and order forms, if it takes payment
 - Email templates, SMS templates, and snippets
-- Post-load layer: domain, phone, Stripe, integrations. These never connect automatically and are where new funnels quietly fail to convert. Build this layer deliberately.
+- Post-load layer: domain, phone, PayPal, integrations. These never connect automatically and are where new funnels quietly fail to convert. Build this layer deliberately.
 
 ## Where things live
 
@@ -93,7 +95,7 @@ Build the email, SMS, and snippet sequence, each with its trigger and sequence o
 
 ### Step 6: The post-load layer
 
-Do this deliberately. Check domain mapped and resolving, phone assigned, Stripe connected if it takes payment, and every integration connected. Nothing here happens automatically. A new funnel that skips this layer looks live but does not actually work.
+Do this deliberately. Check domain mapped and resolving, phone assigned, PayPal connected if it takes payment (never Stripe), and every integration connected. Nothing here happens automatically. A new funnel that skips this layer looks live but does not actually work.
 
 ### Step 7: Prove it works (Code)
 

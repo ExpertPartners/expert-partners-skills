@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "cba58eee8f44645cd52c1096ef264d55b280c299"
+    "eps": "fe5ec94b0594b982ab88f6dfcfcc2d2b273a94d8"
   },
   "zones": [
     "surfaces",
@@ -2488,7 +2488,7 @@
       ],
       "defersTo": [],
       "brandScope": [],
-      "subtitle": "review the monthly close against bank and Stripe",
+      "subtitle": "review the monthly close against bank and PayPal",
       "renderNote": null,
       "layout": {
         "x": 122.5,
@@ -2499,7 +2499,7 @@
         "annotationHeight": 15,
         "subtitleLines": [
           "review the monthly close against",
-          "bank and Stripe"
+          "bank and PayPal"
         ]
       }
     },

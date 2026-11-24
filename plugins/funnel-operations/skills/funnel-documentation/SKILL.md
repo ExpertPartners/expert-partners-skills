@@ -25,6 +25,8 @@ subtitle: "one complete Notion record per funnel"
 
 This is the core of Funnel Operations. It takes one funnel and turns it into one complete, verified record in Notion. The other two skills, Funnel Migration and Funnel Build, both end by running this one. There is one source of truth here. Do not fragment it.
 
+Payment processor rule. PayPal is the only payment processor (HQ Decision Log, November 24, 2026, Stripe and PayPal). When a funnel still shows a Stripe connection, record it in Notes as a leftover to remove. It is never the expected state. Helcim was not approved and is not an option.
+
 ## Who you are talking to
 
 Assume the person running you may not be technical. Do everything you can reach yourself and report what you did, with links.
@@ -47,7 +49,7 @@ A funnel is never just its pages. The canonical object model lives in Notion on 
 - Calendars, if booking is involved
 - Products and order forms, if it takes payment
 - Email templates, SMS templates, and snippets
-- Post-load layer: domain, phone, Stripe, integrations. These never transfer automatically and are where migrations silently break.
+- Post-load layer: domain, phone, PayPal, integrations. These never transfer automatically and are where migrations silently break.
 
 ## The system of record
 
@@ -126,7 +128,7 @@ Then continue the walk with what came back.
 
 Use this in Step 4. Fill in the location and funnel name before dispatching it.
 
-"Read the live GHL funnel for [funnel name] in the [EPIC / Expert Partners] location. Pull the full object model: pages and steps with slugs and the public entry link, embedded forms and surveys, workflows and triggers, tags, pipeline and stage, trigger links, custom fields and custom values, calendars, products and order forms, and every email, SMS, and snippet with its trigger and sequence order. Also pull the post-load layer: domain, phone, Stripe, integrations. Write the result to a single structured file and print DONE with the file path."
+"Read the live GHL funnel for [funnel name] in the [EPIC / Expert Partners] location. Pull the full object model: pages and steps with slugs and the public entry link, embedded forms and surveys, workflows and triggers, tags, pipeline and stage, trigger links, custom fields and custom values, calendars, products and order forms, and every email, SMS, and snippet with its trigger and sequence order. Also pull the post-load layer: domain, phone, payment processor connection (PayPal expected, and flag any Stripe connection for removal), integrations. Write the result to a single structured file and print DONE with the file path."
 
 ### Bridge block: behavioral test-audit
 
@@ -155,7 +157,7 @@ When you write the record, these are the fields and what goes in each:
 - Calendars: calendars, if booking is involved
 - Products and Order Forms: products and order forms, if it takes payment
 - Domain and Published: the domain and whether it is published
-- Post-Load Config: domain, phone, Stripe, integrations
+- Post-Load Config: domain, phone, PayPal, integrations
 - Test-Audit Evidence: contact ID, date, pass or fail
 - Cutover Ready: checked only when the completeness check has passed
 - Owner: the person who owns this funnel

@@ -46,7 +46,7 @@ Why both: the blended view is how Allison actually runs her life and decisions. 
 
 Mercury: assignment follows the account. All Mercury accounts sit legally under Expert Partners LLC; functional assignment follows the account's job (the eXp Revenue Share, Moxie Passthrough Team Commissions, AG Real Estate Commissions, and Real Estate Ads accounts carry the real estate side). Record the account-to-entity mapping in project memory at first run and reuse it.
 QuickBooks: assignment follows the company file, and the QBO chart of accounts is the canonical category reference for both lenses.
-Stripe: assignment follows the account, and within it, the product map in canonical-categories.
+PayPal: the only payment processor (HQ Decision Log, November 24, 2026). Assignment follows the account, and within it, the plan, product or invoice item in canonical-categories. Stripe is discontinued; any legacy Stripe wind-down activity follows the same product map and is labeled legacy.
 Monarch: the blended home. Personal accounts in Monarch are Personal; business accounts Monarch aggregates (Mercury) keep their business assignment underneath the blend.
 
 ## Ambiguity protocol
@@ -68,5 +68,7 @@ When Allison asks for an entity cleanliness check, run this over the trailing 90
 Commingling weakens LLC liability protection and creates tax exposure. The blended cockpit exists so Allison sees her whole financial life her way. This skill exists so that view never costs her the legal and tax protection the clean books provide. Both, structurally, every report.
 
 ## Version
+
+v2.2, November 24, 2026. PayPal replaces Stripe as the payment processor in entity assignment, per the HQ Decision Log.
 
 v2.1, July 7, 2026. Dual-view rewrite per Allison's direction: Monarch is the blended owner cockpit for Allison and Claude, QuickBooks is the category reference and entity-clean books for taxes, and the n8n bridge feeds Monarch snapshots to the project nightly so Cowork stays the driver. Replaces v1 "never blend" with "clean books plus an explicit blended owner lens."
