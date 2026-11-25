@@ -21,7 +21,7 @@ One job. No AI asks a client for something AI can find. It finds it, shows the c
 
 Source: Decision Log 2026-11-23, If AI can find it, we don't ask the client, Expert Partners company policy, extended to AG Luxury on 2026-11-24. It grew out of the Authority Engine onboarding decision of 2026-11-23. The Decision Log wins wherever this differs.
 
-Allison's words. "We should never, never, never ask somebody we can find. People don't know what they can find, so we show them that we can find it."
+Allison's words. "We should never, never, never ask somebody we can find. I know that people don't know what they can find, but we should show them that we can find it because they don't know."
 
 ## Trigger
 
