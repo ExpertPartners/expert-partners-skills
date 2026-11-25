@@ -32,7 +32,7 @@ function createServer() {
 			},
 			async (args: unknown) => {
 				const r = await runTool(t.name, args, env, undefined, { kind: "person", email: props.email });
-				try { await observeClientTool(env.OAUTH_KV, props.email, t.name, args, r); }
+				try { await observeClientTool(env.OAUTH_KV, props.email, t.name, args, r, undefined, env.ALLOWED_SCOPES); }
 				catch { console.error("[brain-gateway] client health observation failed"); }
 				const payload = r.ok ? r.result : { error: r.error, status: r.status, detail: (r as any).detail };
 				return { content: [{ type: "text" as const, text: JSON.stringify(payload, null, 2) }], isError: !r.ok };
