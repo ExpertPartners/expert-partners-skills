@@ -1,3 +1,6 @@
+## 0.15.0 - 2026-11-25
+
+Add Week Wrap for closed-week and attended-session teaching packages with an advantage brief, live-class run of show, and fully scripted chapters in the existing Canva master teaching deck. Reuse saved outputs on retry and revision, resolve private sources live, and keep truthful run evidence in the owning department.
 ## 0.14.0 - 2026-11-25
 
 Add Read the Room, one shared after-session analysis skill for HQ, EP and AG. It combines final transcripts with available chat and Q&A, reports timestamped topic reactions and practical next-session changes, and defines cross-route session identity, completion checks, department-only saving, Ember summaries and durable logging for every attempt.
