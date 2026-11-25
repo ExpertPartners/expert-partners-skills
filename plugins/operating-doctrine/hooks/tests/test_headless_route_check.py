@@ -555,6 +555,10 @@ class FounderOverrides(HookCase):
             f"https://{self.GHL}/v2/location/abc/workflows",
             f"https://{self.GHL}/v2/location/abc/workflow/wf123",
             "https://app.leadconnectorhq.com/v2/location/abc/automation/workflows/wf123",
+            f"https://{self.GHL}/v2/location/abc/automation/workflow/4c56775f-4882",
+            f"https://{self.GHL}/v2/location/abc/automation/workflow/wf123?tab=history",
+            "https://link.allisongaddy.com/v2/location/abc/automation/workflow/wf123",
+            "https://link.allisongaddy.com/v2/location/abc/automation/workflows",
         )
         for url in cases:
             with self.subTest(url=url):
@@ -573,10 +577,27 @@ class FounderOverrides(HookCase):
         self.assertIn("GoHighLevel / PartnerSync builder", note)
         self.assertIn("GoHighLevel workflows, no API", note)
 
+    def test_ag_whitelabel_mapped_live_allows_workflows_and_denies_contacts(self):
+        whitelabel = (
+            "AG GoHighLevel whitelabel,link.allisongaddy.com,"
+            "GHL API v2 through the n8n connector,GHL Private Integration Token,Live,\n"
+        )
+        self.write_cache(MAP_CSV + GITHUB_ROW + whitelabel)
+        note = self.assertAllowed(
+            self.run_hook("https://link.allisongaddy.com/v2/location/abc/automation/workflow/wf1")
+        )
+        self.assertIn("GoHighLevel workflows, no API", note)
+        reason = self.assertDenied(
+            self.run_hook("https://link.allisongaddy.com/v2/location/abc/contacts")
+        )
+        self.assertIn("AG GoHighLevel whitelabel", reason)
+
     def test_ghl_contacts_and_other_paths_stay_denied(self):
         for path in (
             "/v2/location/abc/contacts",
             "/v2/location/abc/workflows-other",
+            "/v2/location/abc/automation/workflow-other",
+            "/v2/location/abc/automation/workflowsx",
             "/v2/location/abc/automation/other",
             "/v2/location/abc/form-builder-v2-other/xyz",
             "/v2/location/abc/survey-builder-v2-other/xyz",

@@ -855,7 +855,8 @@ def allow_note(host: str, entry: dict | None, cached: bool) -> str:
 # row for this shared host cannot cover builder work. This override allows only builder and
 # media-library paths; every other GoHighLevel path still goes through the access map.
 # Applies only to this M2 copy, pending the map owner's durable source fix.
-GHL_BUILDER_HOSTS = ("app.gohighlevel.com", "app.leadconnectorhq.com")
+# link.allisongaddy.com is AG Luxury's whitelabel of the same GoHighLevel app, same paths.
+GHL_BUILDER_HOSTS = ("app.gohighlevel.com", "app.leadconnectorhq.com", "link.allisongaddy.com")
 GHL_BUILDER_PATH_RE = re.compile(
     r"^/v2/location/[^/?#]+/(?:"
     r"sites|funnels|funnels-websites|websites|forms|surveys|builder|page-builder"
@@ -877,9 +878,11 @@ GHL_BUILDER_NOTE = (
 # GoHighLevel has no public API to create, read the steps of, or edit workflows (verified
 # 2026-10-20 and rechecked 2026-11-24; still an open request on HighLevel's ideas board), so
 # the access map's live GoHighLevel row cannot cover the workflow builder. Contacts, tags,
-# custom fields and other API-covered paths still go through the access map.
+# custom fields and other API-covered paths still go through the access map. A single
+# workflow opens in the builder at automation/workflow/<id>, singular, and the workflow
+# definitions endpoint answers WORKFLOW_API_NOT_ENABLED_FOR_LOCATION for some locations.
 GHL_WORKFLOW_PATH_RE = re.compile(
-    r"^/v2/location/[^/?#]+/(?:automation/workflows|workflows|workflow)(?:[/?#]|$)",
+    r"^/v2/location/[^/?#]+/(?:automation/workflows?|workflows?)(?:[/?#]|$)",
     re.I,
 )
 GHL_WORKFLOW_NOTE = (
