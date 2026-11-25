@@ -174,7 +174,11 @@ def repo_safety(repo, fetch=True):
                 for part in Path(name.rstrip("/")).parts
             ):
                 reasons.append(f"ignored file {name}")
-        elif not name.endswith(".DS_Store"):
+        elif name.endswith(".DS_Store"):
+            continue
+        elif code.strip() == "M" and name.endswith(".zip") and same_archive(repo, name):
+            continue
+        else:
             reasons.append(f"uncommitted {name}")
         if len(reasons) >= 5:
             break
@@ -202,6 +206,38 @@ def repo_safety(repo, fetch=True):
     return not reasons, reasons
 
 
+def same_archive(repo, name):
+    """A rebuilt zip whose entries and CRCs match the committed one is not a change."""
+    import io
+    import zipfile
+
+    try:
+        p = subprocess.run(
+            ["git", "-C", str(repo), "show", f"HEAD:{name}"], capture_output=True, timeout=60
+        )
+        if p.returncode != 0:
+            return False
+
+        def entries(z):
+            return sorted((i.filename, i.CRC, i.file_size) for i in z.infolist())
+
+        with zipfile.ZipFile(io.BytesIO(p.stdout)) as a, zipfile.ZipFile(repo / name) as b:
+            return entries(a) == entries(b)
+    except (OSError, zipfile.BadZipFile, subprocess.TimeoutExpired):
+        return False
+
+
+def remote_tag_commits(repo):
+    """Tag commits that exist on the remote; fetch does not map tags under refs/remotes."""
+    rc, out = git(repo, "ls-remote", "--tags", "origin", timeout=120)
+    shas = set()
+    for line in out.splitlines():
+        sha = line.split("\t", 1)[0]
+        if sha and git(repo, "cat-file", "-e", f"{sha}^{{commit}}")[0] == 0:
+            shas.add(sha)
+    return sorted(shas)
+
+
 def remote_default(repo):
     rc, out = git(repo, "symbolic-ref", "-q", "refs/remotes/origin/HEAD")
     if rc == 0 and out.strip():
@@ -222,9 +258,10 @@ def unpushed_refs(repo):
     rc, out = git(repo, "for-each-ref", "--format=%(refname)", "refs/heads", "refs/tags")
     refs = out.split() + ["HEAD"]
     default = remote_default(repo)
+    tags = remote_tag_commits(repo)
     bad = []
     for ref in refs:
-        rc, n = git(repo, "rev-list", "--count", ref, "--not", "--remotes")
+        rc, n = git(repo, "rev-list", "--count", ref, "--not", "--remotes", *tags)
         if rc != 0 or n.strip() == "0":
             continue
         if default:

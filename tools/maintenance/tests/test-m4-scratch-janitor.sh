@@ -39,6 +39,15 @@ mk "$SC/legacy-audit/squashed"; git -C "$SC/legacy-audit/squashed" checkout -qb 
 echo s > "$SC/legacy-audit/squashed/s.txt"; git -C "$SC/legacy-audit/squashed" add . && git -C "$SC/legacy-audit/squashed" commit -qm feat
 git -C "$seed" pull -q; echo s > "$seed/s.txt"; git -C "$seed" add . && git -C "$seed" commit -qm "feat (squash)" && git -C "$seed" push -q origin main
 git -C "$SC/legacy-audit/squashed" fetch -q; old "$SC/legacy-audit/squashed"
+# A tag pushed to the remote is not unpushed work even though fetch keeps it out of refs/remotes.
+mk "$SC/legacy-audit/pushedtag"; git -C "$SC/legacy-audit/pushedtag" checkout -qb proof
+echo p > "$SC/legacy-audit/pushedtag/p.txt"; git -C "$SC/legacy-audit/pushedtag" add . && git -C "$SC/legacy-audit/pushedtag" commit -qm proof
+git -C "$SC/legacy-audit/pushedtag" tag evidence/proof && git -C "$SC/legacy-audit/pushedtag" push -q origin evidence/proof
+git -C "$SC/legacy-audit/pushedtag" checkout -q main && git -C "$SC/legacy-audit/pushedtag" branch -qD proof; old "$SC/legacy-audit/pushedtag"
+# A rebuilt zip with the same entries as the committed one is not a change.
+mk "$SC/legacy-audit/rezip"; (cd "$SC/legacy-audit/rezip" && python3 -c "import zipfile;z=zipfile.ZipFile('kit.zip','w');z.writestr('a.txt','same');z.close()" && git add kit.zip && git commit -qm kit && git push -q origin main)
+python3 -c "import zipfile,time;z=zipfile.ZipFile('$SC/legacy-audit/rezip/kit.zip','w');i=zipfile.ZipInfo('a.txt',(2030,1,1,0,0,0));z.writestr(i,'same');z.close()"
+old "$SC/legacy-audit/rezip"
 # A main clone whose linked worktree sits elsewhere must stay.
 mk "$SC/legacy-audit/hasworktree"; git -C "$SC/legacy-audit/hasworktree" worktree add -q "$T/elsewhere-wt" -b wt 2>/dev/null
 old "$SC/legacy-audit/hasworktree"
@@ -70,6 +79,8 @@ expect present "$SC/legacy-audit/stashed"
 expect present "$SC/legacy-audit/envfile"
 expect present "$SC/legacy-audit/fresh"
 expect gone    "$SC/legacy-audit/squashed"
+expect gone    "$SC/legacy-audit/pushedtag"
+expect gone    "$SC/legacy-audit/rezip"
 expect present "$SC/legacy-audit/hasworktree"
 expect gone    "$SC/legacy-audit/app/node_modules"
 expect present "$SC/legacy-audit/app"
