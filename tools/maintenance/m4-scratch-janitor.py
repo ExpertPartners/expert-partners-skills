@@ -116,14 +116,18 @@ def in_use(path, opened):
 
 
 def newest_mtime(path):
-    """Newest modification time, ignoring .git internals and caches that fetches touch."""
-    newest = 0.0
+    """Newest file modification time, ignoring .git internals and caches that fetches touch.
+
+    Directory mtimes are ignored because removing a cache inside an entry bumps them,
+    which would make an idle entry look freshly changed.
+    """
     try:
-        newest = path.lstat().st_mtime
+        own = path.lstat().st_mtime
     except OSError:
         return time.time()
     if path.is_symlink() or not path.is_dir():
-        return newest
+        return own
+    newest = 0.0
     for dp, dn, fn in os.walk(path):
         dn[:] = [d for d in dn if d != ".git" and d not in CACHE_DIRS]
         for f in fn:
@@ -133,7 +137,7 @@ def newest_mtime(path):
                 newest = max(newest, os.lstat(os.path.join(dp, f)).st_mtime)
             except OSError:
                 pass
-    return newest
+    return newest or own
 
 
 def size_kb(path):
