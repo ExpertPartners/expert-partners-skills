@@ -162,7 +162,9 @@ def repo_safety(repo, fetch=True):
     if rc != 0 or not remotes.strip():
         return False, ["no remote"]
     if fetch:
-        rc, _ = git(repo, "fetch", "--all", "--quiet", timeout=300)
+        # --prune drops tracking refs for branches deleted on the remote, so their
+        # commits only count as pushed if the remote still holds them.
+        rc, _ = git(repo, "fetch", "--all", "--prune", "--quiet", timeout=300)
         if rc != 0:
             return False, ["fetch failed, remote state unknown"]
     rc, st = git(repo, "status", "--porcelain", "--ignored", "--untracked-files=all")
