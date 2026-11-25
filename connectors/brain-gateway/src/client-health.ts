@@ -1,5 +1,6 @@
 // Client canaries share the gateway's KV and Sendblue line. No document bodies are retained.
 import { z } from "zod";
+import { effectiveScopes } from "./access.ts";
 import { CURRENT_DECISION_LOG } from "./brain.ts";
 import type { ToolResult } from "./tools.ts";
 import type { AlertEnv } from "./alert.ts";
@@ -39,7 +40,8 @@ export async function startRun(kv: KVNamespace, client: Client, now = new Date()
 }
 
 /** Only the authenticated MCP handler calls this, after actual execution. HTTP tools cannot attest. */
-export async function observeClientTool(kv: KVNamespace, email: string, tool: string, args: any, result: ToolResult, now = new Date()) {
+/** `allowedList` is the deployed ALLOWED_SCOPES. The scopes check expects exactly this leader's effective scopes. */
+export async function observeClientTool(kv: KVNamespace, email: string, tool: string, args: any, result: ToolResult, now = new Date(), allowedList?: string) {
 	if (!uuid.safeParse(args?.health_run_id).success) return;
 	const run = await get<Run>(kv, runKey(args.health_run_id));
 	if (!run || email !== `${run.client}@expertpartners.com` || now.getTime() - Date.parse(run.startedAt) > RUN_MS) return;
@@ -49,7 +51,10 @@ export async function observeClientTool(kv: KVNamespace, email: string, tool: st
 	if (tool === "list_scopes") {
 		check = "scopes";
 		const keys: string[] = r?.scopes?.map((s: any) => s.scope) ?? [];
-		value = { ...value, count: keys.length, ok: result.ok && keys.length === (run.client === "allison" ? 24 : 17) && keys.includes("ep-private") && (run.client === "allison" ? keys.includes("ag-core") : !keys.some(s => s.startsWith("ag-"))) };
+		// Derived from the deployed allowlist, so registering a scope does not turn a healthy client into a failure.
+		const expected: string[] = effectiveScopes(allowedList, { kind: "person", email: `${run.client}@expertpartners.com` });
+		const exact = expected.length > 0 && keys.length === expected.length && new Set(keys).size === keys.length && expected.every((s) => keys.includes(s));
+		value = { ...value, count: keys.length, ok: result.ok && exact && keys.includes("ep-private") && (run.client === "allison" ? keys.includes("ag-core") : !keys.some(s => s.startsWith("ag-"))) };
 	} else if (tool === "discover" && args.scope === (run.client === "allison" ? "ag-private" : "ag-core")) {
 		check = "scope_denial";
 		value.ok = !result.ok && result.status === 403 && result.detail === "scope_not_allowed";

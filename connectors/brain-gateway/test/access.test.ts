@@ -23,7 +23,8 @@ test("Allison leads all three brains, Don leads HQ and EP only, AG is Allison al
 	assert.ok(!d.some((s) => s.startsWith("ag-")));
 	assert.ok(d.includes("hq-finance") && d.includes("ep-sales"), "leader level means the whole HQ and EP brain");
 	assert.ok(d.includes("ep-private"), "Don reads EP Private");
-	assert.equal(d.length, 19, "Don gets all 11 HQ scopes and all 8 EP scopes");
+	assert.equal(d.length, 22, "Don gets all 12 HQ scopes and all 10 EP scopes");
+	assert.ok(d.includes("ep-events") && d.includes("ep-acn") && d.includes("hq-library-marketing"));
 });
 
 test("anyone else signed in gets no scopes at all", () => {

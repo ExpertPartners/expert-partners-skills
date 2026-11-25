@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { CHECKS, MAX_AGE_MS, clientHealthApi, clientState, evaluateClients, notifyClient, observeClientTool, runReceipt, startRun, type Receipt } from "../src/client-health.ts";
+import { readFileSync } from "node:fs";
+import { URL } from "node:url";
+import { effectiveScopes } from "../src/access.ts";
 import { CURRENT_DECISION_LOG } from "../src/brain.ts";
+
+const DEPLOYED = JSON.parse(readFileSync(new URL("../wrangler.jsonc", import.meta.url), "utf8").replace(/^\s*\/\/.*$/gm, "")).vars.ALLOWED_SCOPES as string;
 
 function kv() {
 	const values = new Map<string, string>();
@@ -24,8 +29,8 @@ test("PASS requires actual authenticated observations for every check, not a cal
 	const args = { health_run_id: run.id };
 	await observeClientTool(k, "don@expertpartners.com", "list_scopes", args, ok({ scopes: [] }), now);
 	assert.equal((await runReceipt(k, "allison", run.id, now))?.checks.scopes, null);
-	const scopes = Array.from({ length: 22 }, (_, i) => `hq-${i}`).concat(["ep-private", "ag-core"]);
-	await observeClientTool(k, "allison@expertpartners.com", "list_scopes", args, ok({ scopes: scopes.map(scope => ({ scope })) }), now);
+	const scopes = effectiveScopes(DEPLOYED, { kind: "person", email: "allison@expertpartners.com" });
+	await observeClientTool(k, "allison@expertpartners.com", "list_scopes", args, ok({ scopes: scopes.map(scope => ({ scope })) }), now, DEPLOYED);
 	await observeClientTool(k, "allison@expertpartners.com", "discover", { ...args, scope: "hq-core", query: "Rulebook" }, ok({ complete: true, files: [{ id: "rulebook", name: "HQ Rulebook", version: "1" }] }), now);
 	await observeClientTool(k, "allison@expertpartners.com", "read", { ...args, scope: "hq-core", id: "rulebook" }, ok({ file: { id: "rulebook", name: "HQ Rulebook", version: "1" }, totalChars: 5000, text: "DO NOT STORE THIS BODY" }), now);
 	await observeClientTool(k, "allison@expertpartners.com", "read", { ...args, scope: "hq-core", id: CURRENT_DECISION_LOG }, ok({ file: { id: CURRENT_DECISION_LOG, version: "2" }, totalChars: 6000 }), now);
@@ -37,6 +42,33 @@ test("PASS requires actual authenticated observations for every check, not a cal
 	assert.equal(Object.keys(receipt!.checks).length, CHECKS.length);
 	assert.ok(!JSON.stringify([...k.values.values()]).includes("DO NOT STORE"));
 	assert.equal(await runReceipt(k, "don", run.id, now), null);
+});
+
+test("the scopes check expects exactly the leader's effective scopes from the deployed allowlist", async () => {
+	const before = "hq-core,hq-hr,hq-employees,hq-skills,hq-finance,hq-operations,hq-analytics,hq-audits,hq-outputs,hq-partnersync,hq-library,ep-core,ep-discovery,ep-marketing,ep-sales,ep-client-experience,ep-operations,ep-outputs,ep-private,ag-core,ag-marketing,ag-sales,ag-listings,ag-client-experience,ag-operations,ag-outputs";
+	const scopesCheck = async (client: "allison" | "don", keys: string[], allowed: string | undefined) => {
+		const k = kv(); const run = await startRun(k, client, now);
+		await observeClientTool(k, `${client}@expertpartners.com`, "list_scopes", { health_run_id: run.id }, ok({ scopes: keys.map(scope => ({ scope })) }), now, allowed);
+		return (await runReceipt(k, client, run.id, now))!.checks.scopes!;
+	};
+	const leader = (client: "allison" | "don", allowed: string) => effectiveScopes(allowed, { kind: "person", email: `${client}@expertpartners.com` });
+	for (const [allowed, a, d] of [[before, 26, 19], [DEPLOYED, 31, 22]] as const) {
+		assert.equal(leader("allison", allowed).length, a);
+		assert.equal(leader("don", allowed).length, d);
+		const pa = await scopesCheck("allison", leader("allison", allowed), allowed);
+		const pd = await scopesCheck("don", leader("don", allowed), allowed);
+		assert.deepEqual([pa.ok, pa.count, pd.ok, pd.count], [true, a, true, d]);
+	}
+	// The old literals (24 and 17) no longer match any deployed allowlist.
+	assert.equal((await scopesCheck("allison", leader("allison", DEPLOYED).slice(0, 24), DEPLOYED)).ok, false);
+	const don = leader("don", DEPLOYED);
+	assert.equal((await scopesCheck("don", don.slice(1), DEPLOYED)).ok, false, "missing scope");
+	assert.equal((await scopesCheck("don", [...don, "hq-bogus"], DEPLOYED)).ok, false, "extra scope");
+	assert.equal((await scopesCheck("don", [...don.slice(1), "ag-core"], DEPLOYED)).ok, false, "Don must never list AG");
+	assert.equal((await scopesCheck("don", [...don.slice(1), don[2]!], DEPLOYED)).ok, false, "duplicate scope");
+	assert.equal((await scopesCheck("allison", leader("allison", DEPLOYED), undefined)).ok, false, "no allowlist fails closed");
+	const noPrivate = "hq-core,ep-core,ag-core";
+	assert.equal((await scopesCheck("allison", leader("allison", noPrivate), noPrivate)).ok, false, "ep-private stays required");
 });
 
 test("overlapping and expired runs cannot mint healthy receipts", async () => {
