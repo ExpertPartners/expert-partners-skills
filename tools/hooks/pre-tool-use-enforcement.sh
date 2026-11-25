@@ -12,6 +12,10 @@
 #          rewrites the commit identity for every worktree of that repo. The
 #          fix is to add --global or --worktree, or run in a scratchpad clone.
 #
+# It also runs the sibling ai-copy-guard.py, which blocks git clones, worktrees
+# and heavy media downloads outside the approved scratch root so AI copies do
+# not pile up on the Macs. That guard has its own kill-switch.
+#
 # KILL-SWITCH:
 #   Sentinel file: touch ~/.claude/pre-tool-use-enforcement-off
 #   Env var:       PRE_TOOL_USE_OFF=1
@@ -33,6 +37,13 @@ printf '%s' "$INPUT" | jq -e 'type == "object" and ((.tool_name // "") | type ==
 
 TOOL=$(printf '%s' "$INPUT" | jq -r '.tool_name // ""')
 CWD=$(printf '%s' "$INPUT" | jq -r '.cwd // ""')
+
+# Keep AI clones, worktrees and heavy downloads inside the approved scratch root.
+COPY_GUARD="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/ai-copy-guard.py"
+if [[ -f "$COPY_GUARD" ]]; then
+  printf '%s' "$INPUT" | /usr/bin/python3 "$COPY_GUARD"
+  [[ $? -eq 2 ]] && exit 2
+fi
 
 [[ "$TOOL" == "Bash" ]] || exit 0
 CMD=$(printf '%s' "$INPUT" | jq -r '.tool_input.command // ""')
