@@ -26,6 +26,7 @@ caches are eligible for removal.
 
 import argparse
 import datetime as dt
+from io import BytesIO
 import json
 import os
 import shutil
@@ -33,6 +34,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from zipfile import BadZipFile, ZipFile
 
 HOME = Path.home()
 SCRATCH = HOME / "HQ-AI-Workspace-M4" / "Scratch"
@@ -208,9 +210,6 @@ def repo_safety(repo, fetch=True):
 
 def same_archive(repo, name):
     """A rebuilt zip whose entries and CRCs match the committed one is not a change."""
-    import io
-    import zipfile
-
     try:
         p = subprocess.run(
             ["git", "-C", str(repo), "show", f"HEAD:{name}"], capture_output=True, timeout=60
@@ -221,9 +220,9 @@ def same_archive(repo, name):
         def entries(z):
             return sorted((i.filename, i.CRC, i.file_size) for i in z.infolist())
 
-        with zipfile.ZipFile(io.BytesIO(p.stdout)) as a, zipfile.ZipFile(repo / name) as b:
+        with ZipFile(BytesIO(p.stdout)) as a, ZipFile(repo / name) as b:
             return entries(a) == entries(b)
-    except (OSError, zipfile.BadZipFile, subprocess.TimeoutExpired):
+    except (OSError, BadZipFile, subprocess.TimeoutExpired):
         return False
 
 
