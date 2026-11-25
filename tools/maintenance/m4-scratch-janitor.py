@@ -26,6 +26,7 @@ caches are eligible for removal.
 
 import argparse
 import datetime as dt
+from io import BytesIO
 import json
 import os
 import shutil
@@ -33,6 +34,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from zipfile import BadZipFile, ZipFile
 
 HOME = Path.home()
 SCRATCH = HOME / "HQ-AI-Workspace-M4" / "Scratch"
@@ -72,6 +74,9 @@ IGNORED_OK = tuple(CACHE_DIRS) + (
     ".wrangler",
     "tsconfig.tsbuildinfo",
     ".pyc",
+    ".output",
+    ".results",
+    "next-env.d.ts",
 )
 
 
@@ -171,19 +176,106 @@ def repo_safety(repo, fetch=True):
                 for part in Path(name.rstrip("/")).parts
             ):
                 reasons.append(f"ignored file {name}")
-        elif not name.endswith(".DS_Store"):
+        elif name.endswith(".DS_Store"):
+            continue
+        elif code.strip() == "M" and name.endswith(".zip") and same_archive(repo, name):
+            continue
+        else:
             reasons.append(f"uncommitted {name}")
         if len(reasons) >= 5:
             break
-    rc, n = git(repo, "rev-list", "--count", "--all", "--not", "--remotes")
-    if rc != 0:
-        reasons.append("rev-list failed")
-    elif n.strip() != "0":
-        reasons.append(f"{n.strip()} commit(s) not on any remote")
+    if (repo / ".git").is_file():
+        # A linked worktree's branches and stash live in its main clone, so dropping the
+        # folder loses only uncommitted files or a detached HEAD that no ref holds.
+        rc, _ = git(repo, "symbolic-ref", "-q", "HEAD")
+        if rc != 0:
+            rc, holders = git(repo, "for-each-ref", "--contains", "HEAD", "--format=%(refname)")
+            if not [h for h in holders.split() if not h.startswith("refs/codex/")]:
+                reasons.append("detached HEAD that no branch or tag holds")
+        return not reasons, reasons
+    rc, wt = git(repo, "worktree", "list", "--porcelain")
+    here = str(repo.resolve())
+    for line in wt.splitlines():
+        if line.startswith("worktree "):
+            other = line[len("worktree ") :]
+            if other != here and not other.startswith(here + "/") and Path(other).exists():
+                reasons.append(f"linked worktree outside it at {other}")
+    for ref, n in unpushed_refs(repo):
+        reasons.append(f"{ref} has {n} commit(s) whose changes are not on a remote")
     rc, stash = git(repo, "stash", "list")
     if stash.strip():
         reasons.append("stash present")
     return not reasons, reasons
+
+
+def same_archive(repo, name):
+    """A rebuilt zip whose entries and CRCs match the committed one is not a change."""
+    try:
+        p = subprocess.run(
+            ["git", "-C", str(repo), "show", f"HEAD:{name}"], capture_output=True, timeout=60
+        )
+        if p.returncode != 0:
+            return False
+
+        def entries(z):
+            return sorted((i.filename, i.CRC, i.file_size) for i in z.infolist())
+
+        with ZipFile(BytesIO(p.stdout)) as a, ZipFile(repo / name) as b:
+            return entries(a) == entries(b)
+    except (OSError, BadZipFile, subprocess.TimeoutExpired):
+        return False
+
+
+def remote_tag_commits(repo):
+    """Tag commits that exist on the remote; fetch does not map tags under refs/remotes."""
+    rc, out = git(repo, "ls-remote", "--tags", "origin", timeout=120)
+    shas = set()
+    for line in out.splitlines():
+        sha = line.split("\t", 1)[0]
+        if sha and git(repo, "cat-file", "-e", f"{sha}^{{commit}}")[0] == 0:
+            shas.add(sha)
+    return sorted(shas)
+
+
+def remote_default(repo):
+    rc, out = git(repo, "symbolic-ref", "-q", "refs/remotes/origin/HEAD")
+    if rc == 0 and out.strip():
+        return out.strip()
+    for cand in ("refs/remotes/origin/main", "refs/remotes/origin/master"):
+        if git(repo, "rev-parse", "-q", "--verify", cand)[0] == 0:
+            return cand
+    return None
+
+
+def unpushed_refs(repo):
+    """Local branches, tags and HEAD whose changes are not on a remote.
+
+    A ref whose commits are missing from every remote still counts as pushed when each
+    file it changed has the same content on the remote default branch, which is what a
+    squash merge leaves behind. Codex turn checkpoints under refs/codex are internal.
+    """
+    rc, out = git(repo, "for-each-ref", "--format=%(refname)", "refs/heads", "refs/tags")
+    refs = out.split() + ["HEAD"]
+    default = remote_default(repo)
+    tags = remote_tag_commits(repo)
+    bad = []
+    for ref in refs:
+        rc, n = git(repo, "rev-list", "--count", ref, "--not", "--remotes", *tags)
+        if rc != 0 or n.strip() == "0":
+            continue
+        if default:
+            rc, base = git(repo, "merge-base", ref, default)
+            if rc == 0 and base.strip():
+                rc, files = git(repo, "diff", "--name-only", base.strip(), ref)
+                names = [f for f in files.splitlines() if f]
+                if rc == 0 and (
+                    not names or git(repo, "diff", "--quiet", ref, default, "--", *names)[0] == 0
+                ):
+                    continue
+        bad.append((ref, n.strip()))
+        if len(bad) >= 5:
+            break
+    return bad
 
 
 def leftover_worktree_roots():
