@@ -53,22 +53,23 @@ export const TOOLS: ToolDef[] = [
 	{
 		name: "discover",
 		description:
-			"List the current direct children of one brain scope, newest first, across every page. Optional query filters by file name. Folders are listed but only documents can be read. Pass a listed subfolder id as folder to list inside it.",
+			"List the current direct children of one brain scope, newest first, across every page. Optional query filters by file name. Folders are listed but only documents and spreadsheets can be read. Pass a listed subfolder id as folder to list inside it.",
 		schema: z.object({ scope, query: z.string().max(200).optional().describe("Filter by file name containing this text."), folder }),
 		run: async (a, r, scopes) => r.discover(inScope(scopes, a.scope), a.query, a.folder),
 	},
 	{
 		name: "read",
 		description:
-			"Read one document that is currently a direct child of the scope, or of the subfolder given as folder (get its id from discover). The whole document is fetched and verified (same version before and after, still in scope) and returned in pages: pass nextOffset back as offset until it is null.",
+			"Read one document that is currently a direct child of the scope, or of the subfolder given as folder (get its id from discover). The whole document is fetched and verified (same version before and after, still in scope) and returned in pages: pass nextOffset back as offset until it is null. For a spreadsheet, read without sheet to list its tabs, then pass one exact tab title as sheet to read that whole tab with sheet row numbers.",
 		schema: z.object({
 			scope,
 			id: z.string().regex(/^[\w-]+$/).describe("A file id returned by discover for this scope."),
 			offset: z.number().int().min(0).optional(),
 			max_chars: z.number().int().min(1).max(MAX_PAGE_CHARS).optional().describe(`Page size, default ${DEFAULT_PAGE_CHARS}.`),
 			folder,
+			sheet: z.string().min(1).max(100).optional().describe("Spreadsheets only. One exact tab title from the tab list."),
 		}),
-		run: async (a, r, scopes) => r.read(inScope(scopes, a.scope), a.id, a.offset ?? 0, a.max_chars ?? DEFAULT_PAGE_CHARS, a.folder),
+		run: async (a, r, scopes) => r.read(inScope(scopes, a.scope), a.id, a.offset ?? 0, a.max_chars ?? DEFAULT_PAGE_CHARS, a.folder, a.sheet),
 	},
 	{
 		name: "decisions",
