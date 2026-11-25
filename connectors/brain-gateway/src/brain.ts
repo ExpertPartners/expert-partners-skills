@@ -47,6 +47,7 @@ export const MAX_PAGE_CHARS = 200_000;
 /** Subfolders below a scope root are reachable this many levels down, no further. */
 export const MAX_NESTED_DEPTH = 4;
 const FOLDER_MIME = "application/vnd.google-apps.folder";
+const REGISTERED_ROOTS: ReadonlySet<string> = new Set(Object.values(BRAIN_FOLDERS));
 
 export const READABLE_MIME = ["application/vnd.google-apps.document", "text/plain", "text/markdown"];
 
@@ -197,6 +198,8 @@ export function createBrainReads(drive: DriveFetch, now = () => new Date(), with
 		const rootMeta = await folderMeta(root);
 		let id = folder;
 		for (let depth = 1; depth <= MAX_NESTED_DEPTH; depth++) {
+			// Another scope's registered root is reachable only through its own scope key, where its department check runs.
+			if (REGISTERED_ROOTS.has(id)) throw new BrainError("not_in_scope", "The folder is not inside this scope.");
 			const meta = await folderMeta(id);
 			if (meta.id !== id || meta.mimeType !== FOLDER_MIME || meta.trashed !== false || withheld.has(id))
 				throw new BrainError("not_in_scope", "The folder is not inside this scope.");

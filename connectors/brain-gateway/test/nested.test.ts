@@ -138,6 +138,33 @@ test("folder never widens scope: denied scopes refuse before any Drive call, and
 	}
 });
 
+test("another scope's registered root cannot be reached as a folder through an enclosing scope", async () => {
+	const OPS = BRAIN_FOLDERS["ep-operations"];
+	const EVENTS = BRAIN_FOLDERS["ep-events"];
+	const t = tree({
+		[OPS]: { mimeType: FOLDER, parents: ["drive-root"], driveId: "D1" },
+		events: f(OPS),
+		[EVENTS]: f("events"),
+		inner: f(EVENTS),
+		plan: d(EVENTS),
+	}, { plan: "event plan" });
+	for (const principal of [{ kind: "department", id: "ep-coo" }, { kind: "person", email: "allison@expertpartners.com" }] as const) {
+		for (const folder of [EVENTS, "inner"]) {
+			const r = await runTool("discover", { scope: "ep-operations", folder }, env, t.drive, principal);
+			assert.equal(r.status, 403, `${principal.kind} ${folder}`);
+			assert.doesNotMatch(JSON.stringify(r), /plan/);
+		}
+		const read = await runTool("read", { scope: "ep-operations", id: "plan", folder: EVENTS }, env, t.drive, principal);
+		assert.equal(read.status, 403);
+	}
+	const middle = await runTool("discover", { scope: "ep-operations", folder: "events" }, env, t.drive, { kind: "department", id: "ep-coo" });
+	assert.ok(middle.ok, "the enclosing folder itself still lists, as before");
+	const own = await runTool("read", { scope: "ep-events", id: "plan" }, env, t.drive, { kind: "department", id: "ep-cgo" });
+	assert.ok(own.ok, "the owning department reads it through its own scope");
+	const coo = await runTool("read", { scope: "ep-events", id: "plan" }, env, t.drive, { kind: "department", id: "ep-coo" });
+	assert.equal(coo.status, 403);
+});
+
 test("each nested home is reachable by its owning department, not only by leader prefix", () => {
 	const homes: Record<string, string[]> = {
 		"ep-cgo": ["ep-events", "hq-library-marketing"],
