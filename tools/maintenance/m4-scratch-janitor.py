@@ -72,6 +72,9 @@ IGNORED_OK = tuple(CACHE_DIRS) + (
     ".wrangler",
     "tsconfig.tsbuildinfo",
     ".pyc",
+    ".output",
+    ".results",
+    "next-env.d.ts",
 )
 
 
@@ -175,15 +178,68 @@ def repo_safety(repo, fetch=True):
             reasons.append(f"uncommitted {name}")
         if len(reasons) >= 5:
             break
-    rc, n = git(repo, "rev-list", "--count", "--all", "--not", "--remotes")
-    if rc != 0:
-        reasons.append("rev-list failed")
-    elif n.strip() != "0":
-        reasons.append(f"{n.strip()} commit(s) not on any remote")
+    if (repo / ".git").is_file():
+        # A linked worktree's branches and stash live in its main clone, so dropping the
+        # folder loses only uncommitted files or a detached HEAD that no ref holds.
+        rc, _ = git(repo, "symbolic-ref", "-q", "HEAD")
+        if rc != 0:
+            rc, holders = git(repo, "for-each-ref", "--contains", "HEAD", "--format=%(refname)")
+            if not [h for h in holders.split() if not h.startswith("refs/codex/")]:
+                reasons.append("detached HEAD that no branch or tag holds")
+        return not reasons, reasons
+    rc, wt = git(repo, "worktree", "list", "--porcelain")
+    here = str(repo.resolve())
+    for line in wt.splitlines():
+        if line.startswith("worktree "):
+            other = line[len("worktree ") :]
+            if other != here and not other.startswith(here + "/") and Path(other).exists():
+                reasons.append(f"linked worktree outside it at {other}")
+    for ref, n in unpushed_refs(repo):
+        reasons.append(f"{ref} has {n} commit(s) whose changes are not on a remote")
     rc, stash = git(repo, "stash", "list")
     if stash.strip():
         reasons.append("stash present")
     return not reasons, reasons
+
+
+def remote_default(repo):
+    rc, out = git(repo, "symbolic-ref", "-q", "refs/remotes/origin/HEAD")
+    if rc == 0 and out.strip():
+        return out.strip()
+    for cand in ("refs/remotes/origin/main", "refs/remotes/origin/master"):
+        if git(repo, "rev-parse", "-q", "--verify", cand)[0] == 0:
+            return cand
+    return None
+
+
+def unpushed_refs(repo):
+    """Local branches, tags and HEAD whose changes are not on a remote.
+
+    A ref whose commits are missing from every remote still counts as pushed when each
+    file it changed has the same content on the remote default branch, which is what a
+    squash merge leaves behind. Codex turn checkpoints under refs/codex are internal.
+    """
+    rc, out = git(repo, "for-each-ref", "--format=%(refname)", "refs/heads", "refs/tags")
+    refs = out.split() + ["HEAD"]
+    default = remote_default(repo)
+    bad = []
+    for ref in refs:
+        rc, n = git(repo, "rev-list", "--count", ref, "--not", "--remotes")
+        if rc != 0 or n.strip() == "0":
+            continue
+        if default:
+            rc, base = git(repo, "merge-base", ref, default)
+            if rc == 0 and base.strip():
+                rc, files = git(repo, "diff", "--name-only", base.strip(), ref)
+                names = [f for f in files.splitlines() if f]
+                if rc == 0 and (
+                    not names or git(repo, "diff", "--quiet", ref, default, "--", *names)[0] == 0
+                ):
+                    continue
+        bad.append((ref, n.strip()))
+        if len(bad) >= 5:
+            break
+    return bad
 
 
 def leftover_worktree_roots():

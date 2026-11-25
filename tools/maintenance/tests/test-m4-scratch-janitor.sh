@@ -34,6 +34,14 @@ mk "$SC/legacy-audit/untracked";   echo x > "$SC/legacy-audit/untracked/notes.md
 mk "$SC/legacy-audit/stashed";     echo y >> "$SC/legacy-audit/stashed/a.txt"; git -C "$SC/legacy-audit/stashed" stash -q; old "$SC/legacy-audit/stashed"
 mk "$SC/legacy-audit/envfile";     echo K=1 > "$SC/legacy-audit/envfile/.env"; old "$SC/legacy-audit/envfile"
 mk "$SC/legacy-audit/fresh"
+# A branch squash-merged on the remote: its commits are not on the remote, its changes are.
+mk "$SC/legacy-audit/squashed"; git -C "$SC/legacy-audit/squashed" checkout -qb feat
+echo s > "$SC/legacy-audit/squashed/s.txt"; git -C "$SC/legacy-audit/squashed" add . && git -C "$SC/legacy-audit/squashed" commit -qm feat
+git -C "$seed" pull -q; echo s > "$seed/s.txt"; git -C "$seed" add . && git -C "$seed" commit -qm "feat (squash)" && git -C "$seed" push -q origin main
+git -C "$SC/legacy-audit/squashed" fetch -q; old "$SC/legacy-audit/squashed"
+# A main clone whose linked worktree sits elsewhere must stay.
+mk "$SC/legacy-audit/hasworktree"; git -C "$SC/legacy-audit/hasworktree" worktree add -q "$T/elsewhere-wt" -b wt 2>/dev/null
+old "$SC/legacy-audit/hasworktree"
 mkdir -p "$SC/legacy-audit/app/node_modules/x"; echo 1 > "$SC/legacy-audit/app/node_modules/x/i.js"
 echo keep > "$SC/legacy-audit/evidence.json"; old "$SC/legacy-audit/app"; old "$SC/legacy-audit/evidence.json"
 
@@ -61,6 +69,8 @@ expect present "$SC/legacy-audit/untracked"
 expect present "$SC/legacy-audit/stashed"
 expect present "$SC/legacy-audit/envfile"
 expect present "$SC/legacy-audit/fresh"
+expect gone    "$SC/legacy-audit/squashed"
+expect present "$SC/legacy-audit/hasworktree"
 expect gone    "$SC/legacy-audit/app/node_modules"
 expect present "$SC/legacy-audit/app"
 expect present "$SC/legacy-audit/evidence.json"
@@ -81,12 +91,16 @@ echo "== leftover linked worktrees in Projects =="
 P="$HOME/HQ-AI-Workspace-M4/Projects/App"; mk "$P"
 git -C "$P" worktree add -q "$P/worktrees/lane-done" -b lane-done 2>/dev/null
 git -C "$P/worktrees/lane-done" push -q origin lane-done 2>/dev/null
+git -C "$P" worktree add -q "$P/worktrees/lane-local" -b lane-local 2>/dev/null
+echo l > "$P/worktrees/lane-local/l.txt"; git -C "$P/worktrees/lane-local" add . && git -C "$P/worktrees/lane-local" commit -qm local
 git -C "$P" worktree add -q "$P/worktrees/lane-open" -b lane-open 2>/dev/null
 echo w > "$P/worktrees/lane-open/w.txt"
 old "$P/worktrees"
 python3 "$JANITOR" >/dev/null
 expect gone    "$P/worktrees/lane-done"
 expect present "$P/worktrees/lane-open"
+expect gone    "$P/worktrees/lane-local"
+git -C "$P" rev-parse -q --verify lane-local >/dev/null && { PASS=$((PASS+1)); echo "  ok   unpushed branch of a dropped worktree stays in the main clone"; } || { FAIL=$((FAIL+1)); echo "  FAIL branch lost"; }
 expect present "$P/a.txt"
 git -C "$P" worktree list | grep -q lane-done && { FAIL=$((FAIL+1)); echo "  FAIL worktree not pruned"; } || { PASS=$((PASS+1)); echo "  ok   worktree metadata pruned"; }
 
