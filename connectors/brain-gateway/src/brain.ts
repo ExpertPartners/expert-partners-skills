@@ -49,7 +49,8 @@ export const MAX_NESTED_DEPTH = 4;
 const FOLDER_MIME = "application/vnd.google-apps.folder";
 const REGISTERED_ROOTS: ReadonlySet<string> = new Set(Object.values(BRAIN_FOLDERS));
 
-export const READABLE_MIME = ["application/vnd.google-apps.document", "text/plain", "text/markdown"];
+export const SHEET_MIME = "application/vnd.google-apps.spreadsheet";
+export const READABLE_MIME = ["application/vnd.google-apps.document", "text/plain", "text/markdown", SHEET_MIME];
 
 /** Only scopes named in the ALLOWED_SCOPES var are reachable. Everything else is refused. */
 export function allowedScopes(list: string | undefined): BrainScope[] {
@@ -271,20 +272,51 @@ export function createBrainReads(drive: DriveFetch, now = () => new Date(), with
 		return { scope, folderId: BRAIN_FOLDERS[scope], reachable: true };
 	}
 
+	/**
+	 * A spreadsheet reads one whole tab at a time through the Sheets values API, using the same read-only
+	 * Drive credential. Without a tab it returns the tab list, so the caller can choose. Rows keep their
+	 * sheet row numbers so a cited row can be checked against the source.
+	 */
+	async function sheetText(id: string, sheet?: string): Promise<string> {
+		const meta = await drive(`/v4/spreadsheets/${encodeURIComponent(id)}?fields=${encodeURIComponent("sheets.properties(title,sheetId,gridProperties(rowCount,columnCount))")}`);
+		if (!meta.ok) throw new BrainError("drive_error", `Spreadsheet lookup answered ${meta.status}.`);
+		const tabs = ((await meta.json()) as { sheets?: { properties?: { title?: string; sheetId?: number } }[] }).sheets?.map((s) => s.properties?.title ?? "") ?? [];
+		if (!tabs.length || tabs.some((t) => !t)) throw new BrainError("incomplete_export", "The spreadsheet returned no complete tab list.");
+		if (sheet === undefined) return `Spreadsheet tabs. Pass one exact title as sheet to read that whole tab.\n${tabs.map((t) => `- ${t}`).join("\n")}\n`;
+		if (!tabs.includes(sheet)) throw new BrainError("sheet_not_found", "That tab is not in this spreadsheet.");
+		const range = `'${sheet.replace(/'/g, "''")}'`;
+		const res = await drive(
+			`/v4/spreadsheets/${encodeURIComponent(id)}/values/${encodeURIComponent(range)}?majorDimension=ROWS&valueRenderOption=FORMATTED_VALUE`,
+		);
+		if (res.status !== 200) throw new BrainError("incomplete_export", "The spreadsheet tab did not return completely.");
+		const body = (await res.json()) as { range?: string; values?: unknown[][] };
+		const start = Number(body.range?.match(/![A-Z]+(\d+)/)?.[1] ?? "1");
+		if (!Number.isInteger(start) || start < 1) throw new BrainError("incomplete_export", "The spreadsheet tab range was unreadable.");
+		const rows = (body.values ?? []).map((row, i) => `R${start + i}\t${JSON.stringify(row.map((c) => String(c ?? "")))}`);
+		const text = `Tab ${sheet}. One line per sheet row, R number then the cells as a JSON array.\n${rows.join("\n")}\n`;
+		if (text.length > MAX_CHARS) throw new BrainError("too_large", "Tab exceeds the full-read limit. Nothing is authoritative.");
+		return text;
+	}
+
 	/** Reads one whole document. Verifies direct membership in scope before and after, and that the version did not change. */
-	async function readWhole(scope: BrainScope, id: string, folder?: string) {
+	async function readWhole(scope: BrainScope, id: string, folder?: string, sheet?: string) {
 		if (withheld.has(id)) throw new BrainError("not_in_scope", "The file is not a readable document in this scope.");
 		const inventory = await discover(scope, undefined, folder);
 		const found = inventory.files.find((f) => f.id === id);
 		if (!found || !READABLE_MIME.includes(found.mimeType))
 			throw new BrainError("not_in_scope", "The file is not a readable document in this scope.");
+		if (sheet !== undefined && found.mimeType !== SHEET_MIME) throw new BrainError("not_a_spreadsheet", "Only a spreadsheet takes a sheet.");
 		const before = await fileVersion(drive, id);
-		const res = await drive(
-			`/drive/v3/files/${encodeURIComponent(id)}${
-				found.mimeType === "application/vnd.google-apps.document" ? "/export?mimeType=text/plain&supportsAllDrives=true" : "?alt=media&supportsAllDrives=true"
-			}`,
-		);
-		const text = await fullText(res);
+		const text =
+			found.mimeType === SHEET_MIME
+				? await sheetText(id, sheet)
+				: await fullText(
+						await drive(
+							`/drive/v3/files/${encodeURIComponent(id)}${
+								found.mimeType === "application/vnd.google-apps.document" ? "/export?mimeType=text/plain&supportsAllDrives=true" : "?alt=media&supportsAllDrives=true"
+							}`,
+						),
+					);
 		const after = await fileVersion(drive, id);
 		if (after.version !== before.version) throw new BrainError("changed_during_read", "Document changed during the read. Read again.");
 		// Rechecks the whole parent chain too, so a folder moved out of scope mid-read is refused.
@@ -293,12 +325,12 @@ export function createBrainReads(drive: DriveFetch, now = () => new Date(), with
 			throw e;
 		});
 		if (!membership.files.some((f) => f.id === id)) throw new BrainError("left_scope", "Document left the selected scope during the read.");
-		return { file: before, text, readAt: now().toISOString(), folder: inventory.folder };
+		return { file: before, text, readAt: now().toISOString(), folder: inventory.folder, ...(sheet !== undefined ? { sheet } : {}) };
 	}
 
 	/** Whole document verified, returned in pages so large documents fit an MCP reply. */
-	async function read(scope: BrainScope, id: string, offset = 0, maxChars = DEFAULT_PAGE_CHARS, folder?: string) {
-		const { file, text, readAt, folder: nested } = await readWhole(scope, id, folder);
+	async function read(scope: BrainScope, id: string, offset = 0, maxChars = DEFAULT_PAGE_CHARS, folder?: string, sheet?: string) {
+		const { file, text, readAt, folder: nested } = await readWhole(scope, id, folder, sheet);
 		const size = Math.min(Math.max(1, maxChars), MAX_PAGE_CHARS);
 		const start = Math.min(Math.max(0, offset), text.length);
 		const end = Math.min(text.length, start + size);
@@ -306,6 +338,7 @@ export function createBrainReads(drive: DriveFetch, now = () => new Date(), with
 			file,
 			scope,
 			...(nested ? { folder: nested } : {}),
+			...(sheet !== undefined ? { sheet } : {}),
 			readAt,
 			totalChars: text.length,
 			offset: start,

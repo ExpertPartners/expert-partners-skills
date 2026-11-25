@@ -65,11 +65,17 @@ async function accessToken(raw: string | undefined, fetchImpl: typeof fetch): Pr
 	return cached.token;
 }
 
-/** Drive GET-only client. Anything that is not a read of the Drive v3 files API is refused here. */
+const SHEETS_API = "https://sheets.googleapis.com";
+
+/**
+ * GET-only client. Only Drive v3 files reads and Sheets v4 spreadsheet reads are reachable. Sheets accepts
+ * the same drive.readonly token, so no write scope is ever requested.
+ */
 export function driveFetch(rawKey: string | undefined, fetchImpl: typeof fetch = fetch): DriveFetch {
 	return async (path: string) => {
-		if (!path.startsWith("/drive/v3/files")) throw new Error("Only the Drive v3 files API is reachable.");
+		const sheets = path.startsWith("/v4/spreadsheets/");
+		if (!sheets && !path.startsWith("/drive/v3/files")) throw new Error("Only the Drive v3 files API and Sheets v4 spreadsheet reads are reachable.");
 		const token = await accessToken(rawKey, fetchImpl);
-		return fetchImpl(`${API}${path}`, { method: "GET", headers: { authorization: `Bearer ${token}` } });
+		return fetchImpl(`${sheets ? SHEETS_API : API}${path}`, { method: "GET", headers: { authorization: `Bearer ${token}` } });
 	};
 }
