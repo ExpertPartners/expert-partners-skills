@@ -51,6 +51,9 @@ old "$SC/legacy-audit/rezip"
 # A main clone whose linked worktree sits elsewhere must stay.
 mk "$SC/legacy-audit/hasworktree"; git -C "$SC/legacy-audit/hasworktree" worktree add -q "$T/elsewhere-wt" -b wt 2>/dev/null
 old "$SC/legacy-audit/hasworktree"
+# Only directory mtimes are fresh (a cache was just removed inside): still idle.
+mk "$SC/legacy-audit/dirbump"; mkdir -p "$SC/legacy-audit/dirbump/.output"; old "$SC/legacy-audit/dirbump"
+rmdir "$SC/legacy-audit/dirbump/.output"
 mkdir -p "$SC/legacy-audit/app/node_modules/x"; echo 1 > "$SC/legacy-audit/app/node_modules/x/i.js"
 echo keep > "$SC/legacy-audit/evidence.json"; old "$SC/legacy-audit/app"; old "$SC/legacy-audit/evidence.json"
 
@@ -78,6 +81,7 @@ expect present "$SC/legacy-audit/untracked"
 expect present "$SC/legacy-audit/stashed"
 expect present "$SC/legacy-audit/envfile"
 expect present "$SC/legacy-audit/fresh"
+expect gone    "$SC/legacy-audit/dirbump"
 expect gone    "$SC/legacy-audit/squashed"
 expect gone    "$SC/legacy-audit/pushedtag"
 expect gone    "$SC/legacy-audit/rezip"
