@@ -1,3 +1,6 @@
+## 0.14.0 - 2026-11-25
+
+Add Read the Room, one shared after-session analysis skill for HQ, EP and AG. It combines final transcripts with available chat and Q&A, reports timestamped topic reactions and practical next-session changes, and defines cross-route session identity, completion checks, department-only saving, Ember summaries and durable logging for every attempt.
 ## 0.13.0 - 2026-11-24
 
 Add a portable Launch Formula Coach that retrieves the preserved original method, and a separate connected launch workflow that coordinates the three source methods with explicit attribution and honest source coverage. Business teaching and source material remain in the owning Drive Brain.
