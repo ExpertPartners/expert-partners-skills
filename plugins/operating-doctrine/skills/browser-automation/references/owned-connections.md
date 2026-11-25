@@ -40,6 +40,20 @@ create a new one to get past the check.
 
 ## Per-job MCP route
 
+### Installed headless policy
+
+Do not pin `route.json`'s `headless_hook` to a versioned plugin cache. Run the
+packaged `scripts/install_headless_policy.py` with one `--config` per installed
+profile route. It installs a stable adapter under the user's private
+`~/.config/expert-partners/browser-policy/` directory and retains an exact backup
+of each changed config. It changes no protected launcher, credential or live job.
+The adapter reads Claude Code's enabled user-installation receipt on startup and
+before policy calls, so the next plugin update reaches every route without
+another config edit. It refuses missing, disabled or ambiguous installations
+instead of silently using a stale policy. Policy cache refresh still comes from
+the installed hook. Verify each actual launcher after migration, not only the
+adapter in isolation.
+
 The packaged `scripts/browser_jobs.py` supplies the per-job stdio MCP route. It
 runs on the browser host around the existing protected launcher. It has no network
 listener, scheduler or background dispatch. The caller starts one browser job per
