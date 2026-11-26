@@ -98,6 +98,9 @@ export class BrainError extends Error {
 
 export type DriveFetch = (path: string) => Promise<Response>;
 
+export type PinnedFile = { id: string; parent: string; drive: string };
+const PINNED_MIME = ["application/vnd.google-apps.document", "text/plain", "text/markdown"];
+
 export type BrainFile = {
 	id: string;
 	name: string;
@@ -409,6 +412,58 @@ export function createBrainReads(
 	/** Whole document verified, returned in pages so large documents fit an MCP reply. */
 	async function read(scope: BrainScope, id: string, offset = 0, maxChars = DEFAULT_PAGE_CHARS, folder?: string, sheet?: string, expectVersion?: string) {
 		const { file, text, readAt, folder: nested } = await readWhole(scope, id, folder, sheet);
+		return { file, scope, ...(nested ? { folder: nested } : {}), ...(sheet !== undefined ? { sheet } : {}), readAt, ...page(text, file, offset, maxChars, sheet, expectVersion) };
+	}
+
+	/** Proves the pinned file is still an untrashed readable child of its pinned parent in its pinned drive. Returns its MIME type. */
+	async function pinnedMember(pin: PinnedFile, code: "not_in_scope" | "left_scope"): Promise<string> {
+		const refuse = () => new BrainError(code, code === "left_scope" ? "Document left the selected scope during the read." : "The file is not a readable document in this scope.");
+		const params = new URLSearchParams({ fields: "id,mimeType,driveId,trashed", supportsAllDrives: "true" });
+		const res = await drive(`/drive/v3/files/${encodeURIComponent(pin.id)}?${params}`);
+		if (res.status === 404) throw refuse();
+		if (!res.ok) throw new BrainError("drive_error", `Drive file lookup answered ${res.status}.`);
+		const meta = (await res.json()) as { id?: string; mimeType?: string; driveId?: string; trashed?: boolean };
+		if (meta.id !== pin.id || meta.driveId !== pin.drive || meta.trashed !== false || !PINNED_MIME.includes(meta.mimeType ?? "")) throw refuse();
+		let pageToken = "";
+		const seen = new Set<string>();
+		do {
+			const q = new URLSearchParams({
+				q: `'${pin.parent}' in parents and trashed=false`,
+				pageSize: "1000",
+				fields: "nextPageToken,incompleteSearch,files(id)",
+				supportsAllDrives: "true",
+				includeItemsFromAllDrives: "true",
+				...(pageToken ? { pageToken } : {}),
+			});
+			const list = await drive(`/drive/v3/files?${q}`);
+			if (!list.ok) throw new BrainError("drive_error", `Drive discovery answered ${list.status}.`);
+			const body = (await list.json()) as { files?: { id?: string }[]; nextPageToken?: string; incompleteSearch?: boolean };
+			if (!Array.isArray(body.files) || body.incompleteSearch) throw new BrainError("incomplete_discovery", "Drive discovery was incomplete.");
+			if (body.files.some((f) => f.id === pin.id)) return meta.mimeType!;
+			pageToken = body.nextPageToken ?? "";
+			if (pageToken && seen.has(pageToken)) throw new BrainError("incomplete_discovery", "Drive repeated a discovery page.");
+			seen.add(pageToken);
+		} while (pageToken);
+		throw refuse();
+	}
+
+	/** One pinned exact file outside every scope root, with the same complete-read and same-version rules as read. */
+	async function readPinned(exception: string, pin: PinnedFile, offset = 0, maxChars = DEFAULT_PAGE_CHARS, expectVersion?: string) {
+		if (withheld.has(pin.id) || withheld.has(pin.parent)) throw new BrainError("not_in_scope", "The file is not a readable document in this scope.");
+		const mimeType = await pinnedMember(pin, "not_in_scope");
+		const before = await fileVersion(drive, pin.id);
+		const text = await fullText(
+			await drive(
+				`/drive/v3/files/${encodeURIComponent(pin.id)}${mimeType === "application/vnd.google-apps.document" ? "/export?mimeType=text/plain&supportsAllDrives=true" : "?alt=media&supportsAllDrives=true"}`,
+			),
+		);
+		const after = await fileVersion(drive, pin.id);
+		if (after.version !== before.version) throw new BrainError("changed_during_read", "Document changed during the read. Read again.");
+		await pinnedMember(pin, "left_scope");
+		return { file: before, exception, readAt: now().toISOString(), ...page(text, before, offset, maxChars, undefined, expectVersion) };
+	}
+
+	function page(text: string, file: BrainFile, offset: number, maxChars: number, sheet?: string, expectVersion?: string) {
 		// A multi-page read is one authoritative read only when every page saw the same version.
 		if (expectVersion !== undefined && file.version !== expectVersion)
 			throw new BrainError("changed_during_read", "Document changed since the earlier pages. Read again from offset 0.");
@@ -423,11 +478,6 @@ export function createBrainReads(
 			else partialRow = true;
 		}
 		return {
-			file,
-			scope,
-			...(nested ? { folder: nested } : {}),
-			...(sheet !== undefined ? { sheet } : {}),
-			readAt,
 			totalChars: text.length,
 			offset: start,
 			nextOffset: end < text.length ? end : null,
@@ -448,5 +498,5 @@ export function createBrainReads(
 		};
 	}
 
-	return { discover, probe, read, decisions };
+	return { discover, probe, read, readPinned, decisions };
 }

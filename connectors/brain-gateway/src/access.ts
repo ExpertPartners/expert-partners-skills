@@ -6,7 +6,7 @@
 // - Department AIs start with their own department folder plus shared HQ governance, and reach another
 //   department only through a named, approved exception.
 // - Private and system folders stay out unless the allowlist names them.
-import { allowedScopes, BrainError, type BrainScope } from "./brain.ts";
+import { allowedScopes, BrainError, type BrainScope, type PinnedFile } from "./brain.ts";
 
 export type Principal =
 	| { kind: "person"; email: string; department?: string } // OAuth sign-in (Claude, ChatGPT, Factory) or the Hub session, optionally narrowed
@@ -86,6 +86,34 @@ export function mayReadException(allowedList: string | undefined, principal: Pri
 	if (!Array.isArray(files) || files.length !== 5 || new Set(files).size !== 5 || files.some((file) => typeof file !== "string" || !/^[\w-]+$/.test(file)))
 		throw new BrainError("file_exceptions_invalid", "The named file exception is malformed.");
 	return files.includes(id);
+}
+
+/** Exact files outside every scope root, each pinned to its parent folder and shared drive. Leader only. */
+export const PINNED_EXCEPTIONS: Record<string, { count: number; leader: string }> = {
+	"gap108-week2-builder": { count: 3, leader: "allison@expertpartners.com" },
+};
+
+/**
+ * The pinned file this principal may read, or null when the request is not for a pinned exception.
+ * Only the named leader acting without a department may use it. The IDs live in the PINNED_FILE_READS
+ * secret as {"<exception>":[{"id":"…","parent":"…","drive":"…"}]}, never in this repository.
+ */
+export function pinnedReadFor(principal: Principal, scope: string, id: string, folder: unknown, json: string | undefined): PinnedFile | null {
+	const exception = Object.prototype.hasOwnProperty.call(PINNED_EXCEPTIONS, scope) ? PINNED_EXCEPTIONS[scope]! : undefined;
+	if (!exception) return null;
+	const refuse = () => new BrainError("not_in_scope", "The file is not a readable document in this scope.");
+	if (principal.kind !== "person" || principal.department !== undefined || principal.email.trim().toLowerCase() !== exception.leader) throw refuse();
+	if (folder !== undefined || !json) throw refuse();
+	let value: unknown;
+	try { value = JSON.parse(json); } catch { throw new BrainError("file_exceptions_invalid", "The pinned file exception is unreadable."); }
+	const files = value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>)[scope] : undefined;
+	const valid = (f: unknown): f is PinnedFile =>
+		!!f && typeof f === "object" && ["id", "parent", "drive"].every((k) => typeof (f as any)[k] === "string" && /^[\w-]+$/.test((f as any)[k])) && Object.keys(f).length === 3;
+	if (!Array.isArray(files) || files.length !== exception.count || !files.every(valid) || new Set(files.map((f) => f.id)).size !== exception.count)
+		throw new BrainError("file_exceptions_invalid", "The pinned file exception is malformed.");
+	const pin = files.find((f) => f.id === id);
+	if (!pin) throw refuse();
+	return pin;
 }
 
 export async function sha256Hex(text: string): Promise<string> {
