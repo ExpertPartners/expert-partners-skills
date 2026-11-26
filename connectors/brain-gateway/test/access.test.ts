@@ -101,3 +101,37 @@ test("department tokens match only by SHA-256 hash and never by guess", async ()
 test("only the approved leaders are listed", () => {
 	assert.deepEqual(Object.keys(PEOPLE).sort(), ["allison@expertpartners.com", "don@expertpartners.com"]);
 });
+
+test("AG Personal Marketing has its own workspace boundary, separate from EP and AG Luxury", async () => {
+	const scopes = ["ag-personal-core", "ag-personal-marketing"] as const;
+	assert.deepEqual(effectiveScopes(ALLOWED, dept("ag-personal-cgo")).sort(), [...scopes, "hq-core"]);
+	assert.deepEqual(effectiveScopes(ALLOWED, person("allison@expertpartners.com", "ag-personal-cgo")).sort(), [...scopes, "hq-core"]);
+	assert.deepEqual(effectiveScopes(ALLOWED, person("don@expertpartners.com", "ag-personal-cgo")), ["hq-core"]);
+	assert.equal(DEPARTMENTS["ag-cgo"].label, "AG Luxury Chief Growth Officer");
+	assert.ok(effectiveScopes(ALLOWED, dept("ag-cgo")).includes("ag-marketing"));
+	for (const scope of scopes) {
+		const own = await runTool("discover", { scope }, { ALLOWED_SCOPES: ALLOWED }, async (path) => {
+			assert.equal(new URL(path, "https://drive.invalid").searchParams.get("q"), `'${BRAIN_FOLDERS[scope]}' in parents and trashed=false`);
+			return Response.json({ files: [] });
+		}, dept("ag-personal-cgo"));
+		assert.equal(own.status, 200);
+		for (const principal of [
+			person("don@expertpartners.com"),
+			...Object.keys(DEPARTMENTS).filter((id) => id !== "ag-personal-cgo").map(dept),
+		]) {
+			assert.ok(!effectiveScopes(ALLOWED, principal).includes(scope));
+			for (const tool of ["discover", "read"]) {
+				const denied = await runTool(tool, { scope, id: "file" }, { ALLOWED_SCOPES: ALLOWED }, async () => {
+					throw new Error("Cross-company or cross-department request must never call Drive");
+				}, principal);
+				assert.equal(denied.status, 403);
+			}
+		}
+	}
+	for (const scope of ["ag-marketing", "ag-core", "ep-marketing", "ep-core", "ag-outputs"]) {
+		const denied = await runTool("discover", { scope }, { ALLOWED_SCOPES: ALLOWED }, async () => {
+			throw new Error("AG Personal cannot reach another brain");
+		}, dept("ag-personal-cgo"));
+		assert.equal(denied.status, 403);
+	}
+});

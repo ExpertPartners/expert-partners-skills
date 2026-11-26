@@ -31,6 +31,8 @@ export const BRAIN_FOLDERS = {
 	"ag-operations": "1NXOwo8Cq5Jb7MTsnzZ5XNRkbybi89RV1",
 	"ag-outputs": "14MfoyCMP2011nGdhf2VowNfpCk8Mh1Hh",
 	"ag-private": "1jvcBly_KLDJnyTKFADtPjVTSWxfGLL8A",
+	"ag-personal-core": "1O0kvppsMruWk5wQBtsazk2B346jDWSn0",
+	"ag-personal-marketing": "1b4Ou1oZ9YkZkD5TJutWQ0NxsphwiZyep",
 	// Workspace and shelf homes that sit inside another department folder.
 	"hq-library-marketing": "1bjwhy6jGjUZBDHtbdXsKRM_q04GTy7PO",
 	"ep-events": "1AVq7ONpjLZxrtppVd5qEussIEPnjZuua",

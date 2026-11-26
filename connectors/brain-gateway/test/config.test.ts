@@ -9,7 +9,7 @@ const config = JSON.parse(
 	readFileSync(new URL("../wrangler.jsonc", import.meta.url), "utf8").replace(/^\s*\/\/.*$/gm, ""),
 );
 const env = { ALLOWED_SCOPES: config.vars.ALLOWED_SCOPES as string };
-const homes = ["hq-hr", "hq-employees", "hq-finance", "hq-audits", "hq-outputs", "ep-client-experience", "hq-library-marketing", "ep-events", "ep-acn", "ag-strong-ones", "ag-case-studies"] as const;
+const homes = ["hq-hr", "hq-employees", "hq-finance", "hq-audits", "hq-outputs", "ep-client-experience", "hq-library-marketing", "ep-events", "ep-acn", "ag-strong-ones", "ag-case-studies", "ag-personal-core", "ag-personal-marketing"] as const;
 
 test("deployed allowlist includes mapped department homes and ep-private, without ag-private or unknown scopes", async () => {
 	const expected = [
@@ -17,9 +17,10 @@ test("deployed allowlist includes mapped department homes and ep-private, withou
 		"ep-core", "ep-discovery", "ep-marketing", "ep-sales", "ep-client-experience", "ep-operations", "ep-outputs", "ep-private",
 		"ag-core", "ag-marketing", "ag-sales", "ag-listings", "ag-client-experience", "ag-operations", "ag-outputs",
 		"hq-library-marketing", "ep-events", "ep-acn", "ag-strong-ones", "ag-case-studies",
+		"ag-personal-core", "ag-personal-marketing",
 	];
 	assert.deepEqual(allowedScopes(env.ALLOWED_SCOPES), expected);
-	assert.equal(new Set(allowedScopes(env.ALLOWED_SCOPES)).size, 31);
+	assert.equal(new Set(allowedScopes(env.ALLOWED_SCOPES)).size, 33);
 	for (const denied of ["ag-private", "bogus"])
 		assert.throws(() => assertScope(env.ALLOWED_SCOPES, denied));
 	const listed = await runTool("list_scopes", {}, env, async () => { throw new Error("Listing scopes must not read Drive"); });
