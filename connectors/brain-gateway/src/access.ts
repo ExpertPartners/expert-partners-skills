@@ -32,18 +32,18 @@ const GOVERNANCE = ["hq-core"];
  * entry names plus its company's system outputs folder and shared governance. `exceptions` is for named,
  * approved cross-department sources only and stays empty until a decision names the source.
  */
-export const DEPARTMENTS: Record<string, { label: string; scopes: BrainScope[]; exceptions: BrainScope[] }> = {
+export const DEPARTMENTS: Record<string, { label: string; scopes: BrainScope[]; exceptions: BrainScope[]; fileExceptions?: string[] }> = {
 	"ep-ceo": { label: "EP Chief Executive Officer", scopes: ["ep-core", "ep-discovery", "ep-acn", ...EP_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
 	"ep-cgo": { label: "EP Chief Growth Officer", scopes: ["ep-marketing", "ep-events", "hq-library", "hq-library-marketing", ...EP_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
 	"ep-cro": { label: "EP Chief Revenue Officer", scopes: ["ep-sales", ...EP_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
 	"ep-cco": { label: "EP Chief Client Officer", scopes: ["ep-client-experience", ...EP_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
 	"ep-coo": { label: "EP Chief Operations Officer", scopes: ["ep-operations", ...EP_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
-	"ag-ceo": { label: "AG Chief Executive Officer", scopes: ["ag-core", "ag-case-studies", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
-	"ag-cgo": { label: "AG Luxury Chief Growth Officer", scopes: ["ag-marketing", "ag-strong-ones", "hq-library", "hq-library-marketing", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
+	"ag-ceo": { label: "AG Chief Executive Officer", scopes: ["ag-core", "ag-case-studies", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [], fileExceptions: ["ag-shared-brand"] },
+	"ag-cgo": { label: "AG Luxury Chief Growth Officer", scopes: ["ag-marketing", "ag-strong-ones", "hq-library", "hq-library-marketing", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [], fileExceptions: ["ag-shared-brand"] },
 	"ag-personal-cgo": { label: "AG Personal Marketing", scopes: ["ag-personal-core", "ag-personal-marketing", ...GOVERNANCE] as BrainScope[], exceptions: [] },
-	"ag-cro": { label: "AG Chief Revenue Officer", scopes: ["ag-sales", "ag-listings", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
-	"ag-cco": { label: "AG Chief Client Officer", scopes: ["ag-client-experience", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
-	"ag-coo": { label: "AG Chief Operations Officer", scopes: ["ag-operations", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
+	"ag-cro": { label: "AG Chief Revenue Officer", scopes: ["ag-sales", "ag-listings", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [], fileExceptions: ["ag-shared-brand"] },
+	"ag-cco": { label: "AG Chief Client Officer", scopes: ["ag-client-experience", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [], fileExceptions: ["ag-shared-brand"] },
+	"ag-coo": { label: "AG Chief Operations Officer", scopes: ["ag-operations", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [], fileExceptions: ["ag-shared-brand"] },
 	"hq-chro": { label: "HQ Chief HR Officer", scopes: ["hq-hr", "hq-employees", "hq-skills", ...HQ_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
 	"hq-cfo": { label: "HQ Chief Finance Officer", scopes: ["hq-finance", ...HQ_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
 	"hq-caio": { label: "HQ Chief AI Officer", scopes: ["hq-operations", "hq-analytics", "hq-partnersync", "hq-audits", ...HQ_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
@@ -68,6 +68,24 @@ export function effectiveScopes(allowedList: string | undefined, principal: Prin
 		if (principal.department) profile = profile.filter((s) => departmentScopes(principal.department!).includes(s));
 	}
 	return allowed.filter((s) => profile.includes(s));
+}
+
+/** Named exact-file exception, never a scope grant. Document IDs stay in the Worker secret. */
+export function mayReadException(allowedList: string | undefined, principal: Principal, scope: string, id: string, folder: unknown, json: string | undefined): boolean {
+	const department = principal.kind === "department" ? principal.id : principal.department;
+	const profile = department ? DEPARTMENTS[department] : undefined;
+	if (!profile?.fileExceptions?.includes("ag-shared-brand") || scope !== "ag-personal-core" || folder !== undefined) return false;
+	// Keep the person's leader boundary and the department's existing Luxury entitlement.
+	if (principal.kind === "person" && !PEOPLE[principal.email.trim().toLowerCase()]?.match("ag-core")) return false;
+	const allowed = allowedScopes(allowedList);
+	if (!allowed.includes("ag-core") || !allowed.includes("ag-personal-core") || !effectiveScopes(allowedList, principal).some((s) => s.startsWith("ag-") && !s.startsWith("ag-personal-"))) return false;
+	if (!json) return false;
+	let value: unknown;
+	try { value = JSON.parse(json); } catch { throw new BrainError("file_exceptions_invalid", "The named file exception is unreadable."); }
+	const files = (value && typeof value === "object" && !Array.isArray(value)) ? (value as Record<string, unknown>)["ag-shared-brand"] : undefined;
+	if (!Array.isArray(files) || files.length !== 5 || new Set(files).size !== 5 || files.some((file) => typeof file !== "string" || !/^[\w-]+$/.test(file)))
+		throw new BrainError("file_exceptions_invalid", "The named file exception is malformed.");
+	return files.includes(id);
 }
 
 export async function sha256Hex(text: string): Promise<string> {

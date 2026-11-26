@@ -33,7 +33,8 @@
       "SENDBLUE_API_SECRET",
       "ALERT_TO",
       "ALERT_FROM",
-      "WITHHELD_SOURCES"
+      "WITHHELD_SOURCES",
+      "FILE_READ_EXCEPTIONS"
     ]
   }
 }

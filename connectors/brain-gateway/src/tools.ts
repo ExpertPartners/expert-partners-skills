@@ -1,7 +1,7 @@
 // One read-only tool registry serves both the MCP connector (/mcp) and the Hub HTTP endpoint (/api/tools).
 // There are no write tools. Nothing here can create, edit, share, trash or delete anything.
 import { z } from "zod";
-import { effectiveScopes, type Principal } from "./access.ts";
+import { effectiveScopes, mayReadException, type Principal } from "./access.ts";
 import {
 	BrainError,
 	canonicalScope,
@@ -20,6 +20,7 @@ export interface ToolEnv {
 	GOOGLE_SA_KEY?: string;
 	ALLOWED_SCOPES?: string;
 	WITHHELD_SOURCES?: string;
+	FILE_READ_EXCEPTIONS?: string;
 }
 
 export interface ToolDef {
@@ -97,6 +98,11 @@ export async function runTool(name: string, args: unknown, env: ToolEnv, drive?:
 	if (!parsed.success) return { ok: false, error: "Invalid arguments", status: 400, detail: parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ") };
 	try {
 		const reads = createBrainReads(drive ?? driveFetch(env.GOOGLE_SA_KEY), undefined, parseWithheld(env.WITHHELD_SOURCES));
+		if (name === "read") {
+			const a = parsed.data as { scope: string; id: string; offset?: number; max_chars?: number; folder?: string; sheet?: string };
+			if (mayReadException(env.ALLOWED_SCOPES, principal, a.scope, a.id, a.folder, env.FILE_READ_EXCEPTIONS))
+				return { ok: true, result: await reads.read("ag-personal-core", a.id, a.offset ?? 0, a.max_chars ?? DEFAULT_PAGE_CHARS, undefined, a.sheet), status: 200 };
+		}
 		return { ok: true, result: await tool.run(parsed.data, reads, effectiveScopes(env.ALLOWED_SCOPES, principal)), status: 200 };
 	} catch (e) {
 		// Never echo provider payloads, URLs, credentials or document text in errors.
