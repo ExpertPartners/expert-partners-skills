@@ -61,7 +61,7 @@ export const TOOLS: ToolDef[] = [
 	{
 		name: "read",
 		description:
-			"Read one document that is currently a direct child of the scope, or of the subfolder given as folder (get its id from discover). The whole document is fetched and verified (same version before and after, still in scope) and returned in pages: pass nextOffset back as offset until it is null. For a spreadsheet, read without sheet to list its tabs, then pass one exact tab title as sheet to read that whole tab with sheet row numbers.",
+			"Read one document that is currently a direct child of the scope, or of the subfolder given as folder (get its id from discover). The whole document is fetched and verified (same version before and after, still in scope) and returned in pages: pass nextOffset back as offset until it is null, and pass the first page's file.version as expect_version so a change between pages is refused. For a spreadsheet, read without sheet to list its tabs, then pass one exact tab title as sheet to read that whole tab with sheet row numbers. Tab pages end on whole rows. partialRow marks a single row longer than the page.",
 		schema: z.object({
 			scope,
 			id: z.string().regex(/^[\w-]+$/).describe("A file id returned by discover for this scope."),
@@ -69,8 +69,9 @@ export const TOOLS: ToolDef[] = [
 			max_chars: z.number().int().min(1).max(MAX_PAGE_CHARS).optional().describe(`Page size, default ${DEFAULT_PAGE_CHARS}.`),
 			folder,
 			sheet: z.string().min(1).max(100).optional().describe("Spreadsheets only. One exact tab title from the tab list."),
+			expect_version: z.string().regex(/^\d+$/).optional().describe("file.version from the first page. A later page refuses with changed_during_read if the document changed."),
 		}),
-		run: async (a, r, scopes) => r.read(inScope(scopes, a.scope), a.id, a.offset ?? 0, a.max_chars ?? DEFAULT_PAGE_CHARS, a.folder, a.sheet),
+		run: async (a, r, scopes) => r.read(inScope(scopes, a.scope), a.id, a.offset ?? 0, a.max_chars ?? DEFAULT_PAGE_CHARS, a.folder, a.sheet, a.expect_version),
 	},
 	{
 		name: "decisions",
@@ -99,9 +100,9 @@ export async function runTool(name: string, args: unknown, env: ToolEnv, drive?:
 	try {
 		const reads = createBrainReads(drive ?? driveFetch(env.GOOGLE_SA_KEY), undefined, parseWithheld(env.WITHHELD_SOURCES));
 		if (name === "read") {
-			const a = parsed.data as { scope: string; id: string; offset?: number; max_chars?: number; folder?: string; sheet?: string };
+			const a = parsed.data as { scope: string; id: string; offset?: number; max_chars?: number; folder?: string; sheet?: string; expect_version?: string };
 			if (mayReadException(env.ALLOWED_SCOPES, principal, a.scope, a.id, a.folder, env.FILE_READ_EXCEPTIONS))
-				return { ok: true, result: await reads.read("ag-personal-core", a.id, a.offset ?? 0, a.max_chars ?? DEFAULT_PAGE_CHARS, undefined, a.sheet), status: 200 };
+				return { ok: true, result: await reads.read("ag-personal-core", a.id, a.offset ?? 0, a.max_chars ?? DEFAULT_PAGE_CHARS, undefined, a.sheet, a.expect_version), status: 200 };
 		}
 		return { ok: true, result: await tool.run(parsed.data, reads, effectiveScopes(env.ALLOWED_SCOPES, principal)), status: 200 };
 	} catch (e) {
