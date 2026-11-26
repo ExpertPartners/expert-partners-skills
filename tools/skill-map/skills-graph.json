@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "61c59a93d315d698fd82a16f50eac1f0db930edc"
+    "eps": "bce78f8c027e900866d2c9de985b1b0ed09b1f16"
   },
   "zones": [
     "surfaces",
@@ -620,7 +620,7 @@
       "calls": [],
       "defersTo": [],
       "brandScope": [],
-      "subtitle": "builds the four core business brain files, in order, from the brain itself",
+      "subtitle": "fills a complete brain template from held evidence, ready for owner review",
       "renderNote": null,
       "layout": {
         "x": 1773.5,
@@ -630,9 +630,9 @@
         "rectHeight": 76,
         "annotationHeight": 15,
         "subtitleLines": [
-          "builds the four core business",
-          "brain files, in order, from the",
-          "brain itself"
+          "fills a complete brain template",
+          "from held evidence, ready for",
+          "owner review"
         ]
       }
     },
