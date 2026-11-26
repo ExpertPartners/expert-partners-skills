@@ -1,3 +1,6 @@
+## 0.15.2 - 2026-11-26
+
+Route AG Personal canon, visual guidance, The Strong Ones, Share the Love and Week Wrap through the separate AG Personal brain scopes. Route only the five shared AG playbook, uniqueness, proof, calibrated voice guide and voice summary sources through AG Personal Core for AG Luxury, preserving its homeowner register, all other Luxury routes and source identities.
 ## 0.15.1 - 2026-11-26
 
 Add explicit synthetic no-send proof mode to Read the Room using metadata.test_mode and a required metadata.test_reason. Test reports are clearly titled, local-only receipts carry test_mode true, and production eligibility and completion gates stay unchanged.

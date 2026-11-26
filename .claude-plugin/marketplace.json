@@ -8,19 +8,19 @@
     {
       "name": "operating-doctrine",
       "source": "./plugins/operating-doctrine",
-      "version": "3.10.5",
+      "version": "3.10.6",
       "description": "The non-negotiable operating standard. Loads at every session."
     },
     {
       "name": "brand-voice",
       "source": "./plugins/brand-voice",
       "description": "Canonical brand context for the Estate brand registry (Expert Partners, EPIC, AG Personal Brand, AG Luxury, FAM, Don Hobbs)",
-      "version": "0.7.10"
+      "version": "0.7.11"
     },
     {
       "name": "content-engines",
       "source": "./plugins/content-engines",
-      "version": "0.15.1",
+      "version": "0.15.2",
       "description": "Allison Gaddy content and marketing engines (master-marketer-free-agent-builder, rare-content-engine, xavier-offer-builder, dm-to-dollars, video-transcript-relay, read-the-room, content-coach, hook-engine, post-grader, post-scheduler, post-value-filter, social-analyzer, speaker-introduction-writer, stage-cards), plus training and film pre-production (gemini-notebook-training-architect, hero-video-preproduction, brand-film-reverse-engineering)."
     },
     {

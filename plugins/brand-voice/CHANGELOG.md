@@ -1,3 +1,6 @@
+## 0.7.11 - 2026-11-26
+
+Route AG Personal canon, visual guidance, The Strong Ones, Share the Love and Week Wrap through the separate AG Personal brain scopes. Route only the five shared AG playbook, uniqueness, proof, calibrated voice guide and voice summary sources through AG Personal Core for AG Luxury, preserving its homeowner register, all other Luxury routes and source identities.
 ## 0.7.10 - 2026-11-24
 
 Keep the join EPIC option in Freedom Funnel and high-ticket funnel work when applying the stay-on-the-job and live commercial scope rules.
