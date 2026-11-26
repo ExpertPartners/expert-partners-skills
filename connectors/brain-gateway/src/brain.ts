@@ -46,10 +46,13 @@ export const DECISION_LOG_SCOPE: BrainScope = "hq-core";
 export const MAX_CHARS = 2_000_000;
 /**
  * Spreadsheet tabs are serialized from one complete values response, then paged. The Hub ledger's Source
- * Inventory tab is about 7.3 million characters. The cap keeps the parsed response plus the serialized text
- * well inside the Worker's 128 MB isolate memory, and still refuses rather than truncating above it.
+ * Inventory tab is about 7.3 million characters. Measured in a fresh process, a tab at the character cap made
+ * of three-byte characters needs the body bytes plus about four copies of the text at once, so both caps keep
+ * that worst case well inside the Worker's 128 MB isolate memory. The byte cap is checked while the body
+ * streams, so an oversized tab is refused before it is parsed rather than exhausting memory.
  */
-export const SHEET_MAX_CHARS = 16_000_000;
+export const SHEET_MAX_CHARS = 10_000_000;
+export const SHEET_MAX_BYTES = 24_000_000;
 /** Sheets reads retry 429 and 503 at most this many attempts in total, never sooner than the server asks. */
 export const SHEET_MAX_ATTEMPTS = 3;
 export const SHEET_MAX_RETRY_DELAY_MS = 8_000;
@@ -200,6 +203,33 @@ export function retryAfterMs(header: string | null, nowMs: number, attempt: numb
 	return 1000 * 2 ** (attempt - 1);
 }
 
+async function boundedJson(stream: ReadableStream<Uint8Array>): Promise<unknown> {
+	const reader = stream.getReader();
+	const chunks: Uint8Array[] = [];
+	let size = 0;
+	try {
+		while (true) {
+			const next = await reader.read();
+			if (next.done) break;
+			size += next.value.byteLength;
+			if (size > SHEET_MAX_BYTES) throw new BrainError("too_large", "Tab exceeds the full-read limit. Nothing is authoritative.");
+			chunks.push(next.value);
+		}
+	} finally {
+		await reader.cancel().catch(() => {});
+		reader.releaseLock();
+	}
+	const decoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: false });
+	let text = "";
+	for (const c of chunks.splice(0)) text += decoder.decode(c, { stream: true });
+	text += decoder.decode();
+	try {
+		return JSON.parse(text);
+	} catch {
+		throw new BrainError("incomplete_export", "The spreadsheet tab did not return completely.");
+	}
+}
+
 export function createBrainReads(
 	drive: DriveFetch,
 	now = () => new Date(),
@@ -329,8 +359,8 @@ export function createBrainReads(
 		const res = await sheetsGet(
 			`/v4/spreadsheets/${encodeURIComponent(id)}/values/${encodeURIComponent(range)}?majorDimension=ROWS&valueRenderOption=FORMATTED_VALUE`,
 		);
-		if (res.status !== 200) throw new BrainError("incomplete_export", "The spreadsheet tab did not return completely.");
-		const body = (await res.json()) as { range?: string; values?: unknown[][] };
+		if (res.status !== 200 || !res.body) throw new BrainError("incomplete_export", "The spreadsheet tab did not return completely.");
+		const body = (await boundedJson(res.body)) as { range?: string; values?: unknown[][] };
 		const start = Number(body.range?.match(/![A-Z]+(\d+)/)?.[1] ?? "1");
 		if (!Number.isInteger(start) || start < 1) throw new BrainError("incomplete_export", "The spreadsheet tab range was unreadable.");
 		const values = body.values ?? [];

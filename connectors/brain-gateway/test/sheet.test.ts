@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { BrainError, BRAIN_FOLDERS, createBrainReads, MAX_CHARS, SHEET_MAX_CHARS } from "../src/brain.ts";
+import { BrainError, BRAIN_FOLDERS, createBrainReads, MAX_CHARS, SHEET_MAX_BYTES, SHEET_MAX_CHARS } from "../src/brain.ts";
 import { driveFetch } from "../src/google.ts";
 
 const SHEET = "application/vnd.google-apps.spreadsheet";
@@ -178,4 +178,32 @@ test("tab titles with quotes are escaped, empty tabs end complete", async () => 
 test("a tab above the sheet cap refuses instead of truncating", async () => {
 	const rows = Array.from({ length: 9 }, () => ["z".repeat(SHEET_MAX_CHARS / 8)]);
 	await assert.rejects(createBrainReads(bigFake({ rows }).drive, undefined, undefined, async () => {}).read("hq-core", ID, 0, 1000, undefined, "Source Inventory"), (e: BrainError) => e.code === "too_large");
+});
+
+test("the values body is refused by bytes while streaming, before it is parsed", async () => {
+	const rows = Array.from({ length: 4 }, () => ["界".repeat(SHEET_MAX_BYTES / 9)]);
+	await assert.rejects(createBrainReads(bigFake({ rows }).drive, undefined, undefined, async () => {}).read("hq-core", ID, 0, 1000, undefined, "Source Inventory"), (e: BrainError) => e.code === "too_large");
+});
+
+test("a tab exactly at the character cap reads, one character more refuses", async () => {
+	const header = "Tab Source Inventory. One line per sheet row, R number then the cells as a JSON array.\n";
+	const fill = (extra: number) => [["a".repeat(SHEET_MAX_CHARS - header.length - 'R1\t[""]\n'.length + extra)]];
+	const at = await createBrainReads(bigFake({ rows: fill(0) }).drive, undefined, undefined, async () => {}).read("hq-core", ID, 0, 1000, undefined, "Source Inventory");
+	assert.equal(at.totalChars, SHEET_MAX_CHARS);
+	await assert.rejects(createBrainReads(bigFake({ rows: fill(1) }).drive, undefined, undefined, async () => {}).read("hq-core", ID, 0, 1000, undefined, "Source Inventory"), (e: BrainError) => e.code === "too_large");
+});
+
+test("one character pages and the header page still join back exactly", async () => {
+	const rows = [["é"], [], ["", "x"]];
+	const reads = createBrainReads(bigFake({ rows }).drive, undefined, undefined, async () => {});
+	const { text, pages } = await readAll(reads, 1);
+	assert.equal(text, `Tab Source Inventory. One line per sheet row, R number then the cells as a JSON array.\nR1\t["é"]\nR2\t[]\nR3\t["","x"]\n`);
+	assert.ok(pages.every((p) => p.text.length >= 1));
+	assert.ok(pages.some((p) => p.partialRow));
+});
+
+test("trailing empty rows that Sheets omits do not leave a dangling page", async () => {
+	const r = await createBrainReads(bigFake({ rows: [["a"], ["b"]] }).drive, undefined, undefined, async () => {}).read("hq-core", ID, 0, 1000, undefined, "Source Inventory");
+	assert.equal(r.nextOffset, null);
+	assert.ok(r.text.endsWith('R2\t["b"]\n'));
 });
