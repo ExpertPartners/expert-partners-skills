@@ -1,3 +1,6 @@
+## 3.11.0 - 2026-11-26
+
+Expand business-brain-foundations to fill a complete selected brain template as Google Docs in one draft pass, core four first, with a single-file repair option, Drive-first evidence, explicit gaps, most-complete and most-recent version selection, and owner review status on every document.
 ## 3.10.6 - 2026-11-26
 
 Route AG Personal canon, visual guidance, The Strong Ones, Share the Love and Week Wrap through the separate AG Personal brain scopes. Route only the five shared AG playbook, uniqueness, proof, calibrated voice guide and voice summary sources through AG Personal Core for AG Luxury, preserving its homeowner register, all other Luxury routes and source identities.
