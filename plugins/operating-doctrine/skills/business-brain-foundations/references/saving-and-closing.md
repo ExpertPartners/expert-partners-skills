@@ -1,51 +1,36 @@
-# Saving, archiving and the closing message
+# Saving and closing
 
-How the four files are named, saved, versioned and archived, and how a run closes. Where this page and SKILL.md differ, SKILL.md wins. The live HQ Rulebook section How we build holds the company file rules, and it wins over this page (R24).
+## Destination and format
 
-## Names (B5, R24, O07)
+Update the selected ready-to-fill Google Docs, not the blank master and not the original source knowledge. Use company code, version and friendly piece name from the existing copy. Do not create a competing Markdown foundation beside a Google Doc.
 
-Markdown files, named by Cal's company file rules, company code and version near the front, then a friendly title (B5, R24).
+Each filled document starts with the draft status from SKILL.md. Keep it a draft until Allison completes the brain-by-brain, section-by-section review in the Week 10 Build. Source references and unresolved notes may follow the relevant section or the document's review notes. Source-method credits stay out of filled files.
 
-| File | Name for Expert Partners | From |
-| --- | --- | --- |
-| About Us | [EP][V1.0] About Us.md | B5, R24 |
-| Ideal Client | [EP][V1.0] Ideal Client.md | B5, R24 |
-| Products and Offerings | [EP][V1.0] Products and Offerings.md | B5, R24 |
-| Testimonials | [EP][V1.0] Testimonials.md | B5, R24 |
+Apply the live document-formatting-standard, with simple headings and short paragraphs. Do not use complex tables to store narrative knowledge. Notion links to the owning Google Doc instead of holding another editable copy.
 
-Company Core files take no department in the name. Another business brain uses its own company code in the same place (R24).
+Save only within the selected brain copy or explicitly selected owning department destination from the live folder map. Never fall back to My Drive or another output folder if that destination fails. Report the exact gap and retain unsaved work in context.
 
-## Versions (R24, R22, B5)
+## Existing files and history
 
-- The first Foundations version of each file is V1.0 (B5).
-- On a rerun, a small change advances the decimal, V1.0 to V1.1, and a larger change advances the whole number, V1.0 to V2.0 (R24).
-- A file nothing changed in keeps its version and is not saved again (R24).
+Read existing content before changing it. Preserve user work and existing review status. For a substantive new revision follow the current company version rule. Unchanged files keep their versions. Use native history or the authorized archive route as applicable, never delete source versions.
 
-## Save place and archive (B6, O08, R22)
+The version-selection report lists alternatives for Allison. Selection alone does not authorize moving them. Before an authorized move compare effective access and destination inheritance, preserving equivalent or narrower access. If that cannot be preserved, leave the source in place and report the gap.
 
-- Save all four to Company Core in the business's own brain, Company Core [EP-BB] for Expert Partners. Find the folder by its name (B6).
-- When a new version replaces an old one, move the old file into the _archived folder inside Company Core. Move it, keeping its file ID and history. Never copy and delete, and never delete (B6, R22).
-- The brain's main Archives folder is not used for these four files (B6).
-- If the _archived folder cannot be found, leave the old version where it is and say so in the closing message (B6, R22).
+## One saved readback
 
-## The existing About Us Google Doc (B6)
+After the full draft pass, reopen each saved document once in full. Check contents, structure, top draft status, name, version and selected destination. A tool's success response is not a saved-content readback.
 
-- [EP][V1.1] About Us stays untouched in Company Core [EP-BB] while the Markdown About Us is built beside it for comparison (B6).
-- Only Allison promotes deliverables into company knowledge (Decision Log 2026-11-08, Every department and workspace carries Cal's two boilerplate blocks before its own instructions). Saving the new Markdown About Us does not make it the master or archive the existing Google Doc (B6, R22).
-- Notion HQ links to the Markdown file and keeps no copy. Foundations writes no Notion copy (B6).
+Report a failed or unverified save as such. Recover through authorized routes without claiming completion. No second audit unless requested or required for public or client material.
 
-## Confirming each save (B7, O09)
+## Closing record
 
-- After saving a file, reopen it from where it was saved and check that its name, version, place and contents are what was written (B7).
-- Only a file that reopened correctly is reported as saved. A file that did not save or did not reopen is reported as not saved, with the reason (B7).
+Return the selected brain folder and a concise result, with the detailed record in the owning work context.
 
-## The closing message (B7, B2, B9, O09)
+- Filled, partial and unknown counts across the inventoried pieces. Filled means all applicable fields have evidence, not approved. Partial means usable content plus at least one material gap. Unknown means no adequate substantive evidence or unresolved applicability. These are mutually exclusive piece-level categories and must sum to the inventory total.
+- Every piece with its link, status and material gaps. Count Case Studies as one piece and name its folder and actual cases, not an invented case file.
+- Sources read, parts, versions selected and alternatives, with completeness-versus-recency conflicts flagged.
+- Files changed and downstream consistency concerns.
+- Failed reads or saves and exact recovery work remaining.
+- One next step, Allison's review in the Week 10 Build. Do not claim approval or promotion.
 
-The run ends with one message, in this order (B7).
-
-1. The four files, each linked by its clickable name, with its version number (B7).
-2. What changed in each file since its last version. On a first run, say each file is new (B7).
-3. The open-question list. Every MISSING note from the four files, each question tagged with who can answer it, Allison or Don (B2, B7).
-4. One next step (B7).
-
-When the run settled a conflict, add the list of other brain files that still carry the losing version, each with its owner, so each owner updates their own file (B9, R23).
+When the assignment requires a shorter reply, keep the detailed record with the deliverables and honor the requested reply length.

@@ -1,70 +1,39 @@
-# The four file structures
+# File structures
 
-What each of the four files holds, in order. The structures follow Cal's current published templates (O01). Section names and field names are kept so the output matches the template's sections, fields and order, and every description below is written in our own words. No template guidance text is copied into a saved file. Each saved file holds the business's own facts only (R16 to R19, B8).
+Read the selected live blank master for exact headings, field names, numbering and order. The inventory below is a routing checklist, not a replacement schema. Do not copy instructional placeholders into the finished text. Use the same structure for each brain's version of a piece, with only its facts differing.
 
-Where this page and SKILL.md differ, SKILL.md wins. Every field the sources cannot fill gets a MISSING note in place, [MISSING: the exact question | Who can answer: Allison or Don], never a guess (R04, B2).
+## Core four first
 
-## 1. About Us (R16)
+1. About Us. Positioning Statement, Mission, What We Do, What We Don't Do, Named Frameworks when evidenced, Key People, Values. Preserve the master subfields for category, distinction, credibility, mechanism, exclusions and responsibilities. Positioning and delivery summaries use two to four sentences, mission one sentence. Do not invent a first-or-only claim or scale statistic.
+2. ICP. Pain Point Analysis, Buyer Language Patterns, Ready-to-Buy Signals, Ideal Customer Profile, Engagement Strategy, Hottest Communities, Executive Summary. Preserve the template fields and counts. Five to seven pains, three exact quotes per pain, ten or more phrases, three priority communities and twenty community records require actual evidence. Unsupported severity, frequency, member counts and posts per week remain gaps with coverage disclosed.
+3. Products and Offerings. Product Ladder in order Awareness, Entry, Foundation, Flagship, Graduate, followed by each offer's One-line, Who it's for, What's included, Price and payment plans, Guarantee, Claims we do NOT make. Preserve gaps and internal-service applicability rather than inventing an external ladder.
+4. Testimonials. Life Transformation, Revenue & Business Impact, Time Savings & Efficiency, Career Advancement, Personal & Unexpected Impact, Team Adoption / Building & Innovation. Quotes are verbatim with real attribution, business and source context. Empty categories stay explicit gaps. No borrowed or rewritten praise.
 
-The file title is About, then the company name (R16).
+## Remaining current pieces
 
-Sections, in this order (R16).
+Follow the selected master order after the core four, including these pieces.
 
-1. Positioning Statement. Two to four sentences. The category the business sits in, what sets it apart, and evidence of its scale (R16).
-2. Mission. One sentence (R16).
-3. What We Do. Two to four sentences on how the business gets paid and how it delivers (R16).
-4. What We Don't Do. The offers, promises, framing, customers and uses the business stays away from (R16).
-5. Named Frameworks. Each framework's name with a one line meaning. Leave the whole section out when the business has none (R16).
-6. Key People. Each person's name, title and what they are responsible for (R16).
-7. Values. Each value with what it means in practice (R16).
+- What Makes Us Unique. Short version, beliefs with proof, real frameworks and three structural uniques with proof.
+- Founder Story. Narrative, personal texture relevant to the business, beliefs and sourced trust signals.
+- Bios. Ready-to-use biographies drawn from the founder story. Keep the distinct personal and luxury bios separate. Don's biography belongs to EP.
+- Mission and Values. Purpose, niche, mission, vision, reason for existing, practical values and target market.
+- Team Profiles. Actual current role, accountabilities, communication style and works-best notes. Planned seats are not filled roles.
+- Org Chart and Decision Rights. Departments, accountable owners, support, recurring decisions, consulted and informed parties, escalation and current guardrails. Do not invent decision rights from a job title.
+- FAQs. Real prospect questions and answers about scope, pricing, delivery and fit, distinct from support tickets.
+- Pricing and Charging Structure. Pricing model, rates, tiers, payment plans, adjustments, extras, discounts, non-negotiables and exceptions. Source every commercial term.
+- Key Links. Exact current URL, description, use and permitted audience. Evidence links are not automatically shareable customer links.
+- Methodology and Frameworks. Actual named methods, purpose, origin and real steps with judgment points.
+- Brand Voice. Every voice owned by this brain, specifically named and separated, with authentic examples. HQ has house writing rules, not a new brand voice.
+- Visual Brand. Pointers to existing approved visual guides, never an invented design system.
+- Words and Names. Brand-specific spelling, names, meanings, preferred and prohibited terms, with shared writing rules linked rather than duplicated.
+- Brain Instructions. Gather applicable current instructions in an orderly file, resolving older rules against newest decisions. A draft instructions file is not live authority.
+- Case Studies. Use the selected folder or file structure. Each authentic case needs identity, before-state, build, wins and wider shift. Do not turn an execution receipt into a measured customer outcome.
+- Compliance where applicable to EP and AG Luxury. Point to current owning requirements and held material, preserve unknowns and do not invent regulatory advice. HQ points to those owning pieces.
 
-## 2. Ideal Client (R17)
+The current baseline is nineteen pieces including the Case Studies folder, with Compliance additional only where applicable. Inventory the live selected master rather than treating the number of Google Docs as the number of pieces.
 
-The file title is one line, written exactly as Research Report: [Problem / Market], with the problem or market it studies in place of [Problem / Market]. Research Report, the colon and the problem or market stay together on that one line, never split into a title and a separate topic line (R17). The file is named Ideal Client (B5).
+## Deferred department support pieces
 
-Sections, in this order, with the numbers and markers the template gives them (R17).
+Customer Service FAQ List, Client Onboarding Process and Customer Service Reply Style Guide remain Week 5 work unless this request explicitly includes them. Keep their source leads visible. Their presence in the historical seventeen-entry library does not silently add them back to this run.
 
-- 🔥 1. Pain Point Analysis. Five to seven pain points. Each one has its name, a Description, a Severity Score (1-10), three Exact Quotes from buyers, its Frequency and its Emotional Triggers. The severity field's label is exactly Severity Score (1-10), with the scale kept inside the label, and its value is a score from 1 to 10 (R17).
-- 🗣️ 2. Buyer Language Patterns. Ten or more phrases buyers actually use, word for word, each with What it really means (R17).
-- 🟢 3. Ready-to-Buy Signals. People asking about, Price ranges mentioned, Urgency indicators, and Current workarounds with why each falls short (R17).
-- 🎯 4. Ideal Customer Profile (ICP). Who they are, Context & environment, Psychographics, Behaviors, Jobs-to-be-done, Buying triggers and Key objections. Together these cover the buyer's role and segment, where they work and with what tools, what drives them, how they solve problems and decide, the outcome they want, what makes them buy and what makes them hesitate (R17).
-- 🤝 5. Engagement Strategy. Where to start, How to enter (per community), Content angles that will resonate and Landmines to avoid, with three priority communities named (R17).
-- 🧱 6. Hottest Communities. Twenty communities, each with its Platform, Name, Member count, Activity level, Link, Why valuable and three Top complaints. Activity level is the estimated number of posts per week about the problem (R17).
-- 📊 7. Executive Summary. Headed Research Report: All About, then the problem or market. It pulls together where the buyers are, the words they use, how severe the pain is, which segments are most urgent, and the channels and angles to use (R17).
-
-The counts and metrics above are fields to fill from real findings. A count or metric the research cannot support is a MISSING note, never a made up number (R17, B2).
-
-## 3. Products and Offerings (R18)
-
-The file title is Products & Offerings (R18). The file is named Products and Offerings (B5).
-
-The first section is the Product Ladder, five rungs in this order, Awareness, Entry, Foundation, Flagship and Graduate, each with its offer name and price (R18).
-
-Then one section per offer, headed with the offer's name, each with these fields in this order (R18).
-
-1. One-line. The offer in one sentence (R18).
-2. Who it's for. The named persona, with a short description (R18).
-3. What's included. The concrete deliverables (R18).
-4. Price. The price and every payment plan (R18).
-5. Guarantee. The guarantee terms, or None (R18).
-6. Claims we do NOT make. The promises the offer never makes (R18).
-
-For the Expert Partners brain only, Gateway to Mastery's price is $997. Leave it out for any other business (B7, R24, Decision Log 2026-10-30, Gateway to Mastery's price is $997).
-
-## 4. Testimonials (R19)
-
-The file title is Testimonials (R19).
-
-Categories, in this order (R19).
-
-1. Life Transformation (R19)
-2. Revenue & Business Impact (R19)
-3. Time Savings & Efficiency (R19)
-4. Career Advancement (R19)
-5. Personal & Unexpected Impact (R19)
-6. Team Adoption / Building & Innovation (R19)
-
-Each entry carries the customer's real quote word for word, the customer's name, their business, and one line of context on where the quote came from or what the customer built (R19).
-
-- Only authentic quotes found in the brain's sources, carried word for word, with the attribution checked against the source (R19).
-- A category with no authentic quote holds a MISSING note asking for one, with who can answer it. A quote is never written, reworded or borrowed to fill a category (B2, O04, R19).
+A support FAQ requires actual client questions. Onboarding distinguishes what happens first, first thirty days, client inputs and sticking points. A support reply guide needs real replies, voice, tone, phrases, openings, closings, formatting and difficult moments. General brand prose alone does not establish any of these.
