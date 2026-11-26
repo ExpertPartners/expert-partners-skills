@@ -29,11 +29,18 @@ Use this entry point when a task needs brand selection or crosses more than one 
 | EPIC program content | `fam-epic-brand` | EPIC Brand Canon in EP Business Brain, Company Core |
 | Free Agent Movement content | `fam-epic-brand` | Free Agent Movement Brand Canon in EP Business Brain, Company Core |
 | Don Hobbs content | `don-hobbs-brand` | Don Hobbs Brand Canon in EP Business Brain, Company Core |
-| Allison Gaddy personal content | `ag-personal-brand` | Allison Gaddy Personal Brand Canon in AG Business Brain, Company Core |
+| Allison Gaddy personal content | `ag-personal-brand` | Allison Gaddy Personal Brand Canon in AG Personal Business Brain, Company Core (`ag-personal-core`), with visual and marketing sources in `ag-personal-marketing` |
 | Consumer real estate content | `ag-luxury-brand` | AG Luxury Brand Canon in AG Business Brain, Company Core |
-| The Strong Ones content | `the-strong-ones-brand` | The Strong Ones section of Allison Gaddy Personal Brand Canon in AG Business Brain, Company Core |
+| The Strong Ones content | `the-strong-ones-brand` | The Strong Ones section of Allison Gaddy Personal Brand Canon in AG Personal Business Brain, Company Core (`ag-personal-core`), with its source folder under `ag-personal-marketing` |
 
 Confirm the current brand relationship, status and exclusions in those live sources and the Decision Log. A routing table identifies a source; it does not freeze brand identity, ownership, offerings or voice in this repository.
+
+For AG work, the exact shared sources AG Brand Playbook, What Makes You Unique,
+Proof, Allison Gaddy Voice Guide (the calibrated guide) and Allison Gaddy Voice
+Summary are read through `ag-personal-core`. This is a source-specific overlap
+route, not blanket access to AG Personal material. Keep AG Luxury canon and
+other Luxury sources on their existing routes, and use the homeowner register
+for AG Luxury rather than the personal or industry register.
 
 ## Workflow
 

@@ -18,6 +18,12 @@ Use for the consumer real estate task described by the caller. Resolve the speak
 
 Read AG Luxury Brand Canon in AG Business Brain, Company Core, together with Shared Writing Rules in HQ Business Brain, Company Core. Read the current supporting documents and visual guide that the canon names when the task needs biography, proof, listing claims or design inputs. Follow the owning brain index to their current versions.
 
+Read only these shared AG sources through `ag-personal-core` when needed,
+AG Brand Playbook, What Makes You Unique, Proof, Allison Gaddy Voice Guide
+(the calibrated guide) and Allison Gaddy Voice Summary. This exact-source
+exception grants no blanket AG Personal access. Keep the homeowner register
+for AG Luxury and all other Luxury retrieval routes unchanged.
+
 ## Workflow
 
 1. Confirm the property, audience, channel and deliverable needed for this task.

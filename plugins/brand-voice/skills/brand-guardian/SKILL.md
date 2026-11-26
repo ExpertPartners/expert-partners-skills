@@ -21,6 +21,12 @@ Resolve company, speaker, audience register, channel, draft and requested action
 
 Use `brand-voice` to read current HQ authority, Shared Writing Rules, the selected Company Core canon and applicable approved voice guide and summary. Open the actual source text, not just a search result. Follow current explicit supersession. If sources conflict without a ruling, identify the exact conflict rather than selecting a convenient version.
 
+For AG reviews, read the exact shared AG Brand Playbook, What Makes You Unique,
+Proof, Allison Gaddy Voice Guide (the calibrated guide) and Allison Gaddy Voice
+Summary through `ag-personal-core`. This source-specific exception grants no
+blanket AG Personal access. Keep AG Luxury's homeowner register and other
+Luxury source routes unchanged.
+
 Keep company voice separate from founder personal voice. Do not mix EP and AG evidence, blend Allison and Don, or treat a program as the parent company. Resolve the current brand relationship and audience register from canon rather than frozen skill rules.
 
 For each conflicting instruction, compare authority, effective date, audience scope and explicit supersession. A live document can still contain stale prices, retired brands, old punctuation or a generic profile prompt that contradicts a newer decision. Apply the newer applicable ruling and the more specific register, and record the excluded stale clause in the internal source report. Do not copy a profile's reusable prompt unfiltered or edit the external canon as a side effect.

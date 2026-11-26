@@ -16,9 +16,13 @@ Use for the personal writing task described by the caller. Resolve its scope fro
 
 ## Required live sources
 
-Read Allison Gaddy Personal Brand Canon in AG Business Brain, Company Core, and Shared Writing Rules in HQ Business Brain, Company Core. Use the owning brain index and the canon's current references to locate the current voice guide and task-specific evidence. For The Strong Ones, read its section in that same personal canon and use `the-strong-ones-brand` for the task mechanics.
+Read Allison Gaddy Personal Brand Canon and the Master Witness Personal Brand Voice document in AG Personal Business Brain, Company Core (`ag-personal-core`), and Shared Writing Rules in HQ Business Brain, Company Core. Use `ag-personal-marketing` for the Allison Gaddy Visual Brand Guide, The Allison Gaddy Show and task-specific marketing evidence. Use the owning brain index and the canon's current references to locate the current sources. For The Strong Ones, read its section in that same personal canon and use `the-strong-ones-brand` for the task mechanics.
 
 ## Workflow
+
+Read the shared AG Brand Playbook, What Makes You Unique, Proof, Allison Gaddy
+Voice Guide (the calibrated guide) and Allison Gaddy Voice Summary through
+`ag-personal-core` when needed, preserving the task's personal audience register.
 
 1. Establish the speaker, intended audience, format and purpose from the request.
 2. Read the live personal canon and relevant current voice guidance before writing.

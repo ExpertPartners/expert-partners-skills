@@ -1,6 +1,6 @@
 ---
 name: share-the-love
-description: "Share the Love notices teachable moments while Allison works anywhere in HQ, Claude chats, projects and Factory. Use every HQ work session, without waiting for a request, when something she builds, learns, fixes or corrects could help real estate agents who use AI like Google or a chatbot. Flag Teaching moment, followed by one sentence, then append to the existing Share List in AG Business Brain, Marketing. Also fires on teaching moment, Share the Love, Teach Me step done, the end of a work session, wrap, and requests for today's list. Captures the lesson in her own words, why it matters to an agent and its source. Never creates a new list. Allison Gaddy is the selling brand, Expert Partners the upsell. Inherits operating-doctrine."
+description: "Share the Love notices teachable moments while Allison works anywhere in HQ, Claude chats, projects and Factory. Use every HQ work session, without waiting for a request, when something she builds, learns, fixes or corrects could help real estate agents who use AI like Google or a chatbot. Flag Teaching moment, followed by one sentence, then append to the existing Share List in AG Personal Business Brain, Marketing. Also fires on teaching moment, Share the Love, Teach Me step done, the end of a work session, wrap, and requests for today's list. Captures the lesson in her own words, why it matters to an agent and its source. Never creates a new list. Allison Gaddy is the selling brand, Expert Partners the upsell. Inherits operating-doctrine."
 tier: plugin
 zone: content
 status: live
@@ -17,9 +17,9 @@ Catch useful lessons from Allison's actual work, without making her remember to 
 
 Before the first capture in a session, read the current HQ Rulebook and applicable Decision Log entries. Resolve these sources live in Drive by name and owning folder, never by a remembered ID.
 
-- `[AG-MKT][V1.0] Share List, Bite-Sized Pieces for Agents` in AG Business Brain, Marketing. Open its content and verify its parent location. This exact existing document is the only save destination. Never rename it to match newer naming rules.
+- `[AG-MKT][V1.0] Share List, Bite-Sized Pieces for Agents` in AG Personal Business Brain, Marketing (`ag-personal-marketing`). Open its content and verify its parent location. This exact existing document is the only save destination. Never rename it to match newer naming rules.
 - Existing Share the Love Kits 01 through 08 in that Marketing folder, including `[AG-Marketing][V1.0] Share the Love Kit 08, Two Strikes and It's a Rule`. Read those actually available, including their notes. Report any missing kit rather than inventing its contents or treating its number as proof all earlier kits exist.
-- `[AG][V1.0] Allison Gaddy Personal Brand Canon` in AG Business Brain, Company Core. Use the industry register, not the homeowner register.
+- `[AG][V1.0] Allison Gaddy Personal Brand Canon` in AG Personal Business Brain, Company Core (`ag-personal-core`). Use the industry register, not the homeowner register.
 
 Read the Share List's current structure, numbering, themes, source notes and readiness restrictions. Match its pattern. The working pattern is one useful nugget, a familiar frustration, one small move an agent can try, and the real story that earned it. Capture that seed, not a complete kit. Use Kit 08's teaching structure as an example, never copy its story onto a different lesson. The canon owns voice. Newer explicit brand rulings win where older canon conflicts.
 

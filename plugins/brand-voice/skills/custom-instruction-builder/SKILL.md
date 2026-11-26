@@ -37,6 +37,12 @@ Resolve authority, date, audience scope and explicit supersession before using a
 
 Use the existing four foundation files and approved voice summary when available. Reuse a calibrated guide rather than demanding fresh extraction. Review-only drafts, historical prices, unattributed endorsements and internal targets never become approved public claims. Select the relevant audience and speaker, never blend companies or founders.
 
+For AG instructions, read the exact shared AG Brand Playbook, What Makes You
+Unique, Proof, Allison Gaddy Voice Guide (the calibrated guide) and Allison Gaddy
+Voice Summary through `ag-personal-core`. This source-specific exception grants
+no blanket AG Personal access. Keep AG Luxury's homeowner register and other
+Luxury source routes unchanged.
+
 ## Draft
 
 Apply the retrieved private template, not a newly invented template. The checks below supplement that contract; they are not substitute output wording. Create `marketing-workspace-custom-instructions.md`, at most 1,000 words, with these level-two headings in exactly this order.
