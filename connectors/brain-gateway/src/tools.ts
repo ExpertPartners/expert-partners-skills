@@ -1,7 +1,7 @@
 // One read-only tool registry serves both the MCP connector (/mcp) and the Hub HTTP endpoint (/api/tools).
 // There are no write tools. Nothing here can create, edit, share, trash or delete anything.
 import { z } from "zod";
-import { effectiveScopes, mayReadException, type Principal } from "./access.ts";
+import { effectiveScopes, mayReadException, pinnedReadFor, type Principal } from "./access.ts";
 import {
 	BrainError,
 	canonicalScope,
@@ -21,6 +21,7 @@ export interface ToolEnv {
 	ALLOWED_SCOPES?: string;
 	WITHHELD_SOURCES?: string;
 	FILE_READ_EXCEPTIONS?: string;
+	PINNED_FILE_READS?: string;
 }
 
 export interface ToolDef {
@@ -101,6 +102,11 @@ export async function runTool(name: string, args: unknown, env: ToolEnv, drive?:
 		const reads = createBrainReads(drive ?? driveFetch(env.GOOGLE_SA_KEY), undefined, parseWithheld(env.WITHHELD_SOURCES));
 		if (name === "read") {
 			const a = parsed.data as { scope: string; id: string; offset?: number; max_chars?: number; folder?: string; sheet?: string; expect_version?: string };
+			const pin = pinnedReadFor(principal, a.scope, a.id, a.folder, env.PINNED_FILE_READS);
+			if (pin) {
+				if (a.sheet !== undefined) throw new BrainError("not_a_spreadsheet", "Only a spreadsheet takes a sheet.");
+				return { ok: true, result: await reads.readPinned(a.scope, pin, a.offset ?? 0, a.max_chars ?? DEFAULT_PAGE_CHARS, a.expect_version), status: 200 };
+			}
 			if (mayReadException(env.ALLOWED_SCOPES, principal, a.scope, a.id, a.folder, env.FILE_READ_EXCEPTIONS))
 				return { ok: true, result: await reads.read("ag-personal-core", a.id, a.offset ?? 0, a.max_chars ?? DEFAULT_PAGE_CHARS, undefined, a.sheet, a.expect_version), status: 200 };
 		}
