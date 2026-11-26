@@ -44,6 +44,15 @@ export type BrainScope = keyof typeof BRAIN_FOLDERS;
 export const CURRENT_DECISION_LOG = "1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc";
 export const DECISION_LOG_SCOPE: BrainScope = "hq-core";
 export const MAX_CHARS = 2_000_000;
+/**
+ * Spreadsheet tabs are serialized from one complete values response, then paged. The Hub ledger's Source
+ * Inventory tab is about 7.3 million characters. The cap keeps the parsed response plus the serialized text
+ * well inside the Worker's 128 MB isolate memory, and still refuses rather than truncating above it.
+ */
+export const SHEET_MAX_CHARS = 16_000_000;
+/** Sheets reads retry 429 and 503 at most this many attempts in total, never sooner than the server asks. */
+export const SHEET_MAX_ATTEMPTS = 3;
+export const SHEET_MAX_RETRY_DELAY_MS = 8_000;
 export const DEFAULT_PAGE_CHARS = 60_000;
 export const MAX_PAGE_CHARS = 200_000;
 /** Subfolders below a scope root are reachable this many levels down, no further. */
@@ -179,7 +188,37 @@ export function parseWithheld(json: string | undefined): ReadonlySet<string> {
 	return new Set(ids as string[]);
 }
 
-export function createBrainReads(drive: DriveFetch, now = () => new Date(), withheld: ReadonlySet<string> = new Set()) {
+/** Milliseconds a 429 or 503 asks the client to wait, from Retry-After seconds or an HTTP date. */
+export function retryAfterMs(header: string | null, nowMs: number, attempt: number): number {
+	if (header !== null && header.trim() !== "") {
+		const secs = Number(header.trim());
+		if (Number.isFinite(secs) && secs >= 0) return Math.ceil(secs * 1000);
+		const at = Date.parse(header);
+		if (Number.isFinite(at)) return Math.max(0, at - nowMs);
+		return Number.POSITIVE_INFINITY;
+	}
+	return 1000 * 2 ** (attempt - 1);
+}
+
+export function createBrainReads(
+	drive: DriveFetch,
+	now = () => new Date(),
+	withheld: ReadonlySet<string> = new Set(),
+	sleep: (ms: number) => Promise<void> = (ms) => new Promise((r) => setTimeout(r, ms)),
+) {
+	/** One idempotent Sheets GET, retried only on 429 or 503 and only within the bounded delay. */
+	async function sheetsGet(path: string): Promise<Response> {
+		for (let attempt = 1; ; attempt++) {
+			const res = await drive(path);
+			if (res.status !== 429 && res.status !== 503) return res;
+			await res.body?.cancel().catch(() => {});
+			const wait = retryAfterMs(res.headers.get("retry-after"), now().getTime(), attempt);
+			if (attempt >= SHEET_MAX_ATTEMPTS || wait > SHEET_MAX_RETRY_DELAY_MS)
+				throw new BrainError("rate_limited", "Google Sheets is rate limiting this read. Nothing is authoritative. Try again later.");
+			await sleep(wait);
+		}
+	}
+
 	type FolderMeta = { id?: string; mimeType?: string; parents?: string[]; trashed?: boolean; driveId?: string };
 	async function folderMeta(id: string): Promise<FolderMeta> {
 		const params = new URLSearchParams({ fields: "id,mimeType,parents,trashed,driveId", supportsAllDrives: "true" });
@@ -280,24 +319,31 @@ export function createBrainReads(drive: DriveFetch, now = () => new Date(), with
 	 * sheet row numbers so a cited row can be checked against the source.
 	 */
 	async function sheetText(id: string, sheet?: string): Promise<string> {
-		const meta = await drive(`/v4/spreadsheets/${encodeURIComponent(id)}?fields=${encodeURIComponent("sheets.properties(title,sheetId,gridProperties(rowCount,columnCount))")}`);
+		const meta = await sheetsGet(`/v4/spreadsheets/${encodeURIComponent(id)}?fields=${encodeURIComponent("sheets.properties(title,sheetId,gridProperties(rowCount,columnCount))")}`);
 		if (!meta.ok) throw new BrainError("drive_error", `Spreadsheet lookup answered ${meta.status}.`);
 		const tabs = ((await meta.json()) as { sheets?: { properties?: { title?: string; sheetId?: number } }[] }).sheets?.map((s) => s.properties?.title ?? "") ?? [];
 		if (!tabs.length || tabs.some((t) => !t)) throw new BrainError("incomplete_export", "The spreadsheet returned no complete tab list.");
 		if (sheet === undefined) return `Spreadsheet tabs. Pass one exact title as sheet to read that whole tab.\n${tabs.map((t) => `- ${t}`).join("\n")}\n`;
 		if (!tabs.includes(sheet)) throw new BrainError("sheet_not_found", "That tab is not in this spreadsheet.");
 		const range = `'${sheet.replace(/'/g, "''")}'`;
-		const res = await drive(
+		const res = await sheetsGet(
 			`/v4/spreadsheets/${encodeURIComponent(id)}/values/${encodeURIComponent(range)}?majorDimension=ROWS&valueRenderOption=FORMATTED_VALUE`,
 		);
 		if (res.status !== 200) throw new BrainError("incomplete_export", "The spreadsheet tab did not return completely.");
 		const body = (await res.json()) as { range?: string; values?: unknown[][] };
 		const start = Number(body.range?.match(/![A-Z]+(\d+)/)?.[1] ?? "1");
 		if (!Number.isInteger(start) || start < 1) throw new BrainError("incomplete_export", "The spreadsheet tab range was unreadable.");
-		const rows = (body.values ?? []).map((row, i) => `R${start + i}\t${JSON.stringify(row.map((c) => String(c ?? "")))}`);
-		const text = `Tab ${sheet}. One line per sheet row, R number then the cells as a JSON array.\n${rows.join("\n")}\n`;
-		if (text.length > MAX_CHARS) throw new BrainError("too_large", "Tab exceeds the full-read limit. Nothing is authoritative.");
-		return text;
+		const values = body.values ?? [];
+		const parts = [`Tab ${sheet}. One line per sheet row, R number then the cells as a JSON array.\n`];
+		let length = parts[0]!.length;
+		for (let i = 0; i < values.length; i++) {
+			const line = `R${start + i}\t${JSON.stringify(values[i]!.map((c) => String(c ?? "")))}\n`;
+			length += line.length;
+			if (length > SHEET_MAX_CHARS) throw new BrainError("too_large", "Tab exceeds the full-read limit. Nothing is authoritative.");
+			parts.push(line);
+		}
+		if (!values.length) parts.push("\n");
+		return parts.join("");
 	}
 
 	/** Reads one whole document. Verifies direct membership in scope before and after, and that the version did not change. */
@@ -331,11 +377,21 @@ export function createBrainReads(drive: DriveFetch, now = () => new Date(), with
 	}
 
 	/** Whole document verified, returned in pages so large documents fit an MCP reply. */
-	async function read(scope: BrainScope, id: string, offset = 0, maxChars = DEFAULT_PAGE_CHARS, folder?: string, sheet?: string) {
+	async function read(scope: BrainScope, id: string, offset = 0, maxChars = DEFAULT_PAGE_CHARS, folder?: string, sheet?: string, expectVersion?: string) {
 		const { file, text, readAt, folder: nested } = await readWhole(scope, id, folder, sheet);
+		// A multi-page read is one authoritative read only when every page saw the same version.
+		if (expectVersion !== undefined && file.version !== expectVersion)
+			throw new BrainError("changed_during_read", "Document changed since the earlier pages. Read again from offset 0.");
 		const size = Math.min(Math.max(1, maxChars), MAX_PAGE_CHARS);
 		const start = Math.min(Math.max(0, offset), text.length);
-		const end = Math.min(text.length, start + size);
+		let end = Math.min(text.length, start + size);
+		let partialRow = false;
+		if (sheet !== undefined && end < text.length) {
+			// Tab pages end on a row boundary. A single row longer than the page is split and flagged.
+			const lastBreak = text.lastIndexOf("\n", end - 1);
+			if (lastBreak >= start) end = lastBreak + 1;
+			else partialRow = true;
+		}
 		return {
 			file,
 			scope,
@@ -345,6 +401,7 @@ export function createBrainReads(drive: DriveFetch, now = () => new Date(), with
 			totalChars: text.length,
 			offset: start,
 			nextOffset: end < text.length ? end : null,
+			...(partialRow ? { partialRow: true } : {}),
 			text: text.slice(start, end),
 		};
 	}
