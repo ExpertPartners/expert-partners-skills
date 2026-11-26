@@ -20,6 +20,10 @@ Read Allison Gaddy Personal Brand Canon and the Master Witness Personal Brand Vo
 
 ## Workflow
 
+Read the shared AG Brand Playbook, What Makes You Unique, Proof, Allison Gaddy
+Voice Guide (the calibrated guide) and Allison Gaddy Voice Summary through
+`ag-personal-core` when needed, preserving the task's personal audience register.
+
 1. Establish the speaker, intended audience, format and purpose from the request.
 2. Read the live personal canon and relevant current voice guidance before writing.
 3. Apply the current perspective, cadence, topic boundaries and exclusions from those sources, keeping other brand contexts separate.

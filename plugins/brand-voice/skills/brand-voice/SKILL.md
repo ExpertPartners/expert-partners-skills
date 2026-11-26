@@ -35,6 +35,13 @@ Use this entry point when a task needs brand selection or crosses more than one 
 
 Confirm the current brand relationship, status and exclusions in those live sources and the Decision Log. A routing table identifies a source; it does not freeze brand identity, ownership, offerings or voice in this repository.
 
+For AG work, the exact shared sources AG Brand Playbook, What Makes You Unique,
+Proof, Allison Gaddy Voice Guide (the calibrated guide) and Allison Gaddy Voice
+Summary are read through `ag-personal-core`. This is a source-specific overlap
+route, not blanket access to AG Personal material. Keep AG Luxury canon and
+other Luxury sources on their existing routes, and use the homeowner register
+for AG Luxury rather than the personal or industry register.
+
 ## Workflow
 
 1. Resolve the brand, speaker, audience, channel and requested deliverable.

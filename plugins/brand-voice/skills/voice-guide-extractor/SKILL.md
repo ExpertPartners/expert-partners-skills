@@ -22,6 +22,12 @@ This is a reconstructed implementation from recovered behavior. The original May
 
 Resolve company, named speaker, personal or business voice, audience register, channels and use case. Use `brand-voice` to locate current Company Core canon, approved guide, summary and calibration record. Keep identity and current brand relationships in Drive, not this skill.
 
+For AG tasks, read the exact shared AG Brand Playbook, What Makes You Unique,
+Proof, Allison Gaddy Voice Guide (the calibrated guide) and Allison Gaddy Voice
+Summary through `ag-personal-core`. This source-specific exception grants no
+blanket AG Personal access. Keep AG Luxury's homeowner register and other
+Luxury source routes unchanged.
+
 If an approved calibrated guide already serves the request, reuse it or audit the requested change. Do not rebuild it because an extractor exists. Preserve accepted opener, rhythm and close decisions without asking the owner to repeat them.
 
 Resolve source authority, date, audience scope and explicit supersession. A profile's old generic prompt is not current policy. Use the supported voice observations while excluding stale commercial, brand, hashtag or punctuation instructions. Specific audience-register rules take precedence over generic perspective advice.
