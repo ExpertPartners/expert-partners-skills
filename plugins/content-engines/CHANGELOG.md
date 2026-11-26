@@ -1,3 +1,6 @@
+## 0.15.1 - 2026-11-26
+
+Add explicit synthetic no-send proof mode to Read the Room using metadata.test_mode and a required metadata.test_reason. Test reports are clearly titled, local-only receipts carry test_mode true, and production eligibility and completion gates stay unchanged.
 ## 0.15.0 - 2026-11-25
 
 Add Week Wrap for closed-week and attended-session teaching packages with an advantage brief, live-class run of show, and fully scripted chapters in the existing Canva master teaching deck. Reuse saved outputs on retry and revision, resolve private sources live, and keep truthful run evidence in the owning department.
