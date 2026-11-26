@@ -12,7 +12,7 @@ subtitle: "The Strong Ones voice inside AG Personal Brand"
 
 # The Strong Ones Brand System
 
-Use for the requested The Strong Ones deliverable. Read the whole Allison Gaddy Personal Brand Canon in AG Business Brain, Company Core, then the section named The Strong Ones. Do not invent a separate source home or treat an archived voice card as governing canon.
+Use for the requested The Strong Ones deliverable. Read the whole Allison Gaddy Personal Brand Canon in AG Personal Business Brain, Company Core (`ag-personal-core`), then the section named The Strong Ones. Find its supporting source folder in AG Personal Marketing (`ag-personal-marketing`), with folder contents available through `ag-strong-ones`. Do not invent a separate source home or treat an archived voice card as governing canon.
 
 ## Required live sources
 

@@ -43,8 +43,8 @@ The books, each found in Google Drive by its folder name:
 
 | Book | Where the folder lives | Folder name | Brand-Dept |
 | --- | --- | --- | --- |
-| You've Got a Friend | AG Business Brain, Marketing | You_ve Got a Friend - Book & TEDx Talk | AG-Marketing |
-| The Strong Ones, including The Potent Woman lineage | AG Business Brain, Marketing | The Strong Ones | AG-Marketing |
+| You've Got a Friend | AG Personal Business Brain, Marketing (`ag-personal-marketing`) | You_ve Got a Friend - Book & TEDx Talk | AG-Marketing |
+| The Strong Ones, including The Potent Woman lineage | AG Personal Business Brain, Marketing (`ag-personal-marketing`) | The Strong Ones | AG-Marketing |
 | The Real Estate Marketing Authority | EP Business Brain, Product | G2M Book Creation | EP-Product |
 | Free Agent Formula | No folder yet | none | none yet |
 
