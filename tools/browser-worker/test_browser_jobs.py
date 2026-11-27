@@ -40,6 +40,9 @@ class JobTests(unittest.TestCase):
         route.root = Path(root)
         route.lock = threading.RLock()
         route.jobs = {}
+        route.control_enabled = False
+        route.control_active = 0
+        route.control_socket = route.control_listener = None
         route.inventory = [
             {
                 "name": "browser_navigate",
@@ -471,6 +474,69 @@ class JobTests(unittest.TestCase):
                         route.dispose_live(job)
                 execute.assert_not_called()
                 self.assertEqual(job["metadata"], original)
+
+    def test_shared_bootstrap_preserves_group_and_foreign_window(self):
+        source = (SCRIPTS / "owned_pages.js").read_text()
+        fixture = r'''
+const assert = require('node:assert/strict');
+async function run(shared, foreignInGroup=false) {
+  const tabs = new Map([[1,{id:1,windowId:5,groupId:7}]]);
+  if(shared)tabs.set(99,{id:99,windowId:5,groupId:foreignInGroup?7:9});
+  let created=0, moved=0, removed=[], closedWindows=[], scheduled;
+  const connector={context:()=>({pages:()=>[connector]}),evaluate:async(fn,arg)=>fn(arg)};
+  global.chrome={
+    tabs:{
+      getCurrent:async()=>tabs.get(1),
+      query:async(q)=>[...tabs.values()].filter(t=>
+        (q.windowId===undefined||t.windowId===q.windowId)&&
+        (q.groupId===undefined||t.groupId===q.groupId)),
+      // Reproduces the extension's release when the connector leaves its group.
+      group:async()=>{throw Error('vendor_target_closed');},
+      remove:async(ids)=>{for(const id of [ids].flat()){removed.push(id);tabs.delete(id);}}
+    },
+    windows:{remove:async(id)=>{
+      closedWindows.push(id);
+      for(const t of tabs.values())if(t.windowId===id)tabs.delete(t.id);
+    },create:async(args)=>{
+      assert.equal(args.tabId,undefined,'never ungroup the attached connector');
+      created++;const seed={id:2,windowId:6,groupId:-1,url:'about:blank'};
+      tabs.set(2,seed);return {id:6,tabs:[seed]};
+    }},
+    tabGroups:{get:async()=>({title:'fixture',color:'green'}),
+      move:async(id,{windowId})=>{
+        assert.equal(id,7);moved++;
+        for(const t of tabs.values())if(t.groupId===id)t.windowId=windowId;
+      }}
+  };
+  if(foreignInGroup){
+    await assert.rejects(()=>newOwnedState(connector),/owned_window_isolation_unproven/);
+    assert.equal(created,0);assert.equal(moved,0);assert.deepEqual(removed,[]);
+    assert.equal(tabs.get(99).windowId,5);return;
+  }
+  const s=await newOwnedState(connector);
+  assert.equal(s.initial.groupId,7);
+  assert.equal(s.initial.windowId,shared?6:5);
+  assert.equal(created,shared?1:0);assert.equal(moved,shared?1:0);
+  assert.deepEqual(removed,shared?[2]:[]);
+  assert.deepEqual([...s.tabIds],[1]);
+  if(shared)assert.deepEqual(tabs.get(99),{id:99,windowId:5,groupId:9});
+  const originalTimer=global.setTimeout;
+  global.setTimeout=fn=>{scheduled=fn;};
+  try {
+    assert.equal((await s.closeWindow()).shared,false);
+    await scheduled();
+  } finally {global.setTimeout=originalTimer;}
+  assert.deepEqual(closedWindows,[shared?6:5]);
+  assert.equal(tabs.has(1),false);
+  if(shared)assert.equal(tabs.has(99),true);
+}
+(async()=>{await run(true);await run(false);await run(true,true);})()
+  .catch(e=>{console.error(e);process.exitCode=1;});
+'''
+        checked = subprocess.run(
+            ["node", "-e", source + fixture], capture_output=True, text=True, timeout=10
+        )
+        self.assertEqual(checked.returncode, 0, checked.stderr)
 
     def test_foreign_group_arrival_is_refused_and_never_closed(self):
         # Execute the shipped JS against actual fake Page references, rather than
@@ -1243,6 +1309,8 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
             route.close_control()
             live = b.Route(config)
             try:
+                self.assertEqual(list(state.glob("*.sock")), [])
+                live.open_control()
                 self.assertEqual(len(list(state.glob("*.sock"))), 1)
             finally:
                 live.close_control()

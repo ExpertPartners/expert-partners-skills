@@ -419,6 +419,7 @@ class LifecycleTests(unittest.TestCase):
             guard = Path(root) / "policy.py"
             guard.write_text("def decide(payload): return None\n")
             route = browser_jobs.Route({"state_dir": root, "headless_hook": str(guard)})
+            route.open_control()
             row = self.receipt(root, control_socket=route.control_socket)
             route.jobs[row["job_id"]] = {**row, "lock": threading.RLock()}
             lifecycle.bind(root, row["job_id"], "native-session")
@@ -482,16 +483,20 @@ const connector={context:()=>({pages:()=>[connector]}),evaluate:async(fn,arg)=>f
         source = (SCRIPTS / "owned_pages.js").read_text()
         fixture = r'''
 const assert=require('node:assert/strict');
-let tabs=[{id:1,windowId:5,groupId:7},{id:50,windowId:5,groupId:9}];const updates=[];
-global.chrome={tabs:{getCurrent:async()=>tabs[0],query:async q=>tabs.filter(t=>t.windowId===q.windowId),
-  group:async({tabIds,createProperties})=>{tabs[0].groupId=8;tabs[0].windowId=createProperties.windowId;return 8;}},
- tabGroups:{get:async id=>({title:id===8?'moved':'fixture',color:'blue'}),update:async(id,p)=>updates.push([id,p])},
- windows:{create:async({tabId})=>{tabs.find(t=>t.id===tabId).windowId=6;return {id:6};}}};
+let tabs=[{id:1,windowId:5,groupId:7},{id:50,windowId:5,groupId:9}];const moves=[];
+global.chrome={tabs:{getCurrent:async()=>tabs[0],query:async q=>tabs.filter(t=>
+  (q.windowId===undefined||t.windowId===q.windowId)&&(q.groupId===undefined||t.groupId===q.groupId)),
+  remove:async id=>{assert.equal(id,60);tabs=tabs.filter(t=>t.id!==id);}},
+ tabGroups:{get:async()=>({title:'fixture',color:'blue'}),move:async(id,{windowId})=>{
+   moves.push([id,windowId]);tabs.filter(t=>t.groupId===id).forEach(t=>t.windowId=windowId);}},
+ windows:{create:async()=>{
+   const seed={id:60,windowId:6,groupId:-1,url:'about:blank'};tabs.push(seed);return {id:6,tabs:[seed]};}}};
 const connector={context:()=>({pages:()=>[connector]}),evaluate:async(fn,arg)=>fn(arg)};
 (async()=>{
  const s=await newOwnedState(connector);
- assert.equal(s.initial.windowId,6);assert.equal(s.initial.groupId,8);
- assert.deepEqual(updates,[[8,{title:'fixture',color:'blue'}]]);
+ assert.equal(s.initial.windowId,6);assert.equal(s.initial.groupId,7);
+ assert.deepEqual(moves,[[7,6]]);
+ assert.equal(tabs.some(t=>t.id===60),false);
  assert.equal(tabs[1].windowId,5);
 })().catch(e=>{console.error(e);process.exitCode=1;});
 '''
