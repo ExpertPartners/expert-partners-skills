@@ -126,15 +126,12 @@ export async function sha256Hex(text: string): Promise<string> {
 /** Department tokens live only as SHA-256 hashes in the DEPARTMENT_TOKEN_HASHES secret: {"<hash>":"<department id>"}. */
 export async function departmentForToken(hashesJson: string | undefined, token: string): Promise<string | null> {
 	if (!hashesJson || !token) return null;
-	let map: unknown;
+	let map: Record<string, string>;
 	try {
 		map = JSON.parse(hashesJson);
 	} catch {
 		return null;
 	}
-	if (!map || typeof map !== "object" || Array.isArray(map)) return null;
-	const hash = await sha256Hex(token);
-	if (!Object.prototype.hasOwnProperty.call(map, hash)) return null;
-	const id = (map as Record<string, unknown>)[hash];
-	return typeof id === "string" && Object.prototype.hasOwnProperty.call(DEPARTMENTS, id) ? id : null;
+	const id = map[await sha256Hex(token)];
+	return id && DEPARTMENTS[id] ? id : null;
 }
