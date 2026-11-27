@@ -271,6 +271,7 @@ def send(e, state, now):
                 "sent_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
             }
             log("sent", ri, "to", r["title"])
+            save_state(state)
         except Exception as ex:
             pending.append(r["title"])
             rec["instances"][r["sessionId"]] = {
@@ -312,6 +313,7 @@ def send(e, state, now):
         rec["inbox_sent_at"] = sent_at
         rec["inbox_revision"] = rev
         log("inbox instance", inst, "revision", rev)
+        save_state(state)
     rec["status"] = "sent" if not pending else "partial"
     rec["sent_at"] = rec.get("sent_at") or sent_at
 
@@ -369,6 +371,7 @@ def run_watch():
         for e in entries():
             if is_experience(e):
                 send(e, state, now)
+                save_state(state)
         state["dl_version"] = meta.get("version")
     relay_pickups(state)
     state["last_watch"] = now.isoformat(timespec="seconds")
@@ -471,6 +474,7 @@ def run_reconcile():
         rec = state["entries"].get(e["key"])
         if not rec or rec.get("status") not in ("sent", "baseline"):
             send(e, state, now)
+            save_state(state)
             missed += 1
         if (
             not is_test(e)
@@ -508,7 +512,18 @@ def run_baseline():
 
 
 if __name__ == "__main__":
+    import fcntl
+
     mode = sys.argv[1] if len(sys.argv) > 1 else "watch"
+    os.makedirs(STATE_DIR, exist_ok=True)
+    # One run at a time. A second run (overlapping schedule, manual run or a
+    # reload mid-run) exits quietly instead of sending duplicates.
+    lock = open(os.path.join(STATE_DIR, "run.lock"), "w")
+    try:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        log("another run holds the lock, skipping", mode)
+        sys.exit(0)
     try:
         {"watch": run_watch, "reconcile": run_reconcile, "baseline": run_baseline}[mode]()
     except urllib.error.HTTPError as ex:
