@@ -117,7 +117,10 @@ const provider = new OAuthProvider<Env>({
 	clientIdMetadataDocumentEnabled: true,
 	enterpriseManagedAuthorization: managedAuthorization,
 	onError: ({ code, internal }) => {
-		console.warn("[oauth]", JSON.stringify({ code, category: internal.category, reason: internal.reason }));
+		const detail = internal.detail as { expected?: unknown; got?: unknown } | undefined;
+        const kind = (value: unknown) => value === "https://claude.ai/oauth/mcp-oauth-client-metadata" ? "claude-metadata" : value === "https://claude.ai" ? "claude-origin" : typeof value;
+        console.warn("[oauth]", JSON.stringify({ code, category: internal.category, reason: internal.reason,
+          ...(internal.reason === "client_id_mismatch" ? { expectedKind: kind(detail?.expected), gotKind: kind(detail?.got) } : {}) }));
 	},
 });
 

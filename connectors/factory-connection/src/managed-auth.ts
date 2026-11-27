@@ -1,26 +1,20 @@
-import type { EmaOptions, ClientInfo } from "@cloudflare/workers-oauth-provider";
+import type { EmaOptions } from "@cloudflare/workers-oauth-provider";
 import { isAllowedEmail } from "./allow.ts";
 
 // The normal OAuth flow remains available. This additional grant accepts only
 // the configured Claude organization and still applies the service's allowlist.
 export const CLAUDE_CLIENT = "https://claude.ai/oauth/mcp-oauth-client-metadata";
-export function isClaudeClient(client: ClientInfo): boolean {
-  return client.clientId === CLAUDE_CLIENT || (
-    client.tokenEndpointAuthMethod === "client_secret_post" &&
-    client.redirectUris.length === 1 && client.redirectUris[0] === "https://claude.ai/idjag-noop"
-  );
-}
 export type ManagedEnv = { CLAUDE_TRUSTED_ISSUER: string; MCP_RESOURCE: string; ALLOWED_EMAILS: string };
 export const managedAuthorization: EmaOptions<ManagedEnv> = {
   allowPublicClients: true, // Claude's CIMD client is public; its signed ID-JAG binds the client.
-  trustedIssuers: async ({ iss, env, clientInfo }) => {
+  trustedIssuers: async ({ iss, env }) => {
     const issuer = env.CLAUDE_TRUSTED_ISSUER;
     if (!issuer || !/^https:\/\/identity\.anthropic\.com\/issuers\/iss_[a-z0-9]+$/.test(issuer)
-      || iss !== issuer || !isClaudeClient(clientInfo)) return null;
+      || iss !== issuer) return null;
     return { issuer, jwksUri: `${issuer}/jwks.json`, algorithms: ["ES256", "RS256"] };
   },
-  mapClaims: async ({ claims, env, resource, clientInfo, requestedScope }) => {
-    if (!isClaudeClient(clientInfo) || claims.iss !== env.CLAUDE_TRUSTED_ISSUER
+  mapClaims: async ({ claims, env, resource, requestedScope }) => {
+    if (claims.iss !== env.CLAUDE_TRUSTED_ISSUER
       || resource !== env.MCP_RESOURCE || typeof claims.email !== "string"
       || !isAllowedEmail(env.ALLOWED_EMAILS, claims.email)) return null;
     const email = claims.email.trim().toLowerCase();
