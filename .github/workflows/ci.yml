@@ -90,6 +90,9 @@ jobs:
       - name: Validate AGENTS.md links
         run: python3 tools/readiness/check_agents_links.py
 
+      - name: New hire onboarding workflow tests
+        run: python3 -m unittest discover -s plugins/operating-doctrine/skills/new-hire-onboarding/tests -v
+
       - name: AGENTS.md link validator tests
         run: python3 -m unittest discover -s tools/readiness/tests -p 'test_agents_links.py' -v
 
