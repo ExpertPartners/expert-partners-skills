@@ -67,10 +67,18 @@ export const SHEET_CACHE_MAX_BYTES = 16_000_000;
 const SHEET_TEXT_FORMAT = "rows-v1";
 export const DEFAULT_PAGE_CHARS = 60_000;
 export const MAX_PAGE_CHARS = 200_000;
+export const DEFAULT_PAGE_ROWS = 64;
+export const MAX_PAGE_ROWS = 256;
+// Range reads never parse a whole tab. Shrink a range before parsing an oversized values body.
+export const ROW_PAGE_MAX_BYTES = 1_200_000;
 /** Subfolders below a scope root are reachable this many levels down, no further. */
 export const MAX_NESTED_DEPTH = 4;
 const FOLDER_MIME = "application/vnd.google-apps.folder";
 const REGISTERED_ROOTS: ReadonlySet<string> = new Set(Object.values(BRAIN_FOLDERS));
+
+/** Where a row page starts and what earlier pages already wrote. Never grants access; every request is re-authorized. */
+export type RowRequest = { start: number; pending: number; emitted: boolean; header: boolean; count: number; maxChars: number; grid?: number; version?: string };
+export const sheetHeader = (sheet: string) => `Tab ${sheet}. One line per sheet row, R number then the cells as a JSON array.\n`;
 
 export const SHEET_MIME = "application/vnd.google-apps.spreadsheet";
 export const READABLE_MIME = ["application/vnd.google-apps.document", "text/plain", "text/markdown", SHEET_MIME];
@@ -215,7 +223,7 @@ export function retryAfterMs(header: string | null, nowMs: number, attempt: numb
 	return 1000 * 2 ** (attempt - 1);
 }
 
-async function boundedJson(stream: ReadableStream<Uint8Array>): Promise<unknown> {
+async function boundedJson(stream: ReadableStream<Uint8Array>, maxBytes = SHEET_MAX_BYTES): Promise<unknown> {
 	const reader = stream.getReader();
 	const decoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: false });
 	let text = "";
@@ -225,7 +233,7 @@ async function boundedJson(stream: ReadableStream<Uint8Array>): Promise<unknown>
 			const next = await reader.read();
 			if (next.done) break;
 			size += next.value.byteLength;
-			if (size > SHEET_MAX_BYTES) throw new BrainError("too_large", "Tab exceeds the full-read limit. Nothing is authoritative.");
+			if (size > maxBytes) throw new BrainError("too_large", "Tab exceeds the full-read limit. Nothing is authoritative.");
 			text += decoder.decode(next.value, { stream: true });
 		}
 	} finally {
@@ -429,7 +437,7 @@ export function createBrainReads(
 		const start = Number(body.range?.match(/![A-Z]+(\d+)/)?.[1] ?? "1");
 		if (!Number.isInteger(start) || start < 1) throw new BrainError("incomplete_export", "The spreadsheet tab range was unreadable.");
 		const values = body.values ?? [];
-		const parts = [`Tab ${sheet}. One line per sheet row, R number then the cells as a JSON array.\n`];
+		const parts = [sheetHeader(sheet)];
 		let length = parts[0]!.length;
 		for (let i = 0; i < values.length; i++) {
 			const row = values[i]!;
@@ -446,9 +454,9 @@ export function createBrainReads(
 	}
 
 	/** Reads one whole document. Verifies direct membership in scope before and after, and that the version did not change. */
-	async function readWhole(scope: BrainScope, id: string, folder?: string, sheet?: string) {
+	async function readWhole(scope: BrainScope, id: string, folder?: string, sheet?: string, rows?: RowRequest) {
 		try {
-			return await verifiedWhole(scope, id, folder, sheet);
+			return await verifiedWhole(scope, id, folder, sheet, rows);
 		} catch (e) {
 			// A failed proof, including revoked Drive access, must not leave a reusable entry.
 			sheetCache.forget(id);
@@ -456,7 +464,7 @@ export function createBrainReads(
 		}
 	}
 
-	async function verifiedWhole(scope: BrainScope, id: string, folder?: string, sheet?: string) {
+	async function verifiedWhole(scope: BrainScope, id: string, folder?: string, sheet?: string, rows?: RowRequest) {
 		if (withheld.has(id)) throw new BrainError("not_in_scope", "The file is not a readable document in this scope.");
 		const inventory = await discover(scope, undefined, folder);
 		const found = inventory.files.find((f) => f.id === id);
@@ -464,10 +472,13 @@ export function createBrainReads(
 			throw new BrainError("not_in_scope", "The file is not a readable document in this scope.");
 		if (sheet !== undefined && found.mimeType !== SHEET_MIME) throw new BrainError("not_a_spreadsheet", "Only a spreadsheet takes a sheet.");
 		const before = await fileVersion(drive, id);
-		const tab = found.mimeType === SHEET_MIME && sheet !== undefined;
+		if (rows?.version !== undefined && rows.version !== before.version)
+			throw new BrainError("changed_during_read", "Document changed since the earlier pages. Restart the read with one version.");
+		const rowPage = rows ? await sheetRows(id, sheet!, rows) : undefined;
+		const tab = !rows && found.mimeType === SHEET_MIME && sheet !== undefined;
 		const cached = tab ? sheetCache.get(id, before.version!, sheet) : undefined;
 		const text =
-			cached !== undefined
+			rowPage !== undefined ? rowPage.text : cached !== undefined
 				? cached
 				: found.mimeType === SHEET_MIME
 				? await sheetText(id, sheet)
@@ -487,7 +498,120 @@ export function createBrainReads(
 		});
 		if (!membership.files.some((f) => f.id === id)) throw new BrainError("left_scope", "Document left the selected scope during the read.");
 		if (tab && cached === undefined) sheetCache.set(id, before.version!, sheet, text);
-		return { file: before, text, readAt: now().toISOString(), folder: inventory.folder, ...(sheet !== undefined ? { sheet } : {}) };
+		return { file: before, text, readAt: now().toISOString(), folder: inventory.folder, ...(sheet !== undefined ? { sheet } : {}), ...(rowPage ? { rowPage } : {}) };
+	}
+
+	/**
+	 * Native row ranges. Sheets drops each range's empty tail, which may or may not be the tab's global tail,
+	 * so trailing empty rows of a range are carried forward as `pending` (always the rows just before `start`)
+	 * and are written only once a later populated row proves they are interior. The final page discards them.
+	 * Concatenating every page's text therefore reproduces the whole-tab serializer byte for byte.
+	 */
+	async function sheetRows(id: string, sheet: string, req: RowRequest) {
+		const meta = await sheetsGet(`/v4/spreadsheets/${encodeURIComponent(id)}?fields=${encodeURIComponent("sheets.properties(title,gridProperties(rowCount,columnCount))")}`);
+		if (!meta.ok) throw new BrainError("drive_error", `Spreadsheet lookup answered ${meta.status}.`);
+		const tabs = (await meta.json()) as { sheets?: { properties?: { title?: string; gridProperties?: { rowCount?: number } } }[] };
+		const tab = tabs.sheets?.find((s) => s.properties?.title === sheet)?.properties;
+		if (!tab) throw new BrainError("sheet_not_found", "That tab is not in this spreadsheet.");
+		const grid = tab.gridProperties?.rowCount;
+		if (!Number.isSafeInteger(grid) || grid! < 1) throw new BrainError("incomplete_export", "The spreadsheet returned no valid grid row bound.");
+		if (req.grid !== undefined && req.grid !== grid) throw new BrainError("changed_during_read", "The tab's grid changed since the earlier pages. Restart the read.");
+		const { start } = req;
+		if (start > grid!) throw new BrainError("invalid_row_range", "start_row exceeds the grid row bound.");
+		let end = Math.min(grid!, start + req.count - 1);
+		let values: unknown[][];
+		while (true) {
+			const range = `'${sheet.replace(/'/g, "''")}'!${start}:${end}`;
+			const res = await sheetsGet(`/v4/spreadsheets/${encodeURIComponent(id)}/values/${encodeURIComponent(range)}?majorDimension=ROWS&valueRenderOption=FORMATTED_VALUE`);
+			if (res.status !== 200 || !res.body || res.headers.has("content-range")) throw new BrainError("incomplete_export", "The spreadsheet range did not return completely.");
+			try {
+				const body = (await boundedJson(res.body, ROW_PAGE_MAX_BYTES)) as { range?: string; values?: unknown[][] };
+				values = body.values ?? [];
+				const first = Number(body.range?.match(/![A-Z]*(\d+)/)?.[1] ?? start);
+				if (first !== start || !Array.isArray(values) || values.length > end - start + 1 || values.some((r) => !Array.isArray(r)))
+					throw new BrainError("incomplete_export", "The spreadsheet returned an invalid row range.");
+				break;
+			} catch (e) {
+				if (!(e instanceof BrainError) || e.code !== "too_large") throw e;
+				if (end === start) throw new BrainError("row_too_large", `Row R${start} exceeds the bounded row-read budget. Nothing was truncated. Read it with character-offset mode (sheet and expect_version), which returns flagged partial rows.`);
+				end = start + Math.floor((end - start) / 2);
+			}
+		}
+		const enc = new TextEncoder();
+		const parts: string[] = [];
+		let chars = 0;
+		let bytes = 0;
+		const fits = (line: string) => {
+			const b = enc.encode(line).byteLength;
+			if (chars + line.length > req.maxChars || bytes + b > req.maxChars) return false;
+			parts.push(line);
+			chars += line.length;
+			bytes += b;
+			return true;
+		};
+		const tooLarge = (row: number) =>
+			new BrainError("row_too_large", `Row R${row} does not fit max_chars ${req.maxChars}. Nothing was truncated. Raise max_chars up to ${MAX_PAGE_CHARS}, or read it with character-offset mode, which returns flagged partial rows.`);
+		let header = req.header;
+		if (!header) {
+			if (!fits(sheetHeader(sheet))) throw tooLarge(start);
+			header = true;
+		}
+		let emitted = req.emitted;
+		let pending = req.pending;
+		let next: number;
+		if (values.length) {
+			// Rows before start that were held back are interior now, because this range has a populated row.
+			while (pending > 0) {
+				if (!fits(`R${start - pending}\t[]\n`)) break;
+				pending--;
+				emitted = true;
+			}
+			if (pending > 0) {
+				if (!parts.length) throw tooLarge(start - pending);
+				next = start;
+			} else {
+				let i = 0;
+				for (; i < values.length; i++) {
+					const row = values[i]!;
+					for (let c = 0; c < row.length; c++) if (typeof row[c] !== "string") row[c] = String(row[c] ?? "");
+					if (!fits(`R${start + i}\t${JSON.stringify(row)}\n`)) break;
+					emitted = true;
+				}
+				if (i === 0 && !parts.length) throw tooLarge(start);
+				if (i < values.length) next = start + i;
+				else {
+					next = end + 1;
+					pending = end - (start + values.length - 1);
+				}
+			}
+		} else {
+			next = end + 1;
+			pending += end - start + 1;
+		}
+		const done = next > grid!;
+		// The whole-tab serializer writes one empty line after the header when the tab has no values.
+		if (done && !emitted) parts.push("\n");
+		return {
+			text: parts.join(""),
+			start_row: start,
+			covered_end_row: next - 1,
+			grid_row_count: grid!,
+			held_empty_rows: done ? 0 : pending,
+			discarded_tail_rows: done ? pending : 0,
+			next_row: done ? null : next,
+			serializer: SHEET_TEXT_FORMAT,
+			state: done ? null : { next, pending, emitted, grid: grid! },
+		};
+	}
+
+	/** One bounded native row page, with the same scope, withholding and version proofs as read. */
+	async function readRows(scope: BrainScope, id: string, sheet: string, req: RowRequest, folder?: string) {
+		if (!Number.isSafeInteger(req.start) || req.start < 1 || !Number.isSafeInteger(req.count) || req.count < 1 || req.count > MAX_PAGE_ROWS)
+			throw new BrainError("invalid_row_range", `Row mode requires start_row >= 1 and max_rows from 1 to ${MAX_PAGE_ROWS}.`);
+		if (!Number.isSafeInteger(req.pending) || req.pending < 0 || req.pending >= req.start) throw new BrainError("invalid_cursor", "The row cursor is invalid.");
+		const maxChars = Math.min(Math.max(1, req.maxChars), MAX_PAGE_CHARS);
+		const { file, readAt, folder: nested, rowPage } = await readWhole(scope, id, folder, sheet, { ...req, maxChars });
+		return { file, scope, ...(nested ? { folder: nested } : {}), sheet, readAt, ...rowPage! };
 	}
 
 	/** Whole document verified, returned in pages so large documents fit an MCP reply. */
@@ -495,7 +619,6 @@ export function createBrainReads(
 		const { file, text, readAt, folder: nested } = await readWhole(scope, id, folder, sheet);
 		return { file, scope, ...(nested ? { folder: nested } : {}), ...(sheet !== undefined ? { sheet } : {}), readAt, ...page(text, file, offset, maxChars, sheet, expectVersion) };
 	}
-
 	/** Proves the pinned file is still an untrashed readable child of its pinned parent in its pinned drive. Returns its MIME type. */
 	async function pinnedMember(pin: PinnedFile, code: "not_in_scope" | "left_scope"): Promise<string> {
 		const refuse = () => new BrainError(code, code === "left_scope" ? "Document left the selected scope during the read." : "The file is not a readable document in this scope.");
@@ -579,5 +702,5 @@ export function createBrainReads(
 		};
 	}
 
-	return { discover, probe, read, readPinned, decisions };
+	return { discover, probe, read, readRows, readPinned, decisions };
 }

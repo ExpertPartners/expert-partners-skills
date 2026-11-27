@@ -35,7 +35,8 @@
       "ALERT_FROM",
       "WITHHELD_SOURCES",
       "FILE_READ_EXCEPTIONS",
-      "PINNED_FILE_READS"
+      "PINNED_FILE_READS",
+      "ROW_CURSOR_KEY"
     ]
   }
 }
