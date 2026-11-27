@@ -1,3 +1,8 @@
+## 3.15.2 - 2026-11-27
+
+Preserve the connector's existing singleton tab group when isolating a fresh browser job from a shared window. Avoid the ungroup-and-regroup ownership release in Playwright Extension 0.6.0, preserve foreign tabs, and verify the exact new window and blank seed cleanup.
+
+Release unused facade control sockets lazily, exit on disconnected stdio, and expire zero-job tunnels after five minutes without interrupting active jobs or in-flight calls.
 ## 3.15.1 - 2026-11-27
 
 The M4 Scratch janitor calls lsof by its full path. Under launchd it had stopped at "lsof unavailable" on every run since it was installed, because launchd's PATH has no /usr/sbin. The AI browser check now runs even when lsof is unavailable.
