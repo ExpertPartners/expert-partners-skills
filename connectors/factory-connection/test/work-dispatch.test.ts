@@ -14,6 +14,7 @@ test("all three dispatch entry points refuse before any Factory request",async()
    ["create_session",{machine:"M4",firstMessage:"Find the original capstone homework"}],
    ["start_and_watch",{machine:"M4",message:"Find the Build 101 original videos"}],
    ["post_message",{sessionId:"other-owner",text:"Commission the capstone homework build"}],
+   ["post_message",{sessionId:"other-owner",text:"Search for the missing original for week 99"}],
   ] as const) {
    const r=await runTool(name,args,env); assert.equal(r.ok,false); assert.equal(r.status,409);
   }

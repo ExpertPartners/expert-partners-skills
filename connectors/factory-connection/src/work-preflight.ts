@@ -62,5 +62,12 @@ export function legacyIntent(policy: WorkPolicy, text: string): WorkIntent | nul
   if (search.test(sentence)) return { action: "source_search", capabilityId: item.id };
   if (build.test(sentence)) return { action: "replacement_build", capabilityId: item.id };
  }
+ for (const sentence of lower.split(/[.!?\n]+/)) {
+  if (/\b(no|not|never|don't|do not|closed|rejected|without|stop)\b/.test(sentence)) continue;
+  if (/\b(search|hunt|recover|find|locate)\b.{0,140}\b(original|missing source|unrecovered source)\b/.test(sentence))
+   return {action: "source_search", capabilityId: "unreconciled-source"};
+  if (/\b(commission|start|create)\b.{0,140}\b(replacement build|reconstruction build|duplicate build)\b/.test(sentence))
+   return {action: "replacement_build", capabilityId: "unreconciled-build"};
+ }
  return null;
 }
