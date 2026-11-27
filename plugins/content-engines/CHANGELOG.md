@@ -1,3 +1,6 @@
+## 0.16.1 - 2026-11-27
+
+Keep Read the Room reports useful in link-viewable department folders with nonidentifying evidence locators and no original recording links, source artifacts or attendee contact details. Respect restricted sessions and recognize the current AG business-line names.
 ## 0.16.0 - 2026-11-27
 
 Require linked readiness, decisions, close criteria, tool ownership and missing-source evidence before Week Wrap drafts or writes a package. Keep attended-session support, route teachables to AGI Course Development, and verify actual Canva notes separately from slide edits.
