@@ -33,7 +33,7 @@ A changed quote or consent state changes the revision and updates the existing c
 
 ## Arrival and recovery
 
-Run the helper before writing, execute allowed actions, refresh real destination receipts, then run it again with the same records. `missing_arrivals` must be empty for arrival to pass. `complete` also requires every configured source read to be complete and no blocked records or duplicate files. No sources is not a complete run. Excluded fixtures and won sales opportunities are counted, not filed.
+Run the helper before writing, execute allowed actions, refresh real destination receipts, then run it again with the same records. `missing_arrivals` must be empty for arrival to pass. `complete` also requires every configured source read to be complete and no destination gaps, blocked records or duplicate files. No sources or no destinations is not a complete run. Unsafe configured destinations remain gaps even when no real wins arrived. Excluded fixtures and won sales opportunities are counted, not filed.
 
 The independent latest-100 source scan must be included in `records` even if already checkpointed. Compare its eligible keys and revisions with real files. This detects missing files and stale revisions instead of trusting a local ledger. Recover from a crash by rereading destination files. Never advance a checkpoint for a failed source, uncertain write or missing arrival. Continue healthy sources while reporting partial state.
 

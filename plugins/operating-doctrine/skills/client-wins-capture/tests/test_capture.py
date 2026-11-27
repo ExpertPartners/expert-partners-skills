@@ -150,6 +150,15 @@ class CaptureTests(unittest.TestCase):
     def test_empty_source_configuration_is_not_complete(self):
         self.assertFalse(MODULE.capture({})["complete"])
 
+    def test_zero_wins_does_not_hide_destination_gap(self):
+        self.data["records"] = []
+        self.data["destinations"][0]["private"] = False
+        result = self.run_capture()
+        self.assertFalse(result["complete"])
+        self.assertEqual(result["destination_gaps"], ["EP"])
+        self.data["destinations"] = []
+        self.assertFalse(self.run_capture()["complete"])
+
     def test_real_entry_point_and_malformed_input(self):
         result = subprocess.run(
             [sys.executable, str(SCRIPT)],

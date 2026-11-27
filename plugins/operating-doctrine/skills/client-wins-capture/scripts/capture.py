@@ -26,6 +26,13 @@ def capture(data):
         if company in destinations:
             raise ValueError("ambiguous company destination")
         destinations[company] = destination
+    destination_gaps = [
+        company
+        for company, destination in destinations.items()
+        if company not in {"EP", "AG"}
+        or not destination.get("folder")
+        or any(destination.get(f) is not True for f in ("verified", "private", "access_preserved"))
+    ]
     observed = {}
     for file in data.get("files", []):
         observed.setdefault(file["key"], []).append(file)
@@ -110,8 +117,11 @@ def capture(data):
             action["file_id"] = files[0]["id"]
         actions.append(action)
     return {
-        "complete": bool(sources) and not (failed or blocked or missing),
+        "complete": bool(sources)
+        and bool(destinations)
+        and not (failed or destination_gaps or blocked or missing),
         "failed_sources": failed,
+        "destination_gaps": destination_gaps,
         "actions": actions,
         "blocked": blocked,
         "excluded": excluded,
