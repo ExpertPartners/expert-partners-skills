@@ -33,7 +33,8 @@ Allison typing wrap and archive, or only W or w, in a Claude Code or Codex sessi
 6. Sweep once for anything a cold worker would need that nothing above captured, and route it to its home with `estate-memory-router`. Use `remember-this` for a future obligation. Say nothing if nothing qualifies.
 7. If a canon or rule changed, run `canon-sync-protocol`.
 8. Stop your own monitors, scheduled wakeups, subscriptions and background tasks.
-9. Archive the session.
+9. Clean up after yourself. Close every browser window and tab your jobs opened; the browser lifecycle hook does it at Stop from the ownership receipts and blocks once if it cannot. Run `~/.local/bin/ep-browser-window-cleanup --cleanup-line` for the browser count. Remove the temp files, Scratch folders and stray worktrees this session created, under the M4 janitor rules in `tools/maintenance/README.md`: never remove uncommitted or unpushed work, or anything of Allison's. Name what you kept and why.
+10. Archive the session. Where the surface says `Ready to archive` instead, that final message carries one line that starts `Cleanup done:` and lists browser windows closed, then temp files, Scratch folders and worktrees removed, for example `Cleanup done: browser windows closed: 1; temp files: 2 removed; Scratch folders: 1 removed; worktrees: 1 removed.`
 
 ## Finite missions
 

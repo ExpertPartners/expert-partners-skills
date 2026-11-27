@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install stable user hooks on either Mac, and the M2-only nightly sweep."""
+"""Install stable user hooks on either Mac, and the M2-only 15 minute sweep."""
 
 import argparse
 import json
@@ -12,6 +12,8 @@ import sys
 
 from browser_lifecycle import atomic_json
 from install_job_route import atomic, verified_runtime
+
+SWEEP_INTERVAL = 15 * 60
 
 
 def merge_hooks(path, command, surface):
@@ -88,7 +90,7 @@ def install(
         (
             "#!/bin/sh\nexec "
             + shlex.join([interpreter, str(runtime / "scripts/browser_window_cleanup.py")])
-            + "\n"
+            + ' "$@"\n'
         ).encode(),
         0o700,
     )
@@ -105,7 +107,7 @@ def install(
     }
     if not ssh_target:
         config = json.loads(route_config.read_text())
-        log = Path(config["state_dir"]) / "nightly-cleanup.log"
+        log = Path(config["state_dir"]) / "sweep-cleanup.log"
         plist = home / "Library/LaunchAgents/com.expertpartners.browser-window-sweep.plist"
         plist.parent.mkdir(parents=True, exist_ok=True)
         atomic(
@@ -118,9 +120,9 @@ def install(
                         str(runtime / "scripts/browser_lifecycle.py"),
                         "--config",
                         str(route_config),
-                        "--sweep",
+                        "--sweep-unowned",
                     ],
-                    "StartCalendarInterval": {"Hour": 2, "Minute": 35},
+                    "StartInterval": SWEEP_INTERVAL,
                     "StandardOutPath": str(log),
                     "StandardErrorPath": str(log),
                     "ProcessType": "Background",

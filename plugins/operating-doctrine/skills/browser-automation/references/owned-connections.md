@@ -257,10 +257,23 @@ Completion is proven, never guessed from age or idle time.
 - Isolation at birth. Chrome can place a new connector in the newest existing window when
   two jobs start close together. Each connector that finds another tab in its window
   moves itself to a new window before ownership is recorded.
-- Nightly sweep. The M2 LaunchAgent `com.expertpartners.browser-window-sweep` runs
-  `browser_lifecycle.py --sweep` at 02:35. It finishes only terminal owned jobs. Active
-  jobs, receipts with no owner record and uncertain receipts are left as they are. An
-  owner row whose job finished more than thirty days ago is dropped; its receipt stays.
+- 15 minute sweep. The M2 LaunchAgent `com.expertpartners.browser-window-sweep` runs
+  `browser_lifecycle.py --sweep-unowned` every 900 seconds. It finishes a job only when
+  its owner row is terminal, the owning session holds no live marker, the receipt has an
+  exact window ID and is not failed, pending, shared, relayed or of unknown creation
+  outcome, and a read-only census shows the window holds no Grok or x.ai tab and no tab
+  from another group. Everything else is held and logged, and one held job holds its
+  whole session. Every decision is one JSON line in `unowned-sweep.log` in the route
+  state folder, with time, action, reason, job, session and window ID; a run with
+  nothing to do logs `nothing_to_close`. An owner row whose job finished more than
+  thirty days ago is dropped; its receipt stays. `--sweep` still runs the plain
+  terminal-owner finish.
+- Cleanup receipt. When the Stop or SessionEnd finish succeeds, the hook writes
+  `~/.cache/expert-partners/browser-lifecycle-receipts/<session>.json` before it
+  removes the session marker, so a session that opened a browser job always leaves a
+  marker or a receipt. A failed finish keeps the marker and blocks Stop once.
+  `ep-browser-window-cleanup --cleanup-line [session]` prints the browser part of the
+  session-wrap `Cleanup done:` line from that evidence.
 - Install. `scripts/install_browser_lifecycle.py` writes the stable user hooks for
   Factory, Claude Code and Codex on either Mac, so a pinned plugin version still runs
   them. On the M4 it forwards every request to the M2 over SSH. On the M2 it also

@@ -37,7 +37,15 @@ class LifecycleTests(unittest.TestCase):
     def setUp(self):
         self.sessions = tempfile.TemporaryDirectory()
         self.addCleanup(self.sessions.cleanup)
-        patcher = patch.dict(os.environ, {"EP_BROWSER_LIFECYCLE_SESSIONS": self.sessions.name})
+        self.receipts = tempfile.TemporaryDirectory()
+        self.addCleanup(self.receipts.cleanup)
+        patcher = patch.dict(
+            os.environ,
+            {
+                "EP_BROWSER_LIFECYCLE_SESSIONS": self.sessions.name,
+                "EP_BROWSER_LIFECYCLE_RECEIPTS": self.receipts.name,
+            },
+        )
         patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -491,6 +499,136 @@ const connector={context:()=>({pages:()=>[connector]}),evaluate:async(fn,arg)=>f
             ["node", "-e", source + fixture], capture_output=True, text=True, timeout=10
         )
         self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_stop_leaves_a_receipt_for_the_cleanup_line(self):
+        session = "wrap-session"
+        self.assertEqual(hook.cleanup_line(session), "browser windows closed: none opened")
+        (Path(self.sessions.name) / session).touch()
+        self.assertIn("NOT done", hook.cleanup_line(session))
+        report = [
+            {"job_id": "a" * 32, "status": "finished"},
+            {"job_id": "b" * 32, "status": "preserved_uncertain"},
+        ]
+        hook.handle({"session_id": session, "hook_event_name": "Stop"}, lambda _: report)
+        self.assertFalse((Path(self.sessions.name) / session).exists())
+        line = hook.cleanup_line(session)
+        self.assertTrue(line.startswith("browser windows closed: 1"), line)
+        self.assertIn("b" * 32 + " preserved_uncertain", line)
+
+    def test_failed_finish_keeps_marker_and_writes_no_receipt(self):
+        session = "broken-session"
+        (Path(self.sessions.name) / session).touch()
+
+        def fail(_):
+            raise RuntimeError("browser_cleanup_incomplete")
+
+        with self.assertRaises(RuntimeError):
+            hook.handle({"session_id": session, "hook_event_name": "Stop"}, fail)
+        self.assertTrue((Path(self.sessions.name) / session).exists())
+        self.assertFalse((Path(self.receipts.name) / (session + ".json")).exists())
+        self.assertIn("NOT done", hook.cleanup_line(session))
+
+    def unowned_fixture(self, root):
+        meta = {"windowId": 5, "groupId": 7, "tabIds": [6]}
+        jobs = {
+            "1" * 32: ("ended", {"metadata": meta}),
+            "2" * 32: ("running", {"metadata": {**meta, "windowId": 8}}),
+            "3" * 32: ("failed-ended", {"metadata": meta, "status": "failed"}),
+            "4" * 32: ("pending-ended", {"metadata": meta, "ownership_pending": True}),
+            "5" * 32: ("nometa-ended", {"metadata": None}),
+        }
+        for job_id, (session, fields) in jobs.items():
+            self.receipt(root, job_id, **fields)
+            lifecycle.bind(root, job_id, session)
+        self.receipt(root, "6" * 32, metadata=meta)
+        for session in ("ended", "failed-ended", "pending-ended", "nometa-ended"):
+            lifecycle.terminal(root, session, "Stop")
+        (Path(self.sessions.name) / "running").touch()
+
+    def test_unowned_sweep_closes_only_ended_owners_and_logs_every_hold(self):
+        with tempfile.TemporaryDirectory() as root:
+            self.unowned_fixture(root)
+            with (
+                patch.object(
+                    lifecycle, "window_tabs", return_value=[{"windowId": 5, "groupId": 7}]
+                ),
+                patch.object(lifecycle, "control", return_value={"ok": True}) as control,
+            ):
+                report = lifecycle.sweep_unowned({"state_dir": root})
+            self.assertEqual(control.call_count, 1)
+            self.assertEqual(control.call_args.args[2]["job_id"], "1" * 32)
+            by_job = {x["job"]: (x["action"], x["reason"]) for x in report}
+            self.assertEqual(by_job["1" * 32], ("closed", "finished"))
+            self.assertEqual(by_job["2" * 32], ("held", "owner_job_running"))
+            self.assertEqual(by_job["3" * 32], ("held", "failed_receipt"))
+            self.assertEqual(by_job["4" * 32], ("held", "ownership_pending"))
+            self.assertEqual(by_job["5" * 32], ("held", "missing_metadata"))
+            self.assertEqual(by_job["6" * 32], ("held", "no_ownership_receipt"))
+            logged = [
+                json.loads(x) for x in (Path(root) / lifecycle.SWEEP_LOG).read_text().splitlines()
+            ]
+            self.assertEqual(len(logged), len(report))
+            for row in logged:
+                self.assertTrue({"at", "action", "reason", "job", "session", "window"} <= set(row))
+            self.assertEqual(
+                logged[0]["session"] is None or isinstance(logged[0]["session"], str), True
+            )
+
+    def test_unowned_sweep_never_closes_grok_foreign_group_or_unreadable_window(self):
+        tabs = (
+            [{"windowId": 5, "groupId": 7, "url": "https://grok.com/c/1"}],
+            [{"windowId": 5, "groupId": 7, "url": "https://accounts.x.ai/"}],
+            [{"windowId": 5, "groupId": 99, "url": "about:blank"}],
+            RuntimeError("census"),
+        )
+        reasons = []
+        for census in tabs:
+            with tempfile.TemporaryDirectory() as root:
+                self.receipt(root, "1" * 32, metadata={"windowId": 5, "groupId": 7})
+                lifecycle.bind(root, "1" * 32, "ended")
+                lifecycle.terminal(root, "ended", "Stop")
+                side = (
+                    {"side_effect": census}
+                    if isinstance(census, Exception)
+                    else {"return_value": census}
+                )
+                with (
+                    patch.object(lifecycle, "window_tabs", **side),
+                    patch.object(lifecycle, "control") as control,
+                ):
+                    report = lifecycle.sweep_unowned({"state_dir": root})
+                control.assert_not_called()
+                reasons.append(report[0]["reason"])
+        self.assertEqual(
+            reasons,
+            [
+                "protected_signed_in_session",
+                "protected_signed_in_session",
+                "group_mismatch",
+                "window_census_unavailable",
+            ],
+        )
+
+    def test_unowned_sweep_logs_a_run_that_found_nothing(self):
+        with tempfile.TemporaryDirectory() as root:
+            self.assertEqual(lifecycle.sweep_unowned({"state_dir": root}), [])
+            row = json.loads((Path(root) / lifecycle.SWEEP_LOG).read_text())
+            self.assertEqual(row["reason"], "nothing_to_close")
+
+    def test_browser_host_sweep_runs_every_fifteen_minutes(self):
+        with tempfile.TemporaryDirectory() as root:
+            home = Path(root)
+            runtime = home / "runtime"
+            (runtime / "scripts").mkdir(parents=True)
+            route = home / "route.json"
+            route.write_text(json.dumps({"state_dir": str(home / "state")}))
+            with patch.object(installer, "verified_runtime", side_effect=lambda r: Path(r)):
+                installer.install(runtime, sys.executable, home, route_config=route)
+            plist = home / "Library/LaunchAgents/com.expertpartners.browser-window-sweep.plist"
+            agent = installer.plistlib.loads(plist.read_bytes())
+            self.assertEqual(agent["StartInterval"], 900)
+            self.assertNotIn("StartCalendarInterval", agent)
+            self.assertEqual(agent["ProgramArguments"][-1], "--sweep-unowned")
 
     def test_user_hooks_survive_pins_preserve_existing_hooks_and_are_idempotent(self):
         with tempfile.TemporaryDirectory() as root:
