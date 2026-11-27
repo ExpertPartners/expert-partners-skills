@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "b81852621c238578ce997873de7fc3029873d1b7"
+    "eps": "3778fe20fd4c7acf508d48acd6da1a7408956927"
   },
   "zones": [
     "surfaces",
@@ -932,6 +932,34 @@
       }
     },
     {
+      "id": "client-wins-capture",
+      "source": "eps:plugins/operating-doctrine/skills/client-wins-capture/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "brain",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "real client wins, filed with evidence and checked on arrival",
+      "renderNote": null,
+      "layout": {
+        "x": 1777,
+        "y": 5564.4,
+        "width": 230,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "real client wins, filed with",
+          "evidence and checked on arrival"
+        ]
+      }
+    },
+    {
       "id": "code-block-routing",
       "source": "eps:plugins/operating-doctrine/skills/code-block-routing/SKILL.md",
       "repo": "eps",
@@ -974,7 +1002,7 @@
       "renderNote": null,
       "layout": {
         "x": 1777,
-        "y": 5564.4,
+        "y": 5853.4,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -2460,7 +2488,7 @@
       "renderNote": null,
       "layout": {
         "x": 1789,
-        "y": 5752.4,
+        "y": 5665.4,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -2654,7 +2682,7 @@
       "renderNote": null,
       "layout": {
         "x": 1777,
-        "y": 5651.4,
+        "y": 4958.4,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -2837,7 +2865,7 @@
       "renderNote": "single faint anchor, inheritance edges collapsed",
       "layout": {
         "x": 1798,
-        "y": 4958.4,
+        "y": 5160.4,
         "width": 188,
         "height": 77,
         "rectHeight": 62,
@@ -3189,7 +3217,7 @@
       "renderNote": null,
       "layout": {
         "x": 1774,
-        "y": 5160.4,
+        "y": 5752.4,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -4604,11 +4632,11 @@
         },
         {
           "x": 2351,
-          "y": 5847.4
+          "y": 5948.4
         },
         {
           "x": 790,
-          "y": 5847.4
+          "y": 5948.4
         },
         {
           "x": 790,
@@ -4679,6 +4707,12 @@
     },
     {
       "from": "capability-refresh",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
+      "from": "client-wins-capture",
       "to": "operating-doctrine",
       "type": "inherits",
       "points": null
@@ -5828,7 +5862,7 @@
         "x": 1748,
         "y": 4910.4,
         "width": 288,
-        "height": 927,
+        "height": 1028,
         "rooms": []
       },
       {

@@ -1,8 +1,8 @@
 {
   "schema": "expert-partners-ai-workforce/v1",
   "source": "canonical",
-  "generatedAt": "2026-11-27T19:47:53Z",
-  "verifiedAt": "2026-11-27T19:47:53Z",
+  "generatedAt": "2026-11-27T20:06:49Z",
+  "verifiedAt": "2026-11-27T20:06:49Z",
   "records": [
     {
       "id": "real-estate-agent-toolkit",
@@ -504,11 +504,11 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged as the operating-doctrine plugin, version 3.12.0, in the expert-partners plugin marketplace.",
-        "Contains 40 skills. Each one activates when a request matches its purpose."
+        "Packaged as the operating-doctrine plugin, version 3.13.0, in the expert-partners plugin marketplace.",
+        "Contains 41 skills. Each one activates when a request matches its purpose."
       ],
       "sourceLinks": [],
-      "lastVerified": "Not yet verified on any platform. Package version 3.12.0.",
+      "lastVerified": "Not yet verified on any platform. Package version 3.13.0.",
       "containsSkillIds": [
         "action-item-closeout",
         "ai-capability-routing",
@@ -520,6 +520,7 @@
         "business-brain-foundations",
         "calendar-link-generator",
         "canon-sync-protocol",
+        "client-wins-capture",
         "code-block-routing",
         "connection-first-implementation",
         "cowork-direct-execution",
@@ -555,10 +556,10 @@
       "accessNote": "Where this is available has not been verified yet.",
       "technicalDetail": {
         "canonicalSource": "expert-partners-skills/plugins/operating-doctrine",
-        "packageVersion": "3.12.0",
+        "packageVersion": "3.13.0",
         "marketplace": "expert-partners",
         "presentedAs": "plugin",
-        "skillCount": "40"
+        "skillCount": "41"
       },
       "keywords": [
         "brain",
@@ -721,7 +722,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -736,7 +737,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -1134,7 +1135,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1155,7 +1156,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "build-standard, connection-first-implementation, research-before-guessing, expert-partners-systems-map, code-block-routing, repo-standards"
       },
@@ -1203,7 +1204,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1218,7 +1219,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -1254,7 +1255,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1270,7 +1271,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "session-model-advisor"
       },
@@ -1316,7 +1317,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1331,7 +1332,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brain",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -1803,7 +1804,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1820,7 +1821,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "ember-browser-routing, connection-first-implementation"
       },
@@ -1863,7 +1864,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1878,7 +1879,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -1915,7 +1916,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -1930,7 +1931,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brain",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -2057,7 +2058,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2072,7 +2073,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -2131,7 +2132,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2146,7 +2147,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -2739,6 +2740,66 @@
       "example": false
     },
     {
+      "id": "client-wins-capture",
+      "humanName": "Client Wins Capture",
+      "kind": "skill",
+      "summary": "Capture real client wins into the owning company brain from CRM submissions, the Hub, social posts and reviews.",
+      "status": "Unknown",
+      "maintainer": "Allison Gaddy",
+      "collectionIds": [],
+      "categories": [
+        "The brain"
+      ],
+      "portable": "unknown",
+      "verifiedSurfaces": [],
+      "invocationInstructions": [
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
+        "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
+      ],
+      "sourceLinks": [],
+      "lastVerified": "Not yet verified on any platform. Canonical lifecycle: live.",
+      "containsSkillIds": [],
+      "relatedIds": [
+        "operating-doctrine-plugin"
+      ],
+      "accessNote": "Where this is available has not been verified yet.",
+      "technicalDetail": {
+        "canonicalSource": "expert-partners-skills/plugins/operating-doctrine/skills/client-wins-capture/SKILL.md",
+        "lifecycle": "live",
+        "tier": "plugin",
+        "zone": "brain",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
+        "inherits": "operating-doctrine"
+      },
+      "keywords": [
+        "arrival",
+        "brain",
+        "capture",
+        "checked",
+        "client",
+        "company",
+        "crm",
+        "doctrine",
+        "evidence",
+        "filed",
+        "hub",
+        "operating",
+        "owning",
+        "posts",
+        "real",
+        "reviews",
+        "social",
+        "submissions",
+        "wins"
+      ],
+      "bestFor": [
+        "real client wins, filed with evidence and checked on arrival"
+      ],
+      "useCases": [],
+      "askExamples": [],
+      "example": false
+    },
+    {
       "id": "code-block-routing",
       "humanName": "Code Block Routing",
       "kind": "skill",
@@ -2752,7 +2813,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2767,7 +2828,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -2945,7 +3006,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -2960,7 +3021,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -3139,7 +3200,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3154,7 +3215,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -3390,7 +3451,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3405,7 +3466,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -3511,7 +3572,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3527,7 +3588,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "deliverable-link"
       },
@@ -3633,7 +3694,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3648,7 +3709,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -3811,7 +3872,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -3826,7 +3887,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -4013,7 +4074,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4028,7 +4089,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -4159,7 +4220,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4174,7 +4235,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -4227,7 +4288,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -4242,7 +4303,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -5399,7 +5460,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -5415,7 +5476,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "research-intake"
       },
@@ -5461,7 +5522,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Do not use for new work."
       ],
       "sourceLinks": [],
@@ -5476,7 +5537,7 @@
         "lifecycle": "retired",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -5511,7 +5572,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -5526,7 +5587,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -5574,7 +5635,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Do not use for new work."
       ],
       "sourceLinks": [],
@@ -5591,7 +5652,7 @@
         "lifecycle": "retired",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "code-block-routing, pin"
       },
@@ -6801,7 +6862,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6816,7 +6877,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brain",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -6858,7 +6919,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -6874,7 +6935,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "repo-standards"
       },
@@ -7283,7 +7344,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7298,7 +7359,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brain",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)"
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)"
       },
       "keywords": [
         "act",
@@ -7388,7 +7449,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Do not use for new work."
       ],
       "sourceLinks": [],
@@ -7404,7 +7465,7 @@
         "lifecycle": "retired",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "code-block-routing"
       },
@@ -7760,7 +7821,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -7775,7 +7836,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -8085,7 +8146,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -8100,7 +8161,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "brain",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -8145,7 +8206,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -8160,7 +8221,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -8203,7 +8264,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -8218,7 +8279,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -8457,7 +8518,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -8472,7 +8533,7 @@
         "lifecycle": "designed",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -8510,7 +8571,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -8525,7 +8586,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -8566,7 +8627,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Do not use for new work."
       ],
       "sourceLinks": [],
@@ -8583,7 +8644,7 @@
         "lifecycle": "retired",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "defersTo": "code-block-routing, pin"
       },
@@ -8620,7 +8681,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -8636,7 +8697,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "share-the-love"
       },
@@ -8676,7 +8737,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -8691,7 +8752,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "hands",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
@@ -8739,7 +8800,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -8754,7 +8815,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "brandScope": "ag-personal-brand"
       },
@@ -9187,7 +9248,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -9203,7 +9264,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "content",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine",
         "calls": "share-the-love"
       },
@@ -9969,7 +10030,7 @@
       "portable": "unknown",
       "verifiedSurfaces": [],
       "invocationInstructions": [
-        "Packaged in the Operating Doctrine plugin, version 3.12.0.",
+        "Packaged in the Operating Doctrine plugin, version 3.13.0.",
         "Describe what you need in plain language. An AI assistant that has this skill loaded uses it when your request matches its purpose."
       ],
       "sourceLinks": [],
@@ -9984,7 +10045,7 @@
         "lifecycle": "live",
         "tier": "plugin",
         "zone": "routing",
-        "packaging": "operating-doctrine plugin v3.12.0 (expert-partners marketplace)",
+        "packaging": "operating-doctrine plugin v3.13.0 (expert-partners marketplace)",
         "inherits": "operating-doctrine"
       },
       "keywords": [
