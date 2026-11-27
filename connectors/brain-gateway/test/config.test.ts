@@ -82,7 +82,7 @@ test("HQ departments reach outputs and only the AI department reaches audits", a
 	for (const id of ["hq-chro", "hq-cfo", "hq-caio"]) {
 		for (const scope of ["hq-outputs", "hq-audits"]) {
 			const r = await runTool("discover", { scope }, env, async () => Response.json({ files: [] }), { kind: "department", id });
-			assert.equal(r.status, scope === "hq-audits" && id !== "hq-caio" ? 403 : 200);
+			assert.equal(r.status, scope === "hq-audits" && id === "hq-cfo" ? 403 : 200);
 		}
 	}
 	for (const scope of ["ag-core", "ag-marketing", "ag-sales", "ag-listings", "ag-client-experience", "ag-operations", "ag-outputs", "ag-private", "ag-strong-ones", "ag-case-studies"]) {
