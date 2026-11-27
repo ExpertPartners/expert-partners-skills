@@ -97,10 +97,13 @@ def git(repo, *args, timeout=120):
 
 def open_paths():
     """Every path a running process has open or uses as its working folder."""
+    # launchd's PATH has no /usr/sbin, where macOS keeps lsof.
+    lsof = shutil.which("lsof", path=os.environ.get("PATH", "") + ":/usr/sbin:/usr/bin")
+    if not lsof:
+        return None
     try:
         out = subprocess.run(
-            # launchd's PATH has no /usr/sbin, so a bare "lsof" is never found there.
-            ["/usr/sbin/lsof", "-n", "-w", "-Fn", "-u", str(os.getuid())],
+            [lsof, "-n", "-w", "-Fn", "-u", str(os.getuid())],
             capture_output=True,
             text=True,
             timeout=180,
