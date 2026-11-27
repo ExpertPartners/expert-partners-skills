@@ -1,3 +1,6 @@
+## 3.15.3 - 2026-11-27
+
+Require the existing work preflight before source searches or replacement builds, preserving closed recovery decisions and continuing approved work through its current owner.
 ## 3.15.2 - 2026-11-27
 
 Preserve the connector's existing singleton tab group when isolating a fresh browser job from a shared window. Avoid the ungroup-and-regroup ownership release in Playwright Extension 0.6.0, preserve foreign tabs, and verify the exact new window and blank seed cleanup.
