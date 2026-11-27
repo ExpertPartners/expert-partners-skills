@@ -16,6 +16,8 @@ Fill the selected business brain's complete template in a single pass. Search he
 
 For an audit or health check, do not enter the fill procedure. Use [audit mode](references/audit-mode.md) instead. It reads existing content and saves a report only.
 
+Audit run contract: recover unfinished saves from the existing task/handoff first. Read the live `[HQ][V1.0] Business Brain Blank Master Templates` every run, including the applicable bodies, and cite each ID and version. Snapshot source IDs, versions and modifiedTime before and after. Duplicate or conflict claims require both file IDs and evidence from each body, otherwise label UNVERIFIED. Anyone-with-link reader visibility is informational, not a deficiency. Persist the complete pending report before a save, commit under a revision guard, and read the filed report back before calling the run finished. Use the [Bench regression checklist](references/audit-regression-checklist.md) for changed audit behavior.
+
 Read the live HQ Rulebook, newest decisions, owning brain and selected blank master before use. Current decisions override the earlier four-file spec. Follow [the run procedure](references/run-procedure.md), [file structures](references/file-structures.md) and [saving and closing](references/saving-and-closing.md).
 
 ## Run modes
