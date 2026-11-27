@@ -17,10 +17,11 @@ export const managedAuthorization: EmaOptions<ManagedEnv> = {
     if (claims.iss !== env.CLAUDE_TRUSTED_ISSUER
       || resource !== env.MCP_RESOURCE || typeof claims.email !== "string"
       || !isAllowedEmail(env.ALLOWED_EMAILS, claims.email)) return null;
+    if (requestedScope.some(scope => scope !== "mcp")) return null;
     const email = claims.email.trim().toLowerCase();
     return {
       userId: `claude-${encodeURIComponent(claims.sub)}`,
-      scope: requestedScope,
+      scope: requestedScope.length ? requestedScope : ["mcp"],
       accessTokenTTL: 900,
       metadata: { issuer: claims.iss, subject: claims.sub },
       props: { email, login: claims.sub, name: email, enterprise: true },
