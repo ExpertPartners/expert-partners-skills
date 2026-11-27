@@ -6,6 +6,7 @@ import { z } from "zod";
 import { env } from "cloudflare:workers";
 import OAuthProvider from "@cloudflare/workers-oauth-provider";
 import { managedAuthorization } from "./managed-auth.ts";
+import { managedMcpRequest } from "./managed-route.ts";
 import { McpServer } from "@modelcontextprotocol/server";
 import { createMcpHandler, getMcpAuthContext } from "agents/mcp/server";
 import { handleAccessRequest } from "./access-handler";
@@ -126,7 +127,7 @@ const provider = new OAuthProvider<Env>({
 });
 
 export default {
-	fetch: (request: Request, bindings: Env, ctx: ExecutionContext) => provider.fetch(request, bindings, ctx),
+	fetch: (request: Request, bindings: Env, ctx: ExecutionContext) => provider.fetch(managedMcpRequest(request), bindings, ctx),
 	// Daily live check of the Business Brain connection (cron in wrangler.jsonc).
 	async scheduled(event: ScheduledController, bindings: Env, ctx: ExecutionContext) {
 		ctx.waitUntil(
