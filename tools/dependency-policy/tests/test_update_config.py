@@ -439,7 +439,9 @@ class FixtureRepo:
         )
         self.write("plugins/research-ops/skills/source-hunter/requirements.txt", LOCK)
         self.write("tools/factory-inbox/requirements.txt", LOCK)
-        self.write("tools/experience-watcher/requirements.txt", "-r ../factory-inbox/requirements.txt\n")
+        self.write(
+            "tools/experience-watcher/requirements.txt", "-r ../factory-inbox/requirements.txt\n"
+        )
         self.write("tools/capability-feed/package.json", "{}\n")
         self.write("tools/skill-map/package.json", "{}\n")
         self.write(".github/workflows/ci.yml", "name: ci\njobs: {}\n")
