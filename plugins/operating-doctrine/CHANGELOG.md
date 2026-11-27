@@ -1,3 +1,6 @@
+## 3.13.0 - 2026-11-27
+
+Add scheduled client wins capture instructions and a deterministic private-case planner with source evidence, consent, deduplication, revision handling and arrival reconciliation.
 ## 3.12.0 - 2026-11-27
 
 Add New Hire Onboarding for named people and AI employees, with Drive access reconciliation, scoped gateway verification, company-first instructions and first-use receipts.
