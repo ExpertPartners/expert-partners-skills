@@ -1,6 +1,6 @@
 // Read-only Business Brain reads. Ported from the Hub reader contract (expert-partners-hub
 // src/lib/business-brain.server.ts): scope map, direct-child discovery, membership and version checks
-// around every export, complete reads only, no cache and no stored copy of any document.
+// around every export, complete reads only. Verified tab text may live briefly in isolate memory only.
 
 // Routing metadata only. The live Departments, Workspaces and Brain Folders map owns scope.
 export const BRAIN_FOLDERS = {
@@ -56,6 +56,15 @@ export const SHEET_MAX_BYTES = 24_000_000;
 /** Sheets reads retry 429 and 503 at most this many attempts in total, never sooner than the server asks. */
 export const SHEET_MAX_ATTEMPTS = 3;
 export const SHEET_MAX_RETRY_DELAY_MS = 8_000;
+/**
+ * Every page of a tab re-proves scope, withholding and version, but rebuilding the whole tab text for each
+ * page cost 100 to 200 ms of CPU per page on large tabs and one page was killed for exceeding the CPU limit.
+ * The verified text is kept in this isolate's memory only, keyed by file, version, exact tab and text format,
+ * so a later page of the same version can skip the rebuild. Size is counted as two bytes per character, the
+ * worst case for a JavaScript string, and the budget leaves room for a cold read at the caps alongside it.
+ */
+export const SHEET_CACHE_MAX_BYTES = 16_000_000;
+const SHEET_TEXT_FORMAT = "rows-v1";
 export const DEFAULT_PAGE_CHARS = 60_000;
 export const MAX_PAGE_CHARS = 200_000;
 /** Subfolders below a scope root are reachable this many levels down, no further. */
@@ -208,7 +217,8 @@ export function retryAfterMs(header: string | null, nowMs: number, attempt: numb
 
 async function boundedJson(stream: ReadableStream<Uint8Array>): Promise<unknown> {
 	const reader = stream.getReader();
-	const chunks: Uint8Array[] = [];
+	const decoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: false });
+	let text = "";
 	let size = 0;
 	try {
 		while (true) {
@@ -216,15 +226,12 @@ async function boundedJson(stream: ReadableStream<Uint8Array>): Promise<unknown>
 			if (next.done) break;
 			size += next.value.byteLength;
 			if (size > SHEET_MAX_BYTES) throw new BrainError("too_large", "Tab exceeds the full-read limit. Nothing is authoritative.");
-			chunks.push(next.value);
+			text += decoder.decode(next.value, { stream: true });
 		}
 	} finally {
 		await reader.cancel().catch(() => {});
 		reader.releaseLock();
 	}
-	const decoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: false });
-	let text = "";
-	for (const c of chunks.splice(0)) text += decoder.decode(c, { stream: true });
 	text += decoder.decode();
 	try {
 		return JSON.parse(text);
@@ -232,6 +239,61 @@ async function boundedJson(stream: ReadableStream<Uint8Array>): Promise<unknown>
 		throw new BrainError("incomplete_export", "The spreadsheet tab did not return completely.");
 	}
 }
+
+/** Least-recently-used tab text for this isolate. Never holds tokens, entitlement results or anything but verified tab text. */
+export const sheetCache = (() => {
+	const entries = new Map<string, string>();
+	let bytes = 0;
+	let policyEpoch = "";
+	const keyOf = (id: string, version: string, sheet: string) => JSON.stringify([id, version, sheet, SHEET_TEXT_FORMAT]);
+	const drop = (key: string) => {
+		const text = entries.get(key);
+		if (text === undefined) return;
+		entries.delete(key);
+		bytes -= text.length * 2;
+	};
+	return {
+		policy(epoch: string) {
+			if (epoch === policyEpoch) return;
+			entries.clear();
+			bytes = 0;
+			policyEpoch = epoch;
+		},
+		get(id: string, version: string, sheet: string): string | undefined {
+			for (const k of entries.keys()) {
+				const [file, cachedVersion] = JSON.parse(k);
+				if (file === id && cachedVersion !== version) drop(k);
+			}
+			const key = keyOf(id, version, sheet);
+			const text = entries.get(key);
+			if (text === undefined) return undefined;
+			entries.delete(key);
+			entries.set(key, text);
+			return text;
+		},
+		set(id: string, version: string, sheet: string, text: string) {
+			const key = keyOf(id, version, sheet);
+			drop(key);
+			// Older versions of the same file can never be served again.
+			for (const k of entries.keys()) {
+				const [file, cachedVersion] = JSON.parse(k);
+				if (file === id && cachedVersion !== version) drop(k);
+			}
+			if (text.length * 2 > SHEET_CACHE_MAX_BYTES) return;
+			while (bytes + text.length * 2 > SHEET_CACHE_MAX_BYTES) drop(entries.keys().next().value!);
+			entries.set(key, text);
+			bytes += text.length * 2;
+		},
+		forget(id: string) {
+			for (const k of [...entries.keys()]) if (JSON.parse(k)[0] === id) drop(k);
+		},
+		clear() {
+			entries.clear();
+			bytes = 0;
+		},
+		stats: () => ({ entries: entries.size, bytes }),
+	};
+})();
 
 export function createBrainReads(
 	drive: DriveFetch,
@@ -370,7 +432,11 @@ export function createBrainReads(
 		const parts = [`Tab ${sheet}. One line per sheet row, R number then the cells as a JSON array.\n`];
 		let length = parts[0]!.length;
 		for (let i = 0; i < values.length; i++) {
-			const line = `R${start + i}\t${JSON.stringify(values[i]!.map((c) => String(c ?? "")))}\n`;
+			const row = values[i]!;
+			// FORMATTED_VALUE cells are normally strings. Normalize in place instead of allocating
+			// another array for every row of a cold read.
+			for (let c = 0; c < row.length; c++) if (typeof row[c] !== "string") row[c] = String(row[c] ?? "");
+			const line = `R${start + i}\t${JSON.stringify(row)}\n`;
 			length += line.length;
 			if (length > SHEET_MAX_CHARS) throw new BrainError("too_large", "Tab exceeds the full-read limit. Nothing is authoritative.");
 			parts.push(line);
@@ -381,6 +447,16 @@ export function createBrainReads(
 
 	/** Reads one whole document. Verifies direct membership in scope before and after, and that the version did not change. */
 	async function readWhole(scope: BrainScope, id: string, folder?: string, sheet?: string) {
+		try {
+			return await verifiedWhole(scope, id, folder, sheet);
+		} catch (e) {
+			// A failed proof, including revoked Drive access, must not leave a reusable entry.
+			sheetCache.forget(id);
+			throw e;
+		}
+	}
+
+	async function verifiedWhole(scope: BrainScope, id: string, folder?: string, sheet?: string) {
 		if (withheld.has(id)) throw new BrainError("not_in_scope", "The file is not a readable document in this scope.");
 		const inventory = await discover(scope, undefined, folder);
 		const found = inventory.files.find((f) => f.id === id);
@@ -388,8 +464,12 @@ export function createBrainReads(
 			throw new BrainError("not_in_scope", "The file is not a readable document in this scope.");
 		if (sheet !== undefined && found.mimeType !== SHEET_MIME) throw new BrainError("not_a_spreadsheet", "Only a spreadsheet takes a sheet.");
 		const before = await fileVersion(drive, id);
+		const tab = found.mimeType === SHEET_MIME && sheet !== undefined;
+		const cached = tab ? sheetCache.get(id, before.version!, sheet) : undefined;
 		const text =
-			found.mimeType === SHEET_MIME
+			cached !== undefined
+				? cached
+				: found.mimeType === SHEET_MIME
 				? await sheetText(id, sheet)
 				: await fullText(
 						await drive(
@@ -406,6 +486,7 @@ export function createBrainReads(
 			throw e;
 		});
 		if (!membership.files.some((f) => f.id === id)) throw new BrainError("left_scope", "Document left the selected scope during the read.");
+		if (tab && cached === undefined) sheetCache.set(id, before.version!, sheet, text);
 		return { file: before, text, readAt: now().toISOString(), folder: inventory.folder, ...(sheet !== undefined ? { sheet } : {}) };
 	}
 

@@ -1,10 +1,13 @@
-import { test } from "node:test";
+import { beforeEach, test } from "node:test";
 import assert from "node:assert/strict";
-import { BrainError, BRAIN_FOLDERS, createBrainReads, MAX_CHARS, SHEET_MAX_BYTES, SHEET_MAX_CHARS } from "../src/brain.ts";
+import { BrainError, BRAIN_FOLDERS, createBrainReads, MAX_CHARS, SHEET_MAX_BYTES, SHEET_MAX_CHARS, sheetCache } from "../src/brain.ts";
 import { driveFetch } from "../src/google.ts";
 
 const SHEET = "application/vnd.google-apps.spreadsheet";
 const ID = "sheet1";
+
+// Each fixture reuses one synthetic file id and version with different content.
+beforeEach(() => sheetCache.clear());
 
 function fake(opts: { versions?: string[]; inScope?: boolean; valuesStatus?: number; mime?: string } = {}) {
 	const calls: string[] = [];
@@ -158,6 +161,8 @@ test("429 and 503 retry no sooner than Retry-After, bounded, other failures do n
 	const r = await createBrainReads(ok.drive, undefined, undefined, sleep).read("hq-core", ID, 0, 1000, undefined, "Source Inventory");
 	assert.match(r.text, /R1\t\["a"\]/);
 	assert.deepEqual(waits, [2000, 2000]);
+	// Independent provider-failure scenarios must start cold.
+	sheetCache.clear();
 	const exhausted = bigFake({ rows: [["a"]], statuses: [{ status: 429 }, { status: 429 }, { status: 429 }] });
 	await assert.rejects(createBrainReads(exhausted.drive, undefined, undefined, async () => {}).read("hq-core", ID, 0, 1000, undefined, "Source Inventory"), (e: BrainError) => e.code === "rate_limited");
 	const long = bigFake({ rows: [["a"]], statuses: [{ status: 429, retryAfter: "30" }] });

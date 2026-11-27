@@ -1,7 +1,7 @@
 // One read-only tool registry serves both the MCP connector (/mcp) and the Hub HTTP endpoint (/api/tools).
 // There are no write tools. Nothing here can create, edit, share, trash or delete anything.
 import { z } from "zod";
-import { effectiveScopes, mayReadException, pinnedReadFor, type Principal } from "./access.ts";
+import { effectiveScopes, mayReadException, pinnedReadFor, sha256Hex, type Principal } from "./access.ts";
 import {
 	BrainError,
 	canonicalScope,
@@ -10,6 +10,7 @@ import {
 	createBrainReads,
 	DEFAULT_PAGE_CHARS,
 	parseWithheld,
+	sheetCache,
 	type DriveFetch,
 	MAX_NESTED_DEPTH,
 	MAX_PAGE_CHARS,
@@ -99,6 +100,8 @@ export async function runTool(name: string, args: unknown, env: ToolEnv, drive?:
 	const parsed = tool.schema.safeParse(args ?? {});
 	if (!parsed.success) return { ok: false, error: "Invalid arguments", status: 400, detail: parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ") };
 	try {
+		// Only a digest of policy configuration, never tokens or authorization results, enters the cache.
+		sheetCache.policy(await sha256Hex(JSON.stringify([env.ALLOWED_SCOPES, env.WITHHELD_SOURCES, env.FILE_READ_EXCEPTIONS, env.PINNED_FILE_READS])));
 		const reads = createBrainReads(drive ?? driveFetch(env.GOOGLE_SA_KEY), undefined, parseWithheld(env.WITHHELD_SOURCES));
 		if (name === "read") {
 			const a = parsed.data as { scope: string; id: string; offset?: number; max_chars?: number; folder?: string; sheet?: string; expect_version?: string };
@@ -107,11 +110,24 @@ export async function runTool(name: string, args: unknown, env: ToolEnv, drive?:
 				if (a.sheet !== undefined) throw new BrainError("not_a_spreadsheet", "Only a spreadsheet takes a sheet.");
 				return { ok: true, result: await reads.readPinned(a.scope, pin, a.offset ?? 0, a.max_chars ?? DEFAULT_PAGE_CHARS, a.expect_version), status: 200 };
 			}
-			if (mayReadException(env.ALLOWED_SCOPES, principal, a.scope, a.id, a.folder, env.FILE_READ_EXCEPTIONS))
-				return { ok: true, result: await reads.read("ag-personal-core", a.id, a.offset ?? 0, a.max_chars ?? DEFAULT_PAGE_CHARS, undefined, a.sheet, a.expect_version), status: 200 };
+			if (mayReadException(env.ALLOWED_SCOPES, principal, a.scope, a.id, a.folder, env.FILE_READ_EXCEPTIONS)) {
+				const result = await reads.read("ag-personal-core", a.id, a.offset ?? 0, a.max_chars ?? DEFAULT_PAGE_CHARS, undefined, a.sheet, a.expect_version);
+				if (!mayReadException(env.ALLOWED_SCOPES, principal, a.scope, a.id, a.folder, env.FILE_READ_EXCEPTIONS) || parseWithheld(env.WITHHELD_SOURCES).has(a.id))
+					throw new BrainError("not_in_scope", "The file is not a readable document in this scope.");
+				return { ok: true, result, status: 200 };
+			}
 		}
-		return { ok: true, result: await tool.run(parsed.data, reads, effectiveScopes(env.ALLOWED_SCOPES, principal)), status: 200 };
+		const result = await tool.run(parsed.data, reads, effectiveScopes(env.ALLOWED_SCOPES, principal));
+		if (name === "read") {
+			const a = parsed.data as { scope: string; id: string; folder?: string };
+			inScope(effectiveScopes(env.ALLOWED_SCOPES, principal), a.scope);
+			const withheld = parseWithheld(env.WITHHELD_SOURCES);
+			if (withheld.has(a.id) || (a.folder !== undefined && withheld.has(a.folder)))
+				throw new BrainError("not_in_scope", "The file is not a readable document in this scope.");
+		}
+		return { ok: true, result, status: 200 };
 	} catch (e) {
+		if (name === "read") sheetCache.forget((parsed.data as { id: string }).id);
 		// Never echo provider payloads, URLs, credentials or document text in errors.
 		if (e instanceof BrainError) return { ok: false, error: e.message, status: e.code === "scope_not_allowed" || e.code === "not_in_scope" ? 403 : 502, detail: e.code };
 		return { ok: false, error: "The complete current Drive source could not be verified. No fallback was used.", status: 502 };
