@@ -1,3 +1,4 @@
+import { withRoots } from "./roots.ts";
 import { beforeEach, test } from "node:test";
 import assert from "node:assert/strict";
 import { BRAIN_FOLDERS, createBrainReads, SHEET_CACHE_MAX_BYTES, sheetCache } from "../src/brain.ts";
@@ -27,7 +28,7 @@ function fixture() {
 		const bytes = new TextEncoder().encode(JSON.stringify({ values: [[title, "界😀é"]] }));
 		return new Response(new ReadableStream({ start(c) { for (const b of bytes) c.enqueue(Uint8Array.of(b)); c.close(); } }));
 	};
-	return { state, drive };
+	return { state, drive: withRoots(drive) };
 }
 
 test("persistent cache separates exact tabs, skips only export, and invalidates old versions", async () => {

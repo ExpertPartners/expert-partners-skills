@@ -33,7 +33,7 @@ function tree(nodes: Record<string, Node>, bodies: Record<string, string> = {}) 
 			const id = decodeURIComponent(meta[1]!);
 			const n = all[id];
 			if (!n) return new Response("missing", { status: 404 });
-			if (url.searchParams.get("fields")!.includes("parents"))
+			if (url.searchParams.get("fields")!.includes("trashed"))
 				return Response.json({ id, mimeType: n.mimeType, parents: n.parents, trashed: n.trashed ?? false, driveId: n.driveId ?? "D1" });
 			return Response.json({ id, name: `n-${id}`, mimeType: n.mimeType, modifiedTime: "2026-11-24T00:00:00Z", version: n.version ?? "1" });
 		}
@@ -45,12 +45,17 @@ function tree(nodes: Record<string, Node>, bodies: Record<string, string> = {}) 
 const f = (parent: string, extra: Partial<Node> = {}): Node => ({ mimeType: FOLDER, parents: [parent], ...extra });
 const d = (parent: string): Node => ({ mimeType: DOC, parents: [parent] });
 
-test("omitting folder keeps the existing discover contract and makes no metadata call", async () => {
+test("omitting folder keeps the result contract with one root preflight and one listing", async () => {
 	const t = tree({ a: d(ROOT) });
 	const r = await runTool("discover", { scope: "ag-marketing" }, env, t.drive);
 	assert.ok(r.ok);
 	assert.deepEqual(Object.keys(r.result as object).sort(), ["complete", "files", "folderId", "readAt", "scope", "withheld"]);
-	assert.equal(t.calls.length, 1);
+	assert.equal(t.calls.length, 2);
+	const [root, listing] = t.calls.map((path) => new URL(path, "https://x"));
+	assert.equal(root!.pathname, `/drive/v3/files/${ROOT}`);
+	assert.equal(root!.searchParams.get("fields"), "id,mimeType,trashed,driveId");
+	assert.equal(root!.searchParams.get("supportsAllDrives"), "true");
+	assert.equal(listing!.pathname, "/drive/v3/files");
 });
 
 test("a verified subfolder lists its own children, one to four levels down", async () => {

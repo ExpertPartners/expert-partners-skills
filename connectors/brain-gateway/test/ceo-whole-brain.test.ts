@@ -1,3 +1,4 @@
+import { withRoots } from "./roots.ts";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -30,10 +31,10 @@ test("each CEO whole-brain profile reaches every non-private scope of its own br
 test("CEO whole-brain discover reaches Drive for every own scope and is refused elsewhere", async () => {
 	for (const [id, prefix] of Object.entries(CEOS)) {
 		for (const scope of brain(prefix)) {
-			const r = await runTool("discover", { scope }, { ALLOWED_SCOPES: ALLOWED }, async (path) => {
+			const r = await runTool("discover", { scope }, { ALLOWED_SCOPES: ALLOWED }, withRoots(async (path) => {
 				assert.equal(new URL(path, "https://drive.invalid").searchParams.get("q"), `'${BRAIN_FOLDERS[scope as keyof typeof BRAIN_FOLDERS]}' in parents and trashed=false`);
 				return Response.json({ files: [] });
-			}, dept(id));
+			}), dept(id));
 			assert.equal(r.status, 200, `${id} ${scope}`);
 		}
 		for (const scope of allowed.filter((s) => !effectiveScopes(ALLOWED, dept(id)).includes(s as any))) {

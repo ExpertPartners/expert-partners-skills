@@ -1,3 +1,4 @@
+import { withRoots } from "./roots.ts";
 import { beforeEach, test } from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
@@ -49,7 +50,7 @@ function sheetFake(opts: { rows: Row[]; grid: number; tab?: string }) {
 		}
 		return new Response("nope", { status: 404 });
 	};
-	return { state, drive };
+	return { state, drive: withRoots(drive) };
 }
 
 const env = (extra: Record<string, string> = {}) => ({ ALLOWED_SCOPES: "hq-core", ROW_CURSOR_KEY: KEY, ...extra });

@@ -1,3 +1,4 @@
+import { withRoots } from "./roots.ts";
 import { beforeEach, test } from "node:test";
 import assert from "node:assert/strict";
 import { BrainError, BRAIN_FOLDERS, createBrainReads, MAX_CHARS, SHEET_MAX_BYTES, SHEET_MAX_CHARS, sheetCache } from "../src/brain.ts";
@@ -31,7 +32,7 @@ function fake(opts: { versions?: string[]; inScope?: boolean; valuesStatus?: num
 		}
 		return new Response("nope", { status: 404 });
 	};
-	return { drive, calls };
+	return { drive: withRoots(drive, { calls }), calls };
 }
 
 test("spreadsheet without a tab lists its tabs", async () => {
@@ -104,7 +105,7 @@ function bigFake(opts: { rows: string[][]; versions?: string[]; statuses?: { sta
 		}
 		return new Response("nope", { status: 404 });
 	};
-	return { drive, calls };
+	return { drive: withRoots(drive, { calls }), calls };
 }
 
 async function readAll(reads: ReturnType<typeof createBrainReads>, max: number, sheet = "Source Inventory") {

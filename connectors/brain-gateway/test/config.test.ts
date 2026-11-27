@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { URL } from "node:url";
 import { allowedScopes, assertScope, BRAIN_FOLDERS } from "../src/brain.ts";
 import { runTool } from "../src/tools.ts";
+import { withRoots } from "./roots.ts";
 
 const config = JSON.parse(
 	readFileSync(new URL("../wrangler.jsonc", import.meta.url), "utf8").replace(/^\s*\/\/.*$/gm, ""),
@@ -33,15 +34,16 @@ test("deployed allowlist includes mapped department homes and ep-private, withou
 test("new department scopes discover only their exact registered direct children", async () => {
 	for (const scope of homes) {
 		const calls: string[] = [];
-		const result = await runTool("discover", { scope }, env, async (path) => {
+		const result = await runTool("discover", { scope }, env, withRoots(async (path) => {
 			calls.push(path);
 			const url = new URL(path, "https://drive.invalid");
 			assert.equal(url.pathname, "/drive/v3/files");
 			assert.equal(url.searchParams.get("q"), `'${BRAIN_FOLDERS[scope]}' in parents and trashed=false`);
 			return new Response(JSON.stringify({ files: [] }), { status: 200 });
-		});
+		}, { calls }));
 		assert.equal(result.ok, true);
-		assert.equal(calls.length, 1);
+		assert.equal(calls.length, 2, "one root preflight, then one direct-child listing");
+		assert.equal(new URL(calls[0]!, "https://drive.invalid").pathname, `/drive/v3/files/${BRAIN_FOLDERS[scope]}`);
 		if (result.ok) {
 			const discovery = result.result as { scope: string; folderId: string; files: unknown[]; complete: boolean; readAt: string };
 			assert.deepEqual({ ...discovery, readAt: undefined }, { scope, folderId: BRAIN_FOLDERS[scope], files: [], complete: true, withheld: 0, readAt: undefined });
@@ -58,10 +60,10 @@ test("legacy ep-client discovers the canonical folder for leaders and the client
 		{ kind: "person", email: "don@expertpartners.com" },
 		{ kind: "department", id: "ep-cco" },
 	] as const) {
-		const r = await runTool("discover", { scope: "ep-client" }, env, async (path) => {
+		const r = await runTool("discover", { scope: "ep-client" }, env, withRoots(async (path) => {
 			assert.equal(new URL(path, "https://drive.invalid").searchParams.get("q"), `'${BRAIN_FOLDERS["ep-client-experience"]}' in parents and trashed=false`);
 			return Response.json({ files: [] });
-		}, principal);
+		}), principal);
 		assert.ok(r.ok);
 		assert.equal((r.result as any).scope, "ep-client-experience");
 	}
@@ -81,7 +83,7 @@ test("legacy ep-client discovers the canonical folder for leaders and the client
 test("HQ departments reach outputs and only the AI department reaches audits", async () => {
 	for (const id of ["hq-chro", "hq-cfo", "hq-caio"]) {
 		for (const scope of ["hq-outputs", "hq-audits"]) {
-			const r = await runTool("discover", { scope }, env, async () => Response.json({ files: [] }), { kind: "department", id });
+			const r = await runTool("discover", { scope }, env, withRoots(async () => Response.json({ files: [] })), { kind: "department", id });
 			assert.equal(r.status, scope === "hq-audits" && id === "hq-cfo" ? 403 : 200);
 		}
 	}

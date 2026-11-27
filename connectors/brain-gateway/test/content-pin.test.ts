@@ -1,3 +1,4 @@
+import { withRoots } from "./roots.ts";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { BRAIN_FOLDERS, contentDigest } from "../src/brain.ts";
@@ -21,7 +22,7 @@ function lagDrive(bodies: string[]) {
 		if (url.pathname.endsWith("/export")) return new Response(bodies[Math.min(exports++, bodies.length - 1)]);
 		return Response.json(source);
 	};
-	return { drive, exports: () => exports };
+	return { drive: withRoots(drive), exports: () => exports };
 }
 const read = (drive: any, extra: object) => runTool("read", { scope: "hq-core", id: source.id, max_chars: 40, ...extra }, env, drive);
 

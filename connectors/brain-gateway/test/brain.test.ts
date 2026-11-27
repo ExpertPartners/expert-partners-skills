@@ -1,3 +1,4 @@
+import { withRoots } from "./roots.ts";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { generateKeyPairSync } from "node:crypto";
@@ -59,7 +60,7 @@ function fakeDrive(opts: {
 		}
 		return new Response("nope", { status: 404 });
 	};
-	return { drive, calls };
+	return { drive: withRoots(drive, { calls }), calls };
 }
 
 test("only allowed scopes resolve, private scopes are refused", () => {
@@ -81,17 +82,17 @@ test("discover walks every page and returns complete", async () => {
 test("discover query is escaped into the Drive search", async () => {
 	const { drive, calls } = fakeDrive({ pages: [[file("a")]] });
 	await createBrainReads(drive).discover("hq-core", "O'Brien\\x");
-	const q = new URL(calls[0], "https://x").searchParams.get("q")!;
+	const q = new URL(calls[1], "https://x").searchParams.get("q")!;
 	assert.match(q, /name contains 'O\\'Brien\\\\x'/);
 });
 
 test("incomplete discovery and repeated page tokens fail closed", async () => {
 	const incomplete = async () => new Response(JSON.stringify({ files: [file("a")], incompleteSearch: true }), { status: 200 });
-	await assert.rejects(createBrainReads(incomplete).discover("hq-core"), /incomplete/);
+	await assert.rejects(createBrainReads(withRoots(incomplete)).discover("hq-core"), /incomplete/);
 	const loop = async () => new Response(JSON.stringify({ files: [file("a")], nextPageToken: "same" }), { status: 200 });
-	await assert.rejects(createBrainReads(loop).discover("hq-core"), /repeated/);
+	await assert.rejects(createBrainReads(withRoots(loop)).discover("hq-core"), /repeated/);
 	const bad = async () => new Response(JSON.stringify({ files: [{ id: "a" }] }), { status: 200 });
-	await assert.rejects(createBrainReads(bad).discover("hq-core"), /incomplete/);
+	await assert.rejects(createBrainReads(withRoots(bad)).discover("hq-core"), /incomplete/);
 });
 
 test("read returns the whole verified document in pages", async () => {
@@ -150,7 +151,7 @@ test("partial, oversized, empty, envelope and invalid UTF-8 exports fail without
 			return new Response(JSON.stringify(file("d1")), { status: 200 });
 		},
 	};
-	await assert.rejects(createBrainReads(bad.drive).read("hq-core", "d1"));
+	await assert.rejects(createBrainReads(withRoots(bad.drive)).read("hq-core", "d1"));
 });
 
 test("the largest allowed log (about 1.4M characters) reads whole and pages to the end", async () => {

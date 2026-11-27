@@ -1,3 +1,4 @@
+import { withRoots } from "./roots.ts";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -68,7 +69,7 @@ test("a leader can narrow to a department but never widen", () => {
 
 test("tools enforce the principal: a department cannot list, discover or read outside its scopes", async () => {
 	const env = { ALLOWED_SCOPES: ALLOWED };
-	const drive = async () => new Response(JSON.stringify({ files: [] }), { status: 200 });
+	const drive = withRoots(async () => new Response(JSON.stringify({ files: [] }), { status: 200 }));
 	const listed = await runTool("list_scopes", {}, env, drive, dept("ep-cro"));
 	assert.ok(listed.ok);
 	assert.deepEqual((listed.result as any).scopes.map((s: any) => s.scope).sort(), ["ag-core", "ep-core", "ep-outputs", "ep-sales", "hq-core"]);
@@ -110,10 +111,10 @@ test("AG Personal Marketing has its own workspace boundary, separate from EP and
 	assert.equal(DEPARTMENTS["ag-cgo"].label, "AG Luxury Chief Growth Officer");
 	assert.ok(effectiveScopes(ALLOWED, dept("ag-cgo")).includes("ag-marketing"));
 	for (const scope of scopes) {
-		const own = await runTool("discover", { scope }, { ALLOWED_SCOPES: ALLOWED }, async (path) => {
+		const own = await runTool("discover", { scope }, { ALLOWED_SCOPES: ALLOWED }, withRoots(async (path) => {
 			assert.equal(new URL(path, "https://drive.invalid").searchParams.get("q"), `'${BRAIN_FOLDERS[scope]}' in parents and trashed=false`);
 			return Response.json({ files: [] });
-		}, dept("ag-personal-cgo"));
+		}), dept("ag-personal-cgo"));
 		assert.equal(own.status, 200);
 		for (const principal of [
 			person("don@expertpartners.com"),

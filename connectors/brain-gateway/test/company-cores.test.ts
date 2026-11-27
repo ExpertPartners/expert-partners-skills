@@ -1,3 +1,4 @@
+import { withRoots } from "./roots.ts";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { COMPANY_CORES, DEPARTMENTS, departmentForToken, effectiveScopes, sha256Hex } from "../src/access.ts";
@@ -17,7 +18,7 @@ test("every fixed token profile lists, discovers and reads every company Core to
 		assert.ok(listed.ok);
 		for (const scope of COMPANY_CORES) {
 			assert.ok((listed.result as any).scopes.some((s: any) => s.scope === scope));
-			const drive = async (path: string) => {
+			const drive = withRoots(async (path: string) => {
 				const url = new URL(path, "https://drive.invalid");
 				if (url.pathname === "/drive/v3/files") {
 					assert.equal(url.searchParams.get("q"), `'${BRAIN_FOLDERS[scope]}' in parents and trashed=false`);
@@ -25,7 +26,7 @@ test("every fixed token profile lists, discovers and reads every company Core to
 				}
 				if (url.pathname.endsWith("/export")) return new Response("first second third");
 				return Response.json(source);
-			};
+			});
 			const discovery = await runTool("discover", { scope }, { ALLOWED_SCOPES: all }, drive, principal);
 			assert.equal(discovery.status, 200, `${id} discover ${scope}, formerly 403`);
 			let offset: number | null = 0;
