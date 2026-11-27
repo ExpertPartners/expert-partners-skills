@@ -179,6 +179,14 @@ async function fullText(response: Response): Promise<string> {
 	}
 }
 
+/** SHA-256 hex of the UTF-8 text, the same bytes for every page of one assembled document. */
+export async function contentDigest(text: string): Promise<string> {
+	const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text)));
+	let hex = "";
+	for (const b of digest) hex += b.toString(16).padStart(2, "0");
+	return hex;
+}
+
 export async function fileVersion(drive: DriveFetch, id: string): Promise<BrainFile> {
 	const params = new URLSearchParams({ fields: "id,name,mimeType,modifiedTime,version", supportsAllDrives: "true" });
 	const res = await drive(`/drive/v3/files/${encodeURIComponent(id)}?${params}`);
@@ -615,9 +623,9 @@ export function createBrainReads(
 	}
 
 	/** Whole document verified, returned in pages so large documents fit an MCP reply. */
-	async function read(scope: BrainScope, id: string, offset = 0, maxChars = DEFAULT_PAGE_CHARS, folder?: string, sheet?: string, expectVersion?: string) {
+	async function read(scope: BrainScope, id: string, offset = 0, maxChars = DEFAULT_PAGE_CHARS, folder?: string, sheet?: string, expectVersion?: string, expectContent?: string) {
 		const { file, text, readAt, folder: nested } = await readWhole(scope, id, folder, sheet);
-		return { file, scope, ...(nested ? { folder: nested } : {}), ...(sheet !== undefined ? { sheet } : {}), readAt, ...page(text, file, offset, maxChars, sheet, expectVersion) };
+		return { file, scope, ...(nested ? { folder: nested } : {}), ...(sheet !== undefined ? { sheet } : {}), readAt, ...(await page(text, file, offset, maxChars, sheet, expectVersion, expectContent)) };
 	}
 	/** Proves the pinned file is still an untrashed readable child of its pinned parent in its pinned drive. Returns its MIME type. */
 	async function pinnedMember(pin: PinnedFile, code: "not_in_scope" | "left_scope"): Promise<string> {
@@ -652,7 +660,7 @@ export function createBrainReads(
 	}
 
 	/** One pinned exact file outside every scope root, with the same complete-read and same-version rules as read. */
-	async function readPinned(exception: string, pin: PinnedFile, offset = 0, maxChars = DEFAULT_PAGE_CHARS, expectVersion?: string) {
+	async function readPinned(exception: string, pin: PinnedFile, offset = 0, maxChars = DEFAULT_PAGE_CHARS, expectVersion?: string, expectContent?: string) {
 		if (withheld.has(pin.id) || withheld.has(pin.parent)) throw new BrainError("not_in_scope", "The file is not a readable document in this scope.");
 		const mimeType = await pinnedMember(pin, "not_in_scope");
 		const before = await fileVersion(drive, pin.id);
@@ -664,13 +672,18 @@ export function createBrainReads(
 		const after = await fileVersion(drive, pin.id);
 		if (after.version !== before.version) throw new BrainError("changed_during_read", "Document changed during the read. Read again.");
 		await pinnedMember(pin, "left_scope");
-		return { file: before, exception, readAt: now().toISOString(), ...page(text, before, offset, maxChars, undefined, expectVersion) };
+		return { file: before, exception, readAt: now().toISOString(), ...(await page(text, before, offset, maxChars, undefined, expectVersion, expectContent)) };
 	}
 
-	function page(text: string, file: BrainFile, offset: number, maxChars: number, sheet?: string, expectVersion?: string) {
+	async function page(text: string, file: BrainFile, offset: number, maxChars: number, sheet?: string, expectVersion?: string, expectContent?: string) {
 		// A multi-page read is one authoritative read only when every page saw the same version.
 		if (expectVersion !== undefined && file.version !== expectVersion)
 			throw new BrainError("changed_during_read", "Document changed since the earlier pages. Read again from offset 0.");
+		// Every page re-exports the whole document, and Drive has served different export bodies under one
+		// unchanged file.version. The digest of the exact text the offsets index is the real continuity proof.
+		const contentSha256 = await contentDigest(text);
+		if (expectContent !== undefined && contentSha256 !== expectContent)
+			throw new BrainError("changed_during_read", "Document text differs from the earlier pages even though its version did not. Read again from offset 0.");
 		const size = Math.min(Math.max(1, maxChars), MAX_PAGE_CHARS);
 		const start = Math.min(Math.max(0, offset), text.length);
 		let end = Math.min(text.length, start + size);
@@ -683,6 +696,7 @@ export function createBrainReads(
 		}
 		return {
 			totalChars: text.length,
+			contentSha256,
 			offset: start,
 			nextOffset: end < text.length ? end : null,
 			...(partialRow ? { partialRow: true } : {}),
