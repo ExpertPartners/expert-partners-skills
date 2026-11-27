@@ -1,3 +1,6 @@
+## 3.16.3 - 2026-11-27
+
+Business Brain Auditor sharing follows the newest Decision Log entry. A brain folder's anyone-with-link reader grant is never reported as an anonymous-editor finding, a file shared on request is compliant, only a permissions-list editor grant is a finding, and the audit never changes ACLs. Before and after source snapshots retry HTTP 429 reads and cover every audited scope root, including Private and Outputs. The regression checklist gains both cases.
 ## 3.16.2 - 2026-11-27
 
 Repair Business Brain Auditor audit mode after failed independent testing. Require fresh blank-master body reads and version citations, paired evidence for duplicate/conflict claims, durable recoverable report saves with guarded atomic commits and final readback, and before/after source snapshots. Preserve link-reader sharing as informational and add a narrow behavioral regression checklist.
