@@ -19,6 +19,7 @@ interface __BaseEnv_Env {
 	ALERT_TO: string;
 	ALERT_FROM: string;
 	WITHHELD_SOURCES: string;
+	WITHHELD_ARCHIVE_ROOTS: string;
 	FILE_READ_EXCEPTIONS: string;
 }
 declare namespace Cloudflare {
@@ -32,7 +33,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "MCP_RESOURCE" | "ALLOWED_EMAILS" | "ALLOWED_SCOPES" | "GOOGLE_SA_KEY" | "HUB_API_TOKEN" | "ACCESS_CLIENT_ID" | "ACCESS_CLIENT_SECRET" | "ACCESS_TOKEN_URL" | "ACCESS_AUTHORIZATION_URL" | "ACCESS_JWKS_URL" | "COOKIE_ENCRYPTION_KEY" | "SENDBLUE_API_KEY_ID" | "SENDBLUE_API_SECRET" | "ALERT_TO" | "ALERT_FROM" | "WITHHELD_SOURCES" | "FILE_READ_EXCEPTIONS">> {}
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "MCP_RESOURCE" | "ALLOWED_EMAILS" | "ALLOWED_SCOPES" | "GOOGLE_SA_KEY" | "HUB_API_TOKEN" | "ACCESS_CLIENT_ID" | "ACCESS_CLIENT_SECRET" | "ACCESS_TOKEN_URL" | "ACCESS_AUTHORIZATION_URL" | "ACCESS_JWKS_URL" | "COOKIE_ENCRYPTION_KEY" | "SENDBLUE_API_KEY_ID" | "SENDBLUE_API_SECRET" | "ALERT_TO" | "ALERT_FROM" | "WITHHELD_SOURCES" | "WITHHELD_ARCHIVE_ROOTS" | "FILE_READ_EXCEPTIONS">> {}
 }
 
 // Begin runtime types

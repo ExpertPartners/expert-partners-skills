@@ -219,6 +219,28 @@ export function parseWithheld(json: string | undefined): ReadonlySet<string> {
 	return new Set(ids as string[]);
 }
 
+/**
+ * Archive folders withheld with everything beneath them, from the WITHHELD_ARCHIVE_ROOTS secret: a JSON
+ * array of Drive folder ids. They join the withheld set, so the folder is never listed and no folder
+ * below it can be walked, listed or read from. Its parent stays readable, which keeps a folder that mixes
+ * current sources with an archive subfolder usable. A malformed value refuses every read.
+ */
+export function parseArchiveRoots(json: string | undefined): ReadonlySet<string> {
+	try {
+		return parseWithheld(json);
+	} catch {
+		throw new BrainError("withheld_invalid", "The withheld archive list is malformed. No source was served.");
+	}
+}
+
+/** Everything withheld: exact sources plus archive roots and, through the folder walks, their descendants. */
+export function withheldSet(sources: string | undefined, archiveRoots: string | undefined): ReadonlySet<string> {
+	return new Set([...parseWithheld(sources), ...parseArchiveRoots(archiveRoots)]);
+}
+
+/** Pinned files sit outside scope roots, so their whole ancestry is checked for withheld folders, at most this many hops. */
+export const MAX_PIN_ANCESTRY = 12;
+
 /** Milliseconds a 429 or 503 asks the client to wait, from Retry-After seconds or an HTTP date. */
 export function retryAfterMs(header: string | null, nowMs: number, attempt: number): number {
 	if (header !== null && header.trim() !== "") {
@@ -650,6 +672,7 @@ export function createBrainReads(
 		if (!res.ok) throw new BrainError("drive_error", `Drive file lookup answered ${res.status}.`);
 		const meta = (await res.json()) as { id?: string; mimeType?: string; driveId?: string; trashed?: boolean };
 		if (meta.id !== pin.id || meta.driveId !== pin.drive || meta.trashed !== false || !PINNED_MIME.includes(meta.mimeType ?? "")) throw refuse();
+		await pinAncestry(pin.parent, refuse);
 		let pageToken = "";
 		const seen = new Set<string>();
 		do {
@@ -670,6 +693,25 @@ export function createBrainReads(
 			if (pageToken && seen.has(pageToken)) throw new BrainError("incomplete_discovery", "Drive repeated a discovery page.");
 			seen.add(pageToken);
 		} while (pageToken);
+		throw refuse();
+	}
+
+	/** Refuses a pin whose parent folder, or any folder above it up to the drive root, is withheld. */
+	async function pinAncestry(parent: string, refuse: () => BrainError) {
+		let id = parent;
+		for (let hop = 0; hop < MAX_PIN_ANCESTRY; hop++) {
+			if (withheld.has(id)) throw refuse();
+			const params = new URLSearchParams({ fields: "id,parents", supportsAllDrives: "true" });
+			const res = await drive(`/drive/v3/files/${encodeURIComponent(id)}?${params}`);
+			if (res.status === 404) throw refuse();
+			if (!res.ok) throw new BrainError("drive_error", `Drive folder lookup answered ${res.status}.`);
+			const meta = (await res.json()) as { id?: string; parents?: string[] };
+			if (meta.id !== id) throw refuse();
+			// A shared drive's top folder has no parents. My Drive folders end at a root that is never withheld.
+			if (!Array.isArray(meta.parents) || meta.parents.length === 0) return;
+			if (meta.parents.length !== 1) throw refuse();
+			id = meta.parents[0]!;
+		}
 		throw refuse();
 	}
 

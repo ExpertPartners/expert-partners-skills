@@ -19,6 +19,18 @@ const BODY = "Fictional pinned body é 🙂 line\n".repeat(40);
 const forbidden = async () => { throw new Error("Refused request must not reach Drive"); };
 
 type Opts = { wrongDrive?: boolean; trashed?: boolean; notUnderParent?: boolean; movedDuringRead?: boolean; versions?: string[]; pageTokens?: boolean };
+/** Folder ancestry above each pinned parent, ending at the shared drive's top folder. */
+const ANCESTRY: Record<string, string[]> = {
+	"fictional-captures": ["fictional-course"],
+	"fictional-frames": ["fictional-course"],
+	"fictional-course": [DRIVE],
+	[DRIVE]: [],
+};
+function ancestry(url: URL) {
+	const id = decodeURIComponent(url.pathname.slice("/drive/v3/files/".length));
+	if (url.searchParams.get("fields") !== "id,parents" || !(id in ANCESTRY)) return undefined;
+	return Response.json({ id, parents: ANCESTRY[id] });
+}
 function driveFor(pin: (typeof pins)[number], o: Opts = {}) {
 	let lists = 0;
 	let v = 0;
@@ -32,6 +44,8 @@ function driveFor(pin: (typeof pins)[number], o: Opts = {}) {
 			if (o.pageTokens && !url.searchParams.get("pageToken")) return Response.json({ files: [{ id: "sibling" }], nextPageToken: "p2" });
 			return Response.json({ files: gone ? [{ id: "sibling" }] : [{ id: "sibling" }, { id: pin.id }] });
 		}
+		const folder = ancestry(url);
+		if (folder) return folder;
 		assert.ok(url.pathname.startsWith(`/drive/v3/files/${pin.id}`), url.pathname);
 		if (url.searchParams.get("alt") === "media") return new Response(BODY, { headers: { "content-type": "text/markdown" } });
 		const fields = url.searchParams.get("fields") ?? "";
@@ -115,6 +129,17 @@ test("wrong drive, trashed, not under the pinned parent and moved during the rea
 	assert.equal(moved.status, 502);
 	assert.equal((moved as any).detail, "left_scope");
 	noLeak(moved);
+});
+
+test("a pinned file below a withheld archive folder is refused at any ancestor, and other pins still read", async () => {
+	for (const archive of ["fictional-course", DRIVE, pins[1]!.parent]) {
+		const w = { ...env, WITHHELD_ARCHIVE_ROOTS: JSON.stringify([archive]) };
+		const r = await runTool("read", { scope: NAME, id: pins[1]!.id }, w, archive === pins[1]!.parent ? forbidden : driveFor(pins[1]!), allison);
+		assert.equal(r.status, 403, archive);
+		noLeak(r);
+	}
+	const unrelated = { ...env, WITHHELD_ARCHIVE_ROOTS: JSON.stringify(["unrelated-archive"]) };
+	assert.equal((await runTool("read", { scope: NAME, id: pins[1]!.id }, unrelated, driveFor(pins[1]!), allison)).status, 200);
 });
 
 test("version drift during a read or between pages refuses", async () => {
