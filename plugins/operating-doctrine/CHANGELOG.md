@@ -1,3 +1,6 @@
+## 3.14.1 - 2026-11-27
+
+The headless route check lets the GoHighLevel Settings, Private Integrations page through, because GoHighLevel has no public API to create a private integration token or grant its scopes. Every other GoHighLevel settings path still goes through the access map. This restores an exception that existed only as an M2-local patch and was lost when the plugin updated.
 ## 3.14.0 - 2026-11-27
 
 Extend deliverable-link with an explicit one-file "share this" action using the existing Drive permission tools. Resolve the exact non-folder target, grant only anyone-with-link reader with search discovery disabled, preserve parents and other grants, verify the result, and never publish a brain folder or share during ordinary delivery.
