@@ -1010,6 +1010,34 @@ def heygen_billing_allowed(host: str, targets: list) -> bool:
     return bool(urls) and all(url in (HEYGEN_BILLING_URL, HEYGEN_BILLING_URL + "/") for url in urls)
 
 
+# The native connectors cover Firecrawl scraping and Replit publication, but not
+# existing-team membership or the Hub editor's Git/DEV-database administration.
+# Keep these UI-only exceptions exact; data/API paths still use the access map.
+WEB_ONLY_ADMIN_NOTE = (
+    "The available connector does not cover this web-only administration screen. Report it as: "
+    "Headless route checked, workspace administration, no API, the available connector "
+    "does not manage Firecrawl team membership or the existing Hub editor Git/DEV settings."
+)
+
+
+def web_only_admin_allowed(host: str, targets: list) -> bool:
+    if host not in ("www.firecrawl.dev", "firecrawl.dev", "replit.com"):
+        return False
+    urls = [url for url, in_code in targets if url and target_host(url, in_code) == host]
+    if not urls:
+        return False
+    for url in urls:
+        parsed = urllib.parse.urlsplit(url)
+        if parsed.scheme != "https" or parsed.netloc != host or parsed.query or parsed.fragment:
+            return False
+        if host == "replit.com":
+            if parsed.path.rstrip("/") != "/@theallisongaddy/expert-partners-hq":
+                return False
+        elif not re.fullmatch(r"/app/t/[A-Za-z0-9_-]+/settings/?", parsed.path):
+            return False
+    return True
+
+
 def decide(payload: dict) -> tuple[str, str] | None:
     """("deny", reason) or ("allow", note) for this tool call, or None when no site is opened."""
     tool_name = str(payload.get("tool_name", ""))
@@ -1038,6 +1066,10 @@ def decide(payload: dict) -> tuple[str, str] | None:
         if github_settings_allowed(host, targets):
             log_event("founder-override-allowed", f"{host} {tool_name}")
             notes.append(GITHUB_SETTINGS_NOTE)
+            continue
+        if web_only_admin_allowed(host, targets):
+            log_event("web-only-administration-allowed", f"{host} {tool_name}")
+            notes.append(WEB_ONLY_ADMIN_NOTE)
             continue
         if heygen_billing_allowed(host, targets):
             log_event("web-only-billing-allowed", f"{host} {tool_name}")
