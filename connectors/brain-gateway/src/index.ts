@@ -11,16 +11,17 @@ import { handleAccessRequest } from "./access-handler";
 import { apiPrincipal } from "./api-principal.ts";
 import { lastResults, runDeepCheck, storeResult } from "./health.ts";
 import { driveFetch } from "./google.ts";
-import { mcpPrincipal, resolveDepartmentToken } from "./mcp-principal.ts";
+import { isAllowedEmail } from "./allow";
 import { runTool, TOOLS } from "./tools";
 import type { Principal } from "./access.ts";
+import type { Props } from "./workers-oauth-utils";
 
 const INSTRUCTIONS = `Read-only access to the Expert Partners Business Brains in Google Drive (HQ, EP, AG). Start with list_scopes, then discover a scope to find documents, then read one by id. Read the Rulebook and Decision Log from hq-core before relying on any rule. Reads return the live document, never a copy, and fail closed when a complete verified read is not possible. Nothing here can write.`;
 
 function createServer() {
 	const server = new McpServer({ name: "Drive brain gateway", version: "1.0.0" }, { instructions: INSTRUCTIONS });
-	const principal = mcpPrincipal(getMcpAuthContext()?.props, env.ALLOWED_EMAILS);
-	if (!principal) return server;
+	const props = getMcpAuthContext()?.props as Props | undefined;
+	if (!props || !isAllowedEmail(env.ALLOWED_EMAILS, props.email)) return server;
 	for (const t of TOOLS) {
 		server.registerTool(
 			t.name,
@@ -30,8 +31,8 @@ function createServer() {
 				annotations: { readOnlyHint: true, openWorldHint: true },
 			},
 			async (args: unknown) => {
-				const r = await runTool(t.name, args, env, undefined, principal);
-				try { if (principal.kind === "person") await observeClientTool(env.OAUTH_KV, principal.email, t.name, args, r, undefined, env.ALLOWED_SCOPES); }
+				const r = await runTool(t.name, args, env, undefined, { kind: "person", email: props.email });
+				try { await observeClientTool(env.OAUTH_KV, props.email, t.name, args, r, undefined, env.ALLOWED_SCOPES); }
 				catch { console.error("[brain-gateway] client health observation failed"); }
 				const payload = r.ok ? r.result : { error: r.error, status: r.status, detail: (r as any).detail };
 				return { content: [{ type: "text" as const, text: JSON.stringify(payload, null, 2) }], isError: !r.ok };
@@ -101,7 +102,6 @@ const provider = new OAuthProvider<Env>({
 	defaultHandler: defaultHandler as any,
 	tokenEndpoint: "/token",
 	resourceMetadata: { resource: env.MCP_RESOURCE },
-	resolveExternalToken: resolveDepartmentToken,
 });
 
 export default {
