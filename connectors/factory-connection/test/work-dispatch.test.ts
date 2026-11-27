@@ -31,3 +31,7 @@ test("missing policy refuses dispatch rather than losing closures",async()=>{
  const r=await runTool("post_message",{sessionId:"existing-owner",text:"Continue"},{FACTORY_API_KEY:"unused"});
  assert.equal(r.status,503);
 });
+test("production refuses a missing live credential instead of evaluating its saved seed",async()=>{
+ const r=await runTool("post_message",{sessionId:"existing-owner",text:"Continue"},{...env,WORK_POLICY_LIVE:"required"});
+ assert.equal(r.status,503);
+});
