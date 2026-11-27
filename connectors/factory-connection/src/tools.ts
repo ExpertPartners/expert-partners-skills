@@ -697,6 +697,9 @@ export async function runTool(name: string, args: unknown, env: ToolEnv) {
 				if (name === "work_preflight") return { ok: true as const, status: 200, result: {...result, ...(intent.action === "inspect" ? {policy} : {})} };
 				if (!result.allowed) return { ok: false as const, status: 409, error: result.reason, detail: result };
 			}
+			if (!intent && ["create_session", "start_and_watch"].includes(name) && [a.firstMessage, a.message].some(x => typeof x === "string" && x.trim())) {
+				return {ok:false as const,status:409,error:"New assignments require an explicit reconciled work intent before a session starts.",detail:{code:"NEW_WORK_PREFLIGHT_REQUIRED",checks:policy.checks}};
+			}
 		}
 		const result = await t.run(parsed.data, new Factory(env.FACTORY_API_KEY), env);
 		return { ok: true as const, status: 200, result };
