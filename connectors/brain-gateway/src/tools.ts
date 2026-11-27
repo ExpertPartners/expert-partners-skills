@@ -9,7 +9,7 @@ import {
 	BRAIN_FOLDERS,
 	createBrainReads,
 	DEFAULT_PAGE_CHARS,
-	parseWithheld,
+	withheldSet,
 	sheetCache,
 	type DriveFetch,
 	MAX_NESTED_DEPTH,
@@ -25,6 +25,7 @@ export interface ToolEnv {
 	GOOGLE_SA_KEY?: string;
 	ALLOWED_SCOPES?: string;
 	WITHHELD_SOURCES?: string;
+	WITHHELD_ARCHIVE_ROOTS?: string;
 	FILE_READ_EXCEPTIONS?: string;
 	PINNED_FILE_READS?: string;
 	/** Dedicated HMAC key for row-mode cursors, base64url of at least 32 random bytes. */
@@ -111,8 +112,8 @@ export async function runTool(name: string, args: unknown, env: ToolEnv, drive?:
 	if (!parsed.success) return { ok: false, error: "Invalid arguments", status: 400, detail: parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ") };
 	try {
 		// Only a digest of policy configuration, never tokens or authorization results, enters the cache.
-		sheetCache.policy(await sha256Hex(JSON.stringify([env.ALLOWED_SCOPES, env.WITHHELD_SOURCES, env.FILE_READ_EXCEPTIONS, env.PINNED_FILE_READS])));
-		const reads = createBrainReads(drive ?? driveFetch(env.GOOGLE_SA_KEY), undefined, parseWithheld(env.WITHHELD_SOURCES));
+		sheetCache.policy(await sha256Hex(JSON.stringify([env.ALLOWED_SCOPES, env.WITHHELD_SOURCES, env.WITHHELD_ARCHIVE_ROOTS, env.FILE_READ_EXCEPTIONS, env.PINNED_FILE_READS])));
+		const reads = createBrainReads(drive ?? driveFetch(env.GOOGLE_SA_KEY), undefined, withheldSet(env.WITHHELD_SOURCES, env.WITHHELD_ARCHIVE_ROOTS));
 		if (name === "read") {
 			const a = parsed.data as ReadArgs;
 			const rowMode = a.start_row !== undefined || a.max_rows !== undefined || a.cursor !== undefined;
@@ -127,7 +128,7 @@ export async function runTool(name: string, args: unknown, env: ToolEnv, drive?:
 			if (rowMode) return { ok: true, result: await rowPage(a, env, reads, principal, exception), status: 200 };
 			if (exception) {
 				const result = await reads.read("ag-personal-core", a.id, a.offset ?? 0, a.max_chars ?? DEFAULT_PAGE_CHARS, undefined, a.sheet, a.expect_version, a.expect_content);
-				if (!mayReadException(env.ALLOWED_SCOPES, principal, a.scope, a.id, a.folder, env.FILE_READ_EXCEPTIONS) || parseWithheld(env.WITHHELD_SOURCES).has(a.id))
+				if (!mayReadException(env.ALLOWED_SCOPES, principal, a.scope, a.id, a.folder, env.FILE_READ_EXCEPTIONS) || withheldSet(env.WITHHELD_SOURCES, env.WITHHELD_ARCHIVE_ROOTS).has(a.id))
 					throw new BrainError("not_in_scope", "The file is not a readable document in this scope.");
 				return { ok: true, result, status: 200 };
 			}
@@ -155,7 +156,7 @@ function errorStatus(code: string) {
 /** Entitlement and withholding are proved again after the read, so a change during the read is refused. */
 function afterRead(a: ReadArgs, env: ToolEnv, principal: Principal) {
 	inScope(effectiveScopes(env.ALLOWED_SCOPES, principal), a.scope);
-	const withheld = parseWithheld(env.WITHHELD_SOURCES);
+	const withheld = withheldSet(env.WITHHELD_SOURCES, env.WITHHELD_ARCHIVE_ROOTS);
 	if (withheld.has(a.id) || (a.folder !== undefined && withheld.has(a.folder)))
 		throw new BrainError("not_in_scope", "The file is not a readable document in this scope.");
 }
@@ -179,7 +180,7 @@ async function rowPage(a: ReadArgs, env: ToolEnv, reads: ReturnType<typeof creat
 	}
 	const { state, ...page } = await reads.readRows(scope, a.id, sheet, req, folder);
 	if (exception) {
-		if (!mayReadException(env.ALLOWED_SCOPES, principal, a.scope, a.id, a.folder, env.FILE_READ_EXCEPTIONS) || parseWithheld(env.WITHHELD_SOURCES).has(a.id))
+		if (!mayReadException(env.ALLOWED_SCOPES, principal, a.scope, a.id, a.folder, env.FILE_READ_EXCEPTIONS) || withheldSet(env.WITHHELD_SOURCES, env.WITHHELD_ARCHIVE_ROOTS).has(a.id))
 			throw new BrainError("not_in_scope", "The file is not a readable document in this scope.");
 	} else afterRead(a, env, principal);
 	const cursor = state
