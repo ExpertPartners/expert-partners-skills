@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { CLAUDE_CLIENT, managedAuthorization as auth, type ManagedEnv } from "../src/managed-auth.ts";
+import { CLAUDE_CLIENT, isClaudeClient, managedAuthorization as auth, type ManagedEnv } from "../src/managed-auth.ts";
 const issuer = "https://identity.anthropic.com/issuers/iss_test";
 const env: ManagedEnv = { CLAUDE_TRUSTED_ISSUER: issuer, MCP_RESOURCE: "https://example.test/mcp", ALLOWED_EMAILS: "allison@example.test,don@example.test" };
 const input = { env, clientInfo: { clientId: CLAUDE_CLIENT, redirectUris: [], tokenEndpointAuthMethod: "none" as const }, request: new Request("https://example.test/token") };
@@ -21,4 +21,12 @@ test("validated claims retain member identity and cannot expand the existing all
     assert.equal(await auth.mapClaims({ ...input, claims: { ...claims, email }, resource: env.MCP_RESOURCE, requestedScope: [] }), null);
   assert.equal(await auth.mapClaims({ ...input, claims, resource: "https://other.test/mcp", requestedScope: [] }), null);
   assert.equal(await auth.mapClaims({ ...input, claims, env: { ...env, ALLOWED_EMAILS: "allison@example.test" }, resource: env.MCP_RESOURCE, requestedScope: [] }), null);
+});
+
+test("Claude's existing confidential managed-auth registration is accepted without reconnecting members", () => {
+  const client = { clientId: "existing-dcr", tokenEndpointAuthMethod: "client_secret_post" as const, redirectUris: ["https://claude.ai/idjag-noop"] };
+  assert.equal(isClaudeClient(client), true);
+  assert.equal(isClaudeClient({ ...client, tokenEndpointAuthMethod: "none" }), false);
+  assert.equal(isClaudeClient({ ...client, redirectUris: ["https://attacker.test/idjag-noop"] }), false);
+  assert.equal(isClaudeClient({ ...client, redirectUris: [...client.redirectUris, "https://attacker.test"] }), false);
 });
