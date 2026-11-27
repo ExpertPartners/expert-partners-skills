@@ -69,7 +69,7 @@ export const TOOLS: ToolDef[] = [
 	{
 		name: "read",
 		description:
-			"Read one document that is currently a direct child of the scope, or of the subfolder given as folder (get its id from discover). The whole document is fetched and verified (same version before and after, still in scope) and returned in pages: pass nextOffset back as offset until it is null, and pass the first page's file.version as expect_version so a change between pages is refused. For a spreadsheet, read without sheet to list its tabs, then pass one exact tab title as sheet to read that whole tab with sheet row numbers. Tab pages end on whole rows. partialRow marks a single row longer than the page. Large tabs can instead be read in bounded native row pages: pass sheet with start_row (1 for a new read, or the row after a complete character-mode prefix) and optional max_rows, then pass each returned cursor back with the same sheet until next_row is null. Joining every row page's text in order, after any character-mode prefix, gives exactly the whole-tab text: interior empty rows are written once a later row proves them, and only the tab's final empty tail is left out (discarded_tail_rows). Scope and version are checked again on every page. A row that does not fit max_chars is refused, never truncated.",
+			"Read one document that is currently a direct child of the scope, or of the subfolder given as folder (get its id from discover). The whole document is fetched and verified (same version before and after, still in scope) and returned in pages: pass nextOffset back as offset until it is null, and pass the first page's file.version as expect_version and its contentSha256 as expect_content so a change between pages is refused. Drive can serve different text under one version, so a mismatch in either means discard every page and restart from offset 0. For a spreadsheet, read without sheet to list its tabs, then pass one exact tab title as sheet to read that whole tab with sheet row numbers. Tab pages end on whole rows. partialRow marks a single row longer than the page. Large tabs can instead be read in bounded native row pages: pass sheet with start_row (1 for a new read, or the row after a complete character-mode prefix) and optional max_rows, then pass each returned cursor back with the same sheet until next_row is null. Joining every row page's text in order, after any character-mode prefix, gives exactly the whole-tab text: interior empty rows are written once a later row proves them, and only the tab's final empty tail is left out (discarded_tail_rows). Scope and version are checked again on every page. A row that does not fit max_chars is refused, never truncated.",
 		schema: z.object({
 			scope,
 			id: z.string().regex(/^[\w-]+$/).describe("A file id returned by discover for this scope."),
@@ -78,11 +78,12 @@ export const TOOLS: ToolDef[] = [
 			folder,
 			sheet: z.string().min(1).max(100).optional().describe("Spreadsheets only. One exact tab title from the tab list."),
 			expect_version: z.string().regex(/^\d+$/).optional().describe("file.version from the first page. A later page refuses with changed_during_read if the document changed."),
+			expect_content: z.string().regex(/^[0-9a-f]{64}$/).optional().describe("contentSha256 from the first page. A later page refuses with changed_during_read if the text differs, even at the same version."),
 			start_row: z.number().int().min(1).max(10_000_000).optional().describe("Row mode only, with sheet. First sheet row of a new row read. Not with offset or cursor."),
 			max_rows: z.number().int().min(1).max(MAX_PAGE_ROWS).optional().describe(`Row mode only. Rows fetched per page, default ${DEFAULT_PAGE_ROWS}. A page may cover fewer rows to fit max_chars.`),
 			cursor: z.string().min(1).max(CURSOR_MAX_LENGTH).optional().describe("Row mode only. The cursor from the previous row page, with the same sheet. Not with offset or start_row."),
 		}),
-		run: async (a, r, scopes) => r.read(inScope(scopes, a.scope), a.id, a.offset ?? 0, a.max_chars ?? DEFAULT_PAGE_CHARS, a.folder, a.sheet, a.expect_version),
+		run: async (a, r, scopes) => r.read(inScope(scopes, a.scope), a.id, a.offset ?? 0, a.max_chars ?? DEFAULT_PAGE_CHARS, a.folder, a.sheet, a.expect_version, a.expect_content),
 	},
 	{
 		name: "decisions",
@@ -120,12 +121,12 @@ export async function runTool(name: string, args: unknown, env: ToolEnv, drive?:
 			const pin = pinnedReadFor(principal, a.scope, a.id, a.folder, env.PINNED_FILE_READS);
 			if (pin) {
 				if (a.sheet !== undefined) throw new BrainError("not_a_spreadsheet", "Only a spreadsheet takes a sheet.");
-				return { ok: true, result: await reads.readPinned(a.scope, pin, a.offset ?? 0, a.max_chars ?? DEFAULT_PAGE_CHARS, a.expect_version), status: 200 };
+				return { ok: true, result: await reads.readPinned(a.scope, pin, a.offset ?? 0, a.max_chars ?? DEFAULT_PAGE_CHARS, a.expect_version, a.expect_content), status: 200 };
 			}
 			const exception = mayReadException(env.ALLOWED_SCOPES, principal, a.scope, a.id, a.folder, env.FILE_READ_EXCEPTIONS);
 			if (rowMode) return { ok: true, result: await rowPage(a, env, reads, principal, exception), status: 200 };
 			if (exception) {
-				const result = await reads.read("ag-personal-core", a.id, a.offset ?? 0, a.max_chars ?? DEFAULT_PAGE_CHARS, undefined, a.sheet, a.expect_version);
+				const result = await reads.read("ag-personal-core", a.id, a.offset ?? 0, a.max_chars ?? DEFAULT_PAGE_CHARS, undefined, a.sheet, a.expect_version, a.expect_content);
 				if (!mayReadException(env.ALLOWED_SCOPES, principal, a.scope, a.id, a.folder, env.FILE_READ_EXCEPTIONS) || parseWithheld(env.WITHHELD_SOURCES).has(a.id))
 					throw new BrainError("not_in_scope", "The file is not a readable document in this scope.");
 				return { ok: true, result, status: 200 };
@@ -142,7 +143,7 @@ export async function runTool(name: string, args: unknown, env: ToolEnv, drive?:
 	}
 }
 
-type ReadArgs = { scope: string; id: string; offset?: number; max_chars?: number; folder?: string; sheet?: string; expect_version?: string; start_row?: number; max_rows?: number; cursor?: string };
+type ReadArgs = { scope: string; id: string; offset?: number; max_chars?: number; folder?: string; sheet?: string; expect_version?: string; expect_content?: string; start_row?: number; max_rows?: number; cursor?: string };
 
 function errorStatus(code: string) {
 	if (code === "scope_not_allowed" || code === "not_in_scope") return 403;
