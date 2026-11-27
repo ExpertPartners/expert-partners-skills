@@ -1,3 +1,4 @@
+import { withRoots } from "./roots.ts";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { BRAIN_FOLDERS, CURRENT_DECISION_LOG } from "../src/brain.ts";
@@ -10,7 +11,7 @@ const f = (id: string, name: string) => ({ id, name, mimeType: DOC, modifiedTime
 
 function drive(opts: { logText?: string; failScope?: string; incomplete?: boolean } = {}) {
 	const logText = opts.logText ?? "November 20, 2026. Newest decision\nbody\nNovember 1, 2026. Older\n";
-	return async (path: string) => {
+	const healthy = withRoots(async (path: string) => {
 		const url = new URL(path, "https://x");
 		const q = url.searchParams.get("q");
 		if (url.pathname === "/drive/v3/files" && q) {
@@ -24,6 +25,12 @@ function drive(opts: { logText?: string; failScope?: string; incomplete?: boolea
 		}
 		const id = url.pathname.split("/").pop()!;
 		return new Response(JSON.stringify(f(id, "n")), { status: 200 });
+	});
+	return async (path: string) => {
+		// An outage affects the root GET too; probes no longer list children.
+		if (opts.failScope && path.includes(BRAIN_FOLDERS[opts.failScope as keyof typeof BRAIN_FOLDERS]))
+			return new Response("unavailable", { status: 503 });
+		return healthy(path);
 	};
 }
 

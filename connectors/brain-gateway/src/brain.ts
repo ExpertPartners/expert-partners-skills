@@ -344,11 +344,10 @@ export function createBrainReads(
 	 * hops. Every hop must be one real folder (not a shortcut), untrashed, not withheld, with exactly one
 	 * parent, in the same shared drive as the root. Anything else is refused rather than guessed.
 	 */
-	async function nestedFolder(scope: BrainScope, folder: string) {
+	async function nestedFolder(scope: BrainScope, folder: string, rootMeta: FolderMeta) {
 		const root = BRAIN_FOLDERS[scope];
 		if (folder === root) return { id: root, depth: 0 };
 		if (withheld.has(folder)) throw new BrainError("not_in_scope", "The folder is not inside this scope.");
-		const rootMeta = await folderMeta(root);
 		let id = folder;
 		for (let depth = 1; depth <= MAX_NESTED_DEPTH; depth++) {
 			// Another scope's registered root is reachable only through its own scope key, where its department check runs.
@@ -366,8 +365,29 @@ export function createBrainReads(
 		throw new BrainError("not_in_scope", `The folder is more than ${MAX_NESTED_DEPTH} levels below this scope.`);
 	}
 
+	/**
+	 * Drive answers a children query on a folder the service account cannot see with an empty, complete
+	 * listing, exactly like a healthy empty folder. Proving the registered root itself is visible first is
+	 * what separates the two, so an access gap is refused instead of reported as an empty brain.
+	 */
+	async function scopeRoot(scope: BrainScope): Promise<FolderMeta> {
+		const id = BRAIN_FOLDERS[scope];
+		const params = new URLSearchParams({ fields: "id,mimeType,trashed,driveId", supportsAllDrives: "true" });
+		const res = await drive(`/drive/v3/files/${encodeURIComponent(id)}?${params}`);
+		if (res.status === 403 || res.status === 404) {
+			await res.body?.cancel().catch(() => {});
+			throw new BrainError("folder_unreadable", "The gateway cannot see this scope's registered folder, so its contents are unknown. This is an access gap, not an empty folder.");
+		}
+		if (!res.ok) throw new BrainError("drive_error", `Drive folder lookup answered ${res.status}.`);
+		const meta = (await res.json()) as FolderMeta;
+		if (meta.id !== id || meta.mimeType !== FOLDER_MIME || meta.trashed !== false)
+			throw new BrainError("folder_unreadable", "This scope's registered folder is not a live folder the gateway can see. Its contents are unknown.");
+		return meta;
+	}
+
 	async function discover(scope: BrainScope, query?: string, folder?: string) {
-		const nested = folder === undefined ? undefined : await nestedFolder(scope, folder);
+		const rootMeta = await scopeRoot(scope);
+		const nested = folder === undefined ? undefined : await nestedFolder(scope, folder, rootMeta);
 		const parentId = nested?.id ?? BRAIN_FOLDERS[scope];
 		const files: BrainFile[] = [];
 		const seen = new Set<string>();
@@ -408,19 +428,13 @@ export function createBrainReads(
 		};
 	}
 
-	/** One cheap request: the scope's registered folder answers and lists. Used by the daily check, which has a request budget. */
+	/**
+	 * One cheap request for the daily check, which has a request budget: the registered folder itself is
+	 * visible to the gateway. A one-item children listing cannot prove that, because it is empty and
+	 * successful for an invisible folder too.
+	 */
 	async function probe(scope: BrainScope) {
-		const params = new URLSearchParams({
-			q: `'${BRAIN_FOLDERS[scope]}' in parents and trashed=false`,
-			pageSize: "1",
-			fields: "incompleteSearch,files(id)",
-			supportsAllDrives: "true",
-			includeItemsFromAllDrives: "true",
-		});
-		const res = await drive(`/drive/v3/files?${params}`);
-		if (!res.ok) throw new BrainError("drive_error", `Drive probe answered ${res.status}.`);
-		const body = (await res.json()) as { files?: unknown[]; incompleteSearch?: boolean };
-		if (!Array.isArray(body.files) || body.incompleteSearch) throw new BrainError("incomplete_discovery", "Drive probe was incomplete.");
+		await scopeRoot(scope);
 		return { scope, folderId: BRAIN_FOLDERS[scope], reachable: true };
 	}
 

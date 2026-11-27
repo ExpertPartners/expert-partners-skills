@@ -1,3 +1,4 @@
+import { withRoots } from "./roots.ts";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -16,7 +17,7 @@ const file = (id: string) => ({ id, name: "Fictional shared source", mimeType: "
 const forbidden = async () => { throw new Error("Unauthorized request must not reach Drive"); };
 function driveFor(id: string, options: { moved?: boolean; changed?: boolean } = {}) {
 	let version = 0;
-	return async (path: string) => {
+	return withRoots(async (path: string) => {
 		const url = new URL(path, "https://drive.invalid");
 		if (url.pathname === "/drive/v3/files") {
 			assert.equal(url.searchParams.get("q"), `'${BRAIN_FOLDERS["ag-personal-core"]}' in parents and trashed=false`);
@@ -25,7 +26,7 @@ function driveFor(id: string, options: { moved?: boolean; changed?: boolean } = 
 		if (url.pathname === `/drive/v3/files/${id}/export`) return new Response("Fictional complete shared source", { headers: { "content-type": "text/plain" } });
 		assert.equal(url.pathname, `/drive/v3/files/${id}`);
 		return Response.json({ ...file(id), version: String(options.changed ? ++version : 1) });
-	};
+	});
 }
 
 test("only the five named Luxury identities read each exact shared file without widening scopes", async () => {
