@@ -1169,3 +1169,35 @@ class HooksJson(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class WebOnlyWorkspaceAdministration(HookCase):
+    def setUp(self):
+        super().setUp()
+        self.write_cache(
+            MAP_CSV
+            + "Firecrawl,www.firecrawl.dev,Firecrawl connector,,Live,\nReplit,replit.com,Replit connector,,Live,\n"
+        )
+        self.fresh_stamp()
+
+    def test_only_team_settings_and_existing_hub_editor_are_allowed(self):
+        for url in (
+            "https://www.firecrawl.dev/app/t/existing-team/settings",
+            "https://replit.com/@theallisongaddy/expert-partners-hq",
+        ):
+            self.assertIn(
+                "workspace administration, no API", self.assertAllowed(self.run_hook(url))
+            )
+        for url in (
+            "https://www.firecrawl.dev/app/t/existing-team/usage",
+            "https://www.firecrawl.dev/app/t/existing-team/settings?next=/api",
+            "https://replit.com/@other/other-app",
+            "http://replit.com/@theallisongaddy/expert-partners-hq",
+        ):
+            self.assertDenied(self.run_hook(url))
+
+    def test_mixed_navigation_cannot_expand_the_exception(self):
+        code = "async (page) => { await page.goto('https://www.firecrawl.dev/app/t/existing-team/settings'); await page.goto('https://www.firecrawl.dev/app/t/existing-team/usage'); }"
+        self.assertDenied(
+            self.run_hook(None, "mcp__playwright-ember__browser_run_code_unsafe", {"code": code})
+        )
