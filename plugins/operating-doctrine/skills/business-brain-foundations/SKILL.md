@@ -45,7 +45,7 @@ Use `business-brain-foundations audit <brain> <department or workspace>` for an 
 
 The complete template covers the core four, company context and all current additional pieces. The live master determines exact sections, fields and order. Keep support pieces deferred to Week 5 unless explicitly included in the requested run. Case Studies is a folder when the selected template says so. Compliance applies to EP and AG Luxury, with HQ pointing to the owning pieces, not inventing legal guidance.
 
-HQ is shared internal operations, not a newly launched customer-facing agency. EP is Expert Partners, with Don's voice and EPIC distinguished from its company voice. AG Luxury and AG Personal are separate brains with separate audiences, offers, bios and voice sources. Current storage in another brain is not proof of ownership.
+HQ is shared internal operations, not a newly launched customer-facing agency. EP is Expert Partners, with Don's voice and EPIC distinguished from its company voice. Keep AG Luxury and AG Personal audiences, offers, bios and voice sources distinct. Resolve their current owning homes from the live department/folder map and newest decisions, not the historical separate-brain layout or a compatibility scope alias. Current storage alone is not proof of ownership.
 
 Every filled document, not an audit report, begins with this status.
 

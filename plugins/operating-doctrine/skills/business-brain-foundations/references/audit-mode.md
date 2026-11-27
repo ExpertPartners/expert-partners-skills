@@ -5,7 +5,7 @@ Audit the selected brain as it exists. Write a report, not corrections. This mod
 ## 1. Establish the run
 
 1. Read the live HQ Rulebook, newest decisions and owning brain. Perform the current shared-work preflight against the Ledger, gap dispositions, capabilities and existing owners. Reuse an existing audit's scope and evidence where still current, not its old conclusions.
-2. Identify the selected brain, actual folder and department or workspace from the request and its existing context. For HQ, EP and AG, resolve the owning scope. Within AG keep Luxury and Personal separate. If scope cannot be determined, report the ambiguity instead of choosing a business or auditing an unrelated department.
+2. Identify the selected brain, actual folder and department or workspace from the request and its existing context. Read the current department/folder map and live scopes to resolve HQ, EP and AG homes. Within AG keep Luxury/real-estate and Personal/influencer content distinct without assuming separate brains or Operations folders. Compatibility scope aliases and historical folders are not new owning homes. If scope cannot be determined, report the ambiguity instead of choosing a business or auditing an unrelated department.
 3. Discover the selected live blank master and the target files, including relevant department references, alternatives and filed workspace/custom instructions. Follow the skill's paged gateway read rules. A denied or withheld listing is incomplete coverage, not evidence that a file is missing.
 4. Resolve the owning brain's Operations destination before saving. Do not send an EP or AG report to HQ Operations merely because HQ ran it. Record inaccessible destinations explicitly, preserve findings in the authorized task handoff and report that the Operations save is blocked. Do not silently substitute a folder or widen access.
 5. Record the run time, brain, department, folder links, master version, source versions and actual read coverage. Instructions filed in Drive do not prove the live workspace has loaded them. Inspect the live configuration only through an authorized reachable route; otherwise mark runtime instructions unverified.
@@ -72,7 +72,7 @@ These are report priorities, not permission to fix. Resolve business-policy choi
 
 ## 4. Save the report
 
-Use the current document-formatting and naming standards. Save a Google Doc in the selected owning brain's Operations folder. Check for an existing same-run report before creation to avoid retries making twins. Preserve prior runs as history; do not overwrite their findings as if they were current observations. Read the saved report back and verify its parent, content and link.
+Use the current document-formatting and naming standards. Save a Google Doc in the selected owning brain's Operations folder. Announce the exact destination and name in one line, then save. Search that destination for an existing report on the same brain/department and subject before creating anything. Update that Google Doc in place under a revision guard, retaining its identity and ordinary version label. Keep run dates and findings clearly distinguished, with prior observations preserved through document history or dated sections, not presented as current evidence. Create a separate report only for a genuinely different scope or purpose. Read the saved report back and verify its parent, content and link.
 
 Report structure:
 
