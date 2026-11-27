@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "bce78f8c027e900866d2c9de985b1b0ed09b1f16"
+    "eps": "f264c88378d8ee99eccd8d4f38d13b75de49c1dc"
   },
   "zones": [
     "surfaces",
@@ -247,7 +247,7 @@
       "renderNote": null,
       "layout": {
         "x": 1777,
-        "y": 5160.4,
+        "y": 5261.4,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -624,7 +624,7 @@
       "renderNote": null,
       "layout": {
         "x": 1773.5,
-        "y": 5247.4,
+        "y": 5348.4,
         "width": 237,
         "height": 91,
         "rectHeight": 76,
@@ -974,7 +974,7 @@
       "renderNote": null,
       "layout": {
         "x": 1777,
-        "y": 5463.4,
+        "y": 5564.4,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -1472,7 +1472,7 @@
       "renderNote": null,
       "layout": {
         "x": 1770,
-        "y": 5362.4,
+        "y": 5463.4,
         "width": 244,
         "height": 77,
         "rectHeight": 62,
@@ -2460,7 +2460,7 @@
       "renderNote": null,
       "layout": {
         "x": 1789,
-        "y": 5651.4,
+        "y": 5752.4,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -2638,6 +2638,34 @@
       }
     },
     {
+      "id": "new-hire-onboarding",
+      "source": "eps:plugins/operating-doctrine/skills/new-hire-onboarding/SKILL.md",
+      "repo": "eps",
+      "tier": "plugin",
+      "zone": "brain",
+      "status": "live",
+      "inherits": [
+        "operating-doctrine"
+      ],
+      "calls": [],
+      "defersTo": [],
+      "brandScope": [],
+      "subtitle": "gets a person or AI employee to verified day-one access",
+      "renderNote": null,
+      "layout": {
+        "x": 1777,
+        "y": 5651.4,
+        "width": 230,
+        "height": 77,
+        "rectHeight": 62,
+        "annotationHeight": 15,
+        "subtitleLines": [
+          "gets a person or AI employee to",
+          "verified day-one access"
+        ]
+      }
+    },
+    {
       "id": "new-project",
       "source": "eps:plugins/operating-doctrine/skills/new-project/SKILL.md",
       "repo": "eps",
@@ -2809,7 +2837,7 @@
       "renderNote": "single faint anchor, inheritance edges collapsed",
       "layout": {
         "x": 1798,
-        "y": 5550.4,
+        "y": 4958.4,
         "width": 188,
         "height": 77,
         "rectHeight": 62,
@@ -3161,7 +3189,7 @@
       "renderNote": null,
       "layout": {
         "x": 1774,
-        "y": 4958.4,
+        "y": 5160.4,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -4277,11 +4305,11 @@
         },
         {
           "x": 1703,
-          "y": 5400.9
+          "y": 5501.9
         },
         {
           "x": 1770,
-          "y": 5400.9
+          "y": 5501.9
         }
       ]
     },
@@ -4576,11 +4604,11 @@
         },
         {
           "x": 2351,
-          "y": 5746.4
+          "y": 5847.4
         },
         {
           "x": 790,
-          "y": 5746.4
+          "y": 5847.4
         },
         {
           "x": 790,
@@ -5197,6 +5225,12 @@
       "points": null
     },
     {
+      "from": "new-hire-onboarding",
+      "to": "operating-doctrine",
+      "type": "inherits",
+      "points": null
+    },
+    {
       "from": "new-project",
       "to": "repo-standards",
       "type": "calls",
@@ -5794,7 +5828,7 @@
         "x": 1748,
         "y": 4910.4,
         "width": 288,
-        "height": 826,
+        "height": 927,
         "rooms": []
       },
       {
