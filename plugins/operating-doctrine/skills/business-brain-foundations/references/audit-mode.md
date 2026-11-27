@@ -56,6 +56,12 @@ Read candidate bodies before calling them duplicates or selecting a version. Rec
 
 Check whether essential evidence is held and usable, such as actual past proposals, sales calls, customer questions, attributed testimonials and authentic case outcomes. Report unavailable or unadmitted evidence as a gap, not a negative business fact. Recommend specific missing references and their owning department. Do not start recording intake, external research or a recovery hunt as part of checking the brain.
 
+Apply the Launch Points arrival health check, not just a successful-read test. Identify the existing authorized recording/file arrival register and its configured window or checkpoint. Compare the expected source records with the actual owning-brain arrivals by stable source identity, not totals alone. Report the window, expected count, matched count, missing IDs, duplicates and failed/delayed routes, with source and destination evidence. Read matched content or its verified receipt to distinguish an empty shell from a usable arrival. Preserve selective sharing: private recordings not admitted to the company brain are not missing company files.
+
+Cal's demonstration checks the 100 most recent source transcripts against local files after a sync failure. That is a demonstrated check window, not an invented universal quota. Use the owning route's actual expected set; if a smaller sample is all that can be checked, disclose it and never infer full coverage. Without an accessible expected-source register or destination inventory, mark arrival reconciliation unverified and name the exact missing evidence. Do not claim zero missing from a destination-only listing.
+
+The existing daily health-check owner owns scheduling and founder alerts under current decisions. An on-demand audit records arrival findings and routes them through the existing owner/handoff. It does not install another monitor, send alerts, ingest files or repair syncs merely because it found a problem.
+
 Prioritize findings:
 
 - P1: conflicting operative instructions or commercial facts that can drive a wrong action, or verified cross-brain/private-audience leakage.
@@ -75,7 +81,7 @@ Report structure:
 3. Master and source manifest, exact links, versions, read time, coverage, exclusions and access gaps. Label the selected copy's role, such as ready-to-fill, so a blank copy is not mistaken for a failed production brain.
 4. Nineteen-piece matrix with all dimensions above, source links and specific field-level gaps. Add applicable Compliance and explicitly included department support separately.
 5. Naming/home findings, stale claims, cross-file contradictions and competing versions, each with evidence or a clear unverified label. No findings in checked scope does not mean none exist elsewhere.
-6. Missing references and instruction health, separating filed content from live runtime configuration.
+6. Missing references, Launch Points expected-versus-arrived reconciliation and instruction health, separating filed content from live runtime configuration.
 7. Prioritized owner correction plan. No source edits occurred; fixes need a separate owner's run. Audit invocation alone never starts that run.
 8. Provenance and gaps, including any missing teaching or readiness crosswalk, then the saved report link in the handoff.
 
@@ -85,7 +91,7 @@ Return the exact report name as a Markdown hyperlink, the material gaps and the 
 
 Verified teaching: Cal's Week 6 R16 at 14:10 is the workspace standards health check. R17 at 15:07 scopes the department. R18 to R21 at 16:02 to 17:55 inspect contradictions, missing evidence, thin files and instructions, and recommend references while preserving business-policy decisions. R22 at 18:47 puts prioritized corrections with the owner. R54 at 46:37 turns the health-check prompt into an Auditor skill, and R55 at 47:04 invokes it for a named department.
 
-Launch Points contributes the verified clean-template-over-held-files method, selective departmental access and saving work back to its chosen owning folder. Apply that workspace-oriented method alongside the verified Week 6 health check. The held Launch Points filing/arrival recording also supports shared synced Drive storage and an audit trail. These are not proof of the missing original health-check prompt's exact wording or an additional scoring rubric. Label any more specific Launch Points health-check attribution unverified unless held teaching supports it.
+Launch Points contributes the verified clean-template-over-held-files method, selective departmental access and saving work back to its chosen owning folder. Its held recording at 1:26:57 shows a transcript sync failure, 1:27:52 distinguishes admitted company transcripts from private recordings, and 1:28:51 compares the 100 most recent source records with local files and reports whether all arrived. Apply that arrival reconciliation alongside the Week 6 document/instruction health check. Shared synced Drive storage and an audit trail are also evidenced. This does not recover the original Auditor prompt's exact wording or establish a numerical content-scoring rubric.
 
 The original Auditor package and complete original prompt are not recovered. This is a necessary reconstruction from verified evidence, not a faithful-original claim. Source recovery stays closed unless Allison supersedes it. Do not hunt for the original or commission another Build 101 lesson.
 
