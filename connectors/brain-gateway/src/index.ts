@@ -116,6 +116,9 @@ const provider = new OAuthProvider<Env>({
 	resourceMetadata: { resource: env.MCP_RESOURCE },
 	clientIdMetadataDocumentEnabled: true,
 	enterpriseManagedAuthorization: managedAuthorization,
+	onError: ({ code, internal }) => {
+		console.warn("[oauth]", JSON.stringify({ code, category: internal.category, reason: internal.reason }));
+	},
 });
 
 export default {
