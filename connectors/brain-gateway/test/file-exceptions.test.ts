@@ -64,7 +64,7 @@ test("non-exception files, wrong scope, nested requests, Don and other departmen
 	}
 	for (const id of Object.keys(DEPARTMENTS).filter((id) => !luxury.includes(id) && id !== "ag-personal-cgo"))
 		assert.equal((await runTool("read", { scope: "ag-personal-core", id: ids[0] }, env, forbidden, dept(id))).status, 403);
-	for (const scope of ["ag-core", "ag-marketing"])
+	for (const scope of ["ag-marketing"])
 		assert.equal((await runTool("read", { scope, id: ids[0] }, env, forbidden, dept("ag-personal-cgo"))).status, 403);
 });
 
