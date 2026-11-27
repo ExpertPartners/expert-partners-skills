@@ -1,3 +1,6 @@
+## 3.14.0 - 2026-11-27
+
+Extend deliverable-link with an explicit one-file "share this" action using the existing Drive permission tools. Resolve the exact non-folder target, grant only anyone-with-link reader with search discovery disabled, preserve parents and other grants, verify the result, and never publish a brain folder or share during ordinary delivery.
 ## 3.13.0 - 2026-11-27
 
 Add scheduled client wins capture instructions and a deterministic private-case planner with source evidence, consent, deduplication, revision handling and arrival reconciliation.
