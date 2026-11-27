@@ -9,6 +9,7 @@
   "workers_dev": true,
   "preview_urls": false,
   "vars": {
+    "WORK_POLICY_LIVE": "required",
     "CLAUDE_TRUSTED_ISSUER": "https://identity.anthropic.com/issuers/iss_uzkm2vzazu3sioktkyoanw",
     "MCP_RESOURCE": "https://factory-connection.expert-partners.workers.dev/mcp",
     "ALLOWED_EMAILS": "allison@expertpartners.com"
@@ -18,6 +19,7 @@
   "dev": { "port": 8788 },
   "secrets": {
     "required": [
+      "GOOGLE_SA_KEY",
       "FACTORY_API_KEY",
       "HUB_API_TOKEN",
       "ACCESS_CLIENT_ID",
