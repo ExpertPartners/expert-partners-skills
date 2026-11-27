@@ -37,7 +37,7 @@ if (mode === "prepare") {
 } else {
 	const calls = { values: 0, versions: 0, lists: 0 };
 	const drive = async (p: string) => {
-		if (p.includes("/values/")) { calls.values++; return new Response(Readable.toWeb(createReadStream(path, { highWaterMark: 65_536 })) as ReadableStream); }
+		if (p.includes("/values/")) { calls.values++; return new Response(Readable.toWeb(createReadStream(path, { highWaterMark: 65_536 })) as unknown as ReadableStream); }
 		if (p.startsWith("/v4/")) return Response.json({ sheets: [{ properties: { title } }] });
 		if (p.startsWith("/drive/v3/files?")) { calls.lists++; return Response.json({ files: [{ id: "benchmark", name: "Benchmark", mimeType: "application/vnd.google-apps.spreadsheet", modifiedTime: "x" }] }); }
 		calls.versions++;
