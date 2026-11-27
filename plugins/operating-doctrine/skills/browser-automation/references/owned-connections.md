@@ -18,6 +18,22 @@ seconds, and refuses if none appears. A connector page handed to a Chrome that i
 still starting loads before the extension and shows ERR_BLOCKED_BY_CLIENT. It does not create a profile,
 choose a fallback account, start a stopped browser or perform a sign-in.
 
+Extension 0.6.0 can move the first client group into the last-focused window,
+even after this adapter created a fresh window. Upstream
+[Playwright issue 44302](https://github.com/microsoft/playwright/issues/44302)
+fixes first-group creation by specifying the tab's original window. Until that
+fix is published in an extension release, `owned_pages.js` isolates a misplaced
+connector by moving its existing group into a fresh window. It first requires
+that the group contain exactly that connector. It never ungroups or regroups
+the attached connector, because the extension treats that as an ownership
+release. It removes only the fresh window's exact blank seed tab, and verifies
+the resulting window contains only the connector with its original group ID.
+Ambiguous membership or placement fails closed. An interrupted allocation with
+missing verified metadata remains a reconciliation hold, not authority for a
+sweeper to close the old or new window. Remove the compatibility fallback after
+a released upstream fix and an owned start/finish check prove original-window
+placement through the installed route.
+
 `EP_BROWSER_EXECUTABLE` may name the
 already installed Chrome executable when its path differs from the macOS default.
 Do not pass a new user-data directory or use this adapter to launch a fresh profile.

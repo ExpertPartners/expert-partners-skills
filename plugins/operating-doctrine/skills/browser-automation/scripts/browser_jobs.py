@@ -16,6 +16,7 @@ import json
 import os
 from pathlib import Path
 import re
+import select
 import signal
 import socket
 import subprocess
@@ -693,24 +694,33 @@ class Route:
         self.lock = threading.RLock()
         self.inventory = None
         self.control_socket = self.control_listener = None
-        if not control:
-            # The read-only diagnostic owns no job, so it serves no finish
-            # channel and leaves no socket in state_dir.
+        self.control_enabled = control
+        self.control_active = 0
+
+    def open_control(self):
+        # An initialized but unused MCP facade owns no jobs or control socket.
+        if not self.control_enabled or self.control_listener is not None:
             return
         self.control_socket = "control-" + uuid.uuid4().hex[:16] + ".sock"
         self.control_listener = socket.socket(socket.AF_UNIX)
         self.control_listener.bind(str(self.root / self.control_socket))
         os.chmod(self.root / self.control_socket, 0o600)
         self.control_listener.listen(8)
+        self.control_listener.settimeout(1)
         threading.Thread(target=self.serve_control, daemon=True).start()
 
     def serve_control(self):
         """Private same-user lifecycle channel, not another browser connection."""
-        while True:
+        listener = self.control_listener
+        while listener is self.control_listener:
             try:
-                connection, _ = self.control_listener.accept()
+                connection, _ = listener.accept()
+            except socket.timeout:
+                continue
             except OSError:
                 return
+            with self.lock:
+                self.control_active += 1
             with connection:
                 try:
                     connection.settimeout(120)
@@ -733,12 +743,28 @@ class Route:
                     connection.sendall((json.dumps(reply) + "\n").encode())
                 except OSError:
                     pass
+                finally:
+                    with self.lock:
+                        self.control_active -= 1
 
     def close_control(self):
         listener = getattr(self, "control_listener", None)
         if listener and self.control_socket:
+            self.control_listener = None
             listener.close()
             (self.root / self.control_socket).unlink(missing_ok=True)
+            self.control_socket = None
+
+    def idle_without_jobs(self):
+        """Only terminal jobs with no client or active lifecycle call are idle."""
+        with self.lock:
+            if self.control_active or any(
+                job.get("status") != "finished" or (job.get("client") and not job["client"].closed)
+                for job in self.jobs.values()
+            ):
+                return False
+            self.close_control()
+            return self.control_socket is None
 
     def preflight(self):
         if socket.gethostname() != self.config["host"]:
@@ -1180,6 +1206,7 @@ class Route:
             "lock": threading.RLock(),
         }
         with self.lock:
+            self.open_control()
             self.jobs[job_id] = job
         with job["lock"]:
             try:
@@ -2044,15 +2071,25 @@ class Route:
         self.close_control()
 
 
-def serve(route):
+FACADE_IDLE_SECONDS = 300
+
+
+def serve(route, idle_seconds=FACADE_IDLE_SECONDS, poll_seconds=1):
     output_lock = threading.Lock()
     workers = set()
     workers_lock = threading.Lock()
+    disconnected = threading.Event()
+    idle_since = time.monotonic()
 
     def emit(value):
         with output_lock:
-            sys.stdout.write(json.dumps(redact(value), ensure_ascii=False) + "\n")
-            sys.stdout.flush()
+            if disconnected.is_set():
+                return
+            try:
+                sys.stdout.write(json.dumps(redact(value), ensure_ascii=False) + "\n")
+                sys.stdout.flush()
+            except (BrokenPipeError, OSError):
+                disconnected.set()
 
     def handle(message):
         try:
@@ -2100,10 +2137,29 @@ def serve(route):
                 workers.discard(threading.current_thread())
 
     try:
-        while True:
-            line = sys.stdin.buffer.readline(1048577)
-            if not line:
-                break
+        buffer = b""
+        fd = sys.stdin.fileno()
+        while not disconnected.is_set():
+            with workers_lock:
+                busy = bool(workers)
+            if route.idle_without_jobs():
+                if not busy and time.monotonic() - idle_since >= idle_seconds:
+                    break
+            else:
+                idle_since = time.monotonic()
+            if b"\n" not in buffer:
+                readable, _, _ = select.select([fd], [], [], poll_seconds)
+                if not readable:
+                    continue
+                chunk = os.read(fd, 65536)
+                if not chunk:
+                    break
+                buffer += chunk
+                if b"\n" not in buffer:
+                    if len(buffer) > 1048576:
+                        raise Refusal("request_too_large")
+                    continue
+            line, _, buffer = buffer.partition(b"\n")
             if len(line) > 1048576:
                 raise Refusal("request_too_large")
             try:

@@ -1,19 +1,31 @@
 /* One private MCP process. Birth provenance is independent of group membership. */
 async function newOwnedState(connector) {
   const context = connector.context();
-  // Chrome can hand a --new-window launch to the most recently created window
-  // when connections start close together, so two jobs once shared a window.
-  // Move this connector into its own window before recording ownership.
+  // Extension 0.6.0 creates the first group in the last-focused window
+  // (microsoft/playwright#44302). Keep the existing group when isolating:
+  // windows.create({tabId}) ungroups the tab and the extension releases it.
+  // Remove this fallback once a released extension pins first-group windowId.
   await connector.evaluate(async () => {
     const t = await chrome.tabs.getCurrent();
     const others = (await chrome.tabs.query({windowId: t.windowId})).filter(x => x.id !== t.id);
     if (!others.length) return;
-    const g = await chrome.tabGroups.get(t.groupId);
-    const w = await chrome.windows.create({tabId: t.id, focused: false});
-    const groupId = await chrome.tabs.group({tabIds: [t.id], createProperties: {windowId: w.id}});
-    await chrome.tabGroups.update(groupId, {title: g.title, color: g.color});
+    const members = await chrome.tabs.query({groupId: t.groupId});
+    if (t.groupId < 0 || members.length !== 1 || members[0].id !== t.id)
+      throw Error('owned_window_isolation_unproven');
+    const w = await chrome.windows.create({url: 'about:blank', focused: false});
+    if (!w.tabs || w.tabs.length !== 1 || w.tabs[0].windowId !== w.id ||
+        w.tabs[0].groupId !== -1 || w.tabs[0].url !== 'about:blank')
+      throw Error('owned_window_isolation_unproven');
+    const seedId = w.tabs[0].id;
+    await chrome.tabGroups.move(t.groupId, {windowId: w.id, index: -1});
+    const moved = await chrome.tabs.query({windowId: w.id});
+    if (moved.length !== 2 || !moved.some(x => x.id === t.id && x.groupId === t.groupId) ||
+        !moved.some(x => x.id === seedId && x.groupId === -1 && x.url === 'about:blank'))
+      throw Error('owned_window_isolation_failed');
+    await chrome.tabs.remove(seedId);
     const placed = await chrome.tabs.query({windowId: w.id});
-    if (placed.length !== 1 || placed[0].id !== t.id) throw Error('owned_window_isolation_failed');
+    if (placed.length !== 1 || placed[0].id !== t.id || placed[0].groupId !== t.groupId)
+      throw Error('owned_window_isolation_failed');
   });
   const initial = await connector.evaluate(async () => {
     const t = await chrome.tabs.getCurrent();
