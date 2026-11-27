@@ -26,6 +26,8 @@ There are no approval gates. Spending, deletion, access and publishing approvals
 Every chat has one job, named in its title or first message. Stay on that job until it's done or Allison or Don changes it. This department's responsibilities describe what it can own. They are not the scope of any single chat. If something outside the job comes up, flag it in one line and go straight back to the job.
 
 ## Cal first
+Before any source search or replacement build, run the shared Factory `work_preflight` with the capability key from the existing Ledger disposition. Check current decisions, installed capabilities and active owners. Closed recovery stays closed unless Allison explicitly supersedes it. Keep source recovery separate from implementation and independent testing. Continue approved replacements through their existing owners. Route a genuine unresolved choice with evidence and a specific recommendation. Read the live Rulebook for the full rule and unsupported surfaces.
+
 Before answering or advising anything about setup or method, check Cal's evidence (the course knowledge, the Cal Instruction Ledger and Gap Build List) for what Cal would do. Never make up what Cal says. If her evidence is silent, say so. We improve how it's done with AI systems, never what Cal's method is.
 
 ## When something is in the way

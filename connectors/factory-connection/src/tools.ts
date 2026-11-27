@@ -1,5 +1,6 @@
 // One tool registry serves both the MCP connector (/mcp) and the Hub HTTP endpoint (/api/tools).
 import { z } from "zod";
+import { legacyIntent, validPolicy, workPreflight } from "./work-preflight.ts";
 import {
 	type Computer,
 	Factory,
@@ -13,12 +14,20 @@ import {
 	resolveComputer,
 	resolveMachine,
 	sleep,
-} from "./factory";
+} from "./factory.ts";
 
 export interface ToolEnv {
 	FACTORY_API_KEY: string;
 	AUTOMATION_WEBHOOKS?: string;
+	OAUTH_KV?: { get(key: string, type: "json"): Promise<unknown> };
 }
+
+const workIntent = z.object({
+ action: z.enum(["source_search", "replacement_build", "continue", "inspect", "escalate"]),
+ capabilityId: z.string().min(1),
+ evidence: z.array(z.string().url()).optional(),
+ recommendation: z.string().optional(),
+});
 
 export interface ToolDef {
 	name: string;
@@ -244,6 +253,7 @@ export const TOOLS: ToolDef[] = [
 			machine,
 			cwd: z.string().optional().describe("Working directory on that Mac"),
 			firstMessage: z.string().optional(),
+			workIntent: workIntent.optional(),
 			...settingsShape,
 			...createOnly,
 		}),
@@ -344,6 +354,7 @@ export const TOOLS: ToolDef[] = [
 		schema: z.object({
 			sessionId: id,
 			text: z.string(),
+			workIntent: workIntent.optional(),
 			images: z.array(image).optional(),
 			files: z.array(file).optional(),
 			computerId: z.string().optional(),
@@ -366,6 +377,7 @@ export const TOOLS: ToolDef[] = [
 		schema: z.object({
 			machine,
 			message: z.string().describe("The full brief. First line is the session name, 'Section - Mission'."),
+			workIntent: workIntent.optional(),
 			cwd: z.string().optional(),
 			waitSeconds: z.number().int().min(0).max(290).optional(),
 			...settingsShape,
@@ -648,6 +660,14 @@ export function findTool(name: string) {
 	return TOOLS.find((t) => t.name === name);
 }
 
+TOOLS.push({
+ name: "work_preflight",
+ description: "Check current source-recovery closure, installed capability and existing ownership before any course source search or replacement build, for every week. No Factory work is started. Closed recovery is refused, duplicate builds route to their owner, approved implementation continues and evidence-backed recommendations can reach Allison. Use the returned owner rather than starting another session.",
+ readOnly: true,
+ schema: z.object({workIntent, sessionId: z.string().optional()}),
+ run: async () => { throw new Error("Preflight must run through the shared dispatch check."); },
+});
+
 /** Run a tool by name with validated args. Errors come back as data, never with secrets. */
 export async function runTool(name: string, args: unknown, env: ToolEnv) {
 	const t = findTool(name);
@@ -655,6 +675,19 @@ export async function runTool(name: string, args: unknown, env: ToolEnv) {
 	const parsed = t.schema.safeParse(args ?? {});
 	if (!parsed.success) return { ok: false as const, status: 400, error: parsed.error.message };
 	try {
+		if (["create_session", "post_message", "start_and_watch", "work_preflight"].includes(name)) {
+			const a = parsed.data as any;
+			const policy = await env.OAUTH_KV?.get("work-preflight-policy:v1", "json");
+			if (!validPolicy(policy)) return { ok: false as const, status: 503, error: "Current work-preflight policy unavailable. Recover its derived view from the existing owning records before dispatch." };
+			const legacy = legacyIntent(policy, [a.firstMessage, a.text, a.message, ...(a.files ?? []).filter((x: any) => x.kind === "text").map((x: any) => x.data)].filter(Boolean).join("\n"));
+			// A positive legacy search/build cannot be disguised by metadata claiming inspection.
+			const intent = legacy ?? a.workIntent;
+			if (intent) {
+				const result = workPreflight(policy, intent, a.sessionId);
+				if (name === "work_preflight") return { ok: true as const, status: 200, result };
+				if (!result.allowed) return { ok: false as const, status: 409, error: result.reason, detail: result };
+			}
+		}
 		const result = await t.run(parsed.data, new Factory(env.FACTORY_API_KEY), env);
 		return { ok: true as const, status: 200, result };
 	} catch (e) {

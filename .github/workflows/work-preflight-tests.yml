@@ -1,0 +1,31 @@
+name: work-preflight-tests
+on:
+  pull_request:
+    paths:
+      - 'connectors/factory-connection/**'
+      - 'tools/hooks/**'
+      - '.github/workflows/work-preflight-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'connectors/factory-connection/**'
+      - 'tools/hooks/**'
+      - '.github/workflows/work-preflight-tests.yml'
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - run: npm ci --ignore-scripts
+        working-directory: connectors/factory-connection
+      - run: npm test && npm run type-check
+        working-directory: connectors/factory-connection
+      - run: python3 -m unittest discover -s tools/hooks/tests -p 'test_work_preflight.py' -v
