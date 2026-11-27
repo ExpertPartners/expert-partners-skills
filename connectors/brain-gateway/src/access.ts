@@ -3,8 +3,8 @@
 //
 // Approved basis (Decision Log Nov 20 2026):
 // - Leader-level access, whole brain: Allison and Don for Expert Partners and HQ, Allison alone for AG Luxury.
-// - Department AIs start with their own department folder plus shared HQ governance, and reach another
-//   department only through a named, approved exception.
+// - Nov 27 2026: every department/workspace AI reads all three company Cores. Other department
+//   folders still require their existing profile grant or a named, approved exception.
 // - Private and system folders stay out unless the allowlist names them.
 import { allowedScopes, BrainError, type BrainScope, type PinnedFile } from "./brain.ts";
 
@@ -26,6 +26,8 @@ const EP_SYSTEM = ["ep-outputs"];
 const AG_SYSTEM = ["ag-outputs"];
 // Shared HQ governance (Rulebook, Decision Log) is context for every department in both companies.
 const GOVERNANCE = ["hq-core"];
+/** Company knowledge is shared by AI profiles, not by changing the human leader boundary. */
+export const COMPANY_CORES: readonly BrainScope[] = ["hq-core", "ep-core", "ag-core"];
 
 /**
  * Departments from [HQ][V1.0] Departments, Workspaces and Brain Folders. Each lists the folders its map
@@ -52,7 +54,7 @@ export const DEPARTMENTS: Record<string, { label: string; scopes: BrainScope[]; 
 function departmentScopes(id: string): BrainScope[] {
 	const d = DEPARTMENTS[id];
 	if (!d) throw new BrainError("unknown_department", "That department is not known to this gateway.");
-	return [...d.scopes, ...d.exceptions];
+	return [...new Set([...d.scopes, ...d.exceptions, ...COMPANY_CORES])];
 }
 
 /** The scopes this principal may read: the deployed allowlist, intersected with their profile. Never wider than either. */

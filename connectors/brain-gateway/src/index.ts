@@ -8,7 +8,7 @@ import OAuthProvider from "@cloudflare/workers-oauth-provider";
 import { McpServer } from "@modelcontextprotocol/server";
 import { createMcpHandler, getMcpAuthContext } from "agents/mcp/server";
 import { handleAccessRequest } from "./access-handler";
-import { departmentForToken, DEPARTMENTS } from "./access.ts";
+import { apiPrincipal } from "./api-principal.ts";
 import { lastResults, runDeepCheck, storeResult } from "./health.ts";
 import { driveFetch } from "./google.ts";
 import { isAllowedEmail } from "./allow";
@@ -48,32 +48,11 @@ function json(data: unknown, status = 200) {
 	return new Response(JSON.stringify(data), { status, headers: { "content-type": "application/json" } });
 }
 
-/** Constant-time compare for the Hub bearer token. */
-function safeEqual(a: string, b: string) {
-	const enc = new TextEncoder();
-	const x = enc.encode(a);
-	const y = enc.encode(b);
-	if (x.length !== y.length) return false;
-	let diff = 0;
-	for (let i = 0; i < x.length; i++) diff |= x[i] ^ y[i];
-	return diff === 0;
-}
-
 async function handleHubApi(request: Request, bindings: Env) {
 	const url = new URL(request.url);
-	const auth = request.headers.get("authorization") ?? "";
-	const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
-	// Two kinds of bearer. The Hub token acts as Allison and may only narrow itself with
-	// X-Brain-Department. A department token is fixed to its department and cannot be widened.
-	let principal: Principal | null = null;
-	if (bindings.HUB_API_TOKEN && token && safeEqual(token, bindings.HUB_API_TOKEN)) {
-		const dept = request.headers.get("x-brain-department") ?? undefined;
-		if (dept && !DEPARTMENTS[dept]) return json({ error: "unknown department" }, 400);
-		principal = { kind: "person", email: "allison@expertpartners.com", department: dept };
-	} else {
-		const id = await departmentForToken((bindings as any).DEPARTMENT_TOKEN_HASHES, token);
-		if (id) principal = { kind: "department", id };
-	}
+	const resolved = await apiPrincipal(request, bindings as any);
+	if (resolved === "unknown_department") return json({ error: "unknown department" }, 400);
+	const principal: Principal | null = resolved;
 	if (!principal) return json({ error: "unauthorized" }, 401);
 	if (url.pathname.startsWith("/api/health/clients")) {
 		if (principal.kind !== "person" || principal.department) return json({ error: "forbidden" }, 403);
