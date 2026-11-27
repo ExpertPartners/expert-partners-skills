@@ -14,8 +14,8 @@ subtitle: "how the room reacted, topic by topic"
 Turn a completed recorded group session into an evidence-led account of what
 landed, what confused people and what to keep or change next time. This is
 after-session analysis, never live monitoring or a claim about anyone's mind.
-One shared skill serves HQ, Expert Partners and AG, including AG Luxury and
-AG Personal. Do not create brand-specific copies.
+One shared skill serves HQ, Expert Partners and AG, including AG Real Estate
+(AGRE) and AG Influencer (AGI). Do not create brand-specific copies.
 
 ## Automatic trigger contract
 
@@ -210,7 +210,7 @@ Create one internal report named `YYYY-MM-DD Read the Room - <Session title>`.
 Use `document-formatting-standard` and keep this section order.
 
 1. Session and evidence coverage, including host, date, duration, brand, source
-   links, channels present and missing, and transcript or attribution limits.
+   channels, evidence locators, and transcript or attribution limits.
 2. Short overview of what landed, friction and the strongest next-session change.
 3. Topic timeline with start/end, topic, summary, reaction and who, exact quote
    and locator. Label unsupported reactions as insufficient evidence.
@@ -232,7 +232,14 @@ skill may perform them directly using the same contract.
 
 Save only to the selected owning department folder from the live map. Never
 save department work to My Drive, even temporarily, or substitute Claude
-Outputs. Check effective destination access is appropriate for the source.
+Outputs. Check effective destination access is appropriate for the output.
+Link-viewable destinations are for derived business findings, not source
+artifacts. Use anonymous audience labels, channel and timestamp locators, and
+short, nonidentifying quotes. Omit attendee names, contact details, identifying
+stories, source URLs and copied transcript or chat blocks from the report and
+summary. If confidentiality is indicated, return a failed receipt rather than
+saving or notifying. The original evidence stays with the recording provider
+under its original access.
 Do not widen access, change sharing or send anything to attendees or externally.
 If saving fails, retain the unsaved draft only in current working context,
 record the exact failure and do not claim a report link.
