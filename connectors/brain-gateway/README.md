@@ -100,3 +100,9 @@ The base comes from Cloudflare's MIT licensed `remote-mcp-cf-access` demo throug
 ## Failure alerts
 
 The daily check texts Allison through the existing Sendblue line when a check fails, and once when it recovers (`src/alert.ts`). Secrets set with `wrangler secret put` from 1Password (Ember vault, Sendblue API and Secret Key): `SENDBLUE_API_KEY_ID`, `SENDBLUE_API_SECRET`, `ALERT_TO`, `ALERT_FROM`. The text names failed checks and short error codes, never document text. A refused send keeps state so the next run retries.
+
+## Claude-issued Auto Connect
+
+The token endpoint also supports the JWT bearer ID-JAG grant through the pinned OAuth provider library. Configure `CLAUDE_TRUSTED_ISSUER` with the organization issuer shown in Claude. Only Claude's official metadata client and that exact issuer are accepted. The library validates signature, audience, client binding, resource, lifetime and replay markers; the claims mapper independently enforces `ALLOWED_EMAILS` and the canonical MCP resource. Member identity remains in encrypted token props, so existing per-person resource restrictions still apply. Public-client use is restricted to Claude's CIMD client, and issued tokens last 15 minutes with no refresh token. KV replay protection is eventually consistent, not a globally atomic single-use guarantee.
+
+This does not grant a new person access or change existing browser OAuth grants. Configure Claude through its visible organization settings after deployment, then verify the saved Auto Connect state.

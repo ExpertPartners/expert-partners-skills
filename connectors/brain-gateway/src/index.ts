@@ -5,6 +5,7 @@ import { clientHealthApi, evaluateClients, observeClientTool } from "./client-he
 import { z } from "zod";
 import { env } from "cloudflare:workers";
 import OAuthProvider from "@cloudflare/workers-oauth-provider";
+import { managedAuthorization } from "./managed-auth.ts";
 import { McpServer } from "@modelcontextprotocol/server";
 import { createMcpHandler, getMcpAuthContext } from "agents/mcp/server";
 import { handleAccessRequest } from "./access-handler";
@@ -113,6 +114,8 @@ const provider = new OAuthProvider<Env>({
 	defaultHandler: defaultHandler as any,
 	tokenEndpoint: "/token",
 	resourceMetadata: { resource: env.MCP_RESOURCE },
+	clientIdMetadataDocumentEnabled: true,
+	enterpriseManagedAuthorization: managedAuthorization,
 });
 
 export default {
