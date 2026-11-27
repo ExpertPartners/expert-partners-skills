@@ -11,6 +11,7 @@ import { handleAccessRequest } from "./access-handler";
 import { apiPrincipal } from "./api-principal.ts";
 import { lastResults, runDeepCheck, storeResult } from "./health.ts";
 import { driveFetch } from "./google.ts";
+import { recordingArrivalChecks } from "./recording-arrivals.ts";
 import { isAllowedEmail } from "./allow";
 import { runTool, TOOLS } from "./tools";
 import type { Principal } from "./access.ts";
@@ -48,6 +49,16 @@ function json(data: unknown, status = 200) {
 	return new Response(JSON.stringify(data), { status, headers: { "content-type": "application/json" } });
 }
 
+async function deepHealth(bindings: Env) {
+	const drive = driveFetch(bindings.GOOGLE_SA_KEY);
+	const now = new Date();
+	const result = await runDeepCheck(bindings.ALLOWED_SCOPES, drive, () => now);
+	const { RECORDING_ARRIVAL_FILE_IDS } = bindings as Env & { RECORDING_ARRIVAL_FILE_IDS?: string };
+	result.checks.push(...await recordingArrivalChecks(RECORDING_ARRIVAL_FILE_IDS, drive, now));
+	result.ok = result.checks.every((check) => check.ok);
+	return result;
+}
+
 async function handleHubApi(request: Request, bindings: Env) {
 	const url = new URL(request.url);
 	const resolved = await apiPrincipal(request, bindings as any);
@@ -62,7 +73,7 @@ async function handleHubApi(request: Request, bindings: Env) {
 	if (request.method === "GET" && url.pathname === "/api/health/deep") {
 		if (principal.kind !== "person" || principal.department) return json({ error: "forbidden" }, 403);
 		if (url.searchParams.get("run") === "1") {
-			const result = await runDeepCheck(bindings.ALLOWED_SCOPES, driveFetch(bindings.GOOGLE_SA_KEY));
+			const result = await deepHealth(bindings);
 			await storeResult(bindings.OAUTH_KV, result);
 		}
 		return json(await lastResults(bindings.OAUTH_KV));
@@ -114,7 +125,7 @@ export default {
 					console.log("[brain-gateway] ChatGPT client checks:", JSON.stringify(await evaluateClients(bindings.OAUTH_KV, bindings as unknown as AlertEnv)));
 					return;
 				}
-				const result = await runDeepCheck(bindings.ALLOWED_SCOPES, driveFetch(bindings.GOOGLE_SA_KEY));
+				const result = await deepHealth(bindings);
 				await storeResult(bindings.OAUTH_KV, result);
 				if (!result.ok) console.error("[brain-gateway] daily check failed:", JSON.stringify(result.checks.filter((c) => !c.ok)));
 				console.log("[brain-gateway] alert:", await maybeAlert(bindings.OAUTH_KV, bindings as unknown as AlertEnv, result));
