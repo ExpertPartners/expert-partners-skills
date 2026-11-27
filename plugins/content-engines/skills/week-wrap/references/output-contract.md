@@ -4,7 +4,7 @@ This is the reusable output shape, not a copy of business knowledge. Resolve fac
 
 ## One-page advantage brief
 
-Save a Google Doc named Week Wrap, {teaching title}, Advantage Brief in the resolved AG Personal Marketing (`ag-personal-marketing`) folder.
+After passing [prewrite completeness](completeness-gate.md), save a Google Doc named Week Wrap, {teaching title}, Advantage Brief in the resolved AGI Course Development folder.
 
 Use these sections in order.
 
@@ -19,7 +19,7 @@ Keep the rendered document to one page without shrinking it below the live forma
 
 ## Live-class run of show and talking points
 
-Save a Google Doc named Week Wrap, {teaching title}, Live Class Run of Show in the same AG Personal Marketing folder.
+Save a Google Doc named Week Wrap, {teaching title}, Live Class Run of Show in the same AGI Course Development folder.
 
 Begin with the central lesson, audience, total duration, learner outcome, required setup and what is proposed rather than decided.
 
@@ -39,7 +39,7 @@ Preserve the current deck's unrelated chapters and use its exact personal-brand 
 
 ## Private run log and evidence map
 
-Use an existing Week Wrap Run Log in AG Personal Marketing, or create one Google Doc there if none exists. Keep one package record per input identity and separate timestamped attempts within it. Resolve folder, deck, kit and source IDs at runtime rather than copying them into this repository.
+Use the existing Week Wrap Run Log in AGI Course Development, or create one there after confirming no existing record is pending migration. Keep one package record per input identity and separate timestamped attempts within it. Resolve folder, deck, kit and source IDs at runtime rather than copying them into this repository.
 
 Each attempt records these fields.
 
@@ -47,6 +47,7 @@ Each attempt records these fields.
 - Started at, finished at and time zone
 - Input route, closed week and cohort or season, or attended session identity
 - Input basis, recording review, transcript or notes, with coverage limits
+- Linked prewrite evidence, preflight outcome and separate post-save package outcome
 - Source keys, private source links, versions or modification times and unresolved conflicts
 - Evidence map linking each substantive claim to source key, implementation status, observed proof and limitation
 - Exact destination folder, master deck and kit identities
