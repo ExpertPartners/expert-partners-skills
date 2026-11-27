@@ -9,7 +9,7 @@
 import { allowedScopes, BRAIN_FOLDERS, BrainError, type BrainScope, type PinnedFile } from "./brain.ts";
 
 export type Principal =
-	| { kind: "person"; email: string; department?: string } // OAuth sign-in (Claude, ChatGPT, Factory) or the Hub session, optionally narrowed
+	| { kind: "person"; email: string; department?: string; businessLine?: "AGRE" | "AGI" } // OAuth sign-in or Hub session, optionally narrowed; line is routing, never a grant
 	| { kind: "department"; id: string }; // a department token, fixed to that department's scopes
 
 type Match = (scope: BrainScope) => boolean;
