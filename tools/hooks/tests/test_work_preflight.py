@@ -7,6 +7,11 @@ spec = importlib.util.spec_from_file_location(
 )
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
+context_spec = importlib.util.spec_from_file_location(
+    "preflight_context", pathlib.Path(__file__).parents[1] / "work-preflight-context.py"
+)
+context_module = importlib.util.module_from_spec(context_spec)
+context_spec.loader.exec_module(context_module)
 
 
 class WorkPreflightTests(unittest.TestCase):
@@ -23,6 +28,40 @@ class WorkPreflightTests(unittest.TestCase):
                 }
             ]
         }
+
+    def test_ordinary_closed_recovery_prompt_blocks_an_unscoped_native_drive_search(self):
+        closed = context_module.closed_searches(
+            self.policy, "Find the original capstone homework and build a replacement."
+        )
+        self.assertEqual(closed, ["lesson"])
+        result = module.check(
+            self.policy,
+            {
+                "tool_name": "mcp__drive__list_files",
+                "tool_input": {"query": "name contains 'homework'"},
+                "closedSearches": closed,
+            },
+        )
+        self.assertEqual(result[0], "SOURCE_RECOVERY_CLOSED")
+        self.assertIsNone(
+            module.check(
+                self.policy,
+                {
+                    "tool_name": "mcp__drive__list_files",
+                    "tool_input": {"query": "'existing-folder' in parents"},
+                    "closedSearches": closed,
+                },
+            )
+        )
+
+    def test_negative_receipt_does_not_turn_continuation_into_source_recovery(self):
+        self.assertEqual(
+            context_module.closed_searches(
+                self.policy,
+                "Do not search the original capstone homework. Continue existing approved implementation.",
+            ),
+            [],
+        )
 
     def test_source_tools_and_shell_reopen_are_blocked(self):
         for tool, args in [

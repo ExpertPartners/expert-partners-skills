@@ -1,7 +1,7 @@
 // One tool registry serves both the MCP connector (/mcp) and the Hub HTTP endpoint (/api/tools).
 import { z } from "zod";
 import { legacyIntent, validPolicy, workPreflight } from "./work-preflight.ts";
-import { liveWorkPolicy } from "./live-work-policy.ts";
+import { orderedWorkPolicy } from "./ordered-work-policy.ts";
 import {
 	type Computer,
 	Factory,
@@ -28,6 +28,7 @@ export interface ToolEnv {
 const workIntent = z.object({
  action: z.enum(["source_search", "replacement_build", "continue", "inspect", "escalate"]),
  capabilityId: z.string().min(1),
+ outcome: z.string().min(1).optional(),
  evidence: z.array(z.string().url()).optional(),
  recommendation: z.string().optional(),
 });
@@ -685,7 +686,7 @@ export async function runTool(name: string, args: unknown, env: ToolEnv) {
 			let policy = seed;
 			if (env.WORK_POLICY_LIVE === "required" && !env.GOOGLE_SA_KEY) return {ok: false as const, status: 503, error: "Live policy credentials unavailable; stale policy is never used."};
 			if (env.GOOGLE_SA_KEY) {
-				try { policy = await liveWorkPolicy(seed, env.GOOGLE_SA_KEY); }
+				try { policy = await orderedWorkPolicy(seed, env.GOOGLE_SA_KEY, new Factory(env.FACTORY_API_KEY)); }
 				catch { return {ok: false as const, status: 503, error: "Live owning dispositions unavailable or changing. Retry preflight; stale policy is never used."}; }
 			}
 			const legacy = legacyIntent(policy, [a.firstMessage, a.text, a.message, ...(a.files ?? []).filter((x: any) => x.kind === "text").map((x: any) => x.data)].filter(Boolean).join("\n"));
@@ -693,7 +694,7 @@ export async function runTool(name: string, args: unknown, env: ToolEnv) {
 			const intent = legacy ?? a.workIntent;
 			if (intent) {
 				const result = workPreflight(policy, intent, a.sessionId);
-				if (name === "work_preflight") return { ok: true as const, status: 200, result };
+				if (name === "work_preflight") return { ok: true as const, status: 200, result: {...result, ...(intent.action === "inspect" ? {policy} : {})} };
 				if (!result.allowed) return { ok: false as const, status: 409, error: result.reason, detail: result };
 			}
 		}

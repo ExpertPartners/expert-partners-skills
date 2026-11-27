@@ -28,7 +28,7 @@ export async function liveWorkPolicy(seed: WorkPolicy, key: string,
   items.push({ id, aliases: JSON.parse(aliases), sourceRecovery: recovery, decisionUrl: decision,
    ownerSession: session, implementation, installed, replacementApproved: approved, evidence: JSON.parse(evidence) });
  }
- const policy = {version: 1 as const, source: {url: seed.source.url, revision: String(after.version)}, items};
+ const policy = {version: 1 as const, source: {...seed.source, revision: String(after.version)}, items};
  if (!items.length || !validPolicy(policy)) throw new Error("Invalid live owning dispositions");
  return policy;
 }

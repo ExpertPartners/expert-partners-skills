@@ -7,6 +7,7 @@ Arbitrary semantic equivalents and vendor web tools without hooks remain unverif
 """
 
 import json
+import importlib.util
 import os
 from pathlib import Path
 import re
@@ -19,11 +20,30 @@ def check(policy, data):
     target = ti.get("sessionId")
     tool = data.get("tool_name", "")
     payload = json.dumps(ti, ensure_ascii=False).lower()
-    search_tool = bool(re.search(r"search|firecrawl|web__run|browser", tool, re.I))
-    shell = tool in {"Bash", "Execute", "exec_command", "shell", "local_shell"}
+    search_tool = bool(
+        re.search(r"search|firecrawl|web__run|browser|list_files", tool, re.I)
+        or re.search(r"(?:__|\.)list_files|firecrawl|web__run", payload)
+    )
+    shell = tool in {
+        "Bash",
+        "Execute",
+        "exec_command",
+        "shell",
+        "local_shell",
+        "container.exec",
+        "Script",
+        "functions.exec",
+    }
     commissioning = bool(
         re.search(r"post_message|create_session|start_and_watch|SendMessage", tool, re.I)
     )
+    # Folder-scoped reads inspect existing work; unscoped name searches can
+    # otherwise reopen closed recovery before any dispatch guard is reached.
+    scoped_listing = bool("list_files" in tool and re.search(r"\bin parents\b", payload))
+    if data.get("closedSearches") and search_tool and not scoped_listing:
+        target = next((i for i in policy["items"] if i["id"] in data["closedSearches"]), None)
+        if target:
+            return "SOURCE_RECOVERY_CLOSED", target
     for item in policy["items"]:
         matched = any(a.lower() in payload for a in [item["id"]] + item["aliases"])
         if intent and intent.get("capabilityId") == item["id"]:
@@ -51,6 +71,7 @@ def check(policy, data):
                 continue
             if item["sourceRecovery"] == "closed" and (
                 search_tool
+                and not scoped_listing
                 or shell
                 and re.search(r"\b(curl|wget|yt-dlp|search|firecrawl|recover|hunt)\b", lower)
             ):
@@ -71,7 +92,26 @@ def main():
         if not isinstance(data, dict):
             raise ValueError("invalid hook event")
         path = Path.home() / ".config/expert-partners/work-preflight-policy.json"
-        policy = json.loads(path.read_text())
+        client_path = path.with_name("work-preflight-client.json")
+        name = data.get("tool_name", "")
+        serialized = json.dumps(data.get("tool_input", {}))
+        critical = re.search(
+            r"search|firecrawl|web__run|browser|list_files|post_message|create_session|start_and_watch|SendMessage",
+            name + serialized,
+            re.I,
+        )
+        if client_path.exists() and critical:
+            spec = importlib.util.spec_from_file_location(
+                "work_client", Path(__file__).with_name("work-policy-client.py")
+            )
+            client = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(client)
+            policy = client.refresh()
+            state_path = client.session_state_path(data)
+            if state_path and state_path.exists():
+                data.update(json.loads(state_path.read_text()))
+        else:
+            policy = json.loads(path.read_text())
         if policy.get("version") != 1 or not isinstance(policy.get("items"), list):
             raise ValueError("invalid derived policy")
         result = check(policy, data)
@@ -91,7 +131,7 @@ def main():
             )
             return 2
         return 0
-    except (ValueError, OSError, TypeError, KeyError):
+    except Exception:
         print(
             "Work preflight could not read its owning-record projection. Restore it before executing work.",
             file=sys.stderr,
