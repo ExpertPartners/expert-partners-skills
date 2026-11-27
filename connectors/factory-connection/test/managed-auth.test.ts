@@ -13,12 +13,18 @@ test("issuer selection pins organization, client, signing algorithm and public-k
   assert.equal(await auth.trustedIssuers({ ...input, iss: issuer, env: { ...env, CLAUDE_TRUSTED_ISSUER: "https://attacker.test" } }), null);
 });
 test("validated claims retain member identity and cannot expand the existing allowlist or resource", async () => {
-  const mapped = await auth.mapClaims({ ...input, claims, resource: env.MCP_RESOURCE, requestedScope: ["read"] });
+  const mapped = await auth.mapClaims({ ...input, claims, resource: env.MCP_RESOURCE, requestedScope: ["mcp"] });
   assert.equal(mapped?.userId, "claude-user%3A123");
   assert.deepEqual(mapped?.props, { email: "don@example.test", login: claims.sub, name: "don@example.test", enterprise: true });
-  assert.deepEqual(mapped?.scope, ["read"]);
+  assert.deepEqual(mapped?.scope, ["mcp"]);
   for (const email of ["other@example.test", "don@example.test.evil", undefined])
     assert.equal(await auth.mapClaims({ ...input, claims: { ...claims, email }, resource: env.MCP_RESOURCE, requestedScope: [] }), null);
   assert.equal(await auth.mapClaims({ ...input, claims, resource: "https://other.test/mcp", requestedScope: [] }), null);
   assert.equal(await auth.mapClaims({ ...input, claims, env: { ...env, ALLOWED_EMAILS: "allison@example.test" }, resource: env.MCP_RESOURCE, requestedScope: [] }), null);
+});
+
+test("managed grants use the declared MCP scope by default and refuse undeclared scopes", async () => {
+  const base = { ...input, claims, resource: env.MCP_RESOURCE };
+  assert.deepEqual((await auth.mapClaims({ ...base, requestedScope: [] }))?.scope, ["mcp"]);
+  assert.equal(await auth.mapClaims({ ...base, requestedScope: ["admin"] }), null);
 });
