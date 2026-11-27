@@ -1,6 +1,7 @@
 // One tool registry serves both the MCP connector (/mcp) and the Hub HTTP endpoint (/api/tools).
 import { z } from "zod";
 import { legacyIntent, validPolicy, workPreflight } from "./work-preflight.ts";
+import { liveWorkPolicy } from "./live-work-policy.ts";
 import {
 	type Computer,
 	Factory,
@@ -19,6 +20,8 @@ import {
 export interface ToolEnv {
 	FACTORY_API_KEY: string;
 	AUTOMATION_WEBHOOKS?: string;
+	GOOGLE_SA_KEY?: string;
+	WORK_POLICY_LIVE?: string;
 	OAUTH_KV?: { get(key: string, type: "json"): Promise<unknown> };
 }
 
@@ -677,8 +680,14 @@ export async function runTool(name: string, args: unknown, env: ToolEnv) {
 	try {
 		if (["create_session", "post_message", "start_and_watch", "work_preflight"].includes(name)) {
 			const a = parsed.data as any;
-			const policy = await env.OAUTH_KV?.get("work-preflight-policy:v1", "json");
-			if (!validPolicy(policy)) return { ok: false as const, status: 503, error: "Current work-preflight policy unavailable. Recover its derived view from the existing owning records before dispatch." };
+			const seed = await env.OAUTH_KV?.get("work-preflight-policy:v1", "json");
+			if (!validPolicy(seed)) return { ok: false as const, status: 503, error: "Current work-preflight policy unavailable. Recover its derived view from the existing owning records before dispatch." };
+			let policy = seed;
+			if (env.WORK_POLICY_LIVE === "required" && !env.GOOGLE_SA_KEY) return {ok: false as const, status: 503, error: "Live policy credentials unavailable; stale policy is never used."};
+			if (env.GOOGLE_SA_KEY) {
+				try { policy = await liveWorkPolicy(seed, env.GOOGLE_SA_KEY); }
+				catch { return {ok: false as const, status: 503, error: "Live owning dispositions unavailable or changing. Retry preflight; stale policy is never used."}; }
+			}
 			const legacy = legacyIntent(policy, [a.firstMessage, a.text, a.message, ...(a.files ?? []).filter((x: any) => x.kind === "text").map((x: any) => x.data)].filter(Boolean).join("\n"));
 			// A positive legacy search/build cannot be disguised by metadata claiming inspection.
 			const intent = legacy ?? a.workIntent;
