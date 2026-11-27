@@ -93,6 +93,9 @@ jobs:
       - name: AGENTS.md link validator tests
         run: python3 -m unittest discover -s tools/readiness/tests -p 'test_agents_links.py' -v
 
+      - name: Week Wrap prewrite contract tests
+        run: python3 -m unittest discover -s tools/week-wrap/tests -v
+
   gitleaks:
     name: gitleaks secret scan (full history)
     runs-on: ubuntu-latest

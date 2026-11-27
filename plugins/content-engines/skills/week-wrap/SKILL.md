@@ -1,6 +1,6 @@
 ---
 name: week-wrap
-description: Turn a closed implementation week or a webinar or session Allison attended and wants to teach into a one-page advantage brief, a live-class run of show with talking points, and a fully scripted chapter in her existing Canva master teaching deck. Use for Week Wrap, a week closeout teaching package, or turning attended learning into Allison's teaching. Reuse the master deck and existing chapter rather than creating another presentation.
+description: Check readiness and turn an implementation week or a session Allison attended and wants to teach into a one-page advantage brief, a live-class run of show with talking points, and a fully scripted chapter in her existing Canva master teaching deck. Use for Week Wrap, a week closeout teaching package, or turning attended learning into Allison's teaching. Reuse the master deck and existing chapter rather than creating another presentation.
 tier: plugin
 zone: content
 status: designed
@@ -21,15 +21,15 @@ Follow the [output contract](references/output-contract.md) for the three delive
 
 ## 1. Resolve the input and live authority
 
-Use the input already supplied. For a closed implementation week, identify the exact week and cohort or season so same-number weeks cannot be mixed. For an attended webinar or session, identify the actual recording, transcript or notes and Allison's intent to teach it. Do not require a closed curriculum week for this second route.
+Use the input already supplied. For an implementation week, identify the exact week and cohort or season so same-number weeks cannot be mixed. For an attended webinar or session, identify the actual recording, transcript or notes and Allison's intent to teach it. Do not require a closed curriculum week for this second route.
 
 Read live business authority through the Brain Gateway. List scopes, discover the owning scope and current documents, and read every needed page until nextOffset is null. Read the current HQ Rulebook, Organization Instructions and Decision Log. Use the newest applicable decision when an older draft differs. A source listing or partial read is not a completed source read.
 
-For the closed-week route, read that week's live Decision Log entries, readiness list and Standard, then the linked implementation and test evidence needed to distinguish built from planned. Preserve open, failed, partial and retired status. Never close a week or change a readiness grade as a side effect of making teaching material.
+For the implementation-week route, identify the exact inclusive date window from the owning record, and run the [prewrite completeness gate](references/completeness-gate.md). This includes a week at its closing checkpoint that has not closed because its package is outstanding. Apply the gate before drafting or writing any deliverable, including updates to existing outputs. Route a failed gate to HQ Chief HR Officer as a linked gap report, then stop without package writes. Never close a week or change a readiness grade as a side effect of making teaching material.
 
-For the attended-session route, read the full supplied recording transcript or notes and any linked implementation evidence. State whether the basis is notes, transcript or recording review. Never imply that notes prove attendance, complete recording review or a working implementation. Use synthetic examples if no implementation exists, clearly identified as examples rather than results.
+For the attended-session route, use the session prewrite checks in the [completeness gate](references/completeness-gate.md). Read the full supplied recording transcript or notes and any linked implementation evidence. State whether the basis is notes, transcript or recording review. Never imply that notes prove attendance, complete recording review or a working implementation. Use synthetic examples if no implementation exists, clearly identified as examples rather than results. Do not use the session route to bypass the implementation-week gate.
 
-Activate ag-personal-brand and read the live AG Personal Brand Book through its owning AG Personal source, Allison Gaddy Personal Brand Canon and Master Witness Personal Brand Voice through `ag-personal-core`, and Shared Writing Rules through HQ. Use `ag-personal-marketing` for personal visual and marketing sources. Do not replace them with a remembered voice or a copied canon. Resolve AG Personal Marketing (`ag-personal-marketing`) from the current Departments, Workspaces and Brain Folders map.
+Activate ag-personal-brand and read the live AG Personal Brand Book, Allison Gaddy Personal Brand Canon, Master Witness Personal Brand Voice and visual guide from their current owning sources, and Shared Writing Rules through HQ. Do not replace them with a remembered voice or a copied canon. Resolve the AGI Course Development folder under AG Chief Executive Officer in the authoritative AG Business Brain from the current decisions and ownership records. Marketing can be a brand source or location of historical outputs, not a destination. Reconcile existing assets by identity with the current migration owner rather than recreating or independently moving them.
 
 Resolve the existing master teaching deck and exact AG Personal Brand kit from the live owning record or current assignment. The target is Allison Gaddy, The Business Rewrite, The Master Teaching Collection. Match the saved design identity, account and kit identity, not just a similar title. Keep runtime IDs and private source links out of the repository. If the assignment supplies an exact identity, use it rather than substituting a search result.
 
@@ -59,7 +59,7 @@ Check spoken word count against each segment's time using a stated rehearsal pac
 
 ## 4. Reuse the master deck and existing chapter
 
-Check the available Canva connection first. If there is no usable connector, follow ember-browser-routing for the verified signed-in M2 browser and own only this task's browser job. Never use another agent's window or create a platform-only copy of the skill.
+Check the available Canva connection and access owner first, separately for searching the deck, inserting pages, writing actual presenter notes and reading them back. A notes read tool or an edit tool for slide faces is not evidence of notes-write support. If the authenticated API or connector cannot perform an operation, coordinate the specific uncovered operation through ember-browser-routing in a verified signed-in Ember M2 job. Never use M4 browser control, another agent's window or a platform-only copy of the skill.
 
 Open the exact existing master deck. Never create, duplicate, import or export another deck as a substitute. Inspect its chapter list and the current run log before editing. If the requested chapter already exists, deepen its speaker notes and update only the in-scope chapter. Otherwise append one chapter after the existing content. Preserve earlier chapters, established design, page order and unrelated speaker notes.
 
@@ -69,11 +69,11 @@ Track the chapter's stable page identities, titles and range in the private run 
 
 ## 5. Save, verify once and report
 
-Use document-formatting-standard for the two Google Docs. Search the resolved AG Personal Marketing folder for this package before creating files. Save directly there with an explicit parent. Never use My Drive, Claude Outputs or another department as a temporary fallback. If this destination is unwritable or its access is unsuitable, keep the unsaved draft in the current working context and report the exact save gap. Do not change permissions to make the save work.
+Use document-formatting-standard for the two Google Docs. Search the resolved AGI Course Development folder and the existing run log for this package before creating files. Save directly there with an explicit parent. Never use Marketing, My Drive, Claude Outputs or another department as a temporary fallback. If this destination is unwritable or its access is unsuitable, keep the unsaved draft in the current working context and report the exact save gap. Do not change permissions to make the save work.
 
 Use the naming and run-log fields in the output contract. Record the attempt start time before writing when the destination is available. Record finish time, input basis, evidence, output links and actual status after the work. A blocked run still gets a truthful entry if the log is writable. If it is not, retain the unsaved entry in the current working context and disclose that it was not saved.
 
-Perform one post-save readback of the two Docs and every chapter slide and its actual speaker notes, including the opener and closer. In that same verification pass check rendered page count, timing totals, claim support, personal brand, attribution and personal-information exclusions, exact deck identity, page identities and AG Personal Marketing parents. Compare against what was drafted and confirm other chapters were preserved. A successful click or a separate script document does not prove Canva notes were saved.
+Perform one post-save readback of the two Docs and every chapter slide and its actual speaker notes, including the opener and closer. In that same verification pass check rendered page count, timing totals, claim support, personal brand, attribution and personal-information exclusions, exact deck identity, page identities and AGI Course Development parents. Compare against what was drafted and confirm other chapters were preserved. A successful click or a separate script document does not prove Canva notes were saved.
 
 Mark complete only when all three deliverables and the run-log entry are saved and the checks pass. Partial outputs stay partial. If verification finds a defect, fix that defect and recheck the affected output, without replaying successful creation steps. Finish only this task's browser job and report its actual closure status.
 
