@@ -1,3 +1,6 @@
+## 3.16.1 - 2026-11-27
+
+Allow only Firecrawl existing-team settings and the existing Hub editor for browser-only membership and Git/DEV administration. Keep scraping, publication and every other vendor path on their headless routes.
 ## 3.16.0 - 2026-11-27
 
 Extend business-brain-foundations with a report-only Business Brain Auditor mode for scoped master-template, naming, freshness, conflicting-version, evidence and instruction health checks. Preserve brain boundaries and teaching gaps, save findings to the owning Operations folder, and require a separate owner correction run instead of modifying audited sources.
