@@ -6,7 +6,7 @@
 // - Nov 27 2026: every department/workspace AI reads all three company Cores. Other department
 //   folders still require their existing profile grant or a named, approved exception.
 // - Private and system folders stay out unless the allowlist names them.
-import { allowedScopes, BrainError, type BrainScope, type PinnedFile } from "./brain.ts";
+import { allowedScopes, BRAIN_FOLDERS, BrainError, type BrainScope, type PinnedFile } from "./brain.ts";
 
 export type Principal =
 	| { kind: "person"; email: string; department?: string } // OAuth sign-in (Claude, ChatGPT, Factory) or the Hub session, optionally narrowed
@@ -30,23 +30,31 @@ const GOVERNANCE = ["hq-core"];
 export const COMPANY_CORES: readonly BrainScope[] = ["hq-core", "ep-core", "ag-core"];
 
 /**
+ * Nov 27 2026: each company's CEO project is its whole-brain project. Private folders stay leader-only, and the
+ * legacy ag-personal-* keys are excluded because they route to the same folders as ag-core and ag-marketing.
+ */
+const wholeBrain = (prefix: "hq-" | "ep-" | "ag-"): BrainScope[] =>
+	(Object.keys(BRAIN_FOLDERS) as BrainScope[]).filter((s) => s.startsWith(prefix) && !s.endsWith("-private") && !s.startsWith("ag-personal-"));
+
+/**
  * Departments from [HQ][V1.0] Departments, Workspaces and Brain Folders. Each lists the folders its map
  * entry names plus its company's system outputs folder and shared governance. `exceptions` is for named,
  * approved cross-department sources only and stays empty until a decision names the source.
  */
 export const DEPARTMENTS: Record<string, { label: string; scopes: BrainScope[]; exceptions: BrainScope[]; fileExceptions?: string[] }> = {
-	"ep-ceo": { label: "EP Chief Executive Officer", scopes: ["ep-core", "ep-discovery", "ep-acn", ...EP_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
+	"ep-ceo": { label: "EP Chief Executive Officer", scopes: [...wholeBrain("ep-"), ...GOVERNANCE] as BrainScope[], exceptions: [] },
 	"ep-cgo": { label: "EP Chief Growth Officer", scopes: ["ep-marketing", "ep-events", "hq-library", "hq-library-marketing", ...EP_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
 	"ep-cro": { label: "EP Chief Revenue Officer", scopes: ["ep-sales", ...EP_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
 	"ep-cco": { label: "EP Chief Client Officer", scopes: ["ep-client-experience", ...EP_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
 	"ep-coo": { label: "EP Chief Operations Officer", scopes: ["ep-operations", ...EP_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
-	"ag-ceo": { label: "AG Chief Executive Officer", scopes: ["ag-core", "ag-case-studies", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [], fileExceptions: ["ag-shared-brand"] },
+	"ag-ceo": { label: "AG Chief Executive Officer", scopes: [...wholeBrain("ag-"), ...GOVERNANCE] as BrainScope[], exceptions: [], fileExceptions: ["ag-shared-brand"] },
 	"ag-cgo": { label: "AG Luxury Chief Growth Officer", scopes: ["ag-marketing", "ag-strong-ones", "hq-library", "hq-library-marketing", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [], fileExceptions: ["ag-shared-brand"] },
 	"ag-personal-cgo": { label: "AG Personal Marketing", scopes: ["ag-personal-core", "ag-personal-marketing", ...GOVERNANCE] as BrainScope[], exceptions: [] },
 	"ag-cro": { label: "AG Chief Revenue Officer", scopes: ["ag-sales", "ag-listings", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [], fileExceptions: ["ag-shared-brand"] },
 	"ag-cco": { label: "AG Chief Client Officer", scopes: ["ag-client-experience", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [], fileExceptions: ["ag-shared-brand"] },
 	"ag-coo": { label: "AG Chief Operations Officer", scopes: ["ag-operations", ...AG_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [], fileExceptions: ["ag-shared-brand"] },
-	"hq-chro": { label: "HQ Chief HR Officer", scopes: ["hq-hr", "hq-employees", "hq-skills", ...HQ_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
+	// HQ has no CEO seat; the Chief HR Officer is HQ's top seat and whole-brain project.
+	"hq-chro": { label: "HQ Chief HR Officer", scopes: wholeBrain("hq-"), exceptions: [] },
 	"hq-cfo": { label: "HQ Chief Finance Officer", scopes: ["hq-finance", ...HQ_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
 	"hq-caio": { label: "HQ Chief AI Officer", scopes: ["hq-operations", "hq-analytics", "hq-partnersync", "hq-audits", ...HQ_SYSTEM, ...GOVERNANCE] as BrainScope[], exceptions: [] },
 };
