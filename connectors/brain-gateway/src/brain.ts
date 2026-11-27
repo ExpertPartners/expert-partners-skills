@@ -15,6 +15,8 @@ export const BRAIN_FOLDERS = {
 	"hq-analytics": "1Yp9EEiJENMvztLNWTxVWJ1TdntFaDs2d",
 	"hq-partnersync": "1N4bLj6BlDjdn_UCE7YWiUd-RTUAAgJqj",
 	"hq-library": "1YADuyGnPhDHoLcJHV873QoipltoNtBwE",
+	// AI Experience Director: Creative Taste Profile, Experience Pattern Library, Experience Research, Director Inbox.
+	"hq-experience": "14ip9yDbf_IKvsdZExdueflS_E5nT5zJg",
 	"ep-core": "1IhLDYB5YBCE_2ea9EHN5enxm8nefxbLm",
 	"ep-discovery": "1k2Rnz5i4VesUVDIYhJgJcTn_VcB4M9AH",
 	"ep-marketing": "1JYwT0hn96Q4w3eDKtmd3QAWyeLwDQIeI",

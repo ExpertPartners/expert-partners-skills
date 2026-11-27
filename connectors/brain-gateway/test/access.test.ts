@@ -24,7 +24,7 @@ test("Allison leads all three brains, Don leads HQ and EP only, AG is Allison al
 	assert.ok(!d.some((s) => s.startsWith("ag-")));
 	assert.ok(d.includes("hq-finance") && d.includes("ep-sales"), "leader level means the whole HQ and EP brain");
 	assert.ok(d.includes("ep-private"), "Don reads EP Private");
-	assert.equal(d.length, 22, "Don gets all 12 HQ scopes and all 10 EP scopes");
+	assert.equal(d.length, 23, "Don gets all 13 HQ scopes and all 10 EP scopes");
 	assert.ok(d.includes("ep-events") && d.includes("ep-acn") && d.includes("hq-library-marketing"));
 });
 
@@ -46,23 +46,23 @@ test("every configured department gets all three Cores and exactly its existing 
 			assert.ok(s in BRAIN_FOLDERS, `${id} names an unknown scope ${s}`);
 			assert.ok(!s.endsWith("-private"), `${id} must not reach private ${s}`);
 		}
-		assert.ok(d.scopes.includes("hq-core"), `${id} carries shared governance`);
+		assert.ok(d.scopes.includes("hq-core") && d.scopes.includes("hq-experience"), `${id} carries shared governance and the AI Experience Director folder`);
 		const actual = effectiveScopes(ALLOWED, dept(id));
 		for (const core of COMPANY_CORES) assert.ok(actual.includes(core), `${id} reads ${core}`);
 		assert.deepEqual(actual.filter((s) => !COMPANY_CORES.includes(s)).sort(), [...new Set([...d.scopes, ...d.exceptions])].filter((s) => !COMPANY_CORES.includes(s)).sort(), id);
 		assert.deepEqual(d.exceptions, [], "exceptions stay empty until a decision names the source");
 	}
 	const cro = effectiveScopes(ALLOWED, dept("ep-cro"));
-	assert.deepEqual(cro.sort(), ["ag-core", "ep-core", "ep-outputs", "ep-sales", "hq-core"]);
+	assert.deepEqual(cro.sort(), ["ag-core", "ep-core", "ep-outputs", "ep-sales", "hq-core", "hq-experience"]);
 	assert.ok(!cro.includes("ep-marketing") && !cro.includes("hq-finance") && !cro.includes("ag-sales"));
-	assert.deepEqual(effectiveScopes(ALLOWED, dept("hq-cfo")).sort(), ["ag-core", "ep-core", "hq-core", "hq-finance", "hq-outputs"]);
-	assert.deepEqual(effectiveScopes(ALLOWED, dept("ag-cro")).sort(), ["ag-core", "ag-listings", "ag-outputs", "ag-sales", "ep-core", "hq-core"]);
+	assert.deepEqual(effectiveScopes(ALLOWED, dept("hq-cfo")).sort(), ["ag-core", "ep-core", "hq-core", "hq-experience", "hq-finance", "hq-outputs"]);
+	assert.deepEqual(effectiveScopes(ALLOWED, dept("ag-cro")).sort(), ["ag-core", "ag-listings", "ag-outputs", "ag-sales", "ep-core", "hq-core", "hq-experience"]);
 });
 
 test("a leader can narrow to a department but never widen", () => {
-	assert.deepEqual(effectiveScopes(ALLOWED, person("allison@expertpartners.com", "ep-cro")).sort(), ["ag-core", "ep-core", "ep-outputs", "ep-sales", "hq-core"]);
+	assert.deepEqual(effectiveScopes(ALLOWED, person("allison@expertpartners.com", "ep-cro")).sort(), ["ag-core", "ep-core", "ep-outputs", "ep-sales", "hq-core", "hq-experience"]);
 	// Don narrowed to an AG department keeps only shared governance, because he is not an AG leader.
-	assert.deepEqual(effectiveScopes(ALLOWED, person("don@expertpartners.com", "ag-cro")), ["hq-core", "ep-core"]);
+	assert.deepEqual(effectiveScopes(ALLOWED, person("don@expertpartners.com", "ag-cro")), ["hq-core", "hq-experience", "ep-core"]);
 	assert.throws(() => effectiveScopes(ALLOWED, person("allison@expertpartners.com", "nope")), /not known/);
 	assert.throws(() => effectiveScopes(ALLOWED, dept("nope")), /not known/);
 });
@@ -72,7 +72,7 @@ test("tools enforce the principal: a department cannot list, discover or read ou
 	const drive = withRoots(async () => new Response(JSON.stringify({ files: [] }), { status: 200 }));
 	const listed = await runTool("list_scopes", {}, env, drive, dept("ep-cro"));
 	assert.ok(listed.ok);
-	assert.deepEqual((listed.result as any).scopes.map((s: any) => s.scope).sort(), ["ag-core", "ep-core", "ep-outputs", "ep-sales", "hq-core"]);
+	assert.deepEqual((listed.result as any).scopes.map((s: any) => s.scope).sort(), ["ag-core", "ep-core", "ep-outputs", "ep-sales", "hq-core", "hq-experience"]);
 	for (const scope of ["ep-marketing", "hq-finance", "ag-sales", "ep-private"]) {
 		const r = await runTool("discover", { scope }, env, drive, dept("ep-cro"));
 		assert.equal(r.ok, false, scope);
@@ -105,9 +105,9 @@ test("only the approved leaders are listed", () => {
 
 test("AG Personal Marketing has its own workspace boundary, separate from EP and AG Luxury", async () => {
 	const scopes = ["ag-personal-core", "ag-personal-marketing"] as const;
-	assert.deepEqual(effectiveScopes(ALLOWED, dept("ag-personal-cgo")).sort(), ["ag-core", ...scopes, "ep-core", "hq-core"]);
-	assert.deepEqual(effectiveScopes(ALLOWED, person("allison@expertpartners.com", "ag-personal-cgo")).sort(), ["ag-core", ...scopes, "ep-core", "hq-core"]);
-	assert.deepEqual(effectiveScopes(ALLOWED, person("don@expertpartners.com", "ag-personal-cgo")), ["hq-core", "ep-core"]);
+	assert.deepEqual(effectiveScopes(ALLOWED, dept("ag-personal-cgo")).sort(), ["ag-core", ...scopes, "ep-core", "hq-core", "hq-experience"]);
+	assert.deepEqual(effectiveScopes(ALLOWED, person("allison@expertpartners.com", "ag-personal-cgo")).sort(), ["ag-core", ...scopes, "ep-core", "hq-core", "hq-experience"]);
+	assert.deepEqual(effectiveScopes(ALLOWED, person("don@expertpartners.com", "ag-personal-cgo")), ["hq-core", "hq-experience", "ep-core"]);
 	assert.equal(DEPARTMENTS["ag-cgo"].label, "AG Luxury Chief Growth Officer");
 	assert.ok(effectiveScopes(ALLOWED, dept("ag-cgo")).includes("ag-marketing"));
 	for (const scope of scopes) {

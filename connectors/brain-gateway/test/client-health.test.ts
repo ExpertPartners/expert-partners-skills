@@ -52,7 +52,7 @@ test("the scopes check expects exactly the leader's effective scopes from the de
 		return (await runReceipt(k, client, run.id, now))!.checks.scopes!;
 	};
 	const leader = (client: "allison" | "don", allowed: string) => effectiveScopes(allowed, { kind: "person", email: `${client}@expertpartners.com` });
-	for (const [allowed, a, d] of [[before, 26, 19], [DEPLOYED, 33, 22]] as const) {
+	for (const [allowed, a, d] of [[before, 26, 19], [DEPLOYED, 34, 23]] as const) {
 		assert.equal(leader("allison", allowed).length, a);
 		assert.equal(leader("don", allowed).length, d);
 		const pa = await scopesCheck("allison", leader("allison", allowed), allowed);
