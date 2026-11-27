@@ -1,3 +1,6 @@
+## 3.16.2 - 2026-11-27
+
+Repair Business Brain Auditor audit mode after failed independent testing. Require fresh blank-master body reads and version citations, paired evidence for duplicate/conflict claims, durable recoverable report saves with guarded atomic commits and final readback, and before/after source snapshots. Preserve link-reader sharing as informational and add a narrow behavioral regression checklist.
 ## 3.16.1 - 2026-11-27
 
 Allow only Firecrawl existing-team settings and the existing Hub editor for browser-only membership and Git/DEV administration. Keep scraping, publication and every other vendor path on their headless routes.
