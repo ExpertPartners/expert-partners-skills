@@ -29,5 +29,6 @@ test("all-week contract, malformed policy, and legacy positive and negative disp
  assert.deepEqual(legacyIntent(policy,"Find the original capstone homework"),{action:"source_search",capabilityId:"homework"});
  assert.equal(legacyIntent(policy,"No original capstone homework search. Continue existing work."),null);
  assert.equal(legacyIntent(policy,"Commission a brain auditor" )?.action,"replacement_build");
+ assert.equal(legacyIntent(policy,"Controlled live results passed for capstone homework and Build 101; duplicate Auditor commission routed to owner"),null);
  assert.equal(workPreflight(policy,{action:"inspect",capabilityId:"week-99"}).allowed,true);
 });

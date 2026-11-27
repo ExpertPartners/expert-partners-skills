@@ -56,7 +56,10 @@ def check(policy, data):
             ):
                 return "SOURCE_RECOVERY_CLOSED", item
             if commissioning and re.search(
-                r"\b(build|commission|rebuild|create|implement)\b", lower
+                r"^\s*(?:please\s+)?(?:build|commission|rebuild|create|implement)\b|"
+                r"\b(?:please|you must|need you to|want you to|your task is to)\s+"
+                r"(?:build|commission|rebuild|create|implement)\b",
+                lower,
             ):
                 return "CAPABILITY_EXISTS" if item["installed"] else "EXISTING_BUILD_OWNER", item
     return None

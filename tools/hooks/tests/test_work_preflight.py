@@ -49,6 +49,17 @@ class WorkPreflightTests(unittest.TestCase):
             module.check(
                 self.policy,
                 {
+                    "tool_name": "post_message",
+                    "tool_input": {
+                        "text": "Controlled live results passed for capstone homework and Build 101; duplicate Auditor commission routed to owner"
+                    },
+                },
+            )
+        )
+        self.assertIsNone(
+            module.check(
+                self.policy,
+                {
                     "tool_name": "Execute",
                     "tool_input": {"command": "rg 'Build 101' existing-records"},
                 },

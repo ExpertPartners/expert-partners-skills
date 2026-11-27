@@ -54,7 +54,7 @@ export function workPreflight(policy: WorkPolicy, intent: WorkIntent, targetSess
 export function legacyIntent(policy: WorkPolicy, text: string): WorkIntent | null {
  const lower = text.toLowerCase();
  const search = /\b(search|hunt|recover|find|locate)\b[^.!?\n]{0,140}\b(original|video|homework|replay|source|capstone|build 101)\b/i;
- const build = /\b(build|commission|rebuild|create|implement)\b/i;
+ const build = /^\s*(?:please\s+)?(?:build|commission|rebuild|create|implement)\b|\b(?:please|you must|need you to|want you to|your task is to)\s+(?:build|commission|rebuild|create|implement)\b/i;
  for (const sentence of lower.split(/[.!?\n]+/)) {
   if (/\b(no|not|never|don't|do not|closed|rejected|without|stop)\b/.test(sentence)) continue;
   const item = policy.items.find(i => [i.id, ...i.aliases].some(a => sentence.includes(a.toLowerCase())));
