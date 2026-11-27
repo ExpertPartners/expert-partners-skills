@@ -1,6 +1,6 @@
 ---
 name: "deliverable-link"
-description: "Every deliverable Claude creates or updates for Allison lands with a markdown hyperlink whose link text is the exact document name. Fires on every create, update, or delivery of any document, file, design, page, board, base, record, or repo artifact in any system (Google Drive, Notion, GitHub, Canva, Miro, Airtable, ClickUp, Gamma, Lucid, or anywhere else that returns a URL), and on every later reference to a deliverable's location. Telling Allison where something is without handing her the clickable link is the failure condition this skill exists to remove. It inherits the operating-doctrine and never overrides it."
+description: "Every deliverable Claude creates or updates for Allison lands with a markdown hyperlink whose link text is the exact document name. Fires on every create, update, or delivery of any document, file, design, page, board, base, record, or repo artifact in any system (Google Drive, Notion, GitHub, Canva, Miro, Airtable, ClickUp, Gamma, Lucid, or anywhere else that returns a URL), and on every later reference to a deliverable's location. Also use for Allison's explicit share this request for one Drive file; ordinary delivery never authorizes public sharing. Telling Allison where something is without handing her the clickable link is the failure condition this skill exists to remove. It inherits the operating-doctrine and never overrides it."
 # --- skill-map metadata (zone, tier, status required -- ruling 14) ---
 tier: plugin
 zone: routing
@@ -31,6 +31,22 @@ First, use the URL the tool result already returned (viewUrl, url, html_url, per
 ## Format
 
 One markdown hyperlink per deliverable. Multiple deliverables in one response each get their own named link. The link sits inside the two-line summary that the document formatting standard already requires, so chat stays a pointer and the document stays the deliverable.
+
+## Share this, one file only
+
+This is the existing delivery skill's sharing entrypoint, not a second sharing service. Brain folders stay restricted. Creating, updating, mentioning or delivering a link does not authorize public access.
+
+When Allison explicitly asks to share a specific Drive file, do the settings work in that same request. Do not ask her to open sharing settings or confirm a file she already identified unambiguously.
+
+1. Resolve the exact file from her link, file ID, or unambiguous conversation reference. Discover by exact title and owning home when needed, then fetch fresh metadata including `id`, `name`, `mimeType`, `parents`, `trashed` and `shortcutDetails`. A title match alone is not identity; never choose the first duplicate. If the reference is ambiguous, ask one short question identifying which file.
+2. Reject a shared-drive root or `application/vnd.google-apps.folder` target. Do not apply this action to a folder, a list of files or a recursive selection. Resolve a shortcut to its actual target and fetch that target's metadata; continue only if it is the specific file Allison meant, not a folder. Stop if the target is missing, trashed, ambiguous or cannot be verified.
+3. Read the file's current permissions, including `type`, `role`, `allowFileDiscovery` and inheritance details when available. Preserve named-user, group and domain roles and the file's parents. A file already verified as anyone-reader with discovery disabled needs no mutation.
+4. Reuse the connected Drive action `make_public` for that exact file ID with `role: "reader"` and `allow_file_discovery: false`. If an anyone permission already exists but needs its role or discovery corrected, update only that file's existing anyone permission with those same settings instead of adding a duplicate. Never grant commenter or writer access.
+5. Never widen a parent, brain folder, shared drive or another file. Never change inherited permissions, move or copy the file into a public home, or relax an organization policy to make sharing succeed. If the only available permission is inherited and cannot be changed on this file alone, report that exact gap without changing its source.
+6. Read back permissions on the same resolved file ID. Confirm anyone-reader with discovery disabled, unchanged parents and unchanged named grants before saying the file can be viewed with the link. If an action errors or delivery is uncertain, inspect the actual state before any retry; do not claim success from the attempted call.
+7. Return the resulting URL as a Markdown link whose text is the exact verified file name, with a short confirmation that anyone with that link can view this file only. Say precisely what failed if no verified share link could be delivered.
+
+Use the equivalent supported Drive permission action if the surface names its tools differently, with the same exact-file checks and reader-only settings. If no write-capable route is available, report that route gap; do not ask Allison to change folder access. Other platforms keep their own explicit sharing actions and permissions.
 
 ## Failure condition
 
