@@ -10,6 +10,8 @@ It also runs `ai-copy-guard.py`, which blocks a `git clone`, a `git worktree add
 
 The running copies on each Mac are installed locally. This folder is the source, not the runtime.
 
+Work preflight uses `work-preflight.py` and the shared Factory connector before source searches or replacement builds. `install-work-preflight.py --policy <private-projection>` adds the canonical hook to Factory, Claude Code and Codex without replacing unrelated hooks. The projection comes from existing owning Ledger dispositions and contains no independent work queue. Keep it private and update it when the owning dispositions or implementation owners change. Never put business record IDs or policy data in this public repository. Source closure never means implementation passed. Vendor tools that do not execute these hooks are not covered by a host installation, and an existing session is not proven refreshed by a settings write.
+
 ## Commands
 
 ```bash
