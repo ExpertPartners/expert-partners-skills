@@ -28,6 +28,10 @@ Design here, build in Code. Do not build the workflow or touch GHL from this roo
 
 ## Steps
 
+Before designing, use the current verified workflow audit and live AI Implementation SOP. A workflow name or successful legacy list is not a definition read. Reconcile drafts as well as published workflows, including triggers, conditions, branches, waits, content and referenced assets. Preserve unknown or missing dependencies.
+
+Use the existing shared Marketplace connector for supported API operations and the authorized M2 browser for UI-only operations. Treat WORKFLOW_API_NOT_ENABLED_FOR_LOCATION as vendor feature access, not a scope error. Read-only inspection must avoid opening a production editor that may auto-save. When implementation is authorized, prove create, edit, publish, disable and delete only with an isolated workflow that has no trigger, no recipients and no sending actions. Confirm removal of the test and verify production versions afterward. Follow the user's exact task boundary; access repair never supplies permission for redesign or launch.
+
 1. Take the business problem from Allison in two or three sentences. If she gives the technical solution instead of the outcome, gently redirect to the outcome she wants.
 
 2. If the design depends on tags, fields, or pipelines, confirm they exist. If unsure, recommend running the GHL asset inventory skill first rather than guessing names.

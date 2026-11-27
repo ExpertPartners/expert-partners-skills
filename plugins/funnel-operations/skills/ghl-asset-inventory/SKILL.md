@@ -26,18 +26,20 @@ Read only. Never create, update, tag, move, or delete anything. If Allison's req
 
 ## Steps
 
-1. Connect to GoHighLevel using the GHL MCP and the saved credentials. If the GHL MCP is not connected yet, say so plainly and try the next authorized route. Do not attempt a workaround that writes data.
+1. Read the live AI Implementation SOP and existing PartnerSync capability record. Verify the actual location grant with a harmless read. Use the shared Marketplace connector when it covers the operation; a native connector may expose a different set of locations. A saved registration is not a successful connection. If a client loaded old code, launch a fresh connection yourself. Never copy credentials between environments.
 
 2. Pull and list, read-only:
    - All contact tags, with contact count per tag if available
    - All custom fields and their data types
    - All pipelines and their stages
    - All calendars with their IDs and names
-   - All active workflow names
+   - Every workflow, including drafts, with stable ID, status and version. Follow every page and folder. Reconcile the result against the existing inventory. Names alone do not establish behavior.
 
 3. Write the result to `/ghl-assets/ghl-asset-inventory.md` in the project folder, structured with a short plain-English summary at the top, then one clean section per category. If the folder does not exist, create the file in the project root and note where it landed.
 
-4. State at the end, in these words: "No changes were made to GoHighLevel."
+4. If workflow behavior is requested, capture definitions, triggers, conditions, branches, waits, message content and referenced assets. Use the public definition API when enabled. A WORKFLOW_API_NOT_ENABLED_FOR_LOCATION response is a vendor feature-access refusal, not proof of a token-scope fault. Use the authorized signed-in M2 browser route documented in the SOP when the API cannot expose the definition. Do not open a production workflow editor for a read-only inventory: the editor may auto-save merely on load. Use the proven passive browser read, keep authentication within its existing session, redact credentials and signed asset URLs, and finish the owned browser job. Do not build a second connector.
+
+5. Verify saved versions and status after the read. State "No changes were made to GoHighLevel" only when the evidence supports it. Disclose any auto-save or metadata change and keep it separate from deliberate step edits. Record missing templates and unresolved dependencies explicitly; never infer their content from their names. Save current evidence in the existing owning Drive home and update the existing audit, retaining its dated history.
 
 ## What good output looks like
 
@@ -45,4 +47,4 @@ A single markdown file, organized by category, every tag and field and pipeline 
 
 ## Warning signs to surface to Allison
 
-Any attempt to create or modify data. Any 401 or 403 permission error, which means the token scope is wrong. Output that is missing pipelines or tags she knows exist, which means the pull was incomplete and should be rerun.
+Any attempt to create or modify production data during inventory. Diagnose 401 and 403 responses from their actual error codes; identity, tenant grants, token scope and vendor feature availability are different failure classes. Missing assets or partial pagination require reconciliation, not assumptions. Never claim that access in one AI environment proves access in another; test each consuming configuration independently.
