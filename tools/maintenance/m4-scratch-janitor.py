@@ -99,7 +99,8 @@ def open_paths():
     """Every path a running process has open or uses as its working folder."""
     try:
         out = subprocess.run(
-            ["lsof", "-n", "-w", "-Fn", "-u", str(os.getuid())],
+            # launchd's PATH has no /usr/sbin, so a bare "lsof" is never found there.
+            ["/usr/sbin/lsof", "-n", "-w", "-Fn", "-u", str(os.getuid())],
             capture_output=True,
             text=True,
             timeout=180,
@@ -617,8 +618,13 @@ def main():
         j.finish()
         return 0
     j = Janitor(args)
+    browsers = not args.sweep and os.environ.get("EP_JANITOR_BROWSER_SWEEP") != "0"
     if j.opened is None:
         print("lsof unavailable, cannot tell what is in use; removing nothing", file=sys.stderr)
+        # The browser check needs no open-file list, so it still runs.
+        if browsers:
+            j.sweep_browsers()
+            j.finish()
         return 1
     if args.sweep:
         for p in args.sweep:
@@ -628,7 +634,7 @@ def main():
                 j.drop_safe_repos(root, args.sweep_idle_days)
     else:
         j.run_scratch()
-        if os.environ.get("EP_JANITOR_BROWSER_SWEEP") != "0":
+        if browsers:
             j.sweep_browsers()
     j.finish()
     return 0
