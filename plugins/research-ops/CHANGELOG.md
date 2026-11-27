@@ -1,3 +1,6 @@
+## 0.6.6 - 2026-11-27
+
+Align research intake with the live cross-surface filing rule and the Deep Research drop-off inbox. Reuse the approved Drive Move workflow, verify the original file and destination, and keep unsupported attachments and unverified filings visible.
 ## 0.6.5 - 2026-11-15
 
 Script-backed skills now say how they run on every surface. A local Mac shell runs the bundled scripts directly. ChatGPT, Claude chat and Cowork use the existing Factory connection with find_owner, then one bounded start_and_watch run, and read the saved result before reporting. This covers source-hunter, video-discovery, brand-film-reverse-engineering, hero-video-preproduction, stage-cards, file-to-knowledge-base-optimizer and browser-automation. Stage cards no longer fall back to pasted card blocks in chat. Existing machine, privacy and scope rules are unchanged.
