@@ -48,6 +48,7 @@ Current layers:
 | `plugins/research-ops/skills/source-hunter/requirements.txt` | Pillow, on the video-discovery runtime |
 | `.../source-hunter/requirements-dev.txt` | pytest, on the source-hunter runtime |
 | `tools/factory-inbox/requirements.txt` | Factory Inbox bridge runtime |
+| `tools/experience-watcher/requirements.txt` | experience watcher runtime, layered on the Factory Inbox lock |
 
 Each file's header names its direct dependencies. Every other entry is transitive.
 
