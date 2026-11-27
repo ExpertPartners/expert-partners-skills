@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>Label</key><string>com.expertpartners.experience-watcher</string>
+<key>ProgramArguments</key><array><string>/opt/homebrew/bin/python3</string><string>__HOME__/HQ-AI-Workspace-M4/Workbench/experience-director/watcher.py</string><string>watch</string></array>
+<key>WorkingDirectory</key><string>__HOME__/HQ-AI-Workspace-M4/Workbench/experience-director</string>
+<key>EnvironmentVariables</key><dict><key>PATH</key><string>/opt/homebrew/bin:/usr/bin:/bin</string><key>HX_STANDARD_DOC</key><string>16pH3N3ECnzALMKUNlxGJ2F4XVW42NoFcF19VZvyn1Tk</string></dict>
+<key>StartInterval</key><integer>600</integer><key>RunAtLoad</key><true/>
+<key>StandardOutPath</key><string>__HOME__/Library/Logs/experience-watcher.log</string>
+<key>StandardErrorPath</key><string>__HOME__/Library/Logs/experience-watcher.err</string>
+</dict></plist>
