@@ -1,7 +1,7 @@
 {
   "schema": "skill-map/v1",
   "generatedFrom": {
-    "eps": "6c9923e2b5161acc7d9a471ad06bef461f9c5a46"
+    "eps": "6ed82bdd931c1516108cf87da6f77723b4bed2af"
   },
   "zones": [
     "surfaces",
@@ -620,19 +620,18 @@
       "calls": [],
       "defersTo": [],
       "brandScope": [],
-      "subtitle": "fills a complete brain template from held evidence, ready for owner review",
+      "subtitle": "fills or audits a complete brain from held evidence",
       "renderNote": null,
       "layout": {
         "x": 1773.5,
         "y": 5348.4,
         "width": 237,
-        "height": 91,
-        "rectHeight": 76,
+        "height": 77,
+        "rectHeight": 62,
         "annotationHeight": 15,
         "subtitleLines": [
-          "fills a complete brain template",
-          "from held evidence, ready for",
-          "owner review"
+          "fills or audits a complete brain",
+          "from held evidence"
         ]
       }
     },
@@ -948,7 +947,7 @@
       "renderNote": null,
       "layout": {
         "x": 1777,
-        "y": 5564.4,
+        "y": 5550.4,
         "width": 230,
         "height": 77,
         "rectHeight": 62,
@@ -1002,7 +1001,7 @@
       "renderNote": null,
       "layout": {
         "x": 1777,
-        "y": 5853.4,
+        "y": 5839.4,
         "width": 230,
         "height": 63,
         "rectHeight": 48,
@@ -1500,7 +1499,7 @@
       "renderNote": null,
       "layout": {
         "x": 1770,
-        "y": 5463.4,
+        "y": 5449.4,
         "width": 244,
         "height": 77,
         "rectHeight": 62,
@@ -2488,7 +2487,7 @@
       "renderNote": null,
       "layout": {
         "x": 1789,
-        "y": 5665.4,
+        "y": 5651.4,
         "width": 206,
         "height": 63,
         "rectHeight": 48,
@@ -3217,7 +3216,7 @@
       "renderNote": null,
       "layout": {
         "x": 1774,
-        "y": 5752.4,
+        "y": 5738.4,
         "width": 236,
         "height": 77,
         "rectHeight": 62,
@@ -4333,11 +4332,11 @@
         },
         {
           "x": 1703,
-          "y": 5501.9
+          "y": 5487.9
         },
         {
           "x": 1770,
-          "y": 5501.9
+          "y": 5487.9
         }
       ]
     },
@@ -4632,11 +4631,11 @@
         },
         {
           "x": 2351,
-          "y": 5948.4
+          "y": 5934.4
         },
         {
           "x": 790,
-          "y": 5948.4
+          "y": 5934.4
         },
         {
           "x": 790,
@@ -5862,7 +5861,7 @@
         "x": 1748,
         "y": 4910.4,
         "width": 288,
-        "height": 1028,
+        "height": 1014,
         "rooms": []
       },
       {
