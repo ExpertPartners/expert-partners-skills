@@ -56,7 +56,7 @@ test("every configured department gets all three Cores and exactly its existing 
 	assert.deepEqual(cro.sort(), ["ag-core", "ep-core", "ep-outputs", "ep-sales", "hq-core", "hq-experience"]);
 	assert.ok(!cro.includes("ep-marketing") && !cro.includes("hq-finance") && !cro.includes("ag-sales"));
 	assert.deepEqual(effectiveScopes(ALLOWED, dept("hq-cfo")).sort(), ["ag-core", "ep-core", "hq-core", "hq-experience", "hq-finance", "hq-outputs"]);
-	assert.deepEqual(effectiveScopes(ALLOWED, dept("ag-cro")).sort(), ["ag-core", "ag-listings", "ag-outputs", "ag-sales", "ep-core", "hq-core", "hq-experience"]);
+	assert.deepEqual(effectiveScopes(ALLOWED, dept("ag-cro")).sort(), ["ag-buyers", "ag-core", "ag-listings", "ag-outputs", "ag-sales", "ep-core", "hq-core", "hq-experience"]);
 });
 
 test("a leader can narrow to a department but never widen", () => {

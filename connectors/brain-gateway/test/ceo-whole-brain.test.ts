@@ -18,7 +18,7 @@ const brain = (p: string) => allowed.filter((s) => s.startsWith(p) && !s.endsWit
 test("each CEO whole-brain profile reaches every non-private scope of its own brain", () => {
 	assert.deepEqual(brain("hq-").sort(), ["hq-analytics", "hq-audits", "hq-core", "hq-employees", "hq-experience", "hq-finance", "hq-hr", "hq-library", "hq-library-marketing", "hq-operations", "hq-outputs", "hq-partnersync", "hq-skills"]);
 	assert.deepEqual(brain("ep-").sort(), ["ep-acn", "ep-client-experience", "ep-core", "ep-discovery", "ep-events", "ep-marketing", "ep-operations", "ep-outputs", "ep-sales"]);
-	assert.deepEqual(brain("ag-").sort(), ["ag-case-studies", "ag-client-experience", "ag-core", "ag-listings", "ag-marketing", "ag-operations", "ag-outputs", "ag-sales", "ag-strong-ones"]);
+	assert.deepEqual(brain("ag-").sort(), ["ag-buyers", "ag-case-studies", "ag-client-experience", "ag-core", "ag-course-development", "ag-listings", "ag-marketing", "ag-operations", "ag-outputs", "ag-sales", "ag-show", "ag-strong-ones", "ag-transactions"]);
 	for (const [id, prefix] of Object.entries(CEOS)) {
 		const s = effectiveScopes(ALLOWED, dept(id));
 		for (const scope of brain(prefix)) assert.ok(s.includes(scope as any), `${id} reaches ${scope}`);
@@ -60,9 +60,9 @@ test("pinned leader files stay unnarrowed-leader only, including for CEO profile
 	assert.ok(pinnedReadFor(person("allison@expertpartners.com"), "gap108-week2-builder", "a", undefined, json));
 });
 
-test("non-CEO departments keep exactly their prior grants", () => {
+test("non-CEO departments keep their grants plus their named project home", () => {
 	const prior: Record<string, string[]> = {
-		"ep-cro": ["ep-sales", "ep-outputs"], "hq-cfo": ["hq-finance", "hq-outputs"], "ag-cro": ["ag-sales", "ag-listings", "ag-outputs"],
+		"ep-cro": ["ep-sales", "ep-outputs"], "hq-cfo": ["hq-finance", "hq-outputs"], "ag-cro": ["ag-sales", "ag-listings", "ag-outputs", "ag-buyers"],
 		"hq-caio": ["hq-operations", "hq-analytics", "hq-partnersync", "hq-audits", "hq-outputs"],
 	};
 	for (const [id, own] of Object.entries(prior))

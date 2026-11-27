@@ -41,6 +41,10 @@ export const BRAIN_FOLDERS = {
 	"ep-acn": "1-OlQOuM1rVQkG8cyAGxTym_O7S4ySnoK",
 	"ag-strong-ones": "1QK-anvUQ7wYyperKEMs5SpsjIdyUPeZT",
 	"ag-case-studies": "1bBsS9eFbM3iNvwhpVLrkkNBsphn4VkxN",
+	"ag-course-development": "18f7KzM9FSwfLCq5j8ao7huFBzSY0CTAH",
+	"ag-buyers": "18rDjhZ2CxUMZdY84_5U2ln7Sy3hxPapH",
+	"ag-transactions": "1uTtK6tKQv2VIWUgZwv2UhZq9kPiJtxGA",
+	"ag-show": "1HsjeTRrieZHxuWNSGiQLehdM3-BT6jCL",
 } as const;
 export type BrainScope = keyof typeof BRAIN_FOLDERS;
 export const CURRENT_DECISION_LOG = "1ausL1HV3ns3VMZH86jD8zjWnAKSQ3DaUfFzkiwR1qWc";
