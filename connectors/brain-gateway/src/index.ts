@@ -113,7 +113,8 @@ const provider = new OAuthProvider<Env>({
 	clientRegistrationEndpoint: "/register",
 	defaultHandler: defaultHandler as any,
 	tokenEndpoint: "/token",
-	resourceMetadata: { resource: env.MCP_RESOURCE },
+	scopesSupported: ["mcp"],
+	resourceMetadata: { resource: env.MCP_RESOURCE, scopes_supported: ["mcp"] },
 	clientIdMetadataDocumentEnabled: true,
 	enterpriseManagedAuthorization: managedAuthorization,
 	onError: ({ code, internal }) => {
