@@ -25,7 +25,8 @@ const HQ_SYSTEM = ["hq-outputs"];
 const EP_SYSTEM = ["ep-outputs"];
 const AG_SYSTEM = ["ag-outputs"];
 // Shared HQ governance (Rulebook, Decision Log) is context for every department in both companies.
-const GOVERNANCE = ["hq-core"];
+// The AI Experience Director folder (hq-experience) is shared the same way, so builders consult it before designing.
+const GOVERNANCE = ["hq-core", "hq-experience"];
 /** Company knowledge is shared by AI profiles, not by changing the human leader boundary. */
 export const COMPANY_CORES: readonly BrainScope[] = ["hq-core", "ep-core", "ag-core"];
 

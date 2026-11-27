@@ -16,15 +16,15 @@ const CEOS = { "ep-ceo": "ep-", "ag-ceo": "ag-", "hq-chro": "hq-" } as const;
 const brain = (p: string) => allowed.filter((s) => s.startsWith(p) && !s.endsWith("-private") && !s.startsWith("ag-personal-"));
 
 test("each CEO whole-brain profile reaches every non-private scope of its own brain", () => {
-	assert.deepEqual(brain("hq-").sort(), ["hq-analytics", "hq-audits", "hq-core", "hq-employees", "hq-finance", "hq-hr", "hq-library", "hq-library-marketing", "hq-operations", "hq-outputs", "hq-partnersync", "hq-skills"]);
+	assert.deepEqual(brain("hq-").sort(), ["hq-analytics", "hq-audits", "hq-core", "hq-employees", "hq-experience", "hq-finance", "hq-hr", "hq-library", "hq-library-marketing", "hq-operations", "hq-outputs", "hq-partnersync", "hq-skills"]);
 	assert.deepEqual(brain("ep-").sort(), ["ep-acn", "ep-client-experience", "ep-core", "ep-discovery", "ep-events", "ep-marketing", "ep-operations", "ep-outputs", "ep-sales"]);
 	assert.deepEqual(brain("ag-").sort(), ["ag-case-studies", "ag-client-experience", "ag-core", "ag-listings", "ag-marketing", "ag-operations", "ag-outputs", "ag-sales", "ag-strong-ones"]);
 	for (const [id, prefix] of Object.entries(CEOS)) {
 		const s = effectiveScopes(ALLOWED, dept(id));
 		for (const scope of brain(prefix)) assert.ok(s.includes(scope as any), `${id} reaches ${scope}`);
 		assert.ok(!s.some((x) => x.endsWith("-private")), `${id} reaches no private scope`);
-		// Only its own brain plus the three shared Cores.
-		assert.deepEqual(s.filter((x) => !x.startsWith(prefix)).sort(), ["ag-core", "ep-core", "hq-core"].filter((c) => !c.startsWith(prefix)).sort());
+		// Only its own brain plus the three shared Cores and the shared AI Experience Director folder.
+		assert.deepEqual(s.filter((x) => !x.startsWith(prefix)).sort(), ["ag-core", "ep-core", "hq-core", "hq-experience"].filter((c) => !c.startsWith(prefix)).sort());
 	}
 });
 
@@ -46,8 +46,8 @@ test("CEO whole-brain discover reaches Drive for every own scope and is refused 
 
 test("person intersection holds: Don narrowed to a CEO profile never gains AG, Allison gains nothing private", () => {
 	for (const id of Object.keys(CEOS)) assert.ok(effectiveScopes(ALLOWED, person("don@expertpartners.com", id)).every((s) => !s.startsWith("ag-")), id);
-	assert.deepEqual(effectiveScopes(ALLOWED, person("don@expertpartners.com", "ag-ceo")), ["hq-core", "ep-core"]);
-	assert.deepEqual(effectiveScopes(ALLOWED, person("allison@expertpartners.com", "ep-ceo")).sort(), [...brain("ep-"), "hq-core", "ag-core"].sort());
+	assert.deepEqual(effectiveScopes(ALLOWED, person("don@expertpartners.com", "ag-ceo")), ["hq-core", "hq-experience", "ep-core"]);
+	assert.deepEqual(effectiveScopes(ALLOWED, person("allison@expertpartners.com", "ep-ceo")).sort(), [...brain("ep-"), "hq-core", "hq-experience", "ag-core"].sort());
 	assert.ok(!effectiveScopes(ALLOWED, person("don@expertpartners.com", "ep-ceo")).includes("ep-private"));
 });
 
@@ -66,6 +66,6 @@ test("non-CEO departments keep exactly their prior grants", () => {
 		"hq-caio": ["hq-operations", "hq-analytics", "hq-partnersync", "hq-audits", "hq-outputs"],
 	};
 	for (const [id, own] of Object.entries(prior))
-		assert.deepEqual(effectiveScopes(ALLOWED, dept(id)).sort(), [...own, "hq-core", "ep-core", "ag-core"].sort(), id);
+		assert.deepEqual(effectiveScopes(ALLOWED, dept(id)).sort(), [...own, "hq-core", "hq-experience", "ep-core", "ag-core"].sort(), id);
 	assert.equal(Object.keys(DEPARTMENTS).length, 14);
 });
