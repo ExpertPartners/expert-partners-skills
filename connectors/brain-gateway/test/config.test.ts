@@ -19,9 +19,10 @@ test("deployed allowlist includes mapped department homes and ep-private, withou
 		"ag-core", "ag-marketing", "ag-sales", "ag-listings", "ag-client-experience", "ag-operations", "ag-outputs",
 		"hq-library-marketing", "ep-events", "ep-acn", "ag-strong-ones", "ag-case-studies",
 		"ag-personal-core", "ag-personal-marketing",
+		"ag-course-development", "ag-buyers", "ag-transactions", "ag-show",
 	];
 	assert.deepEqual(allowedScopes(env.ALLOWED_SCOPES), expected);
-	assert.equal(new Set(allowedScopes(env.ALLOWED_SCOPES)).size, 34);
+	assert.equal(new Set(allowedScopes(env.ALLOWED_SCOPES)).size, 38);
 	for (const denied of ["ag-private", "bogus"])
 		assert.throws(() => assertScope(env.ALLOWED_SCOPES, denied));
 	const listed = await runTool("list_scopes", {}, env, async () => { throw new Error("Listing scopes must not read Drive"); });
