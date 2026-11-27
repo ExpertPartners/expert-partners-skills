@@ -1,3 +1,6 @@
+## 3.12.0 - 2026-11-27
+
+Add New Hire Onboarding for named people and AI employees, with Drive access reconciliation, scoped gateway verification, company-first instructions and first-use receipts.
 ## 3.11.0 - 2026-11-26
 
 Expand business-brain-foundations to fill a complete selected brain template as Google Docs in one draft pass, core four first, with a single-file repair option, Drive-first evidence, explicit gaps, most-complete and most-recent version selection, and owner review status on every document.
