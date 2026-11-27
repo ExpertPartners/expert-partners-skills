@@ -20,7 +20,17 @@ Require a source identity and evidence for both Allison's intent to teach this s
 
 ## Both routes: package feasibility, then completion
 
-Require `package` keys `advantage-brief`, `run-of-show`, `canva-chapter`, each status `ready`, with linked evidence for the verified destination and route. For Docs verify the explicit writable AGI Course Development parent and applicable output checks. For Canva verify the exact existing design, brand kit and a route capable of inserting pages and writing and reading full actual notes. A sidecar notes document does not qualify. This is preflight feasibility, not a delivery claim or a requirement to pre-create artifacts. If the week's close standard includes the package, its status is pending until all three artifacts and the private log pass saved readback. Never report the week closed on the gate's result.
+Require the following `package` keys, each status `ready` with its `url`. Verify those routes on current evidence; a check is not a request to pre-create a deliverable. Use a known working route receipt or an authorized practice asset, never the production teaching package itself to check whether writes are possible.
+
+| Key | Required linked evidence and binding |
+| --- | --- |
+| `advantage-brief`, `run-of-show` | Verified writable AGI Course Development parent and the applicable output checks. |
+| `canva-chapter` | Verified `owner` and `owner_url`; exact `brand_book_id`, `kit_id`, `deck_id`, `master_notes_id`; `brand_url`, `append_route_url`, `master_notes_route_url`. No duplicate assets. |
+| `presenter-notes` | `notes_write_url` and `notes_read_url` for actual Canva Notes, not a sidecar or a slide-face editor. |
+| `internal-video` | Existing `avatar_id` and `voice_id` with `voice_kind: professional` and `avatar_voice_url`; `capture_machine: ember-m2`, `capture_route_url`, `sanitization_route_url`, `renderer_route_url`, `internal_hub_route_url`. Read the video workflow's verified private capability receipt; authenticated inventory alone is not render evidence. |
+| `canva-video-slide` | `embed_route_url`, `playback_route_url`, `external_exclusion_route_url` for playable media in one dedicated slide in the existing deck, and a route that excludes it from external teaching. |
+
+Never report a week closed from a feasibility pass. Missing or unverified ownership, brand, capture, privacy, save, playback or exclusion is a linked HR gap, not a deferred section that can be marked ready.
 
 ## Run the gate and handle its result
 
@@ -29,4 +39,4 @@ Pass the private preflight JSON to `python3 scripts/check_completeness.py` via s
 - Top-level `route` is `week` or `session`. For `week`, provide a nonnegative integer `week`. `checks` maps each required check name to `{inventory_url, expected, evidence}`. `expected` is the independently inventoried list of item keys. `evidence` is an object keyed by those same keys; each row has `status` and `url`. For `readiness` and `sources` add `reason`; for `tools` and routed `decisions` add `owner`; for `decisions` add `receipt_url` pointing to the Change Log receipt or actual owner route. Use `url` to identify the decision itself.
 - To report an inaccessible inventory or incomplete retrieval, do not submit it as read: omit that check and attach its real attempted source link to the private gap report. An empty tools, decision or source inventory is valid only when an exhaustive read confirms no items, with the inventory link retained.
 - Exit `1` or `2`: stop. Send HQ Chief HR Officer a plain private report with the exact week/cohort or session, each missing item or inaccessible source, its inventory/item link and the owner or next recovery action. Report known Week 10 gaps without invoking or writing the Week 10 package. Do not create, update or append package artifacts on a failed preflight.
-- Exit `0`: retain the linked preflight in the private run record and proceed to all three outputs. If the source, identity or evidence changes before saving, reconcile the affected preflight evidence and rerun the gate. A pass never substitutes for post-save verification.
+- Exit `0`: retain the linked preflight in the private run record and proceed to the whole package, including the internal video and embedded slide. If the source, identity or evidence changes before saving, reconcile the affected preflight evidence and rerun the gate. A pass never substitutes for post-save verification.
