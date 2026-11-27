@@ -566,6 +566,28 @@ class FounderOverrides(HookCase):
                 self.assertIn("GoHighLevel workflows, no API, no public workflow API", note)
                 self.assertNotIn("PartnerSync builder", note)
 
+    def test_ghl_private_integrations_paths_are_allowed(self):
+        cases = (
+            f"https://{self.GHL}/v2/location/abc/settings/private-integrations",
+            f"https://{self.GHL}/v2/location/abc/settings/private-integrations/new",
+            f"https://{self.GHL}/v2/location/abc/settings/integrations",
+            "https://link.allisongaddy.com/v2/location/abc/settings/private-integrations",
+        )
+        for url in cases:
+            with self.subTest(url=url):
+                note = self.assertAllowed(self.run_hook(url))
+                self.assertIn("GoHighLevel private integrations, no API", note)
+
+    def test_ghl_other_settings_paths_stay_denied(self):
+        for path in (
+            "/v2/location/abc/settings/private-integrations-other",
+            "/v2/location/abc/settings/custom-fields",
+            "/v2/location/abc/settings/staff",
+        ):
+            with self.subTest(path=path):
+                reason = self.assertDenied(self.run_hook(f"https://{self.GHL}{path}"))
+                self.assertIn("GoHighLevel contacts", reason)
+
     def test_ghl_code_call_mixing_builder_and_workflow_paths_names_both(self):
         code = (
             "async (page) => { await page.goto('https://app.gohighlevel.com/v2/location/abc/survey-builder-v2/x');"

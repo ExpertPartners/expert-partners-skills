@@ -892,6 +892,22 @@ GHL_WORKFLOW_NOTE = (
     "workflows, no API, no public workflow API."
 )
 
+# GoHighLevel's public API cannot create a Private Integration token or read or grant its
+# scopes; that is done only under Settings > Private Integrations in the app (verified
+# 2026-11-24 and 2026-11-27). The access map's live GoHighLevel row therefore cannot cover
+# these settings pages. Every other GoHighLevel path still goes through the access map.
+GHL_PIT_PATH_RE = re.compile(
+    r"^/v2/location/[^/?#]+/settings/(?:integrations|private-integrations)(?:[/?#]|$)",
+    re.I,
+)
+GHL_PIT_NOTE = (
+    "Headless route check: GoHighLevel has no public API for private-integration tokens "
+    "or scopes, so the settings integrations page is let through for creating tokens and "
+    "granting scopes. Every other GoHighLevel path still goes through the access map. "
+    "Report it as: Headless route checked, GoHighLevel private integrations, no API, no "
+    "public PIT scope API."
+)
+
 
 def _paths_on_host(host: str, targets: list) -> list:
     """Normalized paths of every target on this host, empty when the host is absent."""
@@ -909,12 +925,16 @@ def _paths_on_host(host: str, targets: list) -> list:
 
 
 def ghl_builder_allowed(host: str, targets: list) -> bool:
-    """True only when every GoHighLevel target is a builder, media-library or workflow path."""
+    """True only when every GoHighLevel target is a builder, media-library, workflow or
+    private-integrations path."""
     if host not in GHL_BUILDER_HOSTS:
         return False
     paths = _paths_on_host(host, targets)
     return bool(paths) and all(
-        GHL_BUILDER_PATH_RE.search(path) or GHL_WORKFLOW_PATH_RE.search(path) for path in paths
+        GHL_BUILDER_PATH_RE.search(path)
+        or GHL_WORKFLOW_PATH_RE.search(path)
+        or GHL_PIT_PATH_RE.search(path)
+        for path in paths
     )
 
 
@@ -926,6 +946,8 @@ def ghl_builder_notes(host: str, targets: list) -> list:
         notes.append(GHL_BUILDER_NOTE)
     if any(GHL_WORKFLOW_PATH_RE.search(path) for path in paths):
         notes.append(GHL_WORKFLOW_NOTE)
+    if any(GHL_PIT_PATH_RE.search(path) for path in paths):
+        notes.append(GHL_PIT_NOTE)
     return notes
 
 
