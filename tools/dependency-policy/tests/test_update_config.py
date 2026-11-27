@@ -36,6 +36,7 @@ PYTHON_DIRS = {
     "/",
     "/plugins/research-ops/skills/source-hunter",
     "/plugins/research-ops/skills/video-discovery",
+    "/tools/experience-watcher",
     "/tools/factory-inbox",
 }
 NPM_DIRS = {"/tools/capability-feed", "/tools/skill-map"}
@@ -438,6 +439,9 @@ class FixtureRepo:
         )
         self.write("plugins/research-ops/skills/source-hunter/requirements.txt", LOCK)
         self.write("tools/factory-inbox/requirements.txt", LOCK)
+        self.write(
+            "tools/experience-watcher/requirements.txt", "-r ../factory-inbox/requirements.txt\n"
+        )
         self.write("tools/capability-feed/package.json", "{}\n")
         self.write("tools/skill-map/package.json", "{}\n")
         self.write(".github/workflows/ci.yml", "name: ci\njobs: {}\n")

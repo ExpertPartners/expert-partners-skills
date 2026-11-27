@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>Label</key><string>com.expertpartners.experience-reconcile</string>
+<key>ProgramArguments</key><array><string>/opt/homebrew/bin/python3</string><string>__HOME__/HQ-AI-Workspace-M4/Workbench/experience-director/watcher.py</string><string>reconcile</string></array>
+<key>WorkingDirectory</key><string>__HOME__/HQ-AI-Workspace-M4/Workbench/experience-director</string>
+<key>EnvironmentVariables</key><dict><key>PATH</key><string>/opt/homebrew/bin:/usr/bin:/bin</string><key>HX_STANDARD_DOC</key><string>16pH3N3ECnzALMKUNlxGJ2F4XVW42NoFcF19VZvyn1Tk</string></dict>
+<key>StartCalendarInterval</key><dict><key>Hour</key><integer>2</integer><key>Minute</key><integer>15</integer></dict>
+<key>StandardOutPath</key><string>__HOME__/Library/Logs/experience-reconcile.log</string>
+<key>StandardErrorPath</key><string>__HOME__/Library/Logs/experience-reconcile.err</string>
+</dict></plist>

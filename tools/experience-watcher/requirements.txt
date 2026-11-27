@@ -1,0 +1,5 @@
+# Hash-locked Python dependencies: experience watcher runtime.
+# Layers on the Factory Inbox bridge lock, which pins google-auth with its full hashed closure.
+# Change or regenerate: tools/dependency-policy/README.md
+# Direct: google-auth. Any other entry is a transitive dependency.
+-r ../factory-inbox/requirements.txt
