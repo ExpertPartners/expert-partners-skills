@@ -233,8 +233,12 @@ skill may perform them directly using the same contract.
 Save only to the selected owning department folder from the live map. Never
 save department work to My Drive, even temporarily, or substitute Claude
 Outputs. Check effective destination access is appropriate for the output.
-Link-viewable destinations are for derived business findings, not source
-artifacts. Use anonymous audience labels, channel and timestamp locators, and
+Save automatically only when the brain folder has verified restricted sharing.
+Hold if access cannot be verified or anyone with the link can access the
+folder, including through inheritance. Never widen folder access. A specific
+file may be shared only when Allison asks to share that file, as a separate
+action, and never contrary to the source's confidentiality. Use anonymous
+audience labels, channel and timestamp locators, and
 short, nonidentifying quotes. Omit attendee names, contact details, identifying
 stories, source URLs and copied transcript or chat blocks from the report and
 summary. If confidentiality is indicated, return a failed receipt rather than
