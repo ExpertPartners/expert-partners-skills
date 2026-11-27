@@ -8,6 +8,7 @@ import re
 import shlex
 import subprocess
 import sys
+import time
 
 
 def job_ids(value):
@@ -63,6 +64,9 @@ def handle(payload, dispatch):
         # Sessions that never started a browser job never reach the M2, so an
         # unreachable browser host cannot hold up ordinary turns.
         report = dispatch({"action": "finish_session", "session_id": session_id, "event": event})
+        # The receipt is written before the marker goes, so a session that
+        # opened browser jobs always leaves either a marker or a receipt.
+        write_receipt(session_id, event, report)
         marker.unlink(missing_ok=True)
         unresolved = sorted(
             x["job_id"]
@@ -92,6 +96,50 @@ def handle(payload, dispatch):
         if messages:
             return {"systemMessage": " ".join(messages)}
     return {}
+
+
+def receipt_dir():
+    path = Path(
+        os.environ.get(
+            "EP_BROWSER_LIFECYCLE_RECEIPTS", "~/.cache/expert-partners/browser-lifecycle-receipts"
+        )
+    ).expanduser()
+    path.mkdir(parents=True, exist_ok=True, mode=0o700)
+    return path
+
+
+def write_receipt(session_id, event, report):
+    rows = [x for x in (report if isinstance(report, list) else []) if isinstance(x, dict)]
+    receipt = {
+        "session_id": session_id,
+        "event": event,
+        "at": time.time(),
+        "queued": isinstance(report, dict) and bool(report.get("queued")),
+        "closed": sorted(x["job_id"] for x in rows if x.get("status") == "finished"),
+        "other": sorted((x["job_id"], x["status"]) for x in rows if x.get("status") != "finished"),
+    }
+    path = receipt_dir() / (session_id + ".json")
+    temporary = path.with_suffix(".tmp")
+    temporary.write_text(json.dumps(receipt))
+    os.chmod(temporary, 0o600)
+    os.replace(temporary, path)
+    return receipt
+
+
+def cleanup_line(session_id):
+    """Browser part of the session-wrap Cleanup done line, from evidence only."""
+    if (marker_dir() / session_id).exists():
+        return "browser cleanup NOT done, this session still owns browser jobs"
+    try:
+        receipt = json.loads((receipt_dir() / (session_id + ".json")).read_text())
+    except (OSError, ValueError):
+        return "browser windows closed: none opened"
+    if receipt.get("queued"):
+        return "browser windows: close queued at " + receipt["event"]
+    text = "browser windows closed: " + str(len(receipt.get("closed", [])))
+    if receipt.get("other"):
+        text += ", held " + ", ".join(job + " " + status for job, status in receipt["other"])
+    return text
 
 
 def marker_dir():
@@ -139,6 +187,13 @@ def dispatch(request):
 
 
 def main():
+    if sys.argv[1:2] == ["--cleanup-line"]:
+        session_id = sys.argv[2] if len(sys.argv) > 2 else os.environ.get("FACTORY_SESSION_ID", "")
+        if not re.fullmatch(r"[A-Za-z0-9_-]{1,160}", session_id):
+            print("session id required", file=sys.stderr)
+            return 2
+        print(cleanup_line(session_id))
+        return 0
     payload = {}
     try:
         payload = json.loads(sys.stdin.read(1048576))

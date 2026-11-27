@@ -30,6 +30,7 @@ from io import BytesIO
 import json
 import os
 import shutil
+import signal
 import subprocess
 import sys
 import time
@@ -296,17 +297,126 @@ def leftover_worktree_roots():
     return [r for r in roots if r.is_dir() and not r.is_symlink()]
 
 
+AI_AGENTS = {"droid", "claude", "codex"}
+# Executables that only automation ever starts on this Mac.
+AUTOMATION_PATHS = (
+    "ms-playwright",
+    "Google Chrome for Testing",
+    "chrome-headless-shell",
+    "Chromium.app",
+)
+BROWSER_PATHS = AUTOMATION_PATHS + (
+    "/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/Google Chrome Canary.app/Contents/MacOS/",
+    "/Firefox.app/Contents/MacOS/firefox",
+    "/Safari.app/Contents/MacOS/Safari",
+    "/usr/bin/safaridriver",
+)
+AUTOMATION_FLAGS = ("--enable-automation", "--remote-debugging-pipe", "-marionette", "--headless")
+
+
+def processes():
+    """pid -> (ppid, executable path, argv) for this user's processes."""
+    out = subprocess.run(
+        ["ps", "-x", "-ww", "-o", "pid=,ppid=,comm=", "-u", str(os.getuid())],
+        capture_output=True,
+        text=True,
+        timeout=30,
+    ).stdout
+    args = subprocess.run(
+        ["ps", "-x", "-ww", "-o", "pid=,args=", "-u", str(os.getuid())],
+        capture_output=True,
+        text=True,
+        timeout=30,
+    ).stdout
+    argv = {}
+    for line in args.splitlines():
+        pid, _, rest = line.strip().partition(" ")
+        if pid.isdigit():
+            argv[int(pid)] = rest
+    table = {}
+    for line in out.splitlines():
+        parts = line.strip().split(None, 2)
+        if len(parts) == 3 and parts[0].isdigit() and parts[1].isdigit():
+            table[int(parts[0])] = (int(parts[1]), parts[2], argv.get(int(parts[0]), ""))
+    return table
+
+
+def is_browser(exe):
+    return any(p in exe for p in BROWSER_PATHS) and "Helper" not in exe
+
+
+def ai_ancestor(table, pid):
+    """Nearest droid, claude or codex process above pid, or None."""
+    seen = set()
+    pid = table.get(pid, (1,))[0]
+    while pid > 1 and pid in table and pid not in seen:
+        seen.add(pid)
+        ppid, exe, _ = table[pid]
+        if os.path.basename(exe) in AI_AGENTS:
+            return pid
+        pid = ppid
+    return None
+
+
+def browser_violations(table):
+    """Root browser processes an AI opened. Allison's own browsers never qualify.
+
+    Her Chrome and Safari are started by launchd (parent pid 1) from the
+    standard app with no automation flag, so none of the tests below match
+    them. Only the root of a browser tree is returned; its helpers exit with it.
+    """
+    found = []
+    for pid, (ppid, exe, argv) in table.items():
+        if not is_browser(exe):
+            continue
+        parent = table.get(ppid)
+        if parent and is_browser(parent[1]):
+            continue
+        agent = ai_ancestor(table, pid)
+        if agent:
+            why = "opened by " + os.path.basename(table[agent][1])
+        elif any(p in exe for p in AUTOMATION_PATHS):
+            why = "automation browser build"
+        elif any(f in argv.split() for f in AUTOMATION_FLAGS):
+            why = "automation flag"
+        else:
+            continue
+        found.append({"pid": pid, "browser": os.path.basename(exe), "why": why, "agent_pid": agent})
+    return found
+
+
+def opening_session(pid):
+    """The Factory, Claude or Codex session id in an agent's environment, if readable."""
+    if not pid:
+        return None
+    try:
+        out = subprocess.run(
+            ["ps", "-E", "-ww", "-o", "command=", "-p", str(pid)],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        ).stdout
+    except (subprocess.TimeoutExpired, OSError):
+        return None
+    for name in ("FACTORY_SESSION_ID", "CLAUDE_SESSION_ID", "CODEX_SESSION_ID", "CODEX_THREAD_ID"):
+        for token in out.split():
+            if token.startswith(name + "="):
+                return token.split("=", 1)[1][:160]
+    return None
+
+
 def common_dir(repo):
     rc, out = git(repo, "rev-parse", "--path-format=absolute", "--git-common-dir")
     return Path(out.strip()).parent if rc == 0 and out.strip() else None
 
 
 class Janitor:
-    def __init__(self, args):
+    def __init__(self, args, scan_open=True):
         self.args = args
         self.freed_kb = 0
         self.events = []
-        self.opened = open_paths()
+        self.opened = open_paths() if scan_open else set()
         self.now = time.time()
 
     def log(self, **ev):
@@ -431,6 +541,38 @@ class Janitor:
             prune = common_dir(entry) if (entry / ".git").is_file() else None
             self.remove(entry, f"scratch entry idle more than {idle} days", prune_from=prune)
 
+    def sweep_browsers(self):
+        """No AI browser runs on the M4. Close any an AI opened and log who opened it."""
+        try:
+            table = processes()
+        except (subprocess.TimeoutExpired, OSError):
+            self.log(action="browser-sweep-failed", why="process list unavailable")
+            return
+        found = browser_violations(table)
+        for v in found:
+            row = {
+                "pid": v["pid"],
+                "browser": v["browser"],
+                "why": v["why"],
+                "session": opening_session(v["agent_pid"]),
+            }
+            if self.args.dry_run:
+                self.log(action="would-close-browser", **row)
+                continue
+            try:
+                os.kill(v["pid"], signal.SIGTERM)
+                for _ in range(50):
+                    os.kill(v["pid"], 0)
+                    time.sleep(0.1)
+                os.kill(v["pid"], signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            except OSError as e:
+                self.log(action="close-browser-failed", error=str(e), **row)
+                continue
+            self.log(action="closed-browser", **row)
+        self.log(action="browser-sweep", violations=len(found))
+
     def finish(self):
         free = shutil.disk_usage(str(HOME)).free / GIB
         summary = {
@@ -465,7 +607,15 @@ def main():
         help="Apply legacy rules (safe repos and caches only) to these folders",
     )
     ap.add_argument("--sweep-idle-days", type=float, default=1)
+    ap.add_argument(
+        "--browsers-only", action="store_true", help="Only close browsers an AI opened on the M4"
+    )
     args = ap.parse_args()
+    if args.browsers_only:
+        j = Janitor(args, scan_open=False)
+        j.sweep_browsers()
+        j.finish()
+        return 0
     j = Janitor(args)
     if j.opened is None:
         print("lsof unavailable, cannot tell what is in use; removing nothing", file=sys.stderr)
@@ -478,6 +628,8 @@ def main():
                 j.drop_safe_repos(root, args.sweep_idle_days)
     else:
         j.run_scratch()
+        if os.environ.get("EP_JANITOR_BROWSER_SWEEP") != "0":
+            j.sweep_browsers()
     j.finish()
     return 0
 

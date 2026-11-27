@@ -214,8 +214,9 @@ sessions. This rule follows the HQ Rulebook's Browser tabs stay clean section (D
   tab group and shows it only those tabs, so work only inside your own group.
 - Each job owns one whole Chrome window. When the job is done, the whole window closes.
   `browser_job_finish` closes it, and the lifecycle hook closes it at Stop and SessionEnd
-  for every job the session started. A nightly sweep on the M2 closes windows of jobs
-  whose session has ended. A window that also holds a tab the job did not open, Allison's
+  for every job the session started. A sweep on the M2 every 15 minutes closes windows of
+  jobs whose session has ended and holds and logs anything it cannot prove, including
+  the signed-in Grok session. A window that also holds a tab the job did not open, Allison's
   or another job's, stays open and only the job's own tabs close. Never close any other
   window or the browser.
 

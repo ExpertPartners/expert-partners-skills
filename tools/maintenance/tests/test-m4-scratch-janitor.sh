@@ -14,6 +14,8 @@ JANITOR="$(cd "$(dirname "$0")/.." && pwd)/m4-scratch-janitor.py"
 T=$(mktemp -d)
 trap 'rm -rf "$T"' EXIT
 export HOME="$T/home" GIT_CONFIG_GLOBAL="$T/gitconfig"
+# Fixture runs must never signal real browsers on the machine running the test.
+export EP_JANITOR_BROWSER_SWEEP=0
 git config --global user.name test && git config --global user.email test@example.com
 git config --global init.defaultBranch main
 SC="$HOME/HQ-AI-Workspace-M4/Scratch"
@@ -118,6 +120,13 @@ expect gone    "$P/worktrees/lane-local"
 git -C "$P" rev-parse -q --verify lane-local >/dev/null && { PASS=$((PASS+1)); echo "  ok   unpushed branch of a dropped worktree stays in the main clone"; } || { FAIL=$((FAIL+1)); echo "  FAIL branch lost"; }
 expect present "$P/a.txt"
 git -C "$P" worktree list | grep -q lane-done && { FAIL=$((FAIL+1)); echo "  FAIL worktree not pruned"; } || { PASS=$((PASS+1)); echo "  ok   worktree metadata pruned"; }
+
+echo "== AI browser sweep rules =="
+if python3 -m unittest discover -s "$(dirname "$0")" -p 'test_browser_violations.py' >/dev/null 2>&1; then
+  PASS=$((PASS+1)); echo "  ok   only AI-opened browsers qualify, never Allison's"
+else
+  FAIL=$((FAIL+1)); echo "  FAIL browser violation rules"
+fi
 
 echo "-------------------------------------------"
 printf 'passed: %d   failed: %d\n' "$PASS" "$FAIL"

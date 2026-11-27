@@ -13,11 +13,15 @@ import subprocess
 import sys
 import tempfile
 import time
+import urllib.parse
 
 
 OWNER_RETENTION = 30 * 24 * 3600
 NO_ARTIFACTS = "failed_no_artifacts_by_census"
 NO_GENERATION = "failed_no_artifacts_by_generation"
+SWEEP_LOG = "unowned-sweep.log"
+# A signed-in session that no browser job owns is never closed by a sweep.
+PROTECTED_HOSTS = ("grok.com", "x.ai")
 
 
 def identifier(value):
@@ -355,11 +359,220 @@ def _sweep(config, session_id=None):
     return outcomes
 
 
+def sweep_log(root, row):
+    """One JSON line per decision: when, which job and session, which window or tab."""
+    row = {"at": time.time(), **row}
+    path = Path(root).expanduser()
+    path.mkdir(parents=True, exist_ok=True, mode=0o700)
+    handle = os.open(
+        path / SWEEP_LOG, os.O_WRONLY | os.O_CREAT | os.O_APPEND | os.O_NOFOLLOW, 0o600
+    )
+    with os.fdopen(handle, "a") as stream:
+        stream.write(json.dumps(row, sort_keys=True) + "\n")
+    return row
+
+
+def protected_hosts(config):
+    extra = config.get("protected_hosts") or []
+    return tuple(PROTECTED_HOSTS) + tuple(x for x in extra if isinstance(x, str) and x)
+
+
+def live_sessions():
+    """Sessions that still hold a browser job on this host.
+
+    The hook creates one marker per owning session and removes it at Stop,
+    SessionEnd or Interrupt, so a marker is live-session evidence for a
+    session started on this machine. A session on the other Mac records its
+    end through the same hook, which marks its owner rows terminal.
+    """
+    path = Path(
+        os.environ.get(
+            "EP_BROWSER_LIFECYCLE_SESSIONS", "~/.cache/expert-partners/browser-lifecycle-sessions"
+        )
+    ).expanduser()
+    try:
+        return {x.name for x in path.iterdir() if x.is_file()}
+    except OSError:
+        return set()
+
+
+def window_tabs(config, window_id):
+    """Read-only census of one window's tabs through a temporary own connector."""
+    from browser_jobs import Route, STATE_JS, code
+
+    route = Route(config)
+    try:
+        with route.maintenance_connector() as client:
+            observed = code(
+                client,
+                STATE_JS
+                + "return {tabs:await s.connector.evaluate(async()=>(await chrome.tabs.query({}))"
+                + ".map(t=>({tabId:t.id,windowId:t.windowId,groupId:t.groupId,url:t.url||t.pendingUrl||''})))};",
+            )
+    finally:
+        route.close_control()
+    tabs = observed.get("tabs")
+    if not isinstance(tabs, list):
+        raise RuntimeError("window_census_unavailable")
+    return [t for t in tabs if t.get("windowId") == window_id]
+
+
+def window_hold(config, metadata, hosts):
+    """Reason to keep the saved window open, or None when the census shows only this job."""
+    for tab in window_tabs(config, metadata["windowId"]):
+        host = urllib.parse.urlparse(tab.get("url") or "").hostname or ""
+        if any(host == name or host.endswith("." + name) for name in hosts):
+            return "protected_signed_in_session"
+        if metadata.get("groupId") is not None and tab.get("groupId") != metadata["groupId"]:
+            return "group_mismatch"
+    return None
+
+
+def receipt_hold(receipt):
+    """Receipt states the browser service owner ruled hold-and-log, never retried."""
+    if receipt.get("status") == "failed":
+        return "failed_receipt"
+    if receipt.get("ownership_pending"):
+        return "ownership_pending"
+    if receipt.get("window_disposition") == "preserved_shared":
+        return "shared_window"
+    if receipt.get("relay_mode"):
+        return "relay_job"
+    metadata = receipt.get("metadata")
+    if not isinstance(metadata, dict) or type(metadata.get("windowId")) is not int:
+        return "missing_metadata"
+    text = json.dumps(receipt.get("timings") or [])
+    for marker in ("creation_outcome_unknown", "uncheckpointed"):
+        if marker in text:
+            return marker
+    return None
+
+
+def sweep_unowned(config):
+    """Close only windows whose owning session has ended; hold and log the rest.
+
+    Ownership comes from the durable receipts and owner ledger the browser-jobs
+    facade already writes, and liveness from the hook's session markers. A job
+    whose owner is running, whose ownership cannot be determined, whose receipt
+    is in a hold state, or whose window still holds a protected signed-in
+    session or a foreign group is held and logged, never closed. One held job
+    holds its whole session, because the exact finish runs per session.
+    """
+    root = Path(config["state_dir"]).expanduser()
+    hosts = protected_hosts(config)
+    live = live_sessions()
+    report = []
+    ended = {}
+    held_sessions = set()
+
+    def hold(reason, job, session=None, window=None):
+        report.append(
+            sweep_log(
+                root,
+                {
+                    "action": "held",
+                    "reason": reason,
+                    "job": job,
+                    "session": session,
+                    "window": window,
+                },
+            )
+        )
+
+    for path in sorted((root / "owners").glob("*.json")):
+        try:
+            owner = json.loads(path.read_text())
+            job_id = job_identifier(owner["job_id"])
+            receipt = json.loads((root / (job_id + ".json")).read_text())
+        except Exception:
+            hold("receipt_unreadable", path.stem)
+            continue
+        if receipt.get("status") == "finished":
+            continue
+        session_id = owner.get("session_id")
+        metadata = receipt.get("metadata") if isinstance(receipt.get("metadata"), dict) else {}
+        window_id = metadata.get("windowId")
+        if owner.get("state") != "terminal":
+            reason = (
+                "owner_job_running" if session_id in live else "owner_active_without_live_session"
+            )
+            hold(reason, job_id, session_id, window_id)
+            held_sessions.add(session_id)
+            continue
+        if session_id in live:
+            # A terminal mark plus a live marker is contradictory evidence.
+            hold("session_still_live", job_id, session_id, window_id)
+            held_sessions.add(session_id)
+            continue
+        reason = receipt_hold(receipt)
+        if reason:
+            hold(reason, job_id, session_id, window_id)
+            held_sessions.add(session_id)
+            continue
+        ended.setdefault(session_id, []).append((job_id, metadata))
+    for path in sorted(root.glob("*.json")):
+        if not re.fullmatch(r"[0-9a-f]{32}", path.stem) or owner_path(root, path.stem).exists():
+            continue
+        try:
+            receipt = json.loads(path.read_text())
+        except Exception:
+            receipt = {}
+        if receipt.get("status") == "finished":
+            continue
+        hold(
+            "no_ownership_receipt",
+            path.stem,
+            window=(receipt.get("metadata") or {}).get("windowId")
+            if isinstance(receipt.get("metadata"), dict)
+            else None,
+        )
+    for session_id, jobs in ended.items():
+        if session_id in held_sessions:
+            for job_id, metadata in jobs:
+                hold("session_has_held_job", job_id, session_id, metadata.get("windowId"))
+            continue
+        holds = []
+        for job_id, metadata in jobs:
+            try:
+                reason = window_hold(config, metadata, hosts)
+            except Exception:
+                reason = "window_census_unavailable"
+            if reason:
+                holds.append((job_id, metadata.get("windowId"), reason))
+        if holds:
+            for job_id, window_id, reason in holds:
+                hold(reason, job_id, session_id, window_id)
+            for job_id, metadata in jobs:
+                if job_id not in {h[0] for h in holds}:
+                    hold("session_has_held_job", job_id, session_id, metadata.get("windowId"))
+            continue
+        windows = {job_id: metadata.get("windowId") for job_id, metadata in jobs}
+        for outcome in sweep(config, session_id):
+            if outcome["job_id"] not in windows:
+                continue
+            report.append(
+                sweep_log(
+                    root,
+                    {
+                        "action": "closed" if outcome["status"] == "finished" else "held",
+                        "reason": outcome["status"],
+                        "job": outcome["job_id"],
+                        "session": session_id,
+                        "window": windows[outcome["job_id"]],
+                    },
+                )
+            )
+    if not report:
+        sweep_log(root, {"action": "none", "reason": "nothing_to_close"})
+    return report
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", required=True, type=Path)
     parser.add_argument("--request", action="store_true")
     parser.add_argument("--sweep", action="store_true")
+    parser.add_argument("--sweep-unowned", action="store_true")
     parser.add_argument("--session")
     parser.add_argument("--record-census", metavar="JOB_ID")
     parser.add_argument("--reconcile-generation", metavar="JOB_ID")
@@ -384,6 +597,8 @@ def main():
             args.tabs,
             args.reference,
         )
+    elif args.sweep_unowned:
+        report = sweep_unowned(config)
     elif args.sweep:
         report = sweep(config, args.session)
     else:
