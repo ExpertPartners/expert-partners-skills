@@ -24,6 +24,7 @@ import json
 import os
 import re
 import shlex
+import subprocess
 import sys
 
 HOME = os.path.expanduser("~")
@@ -268,13 +269,23 @@ def check(cmd, cwd):
 
 
 def main():
+    raw = sys.stdin.read() or "{}"
+    # Existing sessions already invoke this hook. Read the sibling guard at each
+    # call so a host rollout does not depend only on newly loaded hook settings.
+    policy = os.path.join(HOME, ".config/expert-partners/work-preflight-policy.json")
+    if os.path.exists(policy):
+        guard = os.path.join(os.path.dirname(os.path.realpath(__file__)), "work-preflight.py")
+        result = subprocess.run([sys.executable, guard], input=raw, text=True, capture_output=True)
+        if result.returncode:
+            print(result.stderr.strip() or "Work preflight unavailable", file=sys.stderr)
+            return 2
     if (
         os.path.exists(os.path.join(HOME, ".claude", "ai-copy-guard-off"))
         or os.environ.get("AI_COPY_GUARD_OFF") == "1"
     ):
         return 0
     try:
-        data = json.loads(sys.stdin.read() or "{}")
+        data = json.loads(raw)
     except ValueError:
         return 0
     if not isinstance(data, dict) or data.get("tool_name") not in SHELL_TOOLS:
