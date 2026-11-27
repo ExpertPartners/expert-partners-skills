@@ -4,11 +4,12 @@
   "name": "factory-connection",
   "main": "src/index.ts",
   "compatibility_date": "2026-03-10",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "account_id": "c4a6597a8d775d575401befb7d52846b",
   "workers_dev": true,
   "preview_urls": false,
   "vars": {
+    "CLAUDE_TRUSTED_ISSUER": "https://identity.anthropic.com/issuers/iss_uzkm2vzazu3sioktkyoanw",
     "MCP_RESOURCE": "https://factory-connection.expert-partners.workers.dev/mcp",
     "ALLOWED_EMAILS": "allison@expertpartners.com"
   },

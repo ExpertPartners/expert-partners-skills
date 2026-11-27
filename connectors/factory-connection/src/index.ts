@@ -2,6 +2,7 @@
 // Cloudflare Access, Allison only) and the Expert Partners Hub (bearer HTTP at /api).
 import { env } from "cloudflare:workers";
 import OAuthProvider from "@cloudflare/workers-oauth-provider";
+import { managedAuthorization } from "./managed-auth.ts";
 import { McpServer } from "@modelcontextprotocol/server";
 import { createMcpHandler, getMcpAuthContext } from "agents/mcp/server";
 import { handleAccessRequest } from "./access-handler";
@@ -92,4 +93,6 @@ export default new OAuthProvider<Env>({
 	defaultHandler: defaultHandler as any,
 	tokenEndpoint: "/token",
 	resourceMetadata: { resource: env.MCP_RESOURCE },
+	clientIdMetadataDocumentEnabled: true,
+	enterpriseManagedAuthorization: managedAuthorization,
 });
