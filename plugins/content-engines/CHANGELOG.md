@@ -1,3 +1,6 @@
+## 0.16.0 - 2026-11-27
+
+Require linked readiness, decisions, close criteria, tool ownership and missing-source evidence before Week Wrap drafts or writes a package. Keep attended-session support, route teachables to AGI Course Development, and verify actual Canva notes separately from slide edits.
 ## 0.15.2 - 2026-11-26
 
 Route AG Personal canon, visual guidance, The Strong Ones, Share the Love and Week Wrap through the separate AG Personal brain scopes. Route only the five shared AG playbook, uniqueness, proof, calibrated voice guide and voice summary sources through AG Personal Core for AG Luxury, preserving its homeowner register, all other Luxury routes and source identities.
