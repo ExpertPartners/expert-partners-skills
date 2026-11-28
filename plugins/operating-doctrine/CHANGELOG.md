@@ -1,3 +1,6 @@
+## 3.16.18 - 2026-11-28
+
+Recognize native Google Docs update and Drive document creation connector shapes, bind their exact document identities, and return explicit unverified guard denials when transcript evidence is unavailable.
 ## 3.16.17 - 2026-11-28
 
 Reject malformed source projection boundaries and stale appended JSON before a native document formatting receipt can pass.
