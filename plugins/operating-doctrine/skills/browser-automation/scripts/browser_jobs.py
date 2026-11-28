@@ -2090,6 +2090,13 @@ def serve(route, idle_seconds=FACADE_IDLE_SECONDS, poll_seconds=1):
                 sys.stdout.flush()
             except (BrokenPipeError, OSError):
                 disconnected.set()
+                # Discard the buffered response before interpreter shutdown can
+                # flush the same broken pipe again and turn clean exit into 120.
+                null_fd = os.open(os.devnull, os.O_WRONLY)
+                try:
+                    os.dup2(null_fd, sys.stdout.fileno())
+                finally:
+                    os.close(null_fd)
 
     def handle(message):
         try:
