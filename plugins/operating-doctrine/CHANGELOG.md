@@ -1,3 +1,6 @@
+## 3.16.4 - 2026-11-28
+
+Run ordered existing-work checks before the worker begins, compare intended outcomes across names, and distinguish recorded decisions from independently verified enforcement. Host preflight reads current owning records instead of relying on stale snapshots.
 ## 3.16.3 - 2026-11-27
 
 Business Brain Auditor sharing follows the newest Decision Log entry. A brain folder's anyone-with-link reader grant is never reported as an anonymous-editor finding, a file shared on request is compliant, only a permissions-list editor grant is a finding, and the audit never changes ACLs. Before and after source snapshots retry HTTP 429 reads and cover every audited scope root, including Private and Outputs. The regression checklist gains both cases.
