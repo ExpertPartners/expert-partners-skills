@@ -12,6 +12,17 @@ import sys
 
 def validate(evidence):
     errors = []
+    for index, finding in enumerate(evidence.get("sharingFindings", [])):
+        if finding.get("status") != "editor finding":
+            continue
+        if not any(
+            p.get("type") in ("anyone", "domain")
+            and p.get("role") in ("writer", "organizer", "fileOrganizer")
+            for p in finding.get("permissions", [])
+        ):
+            errors.append(
+                f"sharingFindings[{index}]: actual broad editor grant required; commenter is not editor"
+            )
     for index, claim in enumerate(evidence.get("duplicateClaims", [])):
         if claim.get("status") != "confirmed":
             continue
