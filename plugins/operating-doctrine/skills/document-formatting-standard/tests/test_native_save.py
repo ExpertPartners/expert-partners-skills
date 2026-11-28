@@ -380,6 +380,61 @@ class FormattingTests(unittest.TestCase):
 class ReviewRegressionTests(unittest.TestCase):
     check = HookTests.check
 
+    def test_file_metadata_and_json_artifacts_are_not_native_document_content(self):
+        for command in [
+            "api.call('PATCH','https://www.googleapis.com/drive/v3/files/synthetic',json={'trashed':True})",
+            "api.call('PATCH','https://www.googleapis.com/drive/v3/files/synthetic',json={'name':'Existing name'})",
+            "api.call('PATCH','https://www.googleapis.com/upload/drive/v3/files/proof?uploadType=media',headers={'Content-Type':'application/json'},data='{}')",
+        ]:
+            for name in ["Execute", "Bash"]:
+                self.assertFalse(hook.is_write(name, {"command": command}))
+                self.assertEqual(
+                    {},
+                    self.check([], "PreToolUse", tool_name=name, tool_input={"command": command}),
+                )
+        html = "api.call('PATCH','https://www.googleapis.com/upload/drive/v3/files/synthetic?uploadType=media',headers={'Content-Type':'text/html'},data='<p>Count</p>')"
+        self.assertTrue(hook.is_write("Execute", {"command": html}))
+        self.assertTrue(hook.is_write("Execute", WRITE))
+
+    def test_docs_create_query_and_json_proof_content_have_distinct_transports(self):
+        url = "https://docs.googleapis.com/v1/documents?fields=documentId,title"
+        for name in ["Execute", "Bash"]:
+            self.assertTrue(
+                hook.is_write(
+                    name, {"command": f"api.call('POST','{url}',json={{'title':'Native'}})"}
+                )
+            )
+        self.assertTrue(
+            hook.is_write(
+                "mcp__google_workspace__google_api",
+                {"method": "POST", "url": url, "body": {"title": "Native"}},
+            )
+        )
+        proof = {
+            "documentId": "synthetic",
+            "source": {"mimeType": "application/vnd.google-apps.document"},
+        }
+        for name in ["app.google_drive.upload_file", "app.google_drive.update_file_content"]:
+            self.assertFalse(
+                hook.is_write(
+                    name,
+                    {
+                        "input": {
+                            "file_id": "proof",
+                            "content_mime_type": "application/json",
+                            "content": json.dumps(proof),
+                        }
+                    },
+                )
+            )
+        command = (
+            "api.call('PATCH','https://www.googleapis.com/upload/drive/v3/files/proof?uploadType=media',headers={'Content-Type':'application/json'},json="
+            + repr(proof)
+            + ")"
+        )
+        self.assertFalse(hook.is_write("Execute", {"command": command}))
+        self.assertTrue(hook.is_write("Execute", {"command": WRITE["command"] + "; " + command}))
+
     def test_real_native_google_write_shapes_are_detected(self):
         shapes = [
             (
