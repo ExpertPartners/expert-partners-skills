@@ -19,6 +19,17 @@ test("approved replacement continues without reopening recovery or inventing a p
  assert.equal(workPreflight(policy,{action:"continue",capabilityId:"audit"},"other").allowed,false);
  assert.equal(policy.items[2]!.implementation,"assigned");
 });
+test("a different known capability ID cannot launder an existing outcome to another owner",()=>{
+ const r=workPreflight(policy,{action:"continue",capabilityId:"lesson",outcome:"brain auditor"},"lesson-owner");
+ assert.equal(r.allowed,false);
+ assert.equal(r.ownerSession,"tool-owner");
+});
+test("ambiguous registered outcomes never authorize continuation through a chosen ID",()=>{
+ const ambiguous={...policy,items:[...policy.items,{...policy.items[2]!,id:"other-audit",ownerSession:"other-owner"}]};
+ const r=workPreflight(ambiguous,{action:"continue",capabilityId:"audit",outcome:"brain auditor"},"tool-owner");
+ assert.equal(r.allowed,false);
+ assert.equal(r.ownerSession,null);
+});
 test("unresolved item reaches founder only with a specific recommendation and evidence",()=>{
  assert.equal(workPreflight(policy,{action:"escalate",capabilityId:"unknown",recommendation:"Fill from held teaching",evidence:["https://example.com/held"]}).allowed,true);
  assert.equal(workPreflight(policy,{action:"escalate",capabilityId:"unknown"}).allowed,false);
@@ -31,4 +42,9 @@ test("all-week contract, malformed policy, and legacy positive and negative disp
  assert.equal(legacyIntent(policy,"Commission a brain auditor" )?.action,"replacement_build");
  assert.equal(legacyIntent(policy,"Controlled live results passed for capstone homework and Build 101; duplicate Auditor commission routed to owner"),null);
  assert.equal(workPreflight(policy,{action:"inspect",capabilityId:"week-99"}).allowed,true);
+});
+
+test("an unrelated negative qualifier cannot cancel a positive recovery request",()=>{
+ for(const text of ["Find original capstone homework without asking me.","Find original capstone homework and do not create a new tracker.","Do not build a replacement; find original capstone homework."])
+  assert.equal(legacyIntent(policy,text)?.action,"source_search");
 });
