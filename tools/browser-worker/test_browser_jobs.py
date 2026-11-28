@@ -479,7 +479,7 @@ class JobTests(unittest.TestCase):
         source = (SCRIPTS / "owned_pages.js").read_text()
         fixture = r'''
 const assert = require('node:assert/strict');
-async function run(shared, foreignInGroup=false) {
+async function run(shared, foreignInGroup=false, pendingSeed=false) {
   const tabs = new Map([[1,{id:1,windowId:5,groupId:7}]]);
   if(shared)tabs.set(99,{id:99,windowId:5,groupId:foreignInGroup?7:9});
   let created=0, moved=0, removed=[], closedWindows=[], scheduled;
@@ -499,7 +499,8 @@ async function run(shared, foreignInGroup=false) {
       for(const t of tabs.values())if(t.windowId===id)tabs.delete(t.id);
     },create:async(args)=>{
       assert.equal(args.tabId,undefined,'never ungroup the attached connector');
-      created++;const seed={id:2,windowId:6,groupId:-1,url:'about:blank'};
+      created++;const seed={id:2,windowId:6,groupId:-1,url:pendingSeed?'':'about:blank'};
+      if(pendingSeed)seed.pendingUrl='about:blank';
       tabs.set(2,seed);return {id:6,tabs:[seed]};
     }},
     tabGroups:{get:async()=>({title:'fixture',color:'green'}),
@@ -530,7 +531,7 @@ async function run(shared, foreignInGroup=false) {
   assert.equal(tabs.has(1),false);
   if(shared)assert.equal(tabs.has(99),true);
 }
-(async()=>{await run(true);await run(false);await run(true,true);})()
+(async()=>{await run(true);await run(true,false,true);await run(false);await run(true,true);})()
   .catch(e=>{console.error(e);process.exitCode=1;});
 '''
         checked = subprocess.run(
