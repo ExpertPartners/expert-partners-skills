@@ -1,3 +1,6 @@
+## 3.16.10 - 2026-11-28
+
+Accept Chrome's explicitly pending about:blank seed when isolating an owned browser connector, preserving the attached group and peer tabs.
 ## 3.16.9 - 2026-11-28
 
 Isolate temporary browser cleanup connections with the existing owned-window initializer. Cleanup now preserves peer tabs when the extension initially places its connection in a shared window.
