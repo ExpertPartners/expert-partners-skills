@@ -189,6 +189,11 @@ deciding an element is missing.
 
 ## Rule 4. Browser tabs stay clean
 
+Closing a job's tabs or windows must preserve its existing profile's saved sign-ins
+and permissions. See [saved profile state on macOS](references/chrome-profile-state.md)
+for the Keychain readiness helper and the distinction between window cleanup and
+retaining browser data. Never clear cookies, delete a profile or sign out to clean up.
+
 The M2 is shared by every project and agent. Leftover tabs slow it down and confuse other
 sessions. This rule follows the HQ Rulebook's Browser tabs stay clean section (Decision Log
 2026-10-22, Browser tabs stay clean), which wins if the two ever differ.
