@@ -12,15 +12,17 @@ async function newOwnedState(connector) {
     const members = await chrome.tabs.query({groupId: t.groupId});
     if (t.groupId < 0 || members.length !== 1 || members[0].id !== t.id)
       throw Error('owned_window_isolation_unproven');
+    const blankSeed = t => t.url === 'about:blank' ||
+      (t.url === '' && t.pendingUrl === 'about:blank');
     const w = await chrome.windows.create({url: 'about:blank', focused: false});
     if (!w.tabs || w.tabs.length !== 1 || w.tabs[0].windowId !== w.id ||
-        w.tabs[0].groupId !== -1 || w.tabs[0].url !== 'about:blank')
+        w.tabs[0].groupId !== -1 || !blankSeed(w.tabs[0]))
       throw Error('owned_window_isolation_unproven');
     const seedId = w.tabs[0].id;
     await chrome.tabGroups.move(t.groupId, {windowId: w.id, index: -1});
     const moved = await chrome.tabs.query({windowId: w.id});
     if (moved.length !== 2 || !moved.some(x => x.id === t.id && x.groupId === t.groupId) ||
-        !moved.some(x => x.id === seedId && x.groupId === -1 && x.url === 'about:blank'))
+        !moved.some(x => x.id === seedId && x.groupId === -1 && blankSeed(x)))
       throw Error('owned_window_isolation_failed');
     await chrome.tabs.remove(seedId);
     const placed = await chrome.tabs.query({windowId: w.id});
