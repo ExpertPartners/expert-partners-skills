@@ -449,6 +449,11 @@ def format_doc(api, document_id, rulebook_id, name, parent):
     before_links = links_of(doc)
     before = [text_of(x) for x in paragraphs(doc) if text_of(x).strip()]
     requests = preparation(doc, name)
+    inserted_title = any(
+        request.get("insertText", {}).get("text") == title_subject(name) + "\n"
+        and request["insertText"].get("location", {}).get("index") == 1
+        for request in requests
+    )
     if requests:
         api.json(
             url + ":batchUpdate",
@@ -467,12 +472,11 @@ def format_doc(api, document_id, rulebook_id, name, parent):
     saved = read_native(api, document_id)
     after = [text_of(x) for x in paragraphs(saved) if text_of(x).strip()]
     require(
-        after == before or after == [title_subject(name) + "\n"] + before,
+        after == ([title_subject(name) + "\n"] + before if inserted_title else before),
         "Formatting changed existing wording",
     )
     require(
-        links_of(saved, drop_first=(after == [title_subject(name) + "\n"] + before))
-        == before_links,
+        links_of(saved, drop_first=inserted_title) == before_links,
         "Formatting changed existing hyperlinks",
     )
     verify_native(saved, spec, name)

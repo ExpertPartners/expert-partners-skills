@@ -96,6 +96,7 @@ RECEIPT = (
             "name": NAME,
             "url": URL,
             "revision": "native-revision",
+            "parents": ["home"],
             "native_sha256": "native-hash",
             "content_sha256": "text-hash",
         }
@@ -553,6 +554,65 @@ class ReviewRegressionTests(unittest.TestCase):
             with patch.object(fmt, "verify_native"), patch.object(fmt, "verify_pdf"):
                 with self.subTest(change=change), self.assertRaises(ValueError):
                     fmt.format_doc(api, "synthetic", "authority", NAME, "home")
+
+    def test_external_title_insertion_cannot_be_attributed_to_the_formatter(self):
+        class Changed(self.API):
+            def json(self, url, method="GET", body=None):
+                result = super().json(url, method, body)
+                if method == "GET" and "docs.googleapis.com" in url and self.writes:
+                    result["body"]["content"] = [
+                        paragraph("Synthetic Save\n", 1, "TITLE"),
+                        paragraph("Synthetic Save\n", 16, "TITLE"),
+                        paragraph("Body\n", 31),
+                    ]
+                return result
+
+        api = Changed()
+        with patch.object(fmt, "verify_native"), patch.object(fmt, "verify_pdf"):
+            with self.assertRaisesRegex(ValueError, "wording"):
+                fmt.format_doc(api, "synthetic", "authority", NAME, "home")
+        self.assertFalse(any("insertText" in r for write in api.writes for r in write["requests"]))
+
+    def test_malformed_receipt_returns_a_structured_block(self):
+        raw = json.loads(RECEIPT.split(hook.MARKER)[1])
+        for receipt in [{k: v for k, v in raw.items() if k != "url"}, [], {**raw, "parents": None}]:
+            body = "exit 0\n" + hook.MARKER + json.dumps(receipt) + "\n"
+            rows = call("Execute", FORMAT, body) + [prose(f"Saved [{NAME}]({URL}).")]
+            self.assertEqual("block", self.check(rows)["decision"])
+
+    def test_actual_api_failure_does_not_poison_a_later_same_doc_recovery(self):
+        value = {
+            "method": "POST",
+            "url": "https://docs.googleapis.com/v1/documents/synthetic:batchUpdate",
+            "body": {"requests": []},
+        }
+        rows = call(
+            "mcp__google_workspace__google_api",
+            value,
+            json.dumps({"status": 400, "response": "invalid request"}),
+            "failed",
+        )
+        self.assertEqual([], hook.evidence(rows)[1])
+        rows += call(
+            "mcp__google_workspace__google_api",
+            value,
+            json.dumps({"status": 200, "response": json.dumps({"documentId": "synthetic"})}),
+            "retried",
+        )
+        rows += call("Execute", FORMAT, RECEIPT, "formatter") + [prose(f"Saved [{NAME}]({URL}).")]
+        self.assertEqual({}, self.check(rows))
+        unknown = call(
+            "mcp__google_workspace__google_api",
+            value,
+            json.dumps({"status": 502, "response": "outcome uncertain"}),
+            "uncertain",
+        )
+        self.assertEqual({"synthetic"}, hook.evidence(unknown)[1][0][1])
+        self.assertEqual("block", self.check(unknown)["decision"])
+        unknown += call("Execute", FORMAT, RECEIPT, "formatter") + [
+            prose(f"Saved [{NAME}]({URL}).")
+        ]
+        self.assertEqual({}, self.check(unknown))
 
     def test_h2_effective_color_is_checked_after_native_readback(self):
         document = doc(

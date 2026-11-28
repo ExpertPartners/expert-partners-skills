@@ -105,6 +105,46 @@ def response_ids(name, body):
     return ids
 
 
+def definitive_failure(name, body):
+    if not re.search(r"google_api$", name, re.I):
+        return False
+    try:
+        result = json.loads(body)
+    except (ValueError, TypeError):
+        return False
+    return isinstance(result, dict) and result.get("status") in (
+        400,
+        401,
+        403,
+        404,
+        405,
+        409,
+        412,
+        415,
+        422,
+        429,
+    )
+
+
+def request_ids(name, value):
+    value = operation(value)
+    if re.search(r"google.*(?:upload_file|update_file_content)$", name, re.I):
+        target = value.get("file_id") or value.get("fileId")
+    elif re.search(r"google_api$", name, re.I):
+        match = re.fullmatch(
+            r"https://docs\.googleapis\.com/v1/documents/([\w-]+)(?::batchUpdate)?(?:\?.*)?",
+            value.get("url", ""),
+        )
+        target = match[1] if match else None
+    elif re.search(
+        r"google.*(?:batch_update_document|update_document)$|docs.*batch_update$", name, re.I
+    ):
+        target = value.get("document_id") or value.get("documentId")
+    else:
+        target = None
+    return {target} if isinstance(target, str) and re.fullmatch(r"[\w-]+", target) else set()
+
+
 def shell_success(name, body):
     return (
         bool(re.search(r"^exit 0\b", body))
@@ -190,10 +230,12 @@ def evidence(messages):
                 skills.add(str(value.get("skill", "")).split(":")[-1])
             args = formatter_args(value.get("command", "")) if name in ("Execute", "Bash") else None
             if is_write(name, value):
+                if definitive_failure(name, body):
+                    continue
                 # Execute failures are results too. Do not attest a failed command.
                 if name in ("Execute", "Bash") and not shell_success(name, body):
                     continue
-                ids = response_ids(name, body)
+                ids = response_ids(name, body) or request_ids(name, value)
                 if args:
                     ids = {args["--document-id"]}
                 writes.append((at, ids))
@@ -202,14 +244,23 @@ def evidence(messages):
                     continue
                 for line in body.splitlines():
                     if line.startswith(MARKER):
-                        receipt = json.loads(line[len(MARKER) :])
+                        try:
+                            receipt = json.loads(line[len(MARKER) :])
+                        except (ValueError, TypeError):
+                            continue
                         if (
-                            receipt.get("verified") is True
+                            isinstance(receipt, dict)
+                            and receipt.get("verified") is True
                             and receipt.get("document_id") == args["--document-id"]
                             and receipt.get("name") == args["--name"]
-                            and receipt.get("revision")
-                            and receipt.get("native_sha256")
-                            and receipt.get("content_sha256")
+                            and receipt.get("url")
+                            == f"https://docs.google.com/document/d/{args['--document-id']}/edit"
+                            and isinstance(receipt.get("parents"), list)
+                            and args["--parent-id"] in receipt["parents"]
+                            and all(
+                                isinstance(receipt.get(k), str) and receipt[k]
+                                for k in ("revision", "native_sha256", "content_sha256")
+                            )
                         ):
                             receipts.append((index, receipt, args))
     return skills, writes, receipts, prose
