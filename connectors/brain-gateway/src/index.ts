@@ -13,17 +13,18 @@ import { apiPrincipal } from "./api-principal.ts";
 import { lastResults, runDeepCheck, storeResult } from "./health.ts";
 import { driveFetch } from "./google.ts";
 import { recordingArrivalChecks } from "./recording-arrivals.ts";
-import { isAllowedEmail } from "./allow";
+import { currentNarrowing, mcpPrincipal, parseNarrowing, runNarrowed } from "./mcp-narrowing.ts";
 import { runTool, TOOLS } from "./tools";
 import type { Principal } from "./access.ts";
-import type { Props } from "./workers-oauth-utils";
 
 const INSTRUCTIONS = `Read-only access to the Expert Partners Business Brains in Google Drive (HQ, EP, AG). Start with list_scopes, then discover a scope to find documents, then read one by id. Read the Rulebook and Decision Log from hq-core before relying on any rule. Reads return the live document, never a copy, and fail closed when a complete verified read is not possible. Nothing here can write.`;
 
 function createServer() {
-	const server = new McpServer({ name: "Drive brain gateway", version: "1.0.0" }, { instructions: INSTRUCTIONS });
-	const props = getMcpAuthContext()?.props as Props | undefined;
-	if (!props || !isAllowedEmail(env.ALLOWED_EMAILS, props.email)) return server;
+	// Captured once per request so tool handlers keep the principal resolved before dispatch.
+	const principal = mcpPrincipal(getMcpAuthContext()?.props, env.ALLOWED_EMAILS, currentNarrowing());
+	const routing = principal?.department ? ` Active department ${principal.department}.${principal.businessLine ? ` Business line ${principal.businessLine}. Keep this line's audience, voice, proof and offers distinct. This is routing context, not an extra access grant.` : ""}` : "";
+	const server = new McpServer({ name: "Drive brain gateway", version: "1.0.0" }, { instructions: INSTRUCTIONS + routing });
+	if (!principal) return server;
 	for (const t of TOOLS) {
 		server.registerTool(
 			t.name,
@@ -33,8 +34,8 @@ function createServer() {
 				annotations: { readOnlyHint: true, openWorldHint: true },
 			},
 			async (args: unknown) => {
-				const r = await runTool(t.name, args, env, undefined, { kind: "person", email: props.email });
-				try { await observeClientTool(env.OAUTH_KV, props.email, t.name, args, r, undefined, env.ALLOWED_SCOPES); }
+				const r = await runTool(t.name, args, env, undefined, principal);
+				try { await observeClientTool(env.OAUTH_KV, principal.email, t.name, args, r, undefined, env.ALLOWED_SCOPES); }
 				catch { console.error("[brain-gateway] client health observation failed"); }
 				const payload = r.ok ? r.result : { error: r.error, status: r.status, detail: (r as any).detail };
 				return { content: [{ type: "text" as const, text: JSON.stringify(payload, null, 2) }], isError: !r.ok };
@@ -44,7 +45,9 @@ function createServer() {
 	return server;
 }
 
-const mcpHandler = createMcpHandler(createServer);
+const mcpHandler = createMcpHandler(createServer, {
+	corsOptions: { headers: "Content-Type, Accept, Authorization, mcp-session-id, MCP-Protocol-Version, Mcp-Method, Mcp-Name, X-Brain-Department, X-Brain-Business-Line" },
+});
 
 function json(data: unknown, status = 200) {
 	return new Response(JSON.stringify(data), { status, headers: { "content-type": "application/json" } });
@@ -107,7 +110,13 @@ const defaultHandler = {
 };
 
 const provider = new OAuthProvider<Env>({
-	apiHandler: { fetch: (req: Request, b: Env, ctx: ExecutionContext) => mcpHandler(req, b, ctx) },
+	apiHandler: {
+		fetch: (req: Request, b: Env, ctx: ExecutionContext) => {
+			const narrowing = parseNarrowing(req.headers);
+			if (!narrowing) return json({ error: "invalid department or business line" }, 400);
+			return runNarrowed(narrowing, () => mcpHandler(req, b, ctx));
+		},
+	},
 	apiRoute: "/mcp",
 	authorizeEndpoint: "/authorize",
 	clientRegistrationEndpoint: "/register",

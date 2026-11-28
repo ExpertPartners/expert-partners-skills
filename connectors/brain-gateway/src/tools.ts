@@ -134,6 +134,8 @@ export async function runTool(name: string, args: unknown, env: ToolEnv, drive?:
 			}
 		}
 		const result = await tool.run(parsed.data, reads, effectiveScopes(env.ALLOWED_SCOPES, principal));
+		if (name === "list_scopes" && principal.kind === "person" && principal.department)
+			return { ok: true, result: { ...(result as object), routing: { department: principal.department, ...(principal.businessLine ? { businessLine: principal.businessLine } : {}) } }, status: 200 };
 		if (name === "read") afterRead(parsed.data as ReadArgs, env, principal);
 		return { ok: true, result, status: 200 };
 	} catch (e) {
