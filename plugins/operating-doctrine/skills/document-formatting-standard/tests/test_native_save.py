@@ -694,6 +694,99 @@ class ReviewRegressionTests(unittest.TestCase):
             fmt.verify_native(document, fmt.policy(POLICY), NAME)
 
 
+class ConnectorEvidenceTests(unittest.TestCase):
+    check = HookTests.check
+
+    def test_actual_connector_writes_require_procedures_and_bind_native_targets(self):
+        cases = [
+            (
+                "mcp__Google_Docs__update_doc",
+                {
+                    "documentId": "synthetic",
+                    "requests": [{"insertText": {"location": {"index": 1}, "text": "TEST"}}],
+                },
+                '{"replies":[{"errors":[],"api_replies":[{}]}],"writeControl":{"requiredRevisionId":"saved"}}',
+            ),
+            (
+                "mcp__Google_Drive__create_file",
+                {
+                    "contentMimeType": "application/vnd.google-apps.document",
+                    "parentId": "home",
+                    "title": NAME,
+                },
+                '{"id":"synthetic","mimeType":"application/vnd.google-apps.document","parentId":"home"}',
+            ),
+        ]
+        for name, value, response in cases:
+            with self.subTest(name=name):
+                self.assertTrue(hook.is_write(name, value))
+                denied = self.check([], "PreToolUse", tool_name=name, tool_input=value)
+                self.assertEqual("deny", denied["hookSpecificOutput"]["permissionDecision"])
+                rows = skills() + [prose("I will save this in the existing company home.")]
+                rows += call(name, value, response)
+                self.assertEqual({"synthetic"}, hook.evidence(rows)[1][-1][1])
+                self.assertEqual("block", self.check(rows)["decision"])
+                rows += call("Execute", FORMAT, RECEIPT, "format")
+                rows += [prose(f"[{NAME}]({URL})")]
+                self.assertEqual({}, self.check(rows))
+
+    def test_native_connector_inspection_metadata_and_json_proofs_stay_usable(self):
+        for name, value in [
+            ("mcp__Google_Docs__read_doc", {"documentId": "synthetic"}),
+            ("mcp__Google_Drive__update_file", {"fileId": "synthetic", "title": "Existing"}),
+            (
+                "mcp__Google_Drive__create_file",
+                {
+                    "contentMimeType": "application/json",
+                    "content": '{"documentId":"synthetic","mimeType":"application/vnd.google-apps.document"}',
+                },
+            ),
+        ]:
+            with self.subTest(name=name):
+                self.assertFalse(hook.is_write(name, value))
+                self.assertEqual(
+                    {},
+                    hook.check(
+                        {"hook_event_name": "PreToolUse", "tool_name": name, "tool_input": value}
+                    ),
+                )
+
+    def test_missing_or_unreadable_transcript_has_explicit_unverified_denial(self):
+        with tempfile.TemporaryDirectory() as folder:
+            broken = Path(folder) / "broken.jsonl"
+            broken.write_text("not valid JSON\n")
+            empty = Path(folder) / "empty.jsonl"
+            empty.write_text("")
+            for value in [
+                None,
+                "",
+                str(Path(folder) / "missing.jsonl"),
+                folder,
+                str(broken),
+                str(empty),
+            ]:
+                for repeated in [False, True]:
+                    with self.subTest(path=value, repeated=repeated):
+                        event = {"hook_event_name": "Stop", "stop_hook_active": repeated}
+                        if value is not None:
+                            event["transcript_path"] = value
+                        result = hook.check(event)
+                        self.assertEqual("block", result["decision"])
+                        self.assertIn("unverified", result["reason"].lower())
+                        self.assertIn("runtime", result["reason"].lower())
+            result = hook.check(
+                {
+                    "hook_event_name": "PreToolUse",
+                    "tool_name": "mcp__Google_Docs__update_doc",
+                    "tool_input": {"documentId": "synthetic", "requests": []},
+                }
+            )
+            self.assertEqual("deny", result["hookSpecificOutput"]["permissionDecision"])
+            self.assertIn(
+                "unverified", result["hookSpecificOutput"]["permissionDecisionReason"].lower()
+            )
+
+
 class SourceProjectionTests(unittest.TestCase):
     def test_actual_corrupt_closer_refuses_before_any_native_write(self):
         malformed = (

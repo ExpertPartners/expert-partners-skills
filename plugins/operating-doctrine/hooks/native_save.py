@@ -31,7 +31,11 @@ def records(path):
     with Path(path).open() as source:
         for line in source:
             row = json.loads(line)
+            if not isinstance(row, dict):
+                raise ValueError("Invalid transcript record")
             message = row.get("message", {})
+            if not isinstance(message, dict):
+                raise ValueError("Invalid transcript message")
             # Hook context is not a user request or assistant announcement.
             if message.get("hookEventName") or str(row.get("id", "")).startswith("hook-context-"):
                 continue
@@ -81,11 +85,16 @@ def is_write(name, value):
             re.match(r"https://docs\.googleapis\.com/v1/documents(?:/|\?|$)", value.get("url", ""))
         )
     if re.search(
-        r"google.*(?:batch_update_document|create_document|update_document)$|docs.*(?:batch_update|create_document)$",
+        r"google.*(?:batch_update_document|create_document|update_document|update_doc)$|docs.*(?:batch_update|create_document)$",
         name,
         re.I,
     ):
         return True
+    if re.search(r"google.*create_file$", name, re.I):
+        mime = value.get("contentMimeType")
+        return isinstance(mime, str) and mime.split(";", 1)[0].strip().lower() == (
+            "application/vnd.google-apps.document"
+        )
     if re.search(r"google.*(?:upload_file|update_file_content)$", name, re.I):
         mime = value.get("content_mime_type") or value.get("mime_type") or value.get("mimeType")
         meta = value.get("metadata", {})
@@ -100,7 +109,7 @@ def is_write(name, value):
 
 def response_ids(name, body):
     ids = set()
-    drive = bool(re.search(r"google.*(?:upload_file|update_file_content)$", name, re.I))
+    drive = bool(re.search(r"google.*(?:upload_file|update_file_content|create_file)$", name, re.I))
 
     def walk(value, depth=0):
         if depth > 12:
@@ -164,7 +173,9 @@ def request_ids(name, value):
         )
         target = match[1] if match else None
     elif re.search(
-        r"google.*(?:batch_update_document|update_document)$|docs.*batch_update$", name, re.I
+        r"google.*(?:batch_update_document|update_document|update_doc)$|docs.*batch_update$",
+        name,
+        re.I,
     ):
         target = value.get("document_id") or value.get("documentId")
     else:
@@ -316,7 +327,29 @@ def check(event, recheck=None):
         return {}
     if kind == "PreToolUse" and not is_write(event["tool_name"], event["tool_input"]):
         return {}
-    messages = records(event["transcript_path"])
+    try:
+        transcript = event.get("transcript_path")
+        if not isinstance(transcript, str) or not transcript.strip():
+            raise ValueError("Missing transcript")
+        messages = records(transcript)
+        if not messages:
+            raise ValueError("Empty transcript")
+    except (OSError, ValueError, TypeError):
+        reason = (
+            "Native save remains unverified on this runtime: readable nonempty transcript "
+            "evidence is missing or invalid. The document-formatting-standard and "
+            "deliverable-link procedures cannot be verified. Use the existing supported "
+            "save route with native evidence; a repeated Stop does not establish a pass."
+        )
+        if kind == "PreToolUse":
+            return {
+                "hookSpecificOutput": {
+                    "hookEventName": kind,
+                    "permissionDecision": "deny",
+                    "permissionDecisionReason": reason,
+                }
+            }
+        return {"decision": "block", "reason": reason}
     skills, writes, receipts, prose = evidence(messages)
     if kind == "PreToolUse" and is_write(event["tool_name"], event["tool_input"]):
         missing = SKILLS - skills
