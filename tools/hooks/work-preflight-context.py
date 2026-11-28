@@ -71,7 +71,10 @@ def context(policy, prompt):
 
 
 def closed_searches(policy, prompt):
-    sentences = re.split(r"[.!?\n;#]+|\b(?:and|but|then)\b", prompt.lower())
+    sentences = re.split(
+        r"[.!?\n;#]+|\b(?:and|but|then)\s+(?=(?:do not|don\x27t|never|stop|search|hunt|recover|find|locate|build(?!\s+101\b)|commission|rebuild|create|implement)\b)",
+        prompt.lower(),
+    )
     requested = []
     for item in policy["items"]:
         if (

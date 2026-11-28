@@ -48,3 +48,8 @@ test("an unrelated negative qualifier cannot cancel a positive recovery request"
  for(const text of ["Find original capstone homework without asking me.","Find original capstone homework and do not create a new tracker.","Do not build a replacement; find original capstone homework."])
   assert.equal(legacyIntent(policy,text)?.action,"source_search");
 });
+
+test("action clauses preserve a registered multiword capability name containing and",()=>{
+ const p={...policy,items:[{...policy.items[0]!,id:"audit",aliases:["business brain document and instruction health check"]}]};
+ assert.equal(legacyIntent(p,"Build a business brain document and instruction health check.")?.action,"replacement_build");
+});

@@ -94,7 +94,7 @@ def check(policy, data):
             continue
         # Negative instructions/receipts are inspection, not a positive commission.
         sentences = re.split(
-            r"[.!?\n;#]+|\b(?:and|but|then)\b",
+            r"[.!?\n;#]+|\b(?:and|but|then)\s+(?=(?:do not|don\x27t|never|stop|search|hunt|recover|find|locate|build(?!\s+101\b)|commission|rebuild|create|implement)\b)",
             str(ti.get("text") or ti.get("command") or ti.get("cmd") or ti.get("query") or payload),
         )
         for sentence in sentences:

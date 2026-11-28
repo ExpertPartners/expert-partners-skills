@@ -71,14 +71,14 @@ export function legacyIntent(policy: WorkPolicy, text: string): WorkIntent | nul
  const lower = text.toLowerCase();
  const search = /\b(search|hunt|recover|find|locate)\b[^.!?\n]{0,140}\b(original|video|homework|replay|source|capstone|build 101)\b/i;
  const build = /^\s*(?:please\s+)?(?:build(?!\s+101\b)|commission|rebuild|create|implement)\b|\b(?:please|you must|need you to|want you to|your task is to)\s+(?:build(?!\s+101\b)|commission|rebuild|create|implement)\b/i;
- for (const sentence of lower.split(/[.!?\n;#]+|\b(?:and|but|then)\b/)) {
+ for (const sentence of lower.split(/[.!?\n;#]+|\b(?:and|but|then)\s+(?=(?:do not|don\x27t|never|stop|search|hunt|recover|find|locate|build(?!\s+101\b)|commission|rebuild|create|implement)\b)/)) {
   if (/\b(?:do not|don't|never|stop)\s+(?:\w+\s+){0,2}(?:search|hunt|recover|find|locate|build|commission|rebuild|create|implement)\b|^\s*(?:no|closed|rejected)\b/.test(sentence)) continue;
   const item = policy.items.find(i => [i.id, ...i.aliases].some(a => sentence.includes(a.toLowerCase())));
   if (!item) continue;
   if (search.test(sentence)) return { action: "source_search", capabilityId: item.id };
   if (build.test(sentence)) return { action: "replacement_build", capabilityId: item.id };
  }
- for (const sentence of lower.split(/[.!?\n;#]+|\b(?:and|but|then)\b/)) {
+ for (const sentence of lower.split(/[.!?\n;#]+|\b(?:and|but|then)\s+(?=(?:do not|don\x27t|never|stop|search|hunt|recover|find|locate|build(?!\s+101\b)|commission|rebuild|create|implement)\b)/)) {
   if (/\b(?:do not|don't|never|stop)\s+(?:\w+\s+){0,2}(?:search|hunt|recover|find|locate|build|commission|rebuild|create|implement)\b|^\s*(?:no|closed|rejected)\b/.test(sentence)) continue;
   if (/\b(search|hunt|recover|find|locate)\b.{0,140}\b(original|missing source|unrecovered source)\b/.test(sentence))
    return {action: "source_search", capabilityId: "unreconciled-source"};

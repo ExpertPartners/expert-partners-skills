@@ -42,6 +42,7 @@ export async function liveWorkPolicy(seed: WorkPolicy, key: string,
    if (await sourceDecisionDigest(text)!==digest) throw new Error("Decision receipt history does not match trusted routing record");
    candidate={version:logBefore.version,states:parseSourceDecisions(text,authorityUrl,founder)};
   }
+  if (!candidate) throw new Error("Decision authority missing");
   if (protectedStates.size!==candidate.states.size || [...candidate.states].some(([id,state])=>{
    const saved=protectedStates.get(id);
    return !saved || saved.recovery!==state.recovery || saved.decisionId!==state.decisionId || saved.sourceUrl!==state.sourceUrl || JSON.stringify(saved.aliases)!==JSON.stringify(state.aliases);
@@ -96,7 +97,7 @@ export async function liveWorkPolicy(seed: WorkPolicy, key: string,
   }
  }
  // Removing an implementation row never removes its recorded source closure.
- const remembered=new Map(cached?.states??[]);
+ const remembered=new Map([...protectedStates,...(cached?.states??[])]);
  for (const [id,item] of fallback) if (!remembered.has(id) && item.sourceRecovery==="closed") remembered.set(id,{recovery:"closed",decisionId:"",aliases:item.aliases,sourceUrl:item.decisionUrl});
  const missing=new Map([...remembered,...(candidate?.states??[])]);
  for (const [capability,state] of missing) if (!seen.has(capability)) {
