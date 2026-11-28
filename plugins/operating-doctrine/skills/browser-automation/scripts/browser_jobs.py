@@ -964,9 +964,10 @@ class Route:
             code(client, adopt_connector_js(name))
             code(
                 client,
-                "const p=Buffer.constructor('return process')();if(page.context().pages().length!==1||!page.url().startsWith("
+                OWNED_SOURCE
+                + "const p=Buffer.constructor('return process')();if(page.context().pages().length!==1||!page.url().startsWith("
                 + json.dumps(EXTENSION + "?")
-                + "))throw Error('not_own_connector');p.__epBrowserJob={connector:page,task:null};return {ready:true};",
+                + "))throw Error('not_own_connector');p.__epBrowserJob=await newOwnedState(page);return {ready:true};",
             )
             yield client
         finally:
