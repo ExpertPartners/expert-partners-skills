@@ -1,3 +1,6 @@
+## 3.16.13 - 2026-11-28
+
+Keep the scheduled browser cleanup command from crashing when its window census returns action rows for windows it preserves. Preserve the existing nonzero exit for uncertain lifecycle results.
 ## 3.16.12 - 2026-11-28
 
 Add a macOS Keychain readiness helper so existing signed-in Chrome profiles can retain their saved state after windows close. Recover a locked login Keychain through 1Password without exposing credentials, creating profiles, restoring old tabs or opening a browser during the readiness check.
