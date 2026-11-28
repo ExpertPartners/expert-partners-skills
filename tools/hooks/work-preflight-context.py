@@ -47,6 +47,7 @@ def context(policy, prompt):
         "Inspect actual quality, latest decisions and why work paused before continuing. Built work goes to independent testing; "
         "underway work stays with its existing owner; genuinely missing work uses the existing owner and gap record. "
         "Use each disposition's owner field as the accountable routing owner. A delegated implementation child does not replace that owner. "
+        "Use the current live disposition for implementation status. Older capacity anecdotes do not establish a current blocker. "
         "Source recovery and implementation are independent. A closed source never becomes a hunt because an original is missing. "
         "Do not search for originals for any closed disposition below. Do not create an equivalent assignment under a different name. "
         "Continue authorized implementation, not source recovery. Preserve the founder-approved phase and week sequence.\n"
@@ -87,6 +88,7 @@ def closed_searches(policy, prompt):
 
 
 def main():
+    event = {}
     try:
         event = json.load(sys.stdin)
         client = load_client()
@@ -116,6 +118,18 @@ def main():
         return 0
     except Exception:
         # Do not print raw exceptions: provider errors may contain credential context.
+        if event.get("hook_event_name") == "SessionStart":
+            # Factory treats exit 2 on SessionStart as informational. Its supported
+            # continue:false contract must refuse the next prompt instead.
+            print(
+                json.dumps(
+                    {
+                        "continue": False,
+                        "stopReason": "Live ordered work preflight unavailable. Restore the existing connector route before work; do not use stale policy.",
+                    }
+                )
+            )
+            return 0
         print(
             "Live ordered work preflight unavailable. Recover existing connector access before starting work; stale policy is not a substitute.",
             file=sys.stderr,

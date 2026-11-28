@@ -21,6 +21,21 @@ client_module = context_module.load_client()
 
 
 class WorkPreflightTests(unittest.TestCase):
+    def test_factory_startup_failure_refuses_prompt_instead_of_informational_exit_two(self):
+        output = io.StringIO()
+        with (
+            patch.object(
+                context_module.sys, "stdin", io.StringIO('{"hook_event_name":"SessionStart"}')
+            ),
+            patch.object(context_module.sys, "stdout", output),
+            patch.object(context_module, "load_client") as load,
+        ):
+            load.return_value.refresh.side_effect = RuntimeError("private provider detail")
+            self.assertEqual(context_module.main(), 0)
+        result = json.loads(output.getvalue())
+        self.assertFalse(result["continue"])
+        self.assertNotIn("private provider detail", output.getvalue())
+
     def setUp(self):
         self.policy = {
             "items": [
