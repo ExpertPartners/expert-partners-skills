@@ -1,3 +1,6 @@
+## 3.16.5 - 2026-11-28
+
+Reject self-file duplicate findings and heuristic-only content health claims before an Auditor report commit. Require paired identity, role and field evidence, and preserve permission-read errors as unverified coverage.
 ## 3.16.4 - 2026-11-28
 
 Run ordered existing-work checks before the worker begins, compare intended outcomes across names, and distinguish recorded decisions from independently verified enforcement. Host preflight reads current owning records instead of relying on stale snapshots.
