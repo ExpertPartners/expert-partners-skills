@@ -90,6 +90,9 @@ jobs:
       - name: Validate AGENTS.md links
         run: python3 tools/readiness/check_agents_links.py
 
+      - name: Chrome profile continuity tests
+        run: python3 tools/test-chrome-profile-state.py
+
       - name: New hire onboarding workflow tests
         run: python3 -m unittest discover -s plugins/operating-doctrine/skills/new-hire-onboarding/tests -v
 
