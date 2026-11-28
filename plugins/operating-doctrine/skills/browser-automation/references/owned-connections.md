@@ -28,9 +28,26 @@ that the group contain exactly that connector. It never ungroups or regroups
 the attached connector, because the extension treats that as an ownership
 release. It removes only the fresh window's exact blank seed tab, and verifies
 the resulting window contains only the connector with its original group ID.
-Ambiguous membership or placement fails closed. An interrupted allocation with
-missing verified metadata remains a reconciliation hold, not authority for a
-sweeper to close the old or new window. Remove the compatibility fallback after
+Ambiguous membership or placement fails closed. Before isolation, the route saves
+a per-allocation nonce and intent in its private receipt directory. The private
+Node process fsyncs `births/<nonce>.json` before creation and before moving the
+group. Its seed uses that allocation's unique `about:blank#ep-isolation-<nonce>`
+marker, including Chrome's pending-URL form. Thus a lost creation response retains
+an exact marker, and a lost move/removal response retains the returned birth IDs.
+Both consumer and temporary maintenance allocations use this journal.
+
+For an interrupted isolation without normal metadata, finish stops the old
+transport first. In the same Chrome generation, a fresh owned maintenance
+connector checks the journal identity, exact client connector, seed marker/IDs,
+current extension claims and debugger attachments twice before removing only
+those proven tabs. It records removal intent before that call and verifies both
+tab disappearance and the created window's disposition. Foreign tabs and the
+original shared window survive. An ambiguous, changed, claimed, older-generation
+or pre-journal allocation stays held; the initial snapshot alone never authorizes
+closing its window. A failed maintenance allocation leaves its own failed receipt
+and journal, without recursively allocating another cleanup connection.
+
+Remove the compatibility fallback after
 a released upstream fix and an owned start/finish check prove original-window
 placement through the installed route.
 

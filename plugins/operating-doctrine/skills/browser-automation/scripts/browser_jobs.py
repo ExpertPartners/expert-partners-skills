@@ -28,7 +28,7 @@ import uuid
 
 from chrome_job_window import existing_signed_in_profile, chrome_is_running, verify_window_closed
 from job_transport import StdioClient, Refusal
-from browser_lifecycle import bind, ledger_lock, owner_path, identifier
+from browser_lifecycle import atomic_json, bind, ledger_lock, owner_path, identifier
 from aqua_cleanup import AquaCleanup
 from relay_facade import RelayBroker, generation_key, initialization_js
 from relay_ownership import OwnershipLedger
@@ -867,6 +867,8 @@ class Route:
             row["allocation_failure"] = job["allocation_failure"]
         if job.get("initial_connector"):
             row["initial_connector"] = job["initial_connector"]
+        if job.get("allocation_birth"):
+            row["allocation_birth"] = job["allocation_birth"]
         if job.get("connector_probe"):
             row["connector_probe"] = job["connector_probe"]
         if job.get("window_disposition"):
@@ -956,35 +958,171 @@ class Route:
     def metadata(self, client, strict=True):
         return code(client, STATE_JS + "return await s.snapshot(" + json.dumps(strict) + ");")
 
+    def begin_allocation_birth(self, job):
+        """Durable intent before Chrome creates or moves anything during isolation."""
+        token = uuid.uuid4().hex
+        job["allocation_birth"] = token
+        row = {
+            "token": token,
+            "job_id": job["job_id"],
+            "client_name": job["client_name"],
+            "generation": job["generation"],
+            "marker": "about:blank#ep-isolation-" + token,
+            "connectorId": (job.get("initial_connector") or {}).get("connectorId"),
+            "sourceWindowId": (job.get("initial_connector") or {}).get("windowId"),
+            "stage": "intent",
+        }
+        path = self.root / "births" / (token + ".json")
+        atomic_json(path, row)
+        self.checkpoint(job)
+        return {**row, "path": str(path)}
+
+    def allocation_birth(self, job):
+        token = job.get("allocation_birth")
+        if not isinstance(token, str) or not re.fullmatch(r"[0-9a-f]{32}", token):
+            raise Refusal("allocation_birth_unavailable")
+        path = self.root / "births" / (token + ".json")
+        if path.is_symlink() or path.stat().st_size > 16384:
+            raise Refusal("allocation_birth_unavailable")
+        row = json.loads(path.read_text())
+        if (
+            row.get("token") != token
+            or row.get("job_id") != job["job_id"]
+            or row.get("client_name") != job["client_name"]
+            or row.get("generation") != job["generation"]
+            or row.get("marker") != "about:blank#ep-isolation-" + token
+            or (
+                job.get("initial_connector")
+                and row.get("connectorId") != job["initial_connector"]["connectorId"]
+            )
+            or row.get("stage") not in ("intent", "observed", "creating", "created", "isolated")
+        ):
+            raise Refusal("allocation_birth_mismatch")
+        return path, row
+
+    def dispose_allocation_birth(self, job):
+        """No business work was possible. Reconcile only this isolation's seed/connector."""
+        if (
+            job.get("metadata") is not None
+            or job.get("ownership_pending")
+            or (job.get("allocation_failure") or {}).get("stage") != "connector_isolation"
+        ):
+            raise Refusal("allocation_birth_not_applicable")
+        if self.preflight() != job["generation"]:
+            raise Refusal("browser_generation_changed_requires_reconciliation")
+        path, birth = self.allocation_birth(job)
+        # The allocating process was stopped by dispose_failed before loading
+        # its journal. It cannot race this recovery or overwrite a disposition.
+        with self.maintenance_connector() as client:
+
+            def inspect(remove=False, expected=None):
+                args = {
+                    **birth,
+                    "connectorOrigin": EXTENSION,
+                    "remove": remove,
+                    "expected": expected,
+                }
+                return code(
+                    client,
+                    OWNED_SOURCE
+                    + "return await reconcileIsolationBirth(page,"
+                    + json.dumps(args)
+                    + ");",
+                )
+
+            observed = inspect()
+            if observed.get("held") or not isinstance(observed.get("proof"), str):
+                raise Refusal("allocation_birth_held")
+            if self.preflight() != job["generation"]:
+                raise Refusal("browser_generation_changed_requires_reconciliation")
+            birth["cleanup"] = {
+                "tabIds": sorted(
+                    set((birth.get("cleanup") or {}).get("tabIds", []) + observed["ids"])
+                ),
+                "windowId": observed.get("windowId"),
+                "issued_at": time.time(),
+            }
+            atomic_json(path, birth)
+            outcome = inspect(True, observed["proof"])
+            if outcome.get("closed") is not True:
+                raise Refusal("allocation_birth_close_unverified")
+            if self.preflight() != job["generation"]:
+                raise Refusal("browser_generation_changed_requires_reconciliation")
+            birth["disposition"] = outcome
+            atomic_json(path, birth)
+        job["window_disposition"] = "closed" if outcome.get("windowClosed") else "preserved_shared"
+        job["ownership_pending"] = False
+
     @contextmanager
     def maintenance_connector(self):
         name = "EP cleanup " + uuid.uuid4().hex
-        client = self.client(name)
+        job = {
+            "job_id": uuid.uuid4().hex,
+            "label": "maintenance",
+            "client_name": name,
+            "generation": self.preflight(),
+            "metadata": None,
+            "client": None,
+            "status": "starting",
+            "updated": time.time(),
+        }
+        initialized = False
         try:
+            client = job["client"] = self.client(name)
+            job["allocation_stage"] = "connector_identity"
             code(client, adopt_connector_js(name))
-            code(
+            birth = self.begin_allocation_birth(job)
+            job["allocation_stage"] = "connector_isolation"
+            # Maintenance allocations need the same durable birth evidence as
+            # consumer jobs. Its exact origin is journaled by the private Node
+            # process before creation; never recover recursively on failure.
+            opened = code(
                 client,
                 OWNED_SOURCE
-                + "const p=Buffer.constructor('return process')();if(page.context().pages().length!==1||!page.url().startsWith("
-                + json.dumps(EXTENSION + "?")
-                + "))throw Error('not_own_connector');p.__epBrowserJob=await newOwnedState(page);return {ready:true};",
+                + "const p=Buffer.constructor('return process')();"
+                + FRESH_CONNECTOR_JS
+                + "p.__epBrowserJob=await newOwnedState(page,"
+                + json.dumps(birth)
+                + ");const s=p.__epBrowserJob;return {ready:true,ownership:{...s.initial,tabIds:[s.initial.connectorId],unboundOwnedPages:0}};",
             )
-            yield client
+            if opened.get("ready") is not True:
+                raise Refusal("connector_initialization_failed")
+            initialized = True
+            job["metadata"] = opened.get("ownership")
+            self.checkpoint(job, "ready")
+            yield job["client"]
+        except BaseException as error:
+            if not initialized:
+                job["allocation_failure"] = {
+                    "stage": job.get("allocation_stage", "launcher_handshake"),
+                    "class": allocation_failure(error),
+                }
+            self.checkpoint(job, "failed")
+            raise
         finally:
+            client = job.get("client")
             try:
                 # This connector is its window's only tab, so nothing else can
                 # census its own removal. Its page close event is the proof.
-                closed = code(
-                    client,
-                    STATE_JS + "const gone=new Promise(r=>s.connector.once('close',()=>r(true)));"
-                    "const windowId=await s.connector.evaluate(async()=>{const t=await chrome.tabs.getCurrent();const tabs=await chrome.tabs.query({windowId:t.windowId});if(tabs.length!==1||tabs[0].id!==t.id)throw Error('maintenance_window_not_exclusive');setTimeout(()=>chrome.windows.remove(t.windowId),250);return t.windowId;});"
-                    "const seen=await Promise.race([gone,new Promise(r=>setTimeout(()=>r(false),5000))]);"
-                    "return {windowId,closed:seen};",
-                )
-                if closed.get("closed") is not True:
-                    raise Refusal("maintenance_window_closure_unobserved")
+                if initialized:
+                    closed = code(
+                        client,
+                        STATE_JS
+                        + "const gone=new Promise(r=>s.connector.once('close',()=>r(true)));"
+                        "const windowId=await s.connector.evaluate(async()=>{const t=await chrome.tabs.getCurrent();const tabs=await chrome.tabs.query({windowId:t.windowId});if(tabs.length!==1||tabs[0].id!==t.id)throw Error('maintenance_window_not_exclusive');setTimeout(()=>chrome.windows.remove(t.windowId),250);return t.windowId;});"
+                        "const seen=await Promise.race([gone,new Promise(r=>setTimeout(()=>r(false),5000))]);"
+                        "return {windowId,closed:seen};",
+                    )
+                    if closed.get("closed") is not True:
+                        raise Refusal("maintenance_window_closure_unobserved")
+                    job["window_disposition"] = "closed"
+                    self.checkpoint(job, "finished")
+            except BaseException:
+                self.checkpoint(job, "failed")
+                raise
             finally:
-                client.close()
+                if client:
+                    client.close()
 
     def capture_connection_diagnostics(self, job, stage, client=None, reason="unknown", skip=None):
         """Record fixed-label connection state once per phase without changing the outcome.
@@ -1093,13 +1231,16 @@ class Route:
         job["initial_connector"] = {k: observed[k] for k in fields}
         self.checkpoint(job)
         job["allocation_stage"] = "connector_isolation"
+        birth = self.begin_allocation_birth(job)
         # State is in this private Node process, not the ephemeral VM globals.
         initialized = code(
             client,
             OWNED_SOURCE
             + "const p=Buffer.constructor('return process')();if(p.__epBrowserJob)throw Error('already_attempted');"
             + FRESH_CONNECTOR_JS
-            + "p.__epBrowserJob=await newOwnedState(page);const s=p.__epBrowserJob;return {ready:true,ownership:{...s.initial,tabIds:[...s.ids.values()],unboundOwnedPages:0}};",
+            + "p.__epBrowserBirth="
+            + json.dumps(birth)
+            + ";p.__epBrowserJob=await newOwnedState(page,p.__epBrowserBirth);const s=p.__epBrowserJob;return {ready:true,ownership:{...s.initial,tabIds:[...s.ids.values()],unboundOwnedPages:0}};",
         )
         if initialized.get("ready") is not True:
             raise Refusal("connector_initialization_failed")
@@ -1526,6 +1667,9 @@ class Route:
                 self.mark(job, "live_" + failure_stage(error))
                 reason = getattr(error, "close_reason", reason)
             job["client"].close()
+        if not job.get("metadata") and job.get("allocation_birth"):
+            self.dispose_allocation_birth(job)
+            return
         old = job["metadata"]
         try:
             pending_since = self.reconcile_scope(job)
@@ -1822,6 +1966,7 @@ class Route:
                 # read as closed or settle a vanished window as its own removal.
                 for key in (
                     "initial_connector",
+                    "allocation_birth",
                     "connector_probe",
                     "allocation_failure",
                     "window_disposition",
