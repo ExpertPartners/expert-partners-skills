@@ -1,3 +1,6 @@
+## 3.16.14 - 2026-11-28
+
+Persist connector-isolation birth intent and a unique seed marker before creating or moving browser artifacts. Journal exact IDs before moving the connector group, and reconcile interrupted consumer and maintenance allocations through same-generation, unclaimed exact-tab checks without closing the original shared window.
 ## 3.16.13 - 2026-11-28
 
 Keep the scheduled browser cleanup command from crashing when its window census returns action rows for windows it preserves. Preserve the existing nonzero exit for uncertain lifecycle results.
