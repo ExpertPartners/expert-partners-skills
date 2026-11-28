@@ -65,6 +65,71 @@ class WorkPreflightTests(unittest.TestCase):
             ["lesson"],
         )
 
+    def test_native_task_assignment_cannot_duplicate_an_installed_build_or_reopen_source(self):
+        for name in ["CreateTask", "TaskCreate", "create_task"]:
+            for field in ["title", "subject", "notes"]:
+                result = module.check(
+                    self.policy,
+                    {
+                        "tool_name": name,
+                        "tool_input": {field: "Build a capstone homework replacement."},
+                    },
+                )
+                self.assertIsNotNone(result)
+                self.assertEqual(result[0], "CAPABILITY_EXISTS")
+                result = module.check(
+                    self.policy,
+                    {
+                        "tool_name": name,
+                        "tool_input": {field: "Find the original capstone homework source."},
+                    },
+                )
+                self.assertIsNotNone(result)
+                self.assertEqual(result[0], "SOURCE_RECOVERY_CLOSED")
+        self.assertIsNone(
+            module.check(
+                self.policy,
+                {
+                    "tool_name": "CreateTask",
+                    "tool_input": {"title": "Inspect existing capstone homework decisions."},
+                },
+            )
+        )
+
+    def test_native_task_fields_bind_one_assignment_and_open_searches_keep_their_owner(self):
+        for ti in [
+            {"title": "capstone homework", "notes": "Build a replacement for our brains."},
+            {"subject": "capstone homework", "description": "Find the original prompt."},
+            {"title": "Build a replacement for our brains.", "notes": "capstone homework"},
+        ]:
+            self.assertIsNotNone(
+                module.check(self.policy, {"tool_name": "TaskCreate", "tool_input": ti})
+            )
+        self.policy["source"] = {"decisionAuthority": {"status": "verified"}}
+        self.policy["items"][0]["sourceRecovery"] = "open"
+        self.assertEqual(
+            module.check(
+                self.policy,
+                {
+                    "tool_name": "CreateTask",
+                    "tool_input": {"title": "Find original capstone homework source."},
+                },
+            )[0],
+            "EXISTING_SEARCH_OWNER",
+        )
+        self.assertIsNone(
+            module.check(
+                self.policy,
+                {
+                    "tool_name": "CreateTask",
+                    "tool_input": {
+                        "title": "Build an unrelated fixture.",
+                        "notes": "Do not use capstone homework.",
+                    },
+                },
+            )
+        )
+
     def test_factory_startup_failure_refuses_prompt_instead_of_informational_exit_two(self):
         output = io.StringIO()
         with (

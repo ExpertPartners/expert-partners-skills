@@ -39,8 +39,13 @@ def check(policy, data):
         "shell_command",
     }
     commissioning = bool(
-        re.search(r"post_message|create_session|start_and_watch|SendMessage", tool, re.I)
+        re.search(
+            r"post_message|create_session|start_and_watch|SendMessage|CreateTask|TaskCreate|create_task",
+            tool,
+            re.I,
+        )
     )
+    task_creation = bool(re.search(r"CreateTask|TaskCreate|create_task", tool, re.I))
     authority = policy.get("source", {}).get("decisionAuthority", {})
     authority_unverified = authority.get("status") != "verified"
     fallback = {
@@ -71,6 +76,7 @@ def check(policy, data):
                     return "SOURCE_RECOVERY_CLOSED", resolved
                 if authority_unverified or resolved["sourceRecovery"] == "unverified":
                     return "SOURCE_AUTHORITY_UNVERIFIED", resolved
+                return "EXISTING_SEARCH_OWNER", resolved
             if action == "replacement_build":
                 return "CAPABILITY_EXISTS" if resolved[
                     "installed"
@@ -95,19 +101,67 @@ def check(policy, data):
         # Negative instructions/receipts are inspection, not a positive commission.
         sentences = re.split(
             r"[.!?\n;#]+|\b(?:and|but|then)\s+(?=(?:do not|don\x27t|never|stop|search|hunt|recover|find|locate|build(?!\s+101\b)|commission|rebuild|create|implement)\b)",
-            str(ti.get("text") or ti.get("command") or ti.get("cmd") or ti.get("query") or payload),
+            "\n".join(
+                str(ti[k])
+                for k in (
+                    "text",
+                    "command",
+                    "cmd",
+                    "query",
+                    "title",
+                    "subject",
+                    "activeForm",
+                    "notes",
+                    "description",
+                    "prompt",
+                    "message",
+                )
+                if isinstance(ti.get(k), str)
+            )
+            or payload,
+        )
+        # A native task is one assignment: its title may name the capability
+        # while notes carry the action. Negative references do not bind it.
+        task_context = task_creation and any(
+            a.lower() in clause.lower()
+            and not re.search(
+                r"\b(do not|don't|never|stop|without|no)\b", clause.lower().split(a.lower(), 1)[0]
+            )
+            for clause in sentences
+            for a in [item["id"]] + item["aliases"]
         )
         for sentence in sentences:
             lower = sentence.lower()
-            if not any(a.lower() in lower for a in [item["id"]] + item["aliases"]):
+            if not task_context and not any(
+                a.lower() in lower for a in [item["id"]] + item["aliases"]
+            ):
                 continue
             if re.search(
                 r"\b(?:do not|don't|never|stop)\s+(?:\w+\s+){0,2}(?:search|hunt|recover|find|locate|build|commission|rebuild|create|implement)\b|^\s*(?:no|closed|rejected)\b",
                 lower,
             ):
                 continue
+            if commissioning and re.search(
+                r"\b(search|hunt|recover|find|locate)\b.{0,140}\b(original|source|video|homework|prompt)\b",
+                lower,
+            ):
+                code = (
+                    "SOURCE_RECOVERY_CLOSED"
+                    if item["sourceRecovery"] == "closed"
+                    else "SOURCE_AUTHORITY_UNVERIFIED"
+                    if authority_unverified or item["sourceRecovery"] == "unverified"
+                    else "EXISTING_SEARCH_OWNER"
+                )
+                return code, item
             if (item["sourceRecovery"] in ("closed", "unverified") or authority_unverified) and (
-                search_tool
+                (
+                    search_tool
+                    or commissioning
+                    and re.search(
+                        r"\b(search|hunt|recover|find|locate)\b.{0,140}\b(original|source|video|homework)\b",
+                        lower,
+                    )
+                )
                 and not scoped_listing
                 or shell
                 and re.search(
@@ -137,7 +191,7 @@ def main():
         name = data.get("tool_name", "")
         serialized = json.dumps(data.get("tool_input", {}))
         critical = re.search(
-            r"search|firecrawl|web__run|browser|list_files|post_message|create_session|start_and_watch|SendMessage|\bfind\b|\blocate\b|\brecover\b|\bhunt\b",
+            r"search|firecrawl|web__run|browser|list_files|post_message|create_session|start_and_watch|SendMessage|CreateTask|TaskCreate|create_task|\bfind\b|\blocate\b|\brecover\b|\bhunt\b",
             name + serialized,
             re.I,
         )
