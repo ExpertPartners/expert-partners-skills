@@ -45,19 +45,40 @@ def operation(value):
 
 def is_write(name, value):
     value = operation(value)
-    raw = json.dumps(value)
     if name in ("Execute", "Bash"):
         command = value.get("command", "")
+        if (
+            "format_native_doc.py" not in command
+            and not re.search(
+                r"['\"]Content-Type['\"]\s*:\s*['\"](?:text/html|application/vnd\.google-apps\.document)",
+                command,
+                re.I,
+            )
+            and not re.search(r"https://docs\.googleapis\.com/v1/documents", command)
+            and re.search(r"drive/v3/files.*uploadType=media", command)
+            and re.search(
+                r"['\"]Content-Type['\"]\s*:\s*['\"]application/json(?:[;\"'])", command, re.I
+            )
+        ):
+            return False
         return bool(
             ("format_native_doc.py" in command and "--help" not in command)
             or (
-                re.search(r"(docs\.googleapis\.com|drive/v3/files)", command)
+                (
+                    re.search(r"https://docs\.googleapis\.com/v1/documents(?:/|\?|['\"])", command)
+                    or (
+                        re.search(r"drive/v3/files", command)
+                        and re.search(
+                            r"application/vnd\.google-apps\.document|text/html", command, re.I
+                        )
+                    )
+                )
                 and re.search(r"batchUpdate|['\"](?:POST|PATCH|PUT)['\"]", command)
             )
         )
     if re.search(r"google_api$", name, re.I):
         return value.get("method", "GET").upper() in ("POST", "PATCH", "PUT") and bool(
-            re.match(r"https://docs\.googleapis\.com/v1/documents(?:/|$)", value.get("url", ""))
+            re.match(r"https://docs\.googleapis\.com/v1/documents(?:/|\?|$)", value.get("url", ""))
         )
     if re.search(
         r"google.*(?:batch_update_document|create_document|update_document)$|docs.*(?:batch_update|create_document)$",
@@ -65,10 +86,16 @@ def is_write(name, value):
         re.I,
     ):
         return True
-    return bool(
-        re.search(r"google.*(?:upload_file|update_file_content)$", name, re.I)
-        and re.search(r"application/vnd\.google-apps\.document|text/html|documentId", raw, re.I)
-    )
+    if re.search(r"google.*(?:upload_file|update_file_content)$", name, re.I):
+        mime = value.get("content_mime_type") or value.get("mime_type") or value.get("mimeType")
+        meta = value.get("metadata", {})
+        native = "application/vnd.google-apps.document"
+        if isinstance(meta, dict) and meta.get("mimeType") == native:
+            return True
+        if isinstance(mime, str):
+            return mime.split(";", 1)[0].strip().lower() in (native, "text/html")
+        return isinstance(value.get("documentId"), str)
+    return False
 
 
 def response_ids(name, body):
