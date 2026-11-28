@@ -1,3 +1,6 @@
+## 3.16.8 - 2026-11-28
+
+Validate declared field gaps against the actual rendered Auditor report before commit and after readback. Reject thin findings with no explicit gap and reports that drop their evidence lists.
 ## 3.16.7 - 2026-11-28
 
 Close disconnected browser facade clients cleanly by redirecting a failed response pipe before interpreter shutdown. Existing owned-job cleanup still runs, and active peers are untouched.
