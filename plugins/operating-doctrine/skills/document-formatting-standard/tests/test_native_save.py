@@ -730,10 +730,11 @@ class SourceProjectionTests(unittest.TestCase):
 
     def test_valid_payloads_and_multiple_handoff_instances_remain_usable(self):
         text = 'Retained ordinary history.\nTODAY CHANGE LOG BEGIN v1\n{"rows":[]}\nTODAY CHANGE LOG END\n'
-        text += 'HANDOFF INSTANCE BEGIN v2\n{"id":"one"}\nHANDOFF INSTANCE END\n'
-        text += 'HANDOFF INSTANCE BEGIN v2\n{"id":"two"}\nHANDOFF INSTANCE END\n'
+        text += 'HANDOFF REGISTER BEGIN v2\nroute_id | sender | receiver\nTEST | Sender | Receiver\nHANDOFF REGISTER END\n'
+        text += 'HANDOFF INSTANCE BEGIN v2\nroute_id=TEST\ninstance_id=one\nHANDOFF INSTANCE END\n'
+        text += 'HANDOFF INSTANCE BEGIN v2\nroute_id=TEST\ninstance_id=two\nHANDOFF INSTANCE END\n'
         proof = fmt.source_projection_integrity(text)
-        self.assertEqual([1, 2], [len(x["payload_sha256"]) for x in proof])
+        self.assertEqual([1, 1, 2], [len(x["payload_sha256"]) for x in proof])
         self.assertEqual([], fmt.source_projection_integrity('Ordinary working note.\n'))
 
 

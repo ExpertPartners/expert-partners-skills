@@ -119,8 +119,12 @@ def source_projection_integrity(text):
             def reject_constant(value):
                 raise ValueError("Non-JSON constant in source projection: " + value)
 
-            payload = json.loads(text[left.end():right.start()], parse_constant=reject_constant)
-            payloads.append(digest(payload))
+            payload = text[left.end():right.start()]
+            if name.startswith("TODAY "):
+                json.loads(payload, parse_constant=reject_constant)
+            # Existing Handoff registers are pipe rows and instances are
+            # key=value lines. Preserve their grammar, not a second schema.
+            payloads.append(hashlib.sha256(payload.encode()).hexdigest())
         proof.append({"name": name, "payload_sha256": payloads})
     return proof
 
