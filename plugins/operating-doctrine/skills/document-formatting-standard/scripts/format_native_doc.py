@@ -116,10 +116,11 @@ def source_projection_integrity(text):
                 left[0].strip(" \t\r") == begin and right[0].strip(" \t\r") == end,
                 "Unbalanced source projection boundaries: " + name,
             )
+
             def reject_constant(value):
                 raise ValueError("Non-JSON constant in source projection: " + value)
 
-            payload = text[left.end():right.start()]
+            payload = text[left.end() : right.start()]
             if name.startswith("TODAY "):
                 json.loads(payload, parse_constant=reject_constant)
             # Existing Handoff registers are pipe rows and instances are
@@ -514,7 +515,8 @@ def format_doc(api, document_id, rulebook_id, name, parent):
     )
     saved = read_native(api, document_id)
     require(
-        source_projection_integrity("".join(text_of(x) for x in paragraphs(saved))) == projection_proof,
+        source_projection_integrity("".join(text_of(x) for x in paragraphs(saved)))
+        == projection_proof,
         "Formatting changed source projections",
     )
     after = [text_of(x) for x in paragraphs(saved) if text_of(x).strip()]
