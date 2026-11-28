@@ -1,3 +1,6 @@
+## 3.16.7 - 2026-11-28
+
+Close disconnected browser facade clients cleanly by redirecting a failed response pipe before interpreter shutdown. Existing owned-job cleanup still runs, and active peers are untouched.
 ## 3.16.6 - 2026-11-28
 
 Distinguish commenter access from an actual editor grant in Auditor sharing findings. The evidence validator rejects commenter-only editor claims.
