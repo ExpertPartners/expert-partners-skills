@@ -2,6 +2,7 @@
 import { z } from "zod";
 import { legacyIntent, validPolicy, workPreflight } from "./work-preflight.ts";
 import { orderedWorkPolicy } from "./ordered-work-policy.ts";
+import { HubHealthRefreshError, refreshHubSystemHealth, type HubHealthRefreshEnv } from "./hub-health-refresh.ts";
 import {
 	type Computer,
 	Factory,
@@ -17,7 +18,7 @@ import {
 	sleep,
 } from "./factory.ts";
 
-export interface ToolEnv {
+export interface ToolEnv extends HubHealthRefreshEnv {
 	FACTORY_API_KEY: string;
 	AUTOMATION_WEBHOOKS?: string;
 	GOOGLE_SA_KEY?: string;
@@ -225,6 +226,12 @@ function webhooks(env: ToolEnv): Record<string, { url: string; secret: string; d
 const id = z.string().describe("Session id");
 
 export const TOOLS: ToolDef[] = [
+	{
+		name: "refresh_hub_system_health",
+		description: "Refresh the Hub's six System health snapshots after saving the existing daily receipt. Uses a fixed destination and a server-held dedicated credential; accepts no inputs. One POST, no retries. A 409 means another refresh is running; timeout means uncertain, not safe to retry. Updated means stored, not healthy.",
+		schema: z.object({}).strict(),
+		run: (_a, _f, env) => refreshHubSystemHealth(env),
+	},
 	// ---------- Sessions API, all ten actions ----------
 	{
 		name: "list_sessions",
@@ -704,6 +711,10 @@ export async function runTool(name: string, args: unknown, env: ToolEnv) {
 		const result = await t.run(parsed.data, new Factory(env.FACTORY_API_KEY), env);
 		return { ok: true as const, status: 200, result };
 	} catch (e) {
+		if (e instanceof HubHealthRefreshError) {
+			return { ok: false as const, status: e.status, error: e.message,
+				...(e.upstreamStatus === undefined ? {} : { detail: { upstreamStatus: e.upstreamStatus } }) };
+		}
 		if (e instanceof FactoryError) {
 			return { ok: false as const, status: e.status === 401 ? 502 : e.status, error: e.message, detail: e.body };
 		}

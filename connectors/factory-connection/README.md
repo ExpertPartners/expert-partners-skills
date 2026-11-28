@@ -28,8 +28,17 @@ Secrets live only in 1Password and in the Worker's Cloudflare secrets. Nothing i
 | `ACCESS_CLIENT_ID`, `ACCESS_CLIENT_SECRET` | Factory Connection - Access OIDC client |
 | `ACCESS_AUTHORIZATION_URL`, `ACCESS_TOKEN_URL`, `ACCESS_JWKS_URL` | Endpoints listed in the notes of the Access OIDC client item |
 | `AUTOMATION_WEBHOOKS` (optional) | JSON map of webhook automation name to `{url, secret, description}`, one 1Password item per webhook |
+| `HUB_SYSTEM_HEALTH_REFRESH_TOKEN` (optional) | Existing dedicated Hub System health refresh credential, not the gateway or Factory API token |
 
 Load or rotate them by piping from `op` into `wrangler secret bulk`, never on a command line.
+
+## Daily System health refresh
+
+`refresh_hub_system_health({})` uses the existing MCP and bearer-authenticated HTTP surfaces. It makes one bodyless POST to the fixed Hub System health endpoint with the dedicated server-side secret. Call it only after the existing daily routine has saved and read back its real pass or fail receipt. It adds no scheduler, shell executor, arbitrary URL, credential input or source-body output.
+
+The action returns only the six source outcomes, `updated`, `unavailable` or `failed`. Updated means the snapshot was stored, not that a brain is healthy. Missing configuration fails closed. Upstream refusals and invalid receipts fail without exposing their bodies; a 409 is returned without retry. The 45-second deadline accommodates the Hub's 30-second source-read deadline. A network failure or timeout has an uncertain outcome and must not trigger a blind repeat.
+
+The existing service publisher binds the already-approved dedicated credential from 1Password to the optional Worker secret and deploys through the normal service release. It must match the Hub's dedicated refresh secret, never its gateway token. This source change does not activate that binding, alter Hub production settings or prove future daily execution. After activation, the same scheduled task must prove save-before-refresh through a real scheduled run.
 
 ## Develop and deploy
 
