@@ -128,6 +128,24 @@ class WorkPreflightTests(unittest.TestCase):
         )
         self.assertEqual(result[0], "CAPABILITY_EXISTS")
 
+    def test_native_code_mode_and_shell_command_cannot_reopen_a_closed_target(self):
+        for name, value in [
+            (
+                "exec",
+                {
+                    "code": "text(await tools.exec_command({cmd: \"/bin/echo Find original capstone homework > /tmp/test-marker\"}))"
+                },
+            ),
+            ("shell_command", {"command": "find /tmp -name 'capstone homework original'"}),
+            (
+                "exec",
+                "text(await tools.exec_command({cmd: \"locate capstone homework original\"}))",
+            ),
+        ]:
+            with self.subTest(name=name):
+                result = module.check(self.policy, {"tool_name": name, "tool_input": value})
+                self.assertEqual(result[0], "SOURCE_RECOVERY_CLOSED")
+
     def test_inspection_and_existing_work_are_usable(self):
         self.assertIsNone(
             module.check(
