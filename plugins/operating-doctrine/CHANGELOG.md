@@ -1,3 +1,6 @@
+## 3.16.12 - 2026-11-28
+
+Add a macOS Keychain readiness helper so existing signed-in Chrome profiles can retain their saved state after windows close. Recover a locked login Keychain through 1Password without exposing credentials, creating profiles, restoring old tabs or opening a browser during the readiness check.
 ## 3.16.11 - 2026-11-28
 
 Require native Google Docs formatting and effective-style readback after Drive imports. A real Week 10 save retained HTML spacing but silently saved Arial instead of the declared Poppins font. The existing formatting skill now completes the native formatting step before calling a save complete.
