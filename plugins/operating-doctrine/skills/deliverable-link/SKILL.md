@@ -32,6 +32,12 @@ First, use the URL the tool result already returned (viewUrl, url, html_url, per
 
 One markdown hyperlink per deliverable. Multiple deliverables in one response each get their own named link. The link sits inside the two-line summary that the document formatting standard already requires, so chat stays a pointer and the document stays the deliverable.
 
+For native simple-prose Docs saves, the canonical document-formatting-standard helper returns
+the exact verified name and Markdown link only after native readback. Use that link verbatim.
+The plugin Stop hook rechecks the actual
+Doc revision and requires that exact-name link in the final response. A generic caption or
+an earlier receipt from before another write does not establish completion.
+
 ## Share this, one file only
 
 This is the existing delivery skill's sharing entrypoint, not a second sharing service. Brain folders stay restricted. Creating, updating, mentioning or delivering a link does not authorize public access.

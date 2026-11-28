@@ -3,6 +3,16 @@
   "hooks": {
     "PreToolUse": [
       {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/native_save.py\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
         "matcher": "browser_",
         "hooks": [
           {
@@ -40,6 +50,15 @@
         "hooks": [
           {
             "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/native_save.py\"",
+            "timeout": 160
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/browser_window_cleanup.py\"",
             "timeout": 160
           }
@@ -53,6 +72,17 @@
             "type": "command",
             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/browser_window_cleanup.py\"",
             "timeout": 160
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/native_save.py\"",
+            "timeout": 10
           }
         ]
       }
