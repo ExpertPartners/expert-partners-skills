@@ -86,10 +86,36 @@ def operation(value):
     return value.get("input") if isinstance(value.get("input"), dict) else value
 
 
+def formatter_inspection(command):
+    # Exempt only standalone known read operations, never compound shell work.
+    if re.search(r"[;&|<>$`\n]", command):
+        return False
+    try:
+        parts = shlex.split(command)
+    except ValueError:
+        return False
+    if (
+        len(parts) == 3
+        and re.fullmatch(r"(?:.*/)?python3(?:\.\d+)?", parts[0])
+        and Path(parts[1]).name == "format_native_doc.py"
+        and parts[2] == "--help"
+    ):
+        return True
+    if len(parts) < 2 or Path(parts[-1]).name != "format_native_doc.py":
+        return False
+    if parts[0] in ("test", "/bin/test", "/usr/bin/test"):
+        return len(parts) == 3 and parts[1] == "-f"
+    return parts[0] in ("ls", "/bin/ls", "/usr/bin/ls", "cat", "/bin/cat", "/usr/bin/cat") and all(
+        re.fullmatch(r"-[A-Za-z]+|--", option) for option in parts[1:-1]
+    )
+
+
 def is_write(name, value):
     value = operation(value)
     if name in ("Execute", "Bash"):
         command = value.get("command", "")
+        if formatter_inspection(command):
+            return False
         if (
             "format_native_doc.py" not in command
             and not re.search(
@@ -105,7 +131,7 @@ def is_write(name, value):
         ):
             return False
         return bool(
-            ("format_native_doc.py" in command and "--help" not in command)
+            ("format_native_doc.py" in command)
             or (
                 (
                     re.search(r"https://docs\.googleapis\.com/v1/documents(?:/|\?|['\"])", command)

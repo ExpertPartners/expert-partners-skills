@@ -697,6 +697,39 @@ class ReviewRegressionTests(unittest.TestCase):
 class ConnectorEvidenceTests(unittest.TestCase):
     check = HookTests.check
 
+    def test_actual_formatter_file_inspection_is_not_a_native_write(self):
+        for command in [
+            "ls /tmp/format_native_doc.py",
+            "test -f /tmp/format_native_doc.py",
+            "cat /tmp/format_native_doc.py",
+            f"ls -l '{hook.FORMATTER}'",
+        ]:
+            for name in ["Bash", "Execute"]:
+                with self.subTest(command=command, name=name):
+                    self.assertFalse(hook.is_write(name, {"command": command}))
+                    self.assertEqual(
+                        {},
+                        hook.check(
+                            {
+                                "hook_event_name": "PreToolUse",
+                                "tool_name": name,
+                                "tool_input": {"command": command},
+                            }
+                        ),
+                    )
+
+    def test_formatter_execution_and_compound_writes_still_require_the_guard(self):
+        for command in [
+            FORMAT["command"],
+            FORMAT["command"].replace(hook.FORMATTER, "/tmp/format_native_doc.py"),
+            "ls /tmp/format_native_doc.py && " + FORMAT["command"],
+            "test -f /tmp/format_native_doc.py; " + WRITE["command"],
+            'cat "$(python3 /tmp/format_native_doc.py)"',
+            "python3 /tmp/format_native_doc.py --help; python3 /tmp/format_native_doc.py --document-id x",
+        ]:
+            with self.subTest(command=command):
+                self.assertTrue(hook.is_write("Bash", {"command": command}))
+
     def test_metadata_only_and_malformed_conversation_never_establish_evidence(self):
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / "session.jsonl"
