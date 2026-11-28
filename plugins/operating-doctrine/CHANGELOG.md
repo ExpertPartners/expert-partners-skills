@@ -1,3 +1,6 @@
+## 3.16.16 - 2026-11-28
+
+Keep file metadata, fixture cleanup and JSON evidence uploads outside native document-content save validation. Continue enforcing known Docs writes and native or HTML document imports.
 ## 3.16.15 - 2026-11-28
 
 Validate known native document saves before writing and at delivery. Require the canonical formatting and link procedures, a destination announcement, guarded native title formatting and rendered export verification, then the exact verified document-name link. Preserve existing save routes and state the unsupported interception and layout boundaries.
