@@ -7,6 +7,7 @@ import tempfile
 import types
 import unittest
 from unittest.mock import patch
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -501,7 +502,7 @@ class ReviewRegressionTests(unittest.TestCase):
             if method == "POST":
                 self.writes.append(body)
                 return {"documentId": "synthetic"}
-            if "docs.googleapis.com" in url:
+            if urlsplit(url).hostname == "docs.googleapis.com":
                 base = doc(paragraph("Synthetic Save\n", style="TITLE"), paragraph("Body\n", 16))
                 base["documentId"] = "synthetic"
                 base["documentStyle"] = {
@@ -559,7 +560,11 @@ class ReviewRegressionTests(unittest.TestCase):
         class Changed(self.API):
             def json(self, url, method="GET", body=None):
                 result = super().json(url, method, body)
-                if method == "GET" and "docs.googleapis.com" in url and self.writes:
+                if (
+                    method == "GET"
+                    and urlsplit(url).hostname == "docs.googleapis.com"
+                    and self.writes
+                ):
                     result["body"]["content"] = [
                         paragraph("Synthetic Save\n", 1, "TITLE"),
                         paragraph("Synthetic Save\n", 16, "TITLE"),
