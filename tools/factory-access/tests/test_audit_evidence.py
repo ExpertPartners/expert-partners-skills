@@ -14,6 +14,15 @@ SPEC.loader.exec_module(MODULE)
 
 
 class AuditEvidenceTests(unittest.TestCase):
+    def test_report_must_not_drop_a_thin_pieces_declared_gaps(self):
+        evidence = {
+            "pieces": [{"contentStatus": "thin", "gaps": ["Missing dated outcome evidence."]}],
+            "renderedReportText": "Open field questions\nNone in checked fields.",
+        }
+        self.assertTrue(MODULE.validate(evidence))
+        evidence["renderedReportText"] = "Open field questions\nMissing dated outcome evidence."
+        self.assertFalse(MODULE.validate(evidence))
+
     def test_commenter_is_not_an_editor_finding(self):
         finding = {
             "status": "editor finding",
