@@ -697,6 +697,44 @@ class ReviewRegressionTests(unittest.TestCase):
 class ConnectorEvidenceTests(unittest.TestCase):
     check = HookTests.check
 
+    def test_metadata_only_and_malformed_conversation_never_establish_evidence(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "session.jsonl"
+            for row in [
+                {},
+                {"type": "system", "subtype": "init"},
+                {"type": "message", "message": {"role": "assistant", "content": [None]}},
+                {"type": "message", "message": {"role": "assistant", "content": []}},
+                {
+                    "type": "message",
+                    "message": {"role": "assistant", "content": [{"type": "tool_use"}]},
+                },
+            ]:
+                with self.subTest(row=row):
+                    path.write_text(json.dumps(row) + "\n")
+                    result = hook.check({"hook_event_name": "Stop", "transcript_path": str(path)})
+                    self.assertEqual("block", result["decision"])
+                    self.assertIn("unverified", result["reason"].lower())
+
+    def test_real_messages_preserve_harmless_metadata_and_normalize_string_content(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "session.jsonl"
+            rows = [
+                {"type": "system", "subtype": "init"},
+                {"type": "message", "message": {"role": "user", "content": "Explain this."}},
+                {
+                    "type": "message",
+                    "message": {"role": "assistant", "content": "Here is the explanation."},
+                },
+            ]
+            path.write_text("".join(json.dumps(row) + "\n" for row in rows))
+            messages = hook.records(path)
+            self.assertEqual(2, len(messages))
+            self.assertEqual([{"type": "text", "text": "Explain this."}], messages[0]["content"])
+            self.assertEqual(
+                {}, hook.check({"hook_event_name": "Stop", "transcript_path": str(path)})
+            )
+
     def test_actual_connector_writes_require_procedures_and_bind_native_targets(self):
         cases = [
             (

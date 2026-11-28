@@ -33,13 +33,52 @@ def records(path):
             row = json.loads(line)
             if not isinstance(row, dict):
                 raise ValueError("Invalid transcript record")
-            message = row.get("message", {})
+            if "message" not in row:
+                if row.get("type") == "message":
+                    raise ValueError("Missing transcript message")
+                continue
+            message = row["message"]
             if not isinstance(message, dict):
                 raise ValueError("Invalid transcript message")
             # Hook context is not a user request or assistant announcement.
             if message.get("hookEventName") or str(row.get("id", "")).startswith("hook-context-"):
                 continue
-            result.append(message)
+            if message.get("role") in ("system", "developer"):
+                continue
+            if message.get("role") not in ("user", "assistant"):
+                raise ValueError("Unsupported transcript role")
+            content = message.get("content")
+            if isinstance(content, str):
+                content = [{"type": "text", "text": content}]
+            if not isinstance(content, list) or not content:
+                raise ValueError("Invalid transcript content")
+            meaningful = False
+            for item in content:
+                if not isinstance(item, dict):
+                    raise ValueError("Invalid transcript block")
+                kind = item.get("type")
+                if kind == "text":
+                    if not isinstance(item.get("text"), str):
+                        raise ValueError("Invalid transcript text")
+                    meaningful |= bool(item["text"].strip())
+                elif kind == "tool_use":
+                    if not all(
+                        isinstance(item.get(k), str) and item[k] for k in ("id", "name")
+                    ) or not isinstance(item.get("input"), dict):
+                        raise ValueError("Invalid transcript tool call")
+                    meaningful = True
+                elif kind == "tool_result":
+                    if not isinstance(item.get("tool_use_id"), str) or not isinstance(
+                        item.get("content"), (str, list, dict)
+                    ):
+                        raise ValueError("Invalid transcript tool result")
+                    meaningful = True
+                elif kind in ("image", "document"):
+                    meaningful = True
+                elif kind not in ("thinking", "redacted_thinking"):
+                    raise ValueError("Unsupported transcript block")
+            if meaningful:
+                result.append({**message, "content": content})
     return result
 
 
