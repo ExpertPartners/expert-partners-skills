@@ -14,6 +14,15 @@ SPEC.loader.exec_module(MODULE)
 
 
 class AuditEvidenceTests(unittest.TestCase):
+    def test_commenter_is_not_an_editor_finding(self):
+        finding = {
+            "status": "editor finding",
+            "permissions": [{"type": "anyone", "role": "commenter"}],
+        }
+        self.assertTrue(MODULE.validate({"sharingFindings": [finding]}))
+        finding["permissions"][0]["role"] = "writer"
+        self.assertFalse(MODULE.validate({"sharingFindings": [finding]}))
+
     def claim(self):
         return {
             "status": "confirmed",
