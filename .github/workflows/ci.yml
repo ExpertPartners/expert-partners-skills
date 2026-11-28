@@ -102,6 +102,9 @@ jobs:
       - name: Week Wrap prewrite contract tests
         run: python3 -m unittest discover -s tools/week-wrap/tests -v
 
+      - name: Native document save contract tests
+        run: python3 -m unittest discover -s plugins/operating-doctrine/skills/document-formatting-standard/tests -v
+
   gitleaks:
     name: gitleaks secret scan (full history)
     runs-on: ubuntu-latest

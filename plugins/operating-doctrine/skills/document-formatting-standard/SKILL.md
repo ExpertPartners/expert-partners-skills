@@ -75,3 +75,23 @@ These notes translate the Rulebook's values. They never replace them.
 ## Where this standard lives
 
 This file in expert-partners-skills, plugins/operating-doctrine/skills/document-formatting-standard/, is the canonical copy. Surfaces receive it through the plugin marketplace.
+
+## Native save procedure
+
+Invoke this skill and `deliverable-link` before a company document write. Resolve the live Rulebook and current decisions, the same-subject native Doc, its canonical name and owning parent. Say the resolved destination in assistant prose before the first write. Use the existing connector or delegated Google route for the content save, updating the same Doc when its purpose has not changed. Legacy intake instructions do not override the current save rule.
+
+After the last content write, run `scripts/format_native_doc.py` from this installed skill folder. It uses the existing local Google adapter, not a new credential or service. Resolve that adapter from the configured Google Workspace MCP server or an already verified route. Supply its absolute Python module path, the authorized subject, actual document ID, live Rulebook ID, exact metadata name and parent ID.
+
+```text
+python3 /absolute/installed/skill/scripts/format_native_doc.py \
+  --adapter /absolute/existing/google/server.py \
+  --subject AUTHORIZED_SUBJECT --document-id ACTUAL_DOC_ID \
+  --rulebook-id LIVE_RULEBOOK_ID --name 'EXACT_METADATA_NAME' \
+  --parent-id ACTUAL_OWNING_PARENT
+```
+
+The helper reads the live Rulebook under a version check, retains existing text and links, inserts a missing subject title, applies native named styles under a revision guard and verifies the saved text, title and effective fonts and sizes through the native PDF export. It requires the existing Python `pypdf` dependency for export inspection and checks that before writing. An omitted native font-size field is never assumed to mean the body size. The helper returns a successful `NATIVE_DOC_VERIFIED` receipt and the exact-name link only after verification. Use that exact link in the final reply. A later content write invalidates the earlier receipt.
+
+The installed plugin's Factory-compatible hooks check the known native Google write tools and inline Google API calls, including nested `Execute` calls. They require successful skill loads and the pre-write destination announcement. The Stop hook binds each successful formatter result to that exact saved ID and name, then reads the actual final native revision and content again before checking the caption. A later detected content or style write invalidates the earlier receipt. It rejects an invalid receipt or caption on repeated Stop calls as well. A corrected, freshly verified reply ends the correction. A repeat call does not establish a save pass.
+
+This is bounded workflow enforcement, not an arbitrary-code security boundary. Opaque shell scripts, arbitrary API clients, disabled hooks, web-only surfaces and sessions that have not loaded the plugin remain outside its verified interception. Nested calls do not fire Factory `PostToolUse`, so verification uses the transcript at Stop, not an invented post-call capability. This helper supports single-tab text with native TITLE and H1/H2. Multi-tab Docs, tables, objects, generated list glyphs and special layouts remain with their owning layout procedure and receive no pass from this helper. It requests all native tabs and refuses those structures before writing, including headers, footers, positioned objects and nonstandard page sizes. Definitive Google API request failures stay in history without pretending a mutation succeeded. An uncertain write to an exact structured target remains unverified until a later successful formatter reads that same target back; a creation whose target is unknown remains unbound and unverified. An interrupted or failed save remains unverified.
