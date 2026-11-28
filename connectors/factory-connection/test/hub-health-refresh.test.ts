@@ -33,7 +33,7 @@ test("uses one bodyless POST, fixed HTTPS origin, no redirects and dedicated bin
 		assert.equal(url, "https://hq.expertpartners.com/api/campus/system-health");
 		assert.equal(init.method, "POST");
 		assert.equal(init.body, undefined);
-		assert.equal(init.redirect, "error");
+		assert.equal(init.redirect, "manual");
 		assert.equal(new Headers(init.headers).get("authorization"), `Bearer ${secret}`);
 		assert.equal(init.signal.aborted, false);
 		return receipt();

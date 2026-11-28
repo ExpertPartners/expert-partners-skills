@@ -48,6 +48,10 @@ Missing, edited, truncated, replayed, forked, unsupported or unstable authority 
 
 The action returns only the six source outcomes, `updated`, `unavailable` or `failed`. Updated means the snapshot was stored, not that a brain is healthy. Missing configuration fails closed. Upstream refusals and invalid receipts fail without exposing their bodies; a 409 is returned without retry. The 45-second deadline accommodates the Hub's 30-second source-read deadline. A network failure or timeout has an uncertain outcome and must not trigger a blind repeat.
 
+The request uses Workers-supported `redirect: "manual"`. Every non200 response, including redirects, is refused without following `Location` or forwarding the dedicated bearer to another destination. Workers does not implement `redirect: "error"` and throws before sending it. See the [Workers Request reference](https://developers.cloudflare.com/workers/runtime-apis/request/).
+
+`npm test` includes actual Miniflare/workerd regression tests, using the compatibility date and flags from `wrangler.jsonc`. They bundle the real HTTP handler and registered action and intercept all outbound traffic locally. These tests exercise request construction, a successful sanitized receipt, redirect refusals, non200 responses, malformed and oversized bodies, and rejected caller overrides. They never call production.
+
 The existing service publisher binds the already-approved dedicated credential from 1Password to the optional Worker secret and deploys through the normal service release. It must match the Hub's dedicated refresh secret, never its gateway token. This source change does not activate that binding, alter Hub production settings or prove future daily execution. After activation, the same scheduled task must prove save-before-refresh through a real scheduled run.
 
 ## Develop and deploy

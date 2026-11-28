@@ -42,7 +42,8 @@ export async function refreshHubSystemHealth(env: HubHealthRefreshEnv, send: typ
 		const response = await send(endpoint, {
 			method: "POST",
 			headers: { Authorization: `Bearer ${token}` },
-			redirect: "error",
+			// Workers supports manual, not error. Refuse redirects below without following Location.
+			redirect: "manual",
 			signal: controller.signal,
 		});
 		if (response.status !== 200) {
