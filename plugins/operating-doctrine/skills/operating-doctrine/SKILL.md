@@ -28,6 +28,8 @@ Every chat has one job, named in its title or first message. Stay on that job un
 ## Cal first
 Before any source search or replacement build, run the shared Factory `work_preflight` with the capability key from the existing Ledger disposition. Check current decisions, installed capabilities and active owners. Closed recovery stays closed unless Allison explicitly supersedes it. Keep source recovery separate from implementation and independent testing. Continue approved replacements through their existing owners. Route a genuine unresolved choice with evidence and a specific recommendation. Read the live Rulebook for the full rule and unsupported surfaces.
 
+Before starting new work, the preflight checks Company Tool Builder, the skills marketplace and the Gap Build List in that order. Compare intended outcomes and functionality, including differently named equivalents. Inspect actual quality, current decisions and why work paused before reuse. Built work goes to testing, underway work stays with its existing owner, and only genuine gaps proceed. Supported host hooks fetch this live evidence before the prompt and protect source lookups as well as dispatch. An installed hook or a written instruction is not proof of enforcement. Company Test Bench verifies the worker behavior at the point work starts.
+
 Before answering or advising anything about setup or method, check Cal's evidence (the course knowledge, the Cal Instruction Ledger and Gap Build List) for what Cal would do. Never make up what Cal says. If her evidence is silent, say so. We improve how it's done with AI systems, never what Cal's method is.
 
 ## When something is in the way

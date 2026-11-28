@@ -16,6 +16,9 @@ import time
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--policy", type=Path, required=True)
+    parser.add_argument(
+        "--client", type=Path, help="Private existing connector endpoint and 1Password references"
+    )
     args = parser.parse_args()
     policy = json.loads(args.policy.read_text())
     assert policy["version"] == 1 and policy["source"]["revision"]
@@ -25,6 +28,16 @@ def main():
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(json.dumps(policy, indent=2) + "\n")
     dest.chmod(0o600)
+    if args.client:
+        client = json.loads(args.client.read_text())
+        assert (
+            client["endpoint"].startswith("https://")
+            and client["credentialItem"]
+            and client["vault"]
+        )
+        client_dest = dest.with_name("work-preflight-client.json")
+        client_dest.write_text(json.dumps(client) + "\n")
+        client_dest.chmod(0o600)
     command = "/usr/bin/python3 " + shlex.quote(str(source))
     for relative, nested in [
         (".factory/hooks.json", False),
@@ -46,9 +59,33 @@ def main():
             0,
             {
                 "matcher": "",
-                "hooks": [{"type": "command", "command": command, "timeout": 10}],
+                "hooks": [{"type": "command", "command": command, "timeout": 50}],
             },
         )
+        if args.client:
+            context_command = "/usr/bin/python3 " + shlex.quote(
+                str(source.with_name("work-preflight-context.py"))
+            )
+            prompts = root.setdefault("UserPromptSubmit", [])
+            prompts[:] = [
+                h
+                for h in prompts
+                if not any(
+                    "/work-preflight-context.py" in x.get("command", "") for x in h.get("hooks", [])
+                )
+            ]
+            prompts.insert(
+                0, {"hooks": [{"type": "command", "command": context_command, "timeout": 50}]}
+            )
+            ends = root.setdefault("SessionEnd", [])
+            ends[:] = [
+                h
+                for h in ends
+                if not any(
+                    "/work-preflight-context.py" in x.get("command", "") for x in h.get("hooks", [])
+                )
+            ]
+            ends.append({"hooks": [{"type": "command", "command": context_command, "timeout": 3}]})
         if json.dumps(data, sort_keys=True) != old:
             path.parent.mkdir(parents=True, exist_ok=True)
             if path.exists():

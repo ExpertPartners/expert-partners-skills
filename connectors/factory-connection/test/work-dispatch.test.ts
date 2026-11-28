@@ -35,3 +35,7 @@ test("production refuses a missing live credential instead of evaluating its sav
  const r=await runTool("post_message",{sessionId:"existing-owner",text:"Continue"},{...env,WORK_POLICY_LIVE:"required"});
  assert.equal(r.status,503);
 });
+test("differently named new assignments cannot omit preflight metadata",async()=>{
+ const r=await runTool("create_session",{machine:"M4",firstMessage:"A completely differently named new assignment"},env);
+ assert.equal(r.status,409);assert.equal((r as any).detail.code,"NEW_WORK_PREFLIGHT_REQUIRED");
+});

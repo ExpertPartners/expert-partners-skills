@@ -2,12 +2,14 @@
 export type WorkIntent = {
  action: "source_search" | "replacement_build" | "continue" | "inspect" | "escalate";
  capabilityId: string;
+ outcome?: string;
  evidence?: string[];
  recommendation?: string;
 };
 export type WorkPolicy = {
  version: 1;
- source: { url: string; revision: string };
+ source: { url: string; revision: string; companyToolBuilderSession?: string };
+ checks?: {stage: string; evidence: unknown}[];
  items: {
   id: string; aliases: string[]; sourceRecovery: "closed" | "open";
   decisionUrl: string; ownerSession: string; implementation: string;
@@ -26,10 +28,14 @@ export function validPolicy(p: unknown): p is WorkPolicy {
    Array.isArray(i.evidence));
 }
 export function workPreflight(policy: WorkPolicy, intent: WorkIntent, targetSession?: string) {
- const item = policy.items.find(i => i.id === intent.capabilityId);
+ const direct = policy.items.find(i => i.id === intent.capabilityId);
+ const normalized = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+ const outcome = normalized(intent.outcome ?? "");
+ const equivalents = outcome ? policy.items.filter(i => i.aliases.some(a => normalized(a) === outcome)) : [];
+ const item = direct ?? (equivalents.length === 1 ? equivalents[0] : undefined);
  const evidence = item ? [item.decisionUrl, ...item.evidence] : intent.evidence ?? [];
  const result = (allowed: boolean, code: string, reason: string) => ({
-  allowed, code, reason, capabilityId: intent.capabilityId,
+  allowed, code, reason, capabilityId: item?.id ?? intent.capabilityId,
   ownerSession: item?.ownerSession || null, evidence, source: policy.source,
  });
  if (intent.action === "inspect") return result(true, "INSPECTION", "Read existing records without commissioning work.");
