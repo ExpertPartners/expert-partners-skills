@@ -1,3 +1,6 @@
+## 3.16.6 - 2026-11-28
+
+Distinguish commenter access from an actual editor grant in Auditor sharing findings. The evidence validator rejects commenter-only editor claims.
 ## 3.16.5 - 2026-11-28
 
 Reject self-file duplicate findings and heuristic-only content health claims before an Auditor report commit. Require paired identity, role and field evidence, and preserve permission-read errors as unverified coverage.
