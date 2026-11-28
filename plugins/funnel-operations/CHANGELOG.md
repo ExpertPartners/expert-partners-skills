@@ -1,3 +1,6 @@
+## 0.3.4 - 2026-11-28
+
+Distinguish workflow inventory from verified definitions, diagnose vendor feature refusals correctly, use the existing shared connection and passive M2 read route, and require evidence for read-only and per-environment access claims.
 ## 0.3.3 - 2026-11-24
 
 PayPal is the only payment processor per the HQ Decision Log, November 24, 2026. Retire live Stripe instructions from CFO reviews and funnel operations, preserve labeled legacy wind-down history, and exclude Helcim.
