@@ -41,7 +41,8 @@ test("unknown, empty and prototype departments and invalid line combinations fai
 test("AG routing never grants Don AG or grants access beyond the department; pins remain leader only", async () => {
 	for (const line of ["AGRE", "AGI"]) {
 		const don = principal("don@expertpartners.com", "ag-ceo", line);
-		assert.deepEqual(effectiveScopes(allowed, don), ["hq-core", "ep-core"]);
+		// Current shared governance includes hq-experience; AG remains denied.
+		assert.deepEqual(effectiveScopes(allowed, don), ["hq-core", "hq-experience", "ep-core"]);
 		assert.throws(() => pinnedReadFor(don, "gap108-week2-builder", "file", undefined, "{}"));
 		const allison = principal("allison@expertpartners.com", "ag-cro", line);
 		assert.deepEqual(effectiveScopes(allowed, allison), effectiveScopes(allowed, { kind: "department", id: "ag-cro" }));
