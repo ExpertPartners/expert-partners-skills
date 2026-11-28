@@ -30,6 +30,10 @@ def refresh():
     op = shutil.which("op") or "/opt/homebrew/bin/op"
     raw = subprocess.run(
         [
+            "/bin/zsh",
+            "-lc",
+            'exec "$@"',
+            "work-preflight",
             op,
             "item",
             "get",

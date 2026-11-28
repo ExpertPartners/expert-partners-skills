@@ -1,6 +1,11 @@
 import importlib.util
 import pathlib
+import io
+import json
+import os
+import tempfile
 import unittest
+from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location(
     "preflight", pathlib.Path(__file__).parents[1] / "work-preflight.py"
@@ -12,6 +17,7 @@ context_spec = importlib.util.spec_from_file_location(
 )
 context_module = importlib.util.module_from_spec(context_spec)
 context_spec.loader.exec_module(context_module)
+client_module = context_module.load_client()
 
 
 class WorkPreflightTests(unittest.TestCase):
@@ -62,6 +68,45 @@ class WorkPreflightTests(unittest.TestCase):
             ),
             [],
         )
+
+    def test_background_host_uses_existing_login_bootstrap_for_credential_reference(self):
+        with (
+            tempfile.TemporaryDirectory() as directory,
+            patch.dict(os.environ, {"HOME": directory}),
+        ):
+            root = pathlib.Path(directory) / ".config/expert-partners"
+            root.mkdir(parents=True)
+            (root / "work-preflight-client.json").write_text(
+                json.dumps(
+                    {
+                        "endpoint": "https://example.com/api/tools/work_preflight",
+                        "credentialItem": "reference",
+                        "vault": "vault-reference",
+                    }
+                )
+            )
+            policy = {
+                "version": 1,
+                "source": {"revision": "current"},
+                "items": [{"id": "existing"}],
+                "checks": [
+                    {"stage": name}
+                    for name in ["company_tool_builder", "skills_marketplace", "gap_build_list"]
+                ],
+            }
+            with (
+                patch.object(client_module.subprocess, "run") as process,
+                patch.object(client_module.urllib.request, "urlopen") as request,
+            ):
+                process.return_value.stdout = json.dumps(
+                    {"fields": [{"id": "credential", "value": "test-only-token"}]}
+                )
+                request.return_value = io.StringIO(json.dumps({"result": {"policy": policy}}))
+                self.assertEqual(client_module.refresh(), policy)
+                self.assertEqual(process.call_args.args[0][:3], ["/bin/zsh", "-lc", 'exec "$@"'])
+                self.assertEqual(
+                    json.loads((root / "work-preflight-policy.json").read_text()), policy
+                )
 
     def test_source_tools_and_shell_reopen_are_blocked(self):
         for tool, args in [
