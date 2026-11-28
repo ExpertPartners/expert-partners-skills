@@ -17,6 +17,8 @@
 	},
 	"devDependencies": {
 		"@types/node": "26.0.1",
+		"esbuild": "0.28.2",
+		"miniflare": "4.20260625.0",
 		"typescript": "6.0.3",
 		"wrangler": "4.105.0"
 	}
