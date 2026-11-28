@@ -65,6 +65,37 @@ class WorkPreflightTests(unittest.TestCase):
             ["lesson"],
         )
 
+    def test_native_task_assignment_cannot_duplicate_an_installed_build_or_reopen_source(self):
+        for name in ["CreateTask", "TaskCreate", "create_task"]:
+            for field in ["title", "subject", "notes"]:
+                result = module.check(
+                    self.policy,
+                    {
+                        "tool_name": name,
+                        "tool_input": {field: "Build a capstone homework replacement."},
+                    },
+                )
+                self.assertIsNotNone(result)
+                self.assertEqual(result[0], "CAPABILITY_EXISTS")
+                result = module.check(
+                    self.policy,
+                    {
+                        "tool_name": name,
+                        "tool_input": {field: "Find the original capstone homework source."},
+                    },
+                )
+                self.assertIsNotNone(result)
+                self.assertEqual(result[0], "SOURCE_RECOVERY_CLOSED")
+        self.assertIsNone(
+            module.check(
+                self.policy,
+                {
+                    "tool_name": "CreateTask",
+                    "tool_input": {"title": "Inspect existing capstone homework decisions."},
+                },
+            )
+        )
+
     def test_factory_startup_failure_refuses_prompt_instead_of_informational_exit_two(self):
         output = io.StringIO()
         with (
