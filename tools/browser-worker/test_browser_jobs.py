@@ -2241,6 +2241,56 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
             row = json.loads(receipt.read_text())
             self.assertEqual((row["status"], row["window_disposition"]), ("finished", "closed"))
 
+    def test_maintenance_bootstrap_isolates_its_group_without_moving_a_peer(self):
+        with tempfile.TemporaryDirectory() as root:
+            route = self.route(root)
+            bodies = []
+            client = SimpleNamespace(close=lambda: None)
+
+            def capture(_, body):
+                bodies.append(body)
+                return {"closed": True, "ready": True}
+
+            with (
+                patch.object(route, "client", return_value=client, create=True),
+                patch.object(b, "code", side_effect=capture),
+            ):
+                with route.maintenance_connector():
+                    pass
+        fixture = r'''
+const tabs=new Map([[1,{id:1,windowId:5,groupId:7}],
+ [99,{id:99,windowId:5,groupId:9}]]);const removed=[];
+const page={url:()=>"chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/connect.html?client=fixture",
+ context:()=>({pages:()=>[page]}),evaluate:async(fn,arg)=>fn(arg)};
+global.chrome={tabs:{getCurrent:async()=>tabs.get(1),
+ query:async(q)=>[...tabs.values()].filter(t=>
+  (q.windowId===undefined||q.windowId===t.windowId)&&
+  (q.groupId===undefined||q.groupId===t.groupId)),
+ remove:async(id)=>{removed.push(id);tabs.delete(id);}},
+ windows:{create:async()=>{const seed={id:2,windowId:6,groupId:-1,url:'about:blank'};
+  tabs.set(2,seed);return {id:6,tabs:[seed]};}},
+ tabGroups:{get:async()=>({title:'fixture'}),move:async(group,{windowId})=>{
+  for(const t of tabs.values())if(t.groupId===group)t.windowId=windowId;}}};
+async function initialize(){__INITIALIZE__}
+initialize().then(()=>console.log(JSON.stringify({tabs:[...tabs.values()],removed})),
+ e=>{console.error(e.message);process.exitCode=1;});
+'''
+        done = subprocess.run(
+            ["node", "-e", fixture.replace("__INITIALIZE__", bodies[1])],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        data = json.loads(done.stdout)
+        self.assertEqual(
+            data["tabs"],
+            [
+                {"id": 1, "windowId": 6, "groupId": 7},
+                {"id": 99, "windowId": 5, "groupId": 9},
+            ],
+        )
+        self.assertEqual(data["removed"], [2])
+
     def test_unobserved_maintenance_closure_refuses(self):
         with tempfile.TemporaryDirectory() as root:
             route = self.route(root)
