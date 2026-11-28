@@ -1,3 +1,6 @@
+## 3.16.17 - 2026-11-28
+
+Reject malformed source projection boundaries and stale appended JSON before a native document formatting receipt can pass.
 ## 3.16.16 - 2026-11-28
 
 Keep file metadata, fixture cleanup and JSON evidence uploads outside native document-content save validation. Continue enforcing known Docs writes and native or HTML document imports.
