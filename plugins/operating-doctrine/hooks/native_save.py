@@ -48,7 +48,13 @@ def is_write(name, value):
     if name in ("Execute", "Bash"):
         command = value.get("command", "")
         if (
-            not re.search(r"https://docs\.googleapis\.com/v1/documents", command)
+            "format_native_doc.py" not in command
+            and not re.search(
+                r"['\"]Content-Type['\"]\s*:\s*['\"](?:text/html|application/vnd\.google-apps\.document)",
+                command,
+                re.I,
+            )
+            and not re.search(r"https://docs\.googleapis\.com/v1/documents", command)
             and re.search(r"drive/v3/files.*uploadType=media", command)
             and re.search(
                 r"['\"]Content-Type['\"]\s*:\s*['\"]application/json(?:[;\"'])", command, re.I

@@ -434,6 +434,9 @@ class ReviewRegressionTests(unittest.TestCase):
         )
         self.assertFalse(hook.is_write("Execute", {"command": command}))
         self.assertTrue(hook.is_write("Execute", {"command": WRITE["command"] + "; " + command}))
+        self.assertTrue(hook.is_write("Execute", {"command": command + "; " + FORMAT["command"]}))
+        html = "api.call('PATCH','https://www.googleapis.com/upload/drive/v3/files/synthetic?uploadType=media',headers={'Content-Type':'text/html'},data='<p>Count</p>')"
+        self.assertTrue(hook.is_write("Execute", {"command": command + "; " + html}))
 
     def test_real_native_google_write_shapes_are_detected(self):
         shapes = [
