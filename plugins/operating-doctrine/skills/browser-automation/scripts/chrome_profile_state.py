@@ -124,6 +124,7 @@ def profile_arguments(config, profile, url=None):
         raise StateError("existing_profile_identity_mismatch")
     arguments = [
         "/usr/bin/open",
+        "-n",
         "-a",
         "/Applications/Google Chrome.app",
         "--args",
