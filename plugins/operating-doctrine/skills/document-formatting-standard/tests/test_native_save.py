@@ -694,6 +694,172 @@ class ReviewRegressionTests(unittest.TestCase):
             fmt.verify_native(document, fmt.policy(POLICY), NAME)
 
 
+class ConnectorEvidenceTests(unittest.TestCase):
+    check = HookTests.check
+
+    def test_actual_formatter_file_inspection_is_not_a_native_write(self):
+        for command in [
+            "ls /tmp/format_native_doc.py",
+            "test -f /tmp/format_native_doc.py",
+            "cat /tmp/format_native_doc.py",
+            f"ls -l '{hook.FORMATTER}'",
+            f"python3 '{hook.FORMATTER}' --help",
+        ]:
+            for name in ["Bash", "Execute"]:
+                with self.subTest(command=command, name=name):
+                    self.assertFalse(hook.is_write(name, {"command": command}))
+                    self.assertEqual(
+                        {},
+                        hook.check(
+                            {
+                                "hook_event_name": "PreToolUse",
+                                "tool_name": name,
+                                "tool_input": {"command": command},
+                            }
+                        ),
+                    )
+
+    def test_formatter_execution_and_compound_writes_still_require_the_guard(self):
+        for command in [
+            FORMAT["command"],
+            FORMAT["command"].replace(hook.FORMATTER, "/tmp/format_native_doc.py"),
+            "ls /tmp/format_native_doc.py && " + FORMAT["command"],
+            "test -f /tmp/format_native_doc.py; " + WRITE["command"],
+            'cat "$(python3 /tmp/format_native_doc.py)"',
+            "python3 /tmp/format_native_doc.py --help; python3 /tmp/format_native_doc.py --document-id x",
+            "python3 /tmp/untrusted/format_native_doc.py --help",
+        ]:
+            with self.subTest(command=command):
+                self.assertTrue(hook.is_write("Bash", {"command": command}))
+
+    def test_metadata_only_and_malformed_conversation_never_establish_evidence(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "session.jsonl"
+            for row in [
+                {},
+                {"type": "system", "subtype": "init"},
+                {"type": "message", "message": {"role": "assistant", "content": [None]}},
+                {"type": "message", "message": {"role": "assistant", "content": []}},
+                {
+                    "type": "message",
+                    "message": {"role": "assistant", "content": [{"type": "tool_use"}]},
+                },
+            ]:
+                with self.subTest(row=row):
+                    path.write_text(json.dumps(row) + "\n")
+                    result = hook.check({"hook_event_name": "Stop", "transcript_path": str(path)})
+                    self.assertEqual("block", result["decision"])
+                    self.assertIn("unverified", result["reason"].lower())
+
+    def test_real_messages_preserve_harmless_metadata_and_normalize_string_content(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "session.jsonl"
+            rows = [
+                {"type": "system", "subtype": "init"},
+                {"type": "message", "message": {"role": "user", "content": "Explain this."}},
+                {
+                    "type": "message",
+                    "message": {"role": "assistant", "content": "Here is the explanation."},
+                },
+            ]
+            path.write_text("".join(json.dumps(row) + "\n" for row in rows))
+            messages = hook.records(path)
+            self.assertEqual(2, len(messages))
+            self.assertEqual([{"type": "text", "text": "Explain this."}], messages[0]["content"])
+            self.assertEqual(
+                {}, hook.check({"hook_event_name": "Stop", "transcript_path": str(path)})
+            )
+
+    def test_actual_connector_writes_require_procedures_and_bind_native_targets(self):
+        cases = [
+            (
+                "mcp__Google_Docs__update_doc",
+                {
+                    "documentId": "synthetic",
+                    "requests": [{"insertText": {"location": {"index": 1}, "text": "TEST"}}],
+                },
+                '{"replies":[{"errors":[],"api_replies":[{}]}],"writeControl":{"requiredRevisionId":"saved"}}',
+            ),
+            (
+                "mcp__Google_Drive__create_file",
+                {
+                    "contentMimeType": "application/vnd.google-apps.document",
+                    "parentId": "home",
+                    "title": NAME,
+                },
+                '{"id":"synthetic","mimeType":"application/vnd.google-apps.document","parentId":"home"}',
+            ),
+        ]
+        for name, value, response in cases:
+            with self.subTest(name=name):
+                self.assertTrue(hook.is_write(name, value))
+                denied = self.check([], "PreToolUse", tool_name=name, tool_input=value)
+                self.assertEqual("deny", denied["hookSpecificOutput"]["permissionDecision"])
+                rows = skills() + [prose("I will save this in the existing company home.")]
+                rows += call(name, value, response)
+                self.assertEqual({"synthetic"}, hook.evidence(rows)[1][-1][1])
+                self.assertEqual("block", self.check(rows)["decision"])
+                rows += call("Execute", FORMAT, RECEIPT, "format")
+                rows += [prose(f"[{NAME}]({URL})")]
+                self.assertEqual({}, self.check(rows))
+
+    def test_native_connector_inspection_metadata_and_json_proofs_stay_usable(self):
+        for name, value in [
+            ("mcp__Google_Docs__read_doc", {"documentId": "synthetic"}),
+            ("mcp__Google_Drive__update_file", {"fileId": "synthetic", "title": "Existing"}),
+            (
+                "mcp__Google_Drive__create_file",
+                {
+                    "contentMimeType": "application/json",
+                    "content": '{"documentId":"synthetic","mimeType":"application/vnd.google-apps.document"}',
+                },
+            ),
+        ]:
+            with self.subTest(name=name):
+                self.assertFalse(hook.is_write(name, value))
+                self.assertEqual(
+                    {},
+                    hook.check(
+                        {"hook_event_name": "PreToolUse", "tool_name": name, "tool_input": value}
+                    ),
+                )
+
+    def test_missing_or_unreadable_transcript_has_explicit_unverified_denial(self):
+        with tempfile.TemporaryDirectory() as folder:
+            broken = Path(folder) / "broken.jsonl"
+            broken.write_text("not valid JSON\n")
+            empty = Path(folder) / "empty.jsonl"
+            empty.write_text("")
+            for value in [
+                None,
+                "",
+                str(Path(folder) / "missing.jsonl"),
+                folder,
+                str(broken),
+                str(empty),
+            ]:
+                for repeated in [False, True]:
+                    with self.subTest(path=value, repeated=repeated):
+                        event = {"hook_event_name": "Stop", "stop_hook_active": repeated}
+                        if value is not None:
+                            event["transcript_path"] = value
+                        result = hook.check(event)
+                        self.assertEqual("block", result["decision"])
+                        self.assertIn("unverified", result["reason"].lower())
+                        self.assertIn("runtime", result["reason"].lower())
+            result = hook.check(
+                {
+                    "hook_event_name": "PreToolUse",
+                    "tool_name": "mcp__Google_Docs__update_doc",
+                    "tool_input": {"documentId": "synthetic", "requests": []},
+                }
+            )
+            self.assertEqual("deny", result["hookSpecificOutput"]["permissionDecision"])
+            self.assertIn(
+                "unverified", result["hookSpecificOutput"]["permissionDecisionReason"].lower()
+            )
+
+
 class SourceProjectionTests(unittest.TestCase):
     def test_actual_corrupt_closer_refuses_before_any_native_write(self):
         malformed = (

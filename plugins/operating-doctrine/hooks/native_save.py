@@ -31,11 +31,54 @@ def records(path):
     with Path(path).open() as source:
         for line in source:
             row = json.loads(line)
-            message = row.get("message", {})
+            if not isinstance(row, dict):
+                raise ValueError("Invalid transcript record")
+            if "message" not in row:
+                if row.get("type") == "message":
+                    raise ValueError("Missing transcript message")
+                continue
+            message = row["message"]
+            if not isinstance(message, dict):
+                raise ValueError("Invalid transcript message")
             # Hook context is not a user request or assistant announcement.
             if message.get("hookEventName") or str(row.get("id", "")).startswith("hook-context-"):
                 continue
-            result.append(message)
+            if message.get("role") in ("system", "developer"):
+                continue
+            if message.get("role") not in ("user", "assistant"):
+                raise ValueError("Unsupported transcript role")
+            content = message.get("content")
+            if isinstance(content, str):
+                content = [{"type": "text", "text": content}]
+            if not isinstance(content, list) or not content:
+                raise ValueError("Invalid transcript content")
+            meaningful = False
+            for item in content:
+                if not isinstance(item, dict):
+                    raise ValueError("Invalid transcript block")
+                kind = item.get("type")
+                if kind == "text":
+                    if not isinstance(item.get("text"), str):
+                        raise ValueError("Invalid transcript text")
+                    meaningful |= bool(item["text"].strip())
+                elif kind == "tool_use":
+                    if not all(
+                        isinstance(item.get(k), str) and item[k] for k in ("id", "name")
+                    ) or not isinstance(item.get("input"), dict):
+                        raise ValueError("Invalid transcript tool call")
+                    meaningful = True
+                elif kind == "tool_result":
+                    if not isinstance(item.get("tool_use_id"), str) or not isinstance(
+                        item.get("content"), (str, list, dict)
+                    ):
+                        raise ValueError("Invalid transcript tool result")
+                    meaningful = True
+                elif kind in ("image", "document"):
+                    meaningful = True
+                elif kind not in ("thinking", "redacted_thinking"):
+                    raise ValueError("Unsupported transcript block")
+            if meaningful:
+                result.append({**message, "content": content})
     return result
 
 
@@ -43,10 +86,36 @@ def operation(value):
     return value.get("input") if isinstance(value.get("input"), dict) else value
 
 
+def formatter_inspection(command):
+    # Exempt only standalone known read operations, never compound shell work.
+    if re.search(r"[;&|<>$`\n]", command):
+        return False
+    try:
+        parts = shlex.split(command)
+    except ValueError:
+        return False
+    if (
+        len(parts) == 3
+        and re.fullmatch(r"(?:.*/)?python3(?:\.\d+)?", parts[0])
+        and Path(parts[1]).resolve() == Path(FORMATTER).resolve()
+        and parts[2] == "--help"
+    ):
+        return True
+    if len(parts) < 2 or Path(parts[-1]).name != "format_native_doc.py":
+        return False
+    if parts[0] in ("test", "/bin/test", "/usr/bin/test"):
+        return len(parts) == 3 and parts[1] == "-f"
+    return parts[0] in ("ls", "/bin/ls", "/usr/bin/ls", "cat", "/bin/cat", "/usr/bin/cat") and all(
+        re.fullmatch(r"-[A-Za-z]+|--", option) for option in parts[1:-1]
+    )
+
+
 def is_write(name, value):
     value = operation(value)
     if name in ("Execute", "Bash"):
         command = value.get("command", "")
+        if formatter_inspection(command):
+            return False
         if (
             "format_native_doc.py" not in command
             and not re.search(
@@ -62,7 +131,7 @@ def is_write(name, value):
         ):
             return False
         return bool(
-            ("format_native_doc.py" in command and "--help" not in command)
+            ("format_native_doc.py" in command)
             or (
                 (
                     re.search(r"https://docs\.googleapis\.com/v1/documents(?:/|\?|['\"])", command)
@@ -81,11 +150,16 @@ def is_write(name, value):
             re.match(r"https://docs\.googleapis\.com/v1/documents(?:/|\?|$)", value.get("url", ""))
         )
     if re.search(
-        r"google.*(?:batch_update_document|create_document|update_document)$|docs.*(?:batch_update|create_document)$",
+        r"google.*(?:batch_update_document|create_document|update_document|update_doc)$|docs.*(?:batch_update|create_document)$",
         name,
         re.I,
     ):
         return True
+    if re.search(r"google.*create_file$", name, re.I):
+        mime = value.get("contentMimeType")
+        return isinstance(mime, str) and mime.split(";", 1)[0].strip().lower() == (
+            "application/vnd.google-apps.document"
+        )
     if re.search(r"google.*(?:upload_file|update_file_content)$", name, re.I):
         mime = value.get("content_mime_type") or value.get("mime_type") or value.get("mimeType")
         meta = value.get("metadata", {})
@@ -100,7 +174,7 @@ def is_write(name, value):
 
 def response_ids(name, body):
     ids = set()
-    drive = bool(re.search(r"google.*(?:upload_file|update_file_content)$", name, re.I))
+    drive = bool(re.search(r"google.*(?:upload_file|update_file_content|create_file)$", name, re.I))
 
     def walk(value, depth=0):
         if depth > 12:
@@ -164,7 +238,9 @@ def request_ids(name, value):
         )
         target = match[1] if match else None
     elif re.search(
-        r"google.*(?:batch_update_document|update_document)$|docs.*batch_update$", name, re.I
+        r"google.*(?:batch_update_document|update_document|update_doc)$|docs.*batch_update$",
+        name,
+        re.I,
     ):
         target = value.get("document_id") or value.get("documentId")
     else:
@@ -316,7 +392,29 @@ def check(event, recheck=None):
         return {}
     if kind == "PreToolUse" and not is_write(event["tool_name"], event["tool_input"]):
         return {}
-    messages = records(event["transcript_path"])
+    try:
+        transcript = event.get("transcript_path")
+        if not isinstance(transcript, str) or not transcript.strip():
+            raise ValueError("Missing transcript")
+        messages = records(transcript)
+        if not messages:
+            raise ValueError("Empty transcript")
+    except (OSError, ValueError, TypeError):
+        reason = (
+            "Native save remains unverified on this runtime: readable nonempty transcript "
+            "evidence is missing or invalid. The document-formatting-standard and "
+            "deliverable-link procedures cannot be verified. Use the existing supported "
+            "save route with native evidence; a repeated Stop does not establish a pass."
+        )
+        if kind == "PreToolUse":
+            return {
+                "hookSpecificOutput": {
+                    "hookEventName": kind,
+                    "permissionDecision": "deny",
+                    "permissionDecisionReason": reason,
+                }
+            }
+        return {"decision": "block", "reason": reason}
     skills, writes, receipts, prose = evidence(messages)
     if kind == "PreToolUse" and is_write(event["tool_name"], event["tool_input"]):
         missing = SKILLS - skills
