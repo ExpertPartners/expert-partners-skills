@@ -87,6 +87,49 @@ def utf16(text):
     return len(text.encode("utf-16-le")) // 2
 
 
+def source_projection_integrity(text):
+    """Validate framing without reproducing the owning consumer's schema."""
+    proof = []
+    for name, version, many in [
+        ("TODAY FAILURE TRACKER", 1, False),
+        ("TODAY CHANGE LOG", 1, False),
+        ("TODAY HEALTH RECEIPT", 1, False),
+        ("HANDOFF REGISTER", 2, False),
+        ("HANDOFF INSTANCE", 2, True),
+    ]:
+        candidates = list(re.finditer(r"^" + re.escape(name) + r" (?:BEGIN|END)[^\n]*", text, re.M))
+        if not candidates:
+            continue
+        begin = name + " BEGIN v" + str(version)
+        end = name + " END"
+        require(
+            all(m[0].strip(" \t\r") in (begin, end) for m in candidates),
+            "Malformed source projection delimiter: " + name,
+        )
+        require(
+            len(candidates) % 2 == 0 and (many or len(candidates) == 2),
+            "Missing or duplicate source projection boundary: " + name,
+        )
+        payloads = []
+        for left, right in zip(candidates[::2], candidates[1::2]):
+            require(
+                left[0].strip(" \t\r") == begin and right[0].strip(" \t\r") == end,
+                "Unbalanced source projection boundaries: " + name,
+            )
+
+            def reject_constant(value):
+                raise ValueError("Non-JSON constant in source projection: " + value)
+
+            payload = text[left.end() : right.start()]
+            if name.startswith("TODAY "):
+                json.loads(payload, parse_constant=reject_constant)
+            # Existing Handoff registers are pipe rows and instances are
+            # key=value lines. Preserve their grammar, not a second schema.
+            payloads.append(hashlib.sha256(payload.encode()).hexdigest())
+        proof.append({"name": name, "payload_sha256": payloads})
+    return proof
+
+
 def links_of(doc, drop_first=False):
     # Positions are relative to retained nonempty paragraphs, never run boundaries.
     items = [p for p in paragraphs(doc) if text_of(p).strip()]
@@ -445,6 +488,7 @@ def format_doc(api, document_id, rulebook_id, name, parent):
     )
     url = "https://docs.googleapis.com/v1/documents/" + document_id
     doc = read_native(api, document_id)
+    projection_proof = source_projection_integrity("".join(text_of(x) for x in paragraphs(doc)))
     style_requests(doc, spec, name)  # Refuse unsupported layouts before any write.
     before_links = links_of(doc)
     before = [text_of(x) for x in paragraphs(doc) if text_of(x).strip()]
@@ -470,6 +514,11 @@ def format_doc(api, document_id, rulebook_id, name, parent):
         },
     )
     saved = read_native(api, document_id)
+    require(
+        source_projection_integrity("".join(text_of(x) for x in paragraphs(saved)))
+        == projection_proof,
+        "Formatting changed source projections",
+    )
     after = [text_of(x) for x in paragraphs(saved) if text_of(x).strip()]
     require(
         after == ([title_subject(name) + "\n"] + before if inserted_title else before),
@@ -505,6 +554,7 @@ def format_doc(api, document_id, rulebook_id, name, parent):
         "parents": final["parents"],
         "rulebook_version": authority["version"],
         "rendered_font_sizes": True,
+        "source_projections": projection_proof,
     }
 
 

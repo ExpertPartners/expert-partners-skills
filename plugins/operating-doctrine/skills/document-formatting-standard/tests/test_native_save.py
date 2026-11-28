@@ -694,5 +694,49 @@ class ReviewRegressionTests(unittest.TestCase):
             fmt.verify_native(document, fmt.policy(POLICY), NAME)
 
 
+class SourceProjectionTests(unittest.TestCase):
+    def test_actual_corrupt_closer_refuses_before_any_native_write(self):
+        malformed = (
+            'TODAY FAILURE TRACKER BEGIN v1\n{"schemaVersion":1,"rows":[]}\n'
+            'TODAY FAILURE TRACKER ENDer handoff runner\n{"rows":[]}\n'
+            'TODAY FAILURE TRACKER END\n'
+        )
+
+        class Broken(ReviewRegressionTests.API):
+            def json(self, url, method="GET", body=None):
+                value = super().json(url, method, body)
+                if method == "GET" and urlsplit(url).hostname == "docs.googleapis.com":
+                    value["body"]["content"][1] = paragraph(malformed, 16)
+                return value
+
+        api = Broken()
+        with self.assertRaisesRegex(ValueError, "Malformed source projection"):
+            fmt.format_doc(api, "synthetic", "authority", NAME, "home")
+        self.assertEqual([], api.writes)
+
+    def test_full_payload_and_both_exact_boundaries_are_required(self):
+        good = 'TODAY FAILURE TRACKER BEGIN v1\n{"rows":[]}\nTODAY FAILURE TRACKER END\n'
+        for text in [
+            good + good,
+            good.replace('END\n', 'END appended history\n'),
+            good.replace('{"rows":[]}', '{"rows":[]}\n{"old":true}'),
+            good.replace('BEGIN v1', 'BEGIN v2'),
+            good.replace('{"rows":[]}', '{"value":NaN}'),
+            good.replace('TODAY FAILURE TRACKER END\n', ''),
+            'TODAY FAILURE TRACKER END\n',
+        ]:
+            with self.subTest(text=text), self.assertRaises(ValueError):
+                fmt.source_projection_integrity(text)
+
+    def test_valid_payloads_and_multiple_handoff_instances_remain_usable(self):
+        text = 'Retained ordinary history.\nTODAY CHANGE LOG BEGIN v1\n{"rows":[]}\nTODAY CHANGE LOG END\n'
+        text += 'HANDOFF REGISTER BEGIN v2\nroute_id | sender | receiver\nTEST | Sender | Receiver\nHANDOFF REGISTER END\n'
+        text += 'HANDOFF INSTANCE BEGIN v2\nroute_id=TEST\ninstance_id=one\nHANDOFF INSTANCE END\n'
+        text += 'HANDOFF INSTANCE BEGIN v2\nroute_id=TEST\ninstance_id=two\nHANDOFF INSTANCE END\n'
+        proof = fmt.source_projection_integrity(text)
+        self.assertEqual([1, 1, 2], [len(x["payload_sha256"]) for x in proof])
+        self.assertEqual([], fmt.source_projection_integrity('Ordinary working note.\n'))
+
+
 if __name__ == "__main__":
     unittest.main()
