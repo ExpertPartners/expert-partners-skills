@@ -639,7 +639,8 @@ def main():
     print(json.dumps(report))
     return (
         2
-        if isinstance(report, list) and any(x["status"] == "preserved_uncertain" for x in report)
+        if isinstance(report, list)
+        and any(x.get("status") == "preserved_uncertain" for x in report)
         else 0
     )
 

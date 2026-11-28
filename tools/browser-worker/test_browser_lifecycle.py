@@ -34,6 +34,24 @@ installer = load("install_browser_lifecycle")
 
 
 class LifecycleTests(unittest.TestCase):
+    def test_unowned_sweep_cli_accepts_action_rows(self):
+        import contextlib
+        import io
+
+        with tempfile.TemporaryDirectory() as directory:
+            config = Path(directory) / "route.json"
+            config.write_text(json.dumps({"state_dir": directory}))
+            rows = [{"action": "held", "reason": "owner_job_running", "job": "a" * 32}]
+            with (
+                patch.object(
+                    sys, "argv", ["browser_lifecycle", "--config", str(config), "--sweep-unowned"]
+                ),
+                patch.object(lifecycle, "sweep_unowned", return_value=rows),
+                contextlib.redirect_stdout(io.StringIO()) as output,
+            ):
+                self.assertEqual(lifecycle.main(), 0)
+            self.assertEqual(json.loads(output.getvalue()), rows)
+
     def setUp(self):
         self.sessions = tempfile.TemporaryDirectory()
         self.addCleanup(self.sessions.cleanup)
