@@ -39,22 +39,93 @@ def records(path):
     return result
 
 
+def operation(value):
+    return value.get("input") if isinstance(value.get("input"), dict) else value
+
+
 def is_write(name, value):
+    value = operation(value)
     raw = json.dumps(value)
     if name in ("Execute", "Bash"):
         command = value.get("command", "")
-        return ("format_native_doc.py" in command and "--help" not in command) or (
-            re.search(r"(docs\.googleapis\.com|drive/v3/files)", command)
-            and re.search(r"batchUpdate|['\"](?:POST|PATCH|PUT)['\"]", command)
+        return bool(
+            ("format_native_doc.py" in command and "--help" not in command)
+            or (
+                re.search(r"(docs\.googleapis\.com|drive/v3/files)", command)
+                and re.search(r"batchUpdate|['\"](?:POST|PATCH|PUT)['\"]", command)
+            )
         )
+    if re.search(r"google_api$", name, re.I):
+        return value.get("method", "GET").upper() in ("POST", "PATCH", "PUT") and bool(
+            re.match(r"https://docs\.googleapis\.com/v1/documents(?:/|$)", value.get("url", ""))
+        )
+    if re.search(
+        r"google.*(?:batch_update_document|create_document|update_document)$|docs.*(?:batch_update|create_document)$",
+        name,
+        re.I,
+    ):
+        return True
     return bool(
-        re.search(
-            r"(google.*(upload_file|update_file_content)|docs.*(batch_update|create_document))$",
-            name,
-            re.I,
-        )
-        and ("document" in raw or "doc" in name.lower())
+        re.search(r"google.*(?:upload_file|update_file_content)$", name, re.I)
+        and re.search(r"application/vnd\.google-apps\.document|text/html|documentId", raw, re.I)
     )
+
+
+def response_ids(name, body):
+    ids = set()
+    drive = bool(re.search(r"google.*(?:upload_file|update_file_content)$", name, re.I))
+
+    def walk(value, depth=0):
+        if depth > 12:
+            return
+        if isinstance(value, str):
+            try:
+                walk(json.loads(value), depth + 1)
+            except (ValueError, TypeError):
+                if depth < 2:
+                    for line in value.splitlines():
+                        try:
+                            walk(json.loads(line), depth + 1)
+                        except (ValueError, TypeError):
+                            pass
+        elif isinstance(value, dict):
+            if isinstance(value.get("status"), int) and not 200 <= value["status"] < 300:
+                return
+            for key in ("documentId", "id") if drive else ("documentId",):
+                if isinstance(value.get(key), str) and re.fullmatch(r"[\w-]+", value[key]):
+                    ids.add(value[key])
+            for key in ("response", "result", "data", "file", "document", "content", "text"):
+                if key in value:
+                    walk(value[key], depth + 1)
+        elif isinstance(value, list):
+            for part in value:
+                walk(part, depth + 1)
+
+    walk(body)
+    return ids
+
+
+def shell_success(name, body):
+    return (
+        bool(re.search(r"^exit 0\b", body))
+        if name == "Execute"
+        else not bool(re.search(r"^exit [1-9]\d*\b", body))
+    )
+
+
+def announcement(text):
+    for match in re.finditer(r"\b(save|saving|update|updating|file|filing)\b", text, re.I):
+        before = text[: match.start()]
+        if re.search(
+            r"\b(?:not|never|won['’]t|don['’]t|cannot|can['’]t)\s+(?:\w+\s+){0,2}$", before, re.I
+        ):
+            continue
+        affirmative = match[1].lower().endswith("ing") or re.search(
+            r"(?:\bwill|['’]ll)\s*$", before, re.I
+        )
+        if affirmative and re.search(r"\b(in|into|to)\b", text[match.end() :], re.I):
+            return True
+    return False
 
 
 def formatter_args(command):
@@ -117,17 +188,17 @@ def evidence(messages):
                 in body
             ):
                 skills.add(str(value.get("skill", "")).split(":")[-1])
-            args = formatter_args(value.get("command", "")) if name == "Execute" else None
+            args = formatter_args(value.get("command", "")) if name in ("Execute", "Bash") else None
             if is_write(name, value):
                 # Execute failures are results too. Do not attest a failed command.
-                if name == "Execute" and not re.search(r"^exit 0\b", body):
+                if name in ("Execute", "Bash") and not shell_success(name, body):
                     continue
-                ids = set(re.findall(r"""["']documentId["']\s*:\s*["']([\w-]+)["']""", body))
+                ids = response_ids(name, body)
                 if args:
                     ids = {args["--document-id"]}
                 writes.append((at, ids))
             if args:
-                if not re.search(r"^exit 0\b", body):
+                if not shell_success(name, body):
                     continue
                 for line in body.splitlines():
                     if line.startswith(MARKER):
@@ -180,9 +251,7 @@ def check(event, recheck=None):
                 "Before this document write, invoke the existing Skill procedures: "
                 + ", ".join(sorted(missing))
             )
-        elif not any(
-            re.search(r"\b(sav|updat|fil)\w*.*\b(in|into|to)\b", p, re.I) for _, p in prose
-        ):
+        elif not any(announcement(p) for _, p in prose):
             reason = "Announce the actual resolved save destination in assistant prose before the document write."
         if reason:
             return {
@@ -192,7 +261,7 @@ def check(event, recheck=None):
                     "permissionDecisionReason": reason,
                 }
             }
-    if kind == "Stop" and writes and not event.get("stop_hook_active"):
+    if kind == "Stop" and writes:
         latest = {}
         for at, ids in writes:
             if not ids:

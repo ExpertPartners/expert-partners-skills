@@ -87,14 +87,84 @@ def utf16(text):
     return len(text.encode("utf-16-le")) // 2
 
 
-def links_of(doc):
-    return [
-        (char, json.dumps(run["textRun"]["textStyle"]["link"], sort_keys=True))
-        for p in paragraphs(doc)
-        for run in p["paragraph"].get("elements", [])
-        if run["textRun"].get("textStyle", {}).get("link")
-        for char in run["textRun"]["content"]
-    ]
+def links_of(doc, drop_first=False):
+    # Positions are relative to retained nonempty paragraphs, never run boundaries.
+    items = [p for p in paragraphs(doc) if text_of(p).strip()]
+    if drop_first:
+        items = items[1:]
+    result = []
+    for index, p in enumerate(items):
+        offset = 0
+        for run in p["paragraph"].get("elements", []):
+            text = run["textRun"]["content"]
+            link = run["textRun"].get("textStyle", {}).get("link")
+            if link:
+                result.extend(
+                    (index, offset + j, char, json.dumps(link, sort_keys=True))
+                    for j, char in enumerate(text)
+                )
+            offset += len(text)
+    return result
+
+
+def supported_layout(doc):
+    paragraphs(doc)
+    containers = [doc] + [t.get("documentTab", {}) for t in doc.get("tabs", [])]
+    require(
+        not any(
+            c.get(k)
+            for c in containers
+            for k in ("headers", "footers", "footnotes", "inlineObjects", "positionedObjects")
+        ),
+        "Headers, footers and objects need their owning layout procedure",
+    )
+    style = doc.get("documentStyle") or next(
+        (c["documentStyle"] for c in containers if c.get("documentStyle")), {}
+    )
+    size = style.get("pageSize", {})
+    width, height = size.get("width", {}), size.get("height", {})
+    require(
+        width.get("unit") == height.get("unit") == "PT"
+        and any(
+            abs(width.get("magnitude", 0) - w) < 1 and abs(height.get("magnitude", 0) - h) < 1
+            for w, h in [(612, 792), (595.276, 841.89)]
+        ),
+        "Unknown or special page layout needs its owning procedure",
+    )
+    require(
+        not any(
+            style.get(k)
+            for k in (
+                "defaultHeaderId",
+                "defaultFooterId",
+                "firstPageHeaderId",
+                "firstPageFooterId",
+                "evenPageHeaderId",
+                "evenPageFooterId",
+            )
+        ),
+        "Header or footer layout needs its owning procedure",
+    )
+    for p in paragraphs(doc):
+        require(
+            not p["paragraph"].get("positionedObjectIds"),
+            "Positioned objects need their owning layout procedure",
+        )
+    body = doc.get("body") or doc.get("tabs", [{}])[0].get("documentTab", {}).get("body", {})
+    for element in body.get("content", []):
+        columns = (
+            element.get("sectionBreak", {}).get("sectionStyle", {}).get("columnProperties", [])
+        )
+        require(len(columns) <= 1, "Multi-column layout needs its owning procedure")
+
+
+def read_native(api, document_id):
+    doc = api.json(
+        "https://docs.googleapis.com/v1/documents/" + document_id + "?includeTabsContent=true"
+    )
+    require(doc.get("documentId") == document_id, "Native Doc identity mismatch")
+    supported_layout(doc)
+    return doc
 
 
 def title_subject(name):
@@ -105,6 +175,17 @@ def title_subject(name):
 
 def preparation(doc, name):
     items = paragraphs(doc)
+    require(
+        not any(
+            not text_of(p).strip()
+            and any(
+                e.get("textRun", {}).get("textStyle", {}).get("link")
+                for e in p["paragraph"].get("elements", [])
+            )
+            for p in items
+        ),
+        "Linked spacer paragraphs must be preserved by their owning procedure",
+    )
     nonempty = [x for x in items if text_of(x).strip()]
     require(nonempty, "Empty document has no saved content to verify")
     title = title_subject(name)
@@ -139,11 +220,9 @@ def style_requests(doc, spec, name):
     result = []
     for index, item in enumerate(items):
         p = item["paragraph"]
-        named = (
-            "TITLE"
-            if index == 0
-            else p.get("paragraphStyle", {}).get("namedStyleType", "NORMAL_TEXT")
-        )
+        actual_named = p.get("paragraphStyle", {}).get("namedStyleType", "NORMAL_TEXT")
+        require(actual_named in spec["sizes"], "Unsupported named heading or special layout")
+        named = "TITLE" if index == 0 else actual_named
         require(named in spec["sizes"], "Unsupported named heading or special layout")
         span = {"startIndex": item["startIndex"], "endIndex": item["endIndex"] - 1}
         heading = named != "NORMAL_TEXT"
@@ -207,6 +286,35 @@ def verify_native(doc, spec, name):
                     "magnitude": (got or {}).get("magnitude", 0),
                 }
             require(got == value, "Native paragraph style or spacing mismatch")
+        named = item["paragraph"].get("paragraphStyle", {}).get("namedStyleType", "NORMAL_TEXT")
+        styles = doc.get("namedStyles", {}).get("styles", [])
+        if not styles and doc.get("tabs"):
+            styles = doc["tabs"][0].get("documentTab", {}).get("namedStyles", {}).get("styles", [])
+        base = {}
+        for kind in ["NORMAL_TEXT", named]:
+            base.update(
+                next(
+                    (x.get("textStyle", {}) for x in styles if x.get("namedStyleType") == kind), {}
+                )
+            )
+        color = (
+            spec["blue"] if named == "HEADING_2" and name.startswith(("[HQ", "[EP")) else "#000000"
+        )
+        wanted = [int(color[i : i + 2], 16) / 255 for i in (1, 3, 5)]
+        for run in item["paragraph"].get("elements", []):
+            if not run.get("textRun", {}).get("content", "").strip():
+                continue
+            effective = {**base, **run["textRun"].get("textStyle", {})}
+            optional = effective.get("foregroundColor", {"color": {"rgbColor": {}}})
+            rgb = optional.get("color", {}).get("rgbColor")
+            require(
+                isinstance(rgb, dict)
+                and all(
+                    abs(rgb.get(k, 0) - v) < 0.000001
+                    for k, v in zip(("red", "green", "blue"), wanted)
+                ),
+                "Native effective text color mismatch",
+            )
 
 
 def verify_pdf(pdf, doc, spec):
@@ -288,14 +396,15 @@ class Google:
 
 
 def recheck_receipt(api, receipt):
-    doc = api.json("https://docs.googleapis.com/v1/documents/" + receipt["document_id"])
+    doc = read_native(api, receipt["document_id"])
     meta = api.json(
         "https://www.googleapis.com/drive/v3/files/"
         + receipt["document_id"]
         + "?fields=id,name,parents,mimeType,trashed&supportsAllDrives=true"
     )
     require(
-        doc.get("revisionId") == receipt["revision"]
+        meta.get("id") == receipt["document_id"]
+        and doc.get("revisionId") == receipt["revision"]
         and digest(doc) == receipt["native_sha256"]
         and digest([text_of(x) for x in paragraphs(doc)]) == receipt["content_sha256"]
         and meta["name"] == receipt["name"]
@@ -321,7 +430,8 @@ def format_doc(api, document_id, rulebook_id, name, parent):
     fields = "?fields=id,name,mimeType,parents,trashed,version&supportsAllDrives=true"
     meta = api.json(base + document_id + fields)
     require(
-        meta["name"] == name
+        meta["id"] == document_id
+        and meta["name"] == name
         and parent in meta.get("parents", [])
         and not meta.get("trashed")
         and meta["mimeType"] == "application/vnd.google-apps.document",
@@ -334,7 +444,7 @@ def format_doc(api, document_id, rulebook_id, name, parent):
         "Rulebook changed during read",
     )
     url = "https://docs.googleapis.com/v1/documents/" + document_id
-    doc = api.json(url)
+    doc = read_native(api, document_id)
     style_requests(doc, spec, name)  # Refuse unsupported layouts before any write.
     before_links = links_of(doc)
     before = [text_of(x) for x in paragraphs(doc) if text_of(x).strip()]
@@ -345,7 +455,7 @@ def format_doc(api, document_id, rulebook_id, name, parent):
             "POST",
             {"writeControl": {"requiredRevisionId": doc["revisionId"]}, "requests": requests},
         )
-        doc = api.json(url)
+        doc = read_native(api, document_id)
     api.json(
         url + ":batchUpdate",
         "POST",
@@ -354,22 +464,30 @@ def format_doc(api, document_id, rulebook_id, name, parent):
             "requests": style_requests(doc, spec, name),
         },
     )
-    saved = api.json(url)
+    saved = read_native(api, document_id)
     after = [text_of(x) for x in paragraphs(saved) if text_of(x).strip()]
     require(
         after == before or after == [title_subject(name) + "\n"] + before,
         "Formatting changed existing wording",
     )
-    require(links_of(saved) == before_links, "Formatting changed existing hyperlinks")
+    require(
+        links_of(saved, drop_first=(after == [title_subject(name) + "\n"] + before))
+        == before_links,
+        "Formatting changed existing hyperlinks",
+    )
     verify_native(saved, spec, name)
     verify_pdf(api.pdf(document_id), saved, spec)
     require(
-        saved["revisionId"] == api.json(url)["revisionId"],
+        saved["revisionId"] == read_native(api, document_id)["revisionId"],
         "Document changed during PDF verification",
     )
     final = api.json(base + document_id + fields)
     require(
-        final["name"] == name and final["parents"] == meta["parents"],
+        final["id"] == document_id
+        and final["name"] == name
+        and final["parents"] == meta["parents"]
+        and not final.get("trashed")
+        and final["mimeType"] == "application/vnd.google-apps.document",
         "Saved identity or parent changed",
     )
     return {

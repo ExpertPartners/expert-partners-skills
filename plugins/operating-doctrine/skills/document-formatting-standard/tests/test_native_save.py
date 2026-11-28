@@ -219,8 +219,10 @@ class HookTests(unittest.TestCase):
         self.assertIn("Announce", json.dumps(result))
         self.assertEqual({}, self.check(rows))
 
-    def test_stop_correction_is_not_an_infinite_loop(self):
-        self.assertEqual({}, self.check(call("Execute", WRITE), stop_hook_active=True))
+    def test_repeat_stop_never_waives_missing_verification(self):
+        self.assertEqual(
+            "block", self.check(call("Execute", WRITE), stop_hook_active=True)["decision"]
+        )
 
     def test_fixture_content_cannot_be_an_assistant_announcement(self):
         rows = skills() + [
@@ -371,6 +373,202 @@ class FormattingTests(unittest.TestCase):
             self.pdf([("Count 23", "Poppins-Regular", 11)], document)
         with self.assertRaises(ValueError):
             self.pdf([("Synthetic SaveCount 17", "Poppins-Regular", 11)], document)
+
+
+class ReviewRegressionTests(unittest.TestCase):
+    check = HookTests.check
+
+    def test_real_native_google_write_shapes_are_detected(self):
+        shapes = [
+            (
+                "app.google_drive.update_file_content",
+                {
+                    "input": {
+                        "file_id": "synthetic",
+                        "content_mime_type": "text/html",
+                        "content": "<p>Count 17</p>",
+                    }
+                },
+            ),
+            (
+                "app.google_drive.upload_file",
+                {"input": {"content_mime_type": "text/html", "content": "<p>Count 17</p>"}},
+            ),
+            (
+                "mcp__google_workspace__google_api",
+                {
+                    "method": "POST",
+                    "url": "https://docs.googleapis.com/v1/documents/synthetic:batchUpdate",
+                    "body": {"requests": []},
+                },
+            ),
+        ]
+        for name, value in shapes:
+            with self.subTest(name=name):
+                self.assertTrue(hook.is_write(name, value))
+                result = self.check([], "PreToolUse", tool_name=name, tool_input=value)
+                self.assertEqual("deny", result["hookSpecificOutput"]["permissionDecision"])
+
+    def test_drive_id_response_and_bash_formatter_can_finish(self):
+        value = {
+            "input": {
+                "file_id": "synthetic",
+                "content_mime_type": "text/html",
+                "content": "<p>Count</p>",
+            }
+        }
+        rows = call("app.google_drive.update_file_content", value, json.dumps({"id": "synthetic"}))
+        self.assertEqual({"synthetic"}, hook.evidence(rows)[1][0][1])
+        rows += call("Bash", FORMAT, RECEIPT, "formatter") + [prose(f"Saved [{NAME}]({URL}).")]
+        self.assertEqual({}, self.check(rows))
+
+    def test_escaped_delegated_api_response_binds_actual_document(self):
+        value = {
+            "method": "POST",
+            "url": "https://docs.googleapis.com/v1/documents/synthetic:batchUpdate",
+            "body": {"requests": []},
+        }
+        result = json.dumps(
+            {"status": 200, "response": json.dumps({"documentId": "synthetic", "replies": []})}
+        )
+        rows = call("mcp__google_workspace__google_api", value, result)
+        self.assertEqual({"synthetic"}, hook.evidence(rows)[1][0][1])
+        rows += call("Execute", FORMAT, RECEIPT, "formatter") + [prose(f"Saved [{NAME}]({URL}).")]
+        self.assertEqual({}, self.check(rows))
+
+    def test_negative_prose_is_not_a_destination_announcement(self):
+        for text in [
+            "I am not saving this to HQ Operations.",
+            "I will not save this in HQ Operations.",
+            "I won't save this to HQ Operations.",
+        ]:
+            result = self.check(
+                skills() + [prose(text)], "PreToolUse", tool_name="Execute", tool_input=WRITE
+            )
+            self.assertIn("Announce", json.dumps(result))
+
+    def test_repeated_invalid_stop_is_not_a_delivery_pass(self):
+        rows = call("Execute", FORMAT, RECEIPT) + [prose(f"Updated [existing TEST Doc]({URL}).")]
+        self.assertEqual("block", self.check(rows, stop_hook_active=True)["decision"])
+        rows += [prose(f"Saved [{NAME}]({URL}).")]
+        self.assertEqual({}, self.check(rows, stop_hook_active=True))
+
+    def test_first_unsupported_named_style_refuses_before_preparation(self):
+        for named in ["HEADING_3", "SUBTITLE"]:
+            with self.assertRaises(ValueError):
+                fmt.style_requests(
+                    doc(paragraph("Existing wording\n", style=named)), fmt.policy(POLICY), NAME
+                )
+
+    def test_identical_words_do_not_hide_moved_hyperlinks(self):
+        original = doc(paragraph("X X\n"))
+        original["body"]["content"][0]["paragraph"]["elements"] = [
+            {
+                "textRun": {
+                    "content": "X",
+                    "textStyle": {"link": {"url": "https://example.test/first"}},
+                }
+            },
+            {"textRun": {"content": " X\n", "textStyle": {}}},
+        ]
+        changed = copy.deepcopy(original)
+        changed["body"]["content"][0]["paragraph"]["elements"] = [
+            {"textRun": {"content": "X ", "textStyle": {}}},
+            {
+                "textRun": {
+                    "content": "X",
+                    "textStyle": {"link": {"url": "https://example.test/first"}},
+                }
+            },
+            {"textRun": {"content": "\n", "textStyle": {}}},
+        ]
+        self.assertNotEqual(fmt.links_of(original), fmt.links_of(changed))
+
+    class API:
+        def __init__(self, layout=None, flip=None):
+            self.layout = layout
+            self.flip = flip
+            self.writes = []
+            self.reads = []
+            self.meta_reads = 0
+
+        def request(self, url, *args):
+            return POLICY
+
+        def json(self, url, method="GET", body=None):
+            self.reads.append(url)
+            if method == "POST":
+                self.writes.append(body)
+                return {"documentId": "synthetic"}
+            if "docs.googleapis.com" in url:
+                base = doc(paragraph("Synthetic Save\n", style="TITLE"), paragraph("Body\n", 16))
+                base["documentId"] = "synthetic"
+                base["documentStyle"] = {
+                    "pageSize": {
+                        "width": {"magnitude": 612, "unit": "PT"},
+                        "height": {"magnitude": 792, "unit": "PT"},
+                    }
+                }
+                if self.layout == "tabs" and "includeTabsContent=true" in url:
+                    base["tabs"] = [
+                        {"documentTab": {"body": copy.deepcopy(base["body"])}},
+                        {"documentTab": {"body": copy.deepcopy(base["body"])}},
+                    ]
+                if self.layout == "header":
+                    base["headers"] = {"h": {"content": [paragraph("Header\n")]}}
+                if self.layout == "card":
+                    base["documentStyle"]["pageSize"] = {
+                        "width": {"magnitude": 288, "unit": "PT"},
+                        "height": {"magnitude": 432, "unit": "PT"},
+                    }
+                return base
+            meta = {
+                "id": "synthetic",
+                "name": NAME,
+                "parents": ["home"],
+                "mimeType": "application/vnd.google-apps.document",
+                "trashed": False,
+                "version": "1",
+            }
+            if "/authority" not in url:
+                self.meta_reads += 1
+                if self.meta_reads > 1 and self.flip:
+                    meta.update(self.flip)
+            return meta
+
+        def pdf(self, document_id):
+            return b"unsupported fixture pdf"
+
+    def test_real_complete_layout_refusals_precede_every_write(self):
+        for layout in ["tabs", "header", "card"]:
+            api = self.API(layout=layout)
+            with self.subTest(layout=layout):
+                with self.assertRaises(ValueError):
+                    fmt.format_doc(api, "synthetic", "authority", NAME, "home")
+                self.assertEqual([], api.writes)
+
+    def test_final_identity_is_rechecked_before_verified_receipt(self):
+        for change in [{"trashed": True}, {"id": "different"}, {"mimeType": "application/pdf"}]:
+            api = self.API(flip=change)
+            with patch.object(fmt, "verify_native"), patch.object(fmt, "verify_pdf"):
+                with self.subTest(change=change), self.assertRaises(ValueError):
+                    fmt.format_doc(api, "synthetic", "authority", NAME, "home")
+
+    def test_h2_effective_color_is_checked_after_native_readback(self):
+        document = doc(
+            paragraph("Synthetic Save\n", style="TITLE"), paragraph("Heading\n", 16, "HEADING_2")
+        )
+        for request in fmt.style_requests(document, fmt.policy(POLICY), NAME):
+            if "updateParagraphStyle" in request:
+                u = request["updateParagraphStyle"]
+                p = next(
+                    x
+                    for x in fmt.paragraphs(document)
+                    if x["startIndex"] == u["range"]["startIndex"]
+                )
+                p["paragraph"]["paragraphStyle"] = copy.deepcopy(u["paragraphStyle"])
+        with self.assertRaisesRegex(ValueError, "color"):
+            fmt.verify_native(document, fmt.policy(POLICY), NAME)
 
 
 if __name__ == "__main__":
