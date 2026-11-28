@@ -294,6 +294,7 @@ class LifecycleTests(unittest.TestCase):
             cases = {
                 "1" * 32: {"metadata": {"windowId": 5, "tabIds": [6]}},
                 "2" * 32: {"initial_connector": {"connectorId": 6, "windowId": 5}},
+                "8" * 32: {"allocation_birth": "a" * 32},
                 "3" * 32: {"ownership_pending": True},
                 "4" * 32: {"relay_mode": True, "relay_pid": 99},
                 "5" * 32: {"status": "ready"},
@@ -324,7 +325,7 @@ class LifecycleTests(unittest.TestCase):
             lifecycle.terminal(root, "done", "Stop")
             with patch.object(lifecycle, "control", side_effect=RuntimeError("refused")):
                 report = lifecycle.sweep({"state_dir": root})
-            self.assertEqual(len(report), 6)
+            self.assertEqual(len(report), 7)
             self.assertEqual({x["status"] for x in report}, {"preserved_uncertain"})
 
     def test_stop_reports_census_failures_as_failed_not_clean(self):

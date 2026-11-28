@@ -284,7 +284,7 @@ class JobTests(unittest.TestCase):
 
             def browser_code(_, source):
                 nonlocal receipt
-                if "newOwnedState(page)" not in source:
+                if "newOwnedState(page," not in source:
                     return {
                         "connectorId": 17,
                         "windowId": 25,
@@ -299,6 +299,11 @@ class JobTests(unittest.TestCase):
                 saved = json.loads(receipt.read_text())
                 self.assertEqual(saved["initial_connector"], {"connectorId": 17, "windowId": 25})
                 self.assertIsNone(saved["metadata"])
+                birth = json.loads(
+                    (Path(root) / "births" / (saved["allocation_birth"] + ".json")).read_text()
+                )
+                self.assertEqual(birth["stage"], "intent")
+                self.assertEqual(birth["connectorId"], 17)
                 raise Refusal("owned_operation_failed:owned_window_isolation_failed")
 
             with patch.object(b, "code", side_effect=browser_code):
@@ -2259,8 +2264,13 @@ global.chrome={tabs:{create:async(args)=>{page(10);const t=tabs.get(10);t.url=ar
                 with route.maintenance_connector():
                     pass
         fixture = r'''
+const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
+const root=fs.mkdtempSync(path.join(os.tmpdir(),'maintenance-birth-'));
+const birth=__BIRTH__;birth.path=path.join(root,'birth.json');
 const tabs=new Map([[1,{id:1,windowId:5,groupId:7}],
  [99,{id:99,windowId:5,groupId:9}]]);const removed=[];
+tabs.get(1).url='chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/connect.html?client='+
+ encodeURIComponent(JSON.stringify({name:birth.client_name}));
 const page={url:()=>"chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/connect.html?client=fixture",
  context:()=>({pages:()=>[page]}),evaluate:async(fn,arg)=>fn(arg)};
 global.chrome={tabs:{getCurrent:async()=>tabs.get(1),
@@ -2268,20 +2278,26 @@ global.chrome={tabs:{getCurrent:async()=>tabs.get(1),
   (q.windowId===undefined||q.windowId===t.windowId)&&
   (q.groupId===undefined||q.groupId===t.groupId)),
  remove:async(id)=>{removed.push(id);tabs.delete(id);}},
- windows:{create:async()=>{const seed={id:2,windowId:6,groupId:-1,url:'about:blank'};
+ windows:{create:async({url})=>{const seed={id:2,windowId:6,groupId:-1,url};
   tabs.set(2,seed);return {id:6,tabs:[seed]};}},
  tabGroups:{get:async()=>({title:'fixture'}),move:async(group,{windowId})=>{
   for(const t of tabs.values())if(t.groupId===group)t.windowId=windowId;}}};
 async function initialize(){__INITIALIZE__}
-initialize().then(()=>console.log(JSON.stringify({tabs:[...tabs.values()],removed})),
- e=>{console.error(e.message);process.exitCode=1;});
+initialize().then(()=>console.log(JSON.stringify({tabs:[...tabs.values()].map(({url,...t})=>t),removed})),
+ e=>{console.error(e.message);process.exitCode=1;}).finally(()=>fs.rmSync(root,{recursive:true}));
 '''
+        descriptor = bodies[1].split("newOwnedState(page,", 1)[1].split(");const s=", 1)[0]
+        initialize = bodies[1].replace(descriptor, "birth")
         done = subprocess.run(
-            ["node", "-e", fixture.replace("__INITIALIZE__", bodies[1])],
+            [
+                "node",
+                "-e",
+                fixture.replace("__INITIALIZE__", initialize).replace("__BIRTH__", descriptor),
+            ],
             capture_output=True,
             text=True,
-            check=True,
         )
+        self.assertEqual(done.returncode, 0, done.stderr)
         data = json.loads(done.stdout)
         self.assertEqual(
             data["tabs"],
@@ -2700,10 +2716,11 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
     def test_generation_is_checked_at_use_before_and_after_removal(self):
         gen = {"pid": 123, "started": "synthetic"}
         other = {"pid": 124, "started": "restarted"}
-        # Calls: scope check, before phase two, after removal.
+        # Calls: scope check, maintenance birth generation, before phase two,
+        # after removal.
         for sequence, expected, phases in (
-            ([gen, other], "browser_generation_changed_requires_reconciliation", [False]),
-            ([gen, gen, other], "failed_cleanup_uncertain", [False, True]),
+            ([gen, gen, other], "browser_generation_changed_requires_reconciliation", [False]),
+            ([gen, gen, gen, other], "failed_cleanup_uncertain", [False, True]),
         ):
             with self.subTest(sequence=sequence), tempfile.TemporaryDirectory() as root:
                 route, job, seen, fake = self.pending_peer_route(root, generations=sequence)
@@ -2713,7 +2730,7 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
                 self.assertNotEqual(job.get("window_disposition"), "closed")
                 self.assertTrue(job["ownership_pending"])
 
-    def test_diagnostic_entry_point_has_no_dispose_or_receipt_side_effects(self):
+    def test_diagnostic_entry_point_has_no_dispose_or_target_receipt_side_effects(self):
         with tempfile.TemporaryDirectory() as root:
             route = self.route(root)
             route.bootstrap = contextlib.nullcontext
@@ -2724,7 +2741,7 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
             live = SimpleNamespace(closed=False, close=lambda: self.fail("live client closed"))
             route.jobs[job["job_id"]] = {**job, "client": live, "status": "ready"}
             self.write_peer(root, self.peer_receipt(job["generation"]))
-            before = {p.name: p.read_bytes() for p in Path(root).rglob("*.json")}
+            before = {p.relative_to(root): p.read_bytes() for p in Path(root).rglob("*.json")}
             bodies = []
 
             def fake(_, body):
@@ -2750,7 +2767,13 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
                     route, "client", create=True, return_value=SimpleNamespace(close=lambda: None)
                 ),
                 patch.object(b, "code", side_effect=fake),
-                patch.object(route, "save", side_effect=AssertionError("receipt write")),
+                patch.object(
+                    route,
+                    "save",
+                    side_effect=lambda row: b.Route.save(route, row)
+                    if row.get("label") == "maintenance"
+                    else self.fail("target receipt write"),
+                ),
                 patch.object(route, "dispose_failed", side_effect=AssertionError("dispose")),
                 patch.object(route, "dispose_live", side_effect=AssertionError("dispose live")),
                 patch.object(
@@ -2766,7 +2789,10 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
             self.assertNotIn("CANARY", json.dumps(out))
             self.assertTrue(any('"diagnose": true' in body for body in bodies))
             self.assertFalse(any('"remove": true' in body for body in bodies))
-            self.assertEqual({p.name: p.read_bytes() for p in Path(root).rglob("*.json")}, before)
+            self.assertEqual(
+                {name: (Path(root) / name).read_bytes() for name in before},
+                before,
+            )
 
             def boom(_, body):
                 if "async({old,clientName," in body:
@@ -2778,7 +2804,13 @@ attempt().then(v=>({v}),e=>({e:e.message})).then(o=>console.log(JSON.stringify({
                     route, "client", create=True, return_value=SimpleNamespace(close=lambda: None)
                 ),
                 patch.object(b, "code", side_effect=boom),
-                patch.object(route, "save", side_effect=AssertionError("receipt write")),
+                patch.object(
+                    route,
+                    "save",
+                    side_effect=lambda row: b.Route.save(route, row)
+                    if row.get("label") == "maintenance"
+                    else self.fail("target receipt write"),
+                ),
             ):
                 out = route.diagnose_failed(job["job_id"])
             self.assertEqual(out["code"], "diagnostic_unavailable")

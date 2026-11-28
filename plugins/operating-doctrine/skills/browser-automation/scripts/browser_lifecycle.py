@@ -160,6 +160,7 @@ def census_eligible(receipt):
         and isinstance(receipt.get("allocation_failure"), dict)
         and receipt.get("metadata") is None
         and receipt.get("initial_connector") is None
+        and not receipt.get("allocation_birth")
         and not receipt.get("ownership_pending")
         and not receipt.get("relay_mode")
         and receipt.get("relay_pid") is None

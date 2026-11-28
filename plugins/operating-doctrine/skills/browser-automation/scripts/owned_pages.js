@@ -1,34 +1,91 @@
 /* One private MCP process. Birth provenance is independent of group membership. */
-async function newOwnedState(connector) {
+async function newOwnedState(connector, birth = null) {
   const context = connector.context();
+  // The Python receipt saves the nonce before this call. The private Node
+  // process fsyncs returned birth IDs before moving the group. If an evaluate
+  // response is lost, the seed's nonce still identifies that one creation.
+  const record = data => {
+    if (!birth) return;
+    const fs = Buffer.constructor('return process')().getBuiltinModule('node:fs');
+    const {path, ...identity} = birth;
+    const temp = path + '.tmp';
+    const fd = fs.openSync(temp, 'wx', 0o600);
+    try {
+      fs.writeFileSync(fd, JSON.stringify({...identity, ...data}));
+      fs.fsyncSync(fd);
+    } finally { fs.closeSync(fd); }
+    fs.renameSync(temp, path);
+    const parent = Buffer.constructor('return process')().getBuiltinModule('node:path').dirname(path);
+    const directory = fs.openSync(parent, 'r');
+    try { fs.fsyncSync(directory); } finally { fs.closeSync(directory); }
+  };
   // Extension 0.6.0 creates the first group in the last-focused window
   // (microsoft/playwright#44302). Keep the existing group when isolating:
   // windows.create({tabId}) ungroups the tab and the extension releases it.
   // Remove this fallback once a released extension pins first-group windowId.
-  await connector.evaluate(async () => {
+  const origin = await connector.evaluate(async expected => {
     const t = await chrome.tabs.getCurrent();
+    if (expected) {
+      let exact = false;
+      try { exact = JSON.parse(new URL(t.url).searchParams.get('client')).name === expected; } catch {}
+      if (!exact) throw Error('birth_connector_changed');
+    }
     const others = (await chrome.tabs.query({windowId: t.windowId})).filter(x => x.id !== t.id);
-    if (!others.length) return;
+    const g = await chrome.tabGroups.get(t.groupId);
+    const initial = {connectorId:t.id,windowId:t.windowId,groupId:t.groupId,groupTitle:g.title};
+    if (!others.length) return {...initial, shared:false};
     const members = await chrome.tabs.query({groupId: t.groupId});
     if (t.groupId < 0 || members.length !== 1 || members[0].id !== t.id)
       throw Error('owned_window_isolation_unproven');
-    const blankSeed = t => t.url === 'about:blank' ||
-      (t.url === '' && t.pendingUrl === 'about:blank');
-    const w = await chrome.windows.create({url: 'about:blank', focused: false});
-    if (!w.tabs || w.tabs.length !== 1 || w.tabs[0].windowId !== w.id ||
-        w.tabs[0].groupId !== -1 || !blankSeed(w.tabs[0]))
-      throw Error('owned_window_isolation_unproven');
-    const seedId = w.tabs[0].id;
-    await chrome.tabGroups.move(t.groupId, {windowId: w.id, index: -1});
-    const moved = await chrome.tabs.query({windowId: w.id});
-    if (moved.length !== 2 || !moved.some(x => x.id === t.id && x.groupId === t.groupId) ||
-        !moved.some(x => x.id === seedId && x.groupId === -1 && blankSeed(x)))
-      throw Error('owned_window_isolation_failed');
-    await chrome.tabs.remove(seedId);
-    const placed = await chrome.tabs.query({windowId: w.id});
-    if (placed.length !== 1 || placed[0].id !== t.id || placed[0].groupId !== t.groupId)
-      throw Error('owned_window_isolation_failed');
-  });
+    return {...initial, shared:true};
+  }, birth?.client_name);
+  if (birth) {
+    if (birth.connectorId !== null && origin.connectorId !== birth.connectorId)
+      throw Error('birth_connector_changed');
+    birth = {...birth,connectorId:origin.connectorId,sourceWindowId:origin.windowId};
+  }
+  record({stage:'observed', origin});
+  if (origin.shared) {
+    const marker = birth ? birth.marker : 'about:blank';
+    record({stage:'creating', origin});
+    const created = await connector.evaluate(async marker => {
+      const w = await chrome.windows.create({url:marker, focused:false});
+      const t = w.tabs?.[0];
+      if (!t || w.tabs.length !== 1 || t.windowId !== w.id || t.groupId !== -1 ||
+          !(t.url === marker || (t.url === '' && t.pendingUrl === marker)))
+        throw Error('owned_window_isolation_unproven');
+      return {windowId:w.id,seedId:t.id};
+    }, marker);
+    record({stage:'created', origin, ...created});
+    await connector.evaluate(async ({origin, created, marker}) => {
+      const blankSeed = t => t.url === marker || (t.url === '' && t.pendingUrl === marker);
+      const t = await chrome.tabs.getCurrent();
+      const members = await chrome.tabs.query({groupId:origin.groupId});
+      const destination = await chrome.tabs.query({windowId:created.windowId});
+      if (t.id !== origin.connectorId || t.windowId !== origin.windowId || t.groupId !== origin.groupId ||
+          destination.length !== 1 || destination[0].id !== created.seedId ||
+          destination[0].groupId !== -1 || !blankSeed(destination[0]) ||
+          members.length !== 1 || members[0].id !== t.id)
+        throw Error('owned_window_isolation_unproven');
+      await chrome.tabGroups.move(t.groupId, {windowId:created.windowId,index:-1});
+      const moved = await chrome.tabs.query({windowId:created.windowId});
+      if (moved.length !== 2 || !moved.some(x => x.id === t.id && x.groupId === t.groupId) ||
+          !moved.some(x => x.id === created.seedId && x.groupId === -1 && blankSeed(x)))
+        throw Error('owned_window_isolation_failed');
+    }, {origin, created, marker});
+    // Persist the isolated IDs BEFORE removing the unique seed. Even a lost
+    // remove response now leaves exact evidence outside the dying transport.
+    record({stage:'isolated', origin, ...created});
+    await connector.evaluate(async ({created, origin}) => {
+      await chrome.tabs.remove(created.seedId);
+      const placed = await chrome.tabs.query({windowId:created.windowId});
+      if (placed.length !== 1 || placed[0].id !== origin.connectorId ||
+          placed[0].groupId !== origin.groupId)
+        throw Error('owned_window_isolation_failed');
+    }, {created, origin});
+  } else {
+    record({stage:'isolated', origin, windowId:origin.windowId});
+  }
   const initial = await connector.evaluate(async () => {
     const t = await chrome.tabs.getCurrent();
     const g = await chrome.tabGroups.get(t.groupId);
@@ -239,4 +296,73 @@ async function newOwnedState(connector) {
     }, initial);
   };
   return s;
+}
+
+// Called only after the allocating transport has stopped, in the same Chrome
+// generation, through a fresh owned maintenance connector. No whole-window
+// removal: close only the nonce seed and the exact, client-verified connector.
+async function reconcileIsolationBirth(connector, birth) {
+  return connector.evaluate(async b => {
+    const read = async () => {
+      const tabs = await chrome.tabs.query({});
+      const seeds = tabs.filter(t => t.url === b.marker || (t.url === '' && t.pendingUrl === b.marker));
+      if (seeds.length > 1) throw Error('birth_marker_ambiguous');
+      const seed = seeds[0];
+      if (seed && (seed.groupId !== -1 || (b.seedId !== undefined && seed.id !== b.seedId) ||
+          (b.windowId !== undefined && seed.windowId !== b.windowId)))
+        throw Error('birth_seed_transferred');
+      const savedSeed = tabs.find(t => t.id === b.seedId);
+      if (savedSeed && savedSeed !== seed) throw Error('birth_seed_changed');
+      const removed = b.cleanup && Array.isArray(b.cleanup.tabIds) && b.cleanup.tabIds.length &&
+        b.cleanup.tabIds.every(id => !tabs.some(t => t.id === id)) && !seed;
+      if (b.stage === 'intent' || (b.stage === 'creating' && !seed && !removed))
+        throw Error('birth_creation_outcome_unknown');
+      if (b.stage === 'created' && !seed && !removed) throw Error('birth_seed_missing');
+      const own = tabs.find(t => t.id === b.connectorId);
+      if (!b.origin || b.origin.connectorId !== b.connectorId) throw Error('birth_origin_missing');
+      if (own) {
+        let exact = false;
+        try {
+          const u = new URL(own.url);
+          exact = u.protocol + '//' + u.host + u.pathname === b.connectorOrigin &&
+            JSON.parse(u.searchParams.get('client')).name === b.client_name;
+        } catch {}
+        const allowed = [b.origin.windowId, b.windowId, seed?.windowId];
+        if (!exact || !allowed.includes(own.windowId) ||
+            ![b.origin.groupId, -1].includes(own.groupId))
+          throw Error('birth_connector_changed');
+      }
+      const ids = [own?.id, seed?.id].filter(Number.isInteger);
+      const status = await chrome.runtime.sendMessage({type:'getStatus'});
+      if (!status || !Array.isArray(status.sessions) ||
+          status.sessions.some(s => !Array.isArray(s.tabIds)))
+        throw Error('birth_status_unavailable');
+      const targets = await chrome.debugger.getTargets();
+      if (status.sessions.some(s => s.tabIds.some(id => ids.includes(id))) ||
+          targets.some(t => ids.includes(t.tabId) && t.attached))
+        throw Error('birth_still_claimed');
+      const windowId = b.windowId ?? seed?.windowId ?? b.cleanup?.windowId ?? b.origin.windowId;
+      const proof = JSON.stringify([ids, windowId,
+        tabs.filter(t => t.windowId === windowId).map(t => [t.id,t.groupId]).sort()]);
+      return {ids, windowId, proof};
+    };
+    try {
+      const r = await read();
+      if (!b.remove) return r;
+      if (r.proof !== b.expected || (await read()).proof !== b.expected)
+        throw Error('birth_inventory_changed');
+      if (r.ids.length) await chrome.tabs.remove(r.ids);
+      const after = await chrome.tabs.query({});
+      if (after.some(t => r.ids.includes(t.id) || t.url === b.marker || t.pendingUrl === b.marker))
+        throw Error('birth_close_unverified');
+      const remains = (await chrome.windows.getAll()).some(w => w.id === r.windowId);
+      if (remains && !after.some(t => t.windowId === r.windowId))
+        throw Error('birth_window_close_unverified');
+      return {closed:true, tabIds:r.ids, windowId:r.windowId, windowClosed:!remains};
+    } catch (error) {
+      // Fixed labels only. No tab URLs, client names or extension tokens.
+      const reason = /^birth_[a-z_]+$/.test(error.message) ? error.message : 'birth_census_failed';
+      return {held:true,reason};
+    }
+  }, birth);
 }
