@@ -97,7 +97,7 @@ def formatter_inspection(command):
     if (
         len(parts) == 3
         and re.fullmatch(r"(?:.*/)?python3(?:\.\d+)?", parts[0])
-        and Path(parts[1]).name == "format_native_doc.py"
+        and Path(parts[1]).resolve() == Path(FORMATTER).resolve()
         and parts[2] == "--help"
     ):
         return True

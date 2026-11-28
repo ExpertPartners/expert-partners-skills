@@ -703,6 +703,7 @@ class ConnectorEvidenceTests(unittest.TestCase):
             "test -f /tmp/format_native_doc.py",
             "cat /tmp/format_native_doc.py",
             f"ls -l '{hook.FORMATTER}'",
+            f"python3 '{hook.FORMATTER}' --help",
         ]:
             for name in ["Bash", "Execute"]:
                 with self.subTest(command=command, name=name):
@@ -726,6 +727,7 @@ class ConnectorEvidenceTests(unittest.TestCase):
             "test -f /tmp/format_native_doc.py; " + WRITE["command"],
             'cat "$(python3 /tmp/format_native_doc.py)"',
             "python3 /tmp/format_native_doc.py --help; python3 /tmp/format_native_doc.py --document-id x",
+            "python3 /tmp/untrusted/format_native_doc.py --help",
         ]:
             with self.subTest(command=command):
                 self.assertTrue(hook.is_write("Bash", {"command": command}))
