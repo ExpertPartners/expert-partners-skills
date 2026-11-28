@@ -21,6 +21,50 @@ client_module = context_module.load_client()
 
 
 class WorkPreflightTests(unittest.TestCase):
+    def test_conflicting_known_id_and_outcome_cannot_route_to_the_wrong_owner(self):
+        self.policy["items"].append(
+            {
+                **self.policy["items"][0],
+                "id": "audit",
+                "aliases": ["brain auditor"],
+                "ownerSession": "audit-owner",
+            }
+        )
+        result = module.check(
+            self.policy,
+            {
+                "tool_name": "SendMessage",
+                "tool_input": {
+                    "workIntent": {
+                        "action": "continue",
+                        "capabilityId": "lesson",
+                        "outcome": "brain auditor",
+                    },
+                    "sessionId": "owner",
+                    "text": "Continue the assigned work.",
+                },
+            },
+        )
+        self.assertIsNotNone(result)
+        self.assertEqual(result[1]["id"], "audit")
+
+    def test_positive_recovery_survives_unrelated_negation(self):
+        for text in [
+            "Find original capstone homework without asking me.",
+            "Find original capstone homework and do not create a new tracker.",
+            "Do not build a replacement; find original capstone homework.",
+            "find /tmp -name 'capstone homework original' # do not create tracker",
+        ]:
+            self.assertIsNotNone(
+                module.check(self.policy, {"tool_name": "Execute", "tool_input": {"command": text}})
+            )
+        self.assertEqual(
+            context_module.closed_searches(
+                self.policy, "Find original capstone homework and do not create a new tracker."
+            ),
+            ["lesson"],
+        )
+
     def test_factory_startup_failure_refuses_prompt_instead_of_informational_exit_two(self):
         output = io.StringIO()
         with (

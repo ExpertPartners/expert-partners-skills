@@ -32,6 +32,16 @@ Secrets live only in 1Password and in the Worker's Cloudflare secrets. Nothing i
 
 Load or rotate them by piping from `op` into `wrangler secret bulk`, never on a command line.
 
+## Source decision authority
+
+Every dispatch checks the existing owning assignments, installed marketplace and live gap dispositions. Source recovery is resolved separately from implementation ownership. The private routing seed pins `decisionLogUrl`, `founderDecisionActor` and `decisionReceiptDigest`. Gap URLs and status edits never supply founder authority.
+
+The existing decision document contains `SOURCE RECOVERY DECISION BEGIN v1` / `SOURCE RECOVERY DECISION END` JSON receipts. Each names an ID, recording time, action, founder, exact predecessor, capabilities and aliases, and provenance containing a unique human entry heading, its actual instruction quote and canonical source URL. A reopening must reference the active closure and a separate human entry with the explicit statement `FOUNDER explicitly superseded source recovery closure RECEIPT_ID for CAPABILITY_ID.` An actor label or copied closure instruction is insufficient.
+
+The trusted digest covers the complete canonical receipt history. Reads never advance it. When the existing decision-writing owner records an evidenced founder decision, that same owner validates the full chain, retains every historical receipt and alias, updates the existing private seed's closed-item fallback projection, then publishes the matching digest. Preserve current implementation owners, assignments and approval state. Publish the fallback closures and digest in the same existing seed save and verify readback. This is an integrity publication, not an approval or another tracker. Never refresh the digest merely to silence a mismatch.
+
+Missing, edited, truncated, replayed, forked, unsupported or unstable authority fails source recovery closed. Unrelated document edits do not change the canonical receipt digest. Approved implementation may continue with its current live owner during a source-authority outage. A removed implementation row retains its known source closure but cannot invent an owner or approval. IDs and registered outcome aliases are resolved independently; conflicts and ambiguous outcomes cannot dispatch work.
+
 ## Daily System health refresh
 
 `refresh_hub_system_health({})` uses the existing MCP and bearer-authenticated HTTP surfaces. It makes one bodyless POST to the fixed Hub System health endpoint with the dedicated server-side secret. Call it only after the existing daily routine has saved and read back its real pass or fail receipt. It adds no scheduler, shell executor, arbitrary URL, credential input or source-body output.

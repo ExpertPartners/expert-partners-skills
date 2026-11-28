@@ -49,6 +49,7 @@ def context(policy, prompt):
         "Use each disposition's owner field as the accountable routing owner. A delegated implementation child does not replace that owner. "
         "Use the current live disposition for implementation status. Older capacity anecdotes do not establish a current blocker. "
         "Source recovery and implementation are independent. A closed source never becomes a hunt because an original is missing. "
+        "The decisionAuthority status below identifies whether recovery authority was verified. Unverified authority never permits source recovery, but does not cancel current approved implementation ownership. "
         "Do not search for originals for any closed disposition below. Do not create an equivalent assignment under a different name. "
         "Continue authorized implementation, not source recovery. Preserve the founder-approved phase and week sequence.\n"
         + json.dumps(
@@ -70,13 +71,22 @@ def context(policy, prompt):
 
 
 def closed_searches(policy, prompt):
-    sentences = re.split(r"[.!?\n]+", prompt.lower())
+    sentences = re.split(
+        r"[.!?\n;#]+|\b(?:and|but|then)\s+(?=(?:do not|don\x27t|never|stop|search|hunt|recover|find|locate|build(?!\s+101\b)|commission|rebuild|create|implement)\b)",
+        prompt.lower(),
+    )
     requested = []
     for item in policy["items"]:
-        if item["sourceRecovery"] != "closed":
+        if (
+            item["sourceRecovery"] not in ("closed", "unverified")
+            and policy.get("source", {}).get("decisionAuthority", {}).get("status") == "verified"
+        ):
             continue
         for sentence in sentences:
-            if re.search(r"\b(no|not|never|don't|closed|rejected|without|stop)\b", sentence):
+            if re.search(
+                r"\b(?:do not|don't|never|stop)\s+(?:\w+\s+){0,2}(?:search|hunt|recover|find|locate|build|commission|rebuild|create|implement)\b|^\s*(?:no|closed|rejected)\b",
+                sentence,
+            ):
                 continue
             if re.search(
                 r"\b(find|search|recover|hunt|locate)\b.{0,140}\b(original|source|video|homework)\b",

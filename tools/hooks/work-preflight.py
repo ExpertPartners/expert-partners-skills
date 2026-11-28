@@ -41,39 +41,72 @@ def check(policy, data):
     commissioning = bool(
         re.search(r"post_message|create_session|start_and_watch|SendMessage", tool, re.I)
     )
+    authority = policy.get("source", {}).get("decisionAuthority", {})
+    authority_unverified = authority.get("status") != "verified"
+    fallback = {
+        "id": (intent or {}).get("capabilityId", "unreconciled"),
+        "ownerSession": "",
+        "decisionUrl": policy.get("source", {}).get("url", ""),
+    }
+    if intent:
+        normalize = lambda value: re.sub(r"[^a-z0-9]+", " ", value.lower()).strip()
+        direct = next((i for i in policy["items"] if i["id"] == intent.get("capabilityId")), None)
+        outcome = normalize(intent.get("outcome", ""))
+        matches = [
+            i
+            for i in policy["items"]
+            if outcome and any(normalize(a) == outcome for a in [i["id"]] + i["aliases"])
+        ]
+        action = intent.get("action")
+        if action in ("source_search", "replacement_build", "continue"):
+            if len(matches) > 1:
+                return "AMBIGUOUS_CAPABILITY_OUTCOME", fallback
+            if direct and matches and matches[0]["id"] != direct["id"]:
+                return "CAPABILITY_OUTCOME_CONFLICT", matches[0]
+            resolved = direct or (matches[0] if matches else None)
+            if not resolved:
+                return "RECONCILE_FIRST", fallback
+            if action == "source_search":
+                if resolved["sourceRecovery"] == "closed":
+                    return "SOURCE_RECOVERY_CLOSED", resolved
+                if authority_unverified or resolved["sourceRecovery"] == "unverified":
+                    return "SOURCE_AUTHORITY_UNVERIFIED", resolved
+            if action == "replacement_build":
+                return "CAPABILITY_EXISTS" if resolved[
+                    "installed"
+                ] else "EXISTING_BUILD_OWNER", resolved
+            if action == "continue" and not (
+                resolved["replacementApproved"] and target == resolved["ownerSession"]
+            ):
+                return "EXISTING_OWNER_CONTINUATION", resolved
     # Folder-scoped reads inspect existing work; unscoped name searches can
     # otherwise reopen closed recovery before any dispatch guard is reached.
     scoped_listing = bool("list_files" in tool and re.search(r"\bin parents\b", payload))
     if data.get("closedSearches") and search_tool and not scoped_listing:
         target = next((i for i in policy["items"] if i["id"] in data["closedSearches"]), None)
         if target:
-            return "SOURCE_RECOVERY_CLOSED", target
+            return "SOURCE_RECOVERY_CLOSED" if target[
+                "sourceRecovery"
+            ] == "closed" else "SOURCE_AUTHORITY_UNVERIFIED", target
     for item in policy["items"]:
         matched = any(a.lower() in payload for a in [item["id"]] + item["aliases"])
-        if intent and intent.get("capabilityId") == item["id"]:
-            action = intent.get("action")
-            if action == "source_search" and item["sourceRecovery"] == "closed":
-                return "SOURCE_RECOVERY_CLOSED", item
-            if action == "replacement_build":
-                return "CAPABILITY_EXISTS" if item["installed"] else "EXISTING_BUILD_OWNER", item
-            if action == "continue" and not (
-                item["replacementApproved"] and target == item["ownerSession"]
-            ):
-                return "EXISTING_OWNER_CONTINUATION", item
         if not matched:
             continue
         # Negative instructions/receipts are inspection, not a positive commission.
         sentences = re.split(
-            r"[.!?\n]+",
+            r"[.!?\n;#]+|\b(?:and|but|then)\s+(?=(?:do not|don\x27t|never|stop|search|hunt|recover|find|locate|build(?!\s+101\b)|commission|rebuild|create|implement)\b)",
             str(ti.get("text") or ti.get("command") or ti.get("cmd") or ti.get("query") or payload),
         )
         for sentence in sentences:
             lower = sentence.lower()
             if not any(a.lower() in lower for a in [item["id"]] + item["aliases"]):
                 continue
-            if re.search(r"\b(no|not|never|don't|without|closed|rejected|stop)\b", lower):
+            if re.search(
+                r"\b(?:do not|don't|never|stop)\s+(?:\w+\s+){0,2}(?:search|hunt|recover|find|locate|build|commission|rebuild|create|implement)\b|^\s*(?:no|closed|rejected)\b",
+                lower,
+            ):
                 continue
-            if item["sourceRecovery"] == "closed" and (
+            if (item["sourceRecovery"] in ("closed", "unverified") or authority_unverified) and (
                 search_tool
                 and not scoped_listing
                 or shell
@@ -81,11 +114,13 @@ def check(policy, data):
                     r"\b(curl|wget|yt-dlp|search|firecrawl|recover|hunt|find|locate)\b", lower
                 )
             ):
-                return "SOURCE_RECOVERY_CLOSED", item
+                return "SOURCE_RECOVERY_CLOSED" if item[
+                    "sourceRecovery"
+                ] == "closed" else "SOURCE_AUTHORITY_UNVERIFIED", item
             if commissioning and re.search(
-                r"^\s*(?:please\s+)?(?:build|commission|rebuild|create|implement)\b|"
+                r"^\s*(?:please\s+)?(?:build(?!\s+101\b)|commission|rebuild|create|implement)\b|"
                 r"\b(?:please|you must|need you to|want you to|your task is to)\s+"
-                r"(?:build|commission|rebuild|create|implement)\b",
+                r"(?:build(?!\s+101\b)|commission|rebuild|create|implement)\b",
                 lower,
             ):
                 return "CAPABILITY_EXISTS" if item["installed"] else "EXISTING_BUILD_OWNER", item
