@@ -39,6 +39,15 @@ def validate(evidence):
         if claim.get("basis") in ("name", "length", "similarity", "count"):
             errors.append(f"{label}: a heuristic is not confirmation")
     for index, piece in enumerate(evidence.get("pieces", [])):
+        gaps = piece.get(
+            "gaps", piece.get("missingFields", piece.get("missingOrUnresolvedFields", []))
+        )
+        if piece.get("contentStatus") == "thin" and not gaps:
+            errors.append(f"pieces[{index}]: a thin judgment needs explicit field or evidence gaps")
+        if gaps:
+            rendered = evidence.get("renderedReportText")
+            if not isinstance(rendered, str) or any(gap not in rendered for gap in gaps):
+                errors.append(f"pieces[{index}]: rendered report omits declared gaps")
         if piece.get("contentStatus") not in ("healthy", "filled", "verified"):
             continue
         label = f"pieces[{index}]"
