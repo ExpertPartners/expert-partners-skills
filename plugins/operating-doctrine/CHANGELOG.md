@@ -1,3 +1,6 @@
+## 3.16.9 - 2026-11-28
+
+Isolate temporary browser cleanup connections with the existing owned-window initializer. Cleanup now preserves peer tabs when the extension initially places its connection in a shared window.
 ## 3.16.8 - 2026-11-28
 
 Validate declared field gaps against the actual rendered Auditor report before commit and after readback. Reject thin findings with no explicit gap and reports that drop their evidence lists.
