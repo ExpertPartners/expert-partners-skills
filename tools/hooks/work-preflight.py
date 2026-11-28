@@ -16,6 +16,8 @@ import sys
 
 def check(policy, data):
     ti = data.get("tool_input") or {}
+    if isinstance(ti, str):
+        ti = {"code": ti}
     intent = ti.get("workIntent") or ti.get("work_intent")
     target = ti.get("sessionId")
     tool = data.get("tool_name", "")
@@ -33,6 +35,8 @@ def check(policy, data):
         "container.exec",
         "Script",
         "functions.exec",
+        "exec",
+        "shell_command",
     }
     commissioning = bool(
         re.search(r"post_message|create_session|start_and_watch|SendMessage", tool, re.I)
@@ -73,7 +77,9 @@ def check(policy, data):
                 search_tool
                 and not scoped_listing
                 or shell
-                and re.search(r"\b(curl|wget|yt-dlp|search|firecrawl|recover|hunt)\b", lower)
+                and re.search(
+                    r"\b(curl|wget|yt-dlp|search|firecrawl|recover|hunt|find|locate)\b", lower
+                )
             ):
                 return "SOURCE_RECOVERY_CLOSED", item
             if commissioning and re.search(
@@ -96,7 +102,7 @@ def main():
         name = data.get("tool_name", "")
         serialized = json.dumps(data.get("tool_input", {}))
         critical = re.search(
-            r"search|firecrawl|web__run|browser|list_files|post_message|create_session|start_and_watch|SendMessage",
+            r"search|firecrawl|web__run|browser|list_files|post_message|create_session|start_and_watch|SendMessage|\bfind\b|\blocate\b|\brecover\b|\bhunt\b",
             name + serialized,
             re.I,
         )
