@@ -77,6 +77,25 @@ def main():
             prompts.insert(
                 0, {"hooks": [{"type": "command", "command": context_command, "timeout": 50}]}
             )
+            if relative == ".factory/hooks.json":
+                # Real headless replay observed UserPromptSubmit omitted on a
+                # no-tool path. SessionStart is independently observed to run.
+                starts = root.setdefault("SessionStart", [])
+                starts[:] = [
+                    h
+                    for h in starts
+                    if not any(
+                        "/work-preflight-context.py" in x.get("command", "")
+                        for x in h.get("hooks", [])
+                    )
+                ]
+                starts.insert(
+                    0,
+                    {
+                        "matcher": "",
+                        "hooks": [{"type": "command", "command": context_command, "timeout": 50}],
+                    },
+                )
             ends = root.setdefault("SessionEnd", [])
             ends[:] = [
                 h
